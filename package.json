@@ -30,5 +30,8 @@
     "ts-jest": "^23.10.4",
     "typescript": "^3.9.3",
     "uglify-js": "^3.4.9"
+  },
+  "dependencies": {
+    "axios": "^0.19.2"
   }
 }
