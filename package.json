@@ -2,7 +2,7 @@
   "name": "qaseio",
   "version": "0.0.1",
   "description": "Qase TMS Javascript Api Client",
-  "main": "./dist/qaseio.min.js",
+  "main": "./dist/qaseio.js",
   "types": "./dist/qaseio.d.ts",
   "scripts": {
     "dev": "npm run lint && tsc",
@@ -16,6 +16,7 @@
   "author": "Parviz Khavari <csctclan@gmail.com>",
   "license": "Apache 2.0",
   "devDependencies": {
+    "@hutson/npm-deploy-git-tag": "^6.0.0",
     "@types/jest": "^23.3.7",
     "@typescript-eslint/eslint-plugin": "^3.0.2",
     "@typescript-eslint/eslint-plugin-tslint": "^3.0.2",
