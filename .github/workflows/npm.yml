@@ -28,4 +28,4 @@ jobs:
         registry-url: 'https://registry.npmjs.org'
     - run: npm install
     - run: npm run build
-    - run: npx npm-deploy-git-tag --token=${{ secrets.NPM_TOKEN }} -a public
+    - run: npx npm-deploy-git-tag --token ${{ secrets.NPM_TOKEN }} -a public
