@@ -7,16 +7,17 @@ export class BaseService {
         this.api = api;
     }
 
-    public validateResponse<T>(): (response: AxiosResponse) => T | undefined {
+    public validateResponse<T>(): (response: AxiosResponse) => AxiosResponse<T | any> {
         interface QaseResponse {
             status: boolean;
             result: T;
         }
-        return (response: AxiosResponse): T | undefined => {
+        return (response: AxiosResponse): AxiosResponse<T | any> => {
             const resp: QaseResponse = response.data as QaseResponse;
             if (resp.status) {
-                return resp.result;
+                response.data = resp.result;
             }
+            return response;
         };
     }
 }
