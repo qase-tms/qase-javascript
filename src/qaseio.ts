@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { Projects } from './services/projects';
 
 
-export class QaseIo {
+export class QaseApi {
     public projects: Projects;
 
     private api: AxiosInstance;

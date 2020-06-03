@@ -1,7 +1,7 @@
 import 'jest';
 import axios, { AxiosResponse } from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { QaseIo } from '../../src/qaseio';
+import { QaseApi } from '../../src/qaseio';
 import { ProjectList, ProjectInfo, ProjectCreated, ProjectCreate } from '../../src/models';
 import { list, project, statusTrue } from "../data";
 
@@ -16,7 +16,7 @@ describe('Project api', () => {
         it('Get all projects', () => {
             const content = list(project())
             mock.onGet("/project").reply(200, statusTrue(content))
-            const client = new QaseIo('123')
+            const client = new QaseApi('123')
             client.projects.getAll(params.limit, params.offset).then((resp: AxiosResponse<ProjectList>) => {
                 expect(resp.config.params).toEqual(params)
                 expect(resp.data).toEqual(content as ProjectList)
@@ -27,7 +27,7 @@ describe('Project api', () => {
     it('Get specific project', () => {
         const content = project()
         mock.onGet("/project/TEST").reply(200, statusTrue(content))
-        const client = new QaseIo('123')
+        const client = new QaseApi('123')
         client.projects.get("TEST").then((resp: AxiosResponse<ProjectInfo>) => {
             expect(resp.data).toEqual(content as ProjectInfo)
         })
@@ -40,7 +40,7 @@ describe('Project api', () => {
     ]).forEach(({status, content, equal}) => {
         it('Check project exists', () => {
             mock.onGet("/project/TEST").reply(status, statusTrue(content))
-            const client = new QaseIo('123')
+            const client = new QaseApi('123')
             client.projects.exists("TEST").then((exists: boolean) => {
                 expect(exists).toEqual(equal)
             })
@@ -50,7 +50,7 @@ describe('Project api', () => {
     it('Create new project', () => {
         const content = {code: "TEST"}
         mock.onPost("/project").reply(200, statusTrue(content))
-        const client = new QaseIo('123')
+        const client = new QaseApi('123')
         const create = new ProjectCreate("new project", "TEST")
         client.projects.create(create).then((resp: AxiosResponse<ProjectCreated>) => {
             expect(resp.config.data).toEqual(JSON.stringify(create))
