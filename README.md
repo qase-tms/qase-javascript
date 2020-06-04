@@ -69,3 +69,40 @@ qase.projects.create(prj).then((res) => {
     console.log(res.data)  // ProjectCreated{...}
 })
 ```
+
+### Test cases ###
+
+#### Get all test cases ####
+This method allows to retrieve all test cases stored in selected project. You can you limit and offset params to paginate.
+
+```typescript
+qase.cases.getAll("PRJCODE").then((res) => {
+    console.log(res.data)  // TestCaseList{...}
+})
+```
+
+#### Get a specific test case ####
+This method allows to retrieve a specific test case.
+
+```typescript
+qase.cases.get("PRJCODE", 4).then((res) => {
+    console.log(res.data)  // TestCaseInfo{...}
+})
+```
+
+#### Check test case exists ####
+
+```typescript
+qase.cases.exists("PRJCODE", 4).then((exists) => {
+    console.log(exists)  // boolean
+})
+```
+
+#### Delete test case ####
+This method completely deletes a test case from repository.
+
+```typescript
+qase.cases.delete("PRJCODE", 4).then((res) => {
+    console.log(res)  // AxiosResponse
+})
+```
