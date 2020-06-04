@@ -23,9 +23,7 @@ export class Projects extends BaseService {
     }
 
     public exists(code: string): Promise<boolean> {
-        return this.api
-            .get(`/project/${code}`)
-            .then(this.validateResponse<ProjectInfo>())
+        return this.get(code)
             .then((resp: AxiosResponse<ProjectInfo>) => Boolean(resp.data.code))
             .catch(() => false);
     }
