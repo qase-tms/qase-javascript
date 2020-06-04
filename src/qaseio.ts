@@ -1,9 +1,11 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import { Cases } from './services/cases';
 import { Projects } from './services/projects';
 
 
 export class QaseApi {
     public projects: Projects;
+    public cases: Cases;
 
     private api: AxiosInstance;
 
@@ -17,5 +19,6 @@ export class QaseApi {
         this.api = axios.create(config);
 
         this.projects = new Projects(this.api);
+        this.cases = new Cases(this.api);
     }
 }
