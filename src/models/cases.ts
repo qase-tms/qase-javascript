@@ -1,4 +1,27 @@
-import { BaseList } from './base';
+/* eslint-disable camelcase */
+import { Automation, BaseList, Behavior, Priority, Severity, Type } from './base';
+
+export enum TestCaseStatus {
+    ACTUAL = 'actual',
+    DRAFT = 'draft',
+    DEPRECATED = 'deprecated',
+}
+
+export class TestCaseFilters {
+    public constructor(
+        public filter: {
+            search?: string;
+            milestone_id?: number;
+            suite_id?: number;
+            severity?: Severity[];
+            priority?: Priority[];
+            type?: Type[];
+            behavior?: Behavior[];
+            automation?: Automation[];
+            status?: TestCaseStatus[];
+        }
+    ) {}
+}
 
 export interface TestCaseInfo{
     id: any;

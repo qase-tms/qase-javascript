@@ -17,7 +17,7 @@ describe('Project api', () => {
             const content = list(project())
             mock.onGet("/project").reply(200, statusTrue(content))
             const client = new QaseApi('123')
-            const resp: AxiosResponse<ProjectList> = await client.projects.getAll(params.limit, params.offset)
+            const resp: AxiosResponse<ProjectList> = await client.projects.getAll(params)
             expect(resp.config.params).toEqual(params)
             expect(resp.data).toEqual(content as ProjectList)
         })

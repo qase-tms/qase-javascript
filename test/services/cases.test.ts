@@ -2,7 +2,7 @@ import 'jest';
 import axios, { AxiosResponse } from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { QaseApi } from '../../src/qaseio';
-import { TestCaseInfo, TestCaseList } from '../../src/models';
+import { TestCaseInfo, TestCaseList, TestCaseFilters, Filter, Automation } from '../../src/models';
 import { list, cases, statusTrue } from "../data";
 
 const mock = new MockAdapter(axios);
@@ -17,7 +17,7 @@ describe('Case api', () => {
             const content = list(cases())
             mock.onGet("/case/TEST").reply(200, statusTrue(content))
             const client = new QaseApi('123')
-            const resp: AxiosResponse<TestCaseList> = await client.cases.getAll("TEST", params.limit, params.offset)
+            const resp: AxiosResponse<TestCaseList> = await client.cases.getAll("TEST", params)
             expect(resp.config.params).toEqual(params)
             expect(resp.data).toEqual(content as TestCaseList)
         })
@@ -49,5 +49,14 @@ describe('Case api', () => {
         const client = new QaseApi('123')
         const resp: AxiosResponse<undefined> = await client.cases.delete("TEST", 123)
         expect(resp.data).toEqual({})
+    })
+    
+    it('Validate filters', () => {
+        const filter = new Filter(new TestCaseFilters(
+            {automation: [Automation.AUTOMATED, Automation.IS_NOT_AUTOMATED], search: "name", suite_id: 10}
+        ).filter);
+        expect(filter.filter()).toEqual(
+            {"filter[automation]": "automated,is-not-automated", "filter[search]": "name", "filter[suite_id]": 10}
+        )
     })
 })

@@ -76,7 +76,7 @@ qase.projects.create(prj).then((res) => {
 This method allows to retrieve all test cases stored in selected project. You can you limit and offset params to paginate.
 
 ```typescript
-qase.cases.getAll("PRJCODE").then((res) => {
+qase.cases.getAll("PRJCODE", { limit: 10, offset: 20 }).then((res) => {
     console.log(res.data)  // TestCaseList{...}
 })
 ```

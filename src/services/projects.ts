@@ -1,10 +1,10 @@
-import { ProjectCreate, ProjectCreated, ProjectInfo, ProjectList } from '../models';
+import { BaseGetAllParams, ProjectCreate, ProjectCreated, ProjectInfo, ProjectList } from '../models';
 import { AxiosResponse } from 'axios';
 import { BaseService } from '.';
 
 
 export class Projects extends BaseService {
-    public getAll(limit?: number, offset?: number): Promise<AxiosResponse<ProjectList>> {
+    public getAll({limit, offset}: BaseGetAllParams): Promise<AxiosResponse<ProjectList>> {
         return this.api
             .get('/project', {params: {limit, offset}})
             .then(this.validateResponse<ProjectList>());

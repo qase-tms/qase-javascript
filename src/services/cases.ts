@@ -1,12 +1,16 @@
-import { TestCaseInfo, TestCaseList } from '../models';
+import { BaseGetAllParams, Filter, TestCaseFilters, TestCaseInfo, TestCaseList } from '../models';
 import { AxiosResponse } from 'axios';
 import { BaseService } from '.';
 
+interface CasesGetAllParams extends BaseGetAllParams {
+    filters?: TestCaseFilters;
+}
 
 export class Cases extends BaseService {
-    public getAll(code: string, limit?: number, offset?: number): Promise<AxiosResponse<TestCaseList>> {
+    public getAll(code: string, {limit, offset, filters}: CasesGetAllParams): Promise<AxiosResponse<TestCaseList>> {
+        const filterParams: Record<string, string> = new Filter(filters?.filter).filter();
         return this.api
-            .get(`/case/${code}`, {params: {limit, offset}})
+            .get(`/case/${code}`, {params: {limit, offset, ...filterParams}})
             .then(this.validateResponse<TestCaseList>());
     }
 
