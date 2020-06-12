@@ -52,5 +52,5 @@ export interface TestCaseInfo{
 }
 
 export interface TestCaseList extends BaseList {
-    entities: TestCaseList[];
+    entities: TestCaseInfo[];
 }
