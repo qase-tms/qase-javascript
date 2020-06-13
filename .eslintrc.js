@@ -158,8 +158,7 @@ module.exports = {
         "jsdoc/check-indentation": "error",
         "jsdoc/newline-after-description": "error",
         "max-classes-per-file": [
-            "error",
-            1
+            "off"
         ],
         "max-len": [
             "error",
