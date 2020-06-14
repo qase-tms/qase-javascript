@@ -4,5 +4,8 @@
 **/tslint.json
 **/webpack.config.ts
 **/jest.config.js
-src
-demo
+test/**
+coverage/**
+src/**
+demo/**
+dist/test/**
