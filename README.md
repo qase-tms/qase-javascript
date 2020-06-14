@@ -106,3 +106,52 @@ qase.cases.delete("PRJCODE", 4).then((res) => {
     console.log(res)  // AxiosResponse
 })
 ```
+
+### Test runs ###
+
+#### Get all test runs ####
+This method allows to retrieve all test runs stored in selected project. You can you limit and offset params to paginate.
+
+```typescript
+qase.runs.getAll("PRJCODE", {include: 'cases'}).then((res) => {
+    console.log(res.data)  // RunList{...}
+})
+```
+
+#### Get a specific test run ####
+This method allows to retrieve a specific test run.
+
+```typescript
+qase.runs.get("PRJCODE", 4).then((res) => {
+    console.log(res.data)  // RunInfo{...}
+})
+```
+
+#### Check test run exists ####
+
+```typescript
+qase.runs.exists("PRJCODE", 4).then((exists) => {
+    console.log(exists)  // boolean
+})
+```
+
+#### Create a new test run ####
+This method is used to create a new test run through API.
+
+```typescript
+import { RunCreate } from 'qaseio.models';
+
+const run = new RunCreate("Test run", [1, 2, 3], { description: "some desc" })
+qase.runs.create(run).then((res) => {
+    console.log(res.data)  // RunCreated{...}
+})
+```
+
+#### Delete test run ####
+This method completely deletes a test run from repository.
+
+```typescript
+qase.runs.delete("PRJCODE", 4).then((res) => {
+    console.log(res)  // AxiosResponse
+})
+```
