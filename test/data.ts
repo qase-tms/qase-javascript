@@ -61,6 +61,23 @@ export const run = (): Record<any, any> => ({
     cases: [1, 2, 3],
 });
 
+export const result = (): Record<any, any> => ({
+    hash: '6efce6e4f9de887a2ee863e8197cb74ab626a273',
+    comment: 'some comment',
+    stacktrace: 'some stacktrace',
+    run_id: 1,
+    case_id: 1,
+    steps: null,
+    status: 'Passed',
+    is_api_result: true,
+    time_spent: 0,
+    end_time: '2018-11-11 11:11:11',
+    attachments: [
+        '6efce6e4f9de887a2ee863e8197cb74ab626a271',
+        '6efce6e4f9de887a2ee863e8197cb74ab626a272',
+    ],
+});
+
 export const list = (data: Record<any, any>): Record<any, any> => ({
     total: 10,
     filtered: 10,

@@ -155,3 +155,62 @@ qase.runs.delete("PRJCODE", 4).then((res) => {
     console.log(res)  // AxiosResponse
 })
 ```
+
+### Test run results ###
+
+#### Get all test run results ####
+This method allows to retrieve all test run results stored in selected project. You can you limit and offset params to paginate.
+
+```typescript
+qase.results.getAll("PRJCODE").then((res) => {
+    console.log(res.data)  // ResultList{...}
+})
+```
+
+#### Get a specific test run result ####
+This method allows to retrieve a specific test run result.
+
+```typescript
+qase.results.get("PRJCODE", "2898ba7f3b4d857cec8bee4a852cdc85f8b33132").then((res) => {
+    console.log(res.data)  // ResultInfo{...}
+})
+```
+
+#### Create a new test run result ####
+This method is used to create a new test run result through API.
+
+```typescript
+import { ResultCreate, ResultStatus, ResultStepCreate } from 'qaseio.models';
+
+const result = new ResultCreate(123, ResultStatus.PASSED, {
+    comment: "some comment",
+    steps: [new ResultStepCreate(1, ResultStatus.PASSED)]
+})
+qase.results.create("PRJCODE", 4, result).then((res) => {
+    console.log(res.data)  // ResultCreated{...}
+})
+```
+
+#### Update test run result ####
+This method is used to update existing test run result through API.
+
+```typescript
+import { ResultUpdate, ResultStatus, ResultStepCreate } from 'qaseio.models';
+
+const result = new ResultUpdate(ResultStatus.PASSED, {
+    comment: "some comment",
+    steps: [new ResultStepCreate(2, ResultStatus.PASSED)]
+})
+qase.results.update("PRJCODE", 4, "2898ba7f3b4d857cec8bee4a852cdc85f8b33132", result).then((res) => {
+    console.log(res.data)  // ResultCreated{...}
+})
+```
+
+#### Delete test run result ####
+This method completely deletes a test run result from repository.
+
+```typescript
+qase.results.delete("PRJCODE", 4, "2898ba7f3b4d857cec8bee4a852cdc85f8b33132").then((res) => {
+    console.log(res)  // AxiosResponse
+})
+```
