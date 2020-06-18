@@ -5,6 +5,7 @@ export enum ResultStatus {
     IN_PROGRESS = 'in_progress',
     PASSED = 'passed',
     FAILED = 'failed',
+    SKIPPED = 'skipped',
     BLOCKED = 'blocked',
 }
 
