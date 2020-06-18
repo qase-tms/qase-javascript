@@ -1,8 +1,11 @@
 import 'jest';
-import { QaseCypressReporter } from '../src';
+import mocha from 'mocha';
+import QaseCypressReporter from '../src';
 
 describe('Client', () => {
     it('Init client', () => {
-        new QaseCypressReporter();
+        const runner = new mocha.Runner(new mocha.Suite('new'), false)
+        const options = {reporterOptions: {apiToken: ""}};
+        new QaseCypressReporter(runner, options);
     });
 });
