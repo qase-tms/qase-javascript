@@ -7,3 +7,9 @@
 ```
 npm install cypress-qase-reporter
 ```
+
+## Configuration
+
+## Using Reporter
+
+## Running Qase Reporter

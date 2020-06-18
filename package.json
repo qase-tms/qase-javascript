@@ -36,6 +36,7 @@
     "@typescript-eslint/eslint-plugin-tslint": "^3.0.2",
     "@typescript-eslint/parser": "^3.0.2",
     "axios-mock-adapter": "^1.18.1",
+    "cypress": "^4.8.0",
     "eslint": "^7.1.0",
     "eslint-loader": "^3.0.2",
     "eslint-plugin-jsdoc": "^26.0.1",
@@ -48,6 +49,6 @@
   },
   "dependencies": {
     "mocha": "^8.0.1",
-    "qaseio": "^1.0.3"
+    "qaseio": "^1.0.4"
   }
 }
