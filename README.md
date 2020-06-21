@@ -18,7 +18,8 @@ cypress.json configuration:
     "reporterOptions": {
         "apiToken": "578e3b73a34f06e84eafea103cd44dc24253b2c5",
         "projectCode": "PRJCODE",
-        "runId": 45
+        "runId": 45,
+        "logging": true  # Show debug logs for run
     }
 }
 ```
@@ -63,3 +64,5 @@ To start cypress run with qase reporter run it like this:
 ```bash
 QASE_REPORT=1 npx cypress run
 ```
+
+![Reporter in console](docs/stdout.png)

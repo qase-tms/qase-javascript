@@ -30,6 +30,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@hutson/npm-deploy-git-tag": "^6.0.0",
+    "@types/chalk": "^2.2.0",
     "@types/jest": "^23.3.7",
     "@types/mocha": "^7.0.2",
     "@typescript-eslint/eslint-plugin": "^3.0.2",
@@ -48,6 +49,7 @@
     "typescript": "^3.9.3"
   },
   "dependencies": {
+    "chalk": "^4.1.0",
     "mocha": "^8.0.1",
     "qaseio": "^1.0.4"
   }

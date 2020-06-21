@@ -2,13 +2,13 @@
 import { MochaOptions, Runner, Test, reporters } from 'mocha';
 import { ResultCreate, ResultCreated, ResultStatus } from 'qaseio/dist/src/models';
 import { QaseApi } from 'qaseio';
+import chalk from 'chalk';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const {
     EVENT_TEST_FAIL,
     EVENT_TEST_PASS,
     EVENT_TEST_PENDING,
-    EVENT_RUN_BEGIN,
     EVENT_RUN_END,
 } = Runner.constants;
 
@@ -22,6 +22,7 @@ interface QaseOptions {
     projectCode: string;
     runId?: string;
     runPrefix?: string;
+    logging?: boolean;
 }
 
 class CypressQaseReporter extends reporters.Base {
@@ -41,15 +42,44 @@ class CypressQaseReporter extends reporters.Base {
             return;
         }
 
-        runner.on(EVENT_RUN_BEGIN, () => {
-            if (this.getEnv(Envs.runId)) {
-                this.saveRunId(this.getEnv(Envs.runId));
-            }
-            if (!this.runId) {
-                this.saveRunId(this.options.runId);
-            }
-        });
+        this.addRunnerListeners(runner);
 
+        this.checkProject(
+            this.options.projectCode,
+            (prjExists) => {
+                if (prjExists) {
+                    this.log(chalk`{green Project ${this.options.projectCode} exists}`);
+                    if (this.getEnv(Envs.runId)) {
+                        this.saveRunId(this.getEnv(Envs.runId));
+                    }
+                    if (!this.runId) {
+                        this.saveRunId(this.options.runId);
+                    }
+                    this.checkRun(
+                        this.runId,
+                        (runExists: boolean) => {
+                            const run = this.runId as unknown as string;
+                            if (runExists) {
+                                this.log(chalk`{green Using run ${run} to publish test results}`);
+                            } else {
+                                this.log(chalk`{red Run ${run} does not exist}`);
+                            }
+                        }
+                    );
+                } else {
+                    this.log(chalk`{red Project ${this.options.projectCode} does not exist}`);
+                }
+            }
+        );
+    }
+
+    private log(message?: any, ...optionalParams: any[]) {
+        if (this.options.logging){
+            console.log(chalk`{bold {blue qase:}} ${message}`, ...optionalParams);
+        }
+    }
+
+    private addRunnerListeners(runner: Runner) {
         runner.on(EVENT_TEST_PASS, (test: Test) => {
             this.publishCaseResult(test, ResultStatus.PASSED);
         });
@@ -63,14 +93,43 @@ class CypressQaseReporter extends reporters.Base {
         });
 
         runner.on(EVENT_RUN_END, () => {
-            if (this.results.length === 0) {
-                console.warn(
-                    `\n(Qase Reporter)
-                    \nNo testcases were matched.
-                    Ensure that your tests are declared correctly.\n`
-                );
-            }
+            const check = () => {
+                setTimeout(() => {
+                    if (this.pending) {
+                        check();
+                    } else {
+                        if (this.results.length === 0) {
+                            console.warn(
+                                `\n(Qase Reporter)
+                                \nNo testcases were matched.
+                                Ensure that your tests are declared correctly.\n`
+                            );
+                        }
+                    }
+                }, 1000);
+            };
+            check();
         });
+    }
+
+    private checkProject(projectCode: string, cb: (exists: boolean) => void) {
+        this.api.projects.exists(projectCode)
+            .then(cb)
+            .catch((err) => {
+                this.log(err);
+            });
+    }
+
+    private checkRun(runId: string | number | undefined, cb: (exists: boolean) => void) {
+        if (runId !== undefined) {
+            this.api.runs.exists(this.options.projectCode, runId)
+                .then(cb)
+                .catch((err) => {
+                    this.log(err);
+                });
+        } else {
+            cb(false);
+        }
     }
 
     private getEnv(name: Envs) {
@@ -80,11 +139,13 @@ class CypressQaseReporter extends reporters.Base {
     private saveRunId(runId?: string | number) {
         this.runId = runId;
         if (this.runId) {
-            this.pending.map((fn) => {
-                if (this.runId) {
-                    fn(this.runId);
+            while (this.pending.length) {
+                this.log(`Number of pending: ${this.pending.length}`);
+                const cb = this.pending.shift();
+                if (cb) {
+                    cb(this.runId);
                 }
-            });
+            }
         }
     }
 
@@ -97,7 +158,14 @@ class CypressQaseReporter extends reporters.Base {
     }
 
     private logTestItem(test: Test) {
-        console.log('Test %s %s', test.title, test.state);
+        const map = {
+            failed: chalk`{red Test ${test.title} ${test.state}}`,
+            passed: chalk`{green Test ${test.title} ${test.state}}`,
+            pending: chalk`{blueBright Test ${test.title} ${test.state}}`,
+        };
+        if (test.state) {
+            this.log(map[test.state]);
+        }
     }
 
     private publishCaseResult(test: Test, status: ResultStatus){
@@ -106,6 +174,7 @@ class CypressQaseReporter extends reporters.Base {
         const caseId = this.getCaseId(test);
         const publishTest = (runId: string | number) => {
             if (caseId) {
+                this.log(chalk`{gray Start publishing: ${test.title}}`);
                 this.api.results.create(this.options.projectCode, runId, new ResultCreate(
                     caseId,
                     status,
@@ -117,12 +186,14 @@ class CypressQaseReporter extends reporters.Base {
                 ))
                     .then((res) => {
                         this.results.push({test, result: res.data});
+                        this.log(chalk`{gray Result published: ${test.title} ${res.data.hash}}`);
                     })
                     .catch((err) => {
-                        console.log(err);
+                        this.log(err);
                     });
             }
         };
+
         if (this.runId) {
             publishTest(this.runId);
         } else {
