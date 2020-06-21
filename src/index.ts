@@ -65,7 +65,7 @@ class CypressQaseReporter extends reporters.Base {
         runner.on(EVENT_RUN_END, () => {
             if (this.results.length === 0) {
                 console.warn(
-                    `\n(TestRail Reporter)
+                    `\n(Qase Reporter)
                     \nNo testcases were matched.
                     Ensure that your tests are declared correctly.\n`
                 );
