@@ -136,6 +136,17 @@ export const sharedStep = (): Record<any, any> => ({
     updated: '2019-02-09T23:16:49.000000Z',
 });
 
+export const defect = (): Record<any, any> => ({
+    id: 1,
+    title: 'Dangerous defect',
+    actual_result: 'Something happened',
+    status: 'open',
+    user_id: 1,
+    attachments: [],
+    created: '2019-11-08T22:03:07.000000Z',
+    updated: '2019-11-19T22:29:57.000000Z',
+});
+
 export const list = (data: Record<any, any>): Record<any, any> => ({
     total: 10,
     filtered: 10,

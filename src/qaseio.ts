@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { Attachments } from './services/attachments';
 import { Cases } from './services/cases';
+import { Defects } from './services/defects';
 import { Milestones } from './services/milestones';
 import { Plans } from './services/plans';
 import { Projects } from './services/projects';
@@ -20,6 +21,7 @@ export class QaseApi {
     public suites: Suites;
     public milestones: Milestones;
     public sharedSteps: SharedSteps;
+    public defects: Defects;
 
     private api: AxiosInstance;
 
@@ -41,5 +43,6 @@ export class QaseApi {
         this.suites = new Suites(this.api);
         this.milestones = new Milestones(this.api);
         this.sharedSteps = new SharedSteps(this.api);
+        this.defects = new Defects(this.api);
     }
 }
