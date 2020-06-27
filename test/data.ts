@@ -125,6 +125,17 @@ export const milestone = (): Record<any, any> => ({
     updated: '2018-08-31T23:59:10.000000Z',
 });
 
+export const sharedStep = (): Record<any, any> => ({
+    hash: '0223905c291bada23e6049d415385982af92d758',
+    title: 'Shared step',
+    action: 'Open signup page',
+    expected_result: 'Page is opened',
+    cases: [41, 35, 42, 30],
+    cases_count: 4,
+    created: '2019-02-09T23:16:49.000000Z',
+    updated: '2019-02-09T23:16:49.000000Z',
+});
+
 export const list = (data: Record<any, any>): Record<any, any> => ({
     total: 10,
     filtered: 10,

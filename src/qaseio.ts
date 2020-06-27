@@ -6,6 +6,7 @@ import { Plans } from './services/plans';
 import { Projects } from './services/projects';
 import { Results } from './services/results';
 import { Runs } from './services/runs';
+import { SharedSteps } from './services/sharedSteps';
 import { Suites } from './services/suites';
 
 
@@ -18,6 +19,7 @@ export class QaseApi {
     public plans: Plans;
     public suites: Suites;
     public milestones: Milestones;
+    public sharedSteps: SharedSteps;
 
     private api: AxiosInstance;
 
@@ -38,5 +40,6 @@ export class QaseApi {
         this.plans = new Plans(this.api);
         this.suites = new Suites(this.api);
         this.milestones = new Milestones(this.api);
+        this.sharedSteps = new SharedSteps(this.api);
     }
 }

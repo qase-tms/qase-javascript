@@ -4,6 +4,7 @@ export * from './cases';
 export * from './milestones';
 export * from './plans';
 export * from './projects';
+export * from './sharedSteps';
 export * from './suites';
 export * from './results';
 export * from './runs';
