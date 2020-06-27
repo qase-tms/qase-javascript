@@ -116,6 +116,15 @@ export const suite = (): Record<any, any> => ({
     updated: '2019-07-21T19:10:15.000000Z',
 });
 
+export const milestone = (): Record<any, any> => ({
+    id: 1,
+    title: 'Release 1.0',
+    description: null,
+    due_date: null,
+    created: '2018-08-31T23:59:10.000000Z',
+    updated: '2018-08-31T23:59:10.000000Z',
+});
+
 export const list = (data: Record<any, any>): Record<any, any> => ({
     total: 10,
     filtered: 10,
