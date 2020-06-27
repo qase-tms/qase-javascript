@@ -78,6 +78,23 @@ export const result = (): Record<any, any> => ({
     ],
 });
 
+export const attachment = (): Record<any, any> => ({
+    hash: '2497be4bc95f807d2fe3c2203793673f6e5140e8',
+    file: 'filename.ext',
+    mime: 'text/plain',
+    size: 100,
+    full_path: 'https://storage.cdn.example/filename.ext',
+});
+
+export const attachment_created = (): Record<any, any> => ({
+    filename: 'qaseio_pytest.py',
+    url: 'https://storage.cdn.example/filename.ext',
+    extension: 'py',
+    hash: 'd81bb2beb147c2eceddbf3e10f98e6216cc757e3',
+    mime: 'text\\/x-python',
+    team: 'c66dc393c83fe149449e5de3e64545279e1442ed',
+});
+
 export const list = (data: Record<any, any>): Record<any, any> => ({
     total: 10,
     filtered: 10,
