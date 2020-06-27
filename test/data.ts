@@ -95,6 +95,15 @@ export const attachment_created = (): Record<any, any> => ({
     team: 'c66dc393c83fe149449e5de3e64545279e1442ed',
 });
 
+export const plan = (): Record<any, any> => ({
+    id: 1,
+    title: 'Sample plan',
+    description: 'Regression',
+    cases_count: 10,
+    created: '2019-01-10T22:47:53.000000Z',
+    updated: '2019-01-10T22:47:53.000000Z',
+});
+
 export const list = (data: Record<any, any>): Record<any, any> => ({
     total: 10,
     filtered: 10,

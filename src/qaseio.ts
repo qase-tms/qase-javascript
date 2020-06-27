@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { Attachments } from './services/attachments';
 import { Cases } from './services/cases';
+import { Plans } from './services/plans';
 import { Projects } from './services/projects';
 import { Results } from './services/results';
 import { Runs } from './services/runs';
@@ -12,6 +13,7 @@ export class QaseApi {
     public results: Results;
     public runs: Runs;
     public attachments: Attachments;
+    public plans: Plans;
 
     private api: AxiosInstance;
 
@@ -29,5 +31,6 @@ export class QaseApi {
         this.results = new Results(this.api);
         this.runs = new Runs(this.api);
         this.attachments = new Attachments(this.api);
+        this.plans = new Plans(this.api);
     }
 }
