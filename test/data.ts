@@ -147,6 +147,20 @@ export const defect = (): Record<any, any> => ({
     updated: '2019-11-19T22:29:57.000000Z',
 });
 
+export const customField = (): Record<any, any> => ({
+    id: 1,
+    title: 'Description',
+    type: 'Text',
+    placeholder: 'Write something',
+    default_value: null,
+    value: null,
+    is_required: false,
+    is_visible: false,
+    is_filterable: false,
+    created: '2019-08-26T22:30:07.000000Z',
+    updated: '2019-08-26T22:30:07.000000Z',
+});
+
 export const list = (data: Record<any, any>): Record<any, any> => ({
     total: 10,
     filtered: 10,

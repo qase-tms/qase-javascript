@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { Attachments } from './services/attachments';
 import { Cases } from './services/cases';
+import { CustomFields } from './services/customFields';
 import { Defects } from './services/defects';
 import { Milestones } from './services/milestones';
 import { Plans } from './services/plans';
@@ -22,6 +23,7 @@ export class QaseApi {
     public milestones: Milestones;
     public sharedSteps: SharedSteps;
     public defects: Defects;
+    public customFields: CustomFields;
 
     private api: AxiosInstance;
 
@@ -44,5 +46,6 @@ export class QaseApi {
         this.milestones = new Milestones(this.api);
         this.sharedSteps = new SharedSteps(this.api);
         this.defects = new Defects(this.api);
+        this.customFields = new CustomFields(this.api);
     }
 }

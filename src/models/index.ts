@@ -1,6 +1,7 @@
 export * from './attachments';
 export * from './base';
 export * from './cases';
+export * from './customFields';
 export * from './defects';
 export * from './milestones';
 export * from './plans';
