@@ -2,7 +2,7 @@ import 'jest';
 import axios, { AxiosResponse } from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { QaseApi } from '../../src/qaseio';
-import { Filter, PlanInfo, PlanList, PlanCreated, PlanCreate, PlanUpdate } from '../../src/models';
+import { PlanInfo, PlanList, PlanCreated, PlanCreate, PlanUpdate } from '../../src/models';
 import { list, plan, statusTrue } from "../data";
 
 const mock = new MockAdapter(axios);

@@ -104,6 +104,18 @@ export const plan = (): Record<any, any> => ({
     updated: '2019-01-10T22:47:53.000000Z',
 });
 
+export const suite = (): Record<any, any> => ({
+    id: 1,
+    title: 'Level 1',
+    description: 'Set from API',
+    preconditions: 'Set from API',
+    position: 1,
+    cases_count: 10,
+    parent_id: null,
+    created: '2018-05-02T10:49:01.000000Z',
+    updated: '2019-07-21T19:10:15.000000Z',
+});
+
 export const list = (data: Record<any, any>): Record<any, any> => ({
     total: 10,
     filtered: 10,
