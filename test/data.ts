@@ -161,6 +161,14 @@ export const customField = (): Record<any, any> => ({
     updated: '2019-08-26T22:30:07.000000Z',
 });
 
+export const user = (): Record<any, any> => ({
+    id: 1,
+    name: 'John Smith',
+    email: 'john@example.com',
+    title: 'Team Owner',
+    status: 1,
+});
+
 export const list = (data: Record<any, any>): Record<any, any> => ({
     total: 10,
     filtered: 10,

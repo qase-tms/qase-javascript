@@ -10,6 +10,7 @@ import { Results } from './services/results';
 import { Runs } from './services/runs';
 import { SharedSteps } from './services/sharedSteps';
 import { Suites } from './services/suites';
+import { Users } from './services/users';
 
 
 export class QaseApi {
@@ -24,6 +25,7 @@ export class QaseApi {
     public sharedSteps: SharedSteps;
     public defects: Defects;
     public customFields: CustomFields;
+    public users: Users;
 
     private api: AxiosInstance;
 
@@ -47,5 +49,6 @@ export class QaseApi {
         this.sharedSteps = new SharedSteps(this.api);
         this.defects = new Defects(this.api);
         this.customFields = new CustomFields(this.api);
+        this.users = new Users(this.api);
     }
 }
