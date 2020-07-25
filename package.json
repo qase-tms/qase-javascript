@@ -1,0 +1,50 @@
+{
+  "name": "typescript-template",
+  "version": "v0.0.1",
+  "description": "",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "homepage": "",
+  "bugs": {
+    "url": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "dev": "npm run lint && tsc",
+    "dev:watch": "nodemon --exec 'npm run dev || exit 1'",
+    "lint": "eslint src/**",
+    "lint:fix": "eslint --fix src/**",
+    "build": "npm run clean && npm run dev",
+    "test": "jest --coverage",
+    "clean": "rm -rf dist || true"
+  },
+  "author": {
+    "name": "Parviz Khavari",
+    "email": "havaripa@gmail.com"
+  },
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@hutson/npm-deploy-git-tag": "^6.0.0",
+    "@types/jest": "^23.3.7",
+    "@typescript-eslint/eslint-plugin": "^3.0.2",
+    "@typescript-eslint/eslint-plugin-tslint": "^3.0.2",
+    "@typescript-eslint/parser": "^3.0.2",
+    "axios-mock-adapter": "^1.18.1",
+    "eslint": "^7.1.0",
+    "eslint-loader": "^3.0.2",
+    "eslint-plugin-jsdoc": "^26.0.1",
+    "eslint-plugin-prefer-arrow": "^1.2.1",
+    "handlebars": "^4.7.6",
+    "jest": "^26.0.1",
+    "nodemon": "^1.17.5",
+    "ts-jest": "^26.1.0",
+    "typescript": "^3.9.3"
+  },
+  "dependencies": {}
+}
