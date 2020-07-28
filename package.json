@@ -1,16 +1,16 @@
 {
   "name": "newman-reporter-qase",
   "version": "v1.0.0-alpha1",
-  "description": "",
+  "description": "Qase TMS Newman Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "homepage": "",
+  "homepage": "https://github.com/qase-tms/qase-newman",
   "bugs": {
-    "url": ""
+    "url": "https://github.com/qase-tms/qase-newman/issues"
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/qase-tms/qase-newman.git"
   },
   "engines": {
     "node": ">=10"

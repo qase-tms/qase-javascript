@@ -1,8 +1,9 @@
 import 'jest';
-import TyprescriptTemplate from '../src';
+import { EventEmitter } from 'events';
+import NewmanQaseReporter from '../src';
 
 describe('Tests', () => {
     it('Init main class', () => {
-        new TyprescriptTemplate();
+        new NewmanQaseReporter(new EventEmitter(), {apiToken: "", projectCode: ""}, {collection: ""});
     });
 });

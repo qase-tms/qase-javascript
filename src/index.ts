@@ -44,6 +44,10 @@ class NewmanQaseReporter {
         this.collectionOptions = collectionRunOptions;
         this.api = new QaseApi(this.options.apiToken);
 
+        if (!this.options.projectCode) {
+            return;
+        }
+
         this.addRunnerListeners(emitter);
 
         this.checkProject(
