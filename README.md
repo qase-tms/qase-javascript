@@ -7,7 +7,17 @@ npm install -g newman-reporter-qase
 
 ## Usage
 
-From CLI:
+### Define in tests
+```js
+//qase: 10
+// Qase: 1, 2, 3
+// qase: 4 5 6 14
+pm.test('expect response be 200', function () {
+    pm.response.to.be.info
+})
+```
+
+### From CLI:
 ```bash
 QASE_RUN_ID=34 # Specify Run ID using ENV
 newman run \
