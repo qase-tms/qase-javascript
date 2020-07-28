@@ -1,6 +1,6 @@
 {
-  "name": "typescript-template",
-  "version": "v0.0.1",
+  "name": "newman-reporter-qase",
+  "version": "v1.0.0-alpha1",
   "description": "",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -32,6 +32,8 @@
   "devDependencies": {
     "@hutson/npm-deploy-git-tag": "^6.0.0",
     "@types/jest": "^23.3.7",
+    "@types/newman": "^5.1.0",
+    "@types/postman-collection": "^3.5.4",
     "@typescript-eslint/eslint-plugin": "^3.0.2",
     "@typescript-eslint/eslint-plugin-tslint": "^3.0.2",
     "@typescript-eslint/parser": "^3.0.2",
@@ -46,5 +48,8 @@
     "ts-jest": "^26.1.0",
     "typescript": "^3.9.3"
   },
-  "dependencies": {}
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "qaseio": "^1.1.1"
+  }
 }
