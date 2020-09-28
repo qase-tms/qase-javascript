@@ -149,12 +149,13 @@ class CypressQaseReporter extends reporters.Base {
         }
     }
 
-    private getCaseId(test: Test): number | undefined {
-        const regexp = /(\(Qase ID: (\d+)\))/;
+    private getCaseId(test: Test): number[] {
+        const regexp = /(\(Qase ID: ([\d,]+)\))/;
         const results = regexp.exec(test.title);
         if (results && results.length === 3) {
-            return Number.parseInt(results[2], 10);
+            return results[2].split(',').map((value) => Number.parseInt(value, 10));
         }
+        return [];
     }
 
     private logTestItem(test: Test) {
@@ -171,34 +172,39 @@ class CypressQaseReporter extends reporters.Base {
     private publishCaseResult(test: Test, status: ResultStatus){
         this.logTestItem(test);
 
-        const caseId = this.getCaseId(test);
-        const publishTest = (runId: string | number) => {
-            if (caseId) {
-                this.log(chalk`{gray Start publishing: ${test.title}}`);
-                this.api.results.create(this.options.projectCode, runId, new ResultCreate(
-                    caseId,
-                    status,
-                    {
-                        time: test.duration,
-                        stacktrace: test.err?.stack,
-                        comment: test.err ? `${test.err.name}: ${test.err.message}`:undefined,
-                    }
-                ))
-                    .then((res) => {
-                        this.results.push({test, result: res.data});
-                        this.log(chalk`{gray Result published: ${test.title} ${res.data.hash}}`);
-                    })
-                    .catch((err) => {
-                        this.log(err);
-                    });
-            }
-        };
+        const caseIds = this.getCaseId(test);
+        caseIds.forEach((caseId) => {
+            const publishTest = (runId: string | number) => {
+                if (caseId) {
+                    const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}`:'';
+                    this.log(
+                        chalk`{gray Start publishing: ${test.title}}${add}`
+                    );
+                    this.api.results.create(this.options.projectCode, runId, new ResultCreate(
+                        caseId,
+                        status,
+                        {
+                            time: test.duration,
+                            stacktrace: test.err?.stack,
+                            comment: test.err ? `${test.err.name}: ${test.err.message}`:undefined,
+                        }
+                    ))
+                        .then((res) => {
+                            this.results.push({test, result: res.data});
+                            this.log(chalk`{gray Result published: ${test.title} ${res.data.hash}}${add}`);
+                        })
+                        .catch((err) => {
+                            this.log(err);
+                        });
+                }
+            };
 
-        if (this.runId) {
-            publishTest(this.runId);
-        } else {
-            this.pending.push(publishTest);
-        }
+            if (this.runId) {
+                publishTest(this.runId);
+            } else {
+                this.pending.push(publishTest);
+            }
+        });
     }
 }
 

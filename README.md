@@ -38,6 +38,11 @@ If you want to decorate come test with Qase Case ID you could use qase function:
 import { qase } from 'cypress-qase-reporter/dist/mocha';
 
 describe('My First Test', () => {
+    qase([1,2],
+        it('Several ids', () => {
+            expect(true).to.equal(true);
+        })
+    );
     qase(3,
         it('Correct test', () => {
             expect(true).to.equal(true);
