@@ -1,0 +1,3 @@
+class TyprescriptTemplate {}
+
+export = TyprescriptTemplate;
