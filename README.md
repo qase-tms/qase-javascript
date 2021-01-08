@@ -1,3 +1,9 @@
-# Typescript Template
+# [Qase TMS](https://qase.io) TestCafe Reporter
 
-Set `NPM_TOKEN` secret variable on Github to use full power of Github Actions and publish your project on NPM.
+[![License](https://lxgaming.github.io/badges/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+
+## Installation
+
+```
+npm install testcafe-reporter-qase
+```
