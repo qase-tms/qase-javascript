@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { MochaOptions, Runner, Test, reporters } from 'mocha';
-import { ResultCreate, ResultCreated, ResultStatus } from 'qaseio/dist/src/models';
+import { ResultCreate, ResultCreated, ResultStatus, RunCreate, RunCreated } from 'qaseio/dist/src/models';
 import { QaseApi } from 'qaseio';
 import chalk from 'chalk';
 
@@ -14,7 +14,10 @@ const {
 
 enum Envs {
     report = 'QASE_REPORT',
+    apiToken = 'QASE_API_TOKEN',
     runId = 'QASE_RUN_ID',
+    runName = 'QASE_RUN_NAME',
+    runDescription = 'QASE_RUN_DESCRIPTION',
 }
 
 interface QaseOptions {
@@ -36,7 +39,7 @@ class CypressQaseReporter extends reporters.Base {
         super(runner, options);
 
         this.options = options.reporterOptions as QaseOptions;
-        this.api = new QaseApi(this.options.apiToken);
+        this.api = new QaseApi(this.options.apiToken || this.getEnv(Envs.apiToken) || '');
 
         if (!this.getEnv(Envs.report)) {
             return;
@@ -49,23 +52,33 @@ class CypressQaseReporter extends reporters.Base {
             (prjExists) => {
                 if (prjExists) {
                     this.log(chalk`{green Project ${this.options.projectCode} exists}`);
-                    if (this.getEnv(Envs.runId)) {
-                        this.saveRunId(this.getEnv(Envs.runId));
-                    }
-                    if (!this.runId) {
-                        this.saveRunId(this.options.runId);
-                    }
-                    this.checkRun(
-                        this.runId,
-                        (runExists: boolean) => {
-                            const run = this.runId as unknown as string;
-                            if (runExists) {
-                                this.log(chalk`{green Using run ${run} to publish test results}`);
-                            } else {
-                                this.log(chalk`{red Run ${run} does not exist}`);
+                    if (this.getEnv(Envs.runId) || this.options.runId) {
+                        this.saveRunId(this.getEnv(Envs.runId) || this.options.runId);
+                        this.checkRun(
+                            this.runId,
+                            (runExists: boolean) => {
+                                const run = this.runId as unknown as string;
+                                if (runExists) {
+                                    this.log(chalk`{green Using run ${run} to publish test results}`);
+                                } else {
+                                    this.log(chalk`{red Run ${run} does not exist}`);
+                                }
                             }
-                        }
-                    );
+                        );
+                    } else if (!this.runId) {
+                        this.createRun(
+                            this.getEnv(Envs.runName),
+                            this.getEnv(Envs.runDescription),
+                            (created) => {
+                                if (created) {
+                                    this.saveRunId(created.id);
+                                    this.log(chalk`{green Using run ${this.runId} to publish test results}`);
+                                } else {
+                                    this.log(chalk`{red Could not create run in project ${this.options.projectCode}}`);
+                                }
+                            }
+                        );
+                    }
                 } else {
                     this.log(chalk`{red Project ${this.options.projectCode} does not exist}`);
                 }
@@ -120,12 +133,30 @@ class CypressQaseReporter extends reporters.Base {
             });
     }
 
+    private createRun(
+        name: string | undefined, description: string | undefined, cb: (created: RunCreated | undefined) => void
+    ) {
+        this.api.runs.create(
+            this.options.projectCode,
+            new RunCreate(
+                name || `Automated run ${new Date().toISOString()}`,
+                [],
+                {description: description || 'Cypress automated run'}
+            )
+        )
+            .then((res) => res.data)
+            .then(cb)
+            .catch((err) => {
+                this.log(`Error on creating run ${err as string}`);
+            });
+    }
+
     private checkRun(runId: string | number | undefined, cb: (exists: boolean) => void) {
         if (runId !== undefined) {
             this.api.runs.exists(this.options.projectCode, runId)
                 .then(cb)
                 .catch((err) => {
-                    this.log(err);
+                    this.log(`Error on checking run ${err as string}`);
                 });
         } else {
             cb(false);
