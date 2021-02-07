@@ -20,15 +20,12 @@ export class RunCreate {
     public environment_id?: number;
     public constructor(
         public title: string,
-        public cases: number[] = [],
+        public cases: number[] | null = [],
         args?: {
             description?: string;
             environment_id?: number;
         },
     ) {
-        if (this.cases.length < 1) {
-            throw new Error('You should pass cases');
-        }
         Object.assign(this, args);
     }
 }
