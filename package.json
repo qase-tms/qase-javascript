@@ -1,6 +1,6 @@
 {
   "name": "qaseio",
-  "version": "v1.1.3",
+  "version": "v1.2.0",
   "description": "Qase TMS Javascript Api Client",
   "main": "./dist/src/qaseio.js",
   "types": "./dist/src/qaseio.d.ts",
