@@ -1,0 +1,14 @@
+{
+  "reporter": "cypress-multi-reporters",
+  "reporterOptions": {
+    "reporterEnabled": "cypress-mochawesome-reporter, cypress-qase-reporter",
+    "cypressMochawesomeReporterReporterOptions": {
+      "charts": true
+    },
+    "cypressQaseReporterReporterOptions": {
+      "projectCode": "DEMOTR",
+      "logging": true
+    }
+  },
+  "video": false
+}
