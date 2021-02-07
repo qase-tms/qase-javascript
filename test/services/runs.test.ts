@@ -65,7 +65,7 @@ describe('Run api', () => {
         const resp: AxiosResponse<undefined> = await client.runs.delete("TEST", 123)
         expect(resp.data).toEqual({})
     })
-    
+
     it('Validate filters', () => {
         const filter = new Filter(new RunFilters(
             {status: [RunStatus.ABORT, RunStatus.ACTIVE]}
@@ -73,9 +73,5 @@ describe('Run api', () => {
         expect(filter.filter()).toEqual(
             {"filter[status]": "abort,active"}
         )
-    })
-    
-    it('Validate create', () => {
-        expect(() => new RunCreate("new")).toThrow()
     })
 })
