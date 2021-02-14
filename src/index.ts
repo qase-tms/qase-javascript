@@ -1,28 +1,20 @@
 /* eslint-disable no-console,@typescript-eslint/require-await */
-import { ResultCreate, ResultCreated, ResultStatus, RunCreated } from 'qaseio/dist/src/models';
+import {ResultCreate, ResultCreated, ResultStatus, RunCreate, RunCreated} from 'qaseio/dist/src/models';
 import { QaseApi } from 'qaseio';
-import { Response } from 'node-fetch';
+import chalk from 'chalk';
 import fs from 'fs';
 import moment from 'moment';
 import path from 'path';
+import RuntimeError = WebAssembly.RuntimeError;
 
-interface Config<T = number> {
+interface Config {
     enabled: boolean;
-    host: string;
-    user: string;
-    apiKey: string;
-    projectId: string;
-    runId: T;
+    apiToken: string;
+    projectCode: string;
+    runId: string | number | undefined;
     runName: string;
     runDescription?: string;
-    reference?: string;
-    branchEnv: string;
-    buildNoEnv: string;
-    dateFormat: string;
-    caseMeta: string;
-    runCloseAfterDays?: number;
-    uploadScreenshots: boolean;
-    updateRunTestCases: boolean;
+    logging: boolean;
 }
 
 interface Meta {
@@ -54,30 +46,19 @@ interface TestRunInfo {
     skipped: boolean;
 }
 
-const Status = {
-    Passed: {
-        value: ResultStatus.PASSED,
-        text: 'PASSED',
-        color: 'yellow',
-    },
-    Blocked: {
-        value: ResultStatus.SKIPPED,
-        text: 'SKIPPED',
-        color: 'green',
-    },
-    Failed: {
-        value: ResultStatus.FAILED,
-        text: 'FAILED',
-        color: 'red',
-    },
-};
+interface Test {
+    name: string;
+    meta: Meta;
+    info: TestRunInfo;
+    error: string;
+}
 
-const loadJSON = (file: string): Config<string> | undefined => {
+const loadJSON = (file: string): Config | undefined => {
     try {
         const data = fs.readFileSync(file, { encoding: 'utf8' });
 
         if (data) {
-            return JSON.parse(data) as Config<string>;
+            return JSON.parse(data) as Config;
         }
     } catch (error) {
         // Ignore error when file does not exist or it's malformed
@@ -87,90 +68,48 @@ const loadJSON = (file: string): Config<string> | undefined => {
 };
 
 const prepareConfig = (options: Config = {} as Config): Config => {
-    const loaded = loadJSON(path.join(process.cwd(), '.testrailrc'));
-    const config: Config<string> = Object.assign(
+    const loaded = loadJSON(path.join(process.cwd(), '.qaserc'));
+    if (!loaded) {
+        throw new RuntimeError();
+    }
+    const config: Config = Object.assign(
         loaded,
         options
     );
 
     return {
         enabled: process.env.QASE_ENABLED === 'true' || config.enabled || false,
-        host: process.env.QASE_HOST || config.host,
-        user: process.env.QASE_USER || config.user,
-        apiKey: process.env.QASE_API_KEY || config.apiKey,
-        projectId:
-            (process.env.QASE_PROJECT_ID || config.projectId || '')
-                .replace('P', '')
-                .trim()
+        apiToken: process.env.QASE_API_KEY || config.apiToken,
+        projectCode: process.env.QASE_PROJECT || config.projectCode || ''
         ,
-        runId: Number(
-            (process.env.QASE_RUN_ID || config.runId || '')
-                .replace('R', '')
-                .trim()
-        ),
+        runId: process.env.QASE_RUN_ID || config.runId || '',
         runName:
             process.env.QASE_RUN_NAME ||
             config.runName ||
-            '%BRANCH%#%BUILD% - %DATE%',
+            'Automated Run %DATE%',
         runDescription:
             process.env.QASE_RUN_DESCRIPTION || config.runDescription,
-        reference: process.env.QASE_REFERENCE || config.reference,
-        branchEnv: process.env.QASE_BRANCH_ENV || config.branchEnv || 'BRANCH',
-        buildNoEnv:
-            process.env.QASE_BUILD_NO_ENV || config.buildNoEnv || 'BUILD_NUMBER',
-        dateFormat:
-            process.env.QASE_DATE_FORMAT ||
-            config.dateFormat ||
-            'YYYY-MM-DD HH:mm:ss',
-        caseMeta: process.env.QASE_CASE_META || config.caseMeta || 'CID',
-        runCloseAfterDays:
-            Number(
-                process.env.QASE_RUN_CLOSE_AFTER_DAYS || config.runCloseAfterDays
-            ) || 0,
-        uploadScreenshots:
-            process.env.QASE_UPLOAD_SCREENSHOTS === 'true' ||
-            config.uploadScreenshots ||
-            false,
-        updateRunTestCases:
-            process.env.QASE_UPDATE_RUN_TEST_CASES === 'true' ||
-            config.updateRunTestCases !== false,
+        logging: process.env.QASE_LOGGING !== '' || config.logging,
     };
 };
 
 const prepareReportName = (
     config: Config,
-    branch: string,
-    buildNo: string,
     userAgents: string[]
 ) => {
-    const date = moment().format(config.dateFormat);
+    const date = moment().format();
     return config.runName
-        .replace('%BRANCH%', branch)
-        .replace('%BUILD%', buildNo)
         .replace('%DATE%', date)
         .replace('%AGENTS%', `(${userAgents.join(', ')})`);
 };
 
-const prepareReference = (config: Config, branch: string, buildNo: string) => config.reference
-    ? config.reference.replace('%BRANCH%', branch).replace('%BUILD%', buildNo)
-    : '';
-
 const verifyConfig = (config: Config) => {
-    const { enabled, host, user, apiKey, projectId } = config;
+    const { enabled, apiToken, projectCode } = config;
     if (enabled) {
-        if (!host) {
-            console.log('[TestRail] Hostname was not provided.');
+        if (!projectCode) {
+            console.log('[Qase] Project Code should be provided');
         }
-
-        if (!user || !apiKey) {
-            console.log('[TestRail] Username or api key was not provided.');
-        }
-
-        if (!projectId) {
-            console.log('[TestRail] Project id was not provided.');
-        }
-
-        if (host && user && apiKey && projectId) {
+        if (apiToken && projectCode) {
             return true;
         }
     }
@@ -179,35 +118,72 @@ const verifyConfig = (config: Config) => {
 };
 
 class TestcafeQaseReporter {
-    private noColors: boolean;
     private formatError: unknown;
 
     private config: Config;
-    private branch: string;
-    private buildNo: string;
+    private api: QaseApi;
+    private enabled: boolean;
 
     private userAgents!: string[];
-    private results: ResultCreate[];
+    private pending: Array<(runId: string | number) => void> = [];
+    private results: Array<{test: Test; result: ResultCreated}>;
     private screenshots: {
         [key: string]: Screenshot[];
     };
 
     public constructor() {
         this.config = prepareConfig();
-        this.branch = process.env[this.config.branchEnv] || 'master';
-        this.buildNo = process.env[this.config.buildNoEnv] || 'unknown';
+        this.enabled = verifyConfig(this.config);
+        this.api = new QaseApi(this.config.apiToken);
 
-        this.noColors = false;
         this.results = [];
         this.screenshots = {};
     }
 
     public reportTaskStart = async (_startTime: number, userAgents: string[]) => {
+        if (!this.enabled) {
+            return;
+        }
         this.userAgents = userAgents;
-    };
+        this.config.runName = prepareReportName(this.config, this.userAgents);
 
-    public reportFixtureStart = async () => {
-        // Not needed
+        this.checkProject(
+            this.config.projectCode,
+            (prjExists) => {
+                if (prjExists) {
+                    this.log(chalk`{green Project ${this.config.projectCode} exists}`);
+                    if (this.config.runId) {
+                        this.saveRunId(this.config.runId);
+                        this.checkRun(
+                            this.config.runId,
+                            (runExists: boolean) => {
+                                const run = this.config.runId as unknown as string;
+                                if (runExists) {
+                                    this.log(chalk`{green Using run ${run} to publish test results}`);
+                                } else {
+                                    this.log(chalk`{red Run ${run} does not exist}`);
+                                }
+                            }
+                        );
+                    } else if (!this.config.runId) {
+                        this.createRun(
+                            this.config.runName,
+                            this.config.runDescription,
+                            (created) => {
+                                if (created) {
+                                    this.saveRunId(created.id);
+                                    this.log(chalk`{green Using run ${this.config.runId} to publish test results}`);
+                                } else {
+                                    this.log(chalk`{red Could not create run in project ${this.config.projectCode}}`);
+                                }
+                            }
+                        );
+                    }
+                } else {
+                    this.log(chalk`{red Project ${this.config.projectCode} does not exist}`);
+                }
+            }
+        );
     };
 
     public reportTestDone = async (
@@ -216,59 +192,164 @@ class TestcafeQaseReporter {
         meta: Meta,
         formatError: (x: Record<string, unknown>) => string
     ) => {
-        const hasErr = testRunInfo.errs.length;
-
-        let testStatus: ResultStatus | null = null;
-
-        if (testRunInfo.skipped) {
-            testStatus = ResultStatus.SKIPPED;
-        } else if (hasErr === 0) {
-            testStatus = ResultStatus.PASSED;
-        } else {
-            testStatus = ResultStatus.FAILED;
+        if (!this.enabled) {
+            return;
         }
+        if (meta.CID) {
+            const hasErr = testRunInfo.errs.length;
+            let testStatus: ResultStatus;
 
-        let caseId = 0;
-        if (meta[this.config.caseMeta]) {
-            caseId = Number(meta[this.config.caseMeta].replace('C', '').trim());
-        }
-
-        if (caseId > 0) {
-            const errorLog = testRunInfo.errs
-                .map((x: Record<string, unknown>) => {
-                    const formatted = formatError(x).replace(
-                        // eslint-disable-next-line no-control-regex
-                        /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
-                        ''
-                    );
-
-                    return formatted;
-                })
-                .join('\n');
-
-            this.results.push(
-                new ResultCreate(caseId, testStatus, { comment: `Test ${testStatus}\n${errorLog}`})
-            );
-
-            if (testRunInfo.screenshots.length) {
-                this.screenshots[caseId] = testRunInfo.screenshots;
+            if (testRunInfo.skipped) {
+                testStatus = ResultStatus.BLOCKED;
+            } else if (hasErr > 0) {
+                testStatus = ResultStatus.FAILED;
+            } else {
+                testStatus = ResultStatus.PASSED;
             }
-        } else {
-            console.log(
-                `[TestRail] Test missing the TestRail Case ID in test metadata: ${name}`
-            );
+
+            const errorLog = testRunInfo.errs
+                .map((x: Record<string, unknown>) => formatError(x).replace(
+                    /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
+                    ''
+                ))
+                .join('\n');
+            this.publishCaseResult({name, info: testRunInfo, meta, error: errorLog}, testStatus);
         }
     };
 
-    // eslint-disable-next-line @typescript-eslint/require-await
-    public reportTaskDone = async (
-        _endTime: number,
-        _passed: number,
-        _warnings: string[],
-        _result: TaskResult
-    ) => {
-        // Not implemented
+    public reportTaskDone = async () => {
+        if (!this.enabled) {
+            return;
+        }
+        const check = () => {
+            setTimeout(() => {
+                if (this.pending) {
+                    check();
+                } else {
+                    if (this.results.length === 0) {
+                        console.warn(
+                            `\n(Qase Reporter)
+                                \nNo testcases were matched.
+                                Ensure that your tests are declared correctly.\n`
+                        );
+                    }
+                }
+            }, 1000);
+        };
     };
+
+    private log(message?: any, ...optionalParams: any[]) {
+        if (this.config.logging){
+            console.log(chalk`{bold {blue qase:}} ${message}`, ...optionalParams);
+        }
+    }
+
+    private checkProject(projectCode: string, cb: (exists: boolean) => void) {
+        this.api.projects.exists(projectCode)
+            .then(cb)
+            .catch((err) => {
+                this.log(err);
+            });
+    }
+
+    private createRun(
+        name: string | undefined, description: string | undefined, cb: (created: RunCreated | undefined) => void
+    ) {
+        this.api.runs.create(
+            this.config.projectCode,
+            new RunCreate(
+                name || `Automated run ${new Date().toISOString()}`,
+                [],
+                {description: description || 'Cypress automated run'}
+            )
+        )
+            .then((res) => res.data)
+            .then(cb)
+            .catch((err) => {
+                this.log(`Error on creating run ${err as string}`);
+            });
+    }
+
+    private checkRun(runId: string | number | undefined, cb: (exists: boolean) => void) {
+        if (runId !== undefined) {
+            this.api.runs.exists(this.config.projectCode, runId)
+                .then(cb)
+                .catch((err) => {
+                    this.log(`Error on checking run ${err as string}`);
+                });
+        } else {
+            cb(false);
+        }
+    }
+
+    private saveRunId(runId?: string | number) {
+        this.config.runId = runId;
+        if (this.config.runId) {
+            while (this.pending.length) {
+                this.log(`Number of pending: ${this.pending.length}`);
+                const cb = this.pending.shift();
+                if (cb) {
+                    cb(this.config.runId);
+                }
+            }
+        }
+    }
+
+    private getCaseId(meta: Meta): string[] {
+        if (!meta.CID) {
+            return [];
+        }
+        return meta.CID as unknown as string[];
+    }
+
+    private logTestItem(name: string, status: ResultStatus) {
+        const map = {
+            failed: chalk`{red Test ${name} ${status}}`,
+            passed: chalk`{green Test ${name} ${status}}`,
+            pending: chalk`{blueBright Test ${name} ${status}}`,
+        };
+        if (status) {
+            this.log(map[status]);
+        }
+    }
+
+    private publishCaseResult(test: Test, status: ResultStatus){
+        this.logTestItem(test.name, status);
+
+        const caseIds = this.getCaseId(test.meta);
+        caseIds.forEach((caseId) => {
+            const publishTest = (runId: string | number) => {
+                if (caseId) {
+                    const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}`:'';
+                    this.log(
+                        chalk`{gray Start publishing: ${test.name}}${add}`
+                    );
+                    this.api.results.create(this.config.projectCode, runId, new ResultCreate(
+                        parseInt(caseId, 10),
+                        status,
+                        {
+                            time: test.info.durationMs,
+                            stacktrace: test.error,
+                            comment: test.error ? test.error.split('\n')[0]:undefined,
+                        }
+                    ))
+                        .then((res) => {
+                            this.results.push({test, result: res.data});
+                            this.log(chalk`{gray Result published: ${test.name} ${res.data.hash}}${add}`);
+                        })
+                        .catch((err) => {
+                            this.log(err);
+                        });
+                }
+            };
+
+            if (this.config.runId) {
+                publishTest(this.config.runId);
+            } else {
+                this.pending.push(publishTest);
+            }
+        });
+    }
 }
 
 /// This weird setup is required due to TestCafe prototype injection method.
@@ -276,7 +357,7 @@ export = () => {
     const reporter = new TestcafeQaseReporter();
     return {
         reportTaskStart: reporter.reportTaskStart,
-        reportFixtureStart: reporter.reportFixtureStart,
+        reportFixtureStart: () => { /* Not Implemented */ },
         async reportTestDone(
             name: string,
             testRunInfo: TestRunInfo,
