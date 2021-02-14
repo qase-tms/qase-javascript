@@ -1,8 +1,8 @@
 import 'jest';
-import TyprescriptTemplate from '../src';
+import init from '../src';
 
 describe('Tests', () => {
     it('Init main class', () => {
-        new TyprescriptTemplate();
+        init();
     });
 });
