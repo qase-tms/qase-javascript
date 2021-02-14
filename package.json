@@ -29,11 +29,13 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
+    "deasync": "^0.1.21",
     "qaseio": "^1.2.0"
   },
   "devDependencies": {
     "@hutson/npm-deploy-git-tag": "^6.0.0",
     "@types/chalk": "^2.2.0",
+    "@types/deasync": "^0.1.1",
     "@types/jest": "^23.3.7",
     "@types/mocha": "^7.0.2",
     "@typescript-eslint/eslint-plugin": "^3.10.1",

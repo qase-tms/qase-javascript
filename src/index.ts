@@ -3,6 +3,8 @@ import { MochaOptions, Runner, Test, reporters } from 'mocha';
 import { ResultCreate, ResultCreated, ResultStatus, RunCreate, RunCreated } from 'qaseio/dist/src/models';
 import { QaseApi } from 'qaseio';
 import chalk from 'chalk';
+import { sleep } from 'deasync';
+
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const {
@@ -32,6 +34,7 @@ class CypressQaseReporter extends reporters.Base {
     private api: QaseApi;
     private pending: Array<(runId: string | number) => void> = [];
     private results: Array<{test: Test; result: ResultCreated}> = [];
+    private shouldPublish = 0;
     private options: QaseOptions;
     private runId?: number | string;
 
@@ -44,6 +47,8 @@ class CypressQaseReporter extends reporters.Base {
         if (!this.getEnv(Envs.report)) {
             return;
         }
+
+        this.log(chalk`{yellow Current PID: ${process.pid}}`);
 
         this.addRunnerListeners(runner);
 
@@ -72,6 +77,7 @@ class CypressQaseReporter extends reporters.Base {
                             (created) => {
                                 if (created) {
                                     this.saveRunId(created.id);
+                                    process.env.QASE_RUN_ID = created.id.toString();
                                     this.log(chalk`{green Using run ${this.runId} to publish test results}`);
                                 } else {
                                     this.log(chalk`{red Could not create run in project ${this.options.projectCode}}`);
@@ -106,22 +112,24 @@ class CypressQaseReporter extends reporters.Base {
         });
 
         runner.on(EVENT_RUN_END, () => {
-            const check = () => {
-                setTimeout(() => {
-                    if (this.pending) {
-                        check();
-                    } else {
-                        if (this.results.length === 0) {
-                            console.warn(
-                                `\n(Qase Reporter)
-                                \nNo testcases were matched.
-                                Ensure that your tests are declared correctly.\n`
-                            );
-                        }
-                    }
-                }, 1000);
-            };
-            check();
+            if (this.results.length === 0 && this.shouldPublish === 0) {
+                this.log('No testcases were matched. Ensure that your tests are declared correctly.');
+            }
+            if (this.runId && this.shouldPublish !== 0) {
+                this.log(
+                    chalk`{blue Waiting for 30 seconds to publish pending results}`
+                );
+                const endTime = Date.now() + 30e3;
+                while ((this.shouldPublish !== 0) && (Date.now() < endTime)) {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+                    sleep(500);
+                }
+                if (this.runId && this.shouldPublish !== 0) {
+                    this.log(
+                        chalk`{red Could not send all results for 30 seconds after run. Please contact Qase Team.}`
+                    );
+                }
+            }
         });
     }
 
@@ -205,6 +213,7 @@ class CypressQaseReporter extends reporters.Base {
 
         const caseIds = this.getCaseId(test);
         caseIds.forEach((caseId) => {
+            this.shouldPublish++;
             const publishTest = (runId: string | number) => {
                 if (caseId) {
                     const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}`:'';
@@ -223,9 +232,11 @@ class CypressQaseReporter extends reporters.Base {
                         .then((res) => {
                             this.results.push({test, result: res.data});
                             this.log(chalk`{gray Result published: ${test.title} ${res.data.hash}}${add}`);
+                            this.shouldPublish--;
                         })
                         .catch((err) => {
                             this.log(err);
+                            this.shouldPublish--;
                         });
                 }
             };
