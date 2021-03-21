@@ -1,0 +1,6 @@
+{
+  "enabled": true,
+  "logging": true,
+  "projectCode": "DEMOTR",
+  "runName": "CucumberJS run %DATE%"
+}
