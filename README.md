@@ -79,3 +79,29 @@ Supported ENV variables:
 - `QASE_RUN_NAME` - Same as `runName`
 - `QASE_RUN_DESCRIPTION` - Same as `runDescription`
 - `QASE_LOGGING` - Same as `logging`
+
+## Setup with Protractor
+
+Due to different configurations of protractor and cucumber itself you should install a bit more libraries:
+```bash
+npm install cucumberjs-qase-reporter @cucumber/cucumber @cucumber/messages
+```
+
+After that you will be able to use reporter like this (`protractor.conf.js`):
+```js
+exports.config = {
+  ...
+  cucumberOpts: {
+    require: [
+      './tests/e2e/specs/*.js',
+    ],  // require step definition files before executing features
+    tags: [],
+    'dry-run': false,
+    compiler: [],  
+    format: ["node_modules/cucumberjs-qase-reporter"],
+  },
+  ...
+}
+```
+
+**Do not forget to add .qaserc file!**
