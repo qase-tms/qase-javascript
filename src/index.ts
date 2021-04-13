@@ -121,7 +121,7 @@ class QaseReporter extends Formatter {
 
     public constructor(options: IFormatterOptions) {
         super(options);
-        this.config = prepareConfig(options.parsedArgvOptions as Config, options.parsedArgvOptions.qaseConfig);
+        this.config = prepareConfig(options.parsedArgvOptions as Config, options.parsedArgvOptions?.qaseConfig);
         this.enabled = verifyConfig(this.config);
         this.api = new QaseApi(this.config.apiToken);
 
