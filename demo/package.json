@@ -1,0 +1,16 @@
+{
+  "name": "examples",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "cypress": "cypress open",
+    "cypress:test": "cypress run"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "cypress": "^6.4.0",
+    "cypress-multi-reporters": "^1.4.0",
+    "cypress-qase-reporter": "../"
+  }
+}
