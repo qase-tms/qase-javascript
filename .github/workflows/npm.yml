@@ -6,9 +6,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 4
+      max-parallel: 5
       matrix:
-        node-version: [ '10', '12', '13', '14', '15' ]
+        node-version: [ '10', '14', '15' ]
         prefix: [ "qaseio", "qase-cypress", "qase-cucumberjs", "qase-newman", "qase-testcafe" ]
     name: Project ${{ matrix.prefix }} - Node ${{ matrix.node-version }}
     steps:
@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     strategy:
-      max-parallel: 1
+      max-parallel: 5
       matrix:
         prefix: [ "qaseio", "qase-cypress", "qase-cucumberjs", "qase-newman", "qase-testcafe" ]
     if: startsWith(github.event.ref, 'refs/tags')
