@@ -1,6 +1,6 @@
 {
   "name": "cypress-qase-reporter",
-  "version": "v1.3.0",
+  "version": "v1.3.1",
   "description": "Qase TMS Cypress Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -30,7 +30,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "deasync": "^0.1.21",
-    "qaseio": "^1.2.0"
+    "qaseio": "^1.2.1"
   },
   "devDependencies": {
     "@hutson/npm-deploy-git-tag": "^6.0.0",
@@ -47,7 +47,7 @@
     "eslint": "^7.14.0",
     "eslint-plugin-jsdoc": "^26.0.1",
     "eslint-plugin-prefer-arrow": "^1.2.2",
-    "handlebars": "^4.7.6",
+    "handlebars": "^4.7.7",
     "jest": "^26.6.3",
     "mocha": "^8.2.1",
     "nodemon": "^2.0.6",

@@ -1,6 +1,6 @@
 {
   "name": "newman-reporter-qase",
-  "version": "v1.0.0-alpha2",
+  "version": "v1.0.1",
   "description": "Qase TMS Newman Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -42,7 +42,7 @@
     "eslint-loader": "^3.0.2",
     "eslint-plugin-jsdoc": "^26.0.1",
     "eslint-plugin-prefer-arrow": "^1.2.1",
-    "handlebars": "^4.7.6",
+    "handlebars": "^4.7.7",
     "jest": "^26.0.1",
     "nodemon": "^2.0.4",
     "ts-jest": "^26.1.0",
@@ -50,6 +50,6 @@
   },
   "dependencies": {
     "chalk": "^4.1.0",
-    "qaseio": "^1.1.1"
+    "qaseio": "^1.2.1"
   }
 }
