@@ -199,11 +199,15 @@ class QaseReporter extends Formatter {
                     this.testCaseStarts[envelope.testCaseStarted.id!] = envelope.testCaseStarted;
                 } else if (envelope.testStepFinished) {
                     const stepFin = envelope.testStepFinished;
+                    const stepStatus = stepFin.testStepResult!.status!;
+                    const stepMessage = stepFin.testStepResult!.message!;
                     const oldStatus = this.testCaseStartedResult[stepFin.testCaseStartedId!];
                     const newStatus = StatusMapping[stepFin.testStepResult!.status!];
                     if (newStatus === null) {
-                        this._log(chalk`{redBright Unexpected finish status ${stepFin.testStepResult!.status!} received for step ${stepFin.testStepResult!.message!}}`)
-                        return
+                        this._log(
+                            chalk`{redBright Unexpected finish status ${stepStatus} received for step ${stepMessage}}`
+                        );
+                        return;
                     }
                     if (newStatus !== ResultStatus.PASSED) {
                         this.addErrorMessage(stepFin.testCaseStartedId!, stepFin.testStepResult?.message);
