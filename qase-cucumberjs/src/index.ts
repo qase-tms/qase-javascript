@@ -201,6 +201,10 @@ class QaseReporter extends Formatter {
                     const stepFin = envelope.testStepFinished;
                     const oldStatus = this.testCaseStartedResult[stepFin.testCaseStartedId!];
                     const newStatus = StatusMapping[stepFin.testStepResult!.status!];
+                    if (newStatus === null) {
+                        this._log(chalk`{redBright Unexpected finish status ${stepFin.testStepResult!.status!} received for step ${stepFin.testStepResult!.message!}}`)
+                        return
+                    }
                     if (newStatus !== ResultStatus.PASSED) {
                         this.addErrorMessage(stepFin.testCaseStartedId!, stepFin.testStepResult?.message);
                         if (oldStatus) {
