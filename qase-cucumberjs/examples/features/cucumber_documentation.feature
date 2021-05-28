@@ -7,8 +7,8 @@ Feature: Cucumber documentation
     Scenario: Usage documentation
         Given I am on the cucumber.js GitHub repository
         When I go to the README file
-        Then I should see a "Cool" section
-        When I go to the README file
+#        Then I should see a "Cool" section
+#        When I go to the README file
 
     @badges
     Scenario: Status badges
