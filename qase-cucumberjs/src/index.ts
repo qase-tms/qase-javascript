@@ -166,7 +166,7 @@ class QaseReporter extends Formatter {
                                                 this.saveRunId(created.id);
                                                 this._log(
                                                     // eslint-disable-next-line max-len
-                                                    chalk`{green Using run ${this.config.runId} to publish test results}`
+                                                    chalk`{green Using run ${this.config.runId as unknown as string} to publish test results}`
                                                 );
                                             } else {
                                                 this._log(
@@ -197,6 +197,7 @@ class QaseReporter extends Formatter {
                     this.testCaseScenarioId[envelope.testCase.id!] = envelope.testCase.pickleId!;
                 } else if (envelope.testCaseStarted) {
                     this.testCaseStarts[envelope.testCaseStarted.id!] = envelope.testCaseStarted;
+                    this.testCaseStartedResult[envelope.testCaseStarted.id!] = ResultStatus.PASSED;
                 } else if (envelope.testStepFinished) {
                     const stepFin = envelope.testStepFinished;
                     const stepStatus = stepFin.testStepResult!.status!;
@@ -205,7 +206,8 @@ class QaseReporter extends Formatter {
                     const newStatus = StatusMapping[stepFin.testStepResult!.status!];
                     if (newStatus === null) {
                         this._log(
-                            chalk`{redBright Unexpected finish status ${stepStatus} received for step ${stepMessage}}`
+                            // eslint-disable-next-line max-len
+                            chalk`{redBright Unexpected finish status ${stepStatus as unknown as string} received for step ${stepMessage}}`
                         );
                         return;
                     }
@@ -231,7 +233,8 @@ class QaseReporter extends Formatter {
                         started: tcs,
                         finished: envelope.testCaseFinished,
                         tags: info.tags,
-                        duration: Math.abs((envelope.testCaseFinished.timestamp!.seconds! - tcs.timestamp!.seconds!)),
+                        // eslint-disable-next-line max-len, @typescript-eslint/no-unnecessary-type-assertion
+                        duration: Math.abs((envelope.testCaseFinished.timestamp!.seconds! as number - (tcs.timestamp!.seconds! as number))),
                         error: this.testCaseStartedErrors[tcs.id!]?.join('\n\n'),
                     };
                     this.publishCaseResult(test, status);

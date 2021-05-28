@@ -12,6 +12,6 @@
     "@cucumber/pretty-formatter": "^1.0.0-alpha.0",
     "cucumberjs-qase-reporter": "../",
     "phantom": "^2.0.4",
-    "zombie": "^4.2.1"
+    "zombie": "^6.1.4"
   }
 }
