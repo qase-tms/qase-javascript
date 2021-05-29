@@ -25,7 +25,7 @@ export class Attachments extends BaseService {
             data.append(index.toString(), value, filename);
         });
         return this.api
-            .post(`/attachment/${code}`, data)
+            .post(`/attachment/${code}`, data, { headers: data.getHeaders() })
             .then(this.validateResponse<AttachmentCreated>());
     }
 

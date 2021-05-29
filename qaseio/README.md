@@ -598,9 +598,22 @@ This method is used to upload new attachments through API. It supports different
 input formats
 
 ```typescript
-qase.attachments.upload(
+qase.attachments.create(
     "PRJCODE",
     {value: '{"test": true}', filename: "data.json"}
+).then((res) => {
+    console.log(res.data)  // AttachmentCreated{...}
+})
+```
+
+To upload binary attachment you should use `fs`:
+
+```typescript
+var fs = require("fs")
+const data = fs.createReadStream('/path/to/file.png')
+qase.attachments.create(
+    "PRJCODE",
+    {value: data, filename: "data.png"}
 ).then((res) => {
     console.log(res.data)  // AttachmentCreated{...}
 })
