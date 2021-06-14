@@ -9,3 +9,4 @@ This is a monorepo for all JavaScript-related projects
 - [qase-cucumberjs](/qase-cucumberjs) - CucumberJS reporter
 - [qase-newman](/qase-newman) - Newman reporter
 - [qase-testcafe](/qase-testcafe) - TestCafe reporter
+- [qase-jest](/qase-jest) - Jest reporter
