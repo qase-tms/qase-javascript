@@ -27,6 +27,12 @@ export class Runs extends BaseService {
             .catch(() => false);
     }
 
+    public complete(code: string, runId: string | number): Promise<AxiosResponse<undefined>> {
+        return this.api
+            .post(`/run/${code}/${runId}/complete`)
+            .then(this.validateResponse<undefined>());
+    }
+
     public create(code: string, data: RunCreate): Promise<AxiosResponse<RunCreated>> {
         return this.api
             .post(`/run/${code}`, data)
