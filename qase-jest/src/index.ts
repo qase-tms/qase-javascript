@@ -11,6 +11,7 @@ enum Envs {
     runId = 'QASE_RUN_ID',
     runName = 'QASE_RUN_NAME',
     runDescription = 'QASE_RUN_DESCRIPTION',
+    completeRun = 'QASE_COMPLETE_RUN',
 }
 
 const Statuses = {
@@ -162,6 +163,17 @@ class QaseReporter implements Reporter {
             });
     }
 
+    private completeRun(
+        runId: string | number | undefined, cb: (completed: boolean) => void
+    ) {
+        this.api.runs.complete(this.options.projectCode, runId)
+            .then((res) => res.status)
+            .then(cb)
+            .catch((err) => {
+                this.log(`Error on completing run ${err as string}`);
+            });
+    }
+
     private checkRun(runId: string | number | undefined, cb: (exists: boolean) => void) {
         if (runId !== undefined) {
             this.api.runs.exists(this.options.projectCode, runId)
@@ -219,6 +231,19 @@ class QaseReporter implements Reporter {
                         .catch((err) => {
                             this.log(err);
                             this.shouldPublish--;
+                        })
+                        .then(() => {
+                            if(0 === this.shouldPublish-1) {
+                                if (this.getEnv(Envs.completeRun)) {
+                                    this.completeRun(this.runId, (completed) => {
+                                        if (completed) {
+                                            this.log(chalk`{green Completed run ${this.runId}}`);
+                                        } else {
+                                            this.log(chalk`{red Could not complete run ${this.runId}}`);
+                                        }
+                                    });
+                                }
+                            }
                         });
                 }
             };
