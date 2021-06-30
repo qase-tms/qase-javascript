@@ -7,6 +7,7 @@ module.exports = {
             {
                 apiToken: '',
                 projectCode: '',
+                completeRun: true,
                 logging: true,
             },
         ],

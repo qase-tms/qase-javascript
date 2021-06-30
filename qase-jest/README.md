@@ -19,6 +19,7 @@ Reporter options (* - required):
   `DEMOTR` is project code here)
 - `runId` - Run ID from Qase TMS (also can be got from run URL)
 - `logging` [true/false] - Enabled debug logging from reporter or not
+- `runComplete` [true/false] - Complete run after all tests are finished
 
 Example jest.config.js config:
 
@@ -33,6 +34,7 @@ module.exports = {
         projectCode: 'PRJCODE',
         runId: 45,
         logging: true,
+        runComplete: true,
       },
     ],
   ],
@@ -50,6 +52,7 @@ Supported ENV variables:
 - `QASE_RUN_ID` - Pass Run ID from ENV and override reporter options
 - `QASE_RUN_NAME` - Set custom Run name, when new run is created
 - `QASE_RUN_DESCRIPTION` - Set custom Run description, when new run is created
+- `QASE_RUN_COMPLETE` - Complete run after all tests are finished
 
 ## Using Reporter
 

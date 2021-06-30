@@ -11,6 +11,7 @@ enum Envs {
     runId = 'QASE_RUN_ID',
     runName = 'QASE_RUN_NAME',
     runDescription = 'QASE_RUN_DESCRIPTION',
+    runComplete = 'QASE_RUN_COMPLETE',
 }
 
 const Statuses = {
@@ -27,6 +28,7 @@ interface QaseOptions {
     runId?: string;
     runPrefix?: string;
     logging?: boolean;
+    runComplete?: boolean;
 }
 
 class QaseReporter implements Reporter {
@@ -39,6 +41,8 @@ class QaseReporter implements Reporter {
 
     public constructor(_: Record<string, unknown>, _options: QaseOptions ) {
         this.options = _options;
+        this.options.runComplete = this.options.runComplete ||
+            (this.getEnv(Envs.runComplete) ? true:'' !== '') || false;
         this.api = new QaseApi(this.options.apiToken || this.getEnv(Envs.apiToken) || '');
 
         if (!this.getEnv(Envs.report)) {
@@ -98,6 +102,29 @@ class QaseReporter implements Reporter {
     public onRunComplete(contexts: Set<Context>, results: AggregatedResult): void {
         if (this.results.length === 0 && this.shouldPublish === 0) {
             this.log('No testcases were matched. Ensure that your tests are declared correctly.');
+        }
+
+        if (this.runId && this.shouldPublish !== 0 && this.options.runComplete) {
+            this.log(
+                chalk`{blue Waiting for 30 seconds to publish pending results}`
+            );
+            const endTime = Date.now() + 30e3;
+
+            const interval = setInterval(() => {
+                if (this.shouldPublish === 0) {
+                    this.api.runs.complete(this.options.projectCode, this.runId!)
+                        .then(() => this.log(chalk`{green Run ${this.runId} completed}`))
+                        .catch((err) => this.log(`Error on completing run ${err as string}`));
+                    if (this.runId && this.shouldPublish !== 0) {
+                        this.log(
+                            chalk`{red Could not send all results for 30 seconds after run. Please contact Qase Team.}`
+                        );
+                    }
+                    clearInterval(interval);
+                } else if ((Date.now() > endTime)) {
+                    clearInterval(interval);
+                }
+            }, 200);
         }
     }
 
