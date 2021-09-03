@@ -1,5 +1,5 @@
 /* eslint-disable no-console,@typescript-eslint/no-non-null-assertion */
-import { AggregatedResult, Context, Reporter, ReporterOnStartOptions, Test, TestResult } from '@jest/reporters';
+import { Reporter, Test, TestResult } from '@jest/reporters';
 import { ResultCreate, ResultCreated, ResultStatus, RunCreate, RunCreated } from 'qaseio/dist/src/models';
 import { AssertionResult } from '@jest/types/build/TestResult';
 import { QaseApi } from 'qaseio';
@@ -55,7 +55,7 @@ class QaseReporter implements Reporter {
         this.log(chalk`{yellow Current PID: ${process.pid}}`);
     }
 
-    public onRunStart(results: AggregatedResult, options: ReporterOnStartOptions): void {
+    public onRunStart(): void {
         if (this.isDisabled) {
             return;
         }
@@ -100,7 +100,7 @@ class QaseReporter implements Reporter {
         );
     }
 
-    public onTestResult(test: Test, testResult: TestResult, aggregatedResult: AggregatedResult): void {
+    public onTestResult(_test: Test, testResult: TestResult): void {
         if (this.isDisabled) {
             return;
         }
@@ -110,7 +110,7 @@ class QaseReporter implements Reporter {
         }));
     }
 
-    public onRunComplete(contexts: Set<Context>, results: AggregatedResult): void {
+    public onRunComplete(): void {
         if (this.isDisabled) {
             return;
         }
