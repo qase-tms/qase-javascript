@@ -179,7 +179,7 @@ class QaseReporter implements Reporter {
             new RunCreate(
                 name || `Automated run ${new Date().toISOString()}`,
                 [],
-                {description: description || 'Cypress automated run'}
+                {description: description || 'Jest automated run'}
             )
         )
             .then((res) => res.data)
