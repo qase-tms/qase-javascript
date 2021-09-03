@@ -38,6 +38,7 @@ class QaseReporter implements Reporter {
     private shouldPublish = 0;
     private options: QaseOptions;
     private runId?: number | string;
+    private isDisabled = false;
 
     public constructor(_: Record<string, unknown>, _options: QaseOptions ) {
         this.options = _options;
@@ -46,6 +47,8 @@ class QaseReporter implements Reporter {
         this.api = new QaseApi(this.options.apiToken || this.getEnv(Envs.apiToken) || '');
 
         if (!this.getEnv(Envs.report)) {
+            this.log(chalk`{yellow QASE_REPORT env variable is not set. Reporting to qase.io is disabled.}`);
+            this.isDisabled = true;
             return;
         }
 
@@ -53,6 +56,10 @@ class QaseReporter implements Reporter {
     }
 
     public onRunStart(results: AggregatedResult, options: ReporterOnStartOptions): void {
+        if (this.isDisabled) {
+            return;
+        }
+
         this.checkProject(
             this.options.projectCode,
             (prjExists) => {
@@ -94,12 +101,20 @@ class QaseReporter implements Reporter {
     }
 
     public onTestResult(test: Test, testResult: TestResult, aggregatedResult: AggregatedResult): void {
+        if (this.isDisabled) {
+            return;
+        }
+
         testResult.testResults.map(((value) => {
             this.publishCaseResult(value);
         }));
     }
 
     public onRunComplete(contexts: Set<Context>, results: AggregatedResult): void {
+        if (this.isDisabled) {
+            return;
+        }
+
         if (this.results.length === 0 && this.shouldPublish === 0) {
             this.log('No testcases were matched. Ensure that your tests are declared correctly.');
         }
