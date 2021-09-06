@@ -71,7 +71,7 @@ describe('Run api', () => {
             {status: [RunStatus.ABORT, RunStatus.ACTIVE]}
         ).filter);
         expect(filter.filter()).toEqual(
-            {"filter[status]": "abort,active"}
+            {"filters[status]": "abort,active"}
         )
     })
 })

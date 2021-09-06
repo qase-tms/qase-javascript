@@ -56,7 +56,7 @@ describe('Case api', () => {
             {automation: [Automation.AUTOMATED, Automation.IS_NOT_AUTOMATED], search: "name", suite_id: 10}
         ).filter);
         expect(filter.filter()).toEqual(
-            {"filter[automation]": "automated,is-not-automated", "filter[search]": "name", "filter[suite_id]": 10}
+            {"filters[automation]": "automated,is-not-automated", "filters[search]": "name", "filters[suite_id]": 10}
         )
     })
 })
