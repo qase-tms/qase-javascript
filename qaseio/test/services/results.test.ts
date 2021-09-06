@@ -100,7 +100,7 @@ describe('Result api', () => {
             }
         ).filter);
         expect(filter.filter()).toEqual(
-            {'filter[status]': 'in_progress,failed', 'filter[to_end_time]': 'sometime'}
+            {'filters[status]': 'in_progress,failed', 'filters[to_end_time]': 'sometime'}
         )
     })
 })

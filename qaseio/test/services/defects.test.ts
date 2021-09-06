@@ -64,7 +64,7 @@ describe('Defect api', () => {
             {status: DefectStatus.OPEN}
         ).filter);
         expect(filter.filter()).toEqual(
-            {"filter[status]": "open"}
+            {"filters[status]": "open"}
         )
     })
 })

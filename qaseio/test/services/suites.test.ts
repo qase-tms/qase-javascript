@@ -82,7 +82,7 @@ describe('Suite api', () => {
             {search: "some"}
         ).filter);
         expect(filter.filter()).toEqual(
-            {"filter[search]": "some"}
+            {"filters[search]": "some"}
         )
     })
 })

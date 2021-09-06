@@ -73,7 +73,7 @@ export class Filter {
             } else {
                 value = item[1] as string;
             }
-            result[`filter[${key}]`] = value;
+            result[`filters[${key}]`] = value;
             return result;
         }, {});
         return res;
