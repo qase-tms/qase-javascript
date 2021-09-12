@@ -11,6 +11,7 @@ enum Envs {
     runName = 'QASE_RUN_NAME',
     runDescription = 'QASE_RUN_DESCRIPTION',
     runComplete = 'QASE_RUN_COMPLETE',
+    environmentId = 'QASE_ENVIRONMENT_ID',
 }
 
 const Statuses = {
@@ -28,6 +29,7 @@ interface QaseOptions {
     runPrefix?: string;
     logging?: boolean;
     runComplete?: boolean;
+    environmentId?: number;
 }
 
 const alwaysUndefined = () => undefined;
@@ -188,12 +190,19 @@ class QaseReporter implements Reporter {
         cb: (created: RunCreated | undefined) => void
     ): Promise<void> {
         try {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const environmentId = Number.parseInt(this.getEnv(Envs.environmentId)!, 10) || this.options.environmentId;
+
             const res = await this.api.runs.create(
                 this.options.projectCode,
                 new RunCreate(
                     name || `Automated run ${new Date().toISOString()}`,
                     [],
-                    {description: description || 'Jest automated run'}
+                    {
+                        description: description || 'Jest automated run',
+                        // eslint-disable-next-line camelcase
+                        environment_id: environmentId,
+                    }
                 )
             );
             cb(res.data);
