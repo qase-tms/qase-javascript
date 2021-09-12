@@ -62,21 +62,20 @@ If you want to decorate come test with Qase Case ID you could use qase function:
 import { qase } from 'jest-qase-reporter/dist/jest';
 
 describe('My First Test', () => {
-    
     test(qase([1,2], 'Several ids'), () => {
-        expect(true).to.equal(true);
+        expect(true).toBe(true);
     })
 
     test(qase(3, 'Correct test'), () => {
-        expect(true).to.equal(true);
+        expect(true).toBe(true);
     })
 
     test.skip(qase("4", 'Skipped test'), () => {
-        expect(true).to.equal(true);
+        expect(true).toBe(true);
     })
 
     test(qase(["5", "6"], 'Failed test'), () => {
-        expect(true).to.equal(false);
+        expect(true).toBe(false);
     })
 });
 
