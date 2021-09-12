@@ -18,6 +18,7 @@ Reporter options (* - required):
   page of your project: `https://app.qase.io/project/DEMOTR` - 
   `DEMOTR` is project code here)
 - `runId` - Run ID from Qase TMS (also can be got from run URL)
+- `environmentId` - Environment ID from Qase TMS
 - `logging` [true/false] - Enabled debug logging from reporter or not
 - `runComplete` [true/false] - Complete run after all tests are finished
 
@@ -33,6 +34,7 @@ module.exports = {
         apiToken: '578e3b73a34f06e84eafea103cd44dc24253b2c5',
         projectCode: 'PRJCODE',
         runId: 45,
+        environmentId: 1,
         logging: true,
         runComplete: true,
       },
@@ -50,6 +52,7 @@ Supported ENV variables:
   qase reporter
 - `QASE_API_TOKEN` - API token
 - `QASE_RUN_ID` - Pass Run ID from ENV and override reporter options
+- `QASE_ENVIRONMENT_ID` - Pass Environment ID from ENV and override reporter options
 - `QASE_RUN_NAME` - Set custom Run name, when new run is created
 - `QASE_RUN_DESCRIPTION` - Set custom Run description, when new run is created
 - `QASE_RUN_COMPLETE` - Complete run after all tests are finished
