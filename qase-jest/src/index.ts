@@ -41,8 +41,8 @@ class QaseReporter implements Reporter {
 
     public constructor(_: Record<string, unknown>, _options: QaseOptions ) {
         this.options = _options;
-        this.options.runComplete = this.options.runComplete || !!this.getEnv(Envs.runComplete);
-        this.api = new QaseApi(this.options.apiToken || this.getEnv(Envs.apiToken) || '');
+        this.options.runComplete = !!this.getEnv(Envs.runComplete) || this.options.runComplete;
+        this.api = new QaseApi(this.getEnv(Envs.apiToken) || this.options.apiToken || '');
 
         this.log(chalk`{yellow Current PID: ${process.pid}}`);
 
