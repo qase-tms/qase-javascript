@@ -5,7 +5,6 @@ module.exports = {
         [
             'jest-qase-reporter',
             {
-                apiToken: '',
                 projectCode: '',
                 runComplete: true,
                 logging: true,
