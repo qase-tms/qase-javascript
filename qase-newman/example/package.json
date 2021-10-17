@@ -1,0 +1,16 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "newman run ./sample-collection.json -r qase --reporter-qase-logging --reporter-qase-projectCode DEMO --reporter-qase-apiToken $QASE_API_TOKEN"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "newman": "^5.3.0",
+    "newman-reporter-qase": "../"
+  }
+}
