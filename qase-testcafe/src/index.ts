@@ -328,7 +328,7 @@ class TestcafeQaseReporter {
                         parseInt(caseId, 10),
                         status,
                         {
-                            time: test.info.durationMs,
+                            time: Math.ceil(test.info.durationMs / 1000),
                             stacktrace: test.error,
                             comment: test.error ? test.error.split('\n')[0]:undefined,
                         }
