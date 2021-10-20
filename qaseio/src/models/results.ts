@@ -32,7 +32,7 @@ export class ResultStepCreate {
 }
 
 export class ResultCreate {
-    public time?: number;
+    public time_ms?: number;
     public member_id?: number;
     public comment?: string;
     public stacktrace?: string;
@@ -43,7 +43,7 @@ export class ResultCreate {
         public case_id: number,
         public status: ResultStatus,
         args?: {
-            time?: number;
+            time_ms?: number;
             member_id?: number;
             comment?: string;
             stacktrace?: string;
@@ -58,7 +58,7 @@ export class ResultCreate {
 
 export class ResultUpdate {
     public status?: ResultStatus;
-    public time?: number;
+    public time_ms?: number;
     public comment?: string;
     public stacktrace?: string;
     public defect?: boolean;
@@ -67,7 +67,7 @@ export class ResultUpdate {
     public constructor(
         args?: {
             status?: ResultStatus;
-            time?: number;
+            time_ms?: number;
             comment?: string;
             stacktrace?: string;
             defect?: boolean;
