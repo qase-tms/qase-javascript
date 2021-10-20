@@ -328,7 +328,8 @@ class TestcafeQaseReporter {
                         parseInt(caseId, 10),
                         status,
                         {
-                            time: test.info.durationMs,
+                            // eslint-disable-next-line camelcase
+                            time_ms: test.info.durationMs,
                             stacktrace: test.error,
                             comment: test.error ? test.error.split('\n')[0]:undefined,
                         }
