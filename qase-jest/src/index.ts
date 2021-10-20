@@ -252,7 +252,8 @@ class QaseReporter implements Reporter {
                                 caseId,
                                 Statuses[test.status],
                                 {
-                                    time: test.duration ? Math.ceil(test.duration / 1000) : undefined,
+                                    // eslint-disable-next-line camelcase, @typescript-eslint/no-non-null-assertion
+                                    time_ms: test.duration!,
                                     stacktrace: test.failureMessages.join('\n'),
                                     comment: test.failureMessages.length > 0 ? test.failureMessages.map(
                                         (value) => value.split('\n')[0]
