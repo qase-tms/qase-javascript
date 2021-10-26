@@ -230,7 +230,8 @@ class NewmanQaseReporter {
                     parseInt(caseId, 10),
                     test.result,
                     {
-                        time: test.duration,
+                        // eslint-disable-next-line camelcase
+                        time_ms: test.duration,
                         stacktrace: test.err?.stack,
                         comment: test.err ? test.err.message:`Qase Newman Reporter ${new Date().toLocaleString()}`,
                     }
