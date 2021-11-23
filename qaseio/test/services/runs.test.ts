@@ -9,9 +9,9 @@ const mock = new MockAdapter(axios);
 
 describe('Run api', () => {
     Array.from([
-        {limit: 10, offset: 30},
-        {offset: 30},
-        {limit: 10},
+        { limit: 10, offset: 30 },
+        { offset: 30 },
+        { limit: 10 },
     ]).forEach((params) => {
         it('Get all runs', async () => {
             const content = list(run())
@@ -33,9 +33,9 @@ describe('Run api', () => {
 
 
     Array.from([
-        {status: 200, content: run(), equal: true},
-        {status: 404, content: {}, equal: false},
-    ]).forEach(({status, content, equal}) => {
+        { status: 200, content: run(), equal: true },
+        { status: 404, content: {}, equal: false },
+    ]).forEach(({ status, content, equal }) => {
         it('Check run exists', async () => {
             mock.onGet("/run/TEST/123").reply(status, statusTrue(content))
             const client = new QaseApi('123')
@@ -45,16 +45,17 @@ describe('Run api', () => {
     })
 
     it('Create new run', async () => {
-        const content = {id: 1}
+        const content = { id: 1 }
         mock.onPost("/run/TEST").reply(200, statusTrue(content))
         const client = new QaseApi('123')
-        const create = new RunCreate("new", [1,2,3], {environment_id: 1, description: "some"})
+        const create = new RunCreate("new", [1, 2, 3], { environment_id: 1, description: "some", is_autotest: true })
         const resp: AxiosResponse<RunCreated> = await client.runs.create('TEST', create)
         expect(resp.config.data).toEqual(JSON.stringify({
             title: 'new',
             cases: [1, 2, 3],
             environment_id: 1,
             description: 'some',
+            is_autotest: true,
         }))
         expect(resp.data).toEqual(content as RunCreated)
     })
@@ -68,10 +69,10 @@ describe('Run api', () => {
 
     it('Validate filters', () => {
         const filter = new Filter(new RunFilters(
-            {status: [RunStatus.ABORT, RunStatus.ACTIVE]}
+            { status: [RunStatus.ABORT, RunStatus.ACTIVE] }
         ).filter);
         expect(filter.filter()).toEqual(
-            {"filters[status]": "abort,active"}
+            { "filters[status]": "abort,active" }
         )
     })
 })
