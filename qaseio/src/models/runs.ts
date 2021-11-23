@@ -12,7 +12,7 @@ export class RunFilters {
         public filter: {
             status?: RunStatus[];
         }
-    ) {}
+    ) { }
 }
 
 export class RunCreate {
@@ -24,6 +24,7 @@ export class RunCreate {
         args?: {
             description?: string;
             environment_id?: number;
+            is_autotest: boolean;
         },
     ) {
         Object.assign(this, args);
@@ -34,7 +35,7 @@ export interface RunCreated {
     id: number;
 }
 
-export interface RunInfoStats{
+export interface RunInfoStats {
     total: any;
     untested: any;
     passed: any;
@@ -45,7 +46,7 @@ export interface RunInfoStats{
     deleted: any;
 }
 
-export interface RunInfo{
+export interface RunInfo {
     id: any;
     title: any;
     description: any;
