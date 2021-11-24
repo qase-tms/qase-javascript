@@ -24,7 +24,7 @@ export class RunCreate {
         args?: {
             description?: string;
             environment_id?: number;
-            is_autotest: boolean;
+            is_autotest?: boolean;
         },
     ) {
         Object.assign(this, args);
