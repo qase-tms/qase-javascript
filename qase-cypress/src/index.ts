@@ -149,7 +149,8 @@ class CypressQaseReporter extends reporters.Base {
             new RunCreate(
                 name || `Automated run ${new Date().toISOString()}`,
                 [],
-                {description: description || 'Cypress automated run'}
+                // eslint-disable-next-line camelcase
+                {description: description || 'Cypress automated run', is_autotest: true }
             )
         )
             .then((res) => res.data)
@@ -224,7 +225,8 @@ class CypressQaseReporter extends reporters.Base {
                         caseId,
                         status,
                         {
-                            time: test.duration,
+                            // eslint-disable-next-line camelcase
+                            time_ms: test.duration,
                             stacktrace: test.err?.stack,
                             comment: test.err ? `${test.err.name}: ${test.err.message}`:undefined,
                         }
