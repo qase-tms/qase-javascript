@@ -276,7 +276,8 @@ class QaseReporter extends Formatter {
             new RunCreate(
                 name || `Automated run ${new Date().toISOString()}`,
                 [],
-                {description: description || 'Cypress automated run'}
+                // eslint-disable-next-line camelcase
+                {description: description || 'Cypress automated run', is_autotest: true}
             )
         )
             .then((res) => res.data)
@@ -338,7 +339,8 @@ class QaseReporter extends Formatter {
                         parseInt(caseId, 10),
                         status,
                         {
-                            time: test.duration,
+                            // eslint-disable-next-line camelcase
+                            time_ms: test.duration,
                             stacktrace: test.error,
                             comment: test.error ? test.error.split('\n')[0]:undefined,
                         }
