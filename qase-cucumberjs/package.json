@@ -1,7 +1,7 @@
 {
   "name": "cucumberjs-qase-reporter",
-  "version": "v0.2.5",
-  "description": "",
+  "version": "v0.2.6",
+  "description": "Qase TMS CucumberJS Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "homepage": "",
