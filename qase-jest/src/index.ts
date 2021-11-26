@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { Reporter, Test, TestResult } from '@jest/reporters';
 import { ResultCreate, ResultStatus, RunCreate, RunCreated } from 'qaseio/dist/src/models';
 import { AssertionResult } from '@jest/types/build/TestResult';
@@ -41,7 +42,7 @@ class QaseReporter implements Reporter {
     private isDisabled = false;
     private publishedResultsCount = 0;
 
-    public constructor(_: Record<string, unknown>, _options: QaseOptions ) {
+    public constructor(_: Record<string, unknown>, _options: QaseOptions) {
         this.options = _options;
         this.options.runComplete = !!this.getEnv(Envs.runComplete) || this.options.runComplete;
         this.api = new QaseApi(this.getEnv(Envs.apiToken) || this.options.apiToken || '');
@@ -140,10 +141,10 @@ class QaseReporter implements Reporter {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    public getLastError(): void {}
+    public getLastError(): void { }
 
     private log(message?: any, ...optionalParams: any[]) {
-        if (this.options.logging){
+        if (this.options.logging) {
             // eslint-disable-next-line no-console
             console.log(chalk`{bold {blue qase:}} ${message}`, ...optionalParams);
         }
@@ -200,8 +201,8 @@ class QaseReporter implements Reporter {
                     [],
                     {
                         description: description || 'Jest automated run',
-                        // eslint-disable-next-line camelcase
                         environment_id: environmentId,
+                        is_autotest: true,
                     }
                 )
             );
@@ -238,7 +239,7 @@ class QaseReporter implements Reporter {
         return Promise.all(
             caseIds.map(
                 async (caseId) => {
-                    const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}`:'';
+                    const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}` : '';
                     this.log(
                         chalk`{gray Start publishing: ${test.title}}${add}`
                     );
@@ -257,7 +258,7 @@ class QaseReporter implements Reporter {
                                     stacktrace: test.failureMessages.join('\n'),
                                     comment: test.failureMessages.length > 0 ? test.failureMessages.map(
                                         (value) => value.split('\n')[0]
-                                    ).join('\n'):undefined,
+                                    ).join('\n') : undefined,
                                 }
                             ));
                         this.publishedResultsCount++;
