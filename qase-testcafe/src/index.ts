@@ -260,7 +260,8 @@ class TestcafeQaseReporter {
             new RunCreate(
                 name || `Automated run ${new Date().toISOString()}`,
                 [],
-                {description: description || 'Cypress automated run'}
+                // eslint-disable-next-line camelcase
+                {description: description || 'Cypress automated run', is_autotest: true}
             )
         )
             .then((res) => res.data)
