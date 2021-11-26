@@ -339,7 +339,8 @@ class QaseReporter extends Formatter {
                         parseInt(caseId, 10),
                         status,
                         {
-                            time: test.duration,
+                            // eslint-disable-next-line camelcase
+                            time_ms: test.duration,
                             stacktrace: test.error,
                             comment: test.error ? test.error.split('\n')[0]:undefined,
                         }
