@@ -11,6 +11,6 @@
   "devDependencies": {},
   "dependencies": {
     "@playwright/test": "^1.16.3",
-    "playwright-qase-reporter": "file:.."
+    "playwright-qase-reporter": "^1.0"
   }
 }

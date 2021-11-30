@@ -4,9 +4,9 @@ const { test, expect } = require('@playwright/test');
 
 test.describe('help', () => {
     test(qase(7, 'open page and check title'), async ({ page }) => {
-        await page.goto('https://playwright.dev/');
+        await page.goto('https://qase.io/');
         expect(await page.title()).toBe(
-            'GitHub: Where the world builds software · GitHub'
+            'Qase | Test case management software'
         );
     });
 
@@ -22,7 +22,7 @@ test.describe('help', () => {
     test.describe('me', () => {
 
         test(qase([5, 6], '5 - 6 = -1'), () => {
-            expect(sub(5, 6)).toBe(-2);
+            expect(sub(5, 6)).toBe(-1);
         });
 
         test('5 - 6 = -1', () => {
