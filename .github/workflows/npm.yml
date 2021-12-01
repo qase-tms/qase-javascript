@@ -8,8 +8,8 @@ jobs:
     strategy:
       max-parallel: 5
       matrix:
-        node-version: [ '10', '14', '15' ]
-        prefix: [ "qaseio", "qase-cypress", "qase-cucumberjs", "qase-newman", "qase-testcafe", "qase-jest" ]
+        node-version: [ '14', '15', '16' ]
+        prefix: [ "qaseio", "qase-cypress", "qase-cucumberjs", "qase-newman", "qase-testcafe", "qase-jest", "qase-playwright" ]
     name: Project ${{ matrix.prefix }} - Node ${{ matrix.node-version }}
     steps:
     - uses: actions/checkout@v2
@@ -28,7 +28,7 @@ jobs:
     strategy:
       max-parallel: 5
       matrix:
-        prefix: [ "qaseio", "qase-cypress", "qase-cucumberjs", "qase-newman", "qase-testcafe", "qase-jest" ]
+        prefix: [ "qaseio", "qase-cypress", "qase-cucumberjs", "qase-newman", "qase-testcafe", "qase-jest", "qase-playwright" ]
     if: startsWith(github.event.ref, 'refs/tags')
     name: Publish ${{ matrix.prefix }}
     steps:
@@ -36,7 +36,7 @@ jobs:
     - uses: actions/setup-node@v1
       if: contains(github.event.ref, matrix.prefix)
       with:
-        node-version: '10'
+        node-version: '14'
         registry-url: 'https://registry.npmjs.org'
     - if: contains(github.event.ref, matrix.prefix)
       working-directory: ./${{ matrix.prefix }}
