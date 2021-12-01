@@ -22,7 +22,7 @@ test.describe('help', () => {
     test.describe('me', () => {
 
         test(qase([5, 6], '5 - 6 = -1'), () => {
-            expect(sub(5, 6)).toBe(-2);
+            expect(sub(5, 6)).toBe(-1);
         });
 
         test('5 - 6 = -1', () => {
