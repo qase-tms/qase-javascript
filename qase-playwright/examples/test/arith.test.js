@@ -26,7 +26,7 @@ test.describe('help', () => {
         });
 
         test('5 - 6 = -1', () => {
-            expect(sub(5, 6)).toBe(-1);
+            expect(sub(5, 6)).toBe(-2);
         });
     });
 
