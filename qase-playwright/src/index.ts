@@ -225,6 +225,7 @@ class PlaywrightReporter implements Reporter {
                     description: description || 'Playwright automated run',
                     // eslint-disable-next-line camelcase
                     environment_id: environmentId,
+                    is_autotest: true,
                 })
             );
             cb(res.data);
@@ -257,8 +258,9 @@ class PlaywrightReporter implements Reporter {
             testResult.attachments.map(async (attachment) => {
                 const data: Blob = (fs.createReadStream(attachment?.path as string) as unknown) as Blob;
                 let fileExtention = '';
-                if (/[\w-]+[.][\w]{3,4}$/.test(attachment?.path as string)) {
-                    fileExtention = /[\w-]+[.][\w]{3,4}$/.exec(attachment?.path as string)![0];
+                const path = /[\w-]+[.][\w]{3,4}$/.test(attachment?.path as string);
+                if (path) {
+                    fileExtention = path[0] as string;
                 }
                 const filename = fileExtention !== '' ? fileExtention : attachment.name;
                 const resp = await this.api.attachments.create(
