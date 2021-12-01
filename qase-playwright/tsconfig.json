@@ -18,6 +18,8 @@
     "node_modules",
     "dist",
     "demo",
+    "**/**.test.ts",
+    "**/playwright.config.ts",
     "**/webpack.config.ts"
   ],
   "compilation": {
