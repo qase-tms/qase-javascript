@@ -225,6 +225,7 @@ class PlaywrightReporter implements Reporter {
                     description: description || 'Playwright automated run',
                     // eslint-disable-next-line camelcase
                     environment_id: environmentId,
+                    // eslint-disable-next-line camelcase
                     is_autotest: true,
                 })
             );
