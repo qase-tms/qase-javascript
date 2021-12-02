@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
+import { IdResponse, ResultCreateStatusEnum, ResultCreateStepsStatusEnum } from 'qaseio/dist/src/';
 import { Reporter, Test, TestResult } from '@jest/reporters';
-import { ResultCreate, ResultStatus, RunCreate, RunCreated } from 'qaseio/dist/src/models';
 import { AssertionResult } from '@jest/types/build/TestResult';
 import { QaseApi } from 'qaseio';
 import chalk from 'chalk';
@@ -8,6 +8,7 @@ import chalk from 'chalk';
 enum Envs {
     report = 'QASE_REPORT',
     apiToken = 'QASE_API_TOKEN',
+    basePath = 'QASE_BASE_PATH',
     runId = 'QASE_RUN_ID',
     runName = 'QASE_RUN_NAME',
     runDescription = 'QASE_RUN_DESCRIPTION',
@@ -16,15 +17,61 @@ enum Envs {
 }
 
 const Statuses = {
-    passed: ResultStatus.PASSED,
-    failed: ResultStatus.FAILED,
-    skipped: ResultStatus.SKIPPED,
-    pending: ResultStatus.SKIPPED,
-    disabled: ResultStatus.BLOCKED,
+    passed: ResultCreateStatusEnum.PASSED,
+    failed: ResultCreateStatusEnum.FAILED,
+    skipped: ResultCreateStatusEnum.SKIPPED,
+    pending: ResultCreateStatusEnum.SKIPPED,
+    disabled: ResultCreateStatusEnum.BLOCKED,
 };
+
+class ResultStepCreate {
+    public position: number;
+    public status: ResultCreateStepsStatusEnum;
+    public attachments: string[] | undefined;
+    public comment?: string | undefined;
+    public constructor(
+        position: number, status: ResultCreateStepsStatusEnum, attachments?: string[], comment?: string | undefined) {
+        this.position = position;
+        this.status = status;
+        this.attachments = attachments;
+        this.comment = comment;
+    }
+}
+
+class ResultCreate {
+    public case_id: number;
+    public status: ResultCreateStatusEnum;
+    public time_ms?: number;
+    public member_id?: number;
+    public comment?: string;
+    public stacktrace?: string;
+    public defect?: boolean;
+    public steps?: ResultStepCreate[];
+    public attachments?: string[];
+    public constructor(case_id: number, status: ResultCreateStatusEnum, args?: {
+        time_ms?: number;
+        member_id?: number;
+        comment?: string;
+        stacktrace?: string;
+        defect?: boolean;
+        steps?: ResultStepCreate[];
+        attachments?: string[];
+    }) {
+        this.case_id = case_id;
+        this.status = status;
+        this.time_ms = args?.time_ms;
+        this.member_id = args?.member_id;
+        this.comment = args?.comment;
+        this.stacktrace = args?.stacktrace;
+        this.defect = args?.defect;
+        this.steps = args?.steps;
+        this.attachments = args?.attachments;
+    }
+}
 
 interface QaseOptions {
     apiToken: string;
+    basePath: string;
     projectCode: string;
     runId?: string;
     runPrefix?: string;
@@ -45,7 +92,10 @@ class QaseReporter implements Reporter {
     public constructor(_: Record<string, unknown>, _options: QaseOptions) {
         this.options = _options;
         this.options.runComplete = !!this.getEnv(Envs.runComplete) || this.options.runComplete;
-        this.api = new QaseApi(this.getEnv(Envs.apiToken) || this.options.apiToken || '');
+        this.api = new QaseApi(
+            this.getEnv(Envs.apiToken) || this.options.apiToken || '',
+            this.getEnv(Envs.basePath) || this.options.basePath
+        );
 
         this.log(chalk`{yellow Current PID: ${process.pid}}`);
 
@@ -91,8 +141,9 @@ class QaseReporter implements Reporter {
                         this.getEnv(Envs.runDescription),
                         (created) => {
                             if (created) {
-                                this.runId = created.id;
-                                process.env.QASE_RUN_ID = this.runId.toString();
+                                this.log(`Runid is ${this.runId as string}`);
+                                this.runId = created.result?.id;
+                                process.env.QASE_RUN_ID = this.runId!.toString();
                                 this.log(chalk`{green Using run ${this.runId} to publish test results}`);
                             } else {
                                 this.log(chalk`{red Could not create run in project ${this.options.projectCode}}`);
@@ -133,7 +184,7 @@ class QaseReporter implements Reporter {
 
         try {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            await this.api.runs.complete(this.options.projectCode, this.runId!);
+            await this.api.runs.completeRun(this.options.projectCode, Number(this.runId)!);
             this.log(chalk`{green Run ${this.runId} completed}`);
         } catch (err) {
             this.log(`Error on completing run ${err as string}`);
@@ -176,36 +227,57 @@ class QaseReporter implements Reporter {
         }
     }
 
-    private checkProject(projectCode: string, cb: (exists: boolean) => Promise<void>): Promise<void> {
-        return this.api.projects.exists(projectCode)
-            .then(cb)
-            .catch((err) => {
-                this.log(err);
-                this.isDisabled = true;
-            });
+    private async checkProject(projectCode: string, cb: (exists: boolean) => Promise<void>): Promise<void> {
+        try {
+            const resp = await this.api.projects.getProject(projectCode);
+
+            await cb(Boolean(resp.data.result?.code));
+        } catch (err) {
+            this.log(err);
+            this.isDisabled = true;
+        }
+    }
+
+    private createRunObject(name: string, cases: number[], args?: {
+        description?: string;
+        environment_id: number | undefined;
+        is_autotest: boolean;
+    }) {
+        return {
+            title: name,
+            cases,
+            ...args,
+        };
     }
 
     private async createRun(
         name: string | undefined,
         description: string | undefined,
-        cb: (created: RunCreated | undefined) => void
+        cb: (created: IdResponse | undefined) => void
     ): Promise<void> {
         try {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const environmentId = Number.parseInt(this.getEnv(Envs.environmentId)!, 10) || this.options.environmentId;
+            this.log('Here we go');
 
-            const res = await this.api.runs.create(
-                this.options.projectCode,
-                new RunCreate(
-                    name || `Automated run ${new Date().toISOString()}`,
-                    [],
-                    {
-                        description: description || 'Jest automated run',
-                        environment_id: environmentId,
-                        is_autotest: true,
-                    }
-                )
+            const runObject = this.createRunObject(
+                name || `Automated run ${new Date().toISOString()}`,
+                [],
+                {
+                    description: description || 'Jest automated run',
+                    environment_id: environmentId,
+                    is_autotest: true,
+                }
             );
+
+            this.log(JSON.stringify(runObject));
+
+            const res = await this.api.runs.createRun(
+                this.options.projectCode,
+                runObject
+            );
+            this.log(`Received data: ${JSON.stringify(res.data)}`);
+
             cb(res.data);
         } catch (err) {
             this.log(`Error on creating run ${err as string}`);
@@ -219,8 +291,11 @@ class QaseReporter implements Reporter {
             return;
         }
 
-        return this.api.runs.exists(this.options.projectCode, runId)
-            .then(cb)
+        return this.api.runs.getRun(this.options.projectCode, Number(runId))
+            .then((resp) => {
+                this.log(`Get run result on checking run ${resp.data.result?.id as unknown as string}`);
+                cb(Boolean(resp.data.result?.id));
+            })
             .catch((err) => {
                 this.log(`Error on checking run ${err as string}`);
                 this.isDisabled = true;
@@ -245,7 +320,7 @@ class QaseReporter implements Reporter {
                     );
                     test.failureMessages = test.failureMessages.map((value) => value.replace(/\u001b\[.*?m/g, ''));
                     try {
-                        const res = await this.api.results.create(
+                        const res = await this.api.results.createResult(
                             this.options.projectCode,
                             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                             this.runId!,
@@ -262,7 +337,8 @@ class QaseReporter implements Reporter {
                                 }
                             ));
                         this.publishedResultsCount++;
-                        this.log(chalk`{gray Result published: ${test.title} ${res.data.hash}}${add}`);
+                        this.log(
+                            chalk`{gray Result published: ${test.title} ${JSON.stringify(res.data.result)}}${add}`);
                     } catch (err) {
                         this.log(err);
                     }
