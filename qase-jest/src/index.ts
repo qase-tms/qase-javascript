@@ -9,6 +9,7 @@ enum Envs {
     report = 'QASE_REPORT',
     apiToken = 'QASE_API_TOKEN',
     basePath = 'QASE_BASE_PATH',
+    projectCode = 'QASE_PROJECT_CODE',
     runId = 'QASE_RUN_ID',
     runName = 'QASE_RUN_NAME',
     runDescription = 'QASE_RUN_DESCRIPTION',
@@ -91,6 +92,7 @@ class QaseReporter implements Reporter {
 
     public constructor(_: Record<string, unknown>, _options: QaseOptions) {
         this.options = _options;
+        this.options.projectCode = _options.projectCode || this.getEnv(Envs.projectCode) || '';
         this.options.runComplete = !!this.getEnv(Envs.runComplete) || this.options.runComplete;
         this.api = new QaseApi(
             this.getEnv(Envs.apiToken) || this.options.apiToken || '',
