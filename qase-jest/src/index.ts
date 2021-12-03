@@ -2,7 +2,7 @@
 import { IdResponse, ResultCreateStatusEnum, ResultCreateStepsStatusEnum } from '../../qaseio/src';
 import { Reporter, Test, TestResult } from '@jest/reporters';
 import { AssertionResult } from '@jest/types/build/TestResult';
-import { QaseApi } from '../../qaseio';
+import { QaseApi } from '../../qaseio/src/qaseio';
 import chalk from 'chalk';
 
 enum Envs {
