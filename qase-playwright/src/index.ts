@@ -48,6 +48,7 @@ class PlaywrightReporter implements Reporter {
     private runId?: number | string;
     private isDisabled = false;
     private publishedResultsCount = 0;
+    private resultsToBePublished: string[] = [];
 
     public constructor(_options: QaseOptions) {
         this.options = _options;
@@ -139,6 +140,11 @@ class PlaywrightReporter implements Reporter {
             return;
         }
 
+        while(this.resultsToBePublished.length > 0) { // need wait all results to be published
+            this.log(chalk`{gray Waiting for all results to be published. Remaining ${this.resultsToBePublished.length} results}`);
+            await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+
         if (this.publishedResultsCount === 0) {
             this.log(
                 'No testcases were matched. Ensure that your tests are declared correctly.'
@@ -215,16 +221,10 @@ class PlaywrightReporter implements Reporter {
         cb: (created: RunCreated | undefined) => void
     ): Promise<void> {
         try {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const environmentId = Number.parseInt(this.getEnv(Envs.environmentId)!, 10) ||
-            this.options.environmentId;
-
             const res = await this.api.runs.create(
                 this.options.projectCode,
                 new RunCreate(name || `Automated run ${new Date().toLocaleString()}`, [], {
                     description: description || 'Playwright automated run',
-                    // eslint-disable-next-line camelcase
-                    environment_id: environmentId,
                     // eslint-disable-next-line camelcase
                     is_autotest: true,
                 })
@@ -291,6 +291,8 @@ class PlaywrightReporter implements Reporter {
         }
         return Promise.all(
             caseIds.map(async (caseId) => {
+                const testAlias = `${caseId} - ${test.title}`;
+                this.resultsToBePublished.push(testAlias);
                 const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}` : '';
                 this.log(chalk`{gray Start publishing: ${test.title}}${add}`);
                 try {
@@ -312,6 +314,10 @@ class PlaywrightReporter implements Reporter {
                         })
                     );
 
+                    const resultIndex = this.resultsToBePublished.indexOf(testAlias);
+                    if (resultIndex !== -1) {
+                        this.resultsToBePublished.splice(resultIndex, 1);
+                    }
                     this.publishedResultsCount++;
                     this.log(
                         chalk`{gray Result published: ${test.title} ${res.data.hash}}${add}`

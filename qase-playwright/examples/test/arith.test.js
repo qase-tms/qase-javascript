@@ -2,7 +2,7 @@ const { add, mul, sub, div } = require('./arith');
 const { qase } = require('playwright-qase-reporter/dist/playwright');
 const { test, expect } = require('@playwright/test');
 
-test.describe('help', () => {
+test.describe.parallel('help', () => {
     test(qase(7, 'open page and check title'), async ({ page }) => {
         await page.goto('https://qase.io/');
         expect(await page.title()).toBe(

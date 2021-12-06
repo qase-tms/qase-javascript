@@ -1,6 +1,6 @@
 {
   "name": "playwright-qase-reporter",
-  "version": "v1.1.1",
+  "version": "v1.1.2",
   "description": "Qase TMS Playwright Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -27,7 +27,7 @@
   "author": {
     "name": "Aleksei Galagan",
     "email": "alexneo2003@gmail.com",
-    "url" : "https://github.com/alexneo2003/"
+    "url": "https://github.com/alexneo2003/"
   },
   "license": "Apache-2.0",
   "dependencies": {
