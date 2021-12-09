@@ -354,21 +354,25 @@ class QaseReporter implements Reporter {
         try {
             for (const testPath of testPathes) {
                 const { title, parent } = testPath;
-                const newSuitTitle = title.includes('/') ? testPath.title.split('/').pop() : title;
-                const newSuite: SuiteCreate = {
-                    title: newSuitTitle || '',
-                };
-                if (parent && this.suitesHashMapByPath[parent] && this.suitesHashMapByPath[parent].id !== null) {
-                    newSuite.parent_id = this.suitesHashMapByPath[parent].id;
+                const isTestSuiteExist = this.suitesHashMapByPath[title];
+
+                if (!isTestSuiteExist) {
+                    const newSuitTitle = title.includes('/') ? testPath.title.split('/').pop() : title;
+                    const newSuite: SuiteCreate = {
+                        title: newSuitTitle || '',
+                    };
+                    if (parent && this.suitesHashMapByPath[parent] && this.suitesHashMapByPath[parent].id !== null) {
+                        newSuite.parent_id = this.suitesHashMapByPath[parent].id;
+                    }
+                    const res = await this.api.suites.createSuite(projectCode, newSuite);
+                    const createdSuite = {
+                        id: Number(res.data.result?.id),
+                        title: newSuite.title,
+                        parentId: newSuite?.parent_id || null,
+                    };
+                    this.suitesHashMapBySuitId[createdSuite.id] = createdSuite;
+                    this.suitesHashMapByPath[this.createSuitPath(createdSuite)] = createdSuite;
                 }
-                const res = await this.api.suites.createSuite(projectCode, newSuite);
-                const createdSuite = {
-                    id: Number(res.data.result?.id),
-                    title: newSuite.title,
-                    parentId: newSuite?.parent_id || null,
-                };
-                this.suitesHashMapBySuitId[createdSuite.id] = createdSuite;
-                this.suitesHashMapByPath[this.createSuitPath(createdSuite)] = createdSuite;
             }
         } catch (error) {
             this.log(error);
@@ -377,54 +381,54 @@ class QaseReporter implements Reporter {
 
     private async createTestCases(projectCode, cases: PreparedForReportingTestCase[]) {
         try {
-            await Promise.all(
-                cases.map(async (testcase) => {
-                    const { path, title } = testcase;
-                    const caseFullPath = `${path}/${title}`;
+            // await Promise.all(
+            //     cases.map(async (testcase) => {
+            //         const { path, title } = testcase;
+            //         const caseFullPath = `${path}/${title}`;
 
-                    const isTestCaseExist = this.casesHashMapByPath[caseFullPath];
-                    if (!isTestCaseExist) {
-                        const resp = await this.api.cases.createCase(projectCode, {
-                            title: testcase.title,
-                            suite_id: this.suitesHashMapByPath[path].id,
-                        });
+            //         const isTestCaseExist = this.casesHashMapByPath[caseFullPath];
+            //         if (!isTestCaseExist) {
+            //             const resp = await this.api.cases.createCase(projectCode, {
+            //                 title: testcase.title,
+            //                 suite_id: this.suitesHashMapByPath[path].id,
+            //             });
 
-                        const newTestCase = {
-                            ...testcase,
-                            suiteId: this.suitesHashMapByPath[path].id || null,
-                            id: resp.data.result?.id,
-                        };
+            //             const newTestCase = {
+            //                 ...testcase,
+            //                 suiteId: this.suitesHashMapByPath[path].id || null,
+            //                 id: resp.data.result?.id,
+            //             };
 
-                        const id = resp.data.result?.id;
-                        this.log('Test case created with id: ', id);
-                        this.casesHashMapByPath[caseFullPath] = newTestCase;
-                        this.casesHashMapById[id!] = newTestCase;
-                    }
-                })
-            );
-            // for (const testcase of cases) {
-            //     const { path, title } = testcase;
-            //     const caseFullPath = `${path}/${title}`;
+            //             const id = resp.data.result?.id;
+            //             this.log('Test case created with id: ', id);
+            //             this.casesHashMapByPath[caseFullPath] = newTestCase;
+            //             this.casesHashMapById[id!] = newTestCase;
+            //         }
+            //     })
+            // );
+            for (const testcase of cases) {
+                const { path, title } = testcase;
+                const caseFullPath = `${path}/${title}`;
 
-            //     const isTestCaseExist = this.casesHashMapByPath[caseFullPath];
-            //     if (!isTestCaseExist) {
-            //         const resp = await this.api.cases.createCase(projectCode, {
-            //             title: testcase.title,
-            //             suite_id: this.suitesHashMapByPath[path].id,
-            //         });
+                const isTestCaseExist = this.casesHashMapByPath[caseFullPath];
+                if (!isTestCaseExist) {
+                    const resp = await this.api.cases.createCase(projectCode, {
+                        title: testcase.title,
+                        suite_id: this.suitesHashMapByPath[path].id,
+                    });
 
-            //         const newTestCase = {
-            //             ...testcase,
-            //             suiteId: this.suitesHashMapByPath[path].id || null,
-            //             id: resp.data.result?.id,
-            //         };
+                    const newTestCase = {
+                        ...testcase,
+                        suiteId: this.suitesHashMapByPath[path].id || null,
+                        id: resp.data.result?.id,
+                    };
 
-            //         const id = resp.data.result?.id;
-            //         this.log('Test case created with id: ', id);
-            //         this.casesHashMapByPath[caseFullPath] = newTestCase;
-            //         this.casesHashMapById[id!] = newTestCase;
-            //     }
-            // }
+                    const id = resp.data.result?.id;
+                    this.log('Test case created with id: ', id);
+                    this.casesHashMapByPath[caseFullPath] = newTestCase;
+                    this.casesHashMapById[id!] = newTestCase;
+                }
+            }
         } catch (error) {
             this.log(`Error during publication of test results, ${JSON.stringify(error)}`);
         }
