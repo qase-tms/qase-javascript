@@ -30,6 +30,10 @@ export class QaseApi {
     private api: AxiosInstance;
 
     public constructor(apiToken: string, basePath?: string) {
+        const nodeVersion = process.version;
+        // eslint-disable-next-line no-console
+        console.log(nodeVersion, basePath, apiToken);
+
         const config: AxiosRequestConfig = {
             headers: {
                 Token: apiToken,

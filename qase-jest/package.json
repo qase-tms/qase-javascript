@@ -29,9 +29,7 @@
     "email": "csctclan@gmail.com"
   },
   "license": "Apache-2.0",
-  "dependencies": {
-    "qaseio": "../qaseio"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@hutson/npm-deploy-git-tag": "^6.0.0",
     "@jest/reporters": "^27.0.4",
