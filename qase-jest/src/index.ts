@@ -1,9 +1,8 @@
 /* eslint-disable camelcase */
+import { AssertionResult, Status } from '@jest/test-result';
 import { IdResponse, ResultCreateStatusEnum, ResultCreateStepsStatusEnum, SuiteCreate } from 'qaseio/dist/src';
 import { Reporter, Test, TestResult } from '@jest/reporters';
-import { AssertionResult } from '@jest/types/build/TestResult';
 import { QaseApi } from 'qaseio';
-import { Status } from '@jest/test-result';
 import chalk from 'chalk';
 
 enum Envs {
@@ -226,8 +225,7 @@ class QaseReporter implements Reporter {
         }
 
         try {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            await this.api.runs.completeRun(this.options.projectCode, Number(this.runId)!);
+            await this.api.runs.completeRun(this.options.projectCode, Number(this.runId));
             this.log(chalk`{green Run ${this.runId} completed}`);
         } catch (err) {
             this.log(`Error on completing run ${err as string}`);
@@ -257,7 +255,7 @@ class QaseReporter implements Reporter {
         return [];
     }
 
-    private logTestItem(test: AssertionResult) {
+    private logTestItem(test: PreparedForReportingTestCase) {
         const map = {
             failed: chalk`{red Test ${test.title} ${test.status}}`,
             passed: chalk`{green Test ${test.title} ${test.status}}`,
@@ -317,15 +315,14 @@ class QaseReporter implements Reporter {
         });
 
         // Start creating of test suits
-        filterdTestPathes.map((elem, index) => this.log('TestPath ', index, '  ', JSON.stringify(elem)));
         await this.createSuites(this.options.projectCode, filterdTestPathes);
         await this.createTestCases(this.options.projectCode, this.preparedTestCases);
 
         // Start or reporting results
-
         await Promise.all(this.preparedTestCases.map(async (testcase) => {
             const id = this.casesHashMapByPath[`${testcase.path}/${testcase.title}`].id;
             if (id) {
+                this.logTestItem(testcase);
                 testcase.failureMessages = testcase.failureMessages.map((value) =>
                     value.replace(/\u001b\[.*?m/g, ''));
                 const result = await this.api.results.createResult(
@@ -381,54 +378,53 @@ class QaseReporter implements Reporter {
 
     private async createTestCases(projectCode, cases: PreparedForReportingTestCase[]) {
         try {
-            // await Promise.all(
-            //     cases.map(async (testcase) => {
-            //         const { path, title } = testcase;
-            //         const caseFullPath = `${path}/${title}`;
+            await Promise.all(
+                cases.map(async (testcase) => {
+                    const { path, title } = testcase;
+                    const caseFullPath = `${path}/${title}`;
 
-            //         const isTestCaseExist = this.casesHashMapByPath[caseFullPath];
-            //         if (!isTestCaseExist) {
-            //             const resp = await this.api.cases.createCase(projectCode, {
-            //                 title: testcase.title,
-            //                 suite_id: this.suitesHashMapByPath[path].id,
-            //             });
+                    const isTestCaseExist = this.casesHashMapByPath[caseFullPath];
+                    if (!isTestCaseExist) {
+                        const resp = await this.api.cases.createCase(projectCode, {
+                            title: testcase.title,
+                            suite_id: this.suitesHashMapByPath[path].id,
+                        });
 
-            //             const newTestCase = {
-            //                 ...testcase,
-            //                 suiteId: this.suitesHashMapByPath[path].id || null,
-            //                 id: resp.data.result?.id,
-            //             };
+                        const newTestCase = {
+                            ...testcase,
+                            suiteId: this.suitesHashMapByPath[path].id || null,
+                            id: resp.data.result?.id,
+                        };
 
-            //             const id = resp.data.result?.id;
-            //             this.log('Test case created with id: ', id);
-            //             this.casesHashMapByPath[caseFullPath] = newTestCase;
-            //             this.casesHashMapById[id!] = newTestCase;
-            //         }
-            //     })
-            // );
-            for (const testcase of cases) {
-                const { path, title } = testcase;
-                const caseFullPath = `${path}/${title}`;
+                        const id = resp.data.result?.id;
+                        this.casesHashMapByPath[caseFullPath] = newTestCase;
+                        this.casesHashMapById[id!] = newTestCase;
+                    }
+                })
+            );
+            // for (const testcase of cases) {
+            //     const { path, title } = testcase;
+            //     const caseFullPath = `${path}/${title}`;
 
-                const isTestCaseExist = this.casesHashMapByPath[caseFullPath];
-                if (!isTestCaseExist) {
-                    const resp = await this.api.cases.createCase(projectCode, {
-                        title: testcase.title,
-                        suite_id: this.suitesHashMapByPath[path].id,
-                    });
+            //     const isTestCaseExist = this.casesHashMapByPath[caseFullPath];
+            //     if (!isTestCaseExist) {
+            //         const resp = await this.api.cases.createCase(projectCode, {
+            //             title: testcase.title,
+            //             suite_id: this.suitesHashMapByPath[path].id,
+            //         });
 
-                    const newTestCase = {
-                        ...testcase,
-                        suiteId: this.suitesHashMapByPath[path].id || null,
-                        id: resp.data.result?.id,
-                    };
+            //         const newTestCase = {
+            //             ...testcase,
+            //             suiteId: this.suitesHashMapByPath[path].id || null,
+            //             id: resp.data.result?.id,
+            //         };
 
-                    const id = resp.data.result?.id;
-                    this.log('Test case created with id: ', id);
-                    this.casesHashMapByPath[caseFullPath] = newTestCase;
-                    this.casesHashMapById[id!] = newTestCase;
-                }
-            }
+            //         const id = resp.data.result?.id;
+            //         this.log('Test case created with id: ', id);
+            //         this.casesHashMapByPath[caseFullPath] = newTestCase;
+            //         this.casesHashMapById[id!] = newTestCase;
+            //     }
+            // }
         } catch (error) {
             this.log(`Error during publication of test results, ${JSON.stringify(error)}`);
         }
@@ -651,51 +647,6 @@ class QaseReporter implements Reporter {
 
         return item.title!;
     };
-
-    private async publishCaseResult(test: AssertionResult): Promise<void> {
-        this.logTestItem(test);
-
-        const caseIds = this.getCaseIds(test);
-        if (caseIds.length === 0) {
-            // TODO: autocreate case for result
-            return;
-        }
-        return Promise.all(
-            caseIds.map(
-                async (caseId) => {
-                    const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}` : '';
-                    this.log(
-                        chalk`{gray Start publishing: ${test.title}}${add}`
-                    );
-                    test.failureMessages = test.failureMessages.map((value) => value.replace(/\u001b\[.*?m/g, ''));
-                    try {
-                        const res = await this.api.results.createResult(
-                            this.options.projectCode,
-                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                            this.runId!,
-                            new ResultCreate(
-                                caseId,
-                                Statuses[test.status],
-                                {
-                                    // eslint-disable-next-line camelcase, @typescript-eslint/no-non-null-assertion
-                                    time_ms: test.duration!,
-                                    stacktrace: test.failureMessages.join('\n'),
-                                    comment: test.failureMessages.length > 0 ? test.failureMessages.map(
-                                        (value) => value.split('\n')[0]
-                                    ).join('\n') : undefined,
-                                }
-                            ));
-                        this.publishedResultsCount++;
-                        this.log(
-                            chalk`{gray Result published: ${test.title} ${JSON.stringify(res.data.result)}}${add}`);
-                    } catch (err) {
-                        this.log(err);
-                    }
-                }
-            )
-        ).then(alwaysUndefined);
-
-    }
 }
 
 export = QaseReporter;
