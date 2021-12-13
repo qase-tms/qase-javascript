@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-import { Configuration } from '.';
 import { AttachmentsApi } from './api/attachments-api';
 import { CasesApi } from './api/cases-api';
+import { Configuration } from '.';
 import { CustomFieldsApi } from './api/custom-fields-api';
 import { DefectsApi } from './api/defects-api';
 import { MilestonesApi } from './api/milestones-api';
@@ -42,7 +42,7 @@ export class QaseApi {
         this.configuration = new Configuration({
             apiKey: apiToken,
             basePath,
-        })
+        });
 
         this.projects = new ProjectsApi(this.configuration, basePath, this.api);
         this.cases = new CasesApi(this.configuration, basePath, this.api);
