@@ -50,6 +50,6 @@
   },
   "dependencies": {
     "chalk": "^4.1.0",
-    "qaseio": "^1.5.0"
+    "qaseio": "1.5.0"
   }
 }
