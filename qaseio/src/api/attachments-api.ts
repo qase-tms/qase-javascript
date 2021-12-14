@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Qase.io API
- * # Introduction  You can use our API to access [Qase.io](https://qase.io) API endpoints, which allows to retrieve information about entities stored in database and perform actions with them. The API is organized around [REST](http://en.wikipedia.org/wiki/Representational_State_Transfer).  # API Rate limits  Your application can make up to 200 API requests per minute.  Once the limit is exceeded, clients receive an HTTP 429 with a Retry-After: X header to indicate how long their timeout period is before they will be able to send requests again. The timeout period is set to 60 seconds once the limit is exceeded.  # Authentication  To authorize, use this code:  ```shell # With shell, you can just pass the correct header with each request curl \"https://api.qase.io/v1/api_endpoint\"   -H \"Token: api_token\"   -H \"Content-Type: application/json\" ```  Make sure to replace `api_token` with your API key.  Qase.io uses API tokens to authenticate requests. You can view an manage your API keys in [API tokens pages](https://app.qase.io/user/api/token).  Your API keys has the same access rights as your role in the app, so be sure to keep them secure! Do not share your secret API keys in publicly accessible areas such as GitHub, client-side code, and so forth.  Qase API expects for the API key to be included in all API requests to the server in a header that looks like the following:  `Token: api_token`  You must replace `api_token` with your personal API key.  All API requests must be made over [HTTPS](http://en.wikipedia.org/wiki/HTTP_Secure). Calls made over plain HTTP will fail. API requests without authentication will also fail.  # Access rights  Qase.io is using Role-based Access Control system to restrict some features usage in Web interface and the same rules are applied to API methods. In description for each method you will find a rule name, that is required to perform an action through API. If you don\'t have enough access rights, you will receive an error with `403` status code.  # Errors  Qase API uses the following error codes:  Code | Meaning ---------- | ------- 400 | Bad Request - Your request is invalid. 401 | Unauthorized - Your API key is wrong. 403 | Forbidden - Your role doesn\'t have enough permissions to perform this action 404 | Not Found - The resource could not be found. 405 | Method Not Allowed - You tried to access a resource with an invalid method. 406 | Not Acceptable - You requested a format that isn\'t json. 410 | Gone - The resource requested has been removed from our servers. 429 | Too Many Requests - You\'re performing too many requests! Slow down! 500 | Internal Server Error - We had a problem with our server. Try again later. 503 | Service Unavailable - We\'re temporarily offline for maintenance. Please try again later. 
+ * Qase API Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -37,15 +37,15 @@ export const AttachmentsApiAxiosParamCreator = function (configuration?: Configu
         /**
          * This method allows to remove attachment by Hash. 
          * @summary Remove attachment by Hash.
-         * @param {string} codeOrHash Code or Hash.
+         * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteAttachment: async (codeOrHash: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'codeOrHash' is not null or undefined
-            assertParamExists('deleteAttachment', 'codeOrHash', codeOrHash)
+        deleteAttachment: async (hash: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'hash' is not null or undefined
+            assertParamExists('deleteAttachment', 'hash', hash)
             const localVarPath = `/attachment/{code_or_hash}`
-                .replace(`{${"code_or_hash"}}`, encodeURIComponent(String(codeOrHash)));
+                .replace(`{${"hash"}}`, encodeURIComponent(String(hash)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -74,15 +74,15 @@ export const AttachmentsApiAxiosParamCreator = function (configuration?: Configu
         /**
          * This method allows to retrieve attachment by Hash. 
          * @summary Get attachment by Hash.
-         * @param {string} codeOrHash Code or Hash.
+         * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAttachment: async (codeOrHash: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'codeOrHash' is not null or undefined
-            assertParamExists('getAttachment', 'codeOrHash', codeOrHash)
+        getAttachment: async (hash: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'hash' is not null or undefined
+            assertParamExists('getAttachment', 'hash', hash)
             const localVarPath = `/attachment/{code_or_hash}`
-                .replace(`{${"code_or_hash"}}`, encodeURIComponent(String(codeOrHash)));
+                .replace(`{${"hash"}}`, encodeURIComponent(String(hash)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -154,16 +154,16 @@ export const AttachmentsApiAxiosParamCreator = function (configuration?: Configu
         /**
          * This method allows to upload attachment to Qase. Max upload size: * Up to 32 Mb per file * Up to 128 Mb per single request * Up to 20 files per single request  If there is no free space left in your team account, you will receive an error with code 507 - Insufficient Storage. 
          * @summary Upload attachment.
-         * @param {string} codeOrHash Code or Hash.
+         * @param {string} code Code of project, where to search entities.
          * @param {Array<any>} [file] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        uploadAttachment: async (codeOrHash: string, file?: Array<any>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'codeOrHash' is not null or undefined
-            assertParamExists('uploadAttachment', 'codeOrHash', codeOrHash)
+        uploadAttachment: async (code: string, file?: Array<any>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'code' is not null or undefined
+            assertParamExists('uploadAttachment', 'code', code)
             const localVarPath = `/attachment/{code_or_hash}`
-                .replace(`{${"code_or_hash"}}`, encodeURIComponent(String(codeOrHash)));
+                .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -212,23 +212,23 @@ export const AttachmentsApiFp = function(configuration?: Configuration) {
         /**
          * This method allows to remove attachment by Hash. 
          * @summary Remove attachment by Hash.
-         * @param {string} codeOrHash Code or Hash.
+         * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteAttachment(codeOrHash: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<HashResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteAttachment(codeOrHash, options);
+        async deleteAttachment(hash: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<HashResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteAttachment(hash, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * This method allows to retrieve attachment by Hash. 
          * @summary Get attachment by Hash.
-         * @param {string} codeOrHash Code or Hash.
+         * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAttachment(codeOrHash: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AttachmentResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getAttachment(codeOrHash, options);
+        async getAttachment(hash: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AttachmentResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getAttachment(hash, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -246,13 +246,13 @@ export const AttachmentsApiFp = function(configuration?: Configuration) {
         /**
          * This method allows to upload attachment to Qase. Max upload size: * Up to 32 Mb per file * Up to 128 Mb per single request * Up to 20 files per single request  If there is no free space left in your team account, you will receive an error with code 507 - Insufficient Storage. 
          * @summary Upload attachment.
-         * @param {string} codeOrHash Code or Hash.
+         * @param {string} code Code of project, where to search entities.
          * @param {Array<any>} [file] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async uploadAttachment(codeOrHash: string, file?: Array<any>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AttachmentUploadsResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.uploadAttachment(codeOrHash, file, options);
+        async uploadAttachment(code: string, file?: Array<any>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AttachmentUploadsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.uploadAttachment(code, file, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -268,22 +268,22 @@ export const AttachmentsApiFactory = function (configuration?: Configuration, ba
         /**
          * This method allows to remove attachment by Hash. 
          * @summary Remove attachment by Hash.
-         * @param {string} codeOrHash Code or Hash.
+         * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteAttachment(codeOrHash: string, options?: any): AxiosPromise<HashResponse> {
-            return localVarFp.deleteAttachment(codeOrHash, options).then((request) => request(axios, basePath));
+        deleteAttachment(hash: string, options?: any): AxiosPromise<HashResponse> {
+            return localVarFp.deleteAttachment(hash, options).then((request) => request(axios, basePath));
         },
         /**
          * This method allows to retrieve attachment by Hash. 
          * @summary Get attachment by Hash.
-         * @param {string} codeOrHash Code or Hash.
+         * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAttachment(codeOrHash: string, options?: any): AxiosPromise<AttachmentResponse> {
-            return localVarFp.getAttachment(codeOrHash, options).then((request) => request(axios, basePath));
+        getAttachment(hash: string, options?: any): AxiosPromise<AttachmentResponse> {
+            return localVarFp.getAttachment(hash, options).then((request) => request(axios, basePath));
         },
         /**
          * This method allows to retrieve attachments. 
@@ -299,13 +299,13 @@ export const AttachmentsApiFactory = function (configuration?: Configuration, ba
         /**
          * This method allows to upload attachment to Qase. Max upload size: * Up to 32 Mb per file * Up to 128 Mb per single request * Up to 20 files per single request  If there is no free space left in your team account, you will receive an error with code 507 - Insufficient Storage. 
          * @summary Upload attachment.
-         * @param {string} codeOrHash Code or Hash.
+         * @param {string} code Code of project, where to search entities.
          * @param {Array<any>} [file] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        uploadAttachment(codeOrHash: string, file?: Array<any>, options?: any): AxiosPromise<AttachmentUploadsResponse> {
-            return localVarFp.uploadAttachment(codeOrHash, file, options).then((request) => request(axios, basePath));
+        uploadAttachment(code: string, file?: Array<any>, options?: any): AxiosPromise<AttachmentUploadsResponse> {
+            return localVarFp.uploadAttachment(code, file, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -320,25 +320,25 @@ export class AttachmentsApi extends BaseAPI {
     /**
      * This method allows to remove attachment by Hash. 
      * @summary Remove attachment by Hash.
-     * @param {string} codeOrHash Code or Hash.
+     * @param {string} hash Hash.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AttachmentsApi
      */
-    public deleteAttachment(codeOrHash: string, options?: AxiosRequestConfig) {
-        return AttachmentsApiFp(this.configuration).deleteAttachment(codeOrHash, options).then((request) => request(this.axios, this.basePath));
+    public deleteAttachment(hash: string, options?: AxiosRequestConfig) {
+        return AttachmentsApiFp(this.configuration).deleteAttachment(hash, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * This method allows to retrieve attachment by Hash. 
      * @summary Get attachment by Hash.
-     * @param {string} codeOrHash Code or Hash.
+     * @param {string} hash Hash.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AttachmentsApi
      */
-    public getAttachment(codeOrHash: string, options?: AxiosRequestConfig) {
-        return AttachmentsApiFp(this.configuration).getAttachment(codeOrHash, options).then((request) => request(this.axios, this.basePath));
+    public getAttachment(hash: string, options?: AxiosRequestConfig) {
+        return AttachmentsApiFp(this.configuration).getAttachment(hash, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -357,13 +357,13 @@ export class AttachmentsApi extends BaseAPI {
     /**
      * This method allows to upload attachment to Qase. Max upload size: * Up to 32 Mb per file * Up to 128 Mb per single request * Up to 20 files per single request  If there is no free space left in your team account, you will receive an error with code 507 - Insufficient Storage. 
      * @summary Upload attachment.
-     * @param {string} codeOrHash Code or Hash.
+     * @param {string} code Code of project, where to search entities.
      * @param {Array<any>} [file] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AttachmentsApi
      */
-    public uploadAttachment(codeOrHash: string, file?: Array<any>, options?: AxiosRequestConfig) {
-        return AttachmentsApiFp(this.configuration).uploadAttachment(codeOrHash, file, options).then((request) => request(this.axios, this.basePath));
+    public uploadAttachment(code: string, file?: Array<any>, options?: AxiosRequestConfig) {
+        return AttachmentsApiFp(this.configuration).uploadAttachment(code, file, options).then((request) => request(this.axios, this.basePath));
     }
 }
