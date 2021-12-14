@@ -4,11 +4,14 @@
   "description": "Test cafe example",
   "main": "test.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npx testcafe chrome test.js -r spec,qase"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "testcafe-reporter-qase": "^1.0.5"
+  },
+  "dependencies": {
+    "testcafe": "^1.17.1"
   }
 }
