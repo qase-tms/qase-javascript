@@ -1,0 +1,7 @@
+{
+    "enabled": true,
+    "logging": true,
+    "apiToken": "642fd67e45d2033e050684849a25f5781ca51487",
+    "projectCode": "TESTCAFE",
+    "runName": "TestCafe run %DATE% %AGENTS%"
+}
