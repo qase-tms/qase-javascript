@@ -42,7 +42,7 @@ export class QaseApi {
         this.api = axios.create(config);
         this.configuration = new Configuration({
             apiKey: apiToken,
-            basePath,
+            basePath: baseURL,
         });
 
         this.projects = new ProjectsApi(this.configuration, baseURL, this.api);
