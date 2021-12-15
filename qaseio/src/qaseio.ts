@@ -31,12 +31,13 @@ export class QaseApi {
     private api: AxiosInstance;
     private configuration: Configuration;
 
-    public constructor(apiToken: string, basePath: string) {
+    public constructor(apiToken: string, basePath?: string) {
+        const baseURL = basePath || 'https://api.qase.io/v1';
         const config: AxiosRequestConfig = {
             headers: {
                 Token: apiToken,
             },
-            baseURL: basePath || 'https://api.qase.io/v1',
+            baseURL,
         };
         this.api = axios.create(config);
         this.configuration = new Configuration({
@@ -44,17 +45,17 @@ export class QaseApi {
             basePath,
         });
 
-        this.projects = new ProjectsApi(this.configuration, basePath, this.api);
-        this.cases = new CasesApi(this.configuration, basePath, this.api);
-        this.results = new ResultsApi(this.configuration, basePath, this.api);
-        this.runs = new RunsApi(this.configuration, basePath, this.api);
-        this.attachments = new AttachmentsApi(this.configuration, basePath, this.api);
-        this.plans = new PlansApi(this.configuration, basePath, this.api);
-        this.suites = new SuitesApi(this.configuration, basePath, this.api);
-        this.milestones = new MilestonesApi(this.configuration, basePath, this.api);
-        this.sharedSteps = new SharedStepsApi(this.configuration, basePath, this.api);
-        this.defects = new DefectsApi(this.configuration, basePath, this.api);
-        this.customFields = new CustomFieldsApi(this.configuration, basePath, this.api);
-        this.users = new UsersApi(this.configuration, basePath, this.api);
+        this.projects = new ProjectsApi(this.configuration, baseURL, this.api);
+        this.cases = new CasesApi(this.configuration, baseURL, this.api);
+        this.results = new ResultsApi(this.configuration, baseURL, this.api);
+        this.runs = new RunsApi(this.configuration, baseURL, this.api);
+        this.attachments = new AttachmentsApi(this.configuration, baseURL, this.api);
+        this.plans = new PlansApi(this.configuration, baseURL, this.api);
+        this.suites = new SuitesApi(this.configuration, baseURL, this.api);
+        this.milestones = new MilestonesApi(this.configuration, baseURL, this.api);
+        this.sharedSteps = new SharedStepsApi(this.configuration, baseURL, this.api);
+        this.defects = new DefectsApi(this.configuration, baseURL, this.api);
+        this.customFields = new CustomFieldsApi(this.configuration, baseURL, this.api);
+        this.users = new UsersApi(this.configuration, baseURL, this.api);
     }
 }
