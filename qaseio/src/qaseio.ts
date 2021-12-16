@@ -31,17 +31,18 @@ export class QaseApi {
     private api: AxiosInstance;
     private configuration: Configuration;
 
-    public constructor(apiToken: string, basePath: string) {
+    public constructor(apiToken: string, basePath?: string) {
+        const baseURL = basePath || 'https://api.qase.io/v1';
         const config: AxiosRequestConfig = {
             headers: {
                 Token: apiToken,
             },
-            baseURL: basePath || 'https://api.qase.io/v1',
+            baseURL,
         };
         this.api = axios.create(config);
         this.configuration = new Configuration({
             apiKey: apiToken,
-            basePath,
+            basePath: baseURL,
         });
 
         this.projects = new ProjectsApi(this.configuration, basePath, this.api);
