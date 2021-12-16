@@ -5,9 +5,8 @@ module.exports = {
         [
             'jest-qase-reporter',
             {
-                projectCode: '',
-                environmentId: 1,
-                runComplete: true,
+                projectCode: 'PRJCODE',
+                runComplete: false,
                 logging: true,
             },
         ],

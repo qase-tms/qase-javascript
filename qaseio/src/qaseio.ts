@@ -45,17 +45,17 @@ export class QaseApi {
             basePath: baseURL,
         });
 
-        this.projects = new ProjectsApi(this.configuration, basePath, this.api);
-        this.cases = new CasesApi(this.configuration, basePath, this.api);
-        this.results = new ResultsApi(this.configuration, basePath, this.api);
-        this.runs = new RunsApi(this.configuration, basePath, this.api);
-        this.attachments = new AttachmentsApi(this.configuration, basePath, this.api);
-        this.plans = new PlansApi(this.configuration, basePath, this.api);
-        this.suites = new SuitesApi(this.configuration, basePath, this.api);
-        this.milestones = new MilestonesApi(this.configuration, basePath, this.api);
-        this.sharedSteps = new SharedStepsApi(this.configuration, basePath, this.api);
-        this.defects = new DefectsApi(this.configuration, basePath, this.api);
-        this.customFields = new CustomFieldsApi(this.configuration, basePath, this.api);
-        this.users = new UsersApi(this.configuration, basePath, this.api);
+        this.projects = new ProjectsApi(this.configuration, baseURL, this.api);
+        this.cases = new CasesApi(this.configuration, baseURL, this.api);
+        this.results = new ResultsApi(this.configuration, baseURL, this.api);
+        this.runs = new RunsApi(this.configuration, baseURL, this.api);
+        this.attachments = new AttachmentsApi(this.configuration, baseURL, this.api);
+        this.plans = new PlansApi(this.configuration, baseURL, this.api);
+        this.suites = new SuitesApi(this.configuration, baseURL, this.api);
+        this.milestones = new MilestonesApi(this.configuration, baseURL, this.api);
+        this.sharedSteps = new SharedStepsApi(this.configuration, baseURL, this.api);
+        this.defects = new DefectsApi(this.configuration, baseURL, this.api);
+        this.customFields = new CustomFieldsApi(this.configuration, baseURL, this.api);
+        this.users = new UsersApi(this.configuration, baseURL, this.api);
     }
 }
