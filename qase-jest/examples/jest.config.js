@@ -5,12 +5,7 @@ module.exports = {
         [
             'jest-qase-reporter',
             {
-                projectCode: 'JRQ',
-                basePath: 'http://api.stage.qase.io/v1',
-                apiToken: 'ad9d48cf206a9ded204a4ff9cb7bf93dc5113305',
-                // projectCode: 'JTC',
-                // basePath: 'http://api.qase.lo/v1',
-                // apiToken: 'dev_owner_api_token',
+                projectCode: 'PRJCODE',
                 runComplete: false,
                 logging: true,
             },

@@ -323,6 +323,7 @@ class QaseReporter implements Reporter {
                     (value) => value.split('\n')[0]).join('\n') : undefined,
             };
 
+            // Checks that user defined case ID with 'qase' wrapper;
             if (elem.caseIds && elem.caseIds?.length > 0) {
                 caseObject.case_id = elem.caseIds[0];
             } else {
