@@ -3,28 +3,38 @@ const { qase } = require('jest-qase-reporter/dist/jest');
 
 describe("help", () => {
 
-  test.skip(qase(1, '2 + 3 = 5'), () => {
+  // test(qase(1, '2 + 3 = 5'), () => {
+  //   expect(add(2, 3)).toBe(5);
+  // });
+
+  test('2 + 3 = 5 without qase wrapper', () => {
     expect(add(2, 3)).toBe(5);
   });
 
-  test(qase([2, 3], '3 * 4 = 12'), async () => {
-    await new Promise((r) => setTimeout(r, 2000));
-    expect(mul(3, 4)).toBe(12);
+  test.skip('2 + 3 = 5 skipped', () => {
+    expect(add(2, 3)).toBe(5);
   });
 
-  describe("me", () => {
+  test('2 + 3 = 6', () => {
+    expect(add(2, 3)).toBe(6);
+  });
 
-    test(qase([5, 6], '5 - 6 = -1'), () => {
-      expect(sub(5, 6)).toBe(-2);
+  describe('Suite for the some nested cases', () => {
+    test('Nested 1', () => {
+      expect(add(2, 3)).toBe(5);
     });
 
-    test('5 - 6 = -1', () => {
-      expect(sub(5, 6)).toBe(-1);
+    test.skip('2 + 3 = 5 skipped', () => {
+      expect(add(2, 3)).toBe(5);
+    });
+
+    test('2 + 3 = 6 Wrong case', () => {
+      expect(add(2, 3)).toBe(6);
+    });
+
+    test('Async test case', async () => {
+      await new Promise((r) => setTimeout(r, 2000));
+      expect(mul(3, 4)).toBe(12);
     });
   })
-
-  test('8 / 4 = 2', () => {
-    expect(div(8, 4)).toBe(2);
-  });
-
 })
