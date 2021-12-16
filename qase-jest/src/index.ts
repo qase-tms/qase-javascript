@@ -32,7 +32,7 @@ const Statuses = {
 
 interface QaseOptions {
     apiToken: string;
-    basePath: string;
+    basePath?: string;
     projectCode: string;
     runId?: string;
     runPrefix?: string;
