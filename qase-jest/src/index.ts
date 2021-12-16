@@ -12,13 +12,14 @@ import chalk from 'chalk';
 enum Envs {
     report = 'QASE_REPORT',
     apiToken = 'QASE_API_TOKEN',
-    basePath = 'QASE_BASE_PATH',
+    basePath = 'QASE_API_BASE_URL',
     projectCode = 'QASE_PROJECT_CODE',
     runId = 'QASE_RUN_ID',
     runName = 'QASE_RUN_NAME',
     runDescription = 'QASE_RUN_DESCRIPTION',
     runComplete = 'QASE_RUN_COMPLETE',
     environmentId = 'QASE_ENVIRONMENT_ID',
+    rootSuite = 'QASE_ROOT_SUITE_TITLE'
 }
 
 const Statuses = {
@@ -132,7 +133,7 @@ class QaseReporter implements Reporter {
         if (this.isDisabled) {
             return;
         }
-        this.preparedTestCases = this.transformResultsToMap(testResult.testResults);
+        this.preparedTestCases = this.createPreparedForPublishTestsArray(testResult.testResults);
 
         await this.publishBulkTestResult().then(alwaysUndefined);
     }
@@ -195,7 +196,7 @@ class QaseReporter implements Reporter {
         }
     }
 
-    private transformResultsToMap(testResults: AssertionResult[]) {
+    private createPreparedForPublishTestsArray(testResults: AssertionResult[]) {
         const transformedMap = testResults.map((result) => {
             this.logTestItem(result);
             const item: PreparedForReportingTestCase = {
@@ -322,8 +323,6 @@ class QaseReporter implements Reporter {
                     (value) => value.split('\n')[0]).join('\n') : undefined,
             };
 
-            // TODO: What should happen if the user marked some testcases and test suites, but
-            // they are doesnt exist in the Qase TMS???
             if (elem.caseIds && elem.caseIds?.length > 0) {
                 caseObject.case_id = elem.caseIds[0];
             } else {

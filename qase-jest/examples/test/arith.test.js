@@ -37,4 +37,44 @@ describe("help", () => {
       expect(mul(3, 4)).toBe(12);
     });
   })
+
+  describe("help", () => {
+
+    for (let i = 0; i <= 1000; i++) {
+      test(`${i} + ${i} autocreated`, () => {
+        expect(add(i, i)).toBe(i*2);
+      });
+    }
+
+    test('2 + 3 = 5 without qase wrapper', () => {
+      expect(add(2, 3)).toBe(5);
+    });
+
+    test.skip('2 + 3 = 5 skipped', () => {
+      expect(add(2, 3)).toBe(5);
+    });
+
+    test('2 + 3 = 6', () => {
+      expect(add(2, 3)).toBe(6);
+    });
+
+    describe('Suite for the some nested cases', () => {
+      test('Nested 1', () => {
+        expect(add(2, 3)).toBe(5);
+      });
+
+      test.skip('2 + 3 = 5 skipped', () => {
+        expect(add(2, 3)).toBe(5);
+      });
+
+      test('2 + 3 = 6 Wrong case', () => {
+        expect(add(2, 3)).toBe(6);
+      });
+
+      test('Async test case', async () => {
+        await new Promise((r) => setTimeout(r, 2000));
+        expect(mul(3, 4)).toBe(12);
+      });
+    })
+  })
 })
