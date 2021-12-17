@@ -10,7 +10,7 @@ import { QaseApi } from 'qaseio';
 import chalk from 'chalk';
 
 enum Envs {
-    report = 'QASE_REPORT_TEST_RESULTS',
+    report = 'QASE_REPORT',
     apiToken = 'QASE_API_TOKEN',
     basePath = 'QASE_API_BASE_URL',
     projectCode = 'QASE_PROJECT_CODE',
@@ -77,7 +77,7 @@ class QaseReporter implements Reporter {
 
         if (!this.getEnv(Envs.report)) {
             this.log(
-                chalk`{yellow QASE_REPORT_TEST_RESULTS env variable is not set. Reporting to qase.io is disabled.}`);
+                chalk`{yellow QASE_REPORT env variable is not set. Reporting to qase.io is disabled.}`);
             this.isDisabled = true;
             return;
         }
