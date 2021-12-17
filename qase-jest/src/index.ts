@@ -10,7 +10,7 @@ import { QaseApi } from 'qaseio';
 import chalk from 'chalk';
 
 enum Envs {
-    report = 'QASE_REPORT',
+    report = 'QASE_REPORT_TEST_RESULTS',
     apiToken = 'QASE_API_TOKEN',
     basePath = 'QASE_API_BASE_URL',
     projectCode = 'QASE_PROJECT_CODE',
@@ -19,7 +19,7 @@ enum Envs {
     runDescription = 'QASE_RUN_DESCRIPTION',
     runComplete = 'QASE_RUN_COMPLETE',
     environmentId = 'QASE_ENVIRONMENT_ID',
-    rootSuite = 'QASE_ROOT_SUITE_TITLE'
+    rootSuiteTitle = 'QASE_ROOT_SUITE_TITLE'
 }
 
 const Statuses = {
@@ -33,6 +33,7 @@ const Statuses = {
 interface QaseOptions {
     apiToken: string;
     basePath?: string;
+    rootSuiteTitle?: string;
     projectCode: string;
     runId?: string;
     runPrefix?: string;
@@ -64,17 +65,19 @@ class QaseReporter implements Reporter {
     public constructor(_: Record<string, unknown>, _options: QaseOptions) {
         this.options = _options;
         this.options.projectCode = _options.projectCode || this.getEnv(Envs.projectCode) || '';
+        this.options.rootSuiteTitle = _options.rootSuiteTitle || this.getEnv(Envs.rootSuiteTitle);
         this.options.runComplete = !!this.getEnv(Envs.runComplete) || this.options.runComplete;
         this.api = new QaseApi(
             this.getEnv(Envs.apiToken) || this.options.apiToken || '',
-            this.getEnv(Envs.basePath) || this.options.basePath
+            this.getEnv(Envs.basePath) || this.options.basePath,
         );
 
         this.log(chalk`{yellow Current PID: ${process.pid}}`);
         this.preparedTestCases = [];
 
         if (!this.getEnv(Envs.report)) {
-            this.log(chalk`{yellow QASE_REPORT env variable is not set. Reporting to qase.io is disabled.}`);
+            this.log(
+                chalk`{yellow QASE_REPORT_TEST_RESULTS env variable is not set. Reporting to qase.io is disabled.}`);
             this.isDisabled = true;
             return;
         }
@@ -199,8 +202,11 @@ class QaseReporter implements Reporter {
     private createPreparedForPublishTestsArray(testResults: AssertionResult[]) {
         const transformedMap = testResults.map((result) => {
             this.logTestItem(result);
+            const fullPathToCase = result.ancestorTitles.join('\t');
             const item: PreparedForReportingTestCase = {
-                path: result.ancestorTitles.join('\t'),
+                path: this.options.rootSuiteTitle
+                    ? `${this.options.rootSuiteTitle}\t${fullPathToCase}`
+                    : fullPathToCase,
                 result: result.status,
                 duration: result.duration,
                 status: result.status,
