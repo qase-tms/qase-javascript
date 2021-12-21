@@ -7,11 +7,11 @@ const config = {
         ['list'],
         ['playwright-qase-reporter',
             {
-                apiToken: '7cb32d8e5527f515356706f84ec63bda0b57c408',
-                projectCode: 'DEMO',
+                apiToken: 'api_key',
+                projectCode: 'project_code',
                 runComplete: true,
                 logging: true,
-                uploadAttachments: true,
+                uploadAttachments: true
             }],
     ],
 };

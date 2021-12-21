@@ -1,65 +1,20 @@
-# [Qase TMS](https://qase.io) Jest Reporter
+> # Qase TMS Jest reporter
+>
+> Publish results simple and easy.
 
-[![License](https://lxgaming.github.io/badges/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
-
-## Installation
+## How to integrate
 
 ```
 npm install jest-qase-reporter
 ```
 
-## Configuration
-
-Reporter options (* - required):
-
-- *`apiToken` - Token for API access, you can find more information
-  [here](https://developers.qase.io/#authentication)
-- *`projectCode` - Code of your project (can be extracted from main 
-  page of your project: `https://app.qase.io/project/DEMOTR` - 
-  `DEMOTR` is project code here)
-- `runId` - Run ID from Qase TMS (also can be got from run URL)
-- `environmentId` - Environment ID from Qase TMS
-- `logging` [true/false] - Enabled debug logging from reporter or not
-- `runComplete` [true/false] - Complete run after all tests are finished
-
-Example jest.config.js config:
-
-```js
-module.exports = {
-  reporters: [
-    'default',
-    [
-      'jest-qase-reporter',
-      {
-        apiToken: '578e3b73a34f06e84eafea103cd44dc24253b2c5',
-        projectCode: 'PRJCODE',
-        runId: 45,
-        environmentId: 1,
-        logging: true,
-        runComplete: true,
-      },
-    ],
-  ],
-  ...
-};
-```
-
-You can check example configuration with multiple reporters in [example project](./examples/jest.config.js)
-
-Supported ENV variables:
-
-- `QASE_REPORT` - You **should** pass this ENV if you want to use 
-  qase reporter
-- `QASE_API_TOKEN` - API token
-- `QASE_RUN_ID` - Pass Run ID from ENV and override reporter options
-- `QASE_ENVIRONMENT_ID` - Pass Environment ID from ENV and override reporter options
-- `QASE_RUN_NAME` - Set custom Run name, when new run is created
-- `QASE_RUN_DESCRIPTION` - Set custom Run description, when new run is created
-- `QASE_RUN_COMPLETE` - Complete run after all tests are finished
-
 ## Using Reporter
 
-If you want to decorate come test with Qase Case ID you could use qase function:
+The Jest reporter has the ability to auto-generate test cases
+and suites from your test data.
+
+But if necessary, you can independently register the ID of already
+existing test cases from TMS before the executing tests. For example:
 
 ```typescript
 import { qase } from 'jest-qase-reporter/dist/jest';
@@ -81,12 +36,83 @@ describe('My First Test', () => {
         expect(true).toBe(false);
     })
 });
-
 ```
 
-## Running Jest Reporter
+You should also have an active item in the project settings at
 
-To start jest run with qase reporter run it like this:
+```
+https://app.qase.io/project/QASE_PROJECT_CODE/settings/options
+```
+
+options in the `Test Runs` block:
+
+```
+Auto create test cases
+```
+and
+```
+Allow submitting results in bulk
+```
+
+To run tests and create a test run, execute the command:
 ```bash
 QASE_REPORT=1 npx jest
 ```
+![Output of run](examples/screenshots/screenshot.png)​
+A test run will be performed and available at:
+```
+https://app.qase.io/run/QASE_PROJECT_CODE
+```
+
+## Configuration
+
+Reporter options (* - required):
+
+- *`apiToken` - Token for API access, you can find more information
+  [here](https://developers.qase.io/#authentication)
+- *`projectCode` - Code of your project (can be extracted from main 
+  page of your project: `https://app.qase.io/project/DEMOTR` - 
+  `DEMOTR` is project code here)
+- `runId` - Run ID from Qase TMS (also can be got from run URL)
+- `environmentId` - Environment ID from Qase TMS
+- `logging` [true/false] - Enabled debug logging from reporter or not
+- `runComplete` [true/false] - Complete run after all tests are finished
+
+Example `jest.config.js` config:
+
+```js
+module.exports = {
+  reporters: [
+    'default',
+    [
+      'jest-qase-reporter',
+      {
+        apiToken: 'api_key',
+        projectCode: 'project_code',
+        runId: 45,
+        environmentId: 1,
+        logging: true,
+        runComplete: true,
+      },
+    ],
+  ],
+  ...
+};
+```
+
+You can check example configuration with multiple reporters in [example project](./examples/jest.config.js).
+
+Supported ENV variables:
+
+- `QASE_REPORT` - You **should** pass this ENV if you want to use 
+  qase reporter
+- `QASE_API_TOKEN` - API token
+- `QASE_RUN_ID` - Pass Run ID from ENV and override reporter options
+- `QASE_ENVIRONMENT_ID` - Pass Environment ID from ENV and override reporter options
+- `QASE_RUN_NAME` - Set custom Run name, when new run is created
+- `QASE_RUN_DESCRIPTION` - Set custom Run description, when new run is created
+- `QASE_RUN_COMPLETE` - Complete run after all tests are finished
+
+<!-- references -->
+
+[auth]: https://developers.qase.io/#authentication

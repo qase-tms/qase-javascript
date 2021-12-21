@@ -1,14 +1,15 @@
-# [Qase TMS](https://qase.io) TestCafe Reporter
+> # Qase TMS TestCafe reporter
+>
+> Publish results simple and easy.
 
-[![License](https://lxgaming.github.io/badges/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
-
-## Installation
+## How to integrate
 
 ```
-npm install testcafe-reporter-qase
+npm install testcafe testcafe-reporter-qase
 ```
 
-## Usage
+## Example of usage
+
 In order to use reporter, you should add meta information to your tests. Meta key should be `CID`.
 You should assign list of case IDs to it, e.g.:
 ```js
@@ -25,11 +26,19 @@ test
     });
 ```
 
-After that you can run your tests by providing custom reporter:
+You can run your tests by providing custom reporter:
 ```bash
-npx testcafe chrome examples/use-page-model -r spec,qase
+npx testcafe chrome test.js -r spec,qase
 ```
-
+or
+```
+npm test
+```
+![Output of run](examples/screenshots/screenshot.png)​
+A test run will be performed and available at:
+```
+https://app.qase.io/run/QASE_PROJECT_CODE
+```
 ## Configuration
 
 Qase reporter supports passing parameters using two ways: 
@@ -55,8 +64,8 @@ Example configuration file:
 {
     "enabled": true,
     "logging": true,
-    "apiToken": "a786b45e371e1097c4c78a3211e3a1d23018ceb9",
-    "projectCode": "PROJECTCODE",
+    "apiToken": "api_key",
+    "projectCode": "project_code",
     "runName": "TestCafe run %DATE% %AGENTS%"
 }
 ```
@@ -70,3 +79,7 @@ Supported ENV variables:
 - `QASE_RUN_NAME` - Same as `runName`
 - `QASE_RUN_DESCRIPTION` - Same as `runDescription`
 - `QASE_LOGGING` - Same as `logging`
+
+<!-- references -->
+
+[auth]: https://developers.qase.io/#authentication
