@@ -34,6 +34,12 @@ newman run \
     -x # WA for issue https://github.com/postmanlabs/newman/issues/2148#issuecomment-665229759
 ```
 
+![Output of run](example/screenshots/screenshot.png)​
+A test run will be performed and available at:
+```
+https://app.qase.io/run/QASE_PROJECT_CODE
+```
+
 <!-- references -->
 
 [auth]: https://developers.qase.io/#authentication
