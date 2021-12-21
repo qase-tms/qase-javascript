@@ -1,6 +1,7 @@
 {
   "enabled": true,
   "logging": true,
-  "projectCode": "DEMOTR",
+  "apiToken": "api_key",
+  "projectCode": "project_code",
   "runName": "CucumberJS run %DATE%"
 }

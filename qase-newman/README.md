@@ -1,11 +1,14 @@
-# Qase Newman Reporter
+> # Qase TMS Newman reporter
+>
+> Publish results simple and easy.
 
-Install reporter:
+## How to integrate
+
 ```bash
 npm install -g newman-reporter-qase
 ```
 
-## Usage
+## Example of usage
 
 ### Define in tests
 ```js
@@ -30,3 +33,7 @@ newman run \
     --reporter-qase-runDescription "..." \ # Specify Run description using CLI parameters
     -x # WA for issue https://github.com/postmanlabs/newman/issues/2148#issuecomment-665229759
 ```
+
+<!-- references -->
+
+[auth]: https://developers.qase.io/#authentication

@@ -1,15 +1,14 @@
-# [Qase TMS](https://qase.io) Cucumber JS Reporter
+> # Qase TMS Cucumber JS reporter
+>
+> Publish results simple and easy.
 
-[![License](https://lxgaming.github.io/badges/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
-
-## Installation
+## How to integrate
 
 ```
 npm install cucumberjs-qase-reporter
 ```
 
-
-## Usage
+## Example of usage
 
 Decorate your scenarios with Qase TMS case IDs in format `Q-<case id>` or `Q123`, also `q` can be in any case:
 
@@ -64,8 +63,8 @@ Example configuration file:
 {
     "enabled": true,
     "logging": true,
-    "apiToken": "a786b45e371e1097c4c78a3211e3a1d23018ceb9",
-    "projectCode": "PROJECTCODE",
+    "apiToken": "api_key",
+    "projectCode": "project_code",
     "runName": "CucumberJS run %DATE%"
 }
 ```
@@ -105,3 +104,7 @@ exports.config = {
 ```
 
 **Do not forget to add .qaserc file!**
+
+<!-- references -->
+
+[auth]: https://developers.qase.io/#authentication

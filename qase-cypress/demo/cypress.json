@@ -6,7 +6,8 @@
       "charts": true
     },
     "cypressQaseReporterReporterOptions": {
-      "projectCode": "DEMOTR",
+      "apiToken": "api_key",
+      "projectCode": "project_code",
       "logging": true
     }
   },
