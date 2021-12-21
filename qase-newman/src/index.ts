@@ -83,8 +83,6 @@ class NewmanQaseReporter {
             this.log(err);
             return null;
         });
-
-        this.addRunnerListeners(emitter);
     }
 
     private getEnv(name: Envs) {
