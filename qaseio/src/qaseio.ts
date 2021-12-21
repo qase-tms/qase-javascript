@@ -13,6 +13,10 @@ import { SharedStepsApi } from './api/shared-steps-api';
 import { SuitesApi } from './api/suites-api';
 import { UsersApi } from './api/users-api';
 
+export interface AnalyticsHeaders {
+    'X-Platform': string;
+    'X-Client': string;
+}
 
 export class QaseApi {
     public projects: ProjectsApi;
@@ -31,11 +35,12 @@ export class QaseApi {
     private api: AxiosInstance;
     private configuration: Configuration;
 
-    public constructor(apiToken: string, basePath?: string) {
+    public constructor(apiToken: string, headers: {[key: string]: string}, basePath?: string) {
         const baseURL = basePath || 'https://api.qase.io/v1';
         const config: AxiosRequestConfig = {
             headers: {
                 Token: apiToken,
+                ...headers,
             },
             baseURL,
         };
