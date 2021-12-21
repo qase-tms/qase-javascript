@@ -107,6 +107,8 @@ Supported ENV variables:
 - `QASE_REPORT` - You **should** pass this ENV if you want to use 
   qase reporter
 - `QASE_API_TOKEN` - API token
+- `QASE_PROJECT_CODE` - Your project code
+- `QASE_ROOT_SUITE_TITLE` - Setting the root suite that the reporter will use
 - `QASE_RUN_ID` - Pass Run ID from ENV and override reporter options
 - `QASE_ENVIRONMENT_ID` - Pass Environment ID from ENV and override reporter options
 - `QASE_RUN_NAME` - Set custom Run name, when new run is created
