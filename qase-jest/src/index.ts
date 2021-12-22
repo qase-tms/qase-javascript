@@ -8,6 +8,7 @@ import {
 import { Reporter, Test, TestResult } from '@jest/reporters';
 import { QaseApi } from 'qaseio';
 import chalk from 'chalk';
+import lockfile from '../package-lock.json';
 
 enum Envs {
     report = 'QASE_REPORT',
@@ -69,6 +70,7 @@ class QaseReporter implements Reporter {
         this.options.runComplete = !!this.getEnv(Envs.runComplete) || this.options.runComplete;
         this.api = new QaseApi(
             this.getEnv(Envs.apiToken) || this.options.apiToken || '',
+            this.createHeaders(),
             this.getEnv(Envs.basePath) || this.options.basePath,
         );
 
@@ -119,7 +121,7 @@ class QaseReporter implements Reporter {
                         (created) => {
                             if (created) {
                                 this.runId = created.result?.id;
-                                process.env.QASE_RUN_ID = this.runId!.toString();
+                                process.env.QASE_RUN_ID = String(this?.runId);
                                 this.log(chalk`{green Using run ${this.runId} to publish test results}`);
                             } else {
                                 this.log(chalk`{red Could not create run in project ${this.options.projectCode}}`);
@@ -341,6 +343,21 @@ class QaseReporter implements Reporter {
 
             return caseObject;
         });
+    }
+
+    private createHeaders() {
+        const nodeVersion = process.version;
+        const qaseioVersion = lockfile.dependencies.qaseio.version;
+        const jestVersion = lockfile.dependencies.jest.version;
+        const jestReporterVersion = lockfile.version;
+
+        const xPlatformHeader = `node=${nodeVersion};`;
+        const xClientHeader = `jest=${jestVersion}; qase-jest=${jestReporterVersion}; qaseapi=${qaseioVersion};`;
+
+        return {
+            'X-Client': xClientHeader,
+            'X-Platform': xPlatformHeader,
+        };
     }
 }
 

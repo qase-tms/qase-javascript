@@ -1,9 +1,9 @@
 {
   "name": "jest-qase-reporter",
-  "version": "v1.3.0-alpha.2",
+  "version": "v1.3.0-alpha.3",
   "description": "Qase TMS Jest Reporter",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "bugs": {
     "url": "https://github.com/qase-tms/qase-javascript/issues"
@@ -30,7 +30,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "qaseio": "^2.0.0-alpha.2"
+    "qaseio": "^2.0.0-alpha.3"
   },
   "devDependencies": {
     "@hutson/npm-deploy-git-tag": "^6.0.0",
