@@ -38,7 +38,7 @@
     "ansi-regex": "^6.0.1",
     "axios-mock-adapter": "^1.18.1",
     "eslint": "^7.1.0",
-    "eslint-loader": "^3.0.2",
+    "eslint-loader": "^4.0.0",
     "eslint-plugin-jsdoc": "^26.0.1",
     "eslint-plugin-prefer-arrow": "^1.2.1",
     "handlebars": "^4.7.7",

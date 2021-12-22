@@ -35,7 +35,7 @@ export class QaseApi {
     private api: AxiosInstance;
     private configuration: Configuration;
 
-    public constructor(apiToken: string, headers: {[key: string]: string}, basePath?: string) {
+    public constructor(apiToken: string, basePath?: string, headers?: {[key: string]: string}) {
         const baseURL = basePath || 'https://api.qase.io/v1';
         const config: AxiosRequestConfig = {
             headers: {
