@@ -8,6 +8,7 @@ import {
 import { Reporter, Test, TestResult } from '@jest/reporters';
 import { QaseApi } from 'qaseio';
 import chalk from 'chalk';
+import { execSync } from 'child_process';
 import lockfile from '../package-lock.json';
 
 enum Envs {
@@ -70,8 +71,8 @@ class QaseReporter implements Reporter {
         this.options.runComplete = !!this.getEnv(Envs.runComplete) || this.options.runComplete;
         this.api = new QaseApi(
             this.getEnv(Envs.apiToken) || this.options.apiToken || '',
-            this.createHeaders(),
             this.getEnv(Envs.basePath) || this.options.basePath,
+            this.createHeaders(),
         );
 
         this.log(chalk`{yellow Current PID: ${process.pid}}`);
@@ -346,12 +347,13 @@ class QaseReporter implements Reporter {
     }
 
     private createHeaders() {
-        const nodeVersion = process.version;
+        const {version: nodeVersion, platform: os, arch} = process;
         const qaseioVersion = lockfile.dependencies.qaseio.version;
         const jestVersion = lockfile.dependencies.jest.version;
         const jestReporterVersion = lockfile.version;
+        const npmVersion = execSync('npm -v', { encoding: 'utf8' }).replace(/['"\n]+/g, '');
 
-        const xPlatformHeader = `node=${nodeVersion};`;
+        const xPlatformHeader = `node=${nodeVersion}; npm=${npmVersion}; os=${os}; arch=${arch}`;
         const xClientHeader = `jest=${jestVersion}; qase-jest=${jestReporterVersion}; qaseapi=${qaseioVersion};`;
 
         return {
