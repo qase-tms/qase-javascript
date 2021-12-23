@@ -9,7 +9,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "jest": "^27.0.4",
+    "jest": "^27.0.4"
+  },
+  "dependencies": {
     "jest-qase-reporter": "../"
   }
 }

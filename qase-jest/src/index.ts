@@ -8,6 +8,8 @@ import {
 import { Reporter, Test, TestResult } from '@jest/reporters';
 import { QaseApi } from 'qaseio';
 import chalk from 'chalk';
+import { execSync } from 'child_process';
+import { readFileSync } from 'fs';
 
 enum Envs {
     report = 'QASE_REPORT',
@@ -70,6 +72,7 @@ class QaseReporter implements Reporter {
         this.api = new QaseApi(
             this.getEnv(Envs.apiToken) || this.options.apiToken || '',
             this.getEnv(Envs.basePath) || this.options.basePath,
+            this.createHeaders(),
         );
 
         this.log(chalk`{yellow Current PID: ${process.pid}}`);
@@ -119,7 +122,7 @@ class QaseReporter implements Reporter {
                         (created) => {
                             if (created) {
                                 this.runId = created.result?.id;
-                                process.env.QASE_RUN_ID = this.runId!.toString();
+                                process.env.QASE_RUN_ID = String(this?.runId);
                                 this.log(chalk`{green Using run ${this.runId} to publish test results}`);
                             } else {
                                 this.log(chalk`{red Could not create run in project ${this.options.projectCode}}`);
@@ -341,6 +344,43 @@ class QaseReporter implements Reporter {
 
             return caseObject;
         });
+    }
+
+    private createHeaders() {
+        const { version: nodeVersion, platform: os, arch } = process;
+        const npmVersion = execSync('npm -v', { encoding: 'utf8' }).replace(/['"\n]+/g, '');
+        const qaseapiVersion = this.getPackageVersion('qaseio');
+        const jestVersion = this.getPackageVersion('jest');
+        const jestCaseReporterVersion = this.getPackageVersion('jest-qase-reporter');
+        const xPlatformHeader = `node=${nodeVersion}; npm=${npmVersion}; os=${os}; arch=${arch}`;
+        // eslint-disable-next-line max-len
+        const xClientHeader = `jest=${jestVersion as string}; qase-jest=${jestCaseReporterVersion as string}; qaseapi=${qaseapiVersion as string}`;
+
+        return {
+            'X-Client': xClientHeader,
+            'X-Platform': xPlatformHeader,
+        };
+    }
+
+    private getPackageVersion(name: string) {
+        const UNDEFINED = 'undefined';
+        try {
+            const pathToPackageJson = require.resolve(`${name}/package.json`, { paths: [process.cwd()] });
+            if (pathToPackageJson) {
+                try {
+                    const packageString = readFileSync(pathToPackageJson, { encoding: 'utf8' });
+                    if (packageString) {
+                        const packageObject = JSON.parse(packageString) as { version: string };
+                        return packageObject.version;
+                    }
+                    return UNDEFINED;
+                } catch (error) {
+                    return UNDEFINED;
+                }
+            }
+        } catch (error) {
+            return UNDEFINED;
+        }
     }
 }
 
