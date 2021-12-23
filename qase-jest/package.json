@@ -2,8 +2,8 @@
   "name": "jest-qase-reporter",
   "version": "v1.3.0-alpha.3",
   "description": "Qase TMS Jest Reporter",
-  "main": "./dist/src/index.js",
-  "types": "./dist/src/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "bugs": {
     "url": "https://github.com/qase-tms/qase-javascript/issues"

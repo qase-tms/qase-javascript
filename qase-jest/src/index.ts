@@ -9,7 +9,7 @@ import { Reporter, Test, TestResult } from '@jest/reporters';
 import { QaseApi } from 'qaseio';
 import chalk from 'chalk';
 import { execSync } from 'child_process';
-import lockfile from '../package-lock.json';
+import { readFileSync } from 'fs';
 
 enum Envs {
     report = 'QASE_REPORT',
@@ -347,19 +347,42 @@ class QaseReporter implements Reporter {
     }
 
     private createHeaders() {
-        const {version: nodeVersion, platform: os, arch} = process;
-        const qaseioVersion = lockfile.dependencies.qaseio.version;
-        const jestVersion = lockfile.dependencies.jest.version;
-        const jestReporterVersion = lockfile.version;
+        const { version: nodeVersion, platform: os, arch } = process;
         const npmVersion = execSync('npm -v', { encoding: 'utf8' }).replace(/['"\n]+/g, '');
-
+        const qaseapiVersion = this.getPackageVersion('qaseio');
+        const jestVersion = this.getPackageVersion('jest');
+        const jestCaseReporterVersion = this.getPackageVersion('jest-qase-reporter');
         const xPlatformHeader = `node=${nodeVersion}; npm=${npmVersion}; os=${os}; arch=${arch}`;
-        const xClientHeader = `jest=${jestVersion}; qase-jest=${jestReporterVersion}; qaseapi=${qaseioVersion};`;
+        // eslint-disable-next-line max-len
+        const xClientHeader = `jest=${jestVersion as string}; qase-jest=${jestCaseReporterVersion as string}; qaseapi=${qaseapiVersion as string}`;
 
         return {
             'X-Client': xClientHeader,
             'X-Platform': xPlatformHeader,
         };
+    }
+
+    private getPackageVersion(name: string) {
+        const UNDEFINED = 'undefined';
+        try {
+            const pathToPackageJson = require.resolve(`${name}/package.json`, { paths: [process.cwd()] });
+            if (pathToPackageJson) {
+                try {
+                    const packageString = readFileSync(pathToPackageJson, { encoding: 'utf8' });
+                    if (packageString) {
+                        const packageObject = JSON.parse(packageString) as { version: string };
+                        return packageObject.version;
+                    }
+                    return UNDEFINED;
+                } catch (error) {
+                    this.log(`Unable to read from file with path: ${pathToPackageJson}. Error: ${error as string}`);
+                    return UNDEFINED;
+                }
+            }
+        } catch (error) {
+            this.log(`Unable to resolve the path for the package: ${name}. Error: ${error as string}`);
+            return UNDEFINED;
+        }
     }
 }
 

@@ -1,5 +1,5 @@
 const { add, mul, sub, div } = require('./arith');
-const { qase } = require('jest-qase-reporter/dist/src/jest');
+const { qase } = require('jest-qase-reporter/dist/jest');
 
 describe("Test suite", () => {
   test('2 + 3 = 5 without qase wrapper', () => {
