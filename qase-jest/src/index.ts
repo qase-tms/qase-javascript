@@ -375,12 +375,10 @@ class QaseReporter implements Reporter {
                     }
                     return UNDEFINED;
                 } catch (error) {
-                    this.log(`Unable to read from file with path: ${pathToPackageJson}. Error: ${error as string}`);
                     return UNDEFINED;
                 }
             }
         } catch (error) {
-            this.log(`Unable to resolve the path for the package: ${name}. Error: ${error as string}`);
             return UNDEFINED;
         }
     }
