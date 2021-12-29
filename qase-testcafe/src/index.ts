@@ -14,6 +14,7 @@ interface Config {
     runId: string | number | undefined;
     runName: string;
     runDescription?: string;
+    runComplete: boolean;
     logging: boolean;
 }
 
@@ -89,6 +90,8 @@ const prepareConfig = (options: Config = {} as Config): Config => {
             'Automated Run %DATE%',
         runDescription:
             process.env.QASE_RUN_DESCRIPTION || config.runDescription,
+        runComplete:
+            process.env.QASE_RUN_COMPLETE === 'true' || config.runComplete || false,
         logging: process.env.QASE_LOGGING !== '' || config.logging,
     };
 };
@@ -130,12 +133,13 @@ class TestcafeQaseReporter {
     private screenshots: {
         [key: string]: Screenshot[];
     };
+    private queued: number;
 
     public constructor() {
         this.config = prepareConfig();
         this.enabled = verifyConfig(this.config);
         this.api = new QaseApi(this.config.apiToken);
-
+        this.queued = 0;
         this.results = [];
         this.screenshots = {};
     }
@@ -217,13 +221,13 @@ class TestcafeQaseReporter {
         }
     };
 
-    public reportTaskDone = async () => {
+    public reportTaskDone = async (endTime, passed, warnings, result) => {
         if (!this.enabled) {
             return;
         }
         const check = () => {
             setTimeout(() => {
-                if (this.pending) {
+                if (this.queued > 0) {
                     check();
                 } else {
                     if (this.results.length === 0) {
@@ -233,10 +237,26 @@ class TestcafeQaseReporter {
                                 Ensure that your tests are declared correctly.\n`
                         );
                     }
+                    if (this.config.runComplete) {
+                        this.completeRun(this.config.runId);
+                    }
                 }
             }, 1000);
         };
+        check();
     };
+
+    private completeRun(runId: string | number | undefined) {
+        if (runId !== undefined) {
+            this.api.runs.complete(this.config.projectCode, runId)
+                .then(() => {
+                    this.log('Run completed successfully');
+                })
+                .catch((err) => {
+                    this.log(`Error on completing run ${err as string}`);
+                });
+        }
+    }
 
     private log(message?: any, ...optionalParams: any[]) {
         if (this.config.logging){
@@ -325,6 +345,7 @@ class TestcafeQaseReporter {
                     this.log(
                         chalk`{gray Start publishing: ${test.name}}${add}`
                     );
+                    this.queued ++;
                     this.api.results.create(this.config.projectCode, runId, new ResultCreate(
                         parseInt(caseId, 10),
                         status,
@@ -337,9 +358,11 @@ class TestcafeQaseReporter {
                     ))
                         .then((res) => {
                             this.results.push({test, result: res.data});
+                            this.queued --;
                             this.log(chalk`{gray Result published: ${test.name} ${res.data.hash}}${add}`);
                         })
                         .catch((err) => {
+                            this.queued --;
                             this.log(err);
                         });
                 }
