@@ -91,7 +91,7 @@ const prepareConfig = (options: Config = {} as Config): Config => {
         runDescription:
             process.env.QASE_RUN_DESCRIPTION || config.runDescription,
         runComplete:
-            process.env.QASE_RUN_COMPLETE === 'true' || config.runComplete || false,
+            process.env.QASE_RUN_COMPLETE === 'true' || config.runComplete,
         logging: process.env.QASE_LOGGING !== '' || config.logging,
     };
 };
@@ -345,7 +345,7 @@ class TestcafeQaseReporter {
                     this.log(
                         chalk`{gray Start publishing: ${test.name}}${add}`
                     );
-                    this.queued ++;
+                    this.queued++;
                     this.api.results.create(this.config.projectCode, runId, new ResultCreate(
                         parseInt(caseId, 10),
                         status,
@@ -358,11 +358,11 @@ class TestcafeQaseReporter {
                     ))
                         .then((res) => {
                             this.results.push({test, result: res.data});
-                            this.queued --;
+                            this.queued--;
                             this.log(chalk`{gray Result published: ${test.name} ${res.data.hash}}${add}`);
                         })
                         .catch((err) => {
-                            this.queued --;
+                            this.queued--;
                             this.log(err);
                         });
                 }
