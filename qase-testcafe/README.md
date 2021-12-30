@@ -57,6 +57,7 @@ using `.qaserc` file and using ENV variables.
     - `%DATE%`
     - `%AGENTS%`
 - `runDescription` - Set custom Run description, when new run is created
+- `runComplete` - Complete run after all tests are finished
 - `logging` - Enabled debug logging from reporter or not
 
 Example configuration file:
@@ -78,6 +79,7 @@ Supported ENV variables:
 - `QASE_RUN_ID` - Pass Run ID from ENV and override reporter options
 - `QASE_RUN_NAME` - Same as `runName`
 - `QASE_RUN_DESCRIPTION` - Same as `runDescription`
+- `QASE_RUN_COMPLETE` - Same as `runComplete`
 - `QASE_LOGGING` - Same as `logging`
 
 <!-- references -->
