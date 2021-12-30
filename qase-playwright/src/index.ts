@@ -277,6 +277,12 @@ class PlaywrightReporter implements Reporter {
 
     }
 
+    private removePublished(testAlias): void {
+        const resultIndex = this.resultsToBePublished.indexOf(testAlias);
+        if (resultIndex !== -1) {
+            this.resultsToBePublished.splice(resultIndex, 1);
+        }
+    }
 
     private async publishCaseResult(test: TestCase, testResult: TestResult): Promise<void> {
         this.logTestItem(test, testResult);
@@ -314,15 +320,13 @@ class PlaywrightReporter implements Reporter {
                         })
                     );
 
-                    const resultIndex = this.resultsToBePublished.indexOf(testAlias);
-                    if (resultIndex !== -1) {
-                        this.resultsToBePublished.splice(resultIndex, 1);
-                    }
+                    this.removePublished(testAlias);
                     this.publishedResultsCount++;
                     this.log(
                         chalk`{gray Result published: ${test.title} ${res.data.hash}}${add}`
                     );
                 } catch (err) {
+                    this.removePublished(testAlias);
                     this.log(chalk`{red ${err}}`);
                 }
             })
