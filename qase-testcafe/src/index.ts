@@ -221,6 +221,10 @@ class TestcafeQaseReporter {
         }
     };
 
+    // It is necessary to declare function with parameters,
+    // despite of there are unused, because when function signature not like expected,
+    // testcafe does not call this function
+    // eslint-disable-next-line no-unused-vars
     public reportTaskDone = async (endTime, passed, warnings, result) => {
         if (!this.enabled) {
             return;
