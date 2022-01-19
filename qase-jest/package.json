@@ -1,6 +1,6 @@
 {
   "name": "jest-qase-reporter",
-  "version": "v1.3.0-alpha.3",
+  "version": "v1.3.0-alpha.4",
   "description": "Qase TMS Jest Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -30,7 +30,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "qaseio": "^2.0.0-alpha.4"
+    "qaseio": "^2.0.0-alpha.5"
   },
   "devDependencies": {
     "@hutson/npm-deploy-git-tag": "^6.0.0",
