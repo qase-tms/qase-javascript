@@ -118,7 +118,7 @@ class CypressQaseReporter extends reporters.Base {
                 this.log(
                     chalk`{blue Waiting for 30 seconds to publish pending results}`
                 );
-                const endTime = Date.now() + 30e3;
+                const endTime = Date.now() + 60e3;
                 while ((this.shouldPublish !== 0) && (Date.now() < endTime)) {
                     // sleep 500 ms
                     const sharedArrayBuffer = new SharedArrayBuffer(8);
