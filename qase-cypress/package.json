@@ -1,6 +1,6 @@
 {
   "name": "cypress-qase-reporter",
-  "version": "v1.4.1",
+  "version": "v1.4.2",
   "description": "Qase TMS Cypress Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
