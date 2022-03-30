@@ -20,112 +20,98 @@ import { TagValue } from './tag-value';
 /**
  * 
  * @export
- * @interface Defect
+ * @interface QqlDefect
  */
-export interface Defect {
+export interface QqlDefect {
     /**
      * 
      * @type {number}
-     * @memberof Defect
+     * @memberof QqlDefect
      */
     'id'?: number;
     /**
      * 
      * @type {string}
-     * @memberof Defect
+     * @memberof QqlDefect
      */
     'title'?: string;
     /**
      * 
      * @type {string}
-     * @memberof Defect
+     * @memberof QqlDefect
      */
     'actual_result'?: string;
     /**
      * 
      * @type {string}
-     * @memberof Defect
+     * @memberof QqlDefect
      */
     'severity'?: string;
     /**
      * 
      * @type {string}
-     * @memberof Defect
+     * @memberof QqlDefect
      */
     'status'?: string;
     /**
      * 
      * @type {number}
-     * @memberof Defect
+     * @memberof QqlDefect
      */
     'milestone_id'?: number | null;
     /**
      * 
      * @type {Array<CustomFieldValue>}
-     * @memberof Defect
+     * @memberof QqlDefect
      */
     'custom_fields'?: Array<CustomFieldValue>;
     /**
      * 
      * @type {Array<Attachment>}
-     * @memberof Defect
+     * @memberof QqlDefect
      */
     'attachments'?: Array<Attachment>;
     /**
      * 
      * @type {string}
-     * @memberof Defect
+     * @memberof QqlDefect
      */
     'resolved'?: string | null;
     /**
      * 
      * @type {number}
-     * @memberof Defect
+     * @memberof QqlDefect
      */
     'project_id'?: number;
     /**
      * 
      * @type {number}
-     * @memberof Defect
+     * @memberof QqlDefect
      */
     'member_id'?: number;
     /**
      * 
      * @type {string}
-     * @memberof Defect
+     * @memberof QqlDefect
      */
     'external_data'?: string;
     /**
      * 
      * @type {Array<TagValue>}
-     * @memberof Defect
+     * @memberof QqlDefect
      */
     'tags'?: Array<TagValue>;
     /**
      * 
      * @type {string}
-     * @memberof Defect
+     * @memberof QqlDefect
      */
     'created_at'?: string;
     /**
      * 
      * @type {string}
-     * @memberof Defect
+     * @memberof QqlDefect
      */
     'updated_at'?: string;
-    /**
-     * Deprecated, use the `created_at` property instead.
-     * @type {string}
-     * @memberof Defect
-     * @deprecated
-     */
-    'created'?: string;
-    /**
-     * Deprecated, use the `updated_at` property instead.
-     * @type {string}
-     * @memberof Defect
-     * @deprecated
-     */
-    'updated'?: string;
 }
 

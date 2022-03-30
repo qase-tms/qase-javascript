@@ -37,7 +37,7 @@ export interface Milestone {
      * @type {string}
      * @memberof Milestone
      */
-    'description'?: string;
+    'description'?: string | null;
     /**
      * 
      * @type {string}
@@ -45,23 +45,37 @@ export interface Milestone {
      */
     'status'?: MilestoneStatusEnum;
     /**
-     * 
+     * date in the \'Y-m-d H:i:s\' format
      * @type {string}
      * @memberof Milestone
      */
     'due_date'?: string | null;
     /**
-     * 
+     * Deprecated, use the `created_at` property instead.
      * @type {string}
      * @memberof Milestone
+     * @deprecated
      */
     'created'?: string;
+    /**
+     * Deprecated, use the `updated_at` property instead.
+     * @type {string}
+     * @memberof Milestone
+     * @deprecated
+     */
+    'updated'?: string | null;
     /**
      * 
      * @type {string}
      * @memberof Milestone
      */
-    'updated'?: string | null;
+    'created_at'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Milestone
+     */
+    'updated_at'?: string;
 }
 
 /**

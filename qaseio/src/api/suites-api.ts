@@ -23,6 +23,8 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 // @ts-ignore
 import { IdResponse } from '../model';
 // @ts-ignore
+import { InlineObject1 } from '../model';
+// @ts-ignore
 import { SuiteCreate } from '../model';
 // @ts-ignore
 import { SuiteDelete } from '../model';
@@ -222,17 +224,17 @@ export const SuitesApiAxiosParamCreator = function (configuration?: Configuratio
          * @summary Update test suite.
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
-         * @param {SuiteCreate} suiteCreate 
+         * @param {InlineObject1} inlineObject1 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateSuite: async (code: string, id: number, suiteCreate: SuiteCreate, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateSuite: async (code: string, id: number, inlineObject1: InlineObject1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('updateSuite', 'code', code)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('updateSuite', 'id', id)
-            // verify required parameter 'suiteCreate' is not null or undefined
-            assertParamExists('updateSuite', 'suiteCreate', suiteCreate)
+            // verify required parameter 'inlineObject1' is not null or undefined
+            assertParamExists('updateSuite', 'inlineObject1', inlineObject1)
             const localVarPath = `/suite/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
@@ -257,7 +259,7 @@ export const SuitesApiAxiosParamCreator = function (configuration?: Configuratio
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(suiteCreate, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(inlineObject1, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -330,12 +332,12 @@ export const SuitesApiFp = function(configuration?: Configuration) {
          * @summary Update test suite.
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
-         * @param {SuiteCreate} suiteCreate 
+         * @param {InlineObject1} inlineObject1 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateSuite(code: string, id: number, suiteCreate: SuiteCreate, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IdResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateSuite(code, id, suiteCreate, options);
+        async updateSuite(code: string, id: number, inlineObject1: InlineObject1, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IdResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateSuite(code, id, inlineObject1, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -400,12 +402,12 @@ export const SuitesApiFactory = function (configuration?: Configuration, basePat
          * @summary Update test suite.
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
-         * @param {SuiteCreate} suiteCreate 
+         * @param {InlineObject1} inlineObject1 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateSuite(code: string, id: number, suiteCreate: SuiteCreate, options?: any): AxiosPromise<IdResponse> {
-            return localVarFp.updateSuite(code, id, suiteCreate, options).then((request) => request(axios, basePath));
+        updateSuite(code: string, id: number, inlineObject1: InlineObject1, options?: any): AxiosPromise<IdResponse> {
+            return localVarFp.updateSuite(code, id, inlineObject1, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -477,12 +479,12 @@ export class SuitesApi extends BaseAPI {
      * @summary Update test suite.
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
-     * @param {SuiteCreate} suiteCreate 
+     * @param {InlineObject1} inlineObject1 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof SuitesApi
      */
-    public updateSuite(code: string, id: number, suiteCreate: SuiteCreate, options?: AxiosRequestConfig) {
-        return SuitesApiFp(this.configuration).updateSuite(code, id, suiteCreate, options).then((request) => request(this.axios, this.basePath));
+    public updateSuite(code: string, id: number, inlineObject1: InlineObject1, options?: AxiosRequestConfig) {
+        return SuitesApiFp(this.configuration).updateSuite(code, id, inlineObject1, options).then((request) => request(this.axios, this.basePath));
     }
 }

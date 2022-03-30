@@ -31,7 +31,7 @@ export interface Requirement {
      * @type {number}
      * @memberof Requirement
      */
-    'parent_id'?: number;
+    'parent_id'?: number | null;
     /**
      * 
      * @type {number}
@@ -49,7 +49,7 @@ export interface Requirement {
      * @type {string}
      * @memberof Requirement
      */
-    'description'?: string;
+    'description'?: string | null;
     /**
      * 
      * @type {string}
@@ -67,13 +67,13 @@ export interface Requirement {
      * @type {string}
      * @memberof Requirement
      */
-    'created'?: string;
+    'created_at'?: string;
     /**
      * 
      * @type {string}
      * @memberof Requirement
      */
-    'updated'?: string | null;
+    'updated_at'?: string | null;
 }
 
 /**

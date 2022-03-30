@@ -21,185 +21,164 @@ import { TestStep } from './test-step';
 /**
  * 
  * @export
- * @interface TestCase
+ * @interface QqlTestCase
  */
-export interface TestCase {
+export interface QqlTestCase {
     /**
      * 
      * @type {number}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'id'?: number;
     /**
      * 
      * @type {number}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'position'?: number;
     /**
      * 
      * @type {string}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'title'?: string;
     /**
      * 
      * @type {string}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'description'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'preconditions'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'postconditions'?: string | null;
     /**
      * 
      * @type {number}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'severity'?: number;
     /**
      * 
      * @type {number}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'priority'?: number;
     /**
      * 
      * @type {number}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'type'?: number;
     /**
      * 
      * @type {number}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'layer'?: number;
     /**
      * 
      * @type {number}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'is_flaky'?: number;
     /**
      * 
      * @type {number}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'behavior'?: number;
     /**
      * 
      * @type {number}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'automation'?: number;
     /**
      * 
      * @type {number}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'status'?: number;
     /**
      * 
      * @type {number}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'milestone_id'?: number | null;
     /**
      * 
      * @type {number}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'suite_id'?: number | null;
     /**
      * 
      * @type {Array<CustomFieldValue>}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'custom_fields'?: Array<CustomFieldValue>;
     /**
      * 
      * @type {Array<Attachment>}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'attachments'?: Array<Attachment>;
     /**
      * 
      * @type {string}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'steps_type'?: string | null;
     /**
      * 
      * @type {Array<TestStep>}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'steps'?: Array<TestStep>;
     /**
      * 
      * @type {Array<any> | object}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'params'?: Array<any> | object;
     /**
      * 
      * @type {Array<TagValue>}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'tags'?: Array<TagValue>;
     /**
      * 
      * @type {number}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'member_id'?: number;
     /**
      * 
      * @type {number}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'project_id'?: number;
     /**
      * 
      * @type {string}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'created_at'?: string;
     /**
      * 
      * @type {string}
-     * @memberof TestCase
+     * @memberof QqlTestCase
      */
     'updated_at'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TestCase
-     * @deprecated
-     */
-    'deleted'?: string | null;
-    /**
-     * Deprecated, use the `created_at` property instead.
-     * @type {string}
-     * @memberof TestCase
-     * @deprecated
-     */
-    'created'?: string;
-    /**
-     * Deprecated, use the `updated_at` property instead.
-     * @type {string}
-     * @memberof TestCase
-     * @deprecated
-     */
-    'updated'?: string;
 }
 

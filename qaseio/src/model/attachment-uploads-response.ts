@@ -14,24 +14,13 @@
 
 
 import { AttachmentGet } from './attachment-get';
+import { AttachmentUploadsResponseAllOf } from './attachment-uploads-response-all-of';
+import { Response } from './response';
 
 /**
- * 
+ * @type AttachmentUploadsResponse
  * @export
- * @interface AttachmentUploadsResponse
  */
-export interface AttachmentUploadsResponse {
-    /**
-     * 
-     * @type {boolean}
-     * @memberof AttachmentUploadsResponse
-     */
-    'status'?: boolean;
-    /**
-     * 
-     * @type {Array<AttachmentGet>}
-     * @memberof AttachmentUploadsResponse
-     */
-    'result'?: Array<AttachmentGet>;
-}
+export type AttachmentUploadsResponse = AttachmentUploadsResponseAllOf & Response;
+
 

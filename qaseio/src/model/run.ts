@@ -42,7 +42,7 @@ export interface Run {
      * @type {string}
      * @memberof Run
      */
-    'description'?: string;
+    'description'?: string | null;
     /**
      * 
      * @type {number}
@@ -56,13 +56,13 @@ export interface Run {
      */
     'status_text'?: string;
     /**
-     * 
+     * date in the \'Y-m-d H:i:s\' format
      * @type {string}
      * @memberof Run
      */
     'start_time'?: string | null;
     /**
-     * 
+     * date in the \'Y-m-d H:i:s\' format
      * @type {string}
      * @memberof Run
      */

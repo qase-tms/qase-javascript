@@ -44,7 +44,7 @@ export const AttachmentsApiAxiosParamCreator = function (configuration?: Configu
         deleteAttachment: async (hash: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'hash' is not null or undefined
             assertParamExists('deleteAttachment', 'hash', hash)
-            const localVarPath = `/attachment/{code_or_hash}`
+            const localVarPath = `/attachment/{hash}`
                 .replace(`{${"hash"}}`, encodeURIComponent(String(hash)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -81,7 +81,7 @@ export const AttachmentsApiAxiosParamCreator = function (configuration?: Configu
         getAttachment: async (hash: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'hash' is not null or undefined
             assertParamExists('getAttachment', 'hash', hash)
-            const localVarPath = `/attachment/{code_or_hash}`
+            const localVarPath = `/attachment/{hash}`
                 .replace(`{${"hash"}}`, encodeURIComponent(String(hash)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -162,7 +162,7 @@ export const AttachmentsApiAxiosParamCreator = function (configuration?: Configu
         uploadAttachment: async (code: string, file?: Array<any>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('uploadAttachment', 'code', code)
-            const localVarPath = `/attachment/{code_or_hash}`
+            const localVarPath = `/attachment/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);

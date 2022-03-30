@@ -37,7 +37,7 @@ export interface Plan {
      * @type {string}
      * @memberof Plan
      */
-    'description'?: string;
+    'description'?: string | null;
     /**
      * 
      * @type {number}
@@ -49,12 +49,26 @@ export interface Plan {
      * @type {string}
      * @memberof Plan
      */
-    'created'?: string;
+    'created_at'?: string;
     /**
      * 
      * @type {string}
      * @memberof Plan
      */
-    'updated'?: string | null;
+    'updated_at'?: string;
+    /**
+     * Deprecated, use the `created_at` property instead.
+     * @type {string}
+     * @memberof Plan
+     * @deprecated
+     */
+    'created'?: string;
+    /**
+     * Deprecated, use the `updated_at` property instead.
+     * @type {string}
+     * @memberof Plan
+     * @deprecated
+     */
+    'updated'?: string;
 }
 

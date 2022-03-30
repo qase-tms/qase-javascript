@@ -13,7 +13,6 @@
  */
 
 
-import { AttachmentHash } from './attachment-hash';
 
 /**
  * 
@@ -26,13 +25,13 @@ export interface SharedStepCreateSteps {
      * @type {string}
      * @memberof SharedStepCreateSteps
      */
-    'hash'?: string;
+    'action': string;
     /**
      * 
      * @type {string}
      * @memberof SharedStepCreateSteps
      */
-    'action'?: string;
+    'hash'?: string;
     /**
      * 
      * @type {string}
@@ -46,10 +45,10 @@ export interface SharedStepCreateSteps {
      */
     'data'?: string;
     /**
-     * 
-     * @type {Array<AttachmentHash>}
+     * A list of Attachment hashes.
+     * @type {Array<string>}
      * @memberof SharedStepCreateSteps
      */
-    'attachments'?: Array<AttachmentHash>;
+    'attachments'?: Array<string>;
 }
 

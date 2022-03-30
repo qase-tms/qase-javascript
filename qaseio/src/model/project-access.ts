@@ -25,6 +25,6 @@ export interface ProjectAccess {
      * @type {number}
      * @memberof ProjectAccess
      */
-    'memeber_id'?: number;
+    'member_id'?: number;
 }
 
