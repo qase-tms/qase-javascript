@@ -21,7 +21,7 @@ enum Envs {
     runDescription = 'QASE_RUN_DESCRIPTION',
     runComplete = 'QASE_RUN_COMPLETE',
     environmentId = 'QASE_ENVIRONMENT_ID',
-    rootSuiteTitle = 'QASE_ROOT_SUITE_TITLE'
+    rootSuiteTitle = 'QASE_ROOT_SUITE_TITLE',
 }
 
 const Statuses = {
@@ -66,13 +66,16 @@ class QaseReporter implements Reporter {
 
     public constructor(_: Record<string, unknown>, _options: QaseOptions) {
         this.options = _options;
-        this.options.projectCode = _options.projectCode || this.getEnv(Envs.projectCode) || '';
-        this.options.rootSuiteTitle = _options.rootSuiteTitle || this.getEnv(Envs.rootSuiteTitle);
-        this.options.runComplete = !!this.getEnv(Envs.runComplete) || this.options.runComplete;
+        this.options.projectCode =
+            _options.projectCode || this.getEnv(Envs.projectCode) || '';
+        this.options.rootSuiteTitle =
+            _options.rootSuiteTitle || this.getEnv(Envs.rootSuiteTitle);
+        this.options.runComplete =
+            !!this.getEnv(Envs.runComplete) || this.options.runComplete;
         this.api = new QaseApi(
             this.getEnv(Envs.apiToken) || this.options.apiToken || '',
             this.getEnv(Envs.basePath) || this.options.basePath,
-            this.createHeaders(),
+            this.createHeaders()
         );
 
         this.log(chalk`{yellow Current PID: ${process.pid}}`);
@@ -80,7 +83,8 @@ class QaseReporter implements Reporter {
 
         if (!this.getEnv(Envs.report)) {
             this.log(
-                chalk`{yellow QASE_REPORT env variable is not set. Reporting to qase.io is disabled.}`);
+                chalk`{yellow QASE_REPORT env variable is not set. Reporting to qase.io is disabled.}`
+            );
             this.isDisabled = true;
             return;
         }
@@ -95,7 +99,9 @@ class QaseReporter implements Reporter {
             this.options.projectCode,
             async (prjExists): Promise<void> => {
                 if (!prjExists) {
-                    this.log(chalk`{red Project ${this.options.projectCode} does not exist}`);
+                    this.log(
+                        chalk`{red Project ${this.options.projectCode} does not exist}`
+                    );
                     this.isDisabled = true;
                     return;
                 }
@@ -104,17 +110,16 @@ class QaseReporter implements Reporter {
                 const userDefinedRunId = this.getEnv(Envs.runId) || this.options.runId;
                 if (userDefinedRunId) {
                     this.runId = userDefinedRunId;
-                    return this.checkRun(
-                        this.runId,
-                        (runExists: boolean) => {
-                            if (runExists) {
-                                this.log(chalk`{green Using run ${this.runId} to publish test results}`);
-                            } else {
-                                this.log(chalk`{red Run ${this.runId} does not exist}`);
-                                this.isDisabled = true;
-                            }
+                    return this.checkRun(this.runId, (runExists: boolean) => {
+                        if (runExists) {
+                            this.log(
+                                chalk`{green Using run ${this.runId} to publish test results}`
+                            );
+                        } else {
+                            this.log(chalk`{red Run ${this.runId} does not exist}`);
+                            this.isDisabled = true;
                         }
-                    );
+                    });
                 } else {
                     return this.createRun(
                         this.getEnv(Envs.runName),
@@ -123,9 +128,13 @@ class QaseReporter implements Reporter {
                             if (created) {
                                 this.runId = created.result?.id;
                                 process.env.QASE_RUN_ID = String(this?.runId);
-                                this.log(chalk`{green Using run ${this.runId} to publish test results}`);
+                                this.log(
+                                    chalk`{green Using run ${this.runId} to publish test results}`
+                                );
                             } else {
-                                this.log(chalk`{red Could not create run in project ${this.options.projectCode}}`);
+                                this.log(
+                                    chalk`{red Could not create run in project ${this.options.projectCode}}`
+                                );
                                 this.isDisabled = true;
                             }
                         }
@@ -135,11 +144,16 @@ class QaseReporter implements Reporter {
         );
     }
 
-    public async onTestResult(_test: Test, testResult: TestResult): Promise<void> {
+    public async onTestResult(
+        _test: Test,
+        testResult: TestResult
+    ): Promise<void> {
         if (this.isDisabled) {
             return;
         }
-        this.preparedTestCases = this.createPreparedForPublishTestsArray(testResult.testResults);
+        this.preparedTestCases = this.createPreparedForPublishTestsArray(
+            testResult.testResults
+        );
 
         await this.publishBulkTestResult().then(alwaysUndefined);
     }
@@ -150,7 +164,9 @@ class QaseReporter implements Reporter {
         }
 
         if (this.publishedResultsCount === 0) {
-            this.log('No testcases were matched. Ensure that your tests are declared correctly.');
+            this.log(
+                'No testcases were matched. Ensure that your tests are declared correctly.'
+            );
             return;
         }
 
@@ -159,7 +175,10 @@ class QaseReporter implements Reporter {
         }
 
         try {
-            await this.api.runs.completeRun(this.options.projectCode, Number(this.runId));
+            await this.api.runs.completeRun(
+                this.options.projectCode,
+                Number(this.runId)
+            );
             this.log(chalk`{green Run ${this.runId} completed}`);
         } catch (err) {
             this.log(`Error on completing run ${err as string}`);
@@ -245,11 +264,14 @@ class QaseReporter implements Reporter {
                 this.publishedResultsCount++;
             }
         } catch (error) {
-            this.log(JSON.stringify(error));
+            this.log(chalk`red Something wrong with the bulk sending method`);
         }
     }
 
-    private async checkProject(projectCode: string, cb: (exists: boolean) => Promise<void>): Promise<void> {
+    private async checkProject(
+        projectCode: string,
+        cb: (exists: boolean) => Promise<void>
+    ): Promise<void> {
         try {
             const resp = await this.api.projects.getProject(projectCode);
 
@@ -260,11 +282,15 @@ class QaseReporter implements Reporter {
         }
     }
 
-    private createRunObject(name: string, cases: number[], args?: {
-        description?: string;
-        environment_id: number | undefined;
-        is_autotest: boolean;
-    }) {
+    private createRunObject(
+        name: string,
+        cases: number[],
+        args?: {
+            description?: string;
+            environment_id: number | undefined;
+            is_autotest: boolean;
+        }
+    ) {
         return {
             title: name,
             cases,
@@ -279,7 +305,9 @@ class QaseReporter implements Reporter {
     ): Promise<void> {
         try {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const environmentId = Number.parseInt(this.getEnv(Envs.environmentId)!, 10) || this.options.environmentId;
+            const environmentId =
+                Number.parseInt(this.getEnv(Envs.environmentId)!, 10) ||
+                this.options.environmentId;
 
             const runObject = this.createRunObject(
                 name || `Automated run ${new Date().toISOString()}`,
@@ -301,35 +329,44 @@ class QaseReporter implements Reporter {
         }
     }
 
-    private async checkRun(runId: string | number | undefined, cb: (exists: boolean) => void): Promise<void> {
+    private async checkRun(
+        runId: string | number | undefined,
+        cb: (exists: boolean) => void
+    ): Promise<void> {
         if (runId === undefined) {
             cb(false);
             return;
         }
 
-        return this.api.runs.getRun(this.options.projectCode, Number(runId))
+        return this.api.runs
+            .getRun(this.options.projectCode, Number(runId))
             .then((resp) => {
-                this.log(`Get run result on checking run ${resp.data.result?.id as unknown as string}`);
+                this.log(
+                    `Get run result on checking run ${resp.data.result?.id as unknown as string
+                    }`
+                );
                 cb(Boolean(resp.data.result?.id));
             })
             .catch((err) => {
                 this.log(`Error on checking run ${err as string}`);
                 this.isDisabled = true;
             });
-
     }
 
     private createResultCasesArray() {
         return this.preparedTestCases.map((elem) => {
             const failureMessages = elem.failureMessages.map((value) =>
-                value.replace(/\u001b\[.*?m/g, ''));
+                value.replace(/\u001b\[.*?m/g, '')
+            );
             const caseObject: ResultCreate = {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 status: Statuses[elem.status] || Statuses.failed,
                 time_ms: Number(elem.duration),
                 stacktrace: failureMessages.join('\n'),
-                comment: failureMessages.length > 0 ? failureMessages.map(
-                    (value) => value.split('\n')[0]).join('\n') : undefined,
+                comment:
+                    failureMessages.length > 0
+                        ? failureMessages.map((value) => value.split('\n')[0]).join('\n')
+                        : undefined,
             };
 
             // Verifies that the user defined the ID through the use of the 'qase' wrapper;
@@ -348,13 +385,18 @@ class QaseReporter implements Reporter {
 
     private createHeaders() {
         const { version: nodeVersion, platform: os, arch } = process;
-        const npmVersion = execSync('npm -v', { encoding: 'utf8' }).replace(/['"\n]+/g, '');
+        const npmVersion = execSync('npm -v', { encoding: 'utf8' }).replace(
+            /[''\n]+/g,
+            ''
+        );
         const qaseapiVersion = this.getPackageVersion('qaseio');
         const jestVersion = this.getPackageVersion('jest');
-        const jestCaseReporterVersion = this.getPackageVersion('jest-qase-reporter');
+        const jestCaseReporterVersion =
+            this.getPackageVersion('jest-qase-reporter');
         const xPlatformHeader = `node=${nodeVersion}; npm=${npmVersion}; os=${os}; arch=${arch}`;
         // eslint-disable-next-line max-len
-        const xClientHeader = `jest=${jestVersion as string}; qase-jest=${jestCaseReporterVersion as string}; qaseapi=${qaseapiVersion as string}`;
+        const xClientHeader = `jest=${jestVersion as string}; qase-jest=${jestCaseReporterVersion as string
+        }; qaseapi=${qaseapiVersion as string}`;
 
         return {
             'X-Client': xClientHeader,
@@ -365,12 +407,18 @@ class QaseReporter implements Reporter {
     private getPackageVersion(name: string) {
         const UNDEFINED = 'undefined';
         try {
-            const pathToPackageJson = require.resolve(`${name}/package.json`, { paths: [process.cwd()] });
+            const pathToPackageJson = require.resolve(`${name}/package.json`, {
+                paths: [process.cwd()],
+            });
             if (pathToPackageJson) {
                 try {
-                    const packageString = readFileSync(pathToPackageJson, { encoding: 'utf8' });
+                    const packageString = readFileSync(pathToPackageJson, {
+                        encoding: 'utf8',
+                    });
                     if (packageString) {
-                        const packageObject = JSON.parse(packageString) as { version: string };
+                        const packageObject = JSON.parse(packageString) as {
+                            version: string;
+                        };
                         return packageObject.version;
                     }
                     return UNDEFINED;
