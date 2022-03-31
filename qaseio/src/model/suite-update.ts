@@ -17,31 +17,31 @@
 /**
  * 
  * @export
- * @interface InlineObject1
+ * @interface SuiteUpdate
  */
-export interface InlineObject1 {
+export interface SuiteUpdate {
     /**
      * Test suite title.
      * @type {string}
-     * @memberof InlineObject1
+     * @memberof SuiteUpdate
      */
     'title'?: string;
     /**
      * Test suite description.
      * @type {string}
-     * @memberof InlineObject1
+     * @memberof SuiteUpdate
      */
     'description'?: string;
     /**
      * Test suite preconditions
      * @type {string}
-     * @memberof InlineObject1
+     * @memberof SuiteUpdate
      */
     'preconditions'?: string;
     /**
      * Parent suite ID
      * @type {number}
-     * @memberof InlineObject1
+     * @memberof SuiteUpdate
      */
     'parent_id'?: number | null;
 }
