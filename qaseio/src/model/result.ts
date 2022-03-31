@@ -77,7 +77,7 @@ export interface Result {
      */
     'time_spent_ms'?: number;
     /**
-     * date in the \'Y-m-d H:i:s\' format
+     * 
      * @type {string}
      * @memberof Result
      */

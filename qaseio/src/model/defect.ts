@@ -76,7 +76,7 @@ export interface Defect {
      * @type {string}
      * @memberof Defect
      */
-    'resolved'?: string | null;
+    'resolved_at'?: string | null;
     /**
      * 
      * @type {number}

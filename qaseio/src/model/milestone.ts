@@ -45,7 +45,7 @@ export interface Milestone {
      */
     'status'?: MilestoneStatusEnum;
     /**
-     * date in the \'Y-m-d H:i:s\' format
+     * 
      * @type {string}
      * @memberof Milestone
      */
