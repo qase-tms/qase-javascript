@@ -70,16 +70,30 @@ export interface SharedStep {
      */
     'cases_count'?: number;
     /**
-     * 
+     * Deprecated, use the `created_at` property instead.
      * @type {string}
      * @memberof SharedStep
+     * @deprecated
      */
     'created'?: string;
+    /**
+     * Deprecated, use the `updated_at` property instead.
+     * @type {string}
+     * @memberof SharedStep
+     * @deprecated
+     */
+    'updated'?: string;
     /**
      * 
      * @type {string}
      * @memberof SharedStep
      */
-    'updated'?: string | null;
+    'created_at'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SharedStep
+     */
+    'updated_at'?: string;
 }
 

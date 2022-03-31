@@ -17,38 +17,44 @@
 /**
  * 
  * @export
- * @interface User
+ * @interface QqlPlan
  */
-export interface User {
+export interface QqlPlan {
     /**
      * 
      * @type {number}
-     * @memberof User
+     * @memberof QqlPlan
      */
     'id'?: number;
     /**
      * 
      * @type {string}
-     * @memberof User
-     */
-    'name'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof User
-     */
-    'email'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof User
+     * @memberof QqlPlan
      */
     'title'?: string;
     /**
      * 
-     * @type {number}
-     * @memberof User
+     * @type {string}
+     * @memberof QqlPlan
      */
-    'status'?: number;
+    'description'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QqlPlan
+     */
+    'cases_count'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof QqlPlan
+     */
+    'created_at'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QqlPlan
+     */
+    'updated_at'?: string;
 }
 

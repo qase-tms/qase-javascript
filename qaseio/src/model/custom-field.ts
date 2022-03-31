@@ -81,17 +81,31 @@ export interface CustomField {
      */
     'is_filterable'?: boolean;
     /**
-     * 
+     * Deprecated, use the `created_at` property instead.
      * @type {string}
      * @memberof CustomField
+     * @deprecated
      */
     'created'?: string;
+    /**
+     * Deprecated, use the `updated_at` property instead.
+     * @type {string}
+     * @memberof CustomField
+     * @deprecated
+     */
+    'updated'?: string | null;
     /**
      * 
      * @type {string}
      * @memberof CustomField
      */
-    'updated'?: string | null;
+    'created_at'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CustomField
+     */
+    'updated_at'?: string;
     /**
      * 
      * @type {Array<string>}

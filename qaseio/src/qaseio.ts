@@ -11,7 +11,6 @@ import { ResultsApi } from './api/results-api';
 import { RunsApi } from './api/runs-api';
 import { SharedStepsApi } from './api/shared-steps-api';
 import { SuitesApi } from './api/suites-api';
-import { UsersApi } from './api/users-api';
 
 export interface AnalyticsHeaders {
     'X-Platform': string;
@@ -30,12 +29,15 @@ export class QaseApi {
     public sharedSteps: SharedStepsApi;
     public defects: DefectsApi;
     public customFields: CustomFieldsApi;
-    public users: UsersApi;
 
     private api: AxiosInstance;
     private configuration: Configuration;
 
-    public constructor(apiToken: string, basePath?: string, headers?: {[key: string]: string}) {
+    public constructor(
+        apiToken: string,
+        basePath?: string,
+        headers?: { [key: string]: string }
+    ) {
         const baseURL = basePath || 'https://api.qase.io/v1';
         const config: AxiosRequestConfig = {
             headers: {
@@ -54,13 +56,24 @@ export class QaseApi {
         this.cases = new CasesApi(this.configuration, baseURL, this.api);
         this.results = new ResultsApi(this.configuration, baseURL, this.api);
         this.runs = new RunsApi(this.configuration, baseURL, this.api);
-        this.attachments = new AttachmentsApi(this.configuration, baseURL, this.api);
+        this.attachments = new AttachmentsApi(
+            this.configuration,
+            baseURL,
+            this.api
+        );
         this.plans = new PlansApi(this.configuration, baseURL, this.api);
         this.suites = new SuitesApi(this.configuration, baseURL, this.api);
         this.milestones = new MilestonesApi(this.configuration, baseURL, this.api);
-        this.sharedSteps = new SharedStepsApi(this.configuration, baseURL, this.api);
+        this.sharedSteps = new SharedStepsApi(
+            this.configuration,
+            baseURL,
+            this.api
+        );
         this.defects = new DefectsApi(this.configuration, baseURL, this.api);
-        this.customFields = new CustomFieldsApi(this.configuration, baseURL, this.api);
-        this.users = new UsersApi(this.configuration, baseURL, this.api);
+        this.customFields = new CustomFieldsApi(
+            this.configuration,
+            baseURL,
+            this.api
+        );
     }
 }

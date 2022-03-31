@@ -15,7 +15,7 @@
 
 
 /**
- * Could be used insetad of case_id
+ * Could be used instead of `case_id`.
  * @export
  * @interface ResultCreateCase
  */
@@ -27,7 +27,7 @@ export interface ResultCreateCase {
      */
     'title'?: string;
     /**
-     * 
+     * Nested suites should be separated with `TAB` symbol.
      * @type {string}
      * @memberof ResultCreateCase
      */

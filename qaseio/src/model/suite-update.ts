@@ -17,32 +17,32 @@
 /**
  * 
  * @export
- * @interface TestCaseUpdateSteps
+ * @interface SuiteUpdate
  */
-export interface TestCaseUpdateSteps {
+export interface SuiteUpdate {
     /**
-     * 
+     * Test suite title.
      * @type {string}
-     * @memberof TestCaseUpdateSteps
+     * @memberof SuiteUpdate
      */
-    'action'?: string;
+    'title'?: string;
     /**
-     * 
+     * Test suite description.
      * @type {string}
-     * @memberof TestCaseUpdateSteps
+     * @memberof SuiteUpdate
      */
-    'expected_result'?: string;
+    'description'?: string;
     /**
-     * 
+     * Test suite preconditions
      * @type {string}
-     * @memberof TestCaseUpdateSteps
+     * @memberof SuiteUpdate
      */
-    'data'?: string;
+    'preconditions'?: string;
     /**
-     * 
+     * Parent suite ID
      * @type {number}
-     * @memberof TestCaseUpdateSteps
+     * @memberof SuiteUpdate
      */
-    'position'?: number;
+    'parent_id'?: number | null;
 }
 

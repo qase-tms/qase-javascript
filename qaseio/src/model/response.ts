@@ -26,11 +26,5 @@ export interface Response {
      * @memberof Response
      */
     'status'?: boolean;
-    /**
-     * 
-     * @type {object}
-     * @memberof Response
-     */
-    'result'?: object;
 }
 

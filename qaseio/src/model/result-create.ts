@@ -24,6 +24,12 @@ import { ResultCreateSteps } from './result-create-steps';
 export interface ResultCreate {
     /**
      * 
+     * @type {string}
+     * @memberof ResultCreate
+     */
+    'status': ResultCreateStatusEnum;
+    /**
+     * 
      * @type {number}
      * @memberof ResultCreate
      */
@@ -34,12 +40,6 @@ export interface ResultCreate {
      * @memberof ResultCreate
      */
     'case'?: ResultCreateCase;
-    /**
-     * 
-     * @type {string}
-     * @memberof ResultCreate
-     */
-    'status'?: ResultCreateStatusEnum;
     /**
      * 
      * @type {number}
@@ -77,11 +77,11 @@ export interface ResultCreate {
      */
     'comment'?: string | null;
     /**
-     * 
-     * @type {Array<string>}
+     * A map of parameters (name => value)
+     * @type {{ [key: string]: string; }}
      * @memberof ResultCreate
      */
-    'param'?: Array<string>;
+    'param'?: { [key: string]: string; };
     /**
      * 
      * @type {Array<ResultCreateSteps>}

@@ -106,11 +106,23 @@ export interface TestCaseCreate {
      */
     'status'?: number;
     /**
+     * A list of Attachment hashes.
+     * @type {Array<string>}
+     * @memberof TestCaseCreate
+     */
+    'attachments'?: Array<string>;
+    /**
      * 
      * @type {Array<TestCaseCreateSteps>}
      * @memberof TestCaseCreate
      */
     'steps'?: Array<TestCaseCreateSteps>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof TestCaseCreate
+     */
+    'tags'?: Array<string>;
     /**
      * A map of custom fields values (id => value)
      * @type {{ [key: string]: string; }}

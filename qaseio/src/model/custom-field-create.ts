@@ -40,13 +40,7 @@ export interface CustomFieldCreate {
      */
     'type': number;
     /**
-     * 
-     * @type {Array<string>}
-     * @memberof CustomFieldCreate
-     */
-    'projects_codes': Array<string>;
-    /**
-     * 
+     * Required if type one of: 3 - selectbox; 5 - radio; 6 - multiselect; 
      * @type {Array<CustomFieldCreateValue>}
      * @memberof CustomFieldCreate
      */
@@ -81,5 +75,11 @@ export interface CustomFieldCreate {
      * @memberof CustomFieldCreate
      */
     'is_required'?: boolean;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof CustomFieldCreate
+     */
+    'projects_codes'?: Array<string>;
 }
 
