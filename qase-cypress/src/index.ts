@@ -4,20 +4,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access  */
-import { IdResponse, ResultCreate, ResultCreateStatusEnum} from 'qaseio/dist/src';
+import { IdResponse, ResultCreateStatusEnum } from 'qaseio/dist/src';
 import { MochaOptions, Runner, Test, reporters } from 'mocha';
 import { QaseApi } from 'qaseio';
 import chalk from 'chalk';
-import {execSync} from 'child_process';
-import {readFileSync} from 'fs';
+import { execSync } from 'child_process';
+import { readFileSync } from 'fs';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const {
-    EVENT_TEST_FAIL,
-    EVENT_TEST_PASS,
-    EVENT_TEST_PENDING,
-    EVENT_RUN_END,
-} = Runner.constants;
+const { EVENT_TEST_FAIL, EVENT_TEST_PASS, EVENT_TEST_PENDING, EVENT_RUN_END } =
+  Runner.constants;
 
 enum Envs {
     report = 'QASE_REPORT',
@@ -40,9 +36,15 @@ interface QaseOptions {
 }
 
 class CypressQaseReporter extends reporters.Base {
+    public testCasesForPublishingCount = 0;
     private api: QaseApi;
     private pending: Array<(runId: string | number) => void> = [];
-    private shouldPublish: Array<{test: Test; status: ResultCreateStatusEnum}> = [];
+    private shouldPublish: Array<{ test: Test; status: ResultCreateStatusEnum }> =
+    [];
+    private results: Array<{
+        test: Test;
+        result: any;
+    }> = [];
     private options: QaseOptions;
     private runId?: number | string;
     private isDisabled = false;
@@ -55,7 +57,7 @@ class CypressQaseReporter extends reporters.Base {
         this.api = new QaseApi(
             this.options.apiToken || CypressQaseReporter.getEnv(Envs.apiToken) || '',
             CypressQaseReporter.getEnv(Envs.basePath) || this.options.basePath,
-            CypressQaseReporter.createHeaders(),
+            CypressQaseReporter.createHeaders()
         );
 
         if (!CypressQaseReporter.getEnv(Envs.report)) {
@@ -66,45 +68,47 @@ class CypressQaseReporter extends reporters.Base {
 
         this.addRunnerListeners(runner);
 
-        void this.checkProject(
-            this.options.projectCode,
-            async (prjExists) => {
-                if (prjExists) {
-                    this.log(chalk`{green Project ${this.options.projectCode} exists}`);
-                    if (CypressQaseReporter.getEnv(Envs.runId) || this.options.runId) {
-                        this.saveRunId(CypressQaseReporter.getEnv(Envs.runId) || this.options.runId);
-                        await this.checkRun(
-                            this.runId,
-                            (runExists: boolean) => {
-                                const run = this.runId as unknown as string;
-                                if (runExists) {
-                                    this.log(chalk`{green Using run ${run} to publish test results}`);
-                                } else {
-                                    this.log(chalk`{red Run ${run} does not exist}`);
-                                }
+        void this.checkProject(this.options.projectCode, async (prjExists) => {
+            if (prjExists) {
+                this.log(chalk`{green Project ${this.options.projectCode} exists}`);
+                if (CypressQaseReporter.getEnv(Envs.runId) || this.options.runId) {
+                    this.saveRunId(
+                        CypressQaseReporter.getEnv(Envs.runId) || this.options.runId
+                    );
+                    await this.checkRun(this.runId, (runExists: boolean) => {
+                        const run = this.runId as unknown as string;
+                        if (runExists) {
+                            this.log(chalk`{green Using run ${run} to publish test results}`);
+                        } else {
+                            this.log(chalk`{red Run ${run} does not exist}`);
+                        }
+                    });
+                } else if (!this.runId) {
+                    await this.createRun(
+                        CypressQaseReporter.getEnv(Envs.runName),
+                        CypressQaseReporter.getEnv(Envs.runDescription),
+                        (created) => {
+                            if (created) {
+                                this.runId = created.result?.id;
+                                process.env.QASE_RUN_ID = String(this?.runId);
+                                this.log(
+                                    chalk`{green Using run ${this.runId} to publish test results}`
+                                );
+                            } else {
+                                this.log(
+                                    chalk`{red Could not create run in project ${this.options.projectCode}}`
+                                );
+                                this.isDisabled = true;
                             }
-                        );
-                    } else if (!this.runId) {
-                        await this.createRun(
-                            CypressQaseReporter.getEnv(Envs.runName),
-                            CypressQaseReporter.getEnv(Envs.runDescription),
-                            (created) => {
-                                if (created) {
-                                    this.runId = created.result?.id;
-                                    process.env.QASE_RUN_ID = String(this?.runId);
-                                    this.log(chalk`{green Using run ${this.runId} to publish test results}`);
-                                } else {
-                                    this.log(chalk`{red Could not create run in project ${this.options.projectCode}}`);
-                                    this.isDisabled = true;
-                                }
-                            }
-                        );
-                    }
-                } else {
-                    this.log(chalk`{red Project ${this.options.projectCode} does not exist}`);
+                        }
+                    );
                 }
+            } else {
+                this.log(
+                    chalk`{red Project ${this.options.projectCode} does not exist}`
+                );
             }
-        );
+        });
     }
 
     private static getEnv(name: Envs) {
@@ -120,11 +124,15 @@ class CypressQaseReporter extends reporters.Base {
         return [];
     }
 
-    private static createRunObject(name: string, cases: number[], args?: {
-        description?: string;
-        environment_id: number | undefined;
-        is_autotest: boolean;
-    }) {
+    private static createRunObject(
+        name: string,
+        cases: number[],
+        args?: {
+            description?: string;
+            environment_id: number | undefined;
+            is_autotest: boolean;
+        }
+    ) {
         return {
             title: name,
             cases,
@@ -134,13 +142,20 @@ class CypressQaseReporter extends reporters.Base {
 
     private static createHeaders() {
         const { version: nodeVersion, platform: os, arch } = process;
-        const npmVersion = execSync('npm -v', { encoding: 'utf8' }).replace(/['"\n]+/g, '');
+        const npmVersion = execSync('npm -v', { encoding: 'utf8' }).replace(
+            /['"\n]+/g,
+            ''
+        );
         const qaseapiVersion = CypressQaseReporter.getPackageVersion('qaseio');
         const cypressVersion = CypressQaseReporter.getPackageVersion('cypress');
-        const cypressCaseReporterVersion = this.getPackageVersion('cypress-qase-reporter');
+        const cypressCaseReporterVersion = this.getPackageVersion(
+            'cypress-qase-reporter'
+        );
         const xPlatformHeader = `node=${nodeVersion}; npm=${npmVersion}; os=${os}; arch=${arch}`;
         // eslint-disable-next-line max-len
-        const xClientHeader = `cypress=${cypressVersion as string}; qase-cypress=${cypressCaseReporterVersion as string}; qaseapi=${qaseapiVersion as string}`;
+        const xClientHeader = `cypress=${cypressVersion as string}; qase-cypress=${
+            cypressCaseReporterVersion as string
+        }; qaseapi=${qaseapiVersion as string}`;
 
         return {
             'X-Client': xClientHeader,
@@ -151,12 +166,18 @@ class CypressQaseReporter extends reporters.Base {
     private static getPackageVersion(name: string) {
         const UNDEFINED = 'undefined';
         try {
-            const pathToPackageJson = require.resolve(`${name}/package.json`, { paths: [process.cwd()] });
+            const pathToPackageJson = require.resolve(`${name}/package.json`, {
+                paths: [process.cwd()],
+            });
             if (pathToPackageJson) {
                 try {
-                    const packageString = readFileSync(pathToPackageJson, { encoding: 'utf8' });
+                    const packageString = readFileSync(pathToPackageJson, {
+                        encoding: 'utf8',
+                    });
                     if (packageString) {
-                        const packageObject = JSON.parse(packageString) as { version: string };
+                        const packageObject = JSON.parse(packageString) as {
+                            version: string;
+                        };
                         return packageObject.version;
                     }
                     return UNDEFINED;
@@ -170,39 +191,34 @@ class CypressQaseReporter extends reporters.Base {
     }
 
     private log(message?: any, ...optionalParams: any[]) {
-        if (this.options.logging){
+        if (this.options.logging) {
             console.log(chalk`{bold {blue qase:}} ${message}`, ...optionalParams);
         }
     }
 
     private addRunnerListeners(runner: Runner) {
         runner.on(EVENT_TEST_PASS, (test: Test) => {
-            this.saveCaseResult(test, ResultCreateStatusEnum.PASSED);
+            this.publishCaseResult(test, ResultCreateStatusEnum.PASSED);
         });
 
         runner.on(EVENT_TEST_PENDING, (test: Test) => {
-            this.saveCaseResult(test, ResultCreateStatusEnum.SKIPPED);
+            this.publishCaseResult(test, ResultCreateStatusEnum.SKIPPED);
         });
 
         runner.on(EVENT_TEST_FAIL, (test: Test) => {
-            this.saveCaseResult(test, ResultCreateStatusEnum.FAILED);
+            this.publishCaseResult(test, ResultCreateStatusEnum.FAILED);
         });
 
         runner.addListener(EVENT_RUN_END, () => {
-            if (this.shouldPublish.length === 0) {
+            if (this.testCasesForPublishingCount === 0) {
                 this.log('Nothing to send.');
             } else if (this.runId) {
                 this.log(
-                    chalk`{blue Waiting for 30 seconds to publish pending results}`
+                    chalk`{blue Waiting for 60 seconds to publish pending results}`
                 );
 
-                void this.publishBulkTestResult().then(() => {
-                    this.publishedResults = true;
-                }).catch((e) => {
-                    console.log(e);
-                });
-                const endTime = Date.now() + 30e3;
-                while ((!this.publishedResults) && (Date.now() < endTime)) {
+                const endTime = Date.now() + 60e3;
+                while (!this.publishedResults && Date.now() < endTime) {
                     // sleep 500 ms
                     const sharedArrayBuffer = new SharedArrayBuffer(8);
                     const int32array = new Int32Array(sharedArrayBuffer);
@@ -217,7 +233,10 @@ class CypressQaseReporter extends reporters.Base {
         });
     }
 
-    private async checkProject(projectCode: string, cb: (exists: boolean) => Promise<void>): Promise<void> {
+    private async checkProject(
+        projectCode: string,
+        cb: (exists: boolean) => Promise<void>
+    ): Promise<void> {
         try {
             const resp = await this.api.projects.getProject(projectCode);
 
@@ -236,8 +255,9 @@ class CypressQaseReporter extends reporters.Base {
     ): Promise<void> {
         try {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const environmentId = Number.parseInt(CypressQaseReporter.getEnv(Envs.environmentId)!, 10)
-                || this.options.environmentId;
+            const environmentId =
+        Number.parseInt(CypressQaseReporter.getEnv(Envs.environmentId)!, 10) ||
+        this.options.environmentId;
 
             const runObject = CypressQaseReporter.createRunObject(
                 name || `Automated run ${new Date().toISOString()}`,
@@ -260,22 +280,29 @@ class CypressQaseReporter extends reporters.Base {
     }
 
     // eslint-disable-next-line @typescript-eslint/require-await
-    private async checkRun(runId: string | number | undefined, cb: (exists: boolean) => void): Promise<void> {
+    private async checkRun(
+        runId: string | number | undefined,
+        cb: (exists: boolean) => void
+    ): Promise<void> {
         if (runId === undefined) {
             cb(false);
             return;
         }
 
-        return this.api.runs.getRun(this.options.projectCode, Number(runId))
+        return this.api.runs
+            .getRun(this.options.projectCode, Number(runId))
             .then((resp) => {
-                this.log(`Get run result on checking run ${resp.data.result?.id as unknown as string}`);
+                this.log(
+                    `Get run result on checking run ${
+            resp.data.result?.id as unknown as string
+                    }`
+                );
                 cb(Boolean(resp.data.result?.id));
             })
             .catch((err) => {
                 this.log(`Error on checking run ${err as string}`);
                 this.isDisabled = true;
             });
-
     }
 
     private saveRunId(runId?: string | number) {
@@ -302,53 +329,45 @@ class CypressQaseReporter extends reporters.Base {
         }
     }
 
-    private saveCaseResult(test: Test, status: ResultCreateStatusEnum){
+    private publishCaseResult(test: Test, status: ResultCreateStatusEnum) {
         this.logTestItem(test);
-        this.shouldPublish.push({
-            test,
-            status,
-        });
-    }
 
-    private createResultCasesArray() {
-        const results: ResultCreate[] = [];
-        this.shouldPublish.forEach((testResult) => {
-            const caseIds = CypressQaseReporter.getCaseId(testResult.test);
-            caseIds.forEach((caseId) => {
+        const caseIds = CypressQaseReporter.getCaseId(test);
+        caseIds.forEach((caseId) => {
+            this.testCasesForPublishingCount++;
+            const publishTest = (runId: string | number) => {
                 if (caseId) {
-                    results.push({
-                        case_id: caseId,
-                        status: testResult.status,
-                        time_ms: testResult.test.duration,
-                        stacktrace: testResult.test.err?.stack,
-                        comment: testResult.test.err
-                            ? `${testResult.test.err.name}: ${testResult.test.err.message}`
-                            : undefined,
-                    });
+                    const add =
+            caseIds.length > 1 ? chalk` {white For case ${caseId}}` : '';
+                    this.log(chalk`{gray Start publishing: ${test.title}}${add}`);
+                    this.api.results
+                        .createResult(this.options.projectCode, Number(runId), {
+                            status,
+                            case_id: caseId,
+                            time_ms: test.duration,
+                            stacktrace: test.err?.stack,
+                            comment: test.err
+                                ? `${test.err.name}: ${test.err.message}`
+                                : undefined,
+                        })
+                        .then((res) => {
+                            this.results.push({ test, result: res.data });
+                            this.log(chalk`{gray Result published: ${test.title}}${add}`);
+                            this.testCasesForPublishingCount--;
+                        })
+                        .catch((err) => {
+                            this.log(err);
+                            this.testCasesForPublishingCount--;
+                        });
                 }
-            });
-        });
-        return results;
-    }
-
-    private async publishBulkTestResult() {
-        try {
-            const body = {
-                results: this.createResultCasesArray(),
             };
 
-            const res = await this.api.results.createResultBulk(
-                this.options.projectCode,
-                Number(this.runId),
-                body
-            );
-
-            if (res.status === 200) {
-                this.publishedResults = true;
+            if (this.runId) {
+                publishTest(this.runId);
+            } else {
+                this.pending.push(publishTest);
             }
-        } catch (error) {
-            this.log(JSON.stringify(error));
-        }
+        });
     }
 }
 
