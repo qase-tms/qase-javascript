@@ -13,7 +13,7 @@
  */
 
 
-import { TestCaseUpdateSteps } from './test-case-update-steps';
+import { TestCaseCreateSteps } from './test-case-create-steps';
 
 /**
  * 
@@ -106,11 +106,23 @@ export interface TestCaseUpdate {
      */
     'status'?: number;
     /**
-     * 
-     * @type {Array<TestCaseUpdateSteps>}
+     * A list of Attachment hashes.
+     * @type {Array<string>}
      * @memberof TestCaseUpdate
      */
-    'steps'?: Array<TestCaseUpdateSteps>;
+    'attachments'?: Array<string>;
+    /**
+     * 
+     * @type {Array<TestCaseCreateSteps>}
+     * @memberof TestCaseUpdate
+     */
+    'steps'?: Array<TestCaseCreateSteps>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof TestCaseUpdate
+     */
+    'tags'?: Array<string>;
     /**
      * A map of custom fields values (id => value)
      * @type {{ [key: string]: string; }}

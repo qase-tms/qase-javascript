@@ -13,14 +13,19 @@
  */
 
 
-import { Response } from './response';
-import { User } from './user';
-import { UserResponseAllOf } from './user-response-all-of';
+import { AttachmentGet } from './attachment-get';
 
 /**
- * @type UserResponse
+ * 
  * @export
+ * @interface AttachmentUploadsResponseAllOf
  */
-export type UserResponse = Response & UserResponseAllOf;
-
+export interface AttachmentUploadsResponseAllOf {
+    /**
+     * 
+     * @type {Array<AttachmentGet>}
+     * @memberof AttachmentUploadsResponseAllOf
+     */
+    'result'?: Array<AttachmentGet>;
+}
 

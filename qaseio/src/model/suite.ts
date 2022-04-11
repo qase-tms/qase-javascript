@@ -37,13 +37,13 @@ export interface Suite {
      * @type {string}
      * @memberof Suite
      */
-    'description'?: string;
+    'description'?: string | null;
     /**
      * 
      * @type {string}
      * @memberof Suite
      */
-    'preconditions'?: string;
+    'preconditions'?: string | null;
     /**
      * 
      * @type {number}
@@ -63,16 +63,30 @@ export interface Suite {
      */
     'parent_id'?: number | null;
     /**
-     * 
+     * Deprecated, use the `created_at` property instead.
      * @type {string}
      * @memberof Suite
+     * @deprecated
      */
     'created'?: string;
+    /**
+     * Deprecated, use the `updated_at` property instead.
+     * @type {string}
+     * @memberof Suite
+     * @deprecated
+     */
+    'updated'?: string | null;
     /**
      * 
      * @type {string}
      * @memberof Suite
      */
-    'updated'?: string | null;
+    'created_at'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Suite
+     */
+    'updated_at'?: string;
 }
 

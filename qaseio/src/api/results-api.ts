@@ -44,21 +44,21 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
          * This method allows to create test run result by Run Id. 
          * @summary Create test run result.
          * @param {string} code Code of project, where to search entities.
-         * @param {string | number} idOrHash Id or Hash.
+         * @param {number} id Identifier.
          * @param {ResultCreate} resultCreate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createResult: async (code: string, idOrHash: string | number, resultCreate: ResultCreate, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createResult: async (code: string, id: number, resultCreate: ResultCreate, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('createResult', 'code', code)
-            // verify required parameter 'idOrHash' is not null or undefined
-            assertParamExists('createResult', 'idOrHash', idOrHash)
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('createResult', 'id', id)
             // verify required parameter 'resultCreate' is not null or undefined
             assertParamExists('createResult', 'resultCreate', resultCreate)
-            const localVarPath = `/result/{code}/{id_or_hash}`
+            const localVarPath = `/result/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
-                .replace(`{${"id_or_hash"}}`, encodeURIComponent(String(idOrHash)));
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -183,18 +183,18 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
          * This method allows to retrieve a specific test run result by Hash. 
          * @summary Get test run result by code.
          * @param {string} code Code of project, where to search entities.
-         * @param {string | number} idOrHash Id or Hash.
+         * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getResult: async (code: string, idOrHash: string | number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getResult: async (code: string, hash: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getResult', 'code', code)
-            // verify required parameter 'idOrHash' is not null or undefined
-            assertParamExists('getResult', 'idOrHash', idOrHash)
-            const localVarPath = `/result/{code}/{id_or_hash}`
+            // verify required parameter 'hash' is not null or undefined
+            assertParamExists('getResult', 'hash', hash)
+            const localVarPath = `/result/{code}/{hash}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
-                .replace(`{${"id_or_hash"}}`, encodeURIComponent(String(idOrHash)));
+                .replace(`{${"hash"}}`, encodeURIComponent(String(hash)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -337,13 +337,13 @@ export const ResultsApiFp = function(configuration?: Configuration) {
          * This method allows to create test run result by Run Id. 
          * @summary Create test run result.
          * @param {string} code Code of project, where to search entities.
-         * @param {string | number} idOrHash Id or Hash.
+         * @param {number} id Identifier.
          * @param {ResultCreate} resultCreate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createResult(code: string, idOrHash: string | number, resultCreate: ResultCreate, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Response & object>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createResult(code, idOrHash, resultCreate, options);
+        async createResult(code: string, id: number, resultCreate: ResultCreate, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Response & object>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createResult(code, id, resultCreate, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -376,12 +376,12 @@ export const ResultsApiFp = function(configuration?: Configuration) {
          * This method allows to retrieve a specific test run result by Hash. 
          * @summary Get test run result by code.
          * @param {string} code Code of project, where to search entities.
-         * @param {string | number} idOrHash Id or Hash.
+         * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getResult(code: string, idOrHash: string | number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ResultResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getResult(code, idOrHash, options);
+        async getResult(code: string, hash: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ResultResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getResult(code, hash, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -426,13 +426,13 @@ export const ResultsApiFactory = function (configuration?: Configuration, basePa
          * This method allows to create test run result by Run Id. 
          * @summary Create test run result.
          * @param {string} code Code of project, where to search entities.
-         * @param {string | number} idOrHash Id or Hash.
+         * @param {number} id Identifier.
          * @param {ResultCreate} resultCreate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createResult(code: string, idOrHash: string | number, resultCreate: ResultCreate, options?: any): AxiosPromise<Response & object> {
-            return localVarFp.createResult(code, idOrHash, resultCreate, options).then((request) => request(axios, basePath));
+        createResult(code: string, id: number, resultCreate: ResultCreate, options?: any): AxiosPromise<Response & object> {
+            return localVarFp.createResult(code, id, resultCreate, options).then((request) => request(axios, basePath));
         },
         /**
          * This method allows to create a lot of test run result at once. 
@@ -462,12 +462,12 @@ export const ResultsApiFactory = function (configuration?: Configuration, basePa
          * This method allows to retrieve a specific test run result by Hash. 
          * @summary Get test run result by code.
          * @param {string} code Code of project, where to search entities.
-         * @param {string | number} idOrHash Id or Hash.
+         * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getResult(code: string, idOrHash: string | number, options?: any): AxiosPromise<ResultResponse> {
-            return localVarFp.getResult(code, idOrHash, options).then((request) => request(axios, basePath));
+        getResult(code: string, hash: string, options?: any): AxiosPromise<ResultResponse> {
+            return localVarFp.getResult(code, hash, options).then((request) => request(axios, basePath));
         },
         /**
          * This method allows to retrieve all test run results stored in selected project. 
@@ -509,14 +509,14 @@ export class ResultsApi extends BaseAPI {
      * This method allows to create test run result by Run Id. 
      * @summary Create test run result.
      * @param {string} code Code of project, where to search entities.
-     * @param {string | number} idOrHash Id or Hash.
+     * @param {number} id Identifier.
      * @param {ResultCreate} resultCreate 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ResultsApi
      */
-    public createResult(code: string, idOrHash: string | number, resultCreate: ResultCreate, options?: AxiosRequestConfig) {
-        return ResultsApiFp(this.configuration).createResult(code, idOrHash, resultCreate, options).then((request) => request(this.axios, this.basePath));
+    public createResult(code: string, id: number, resultCreate: ResultCreate, options?: AxiosRequestConfig) {
+        return ResultsApiFp(this.configuration).createResult(code, id, resultCreate, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -551,13 +551,13 @@ export class ResultsApi extends BaseAPI {
      * This method allows to retrieve a specific test run result by Hash. 
      * @summary Get test run result by code.
      * @param {string} code Code of project, where to search entities.
-     * @param {string | number} idOrHash Id or Hash.
+     * @param {string} hash Hash.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ResultsApi
      */
-    public getResult(code: string, idOrHash: string | number, options?: AxiosRequestConfig) {
-        return ResultsApiFp(this.configuration).getResult(code, idOrHash, options).then((request) => request(this.axios, this.basePath));
+    public getResult(code: string, hash: string, options?: AxiosRequestConfig) {
+        return ResultsApiFp(this.configuration).getResult(code, hash, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

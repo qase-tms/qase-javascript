@@ -13,12 +13,12 @@
  */
 
 
-import { Defect } from './defect';
-import { Plan } from './plan';
+import { QqlDefect } from './qql-defect';
+import { QqlPlan } from './qql-plan';
+import { QqlTestCase } from './qql-test-case';
 import { Requirement } from './requirement';
 import { Result } from './result';
 import { Run } from './run';
-import { TestCase } from './test-case';
 
 /**
  * 
@@ -28,9 +28,9 @@ import { TestCase } from './test-case';
 export interface SearchResponseAllOfResult {
     /**
      * 
-     * @type {Array<TestCase | Defect | Run | Result | Plan | Requirement>}
+     * @type {Array<Run | Result | Requirement | QqlTestCase | QqlDefect | QqlPlan>}
      * @memberof SearchResponseAllOfResult
      */
-    'entities'?: Array<TestCase | Defect | Run | Result | Plan | Requirement>;
+    'entities'?: Array<Run | Result | Requirement | QqlTestCase | QqlDefect | QqlPlan>;
 }
 

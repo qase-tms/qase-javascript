@@ -45,7 +45,7 @@ export interface TestCaseCreateSteps {
      */
     'position'?: number;
     /**
-     * 
+     * A list of Attachment hashes.
      * @type {Array<string>}
      * @memberof TestCaseCreateSteps
      */

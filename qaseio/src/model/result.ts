@@ -33,13 +33,13 @@ export interface Result {
      * @type {string}
      * @memberof Result
      */
-    'comment'?: string;
+    'comment'?: string | null;
     /**
      * 
      * @type {string}
      * @memberof Result
      */
-    'stacktrace'?: string;
+    'stacktrace'?: string | null;
     /**
      * 
      * @type {number}
@@ -57,7 +57,7 @@ export interface Result {
      * @type {Array<ResultSteps>}
      * @memberof Result
      */
-    'steps'?: Array<ResultSteps>;
+    'steps'?: Array<ResultSteps> | null;
     /**
      * 
      * @type {string}

@@ -42,7 +42,7 @@ export interface Run {
      * @type {string}
      * @memberof Run
      */
-    'description'?: string;
+    'description'?: string | null;
     /**
      * 
      * @type {number}

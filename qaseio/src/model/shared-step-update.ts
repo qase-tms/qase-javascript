@@ -26,23 +26,26 @@ export interface SharedStepUpdate {
      * @type {string}
      * @memberof SharedStepUpdate
      */
-    'title'?: string;
+    'title': string;
     /**
-     * 
+     * Deprecated, use the `steps` property instead.
      * @type {string}
      * @memberof SharedStepUpdate
+     * @deprecated
      */
     'action'?: string;
     /**
-     * 
+     * Deprecated, use the `steps` property instead.
      * @type {string}
      * @memberof SharedStepUpdate
+     * @deprecated
      */
     'expected_result'?: string;
     /**
-     * 
+     * Deprecated, use the `steps` property instead.
      * @type {string}
      * @memberof SharedStepUpdate
+     * @deprecated
      */
     'data'?: string;
     /**

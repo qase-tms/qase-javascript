@@ -29,12 +29,6 @@ export interface CustomFieldUpdate {
     'title': string;
     /**
      * 
-     * @type {Array<string>}
-     * @memberof CustomFieldUpdate
-     */
-    'projects_codes': Array<string>;
-    /**
-     * 
      * @type {Array<CustomFieldCreateValue>}
      * @memberof CustomFieldUpdate
      */
@@ -75,5 +69,11 @@ export interface CustomFieldUpdate {
      * @memberof CustomFieldUpdate
      */
     'is_required'?: boolean;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof CustomFieldUpdate
+     */
+    'projects_codes'?: Array<string>;
 }
 

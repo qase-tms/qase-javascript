@@ -56,13 +56,13 @@ export interface TestStep {
      * @type {string}
      * @memberof TestStep
      */
-    'expected_result'?: string;
+    'expected_result'?: string | null;
     /**
      * 
      * @type {string}
      * @memberof TestStep
      */
-    'data'?: string;
+    'data'?: string | null;
     /**
      * 
      * @type {Array<Attachment>}

@@ -37,7 +37,7 @@ export interface Environment {
      * @type {string}
      * @memberof Environment
      */
-    'description'?: string;
+    'description'?: string | null;
     /**
      * 
      * @type {string}
@@ -49,6 +49,6 @@ export interface Environment {
      * @type {string}
      * @memberof Environment
      */
-    'host'?: string;
+    'host'?: string | null;
 }
 

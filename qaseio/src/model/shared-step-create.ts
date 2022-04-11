@@ -13,7 +13,6 @@
  */
 
 
-import { AttachmentHash } from './attachment-hash';
 import { SharedStepCreateSteps } from './shared-step-create-steps';
 
 /**
@@ -27,31 +26,28 @@ export interface SharedStepCreate {
      * @type {string}
      * @memberof SharedStepCreate
      */
-    'title'?: string;
+    'title': string;
     /**
-     * 
+     * Deprecated, use the `steps` property instead.
      * @type {string}
      * @memberof SharedStepCreate
+     * @deprecated
      */
     'action'?: string;
     /**
-     * 
+     * Deprecated, use the `steps` property instead.
      * @type {string}
      * @memberof SharedStepCreate
+     * @deprecated
      */
     'expected_result'?: string;
     /**
-     * 
+     * Deprecated, use the `steps` property instead.
      * @type {string}
      * @memberof SharedStepCreate
+     * @deprecated
      */
     'data'?: string;
-    /**
-     * 
-     * @type {Array<AttachmentHash>}
-     * @memberof SharedStepCreate
-     */
-    'attachments'?: Array<AttachmentHash>;
     /**
      * 
      * @type {Array<SharedStepCreateSteps>}
