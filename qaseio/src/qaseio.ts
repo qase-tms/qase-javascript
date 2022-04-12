@@ -36,7 +36,8 @@ export class QaseApi {
     public constructor(
         apiToken: string,
         basePath?: string,
-        headers?: { [key: string]: string }
+        headers?: { [key: string]: string },
+        formDataCtor?: new () => any,
     ) {
         const baseURL = basePath || 'https://api.qase.io/v1';
         const config: AxiosRequestConfig = {
@@ -50,6 +51,7 @@ export class QaseApi {
         this.configuration = new Configuration({
             apiKey: apiToken,
             basePath: baseURL,
+            formDataCtor: formDataCtor
         });
 
         this.projects = new ProjectsApi(this.configuration, baseURL, this.api);
