@@ -6,7 +6,7 @@ test.describe.parallel('Test suite', () => {
     test(qase(7, 'open page and check title'), async ({ page }) => {
         await page.goto('https://qase.io/');
         expect(await page.title()).toBe(
-            'Qase | Test case management software'
+            'Qase | TMS'
         );
     });
 
@@ -21,11 +21,11 @@ test.describe.parallel('Test suite', () => {
 
     test.describe('Test suite', () => {
 
-        test(qase([5, 6], '5 - 6 = -1'), () => {
+        test(qase([5], '5 - 6 = -1'), () => {
             expect(sub(5, 6)).toBe(-1);
         });
 
-        test('5 - 6 = -1', () => {
+        test(qase([6], '5 - 6 = -1'), () => {
             expect(sub(5, 6)).toBe(-2);
         });
     });

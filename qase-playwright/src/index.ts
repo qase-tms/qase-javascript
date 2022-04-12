@@ -1,18 +1,23 @@
 /* eslint-disable max-len */
-import { Reporter, TestCase, TestResult } from '@playwright/test/reporter';
+/* eslint-disable camelcase */
 import {
-    ResultCreate,
-    ResultStatus,
-    RunCreate,
-    RunCreated,
-} from 'qaseio/dist/src/models';
+    IdResponse,
+    ResultCreateStatusEnum,
+    Configuration
+} from 'qaseio/dist/src';
+
+import { Reporter, TestCase, TestResult } from '@playwright/test/reporter';
+import { createReadStream, readFileSync } from 'fs';
 import { QaseApi } from 'qaseio';
+import FormData from "form-data";
 import chalk from 'chalk';
-import fs from 'fs';
+import { execSync } from 'child_process';
 
 enum Envs {
     report = 'QASE_REPORT',
     apiToken = 'QASE_API_TOKEN',
+    basePath = 'QASE_API_BASE_URL',
+    projectCode = 'QASE_PROJECT_CODE',
     runId = 'QASE_RUN_ID',
     runName = 'QASE_RUN_NAME',
     runDescription = 'QASE_RUN_DESCRIPTION',
@@ -22,15 +27,16 @@ enum Envs {
 }
 
 const Statuses = {
-    passed: ResultStatus.PASSED,
-    failed: ResultStatus.FAILED,
-    skipped: ResultStatus.SKIPPED,
-    pending: ResultStatus.SKIPPED,
-    disabled: ResultStatus.BLOCKED,
+    passed: ResultCreateStatusEnum.PASSED,
+    failed: ResultCreateStatusEnum.FAILED,
+    skipped: ResultCreateStatusEnum.SKIPPED,
+    pending: ResultCreateStatusEnum.SKIPPED,
+    disabled: ResultCreateStatusEnum.BLOCKED,
 };
 
 interface QaseOptions {
     apiToken: string;
+    basePath?: string;
     projectCode: string;
     runId?: string;
     runPrefix?: string;
@@ -52,22 +58,97 @@ class PlaywrightReporter implements Reporter {
 
     public constructor(_options: QaseOptions) {
         this.options = _options;
-        this.options.runComplete = !!this.getEnv(Envs.runComplete) || this.options.runComplete;
-        this.options.uploadAttachments = !!this.getEnv(Envs.uploadAttachments) || this.options.uploadAttachments;
+        this.options.runComplete = !!PlaywrightReporter.getEnv(Envs.runComplete) || this.options.runComplete;
+        this.options.uploadAttachments = !!PlaywrightReporter.getEnv(Envs.uploadAttachments) || this.options.uploadAttachments;
 
         this.api = new QaseApi(
-            this.getEnv(Envs.apiToken) || this.options.apiToken || ''
+            PlaywrightReporter.getEnv(Envs.apiToken) || this.options.apiToken || '',
+            PlaywrightReporter.getEnv(Envs.basePath) || this.options.basePath,
+            PlaywrightReporter.createHeaders(),
         );
+
+
+        const configuration: Configuration = new Configuration({
+            apiKey: PlaywrightReporter.getEnv(Envs.apiToken) || this.options.apiToken || '',
+            basePath: PlaywrightReporter.getEnv(Envs.basePath) || this.options.basePath,
+            formDataCtor: FormData,
+        });
+        this.api = new QaseApi(configuration);
 
         this.log(chalk`{yellow Current PID: ${process.pid}}`);
 
-        if (!this.getEnv(Envs.report)) {
+        if (!PlaywrightReporter.getEnv(Envs.report)) {
             this.log(
                 chalk`{yellow QASE_REPORT env variable is not set. Reporting to qase.io is disabled.}`
             );
             this.isDisabled = true;
             return;
         }
+    }
+
+    private static createRunObject(name: string, cases: number[], args?: {
+        description?: string;
+        environment_id: number | undefined;
+        is_autotest: boolean;
+    }) {
+        return {
+            title: name,
+            cases,
+            ...args,
+        };
+    }
+
+    private static createResultObject(caseId: number, status: ResultCreateStatusEnum, args?: {
+        time_ms: number;
+        stacktrace: string | undefined;
+        comment: string | undefined;
+        attachments: string[] | undefined;
+    }) {
+        return {
+            case_id: caseId,
+            status,
+            ...args,
+        };
+    }
+
+    private static getEnv(name: Envs) {
+        return process.env[name];
+    }
+
+    private static getPackageVersion(name: string) {
+        const UNDEFINED = 'undefined';
+        try {
+            const pathToPackageJson = require.resolve(`${name}/package.json`, { paths: [process.cwd()] });
+            if (pathToPackageJson) {
+                try {
+                    const packageString = readFileSync(pathToPackageJson, { encoding: 'utf8' });
+                    if (packageString) {
+                        const packageObject = JSON.parse(packageString) as { version: string };
+                        return packageObject.version;
+                    }
+                    return UNDEFINED;
+                } catch (error) {
+                    return UNDEFINED;
+                }
+            }
+        } catch (error) {
+            return UNDEFINED;
+        }
+    }
+
+    private static createHeaders() {
+        const { version: nodeVersion, platform: os, arch } = process;
+        const npmVersion = execSync('npm -v', { encoding: 'utf8' }).replace(/['"\n]+/g, '');
+        const qaseapiVersion = PlaywrightReporter.getPackageVersion('qaseio');
+        const playwrightVersion = PlaywrightReporter.getPackageVersion('playwright');
+        const playwrightCaseReporterVersion = PlaywrightReporter.getPackageVersion('playwright-qase-reporter');
+        const xPlatformHeader = `node=${nodeVersion}; npm=${npmVersion}; os=${os}; arch=${arch}`;
+        const xClientHeader = `playwright=${playwrightVersion as string}; qase-playwright=${playwrightCaseReporterVersion as string}; qaseapi=${qaseapiVersion as string}`;
+
+        return {
+            'X-Client': xClientHeader,
+            'X-Platform': xPlatformHeader,
+        };
     }
 
     public async onBegin(): Promise<void> {
@@ -87,7 +168,7 @@ class PlaywrightReporter implements Reporter {
                 }
 
                 this.log(chalk`{green Project ${this.options.projectCode} exists}`);
-                const userDefinedRunId = this.getEnv(Envs.runId) || this.options.runId;
+                const userDefinedRunId = PlaywrightReporter.getEnv(Envs.runId) || this.options.runId;
                 if (userDefinedRunId) {
                     this.runId = userDefinedRunId;
                     return this.checkRun(this.runId, (runExists: boolean) => {
@@ -102,12 +183,12 @@ class PlaywrightReporter implements Reporter {
                     });
                 } else {
                     return this.createRun(
-                        this.getEnv(Envs.runName),
-                        this.getEnv(Envs.runDescription),
+                        PlaywrightReporter.getEnv(Envs.runName),
+                        PlaywrightReporter.getEnv(Envs.runDescription),
                         (created) => {
                             if (created) {
-                                this.runId = created.id;
-                                process.env.QASE_RUN_ID = this.runId.toString();
+                                this.runId = created.result?.id;
+                                process.env.QASE_RUN_ID = String(this?.runId);
                                 this.log(
                                     chalk`{green Using run ${this.runId} to publish test results}`
                                 );
@@ -157,8 +238,7 @@ class PlaywrightReporter implements Reporter {
         }
 
         try {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            await this.api.runs.complete(this.options.projectCode, this.runId!);
+            await this.api.runs.completeRun(this.options.projectCode, Number(this.runId));
             this.log(chalk`{green Run ${this.runId} completed}`);
         } catch (err) {
             this.log(`Error on completing run ${err as string}`);
@@ -173,10 +253,6 @@ class PlaywrightReporter implements Reporter {
             // eslint-disable-next-line no-console
             console.log(chalk`{bold {blue qase:}} ${message}`, ...optionalParams);
         }
-    }
-
-    private getEnv(name: Envs) {
-        return process.env[name];
     }
 
     private getCaseIds(test: TestCase): number[] {
@@ -201,33 +277,37 @@ class PlaywrightReporter implements Reporter {
         }
     }
 
-    private checkProject(
-        projectCode: string,
-        cb: (exists: boolean) => Promise<void>
-    ): Promise<void> {
-
-        return this.api.projects
-            .exists(projectCode)
-            .then(cb)
-            .catch((err) => {
-                this.log(err);
-                this.isDisabled = true;
-            });
+    private async checkProject(projectCode: string, cb: (exists: boolean) => Promise<void>): Promise<void> {
+        try {
+            const response = await this.api.projects.getProject(projectCode);
+            await cb(Boolean(response.data.result?.code));
+        } catch (err) {
+            this.log(err);
+            this.isDisabled = true;
+        }
     }
 
     private async createRun(
         name: string | undefined,
         description: string | undefined,
-        cb: (created: RunCreated | undefined) => void
+        cb: (created: IdResponse | undefined) => void
     ): Promise<void> {
         try {
-            const res = await this.api.runs.create(
-                this.options.projectCode,
-                new RunCreate(name || `Automated run ${new Date().toLocaleString()}`, [], {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const environmentId = Number.parseInt(PlaywrightReporter.getEnv(Envs.environmentId)!, 10) || this.options.environmentId;
+
+            const runObject = PlaywrightReporter.createRunObject(
+                name || `Automated run ${new Date().toISOString()}`,
+                [],
+                {
                     description: description || 'Playwright automated run',
-                    // eslint-disable-next-line camelcase
+                    environment_id: environmentId,
                     is_autotest: true,
-                })
+                }
+            );
+            const res = await this.api.runs.createRun(
+                this.options.projectCode,
+                runObject
             );
             cb(res.data);
         } catch (err) {
@@ -236,18 +316,17 @@ class PlaywrightReporter implements Reporter {
         }
     }
 
-    private async checkRun(
-        runId: string | number | undefined,
-        cb: (exists: boolean) => void
-    ): Promise<void> {
+    private async checkRun(runId: string | number | undefined, cb: (exists: boolean) => void): Promise<void> {
         if (runId === undefined) {
             cb(false);
             return;
         }
 
-        return this.api.runs
-            .exists(this.options.projectCode, runId)
-            .then(cb)
+        return this.api.runs.getRun(this.options.projectCode, Number(runId))
+            .then((resp) => {
+                this.log(`Get run result on checking run ${resp.data.result?.id as unknown as string}`);
+                cb(Boolean(resp.data.result?.id));
+            })
             .catch((err) => {
                 this.log(`Error on checking run ${err as string}`);
                 this.isDisabled = true;
@@ -257,24 +336,15 @@ class PlaywrightReporter implements Reporter {
     private async uploadAttachments(testResult: TestResult): Promise<string[]> {
         return Promise.all(
             testResult.attachments.map(async (attachment) => {
-                const data: Blob = (fs.createReadStream(attachment?.path as string) as unknown) as Blob;
-                let fileExtention = '';
-                const path = /[\w-]+[.][\w]{3,4}$/.test(attachment?.path as string);
-                if (path) {
-                    fileExtention = path[0] as string;
-                }
-                const filename = fileExtention !== '' ? fileExtention : attachment.name;
-                const resp = await this.api.attachments.create(
+                const data = createReadStream(attachment?.path as string);
+                const response = await this.api.attachments.uploadAttachment(
                     this.options.projectCode,
-                    { value: data, filename }
+                    [data]
                 );
-                // TODO: need fix response format for attachments.create method in qase.io package
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                return (resp.data[0].hash as string);
+                return (response.data.result?.[0].hash as string);
 
             })
         );
-
     }
 
     private removePublished(testAlias): void {
@@ -301,34 +371,36 @@ class PlaywrightReporter implements Reporter {
                 this.resultsToBePublished.push(testAlias);
                 const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}` : '';
                 this.log(chalk`{gray Start publishing: ${test.title}}${add}`);
-                try {
-                    while(!this.runId) { // need wait runId variable to be initialised in onBegin() hook
-                        await new Promise((resolve) => setTimeout(resolve, 50));
+                while(!this.runId) { // need wait runId variable to be initialised in onBegin() hook
+                    await new Promise((resolve) => setTimeout(resolve, 50));
+                }
+
+                const resultObject = PlaywrightReporter.createResultObject(
+                    caseId,
+                    Statuses[testResult.status],
+                    {
+                        time_ms: testResult.duration,
+                        stacktrace: testResult.error?.stack?.replace(/\u001b\[.*?m/g, ''),
+                        // eslint-disable-next-line max-len
+                        comment: testResult.error ? `${test.title}: ${testResult.error?.message?.replace(/\u001b\[.*?m/g, '') as string}` : undefined,
+                        attachments: attachmentsArray.length > 0 ? attachmentsArray : undefined,
                     }
+                );
 
-                    const res = await this.api.results.create(
-                        this.options.projectCode,
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                        this.runId,
-                        new ResultCreate(caseId, Statuses[testResult.status], {
-                        // eslint-disable-next-line camelcase, @typescript-eslint/no-non-null-assertion
-                            time_ms: testResult.duration,
-                            stacktrace: testResult.error?.stack?.replace(/\u001b\[.*?m/g, ''),
-                            // eslint-disable-next-line max-len
-                            comment: testResult.error ? `${test.title}: ${testResult.error?.message?.replace(/\u001b\[.*?m/g, '') as string}` : undefined,
-                            attachments: attachmentsArray.length > 0 ? attachmentsArray : undefined,
-                        })
-                    );
-
+                this.api.results.createResult(
+                    this.options.projectCode,
+                    Number(this.runId),
+                    resultObject
+                ).then(() => {
                     this.removePublished(testAlias);
                     this.publishedResultsCount++;
                     this.log(
-                        chalk`{gray Result published: ${test.title} ${res.data.hash}}${add}`
+                        chalk`{gray Result published: ${test.title} }${add}`
                     );
-                } catch (err) {
+                }).catch((err) => {
                     this.removePublished(testAlias);
                     this.log(chalk`{red ${err}}`);
-                }
+                });
             })
         ).then(alwaysUndefined);
     }
