@@ -152,7 +152,6 @@ class CypressQaseReporter extends reporters.Base {
             'cypress-qase-reporter'
         );
         const xPlatformHeader = `node=${nodeVersion}; npm=${npmVersion}; os=${os}; arch=${arch}`;
-        // eslint-disable-next-line max-len
         const xClientHeader = `cypress=${cypressVersion as string}; qase-cypress=${
             cypressCaseReporterVersion as string
         }; qaseapi=${qaseapiVersion as string}`;
@@ -214,10 +213,10 @@ class CypressQaseReporter extends reporters.Base {
                 this.log('Nothing to send.');
             } else if (this.runId) {
                 this.log(
-                    chalk`{blue Waiting for 60 seconds to publish pending results}`
+                    chalk`{blue Waiting for 30 seconds to publish pending results}`
                 );
 
-                const endTime = Date.now() + 60e3;
+                const endTime = Date.now() + 30e3;
                 while (!this.publishedResults && Date.now() < endTime) {
                     // sleep 500 ms
                     const sharedArrayBuffer = new SharedArrayBuffer(8);
@@ -240,7 +239,6 @@ class CypressQaseReporter extends reporters.Base {
         try {
             const resp = await this.api.projects.getProject(projectCode);
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             await cb(Boolean(resp.data.result?.code));
         } catch (err) {
             this.log(err);
@@ -254,10 +252,7 @@ class CypressQaseReporter extends reporters.Base {
         cb: (created: IdResponse | undefined) => void
     ): Promise<void> {
         try {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const environmentId =
-        Number.parseInt(CypressQaseReporter.getEnv(Envs.environmentId)!, 10) ||
-        this.options.environmentId;
+            const environmentId = Number(CypressQaseReporter.getEnv(Envs.environmentId)) || this.options.environmentId;
 
             const runObject = CypressQaseReporter.createRunObject(
                 name || `Automated run ${new Date().toISOString()}`,
