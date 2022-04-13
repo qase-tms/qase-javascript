@@ -51,7 +51,7 @@ export class QaseApi {
         this.configuration = new Configuration({
             apiKey: apiToken,
             basePath: baseURL,
-            formDataCtor: formDataCtor
+            formDataCtor,
         });
 
         this.projects = new ProjectsApi(this.configuration, baseURL, this.api);
