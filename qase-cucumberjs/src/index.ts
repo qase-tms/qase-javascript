@@ -1,9 +1,11 @@
+/* eslint-disable camelcase */
 /* eslint-disable no-console,no-underscore-dangle,@typescript-eslint/no-non-null-assertion */
-import {ResultCreate, ResultCreated, ResultStatus, RunCreate, RunCreated} from 'qaseio/dist/src/models';
+import {IdResponse, ResultCreateStatusEnum} from 'qaseio/dist/src';
 import {Formatter} from '@cucumber/cucumber';
 import {IFormatterOptions} from '@cucumber/cucumber/lib/formatter';
 import {QaseApi} from 'qaseio';
 import chalk from 'chalk';
+import {execSync} from 'child_process';
 import fs from 'fs';
 import {io} from '@cucumber/messages/dist/src/messages';
 import moment from 'moment';
@@ -16,6 +18,8 @@ import Status = io.cucumber.messages.TestStepFinished.TestStepResult.Status;
 interface Config {
     enabled: boolean;
     apiToken: string;
+    basePath?: string;
+    environmentId?: number;
     projectCode: string;
     runId: string | number | undefined;
     runName: string;
@@ -32,10 +36,10 @@ interface Test {
     error?: string;
 }
 
-const StatusMapping: Record<Status, ResultStatus | null> = {
-    [Status.PASSED]: ResultStatus.PASSED,
-    [Status.FAILED]: ResultStatus.FAILED,
-    [Status.SKIPPED]: ResultStatus.SKIPPED,
+const StatusMapping: Record<Status, ResultCreateStatusEnum | null> = {
+    [Status.PASSED]: ResultCreateStatusEnum.PASSED,
+    [Status.FAILED]: ResultCreateStatusEnum.FAILED,
+    [Status.SKIPPED]: ResultCreateStatusEnum.SKIPPED,
     [Status.AMBIGUOUS]: null,
     [Status.PENDING]: null,
     [Status.UNDEFINED]: null,
@@ -69,16 +73,13 @@ const prepareConfig = (options: Config = {} as Config, configFile = '.qaserc'): 
 
     return {
         enabled: process.env.QASE_ENABLED === 'true' || config.enabled || false,
-        apiToken: process.env.QASE_API_TOKEN || config.apiToken,
-        projectCode: process.env.QASE_PROJECT || config.projectCode || ''
-        ,
+        basePath: process.env.QASE_API_BASE_URL || config.basePath,
+        apiToken: process.env.QASE_API_TOKEN || config.apiToken || '',
+        environmentId: Number.parseInt(process.env.QASE_ENVIRONMENT_ID!, 10) || config.environmentId,
+        projectCode: process.env.QASE_PROJECT || config.projectCode || '',
         runId: process.env.QASE_RUN_ID || config.runId || '',
-        runName:
-            process.env.QASE_RUN_NAME ||
-            config.runName ||
-            'Automated Run %DATE%',
-        runDescription:
-            process.env.QASE_RUN_DESCRIPTION || config.runDescription,
+        runName: process.env.QASE_RUN_NAME || config.runName || 'Automated Run %DATE%',
+        runDescription: process.env.QASE_RUN_DESCRIPTION || config.runDescription,
         logging: process.env.QASE_LOGGING !== '' || config.logging,
     };
 };
@@ -112,19 +113,22 @@ class QaseReporter extends Formatter {
 
     private pickleInfo: Record<string, { tags: string[]; name: string }> = {};
     private testCaseStarts: Record<string, ITestCaseStarted> = {};
-    private testCaseStartedResult: Record<string, ResultStatus> = {};
+    private testCaseStartedResult: Record<string, ResultCreateStatusEnum> = {};
     private testCaseStartedErrors: Record<string, string[]> = {};
     private testCaseScenarioId: Record<string, string> = {};
     private pending: Array<(runId: string | number) => void> = [];
-    private results: Array<{test: Test; result: ResultCreated}> = [];
+    private results: Array<{test: Test; result: any}> = [];
     private shouldPublish = 0;
 
     public constructor(options: IFormatterOptions) {
         super(options);
         this.config = prepareConfig(options.parsedArgvOptions as Config, options.parsedArgvOptions?.qaseConfig);
         this.enabled = verifyConfig(this.config);
-        this.api = new QaseApi(this.config.apiToken);
-
+        this.api = new QaseApi(
+            this.config.apiToken,
+            this.config.basePath,
+            this.createHeaders(),
+        );
         if (!this.enabled) {
             return;
         }
@@ -138,15 +142,15 @@ class QaseReporter extends Formatter {
                         tags: this.extractIds(envelope.pickle.tags!), name: envelope.pickle.name!,
                     };
                 } else if (envelope.testRunStarted) {
-                    this.checkProject(
+                    void this.checkProject(
                         this.config.projectCode,
-                        (prjExists) => {
+                        async (prjExists): Promise<void> => {
                             if (prjExists) {
                                 this._log(chalk`{green Project ${this.config.projectCode} exists}`);
                                 const willRun = Object.keys(this.pickleInfo).length !== 0;
                                 if (this.config.runId && willRun) {
                                     this.saveRunId(this.config.runId);
-                                    this.checkRun(
+                                    return this.checkRun(
                                         this.config.runId,
                                         (runExists: boolean) => {
                                             const run = this.config.runId as unknown as string;
@@ -158,12 +162,12 @@ class QaseReporter extends Formatter {
                                         }
                                     );
                                 } else if (!this.config.runId && willRun) {
-                                    this.createRun(
+                                    return this.createRun(
                                         this.config.runName,
                                         this.config.runDescription,
                                         (created) => {
                                             if (created) {
-                                                this.saveRunId(created.id);
+                                                this.saveRunId(created.result?.id);
                                                 this._log(
                                                     // eslint-disable-next-line max-len
                                                     chalk`{green Using run ${this.config.runId as unknown as string} to publish test results}`
@@ -197,7 +201,7 @@ class QaseReporter extends Formatter {
                     this.testCaseScenarioId[envelope.testCase.id!] = envelope.testCase.pickleId!;
                 } else if (envelope.testCaseStarted) {
                     this.testCaseStarts[envelope.testCaseStarted.id!] = envelope.testCaseStarted;
-                    this.testCaseStartedResult[envelope.testCaseStarted.id!] = ResultStatus.PASSED;
+                    this.testCaseStartedResult[envelope.testCaseStarted.id!] = ResultCreateStatusEnum.PASSED;
                 } else if (envelope.testStepFinished) {
                     const stepFin = envelope.testStepFinished;
                     const stepStatus = stepFin.testStepResult!.status!;
@@ -211,10 +215,10 @@ class QaseReporter extends Formatter {
                         );
                         return;
                     }
-                    if (newStatus !== ResultStatus.PASSED) {
+                    if (newStatus !== ResultCreateStatusEnum.PASSED) {
                         this.addErrorMessage(stepFin.testCaseStartedId!, stepFin.testStepResult?.message);
                         if (oldStatus) {
-                            if (oldStatus !== ResultStatus.FAILED && newStatus) {
+                            if (oldStatus !== ResultCreateStatusEnum.FAILED && newStatus) {
                                 this.testCaseStartedResult[stepFin.testCaseStartedId!] = newStatus;
                             }
                         } else {
@@ -260,43 +264,71 @@ class QaseReporter extends Formatter {
         }
     }
 
-    private checkProject(projectCode: string, cb: (exists: boolean) => void) {
-        this.api.projects.exists(projectCode)
-            .then(cb)
-            .catch((err) => {
-                this._log(err);
-            });
+    private async checkProject(projectCode: string, cb: (exists: boolean) => Promise<void>): Promise<void> {
+        try {
+            const resp = await this.api.projects.getProject(projectCode);
+
+            await cb(Boolean(resp.data.result?.code));
+        } catch (err) {
+            this._log(err);
+            this.enabled = false;
+        }
     }
 
-    private createRun(
-        name: string | undefined, description: string | undefined, cb: (created: RunCreated | undefined) => void
-    ) {
-        this.api.runs.create(
-            this.config.projectCode,
-            new RunCreate(
+    private async createRun(
+        name: string | undefined,
+        description: string | undefined,
+        cb: (created: IdResponse) => void
+    ): Promise<void> {
+        try {
+            const runObject = this.createRunObject(
                 name || `Automated run ${new Date().toISOString()}`,
                 [],
-                // eslint-disable-next-line camelcase
-                {description: description || 'Cypress automated run', is_autotest: true}
-            )
-        )
-            .then((res) => res.data)
-            .then(cb)
-            .catch((err) => {
-                this._log(`Error on creating run ${err as string}`);
-            });
+                {
+                    description: description || 'CucumberJS automated run',
+                    environment_id: this.config.environmentId,
+                    is_autotest: true,
+                }
+            );
+            const res = await this.api.runs.createRun(
+                this.config.projectCode,
+                runObject
+            );
+            cb(res.data);
+        } catch (err) {
+            this._log(`Error on creating run ${err as string}`);
+            this.enabled = false;
+        }
     }
 
-    private checkRun(runId: string | number | undefined, cb: (exists: boolean) => void) {
-        if (runId !== undefined) {
-            this.api.runs.exists(this.config.projectCode, runId)
-                .then(cb)
-                .catch((err) => {
-                    this._log(`Error on checking run ${err as string}`);
-                });
-        } else {
+    private createRunObject(name: string, cases: number[], args?: {
+        description?: string;
+        environment_id: number | undefined;
+        is_autotest: boolean;
+    }) {
+        return {
+            title: name,
+            cases,
+            ...args,
+        };
+    }
+
+    private async checkRun(runId: string | number | undefined, cb: (exists: boolean) => void): Promise<void> {
+        if (runId === undefined) {
             cb(false);
+            return;
         }
+
+        return this.api.runs.getRun(this.config.projectCode, Number(runId))
+            .then((resp) => {
+                this._log(`Get run result on checking run ${resp.data.result?.id as unknown as string}`);
+                cb(Boolean(resp.data.result?.id));
+            })
+            .catch((err) => {
+                this._log(`Error on checking run ${err as string}`);
+                this.enabled = false;
+            });
+
     }
 
     private saveRunId(runId?: string | number) {
@@ -312,7 +344,7 @@ class QaseReporter extends Formatter {
         }
     }
 
-    private logTestItem(name: string, status: ResultStatus) {
+    private logTestItem(name: string, status: ResultCreateStatusEnum) {
         const map = {
             failed: chalk`{red Test ${name} ${status}}`,
             passed: chalk`{green Test ${name} ${status}}`,
@@ -323,7 +355,7 @@ class QaseReporter extends Formatter {
         }
     }
 
-    private publishCaseResult(test: Test, status: ResultStatus){
+    private publishCaseResult(test: Test, status: ResultCreateStatusEnum){
         this.logTestItem(test.name, status);
 
         const caseIds = test.tags;
@@ -335,20 +367,17 @@ class QaseReporter extends Formatter {
                     this._log(
                         chalk`{gray Start publishing: ${test.name}}${add}`
                     );
-                    const result = new ResultCreate(
-                        parseInt(caseId, 10),
+
+                    this.api.results.createResult(this.config.projectCode, Number(runId), {
                         status,
-                        {
-                            // eslint-disable-next-line camelcase
-                            time_ms: test.duration,
-                            stacktrace: test.error,
-                            comment: test.error ? test.error.split('\n')[0]:undefined,
-                        }
-                    );
-                    this.api.results.create(this.config.projectCode, runId, result)
+                        case_id: parseInt(caseId, 10),
+                        time: test.duration,
+                        stacktrace: test.error,
+                        comment: test.error ? test.error.split('\n')[0]:undefined,
+                    })
                         .then((res) => {
                             this.results.push({test, result: res.data});
-                            this._log(chalk`{gray Result published: ${test.name} ${res.data.hash}}${add}`);
+                            this._log(chalk`{gray Result published: ${test.name} ${caseId}}${add}`);
                             this.shouldPublish--;
                         })
                         .catch((err) => {
@@ -369,6 +398,43 @@ class QaseReporter extends Formatter {
     private extractIds(tagsList: io.cucumber.messages.Pickle.IPickleTag[]): string[] {
         const regex = /[Qq]-*(\d+)/;
         return tagsList.filter((tagInfo) => regex.test(tagInfo.name!)).map((tagInfo) => regex.exec(tagInfo.name!)![1]);
+    }
+
+    private createHeaders() {
+        const { version: nodeVersion, platform: os, arch } = process;
+        const npmVersion = execSync('npm -v', { encoding: 'utf8' }).replace(/['"\n]+/g, '');
+        const qaseapiVersion = this.getPackageVersion('qaseio');
+        const frameworkVersion = this.getPackageVersion('@cucumber/cucumber');
+        const reporterVersion = this.getPackageVersion('cucumberjs-qase-reporter');
+        const xPlatformHeader = `node=${nodeVersion};npm=${npmVersion};os=${os};arch=${arch}`;
+        // eslint-disable-next-line max-len
+        const xClientHeader = `cucumberjs=${frameworkVersion as string};qase-cucumberjs=${reporterVersion as string};qaseapi=${qaseapiVersion as string}`;
+
+        return {
+            'X-Client': xClientHeader,
+            'X-Platform': xPlatformHeader,
+        };
+    }
+
+    private getPackageVersion(name: string) {
+        const UNDEFINED = 'undefined';
+        try {
+            const pathToPackageJson = require.resolve(`${name}/package.json`, { paths: [process.cwd()] });
+            if (pathToPackageJson) {
+                try {
+                    const packageString = fs.readFileSync(pathToPackageJson, { encoding: 'utf8' });
+                    if (packageString) {
+                        const packageObject = JSON.parse(packageString) as { version: string };
+                        return packageObject.version;
+                    }
+                    return UNDEFINED;
+                } catch (error) {
+                    return UNDEFINED;
+                }
+            }
+        } catch (error) {
+            return UNDEFINED;
+        }
     }
 }
 
