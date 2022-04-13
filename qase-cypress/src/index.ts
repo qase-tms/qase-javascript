@@ -14,6 +14,7 @@ import { readFileSync } from 'fs';
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const { EVENT_TEST_FAIL, EVENT_TEST_PASS, EVENT_TEST_PENDING, EVENT_RUN_END } =
   Runner.constants;
+const DEFAULT_DELAY = 30;
 
 enum Envs {
     report = 'QASE_REPORT',
@@ -23,6 +24,7 @@ enum Envs {
     runName = 'QASE_RUN_NAME',
     runDescription = 'QASE_RUN_DESCRIPTION',
     environmentId = 'QASE_ENVIRONMENT_ID',
+    delay = 'QASE_DELAY'
 }
 
 interface QaseOptions {
@@ -33,6 +35,7 @@ interface QaseOptions {
     runPrefix?: string;
     logging?: boolean;
     environmentId?: number;
+    delay?: number;
 }
 
 class CypressQaseReporter extends reporters.Base {
@@ -212,11 +215,13 @@ class CypressQaseReporter extends reporters.Base {
             if (this.testCasesForPublishingCount === 0) {
                 this.log('Nothing to send.');
             } else if (this.runId) {
+                const delay = Number(CypressQaseReporter.getEnv(Envs.delay)) || this.options.delay || DEFAULT_DELAY;
+
                 this.log(
-                    chalk`{blue Waiting for 30 seconds to publish pending results}`
+                    chalk`{blue Waiting for ${delay} seconds to publish pending results}`
                 );
 
-                const endTime = Date.now() + 30e3;
+                const endTime = Date.now() + delay * 1000;
                 while (!this.publishedResults && Date.now() < endTime) {
                     // sleep 500 ms
                     const sharedArrayBuffer = new SharedArrayBuffer(8);
@@ -225,7 +230,7 @@ class CypressQaseReporter extends reporters.Base {
                 }
                 if (!this.publishedResults) {
                     this.log(
-                        chalk`{red Could not send all results for 30 seconds after run. Please contact Qase Team.}`
+                        chalk`{red Could not send all results for ${delay} seconds after run. Please contact Qase Team.}`
                     );
                 }
             }
