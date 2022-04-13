@@ -230,6 +230,7 @@ class CypressQaseReporter extends reporters.Base {
                 }
                 if (!this.publishedResults) {
                     this.log(
+                        // eslint-disable-next-line max-len
                         chalk`{red Could not send all results for ${delay} seconds after run. Please contact Qase Team.}`
                     );
                 }
