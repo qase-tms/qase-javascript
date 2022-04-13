@@ -3,13 +3,12 @@
 import {
     IdResponse,
     ResultCreateStatusEnum,
-    Configuration
 } from 'qaseio/dist/src';
 
 import { Reporter, TestCase, TestResult } from '@playwright/test/reporter';
 import { createReadStream, readFileSync } from 'fs';
+import FormData from 'form-data';
 import { QaseApi } from 'qaseio';
-import FormData from "form-data";
 import chalk from 'chalk';
 import { execSync } from 'child_process';
 
@@ -65,15 +64,8 @@ class PlaywrightReporter implements Reporter {
             PlaywrightReporter.getEnv(Envs.apiToken) || this.options.apiToken || '',
             PlaywrightReporter.getEnv(Envs.basePath) || this.options.basePath,
             PlaywrightReporter.createHeaders(),
+            FormData
         );
-
-
-        const configuration: Configuration = new Configuration({
-            apiKey: PlaywrightReporter.getEnv(Envs.apiToken) || this.options.apiToken || '',
-            basePath: PlaywrightReporter.getEnv(Envs.basePath) || this.options.basePath,
-            formDataCtor: FormData,
-        });
-        this.api = new QaseApi(configuration);
 
         this.log(chalk`{yellow Current PID: ${process.pid}}`);
 
@@ -334,15 +326,24 @@ class PlaywrightReporter implements Reporter {
     }
 
     private async uploadAttachments(testResult: TestResult): Promise<string[]> {
+        // eslint-disable-next-line no-console
         return Promise.all(
             testResult.attachments.map(async (attachment) => {
                 const data = createReadStream(attachment?.path as string);
+
+                const options = {
+                    headers: {
+                        'Content-Type': 'multipart/form-data; boundary=--' + Math.random().toString().substr(2),
+                    },
+                };
+
                 const response = await this.api.attachments.uploadAttachment(
                     this.options.projectCode,
-                    [data]
+                    [data],
+                    options
                 );
-                return (response.data.result?.[0].hash as string);
 
+                return (response.data.result?.[0].hash as string);
             })
         );
     }
