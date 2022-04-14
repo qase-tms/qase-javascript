@@ -9,6 +9,7 @@ import { Reporter, TestCase, TestResult } from '@playwright/test/reporter';
 import { createReadStream, readFileSync } from 'fs';
 import FormData from 'form-data';
 import { QaseApi } from 'qaseio';
+import axios from 'axios';
 import chalk from 'chalk';
 import { execSync } from 'child_process';
 
@@ -132,7 +133,7 @@ class PlaywrightReporter implements Reporter {
         const { version: nodeVersion, platform: os, arch } = process;
         const npmVersion = execSync('npm -v', { encoding: 'utf8' }).replace(/['"\n]+/g, '');
         const qaseapiVersion = PlaywrightReporter.getPackageVersion('qaseio');
-        const playwrightVersion = PlaywrightReporter.getPackageVersion('playwright');
+        const playwrightVersion = PlaywrightReporter.getPackageVersion('playwright-core');
         const playwrightCaseReporterVersion = PlaywrightReporter.getPackageVersion('playwright-qase-reporter');
         const xPlatformHeader = `node=${nodeVersion}; npm=${npmVersion}; os=${os}; arch=${arch}`;
         const xClientHeader = `playwright=${playwrightVersion as string}; qase-playwright=${playwrightCaseReporterVersion as string}; qaseapi=${qaseapiVersion as string}`;
@@ -212,7 +213,6 @@ class PlaywrightReporter implements Reporter {
         if (this.isDisabled) {
             return;
         }
-
         while(this.resultsToBePublished.length > 0) { // need wait all results to be published
             this.log(chalk`{gray Waiting for all results to be published. Remaining ${this.resultsToBePublished.length} results}`);
             await new Promise((resolve) => setTimeout(resolve, 100));
@@ -325,25 +325,25 @@ class PlaywrightReporter implements Reporter {
             });
     }
 
-    private async uploadAttachments(testResult: TestResult): Promise<string[]> {
-        // eslint-disable-next-line no-console
-        return Promise.all(
+    private async uploadAttachments(testResult: TestResult) {
+        return await Promise.all(
             testResult.attachments.map(async (attachment) => {
                 const data = createReadStream(attachment?.path as string);
+                const form = new FormData();
+                form.append('file', data);
+                const headers = form.getHeaders();
+                headers.Token = this.options.apiToken;
+                headers.Accept = 'application/json';
 
-                const options = {
-                    headers: {
-                        'Content-Type': 'multipart/form-data; boundary=--' + Math.random().toString().substr(2),
+                const response = await axios.post(String(this.options.basePath) + '/attachment/' + this.options.projectCode,
+                    form,
+                    {
+                        headers,
                     },
-                };
-
-                const response = await this.api.attachments.uploadAttachment(
-                    this.options.projectCode,
-                    [data],
-                    options
                 );
 
-                return (response.data.result?.[0].hash as string);
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                return  (response.data.result?.[0].hash as string);
             })
         );
     }
@@ -362,10 +362,6 @@ class PlaywrightReporter implements Reporter {
             // TODO: autocreate case for result
             return;
         }
-        let attachmentsArray: string[] = [];
-        if (this.options.uploadAttachments && testResult.attachments.length > 0) {
-            attachmentsArray = await this.uploadAttachments(testResult);
-        }
         return Promise.all(
             caseIds.map(async (caseId) => {
                 const testAlias = `${caseId} - ${test.title}`;
@@ -376,6 +372,11 @@ class PlaywrightReporter implements Reporter {
                     await new Promise((resolve) => setTimeout(resolve, 50));
                 }
 
+                let attachmentsArray: any[] = [];
+                if (this.options.uploadAttachments && testResult.attachments.length > 0) {
+                    attachmentsArray = await this.uploadAttachments(testResult);
+                }
+
                 const resultObject = PlaywrightReporter.createResultObject(
                     caseId,
                     Statuses[testResult.status],
@@ -384,7 +385,9 @@ class PlaywrightReporter implements Reporter {
                         stacktrace: testResult.error?.stack?.replace(/\u001b\[.*?m/g, ''),
                         // eslint-disable-next-line max-len
                         comment: testResult.error ? `${test.title}: ${testResult.error?.message?.replace(/\u001b\[.*?m/g, '') as string}` : undefined,
-                        attachments: attachmentsArray.length > 0 ? attachmentsArray : undefined,
+                        attachments: attachmentsArray.length > 0
+                            ? attachmentsArray
+                            : undefined,
                     }
                 );
 
