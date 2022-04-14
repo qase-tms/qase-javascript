@@ -33,12 +33,17 @@ Feature: Cucumber documentation
         And I should see a "Dependencies" badge
 ```
 
-After that you can use `cucumberjs-qase-reporter` as formatter:
+To run tests and create a test run, execute the command (for example from folder examples):
 
-```bash
-cucumber-js -f cucumberjs-qase-reporter features
 ```
+    cucumber-js -f cucumberjs-qase-reporter --format-options='{\"qaseConfig\": \"./.qaserc\"}' features -r examples/zombie/support -r examples/zombie/steps
 
+```
+![Output of run](./examples/screenshots/screenshot.png)​
+A test run will be performed and available at:
+```
+https://app.qase.io/run/<projectCode>
+```
 ## Configuration
 
 Qase reporter supports passing parameters using two ways:
@@ -46,6 +51,8 @@ using `.qaserc` file and using ENV variables.
 
 `.qaserc` parameters:
 - `enabled` - Enable reporter
+- `basePath` - URL Qase.io
+- `environmentId` - To execute with the sending of the envinroment information
 - `apiToken` - Token for API access, you can find more information
   [here](https://developers.qase.io/#authentication)
 - `projectCode` - Code of your project (can be extracted from main
@@ -61,23 +68,32 @@ using `.qaserc` file and using ENV variables.
 Example configuration file:
 ```json
 {
-    "enabled": true,
-    "logging": true,
-    "apiToken": "api_key",
-    "projectCode": "project_code",
-    "runName": "CucumberJS run %DATE%"
+  "enabled": true,
+  "logging": true,
+  "apiToken": "api_key",
+  "projectCode": "project_code",
+  "runName": "CucumberJS run %DATE%",
+  "environmentId": 1,
+  "basePath": "https://api.qase.io/v1"
 }
 ```
 
 Supported ENV variables:
 
 - `QASE_ENABLED` - Same as `enabled`
+- `QASE_API_BASE_URL` - Same as `basePath`
 - `QASE_API_TOKEN` - Same as `apiToken`
 - `QASE_PROJECT` - Same as `projectCode`
 - `QASE_RUN_ID` - Pass Run ID from ENV and override reporter options
 - `QASE_RUN_NAME` - Same as `runName`
 - `QASE_RUN_DESCRIPTION` - Same as `runDescription`
+- `QASE_ENVIRONMENT_ID` - Same as `environmentId`
 - `QASE_LOGGING` - Same as `logging`
+
+To run using ENV you have to execute:
+```bash
+cucumber-js -f cucumberjs-qase-reporter features
+```
 
 ## Setup with Protractor
 
