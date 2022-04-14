@@ -9,7 +9,6 @@ import { Reporter, TestCase, TestResult } from '@playwright/test/reporter';
 import { createReadStream, readFileSync } from 'fs';
 import FormData from 'form-data';
 import { QaseApi } from 'qaseio';
-import axios from 'axios';
 import chalk from 'chalk';
 import { execSync } from 'child_process';
 
@@ -48,6 +47,21 @@ interface QaseOptions {
 
 const alwaysUndefined = () => undefined;
 
+let customBoundary = '----------------------------';
+for (let i = 0; i < 24; i++) {
+    customBoundary += Math.floor(Math.random() * 10).toString(16);
+}
+
+class CustomBoundaryFormData extends FormData {
+    public constructor() {
+        super();
+    }
+
+    public getBoundary(): string {
+        return customBoundary;
+    }
+}
+
 class PlaywrightReporter implements Reporter {
     private api: QaseApi;
     private options: QaseOptions;
@@ -65,7 +79,7 @@ class PlaywrightReporter implements Reporter {
             PlaywrightReporter.getEnv(Envs.apiToken) || this.options.apiToken || '',
             PlaywrightReporter.getEnv(Envs.basePath) || this.options.basePath,
             PlaywrightReporter.createHeaders(),
-            FormData
+            CustomBoundaryFormData
         );
 
         this.log(chalk`{yellow Current PID: ${process.pid}}`);
@@ -329,21 +343,21 @@ class PlaywrightReporter implements Reporter {
         return await Promise.all(
             testResult.attachments.map(async (attachment) => {
                 const data = createReadStream(attachment?.path as string);
-                const form = new FormData();
-                form.append('file', data);
-                const headers = form.getHeaders();
-                headers.Token = this.options.apiToken;
-                headers.Accept = 'application/json';
 
-                const response = await axios.post(String(this.options.basePath) + '/attachment/' + this.options.projectCode,
-                    form,
-                    {
-                        headers,
+                const options = {
+                    headers: {
+                        'Content-Type': 'multipart/form-data; boundary=' + customBoundary,
                     },
+                };
+
+                const response = await this.api.attachments.uploadAttachment(
+                    this.options.projectCode,
+                    [data],
+                    options
                 );
 
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                return  (response.data.result?.[0].hash as string);
+                return (response.data.result?.[0].hash as string);
             })
         );
     }
