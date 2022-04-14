@@ -225,6 +225,7 @@ class PlaywrightReporter implements Reporter {
                 this.options.projectCode,
                 new RunCreate(name || `Automated run ${new Date().toLocaleString()}`, [], {
                     description: description || 'Playwright automated run',
+                    environment_id: Number.parseInt(this.getEnv(Envs.environmentId)!, 10) || this.options.environmentId,
                     // eslint-disable-next-line camelcase
                     is_autotest: true,
                 })
