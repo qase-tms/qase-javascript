@@ -10,6 +10,7 @@ import RuntimeError = WebAssembly.RuntimeError;
 interface Config {
     enabled: boolean;
     apiToken: string;
+    basePath?: string;
     projectCode: string;
     runId: string | number | undefined;
     runName: string;
@@ -81,6 +82,7 @@ const prepareConfig = (options: Config = {} as Config): Config => {
     return {
         enabled: process.env.QASE_ENABLED === 'true' || config.enabled || false,
         apiToken: process.env.QASE_API_TOKEN || config.apiToken,
+        basePath: process.env.QASE_API_BASE_URL || config.basePath,
         projectCode: process.env.QASE_PROJECT || config.projectCode || ''
         ,
         runId: process.env.QASE_RUN_ID || config.runId || '',

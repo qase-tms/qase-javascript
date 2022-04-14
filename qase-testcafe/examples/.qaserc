@@ -1,7 +1,7 @@
 {
     "enabled": true,
     "logging": true,
-    "apiToken": "api_key",
-    "projectCode": "project_code",
+    "apiToken": "cc8ffc61c3e9a5aa22defc090a02512cfba2bd00",
+    "projectCode": "TRCH",
     "runName": "TestCafe run %DATE% %AGENTS%"
 }
