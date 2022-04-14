@@ -1,4 +1,5 @@
 /* eslint-disable max-len */
+/* eslint-disable camelcase */
 import { Reporter, TestCase, TestResult } from '@playwright/test/reporter';
 import {
     ResultCreate,
@@ -225,8 +226,7 @@ class PlaywrightReporter implements Reporter {
                 this.options.projectCode,
                 new RunCreate(name || `Automated run ${new Date().toLocaleString()}`, [], {
                     description: description || 'Playwright automated run',
-                    environment_id: Number.parseInt(this.getEnv(Envs.environmentId)!, 10) || this.options.environmentId,
-                    // eslint-disable-next-line camelcase
+                    environment_id: Number(this.getEnv(Envs.environmentId)) || this.options.environmentId,
                     is_autotest: true,
                 })
             );
@@ -272,7 +272,6 @@ class PlaywrightReporter implements Reporter {
                 // TODO: need fix response format for attachments.create method in qase.io package
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 return (resp.data[0].hash as string);
-
             })
         );
 
@@ -309,13 +308,10 @@ class PlaywrightReporter implements Reporter {
 
                     const res = await this.api.results.create(
                         this.options.projectCode,
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         this.runId,
                         new ResultCreate(caseId, Statuses[testResult.status], {
-                        // eslint-disable-next-line camelcase, @typescript-eslint/no-non-null-assertion
                             time_ms: testResult.duration,
                             stacktrace: testResult.error?.stack?.replace(/\u001b\[.*?m/g, ''),
-                            // eslint-disable-next-line max-len
                             comment: testResult.error ? `${test.title}: ${testResult.error?.message?.replace(/\u001b\[.*?m/g, '') as string}` : undefined,
                             attachments: attachmentsArray.length > 0 ? attachmentsArray : undefined,
                         })
