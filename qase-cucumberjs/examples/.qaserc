@@ -3,5 +3,7 @@
   "logging": true,
   "apiToken": "api_key",
   "projectCode": "project_code",
-  "runName": "CucumberJS run %DATE%"
+  "runName": "CucumberJS run %DATE%",
+  "environmentId": 1,
+  "basePath": "https://api.qase.io/v1"
 }
