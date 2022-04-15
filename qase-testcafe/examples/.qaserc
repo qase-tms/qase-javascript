@@ -2,7 +2,7 @@
     "enabled": true,
     "logging": true,
     "environmentId": 1,
-    "apiToken": "",
-    "projectCode": "",
+    "apiToken": "api_key",
+    "projectCode": "project_code"
     "runName": "TestCafe run %DATE% %AGENTS%"
 }
