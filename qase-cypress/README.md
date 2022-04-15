@@ -63,6 +63,9 @@ Reporter options (* - required):
   `DEMOTR` is project code here)
 - `runId` - Run ID from Qase TMS (also can be got from run URL)
 - `logging` [true/false] - Enabled debug logging from reporter or not
+- `delay` (seconds) - Delay to publish pending results
+- `environmentId` - To execute with the sending of the envinroment information
+- `basePath` - URL Qase.io
 
 Example `cypress.json` config:
 
@@ -73,7 +76,8 @@ Example `cypress.json` config:
         "apiToken": "api_key",
         "projectCode": "project_code",
         "runId": 45,
-        "logging": true
+        "logging": true,
+        "basePath": "https://api.qase.io/v1"
     }
 }
 ```
