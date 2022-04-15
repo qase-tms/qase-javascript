@@ -10,6 +10,7 @@ import { createReadStream, readFileSync } from 'fs';
 import FormData from 'form-data';
 import { QaseApi } from 'qaseio';
 import chalk from 'chalk';
+import crypto from 'crypto';
 import { execSync } from 'child_process';
 
 enum Envs {
@@ -48,9 +49,9 @@ interface QaseOptions {
 const alwaysUndefined = () => undefined;
 
 let customBoundary = '----------------------------';
-for (let i = 0; i < 24; i++) {
-    customBoundary += Math.floor(Math.random() * 10).toString(16);
-}
+crypto.randomBytes(24).forEach((value) => {
+    customBoundary += Math.floor(value * 10).toString(16);
+});
 
 class CustomBoundaryFormData extends FormData {
     public constructor() {
