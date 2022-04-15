@@ -1,10 +1,15 @@
 /* eslint-disable no-console,@typescript-eslint/require-await */
-import {ResultCreate, ResultCreated, ResultStatus, RunCreate, RunCreated} from 'qaseio/dist/src/models';
+/* eslint-disable camelcase */
+/* eslint-disable no-unused-vars */
+import {
+    IdResponse, ResultCreateStatusEnum, ResultResponse,
+} from 'qaseio/dist/src';
 import { QaseApi } from 'qaseio';
 import chalk from 'chalk';
-import fs from 'fs';
+import {execSync} from 'child_process';
 import moment from 'moment';
 import path from 'path';
+import {readFileSync} from 'fs';
 import RuntimeError = WebAssembly.RuntimeError;
 
 interface Config {
@@ -16,6 +21,7 @@ interface Config {
     runName: string;
     runDescription?: string;
     runComplete: boolean;
+    environmentId: string | number | undefined;
     logging: boolean;
 }
 
@@ -57,7 +63,7 @@ interface Test {
 
 const loadJSON = (file: string): Config | undefined => {
     try {
-        const data = fs.readFileSync(file, { encoding: 'utf8' });
+        const data = readFileSync(file, { encoding: 'utf8' });
 
         if (data) {
             return JSON.parse(data) as Config;
@@ -83,8 +89,7 @@ const prepareConfig = (options: Config = {} as Config): Config => {
         enabled: process.env.QASE_ENABLED === 'true' || config.enabled || false,
         apiToken: process.env.QASE_API_TOKEN || config.apiToken,
         basePath: process.env.QASE_API_BASE_URL || config.basePath,
-        projectCode: process.env.QASE_PROJECT || config.projectCode || ''
-        ,
+        projectCode: process.env.QASE_PROJECT || config.projectCode || '',
         runId: process.env.QASE_RUN_ID || config.runId || '',
         runName:
             process.env.QASE_RUN_NAME ||
@@ -94,6 +99,7 @@ const prepareConfig = (options: Config = {} as Config): Config => {
             process.env.QASE_RUN_DESCRIPTION || config.runDescription,
         runComplete:
             process.env.QASE_RUN_COMPLETE === 'true' || config.runComplete,
+        environmentId: process.env.QASE_ENVIRONMENT_ID || config.environmentId || undefined,
         logging: process.env.QASE_LOGGING !== '' || config.logging,
     };
 };
@@ -131,7 +137,7 @@ class TestcafeQaseReporter {
 
     private userAgents!: string[];
     private pending: Array<(runId: string | number) => void> = [];
-    private results: Array<{test: Test; result: ResultCreated}>;
+    private results: Array<{test: Test; result: ResultResponse}>;
     private screenshots: {
         [key: string]: Screenshot[];
     };
@@ -146,6 +152,74 @@ class TestcafeQaseReporter {
         this.screenshots = {};
     }
 
+    private static getCaseId(meta: Meta): string[] {
+        if (!meta.CID) {
+            return [];
+        }
+        return meta.CID as unknown as string[];
+    }
+
+    private static createHeaders() {
+        const { version: nodeVersion, platform: os, arch } = process;
+        const npmVersion = execSync('npm -v', { encoding: 'utf8' }).replace(/['"\n]+/g, '');
+        const qaseapiVersion = this.getPackageVersion('qaseio');
+        const testcafeVersion = this.getPackageVersion('testcafe');
+        const testcafeCaseReporterVersion = this.getPackageVersion('testcafe-reporter-qase');
+        const xPlatformHeader = `node=${nodeVersion}; npm=${npmVersion}; os=${os}; arch=${arch}`;
+        // eslint-disable-next-line max-len
+        const xClientHeader = `jest=${testcafeVersion as string}; qase-jest=${testcafeCaseReporterVersion as string}; qaseapi=${qaseapiVersion as string}`;
+
+        return {
+            'X-Client': xClientHeader,
+            'X-Platform': xPlatformHeader,
+        };
+    }
+
+    private static createRunObject(name: string, cases: number[], args?: {
+        description?: string;
+        environment_id: number | undefined;
+        is_autotest: boolean;
+    }) {
+        return {
+            title: name,
+            cases,
+            ...args,
+        };
+    }
+
+    private static createResultObject(caseId: number, status: ResultCreateStatusEnum, args?: {
+        time_ms: number;
+        stacktrace: string | undefined;
+        comment: string | undefined;
+    }) {
+        return {
+            case_id: caseId,
+            status,
+            ...args,
+        };
+    }
+
+    private static getPackageVersion(name: string) {
+        const UNDEFINED = 'undefined';
+        try {
+            const pathToPackageJson = require.resolve(`${name}/package.json`, { paths: [process.cwd()] });
+            if (pathToPackageJson) {
+                try {
+                    const packageString = readFileSync(pathToPackageJson, { encoding: 'utf8' });
+                    if (packageString) {
+                        const packageObject = JSON.parse(packageString) as { version: string };
+                        return packageObject.version;
+                    }
+                    return UNDEFINED;
+                } catch (error) {
+                    return UNDEFINED;
+                }
+            }
+        } catch (error) {
+            return UNDEFINED;
+        }
+    }
+
     public reportTaskStart = async (_startTime: number, userAgents: string[]) => {
         if (!this.enabled) {
             return;
@@ -153,40 +227,48 @@ class TestcafeQaseReporter {
         this.userAgents = userAgents;
         this.config.runName = prepareReportName(this.config, this.userAgents);
 
-        this.checkProject(
+        return this.checkProject(
             this.config.projectCode,
-            (prjExists) => {
-                if (prjExists) {
-                    this.log(chalk`{green Project ${this.config.projectCode} exists}`);
-                    if (this.config.runId) {
-                        this.saveRunId(this.config.runId);
-                        this.checkRun(
-                            this.config.runId,
-                            (runExists: boolean) => {
-                                const run = this.config.runId as unknown as string;
-                                if (runExists) {
-                                    this.log(chalk`{green Using run ${run} to publish test results}`);
-                                } else {
-                                    this.log(chalk`{red Run ${run} does not exist}`);
-                                }
-                            }
-                        );
-                    } else if (!this.config.runId) {
-                        this.createRun(
-                            this.config.runName,
-                            this.config.runDescription,
-                            (created) => {
-                                if (created) {
-                                    this.saveRunId(created.id);
-                                    this.log(chalk`{green Using run ${this.config.runId} to publish test results}`);
-                                } else {
-                                    this.log(chalk`{red Could not create run in project ${this.config.projectCode}}`);
-                                }
-                            }
-                        );
-                    }
+            async (prjExists): Promise<void> => {
+                if (!prjExists) {
+                    this.log(
+                        chalk`{red Project ${this.config.projectCode} does not exist}`
+                    );
+                    this.enabled = false;
+                    return;
+                }
+
+                this.log(chalk`{green Project ${this.config.projectCode} exists}`);
+                if (this.config.runId) {
+                    this.saveRunId(this.config.runId);
+                    return this.checkRun(this.config.runId, (runExists: boolean) => {
+                        if (runExists) {
+                            this.log(
+                                chalk`{green Using run ${this.config.runId} to publish test results}`
+                            );
+                        } else {
+                            this.log(chalk`{red Run ${this.config.runId} does not exist}`);
+                            this.enabled = false;
+                        }
+                    });
                 } else {
-                    this.log(chalk`{red Project ${this.config.projectCode} does not exist}`);
+                    return this.createRun(
+                        this.config.runName,
+                        this.config.runDescription,
+                        (created) => {
+                            if (created) {
+                                this.saveRunId(created.result?.id);
+                                this.log(
+                                    chalk`{green Using run ${this.config.runId} to publish test results}`
+                                );
+                            } else {
+                                this.log(
+                                    chalk`{red Could not create run in project ${this.config.projectCode}}`
+                                );
+                                this.enabled = false;
+                            }
+                        }
+                    );
                 }
             }
         );
@@ -203,14 +285,14 @@ class TestcafeQaseReporter {
         }
         if (meta.CID) {
             const hasErr = testRunInfo.errs.length;
-            let testStatus: ResultStatus;
+            let testStatus: ResultCreateStatusEnum;
 
             if (testRunInfo.skipped) {
-                testStatus = ResultStatus.BLOCKED;
+                testStatus = ResultCreateStatusEnum.SKIPPED;
             } else if (hasErr > 0) {
-                testStatus = ResultStatus.FAILED;
+                testStatus = ResultCreateStatusEnum.FAILED;
             } else {
-                testStatus = ResultStatus.PASSED;
+                testStatus = ResultCreateStatusEnum.PASSED;
             }
 
             const errorLog = testRunInfo.errs
@@ -254,7 +336,7 @@ class TestcafeQaseReporter {
 
     private completeRun(runId: string | number | undefined) {
         if (runId !== undefined) {
-            this.api.runs.complete(this.config.projectCode, runId)
+            this.api.runs.completeRun(this.config.projectCode, Number(this.config.runId))
                 .then(() => {
                     this.log('Run completed successfully');
                 })
@@ -270,43 +352,59 @@ class TestcafeQaseReporter {
         }
     }
 
-    private checkProject(projectCode: string, cb: (exists: boolean) => void) {
-        this.api.projects.exists(projectCode)
-            .then(cb)
-            .catch((err) => {
-                this.log(err);
-            });
+    private async checkProject(projectCode: string, cb: (exists: boolean) => Promise<void>): Promise<void> {
+        try {
+            const resp = await this.api.projects.getProject(projectCode);
+            await cb(Boolean(resp.data.result?.code));
+        } catch (err) {
+            this.log(err);
+            this.enabled = false;
+        }
     }
 
-    private createRun(
-        name: string | undefined, description: string | undefined, cb: (created: RunCreated | undefined) => void
-    ) {
-        this.api.runs.create(
-            this.config.projectCode,
-            new RunCreate(
+    private async createRun(
+        name: string | undefined,
+        description: string | undefined,
+        cb: (created: IdResponse | undefined) => void
+    ): Promise<void> {
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const runObject = TestcafeQaseReporter.createRunObject(
                 name || `Automated run ${new Date().toISOString()}`,
                 [],
-                // eslint-disable-next-line camelcase
-                {description: description || 'Cypress automated run', is_autotest: true}
-            )
-        )
-            .then((res) => res.data)
-            .then(cb)
-            .catch((err) => {
-                this.log(`Error on creating run ${err as string}`);
-            });
+                {
+                    description: description || 'TestCafe automated run',
+                    environment_id: Number(this.config.environmentId),
+                    is_autotest: true,
+                }
+            );
+            const res = await this.api.runs.createRun(
+                this.config.projectCode,
+                runObject
+            );
+            cb(res.data);
+        } catch (err) {
+            this.log(`Error on creating run ${err as string}`);
+            this.enabled = false;
+        }
     }
 
-    private checkRun(runId: string | number | undefined, cb: (exists: boolean) => void) {
-        if (runId !== undefined) {
-            this.api.runs.exists(this.config.projectCode, runId)
-                .then(cb)
-                .catch((err) => {
-                    this.log(`Error on checking run ${err as string}`);
-                });
-        } else {
+    private async checkRun(runId: string | number | undefined, cb: (exists: boolean) => void): Promise<void> {
+        if (runId === undefined) {
             cb(false);
+            return;
         }
+
+        return this.api.runs.getRun(this.config.projectCode, Number(runId))
+            .then((resp) => {
+                this.log(`Get run result on checking run ${resp.data.result?.id as unknown as string}`);
+                cb(Boolean(resp.data.result?.id));
+            })
+            .catch((err) => {
+                this.log(`Error on checking run ${err as string}`);
+                this.enabled = false;
+            });
+
     }
 
     private saveRunId(runId?: string | number) {
@@ -322,14 +420,7 @@ class TestcafeQaseReporter {
         }
     }
 
-    private getCaseId(meta: Meta): string[] {
-        if (!meta.CID) {
-            return [];
-        }
-        return meta.CID as unknown as string[];
-    }
-
-    private logTestItem(name: string, status: ResultStatus) {
+    private logTestItem(name: string, status: ResultCreateStatusEnum) {
         const map = {
             failed: chalk`{red Test ${name} ${status}}`,
             passed: chalk`{green Test ${name} ${status}}`,
@@ -340,10 +431,10 @@ class TestcafeQaseReporter {
         }
     }
 
-    private publishCaseResult(test: Test, status: ResultStatus){
+    private publishCaseResult(test: Test, status: ResultCreateStatusEnum){
         this.logTestItem(test.name, status);
 
-        const caseIds = this.getCaseId(test.meta);
+        const caseIds = TestcafeQaseReporter.getCaseId(test.meta);
         caseIds.forEach((caseId) => {
             const publishTest = (runId: string | number) => {
                 if (caseId) {
@@ -352,20 +443,26 @@ class TestcafeQaseReporter {
                         chalk`{gray Start publishing: ${test.name}}${add}`
                     );
                     this.queued++;
-                    this.api.results.create(this.config.projectCode, runId, new ResultCreate(
+
+                    const resultObject = TestcafeQaseReporter.createResultObject(
                         parseInt(caseId, 10),
                         status,
                         {
-                            // eslint-disable-next-line camelcase
                             time_ms: test.info.durationMs,
                             stacktrace: test.error,
                             comment: test.error ? test.error.split('\n')[0]:undefined,
                         }
-                    ))
+                    );
+
+                    this.api.results.createResult(
+                        this.config.projectCode,
+                        Number(runId),
+                        resultObject
+                    )
                         .then((res) => {
                             this.results.push({test, result: res.data});
                             this.queued--;
-                            this.log(chalk`{gray Result published: ${test.name} ${res.data.hash}}${add}`);
+                            this.log(chalk`{gray Result published: ${test.name}}${add}`);
                         })
                         .catch((err) => {
                             this.queued--;
@@ -384,6 +481,7 @@ class TestcafeQaseReporter {
 }
 
 /// This weird setup is required due to TestCafe prototype injection method.
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export = () => {
     const reporter = new TestcafeQaseReporter();
     return {
