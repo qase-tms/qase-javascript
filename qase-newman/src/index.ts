@@ -1,29 +1,49 @@
 /* eslint-disable no-console */
+/* eslint-disable camelcase */
 import { EventList, Item } from 'postman-collection';
-import { ResultCreate, ResultCreated, ResultStatus, RunCreate } from 'qaseio/dist/src/models';
+import {
+    IdResponse,
+    ResultCreateStatusEnum,
+} from 'qaseio/dist/src';
 import { EventEmitter } from 'events';
 import { NewmanRunOptions } from 'newman';
 import { QaseApi } from 'qaseio';
 import chalk from 'chalk';
+import { execSync } from 'child_process';
+import { readFileSync } from 'fs';
 
 enum Envs {
+    report = 'QASE_REPORT',
+    apiToken = 'QASE_API_TOKEN',
+    basePath = 'QASE_API_BASE_URL',
+    projectCode = 'QASE_PROJECT_CODE',
     runId = 'QASE_RUN_ID',
+    runName = 'QASE_RUN_NAME',
+    runDescription = 'QASE_RUN_DESCRIPTION',
+    runComplete = 'QASE_RUN_COMPLETE',
+    environmentId = 'QASE_ENVIRONMENT_ID',
+    rootSuiteTitle = 'QASE_ROOT_SUITE_TITLE',
 }
 
 interface QaseOptions {
     apiToken: string;
+    basePath?: string;
+    rootSuiteTitle?: string;
     projectCode: string;
     runId?: string;
+    runPrefix?: string;
     runName?: string;
     runDescription?: string;
     logging?: boolean;
+    runComplete?: boolean;
+    environmentId?: number;
 }
 
 interface Test {
     name: string;
     response?: any;
     err?: Error;
-    result: ResultStatus;
+    result: ResultCreateStatusEnum;
     duration: number;
     ids: string[];
 }
@@ -33,56 +53,55 @@ type RunId = number | string;
 class NewmanQaseReporter {
     private api: QaseApi;
     private prePending: Record<string, Test> = {};
-    private pending: Array<(runId: string | number) => void> = [];
-    private readonly results: Array<{ test: Test; result: ResultCreated }> = [];
     private options: QaseOptions;
     private collectionOptions: NewmanRunOptions;
     private runId?: number | string;
-    private readonly runIdP: Promise<RunId | null> = Promise.resolve(null);
+    private isDisabled = false;
 
     public constructor(
         emitter: EventEmitter,
-        options: QaseOptions,
-        collectionRunOptions: NewmanRunOptions,
+        _options: QaseOptions,
+        collectionRunOptions: NewmanRunOptions
     ) {
-        this.options = options;
+        this.options = _options;
+        this.options.projectCode =
+            _options.projectCode || this.getEnv(Envs.projectCode) || '';
         this.collectionOptions = collectionRunOptions;
-        this.api = new QaseApi(this.options.apiToken);
+        this.options.runComplete =
+            !!this.getEnv(Envs.runComplete) || this.options.runComplete;
+
+        this.api = new QaseApi(
+            this.getEnv(Envs.apiToken) || this.options.apiToken || '',
+            this.getEnv(Envs.basePath) || this.options.basePath,
+            this.createHeaders()
+        );
+
+        this.log(chalk`{yellow Current PID: ${process.pid}}`);
 
         if (!this.options.projectCode) {
             return;
         }
 
         this.addRunnerListeners(emitter);
+    }
 
-        this.runIdP = this.checkProject(
-            this.options.projectCode,
-            (prjExists) => {
-                if (!prjExists) {
-                    return Promise.reject(chalk`{red Project ${this.options.projectCode} does not exist}`);
-                }
-                this.log(chalk`{green Project ${this.options.projectCode} exists}`);
-                const providedRunId = this.getEnv(Envs.runId) || this.options.runId;
-                if (providedRunId) {
-                    return this.checkRun(
-                        providedRunId,
-                        (runExists: boolean) => {
-                            if (runExists) {
-                                this.log(chalk`{green Using run ${providedRunId} to publish test results}`);
-                                return Promise.resolve(providedRunId);
-                            } else {
-                                return Promise.reject(chalk`{red Run ${providedRunId} does not exist}`);
-                            }
-                        }
-                    );
-                } else {
-                    return this.createRun(this.options.runName, this.options.runDescription);
-                }
-            }
-        ).catch((err) => {
-            this.log(err);
-            return null;
-        });
+    private createHeaders() {
+        const { version: nodeVersion, platform: os, arch } = process;
+        const npmVersion = execSync('npm -v', { encoding: 'utf8' }).replace(
+            /['"\n]+/g,
+            ''
+        );
+        const qaseapiVersion = this.getPackageVersion('qaseio');
+        const frameworkVersion = this.getPackageVersion('newman');
+        const reporterVersion = this.getPackageVersion('newman-reporter-qase');
+        const xPlatformHeader = `node=${nodeVersion}; npm=${npmVersion}; os=${os}; arch=${arch}`;
+        // eslint-disable-next-line max-len
+        const xClientHeader = `newman=${frameworkVersion as string}; qase-newman=${reporterVersion as string}; qaseapi=${qaseapiVersion as string}`;
+
+        return {
+            'X-Client': xClientHeader,
+            'X-Platform': xPlatformHeader,
+        };
     }
 
     private getEnv(name: Envs) {
@@ -95,7 +114,84 @@ class NewmanQaseReporter {
         }
     }
 
+    private getPackageVersion(name: string) {
+        const UNDEFINED = 'undefined';
+        try {
+            const pathToPackageJson = require.resolve(`${name}/package.json`, {
+                paths: [process.cwd()],
+            });
+            if (pathToPackageJson) {
+                try {
+                    const packageString = readFileSync(pathToPackageJson, {
+                        encoding: 'utf8',
+                    });
+                    if (packageString) {
+                        const packageObject = JSON.parse(packageString) as {
+                            version: string;
+                        };
+                        return packageObject.version;
+                    }
+                    return UNDEFINED;
+                } catch (error) {
+                    return UNDEFINED;
+                }
+            }
+        } catch (error) {
+            return UNDEFINED;
+        }
+    }
+
     private addRunnerListeners(runner: EventEmitter) {
+        runner.on('start', () => {
+            if (this.isDisabled) {
+                return;
+            }
+
+            void this.checkProject(this.options.projectCode, async (prjExists) => {
+                if (!prjExists) {
+                    this.log(
+                        chalk`{red Project ${this.options.projectCode} does not exist}`
+                    );
+                    this.isDisabled = true;
+                    return;
+                }
+                this.log(chalk`{green Project ${this.options.projectCode} exists}`);
+                const providedRunId = this.getEnv(Envs.runId) || this.options.runId;
+                if (providedRunId) {
+                    this.runId = providedRunId;
+                    return this.checkRun(this.runId, (runExists: boolean) => {
+                        if (runExists) {
+                            this.log(
+                                chalk`{green Using run ${this.runId} to publish test results}`
+                            );
+                        } else {
+                            this.log(chalk`{red Run ${this.runId} does not exist}`);
+                            this.isDisabled = true;
+                        }
+                    });
+                } else {
+                    return this.createRun(
+                        this.getEnv(Envs.runName) || this.options.runName,
+                        this.getEnv(Envs.runDescription) || this.options.runDescription,
+                        (created) => {
+                            if (created) {
+                                this.runId = created.result?.id;
+                                process.env.QASE_RUN_ID = String(this.runId);
+                                this.log(
+                                    chalk`{green Using run ${this.runId} to publish test results}`
+                                );
+                            } else {
+                                this.log(
+                                    chalk`{red Could not create run in project ${this.options.projectCode}}`
+                                );
+                                this.isDisabled = true;
+                            }
+                        }
+                    );
+                }
+            });
+        });
+
         runner.on('beforeItem', (err, args: Record<string, unknown>) => {
             const item: Item = args.item as Item;
             const name = this.itemName(args);
@@ -104,7 +200,7 @@ class NewmanQaseReporter {
                 this.log('Test', name, 'starting, case ids:', ids);
                 this.prePending[name] = {
                     name,
-                    result: ResultStatus.PASSED,
+                    result: ResultCreateStatusEnum.PASSED,
                     duration: 0,
                     ids,
                 } as Test;
@@ -121,7 +217,7 @@ class NewmanQaseReporter {
         runner.on('assertion', (err: Error, args: Record<string, unknown>) => {
             const name = this.itemName(args);
             if (name && this.prePending[name] && err) {
-                this.prePending[name].result = ResultStatus.FAILED;
+                this.prePending[name].result = ResultCreateStatusEnum.FAILED;
                 this.prePending[name].err = err;
             }
         });
@@ -163,43 +259,84 @@ class NewmanQaseReporter {
         return ids;
     }
 
-    private checkProject(projectCode: string, cb: (exists: boolean) => Promise<RunId>) {
-        return this.api.projects.exists(projectCode).then(cb);
-    }
+    private async checkProject(
+        projectCode: string,
+        cb: (exists: boolean) => Promise<void>
+    ): Promise<void> {
+        try {
+            const resp = await this.api.projects.getProject(projectCode);
 
-    private checkRun(runId: string | number | undefined, cb: (exists: boolean) => Promise<RunId>) {
-        if (runId !== undefined) {
-            return this.api.runs.exists(this.options.projectCode, runId).then(cb);
-        } else {
-            return cb(false);
+            await cb(Boolean(resp.data.result?.code));
+        } catch (err) {
+            this.log(err);
+            this.isDisabled = true;
         }
     }
 
-    private createRun(
+    private async createRun(
         name: string | undefined,
-        description: string | undefined
-    ): Promise<RunId> {
-        return this.api.runs.create(
-            this.options.projectCode,
-            new RunCreate(
+        description: string | undefined,
+        cb: (created: IdResponse | undefined) => void
+    ): Promise<void> {
+        try {
+            const runObject = this.createRunObject(
                 name || `Automated run ${new Date().toISOString()}`,
                 [],
                 {
                     description: description || 'Newman automated run',
-                    // eslint-disable-next-line camelcase
                     is_autotest: true,
                 }
-            )
-        ).catch((err) => Promise.reject(`Error on creating run ${err as string}`))
-            .then((res) => {
-                const runId = res.data?.id;
-                if (runId) {
-                    return runId;
-                } else {
-                    return Promise.reject(chalk`{red Could not create run in project ${this.options.projectCode}}`);
-                }
-            });
+            );
 
+            const resp = await this.api.runs.createRun(
+                this.options.projectCode,
+                runObject
+            );
+
+            cb(resp.data);
+        } catch (err) {
+            this.log(`Error on creating run ${err as string}`);
+            this.isDisabled = true;
+        }
+    }
+
+    private createRunObject(
+        name: string,
+        cases: number[],
+        args?: {
+            description?: string;
+            is_autotest: boolean;
+        }
+    ) {
+        return {
+            title: name,
+            cases,
+            ...args,
+        };
+    }
+
+    private async checkRun(
+        runId: string | number | undefined,
+        cb: (exists: boolean) => void
+    ): Promise<void> {
+        if (runId === undefined) {
+            cb(false);
+            return;
+        }
+
+        return this.api.runs
+            .getRun(this.options.projectCode, Number(runId))
+            .then((resp) => {
+                this.log(
+                    `Get run result on checking run ${resp.data.result?.id as unknown as string
+                    }`
+                );
+                cb(Boolean(resp.data.result?.id));
+            })
+            .catch((err) => {
+                this.log(`Error on checking run ${err as string}`);
+                this.isDisabled = true;
+            });
     }
 
     private itemName(args: Record<string, unknown>) {
@@ -224,33 +361,28 @@ class NewmanQaseReporter {
     private publishCaseResult(test: Test) {
         this.logTestItem(test);
 
-        const publishTest = (runId: RunId | null) => {
-            if (runId === null || test.ids.length === 0) {
-                return;
-            }
-            test.ids.forEach((caseId) => {
-                this.log(chalk`{gray Result publishing: ${test.name} case: ${caseId}}`);
-                this.api.results.create(this.options.projectCode, runId, new ResultCreate(
-                    parseInt(caseId, 10),
-                    test.result,
-                    {
-                        // eslint-disable-next-line camelcase
-                        time_ms: test.duration,
-                        stacktrace: test.err?.stack,
-                        comment: test.err ? test.err.message : `Qase Newman Reporter ${new Date().toLocaleString()}`,
-                    }
-                ))
-                    .then((res) => {
-                        this.results.push({ test, result: res.data });
-                        this.log(chalk`{gray Result published: ${test.name} case ${caseId}}`);
-                    })
-                    .catch((err) => {
-                        this.log(`Got error on publishing: ${err as string}`);
-                    });
-            });
-        };
-
-        void this.runIdP.then(publishTest);
+        if (this.runId === null || test.ids.length === 0) {
+            return;
+        }
+        test.ids.forEach((caseId) => {
+            this.log(chalk`{gray Result publishing: ${test.name} case: ${caseId}}`);
+            this.api.results
+                .createResult(this.options.projectCode, Number(this.runId), {
+                    case_id: Number(caseId),
+                    status: test.result,
+                    time_ms: test.duration,
+                    stacktrace: test.err?.stack,
+                    comment: test.err
+                        ? test.err.message
+                        : `Qase Newman Reporter ${new Date().toLocaleString()}`,
+                })
+                .then(() => {
+                    this.log(chalk`{gray Result published: ${test.name} case ${caseId}}`);
+                })
+                .catch((err) => {
+                    this.log(`Got error on publishing: ${err as string}`);
+                });
+        });
     }
 }
 

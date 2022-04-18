@@ -1,6 +1,6 @@
 {
   "name": "newman-reporter-qase",
-  "version": "v1.0.5",
+  "version": "v1.0.6-alpha.0",
   "description": "Qase TMS Newman Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -52,6 +52,6 @@
   },
   "dependencies": {
     "chalk": "^4.1.0",
-    "qaseio": "^1.5.0"
+    "qaseio": "^2.0.0"
   }
 }

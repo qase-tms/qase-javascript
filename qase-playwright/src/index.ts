@@ -228,6 +228,7 @@ class PlaywrightReporter implements Reporter {
         if (this.isDisabled) {
             return;
         }
+
         while(this.resultsToBePublished.length > 0) { // need wait all results to be published
             this.log(chalk`{gray Waiting for all results to be published. Remaining ${this.resultsToBePublished.length} results}`);
             await new Promise((resolve) => setTimeout(resolve, 100));
