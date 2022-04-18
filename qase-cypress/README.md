@@ -91,6 +91,11 @@ Supported ENV variables:
 - `QASE_RUN_ID` - Pass Run ID from ENV and override reporter options
 - `QASE_RUN_NAME` - Set custom Run name, when new run is created
 - `QASE_RUN_DESCRIPTION` - Set custom Run description, when new run is created
+- `QASE_API_TOKEN` - Token for API access, you can find more information
+  [here](https://developers.qase.io/#authentication)
+- `QASE_API_BASE_URL` - URL Qase.io, default value `https://api.qase.io/v1`
+- `QASE_ENVIRONMENT_ID` - To execute with the sending of the envinroment information
+- `QASE_DELAY` - Delay to publish pending results
 
 <!-- references -->
 
