@@ -7,9 +7,9 @@ const config = {
         ['list'],
         ['playwright-qase-reporter',
             {
-                apiToken: '',
+                apiToken: 'api_key',
+                projectCode: 'project_code',
                 basePath: 'https://api.qase.io/v1',
-                projectCode: '',
                 runComplete: true,
                 logging: true,
                 uploadAttachments: true,
