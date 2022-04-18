@@ -146,7 +146,11 @@ class TestcafeQaseReporter {
     public constructor() {
         this.config = prepareConfig();
         this.enabled = verifyConfig(this.config);
-        this.api = new QaseApi(this.config.apiToken);
+        this.api = new QaseApi(
+            this.config.apiToken,
+            this.config.basePath,
+            TestcafeQaseReporter.createHeaders(),
+        );
         this.queued = 0;
         this.results = [];
         this.screenshots = {};
@@ -167,7 +171,7 @@ class TestcafeQaseReporter {
         const testcafeCaseReporterVersion = this.getPackageVersion('testcafe-reporter-qase');
         const xPlatformHeader = `node=${nodeVersion}; npm=${npmVersion}; os=${os}; arch=${arch}`;
         // eslint-disable-next-line max-len
-        const xClientHeader = `jest=${testcafeVersion as string}; qase-jest=${testcafeCaseReporterVersion as string}; qaseapi=${qaseapiVersion as string}`;
+        const xClientHeader = `testcafe=${testcafeVersion as string}; qase-testcafe=${testcafeCaseReporterVersion as string}; qaseapi=${qaseapiVersion as string}`;
 
         return {
             'X-Client': xClientHeader,
