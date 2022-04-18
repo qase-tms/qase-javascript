@@ -11,7 +11,9 @@ const config = {
                 projectCode: 'project_code',
                 runComplete: true,
                 logging: true,
-                uploadAttachments: true
+                uploadAttachments: true,
+                basePath: 'https://api.qase.io/v1',
+                environmentId: 1
             }],
     ],
 };
