@@ -8,7 +8,9 @@
     "cypressQaseReporterReporterOptions": {
       "apiToken": "api_key",
       "projectCode": "project_code",
-      "logging": true
+      "logging": true,
+      "basePath": "https://api.qase.io/v1",
+      "environmentId": 1
     }
   },
   "video": false
