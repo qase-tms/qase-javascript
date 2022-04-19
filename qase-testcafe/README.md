@@ -48,10 +48,12 @@ using `.qaserc` file and using ENV variables.
 - `enabled` - Enable reporter
 - `apiToken` - Token for API access, you can find more information
   [here](https://developers.qase.io/#authentication)
+- `basePath` - Qase.io URL
 - `projectCode` - Code of your project (can be extracted from main
   page of your project: `https://app.qase.io/project/DEMOTR` -
   `DEMOTR` is project code here)
 - `runId` - Pass Run ID
+- `environmentId` - Environment ID from Qase TMS
 - `runName` - Set custom Run name, when new run is created.
   Supports two parameters:
     - `%DATE%`

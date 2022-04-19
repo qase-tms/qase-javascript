@@ -1,7 +1,10 @@
 {
     "enabled": true,
     "logging": true,
+    "environmentId": 1,
     "apiToken": "api_key",
+    "runComplete": true,
     "projectCode": "project_code",
-    "runName": "TestCafe run %DATE% %AGENTS%"
+    "runName": "TestCafe run %DATE% %AGENTS%",
+    "basePath": "https://api.qase.io/v1"
 }
