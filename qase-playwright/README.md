@@ -54,6 +54,7 @@ Reporter options (* - required):
 - *`projectCode` - Code of your project (can be extracted from main 
   page of your project: `https://app.qase.io/project/DEMOTR` - 
   `DEMOTR` is project code here)
+  `basePath` - Qase.io url
 - `runId` - Run ID from Qase TMS (also can be got from run URL)
 - `environmentId` - Environment ID from Qase TMS
 - `logging` [true/false] - Enabled debug logging from reporter or not
@@ -75,6 +76,7 @@ const config = {
                 apiToken: 'api_key',
                 projectCode: 'project_code',
                 runComplete: true,
+                basePath: 'https://api.qase.io/v1',
                 logging: true,
                 uploadAttachments: true,
             }],
@@ -89,6 +91,8 @@ Supported ENV variables:
 
 - `QASE_REPORT` - You **should** pass this ENV if you want to use qase reporter
 - `QASE_API_TOKEN` - API token
+- `QASE_PROJECT_CODE` - Code of your project (can be extracted from main page of your project: https://app.qase.io/project/DEMOTR - DEMOTR is project code here)
+- `QASE_API_BASE_URL` - Qase.io url
 - `QASE_RUN_ID` - Pass Run ID from ENV and override reporter options
 - `QASE_ENVIRONMENT_ID` - Pass Environment ID from ENV and override reporter options
 - `QASE_RUN_NAME` - Set custom Run name, when new run is created
