@@ -9,6 +9,7 @@ const config = {
             {
                 apiToken: 'api_key',
                 projectCode: 'project_code',
+                basePath: 'https://api.qase.io/v1',
                 runComplete: true,
                 logging: true,
                 uploadAttachments: true,
