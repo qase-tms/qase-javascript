@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 export = {
     qase: (caseId: number | string | number[] | string[], name: string): string => {
         let caseIds: number[] | string[];
