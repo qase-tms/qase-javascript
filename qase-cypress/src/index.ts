@@ -1,20 +1,15 @@
 /* eslint-disable no-console */
 /* eslint-disable camelcase */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access  */
 import { IdResponse, ResultCreateStatusEnum } from 'qaseio/dist/src';
 import { MochaOptions, Runner, Test, reporters } from 'mocha';
+import { execSync, spawnSync } from 'child_process';
 import { QaseApi } from 'qaseio';
 import chalk from 'chalk';
-import { execSync } from 'child_process';
 import { readFileSync } from 'fs';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const { EVENT_TEST_FAIL, EVENT_TEST_PASS, EVENT_TEST_PENDING, EVENT_RUN_END } =
   Runner.constants;
-const DEFAULT_DELAY = 30;
 
 enum Envs {
     report = 'QASE_REPORT',
@@ -24,7 +19,6 @@ enum Envs {
     runName = 'QASE_RUN_NAME',
     runDescription = 'QASE_RUN_DESCRIPTION',
     environmentId = 'QASE_ENVIRONMENT_ID',
-    delay = 'QASE_DELAY'
 }
 
 interface QaseOptions {
@@ -35,7 +29,14 @@ interface QaseOptions {
     runPrefix?: string;
     logging?: boolean;
     environmentId?: number;
-    delay?: number;
+}
+
+interface BulkCaseObject {
+    case_id: number;
+    status: ResultCreateStatusEnum;
+    time_ms: number;
+    stacktrace?: string;
+    comment: string;
 }
 
 class CypressQaseReporter extends reporters.Base {
@@ -51,7 +52,7 @@ class CypressQaseReporter extends reporters.Base {
     private options: QaseOptions;
     private runId?: number | string;
     private isDisabled = false;
-    private publishedResults = false;
+    private resultsForPublishing: BulkCaseObject[] = [];
 
     public constructor(runner: Runner, options: MochaOptions) {
         super(runner, options);
@@ -200,40 +201,38 @@ class CypressQaseReporter extends reporters.Base {
 
     private addRunnerListeners(runner: Runner) {
         runner.on(EVENT_TEST_PASS, (test: Test) => {
-            this.publishCaseResult(test, ResultCreateStatusEnum.PASSED);
+            this.transformCaseResultToBulkObject(test, ResultCreateStatusEnum.PASSED);
         });
 
         runner.on(EVENT_TEST_PENDING, (test: Test) => {
-            this.publishCaseResult(test, ResultCreateStatusEnum.SKIPPED);
+            this.transformCaseResultToBulkObject(test, ResultCreateStatusEnum.SKIPPED);
         });
 
         runner.on(EVENT_TEST_FAIL, (test: Test) => {
-            this.publishCaseResult(test, ResultCreateStatusEnum.FAILED);
+            this.transformCaseResultToBulkObject(test, ResultCreateStatusEnum.FAILED);
         });
 
         runner.addListener(EVENT_RUN_END, () => {
-            if (this.testCasesForPublishingCount === 0) {
+            if (this.resultsForPublishing.length === 0) {
                 this.log('Nothing to send.');
             } else if (this.runId) {
-                const delay = Number(CypressQaseReporter.getEnv(Envs.delay)) || this.options.delay || DEFAULT_DELAY;
+                const config = {
+                    apiToken: CypressQaseReporter.getEnv(Envs.apiToken) || this.options.apiToken || '',
+                    basePath: CypressQaseReporter.getEnv(Envs.basePath) || this.options.basePath,
+                    headers: CypressQaseReporter.createHeaders(),
+                    code: this.options.projectCode,
+                    runId: Number(this.runId),
+                    body: {
+                        results: this.resultsForPublishing,
+                    },
+                };
 
-                this.log(
-                    chalk`{blue Waiting for ${delay} seconds to publish pending results}`
-                );
-
-                const endTime = Date.now() + delay * 1000;
-                while (!this.publishedResults && Date.now() < endTime) {
-                    // sleep 500 ms
-                    const sharedArrayBuffer = new SharedArrayBuffer(8);
-                    const int32array = new Int32Array(sharedArrayBuffer);
-                    Atomics.wait(int32array, 0, 0, 500);
-                }
-                if (!this.publishedResults) {
-                    this.log(
-                        // eslint-disable-next-line max-len
-                        chalk`{red Could not send all results for ${delay} seconds after run. Please contact Qase Team.}`
-                    );
-                }
+                spawnSync('node', [`${__dirname}/reportBulk.js`], {
+                    stdio: 'inherit',
+                    env: Object.assign(process.env, {
+                        reporting_config: JSON.stringify(config),
+                    }),
+                });
             }
         });
     }
@@ -258,7 +257,9 @@ class CypressQaseReporter extends reporters.Base {
         cb: (created: IdResponse | undefined) => void
     ): Promise<void> {
         try {
-            const environmentId = Number(CypressQaseReporter.getEnv(Envs.environmentId)) || this.options.environmentId;
+            const environmentId =
+        Number(CypressQaseReporter.getEnv(Envs.environmentId)) ||
+        this.options.environmentId;
 
             const runObject = CypressQaseReporter.createRunObject(
                 name || `Automated run ${new Date().toISOString()}`,
@@ -328,45 +329,27 @@ class CypressQaseReporter extends reporters.Base {
         if (test.state) {
             this.log(map[test.state]);
         }
+        if (test.file) {
+            this.log(test.file);
+        } else {
+            this.log('No files provided');
+        }
     }
 
-    private publishCaseResult(test: Test, status: ResultCreateStatusEnum) {
+    private transformCaseResultToBulkObject(test: Test, status: ResultCreateStatusEnum) {
         this.logTestItem(test);
-
         const caseIds = CypressQaseReporter.getCaseId(test);
-        caseIds.forEach((caseId) => {
-            this.testCasesForPublishingCount++;
-            const publishTest = (runId: string | number) => {
-                if (caseId) {
-                    const add =
-            caseIds.length > 1 ? chalk` {white For case ${caseId}}` : '';
-                    this.log(chalk`{gray Start publishing: ${test.title}}${add}`);
-                    this.api.results
-                        .createResult(this.options.projectCode, Number(runId), {
-                            status,
-                            case_id: caseId,
-                            time_ms: test.duration,
-                            stacktrace: test.err?.stack,
-                            comment: test.err
-                                ? `${test.err.name}: ${test.err.message}`
-                                : undefined,
-                        })
-                        .then((res) => {
-                            this.results.push({ test, result: res.data });
-                            this.log(chalk`{gray Result published: ${test.title}}${add}`);
-                            this.testCasesForPublishingCount--;
-                        })
-                        .catch((err) => {
-                            this.log(err);
-                            this.testCasesForPublishingCount--;
-                        });
-                }
-            };
 
-            if (this.runId) {
-                publishTest(this.runId);
-            } else {
-                this.pending.push(publishTest);
+        caseIds.forEach((caseId) => {
+            if (caseId) {
+                const caseResultBulkObject = {
+                    status,
+                    case_id: caseId,
+                    time_ms: test.duration || 0,
+                    stacktrace: test.err?.stack,
+                    comment: test.err ? `${test.err.name}: ${test.err.message}` : '',
+                };
+                this.resultsForPublishing.push(caseResultBulkObject );
             }
         });
     }
