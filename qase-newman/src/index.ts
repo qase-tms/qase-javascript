@@ -5,12 +5,13 @@ import {
     IdResponse,
     ResultCreateStatusEnum,
 } from 'qaseio/dist/src';
+import { execSync, spawnSync } from 'child_process';
 import { EventEmitter } from 'events';
 import { NewmanRunOptions } from 'newman';
 import { QaseApi } from 'qaseio';
 import chalk from 'chalk';
-import { execSync } from 'child_process';
 import { readFileSync } from 'fs';
+
 
 enum Envs {
     report = 'QASE_REPORT',
@@ -46,9 +47,17 @@ interface Test {
     result: ResultCreateStatusEnum;
     duration: number;
     ids: string[];
+    startStamp: number;
+    endStamp: number;
 }
 
-type RunId = number | string;
+interface BulkCaseObject {
+    case_id: number;
+    status: ResultCreateStatusEnum;
+    time_ms: number;
+    stacktrace?: string;
+    comment: string;
+}
 
 class NewmanQaseReporter {
     private api: QaseApi;
@@ -203,6 +212,7 @@ class NewmanQaseReporter {
                     result: ResultCreateStatusEnum.PASSED,
                     duration: 0,
                     ids,
+                    startStamp: Date.now(),
                 } as Test;
             }
         });
@@ -225,11 +235,35 @@ class NewmanQaseReporter {
         runner.on('item', (err, args: Record<string, unknown>) => {
             const name = this.itemName(args);
             if (name && this.prePending[name]) {
-                this.publishCaseResult(this.prePending[name]);
+                const item = this.prePending[name];
+                item.endStamp = Date.now();
+                item.duration = item.endStamp - item.startStamp;
+                this.logTestItem(this.prePending[name]);
             }
         });
 
+        runner.on('beforeDone', () => {
+            const config = {
+                apiToken: this.getEnv(Envs.apiToken) || this.options.apiToken || '',
+                basePath: this.getEnv(Envs.basePath) || this.options.basePath,
+                headers: this.createHeaders(),
+                code: this.options.projectCode,
+                runId: Number(this.runId),
+                body: {
+                    results: this.createBulkResultsBodyObject(),
+                },
+            };
+
+            spawnSync('node', [`${__dirname}/reportBulk.js`], {
+                stdio: 'inherit',
+                env: Object.assign(process.env, {
+                    reporting_config: JSON.stringify(config),
+                }),
+            });
+        });
+
         runner.on('done', () => {
+            this.log('Done');
             this.log('Run finished');
         });
     }
@@ -358,31 +392,26 @@ class NewmanQaseReporter {
         }
     }
 
-    private publishCaseResult(test: Test) {
-        this.logTestItem(test);
+    private createBulkResultsBodyObject() {
+        const prePandingValuesArray = Object.values(this.prePending);
 
-        if (this.runId === null || test.ids.length === 0) {
-            return;
-        }
-        test.ids.forEach((caseId) => {
-            this.log(chalk`{gray Result publishing: ${test.name} case: ${caseId}}`);
-            this.api.results
-                .createResult(this.options.projectCode, Number(this.runId), {
-                    case_id: Number(caseId),
-                    status: test.result,
-                    time_ms: test.duration,
-                    stacktrace: test.err?.stack,
-                    comment: test.err
-                        ? test.err.message
-                        : `Qase Newman Reporter ${new Date().toLocaleString()}`,
-                })
-                .then(() => {
-                    this.log(chalk`{gray Result published: ${test.name} case ${caseId}}`);
-                })
-                .catch((err) => {
-                    this.log(`Got error on publishing: ${err as string}`);
-                });
-        });
+        return prePandingValuesArray.reduce((accum, test) => {
+            const { ids } = test;
+
+            const testsByIdArray = ids.map((id) => ({
+                case_id: Number(id),
+                status: test.result,
+                time_ms: test.duration,
+                stacktrace: test.err?.stack,
+                comment: test.err ? test.err.message : '',
+            })
+            );
+
+            return [
+                ...accum,
+                ...testsByIdArray,
+            ];
+        },[] as BulkCaseObject[]);
     }
 }
 
