@@ -1,6 +1,6 @@
 {
   "name": "cypress-qase-reporter",
-  "version": "v1.4.2-alpha.1",
+  "version": "v1.4.2-alpha.2",
   "description": "Qase TMS Cypress Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -16,7 +16,7 @@
     "node": ">=10"
   },
   "scripts": {
-    "dev": "npm run lint && tsc",
+    "dev": "npm run lint && tsc && cp ./src/reportBulk.js ./dist",
     "dev:watch": "nodemon --exec 'npm run dev || exit 1'",
     "lint": "eslint --fix src/**",
     "build": "npm run clean && npm run dev",
