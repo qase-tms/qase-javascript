@@ -5,13 +5,12 @@ import {
     IdResponse,
     ResultCreateStatusEnum,
 } from 'qaseio/dist/src';
+import { execSync, spawnSync } from 'child_process';
 import { EventEmitter } from 'events';
 import { NewmanRunOptions } from 'newman';
 import { QaseApi } from 'qaseio';
 import chalk from 'chalk';
-import { execSync } from 'child_process';
 import { readFileSync } from 'fs';
-import { spawnSync } from 'child_process';
 
 
 enum Envs {
@@ -396,30 +395,23 @@ class NewmanQaseReporter {
     private createBulkResultsBodyObject() {
         const prePandingValuesArray = Object.values(this.prePending);
 
-        const BulkCaseObjectsArray = prePandingValuesArray.reduce((accum, test) => {
+        return prePandingValuesArray.reduce((accum, test) => {
             const { ids } = test;
 
-            const testsByIdArray = ids.map((id) => {
-                const bulkObject = {
-                    case_id: Number(id),
-                    status: test.result,
-                    time_ms: test.duration,
-                    stacktrace: test.err?.stack,
-                    comment: test.err ? test.err.message : '',
-                };
+            const testsByIdArray = ids.map((id) => ({
+                case_id: Number(id),
+                status: test.result,
+                time_ms: test.duration,
+                stacktrace: test.err?.stack,
+                comment: test.err ? test.err.message : '',
+            })
+            );
 
-                return bulkObject;
-            });
-
-            const newValue = [
+            return [
                 ...accum,
                 ...testsByIdArray,
             ];
-
-            return newValue;
         },[] as BulkCaseObject[]);
-
-        return BulkCaseObjectsArray;
     }
 }
 
