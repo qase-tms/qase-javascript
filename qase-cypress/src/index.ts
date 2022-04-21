@@ -329,11 +329,6 @@ class CypressQaseReporter extends reporters.Base {
         if (test.state) {
             this.log(map[test.state]);
         }
-        if (test.file) {
-            this.log(test.file);
-        } else {
-            this.log('No files provided');
-        }
     }
 
     private transformCaseResultToBulkObject(test: Test, status: ResultCreateStatusEnum) {
