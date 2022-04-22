@@ -25,7 +25,17 @@ test
         await t
     });
 ```
+You should also have an active item in the project settings at
 
+```
+https://app.qase.io/project/QASE_PROJECT_CODE/settings/options
+```
+
+options in the `Test Runs` block:
+
+```
+Allow submitting results in bulk
+```
 You can run your tests by providing custom reporter:
 ```bash
 npx testcafe chrome test.js -r spec,qase
