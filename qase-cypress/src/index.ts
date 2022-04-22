@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable camelcase */
+/* eslint-disable @typescript-eslint/unbound-method */
 import { IdResponse, ResultCreateStatusEnum } from 'qaseio/dist/src';
 import { MochaOptions, Runner, Test, reporters } from 'mocha';
 import { execSync, spawnSync } from 'child_process';
@@ -19,6 +20,9 @@ enum Envs {
     runName = 'QASE_RUN_NAME',
     runDescription = 'QASE_RUN_DESCRIPTION',
     environmentId = 'QASE_ENVIRONMENT_ID',
+    screenshotFolder = 'QASE_SCREENSHOT_FOLDER',
+    sendScreenshot = 'QASE_SCREENSHOT_SENDING',
+    runClose = 'QASE_RUN_CLOSE',
 }
 
 interface QaseOptions {
@@ -29,6 +33,9 @@ interface QaseOptions {
     runPrefix?: string;
     logging?: boolean;
     environmentId?: number;
+    screenshotFolder?: string;
+    sendScreenshot?: boolean;
+    runClose?: boolean;
 }
 
 interface BulkCaseObject {
@@ -225,12 +232,23 @@ class CypressQaseReporter extends reporters.Base {
                     body: {
                         results: this.resultsForPublishing,
                     },
+                    runClose: CypressQaseReporter.getEnv(Envs.runClose) || this.options.runClose || false,
+                };
+
+                const screenshotsConfig = {
+                    screenshotFolder: CypressQaseReporter.getEnv(Envs.screenshotFolder)
+                        || this.options.screenshotFolder
+                        || 'screenshots',
+                    sendScreenshot: CypressQaseReporter.getEnv(Envs.screenshotFolder)
+                        || this.options.sendScreenshot
+                        || false,
                 };
 
                 spawnSync('node', [`${__dirname}/reportBulk.js`], {
                     stdio: 'inherit',
                     env: Object.assign(process.env, {
                         reporting_config: JSON.stringify(config),
+                        screenshots_config: JSON.stringify(screenshotsConfig),
                     }),
                 });
             }
