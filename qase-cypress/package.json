@@ -29,7 +29,8 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "qaseio": "^2.0.0"
+    "form-data": "^4.0.0",
+    "qaseio": "^2.0.1"
   },
   "devDependencies": {
     "@hutson/npm-deploy-git-tag": "^6.0.0",
