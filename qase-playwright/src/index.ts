@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 /* eslint-disable camelcase */
 import {
-    IdResponse,
+    IdResponse, ResultCreate,
     ResultCreateStatusEnum,
 } from 'qaseio/dist/src';
 
@@ -46,8 +46,6 @@ interface QaseOptions {
     uploadAttachments?: boolean;
 }
 
-const alwaysUndefined = () => undefined;
-
 let customBoundary = '----------------------------';
 crypto.randomBytes(24).forEach((value) => {
     customBoundary += Math.floor(value * 10).toString(16);
@@ -68,8 +66,8 @@ class PlaywrightReporter implements Reporter {
     private options: QaseOptions;
     private runId?: number | string;
     private isDisabled = false;
-    private publishedResultsCount = 0;
-    private resultsToBePublished: string[] = [];
+    private queued = 0;
+    private resultsToBePublished: ResultCreate[] = [];
 
     public constructor(_options: QaseOptions) {
         this.options = _options;
@@ -102,19 +100,6 @@ class PlaywrightReporter implements Reporter {
         return {
             title: name,
             cases,
-            ...args,
-        };
-    }
-
-    private static createResultObject(caseId: number, status: ResultCreateStatusEnum, args?: {
-        time_ms: number;
-        stacktrace: string | undefined;
-        comment: string | undefined;
-        attachments: string[] | undefined;
-    }) {
-        return {
-            case_id: caseId,
-            status,
             ...args,
         };
     }
@@ -220,8 +205,12 @@ class PlaywrightReporter implements Reporter {
         if (this.isDisabled) {
             return;
         }
-
-        return this.publishCaseResult(test, testResult).then(alwaysUndefined);
+        this.queued ++;
+        let attachmentsArray: any[] = [];
+        if (this.options.uploadAttachments && testResult.attachments.length > 0) {
+            attachmentsArray = await this.uploadAttachments(testResult);
+        }
+        return this.prepareCaseResult(test, testResult, attachmentsArray);
     }
 
     public async onEnd(): Promise<void> {
@@ -229,17 +218,38 @@ class PlaywrightReporter implements Reporter {
             return;
         }
 
-        while(this.resultsToBePublished.length > 0) { // need wait all results to be published
-            this.log(chalk`{gray Waiting for all results to be published. Remaining ${this.resultsToBePublished.length} results}`);
-            await new Promise((resolve) => setTimeout(resolve, 100));
-        }
+        await new Promise((resolve, reject) => {
+            let timer  = 0;
+            const interval = setInterval( () => {
+                timer ++;
+                if (this.runId && this.queued === 0) {
+                    clearInterval(interval);
+                    resolve();
+                }
+                if (timer > 30) {
+                    clearInterval(interval);
+                    reject();
+                }
+            }, 100);
+        });
 
-        if (this.publishedResultsCount === 0) {
+        if (this.resultsToBePublished.length === 0) {
             this.log(
                 'No testcases were matched. Ensure that your tests are declared correctly.'
             );
             return;
         }
+
+        const body = {
+            results: this.resultsToBePublished,
+        };
+        await this.api.results.createResultBulk(
+            this.options.projectCode,
+            Number(this.runId),
+            body
+        );
+        this.log(chalk`{green ${this.resultsToBePublished.length} result(s) sent to Qase}`);
+
 
         if (!this.options.runComplete) {
             return;
@@ -252,9 +262,6 @@ class PlaywrightReporter implements Reporter {
             this.log(`Error on completing run ${err as string}`);
         }
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    public getLastError(): void {}
 
     private log(message?: any, ...optionalParams: any[]) {
         if (this.options.logging) {
@@ -371,58 +378,39 @@ class PlaywrightReporter implements Reporter {
         }
     }
 
-    private async publishCaseResult(test: TestCase, testResult: TestResult): Promise<void> {
+    private prepareCaseResult(test: TestCase, testResult: TestResult, attachments: any[]) {
+        this.queued --;
         this.logTestItem(test, testResult);
         const caseIds = this.getCaseIds(test);
         if (caseIds.length === 0) {
             // TODO: autocreate case for result
             return;
         }
-        return Promise.all(
-            caseIds.map(async (caseId) => {
-                const testAlias = `${caseId} - ${test.title}`;
-                this.resultsToBePublished.push(testAlias);
-                const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}` : '';
-                this.log(chalk`{gray Start publishing: ${test.title}}${add}`);
-                while(!this.runId) { // need wait runId variable to be initialised in onBegin() hook
-                    await new Promise((resolve) => setTimeout(resolve, 50));
-                }
+        caseIds.map(async (caseId) => {
+            const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}` : '';
+            this.log(chalk`{gray Start publishing: ${test.title}}${add}`);
+            while(!this.runId) { // need wait runId variable to be initialised in onBegin() hook
+                await new Promise((resolve) => setTimeout(resolve, 50));
+            }
 
-                let attachmentsArray: any[] = [];
-                if (this.options.uploadAttachments && testResult.attachments.length > 0) {
-                    attachmentsArray = await this.uploadAttachments(testResult);
-                }
+            const caseObject: ResultCreate = {
+                case_id: caseId,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                status: Statuses[testResult.status] || Statuses.failed,
+                time_ms: testResult.duration,
+                stacktrace: testResult.error?.stack?.replace(/\u001b\[.*?m/g, ''),
+                comment: testResult.error ? `${test.title}: ${testResult.error?.message?.replace(/\u001b\[.*?m/g, '') as string}` : undefined,
+                attachments: attachments.length > 0
+                    ? attachments
+                    : undefined,
+            };
 
-                const resultObject = PlaywrightReporter.createResultObject(
-                    caseId,
-                    Statuses[testResult.status],
-                    {
-                        time_ms: testResult.duration,
-                        stacktrace: testResult.error?.stack?.replace(/\u001b\[.*?m/g, ''),
-                        // eslint-disable-next-line max-len
-                        comment: testResult.error ? `${test.title}: ${testResult.error?.message?.replace(/\u001b\[.*?m/g, '') as string}` : undefined,
-                        attachments: attachmentsArray.length > 0
-                            ? attachmentsArray
-                            : undefined,
-                    }
-                );
-
-                this.api.results.createResult(
-                    this.options.projectCode,
-                    Number(this.runId),
-                    resultObject
-                ).then(() => {
-                    this.removePublished(testAlias);
-                    this.publishedResultsCount++;
-                    this.log(
-                        chalk`{gray Result published: ${test.title} }${add}`
-                    );
-                }).catch((err) => {
-                    this.removePublished(testAlias);
-                    this.log(chalk`{red ${err}}`);
-                });
-            })
-        ).then(alwaysUndefined);
+            this.resultsToBePublished.push(caseObject);
+            this.log(
+                chalk`{gray Result prepared for publish: ${test.title} }${add}`
+            );
+            return;
+        });
     }
 }
 
