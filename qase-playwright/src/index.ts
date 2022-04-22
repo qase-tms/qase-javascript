@@ -230,7 +230,7 @@ class PlaywrightReporter implements Reporter {
                     clearInterval(interval);
                     reject();
                 }
-            }, 100);
+            }, 1000);
         });
 
         if (this.resultsToBePublished.length === 0) {
