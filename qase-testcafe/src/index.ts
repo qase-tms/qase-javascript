@@ -1,15 +1,16 @@
 /* eslint-disable no-console,@typescript-eslint/require-await */
 /* eslint-disable camelcase */
 /* eslint-disable no-unused-vars */
+import { CustomBoundaryFormData, customBoundary } from './CustomBoundaryFormData';
 import {
-    IdResponse, ResultCreateStatusEnum, ResultResponse,
+    IdResponse, ResultCreate, ResultCreateStatusEnum,
 } from 'qaseio/dist/src';
+import {createReadStream, readFileSync} from 'fs';
 import { QaseApi } from 'qaseio';
 import chalk from 'chalk';
 import {execSync} from 'child_process';
 import moment from 'moment';
 import path from 'path';
-import {readFileSync} from 'fs';
 import RuntimeError = WebAssembly.RuntimeError;
 
 interface Config {
@@ -21,18 +22,13 @@ interface Config {
     runName: string;
     runDescription?: string;
     runComplete: boolean;
+    uploadAttachments: boolean;
     environmentId: string | number | undefined;
     logging: boolean;
 }
 
 interface Meta {
     [key: string]: string;
-}
-
-interface TaskResult {
-    passedCount: number;
-    failedCount: number;
-    skippedCount: number;
 }
 
 interface Screenshot {
@@ -99,6 +95,8 @@ const prepareConfig = (options: Config = {} as Config): Config => {
             process.env.QASE_RUN_DESCRIPTION || config.runDescription,
         runComplete:
             process.env.QASE_RUN_COMPLETE === 'true' || config.runComplete,
+        uploadAttachments:
+            process.env.QASE_UPLOAD_ATTACHMENTS === 'true' || config.uploadAttachments,
         environmentId: process.env.QASE_ENVIRONMENT_ID || config.environmentId || undefined,
         logging: process.env.QASE_LOGGING !== '' || config.logging,
     };
@@ -129,19 +127,18 @@ const verifyConfig = (config: Config) => {
 };
 
 class TestcafeQaseReporter {
-    private formatError: unknown;
-
     private config: Config;
     private api: QaseApi;
     private enabled: boolean;
 
     private userAgents!: string[];
     private pending: Array<(runId: string | number) => void> = [];
-    private results: Array<{test: Test; result: ResultResponse}>;
+    private results: ResultCreate[] = [];
     private screenshots: {
         [key: string]: Screenshot[];
     };
     private queued: number;
+    private sending = false;
 
     public constructor() {
         this.config = prepareConfig();
@@ -150,9 +147,9 @@ class TestcafeQaseReporter {
             this.config.apiToken,
             this.config.basePath,
             TestcafeQaseReporter.createHeaders(),
+            CustomBoundaryFormData,
         );
         this.queued = 0;
-        this.results = [];
         this.screenshots = {};
     }
 
@@ -187,18 +184,6 @@ class TestcafeQaseReporter {
         return {
             title: name,
             cases,
-            ...args,
-        };
-    }
-
-    private static createResultObject(caseId: number, status: ResultCreateStatusEnum, args?: {
-        time_ms: number;
-        stacktrace: string | undefined;
-        comment: string | undefined;
-    }) {
-        return {
-            case_id: caseId,
-            status,
             ...args,
         };
     }
@@ -288,6 +273,7 @@ class TestcafeQaseReporter {
             return;
         }
         if (meta.CID) {
+            this.queued ++;
             const hasErr = testRunInfo.errs.length;
             let testStatus: ResultCreateStatusEnum;
 
@@ -305,42 +291,61 @@ class TestcafeQaseReporter {
                     ''
                 ))
                 .join('\n');
-            this.publishCaseResult({name, info: testRunInfo, meta, error: errorLog}, testStatus);
+
+            let attachmentsArray: any[] = [];
+            if (this.config.uploadAttachments && testRunInfo.screenshots.length > 0) {
+                attachmentsArray = await this.uploadAttachments(testRunInfo);
+            }
+
+            this.prepareCaseResult({name, info: testRunInfo, meta, error: errorLog}, testStatus, attachmentsArray);
         }
     };
 
-    // It is necessary to declare function with parameters,
-    // despite of there are unused, because when function signature not like expected,
-    // testcafe does not call this function
-    // eslint-disable-next-line no-unused-vars
-    public reportTaskDone = async (endTime, passed, warnings, result) => {
+    public reportTaskDone = async () => {
         if (!this.enabled) {
             return;
         }
-        const check = () => {
-            setTimeout(() => {
-                if (this.queued > 0) {
-                    check();
-                } else {
-                    if (this.results.length === 0) {
-                        console.warn(
-                            `\n(Qase Reporter)
-                                \nNo testcases were matched.
-                                Ensure that your tests are declared correctly.\n`
-                        );
-                    }
-                    if (this.config.runComplete) {
-                        this.completeRun(this.config.runId);
-                    }
+        await new Promise((resolve, reject) => {
+            let timer  = 0;
+            const interval = setInterval( () => {
+                timer ++;
+                if (this.config.runId && this.queued === 0) {
+                    clearInterval(interval);
+                    resolve();
+                }
+                if (timer > 30) {
+                    clearInterval(interval);
+                    reject();
                 }
             }, 1000);
-        };
-        check();
+        });
+
+        if (this.results.length === 0) {
+            console.warn(
+                `\n(Qase Reporter)
+                                \nNo testcases were matched.
+                                Ensure that your tests are declared correctly.\n`
+            );
+        } else {
+            const body = {
+                results: this.results,
+            };
+            await this.api.results.createResultBulk(
+                this.config.projectCode,
+                Number(this.config.runId),
+                body
+            );
+            this.log('Results sent to Qase');
+
+            if (this.config.runComplete) {
+                await this.completeRun(this.config.runId);
+            }
+        }
     };
 
-    private completeRun(runId: string | number | undefined) {
+    private async completeRun(runId: string | number | undefined) {
         if (runId !== undefined) {
-            this.api.runs.completeRun(this.config.projectCode, Number(this.config.runId))
+            await this.api.runs.completeRun(this.config.projectCode, Number(this.config.runId))
                 .then(() => {
                     this.log('Run completed successfully');
                 })
@@ -361,7 +366,7 @@ class TestcafeQaseReporter {
             const resp = await this.api.projects.getProject(projectCode);
             await cb(Boolean(resp.data.result?.code));
         } catch (err) {
-            this.log(err);
+            this.log(`Error on checking project ${err as string}`);
             this.enabled = false;
         }
     }
@@ -429,58 +434,61 @@ class TestcafeQaseReporter {
             failed: chalk`{red Test ${name} ${status}}`,
             passed: chalk`{green Test ${name} ${status}}`,
             pending: chalk`{blueBright Test ${name} ${status}}`,
+            skipped: chalk`{blueBright Test ${name} ${status}}`,
         };
         if (status) {
             this.log(map[status]);
         }
     }
 
-    private publishCaseResult(test: Test, status: ResultCreateStatusEnum){
+    private prepareCaseResult(test: Test, status: ResultCreateStatusEnum, attachments: any[]){
         this.logTestItem(test.name, status);
-
+        this.queued --;
         const caseIds = TestcafeQaseReporter.getCaseId(test.meta);
         caseIds.forEach((caseId) => {
-            const publishTest = (runId: string | number) => {
-                if (caseId) {
-                    const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}`:'';
-                    this.log(
-                        chalk`{gray Start publishing: ${test.name}}${add}`
-                    );
-                    this.queued++;
+            if (caseId) {
+                const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}`:'';
+                this.log(
+                    chalk`{gray Ready for publishing: ${test.name}}${add}`
+                );
+                const caseObject: ResultCreate = {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                    case_id: parseInt(caseId, 10),
+                    status,
+                    time_ms: test.info.durationMs,
+                    stacktrace: test.error,
+                    comment: test.error ? test.error.split('\n')[0]:undefined,
+                    attachments: attachments.length > 0
+                        ? attachments
+                        : undefined,
+                };
 
-                    const resultObject = TestcafeQaseReporter.createResultObject(
-                        parseInt(caseId, 10),
-                        status,
-                        {
-                            time_ms: test.info.durationMs,
-                            stacktrace: test.error,
-                            comment: test.error ? test.error.split('\n')[0]:undefined,
-                        }
-                    );
-
-                    this.api.results.createResult(
-                        this.config.projectCode,
-                        Number(runId),
-                        resultObject
-                    )
-                        .then((res) => {
-                            this.results.push({test, result: res.data});
-                            this.queued--;
-                            this.log(chalk`{gray Result published: ${test.name}}${add}`);
-                        })
-                        .catch((err) => {
-                            this.queued--;
-                            this.log(err);
-                        });
-                }
-            };
-
-            if (this.config.runId) {
-                publishTest(this.config.runId);
-            } else {
-                this.pending.push(publishTest);
+                this.results.push(caseObject);
             }
         });
+    }
+
+    private async uploadAttachments(testRunInfo: TestRunInfo) {
+        return await Promise.all(
+            testRunInfo.screenshots.map(async (attachment) => {
+                const data = createReadStream(attachment?.screenshotPath);
+
+                const options = {
+                    headers: {
+                        'Content-Type': 'multipart/form-data; boundary=' + customBoundary,
+                    },
+                };
+
+                const response = await this.api.attachments.uploadAttachment(
+                    this.config.projectCode,
+                    [data],
+                    options
+                );
+
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                return (response.data.result?.[0].hash as string);
+            })
+        );
     }
 }
 
