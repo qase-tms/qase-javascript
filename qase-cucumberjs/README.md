@@ -32,18 +32,35 @@ Feature: Cucumber documentation
         Then I should see a "Build Status" badge
         And I should see a "Dependencies" badge
 ```
+You should also have an active item in the project settings at
+
+```
+https://app.qase.io/project/QASE_PROJECT_CODE/settings/options
+```
+
+option in the `Test Runs` block:
+
+
+```
+Allow submitting results in bulk
+```
+
 
 To run tests and create a test run, execute the command (for example from folder examples):
 
 ```
-    cucumber-js -f cucumberjs-qase-reporter --format-options='{\"qaseConfig\": \"./.qaserc\"}' features -r examples/zombie/support -r examples/zombie/steps
+npm run test-zombie
+```
+<p align="center">
+  <img width="65%" src="./examples/screenshots/screenshot.png">
+</p>
+
+A test run will be performed and available at:
 
 ```
-![Output of run](./examples/screenshots/screenshot.png)​
-A test run will be performed and available at:
+https://app.qase.io/run/QASE_PROJECT_CODE
 ```
-https://app.qase.io/run/<projectCode>
-```
+
 ## Configuration
 
 Qase reporter supports passing parameters using two ways:

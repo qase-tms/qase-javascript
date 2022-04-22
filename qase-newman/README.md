@@ -5,7 +5,7 @@
 ## How to integrate
 
 ```bash
-npm install -g newman-reporter-qase
+npm install newman-reporter-qase
 ```
 
 ## Example of usage
@@ -19,9 +19,19 @@ pm.test('expect response be 200', function () {
     pm.response.to.be.info
 })
 ```
+You should also have an active item in the project settings at
 
-### From CLI:
-```bash
+```
+https://app.qase.io/project/QASE_PROJECT_CODE/settings/options
+```
+
+option in the `Test Runs` block:
+
+```
+Allow submitting results in bulk
+```
+### Execute rom CLI:
+```
 QASE_RUN_ID=34 # Specify Run ID using ENV
 newman run \
     -r qase \ # Enable Qase logger
@@ -35,8 +45,12 @@ newman run \
     -x # WA for issue https://github.com/postmanlabs/newman/issues/2148#issuecomment-665229759
 ```
 
-![Output of run](example/screenshots/screenshot.png)​
+<p align="center">
+  <img width="65%" src="./example/screenshots/screenshot.png">
+</p>
+
 A test run will be performed and available at:
+
 ```
 https://app.qase.io/run/QASE_PROJECT_CODE
 ```

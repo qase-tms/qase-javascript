@@ -58,8 +58,13 @@ To run tests and create a test run, execute the command:
 ```bash
 QASE_REPORT=1 npx jest
 ```
-![Output of run](examples/screenshots/screenshot.png)​
+
+<p align="center">
+  <img width="65%" src="./examples/screenshots/screenshot.png">
+</p>
+
 A test run will be performed and available at:
+
 ```
 https://app.qase.io/run/QASE_PROJECT_CODE
 ```
