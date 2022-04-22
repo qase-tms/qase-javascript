@@ -10,7 +10,9 @@ test.meta('CID', [1,2])('Check property of element', async (t) => {
     await t
         .expect(developerNameInput.value).eql('', 'input is empty')
         .typeText(developerNameInput, 'Peter Parker')
-        .expect(developerNameInput.value).contains('Peter', 'input contains text "Peter"');
+        .expect(developerNameInput.value)
+        .contains('Peter', 'input contains text "Peter"')
+    ;
 });
 
 test.meta('CID', [3])('Check property of element', async (t) => {
@@ -19,7 +21,9 @@ test.meta('CID', [3])('Check property of element', async (t) => {
     await t
         .expect(developerNameInput.value).eql('', 'input is empty')
         .typeText(developerNameInput, 'Peter Porker')
-        .expect(developerNameInput.value).contains('Parker', 'input contains text "Parker"');
+        .expect(developerNameInput.value)
+        .contains('Parker', 'input contains text "Parker"')
+    ;
 });
 
 test.skip.meta('CID', [4])('Check property of element', async (t) => {
@@ -28,5 +32,7 @@ test.skip.meta('CID', [4])('Check property of element', async (t) => {
     await t
         .expect(developerNameInput.value).eql('', 'input is empty')
         .typeText(developerNameInput, 'Peter Parker')
-        .expect(developerNameInput.value).contains('Peter', 'input contains text "Peter"');
+        .expect(developerNameInput.value)
+        .contains('Peter', 'input contains text "Peter"')
+    ;
 });
