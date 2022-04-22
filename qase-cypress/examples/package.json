@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "cypress": "cypress open",
-    "cypress qase": "QASE_REPORT=1 npx cypress run"
+    "cypress qase": "QASE_REPORT=1 cypress run"
   },
   "author": "",
   "license": "Apache-2.0",
