@@ -11,7 +11,7 @@ describe('My First Test', () => {
     }));
 
     qase(2, it('Gets, types and asserts', () => {
-        cy.visit('');
+        cy.visit('https://example.cypress.io');
 
         cy.contains('type').click();
         
@@ -20,7 +20,7 @@ describe('My First Test', () => {
         // Get an input, type into it and verify that the value has been updated
         cy.get('.action-email')
             .type('fake@email.com')
-            .should('have.value', 'fake@email.com');
+            .should('have.value', 'unexpected@email.com');
     }));
 
     qase(3, it.skip('Gets, types and asserts', () => {
@@ -34,6 +34,6 @@ describe('My First Test', () => {
         // Get an input, type into it and verify that the value has been updated
         cy.get('.action-email')
             .type('fake@email.com')
-            .should('have.value', 'fake@email.com');
+            .should('have.value', 'unexpected@email.com');
     }));
 });
