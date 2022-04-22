@@ -59,6 +59,7 @@ using `.qaserc` file and using ENV variables.
     - `%DATE%`
     - `%AGENTS%`
 - `runDescription` - Set custom Run description, when new run is created
+- `uploadAttachments` - Uploading attachment to Qase TMS
 - `runComplete` - Complete run after all tests are finished
 - `logging` - Enabled debug logging from reporter or not
 
@@ -83,6 +84,7 @@ Supported ENV variables:
 - `QASE_RUN_DESCRIPTION` - Same as `runDescription`
 - `QASE_RUN_COMPLETE` - Same as `runComplete`
 - `QASE_LOGGING` - Same as `logging`
+- `QASE_UPLOAD_ATTACHMENTS` - Same as `uploadAttachments`
 
 <!-- references -->
 
