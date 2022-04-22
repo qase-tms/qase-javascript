@@ -386,12 +386,10 @@ class PlaywrightReporter implements Reporter {
             // TODO: autocreate case for result
             return;
         }
-        caseIds.map(async (caseId) => {
+
+        caseIds.forEach((caseId) => {
             const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}` : '';
             this.log(chalk`{gray Start publishing: ${test.title}}${add}`);
-            while(!this.runId) { // need wait runId variable to be initialised in onBegin() hook
-                await new Promise((resolve) => setTimeout(resolve, 50));
-            }
 
             const caseObject: ResultCreate = {
                 case_id: caseId,
@@ -409,7 +407,6 @@ class PlaywrightReporter implements Reporter {
             this.log(
                 chalk`{gray Result prepared for publish: ${test.title} }${add}`
             );
-            return;
         });
     }
 }
