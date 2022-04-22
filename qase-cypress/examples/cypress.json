@@ -12,7 +12,8 @@
       "basePath": "https://api.qase.io/v1",
       "screenshotFolder": "screenshots",
       "sendScreenshot": true,
-      "runClose": true
+      "runClose": true,
+      "environmentId": 1
     }
   },
   "video": false

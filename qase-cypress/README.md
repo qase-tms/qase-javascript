@@ -39,7 +39,15 @@ describe('My First Test', () => {
 });
 
 ```
+You should also have an active item in the project settings at
 
+```
+https://app.qase.io/project/QASE_PROJECT_CODE/settings/options
+```
+
+option in the `Test Runs` block:
+
+Allow submitting results in bulk
 To run tests and create a test run, execute the command:
 ```bash
 QASE_REPORT=1 npx cypress run
@@ -65,7 +73,9 @@ Reporter options (* - required):
   `DEMOTR` is project code here)
 - `runId` - Run ID from Qase TMS (also can be got from run URL)
 - `logging` [true/false] - Enabled debug logging from reporter or not
-- `delay` (seconds) - Delay to publish pending results
+- `screenshotFolder` - Folder for save screenshot cypress,
+- `sendScreenshot` [true/false] - Permission to send screenshots to Qase TMS
+- `runClose` [true/false] - Permission for automatic completion of the test run
 - `environmentId` - To execute with the sending of the envinroment information
 - `basePath` - URL Qase.io
 
@@ -97,7 +107,9 @@ Supported ENV variables:
   [here](https://developers.qase.io/#authentication)
 - `QASE_API_BASE_URL` - URL Qase.io, default value `https://api.qase.io/v1`
 - `QASE_ENVIRONMENT_ID` - To execute with the sending of the envinroment information
-- `QASE_DELAY` - Delay to publish pending results
+- `QASE_SCREENSHOT_FOLDER` - Folder for save screenshot cypress
+- `QASE_SCREENSHOT_SENDING` - Permission to send screenshots to Qase TMS
+- `QASE_RUN_CLOSE` - Permission for automatic completion of the test run
 
 <!-- references -->
 
