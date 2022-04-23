@@ -35,7 +35,17 @@ describe('Test suite', () => {
 });
 
 ```
+You should also have an active item in the project settings at
 
+```
+https://app.qase.io/project/QASE_PROJECT_CODE/settings/options
+```
+
+options in the `Test Runs` block:
+
+```
+Allow submitting results in bulk
+```
 To run tests and create a test run, execute the command:
 ```
 QASE_REPORT=1 npx playwright test
