@@ -6,5 +6,6 @@
     "runComplete": true,
     "projectCode": "project_code",
     "runName": "TestCafe run %DATE% %AGENTS%",
-    "basePath": "https://api.qase.io/v1"
+    "basePath": "https://api.qase.io/v1",
+    "uploadAttachments": true
 }

@@ -1,10 +1,10 @@
 {
   "name": "example",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Test cafe example",
   "main": "test.js",
   "scripts": {
-    "test": "npx testcafe chrome test.js -r spec,qase"
+    "test": "npx testcafe chrome test.js -r spec,qase -s path=screenshots,takeOnFails=true,fullPage=true"
   },
   "author": "",
   "license": "ISC",

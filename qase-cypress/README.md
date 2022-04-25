@@ -44,10 +44,12 @@ To run tests and create a test run, execute the command:
 ```bash
 QASE_REPORT=1 npx cypress run
 ```
-
-![Reporter in console](docs/stdout.png)
+<p align="center">
+  <img width="65%" src="./docs/stdout.png">
+</p>
 
 A test run will be performed and available at:
+
 ```
 https://app.qase.io/run/QASE_PROJECT_CODE
 ```

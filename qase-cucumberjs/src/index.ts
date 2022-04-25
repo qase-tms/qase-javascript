@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-console,no-underscore-dangle,@typescript-eslint/no-non-null-assertion */
-import {IdResponse, ResultCreateStatusEnum} from 'qaseio/dist/src';
+import {IdResponse, ResultCreate, ResultCreateStatusEnum} from 'qaseio/dist/src';
 import {Formatter} from '@cucumber/cucumber';
 import {IFormatterOptions} from '@cucumber/cucumber/lib/formatter';
 import {QaseApi} from 'qaseio';
@@ -107,7 +107,7 @@ const verifyConfig = (config: Config) => {
 };
 
 class QaseReporter extends Formatter {
-    private config: Config;
+    private readonly config: Config;
     private api: QaseApi;
     private enabled: boolean;
 
@@ -117,8 +117,7 @@ class QaseReporter extends Formatter {
     private testCaseStartedErrors: Record<string, string[]> = {};
     private testCaseScenarioId: Record<string, string> = {};
     private pending: Array<(runId: string | number) => void> = [];
-    private results: Array<{test: Test; result: any}> = [];
-    private shouldPublish = 0;
+    private results: ResultCreate[] = [];
 
     public constructor(options: IFormatterOptions) {
         super(options);
@@ -189,14 +188,13 @@ class QaseReporter extends Formatter {
                         }
                     );
                 } else if (envelope.testRunFinished) {
-                    if (this.results.length === 0 && this.shouldPublish === 0) {
+                    if (this.results.length === 0) {
                         this._log('No testcases were matched. Ensure that your tests are declared correctly.');
+
+                        return;
                     }
-                    if (envelope.testRunFinished.success) {
-                        this._log('Finished success');
-                    } else {
-                        this._log('Finished with errors');
-                    }
+
+                    this.publishResults();
                 } else if (envelope.testCase) {
                     this.testCaseScenarioId[envelope.testCase.id!] = envelope.testCase.pickleId!;
                 } else if (envelope.testCaseStarted) {
@@ -241,11 +239,25 @@ class QaseReporter extends Formatter {
                         duration: Math.abs((envelope.testCaseFinished.timestamp!.seconds! as number - (tcs.timestamp!.seconds! as number))),
                         error: this.testCaseStartedErrors[tcs.id!]?.join('\n\n'),
                     };
-                    this.publishCaseResult(test, status);
+                    this.addForSending(test, status);
                 } else if (envelope.parseError) {
                     console.log('Error:', envelope.parseError);
                 }
             });
+    }
+
+    private publishResults() {
+        this.api.results.createResultBulk(
+            this.config.projectCode,
+            Number(this.config.runId),
+            {
+                results: this.results,
+            }
+        ).then(() => {
+            this._log(chalk`{gray Results sent}`);
+        }).catch((err) => {
+            this._log(err);
+        });
     }
 
     private addErrorMessage(tcsid: string, error: string | null | undefined) {
@@ -355,43 +367,29 @@ class QaseReporter extends Formatter {
         }
     }
 
-    private publishCaseResult(test: Test, status: ResultCreateStatusEnum){
+    private addForSending(test: Test, status: ResultCreateStatusEnum){
         this.logTestItem(test.name, status);
 
         const caseIds = test.tags;
         caseIds.forEach((caseId) => {
-            this.shouldPublish++;
-            const publishTest = (runId: string | number) => {
-                if (caseId) {
-                    const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}`:'';
-                    this._log(
-                        chalk`{gray Start publishing: ${test.name}}${add}`
-                    );
+            if (!caseId) {
+                return;
+            }
 
-                    this.api.results.createResult(this.config.projectCode, Number(runId), {
-                        status,
-                        case_id: parseInt(caseId, 10),
-                        time: test.duration,
-                        stacktrace: test.error,
-                        comment: test.error ? test.error.split('\n')[0]:undefined,
-                    })
-                        .then((res) => {
-                            this.results.push({test, result: res.data});
-                            this._log(chalk`{gray Result published: ${test.name} ${caseId}}${add}`);
-                            this.shouldPublish--;
-                        })
-                        .catch((err) => {
-                            this._log(err);
-                            this.shouldPublish--;
-                        });
-                }
+            const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}`:'';
+            this._log(
+                chalk`{gray Added for publishing: ${test.name}}${add}`
+            );
+
+            const caseObject: ResultCreate = {
+                status,
+                case_id: parseInt(caseId, 10),
+                time: test.duration,
+                stacktrace: test.error,
+                comment: test.error ? test.error.split('\n')[0]:undefined,
             };
 
-            if (this.config.runId) {
-                publishTest(this.config.runId);
-            } else {
-                this.pending.push(publishTest);
-            }
+            this.results.push(caseObject);
         });
     }
 

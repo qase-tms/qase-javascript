@@ -13,7 +13,6 @@ const config = {
                 uploadAttachments: true,
                 runComplete: true,
                 logging: true,
-                environmentId: 1
             }],
     ],
 };

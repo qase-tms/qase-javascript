@@ -25,7 +25,17 @@ test
         await t
     });
 ```
+You should also have an active item in the project settings at
 
+```
+https://app.qase.io/project/QASE_PROJECT_CODE/settings/options
+```
+
+options in the `Test Runs` block:
+
+```
+Allow submitting results in bulk
+```
 You can run your tests by providing custom reporter:
 ```bash
 npx testcafe chrome test.js -r spec,qase
@@ -34,8 +44,13 @@ or
 ```
 npm test
 ```
-![Output of run](examples/screenshots/screenshot.png)​
+
+<p align="center">
+  <img width="65%" src="./examples/screenshots/screenshot.png">
+</p>
+
 A test run will be performed and available at:
+
 ```
 https://app.qase.io/run/QASE_PROJECT_CODE
 ```
@@ -59,6 +74,7 @@ using `.qaserc` file and using ENV variables.
     - `%DATE%`
     - `%AGENTS%`
 - `runDescription` - Set custom Run description, when new run is created
+- `uploadAttachments` - Uploading attachment to Qase TMS
 - `runComplete` - Complete run after all tests are finished
 - `logging` - Enabled debug logging from reporter or not
 
@@ -83,6 +99,7 @@ Supported ENV variables:
 - `QASE_RUN_DESCRIPTION` - Same as `runDescription`
 - `QASE_RUN_COMPLETE` - Same as `runComplete`
 - `QASE_LOGGING` - Same as `logging`
+- `QASE_UPLOAD_ATTACHMENTS` - Same as `uploadAttachments`
 
 <!-- references -->
 
