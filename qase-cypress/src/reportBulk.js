@@ -15,7 +15,6 @@ const config = JSON.parse(process.env?.reporting_config);
 const screenshotsConfig = JSON.parse(process.env?.screenshots_config);
 
 let hashesMap = {};
-const filePathesByCaseIdMap = {};
 
 let customBoundary = '----------------------------';
 crypto.randomBytes(24).forEach((value) => {
@@ -55,6 +54,31 @@ const getFiles = (pathToFile) => {
     return files;
 };
 
+const parseScreenshotDirectory = () => {
+    const pathToScreenshotDir = path.join(process.cwd(), `cypress/${screenshotsConfig.screenshotFolder}`);
+    const files = getFiles(pathToScreenshotDir);
+    const filePathesByCaseIdMap = {};
+
+    files.forEach((file) => {
+        if(file.includes('Qase ID')) {
+            const caseIds = getCaseId(file);
+
+            if (caseIds) {
+                caseIds.forEach((caseId) => {
+                    const attachmentObject = {
+                        caseId,
+                        file: [file],
+                    };
+
+                    filePathesByCaseIdMap[caseId] = attachmentObject;
+                });
+            }
+        }
+    });
+
+    return filePathesByCaseIdMap;
+};
+
 const publishBulkResult = async () => {
     if (config) {
         console.log('Publication is started');
@@ -63,26 +87,7 @@ const publishBulkResult = async () => {
 
         if (screenshotsConfig.screenshotFolder && screenshotsConfig.sendScreenshot) {
             try {
-                const pathToScreenshotDir = path.join(process.cwd(), `cypress/${screenshotsConfig.screenshotFolder}`);
-                const files = getFiles(pathToScreenshotDir);
-
-                files.forEach((file) => {
-                    if(file.includes('Qase ID')) {
-                        const caseIds = getCaseId(file);
-
-                        if (caseIds) {
-                            caseIds.forEach((caseId) => {
-                                const attachmentObject = {
-                                    caseId,
-                                    file: [file],
-                                };
-
-                                filePathesByCaseIdMap[caseId] =
-                                  attachmentObject;
-                            });
-                        }
-                    }
-                });
+                const filePathesByCaseIdMap = parseScreenshotDirectory();
 
                 if (filePathesByCaseIdMap) {
                     const filesMap = Object.values(filePathesByCaseIdMap);
@@ -156,7 +161,7 @@ const publishBulkResult = async () => {
                 console.log(chalk`{green Results sent}`);
             }
 
-            if(config.runClose) {
+            if(config.runComplete) {
                 await api.runs.completeRun(config.code, config.runId);
                 console.log(chalk`{green Run compleated}`);
             }

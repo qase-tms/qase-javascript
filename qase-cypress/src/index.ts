@@ -22,7 +22,7 @@ enum Envs {
     environmentId = 'QASE_ENVIRONMENT_ID',
     screenshotFolder = 'QASE_SCREENSHOT_FOLDER',
     sendScreenshot = 'QASE_SCREENSHOT_SENDING',
-    runClose = 'QASE_RUN_CLOSE',
+    runComplete = 'QASE_RUN_COMPLETE',
 }
 
 interface QaseOptions {
@@ -35,7 +35,7 @@ interface QaseOptions {
     environmentId?: number;
     screenshotFolder?: string;
     sendScreenshot?: boolean;
-    runClose?: boolean;
+    runComplete?: boolean;
 }
 
 interface BulkCaseObject {
@@ -232,7 +232,7 @@ class CypressQaseReporter extends reporters.Base {
                     body: {
                         results: this.resultsForPublishing,
                     },
-                    runClose: CypressQaseReporter.getEnv(Envs.runClose) || this.options.runClose || false,
+                    runComplete: CypressQaseReporter.getEnv(Envs.runComplete) || this.options.runComplete || false,
                 };
 
                 const screenshotsConfig = {
