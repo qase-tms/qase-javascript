@@ -46,7 +46,7 @@ newman run \
 ```
 
 <p align="center">
-  <img width="65%" src="./example/screenshots/screenshot.png">
+  <img width="65%" src="./examples/screenshots/screenshot.png">
 </p>
 
 A test run will be performed and available at:
