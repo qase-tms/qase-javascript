@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "QASE_REPORT=1 npx jest"
   },
   "author": "",
   "license": "ISC",
