@@ -45,7 +45,6 @@ option in the `Test Runs` block:
 Allow submitting results in bulk
 ```
 
-
 To run tests and create a test run, execute the command (for example from folder examples):
 
 ```

@@ -41,7 +41,7 @@ You should also have an active item in the project settings at
 https://app.qase.io/project/QASE_PROJECT_CODE/settings/options
 ```
 
-options in the `Test Runs` block:
+option in the `Test Runs` block:
 
 ```
 Allow submitting results in bulk
