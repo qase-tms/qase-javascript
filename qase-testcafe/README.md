@@ -26,22 +26,19 @@ test
     });
 ```
 You should also have an active item in the project settings at
-
 ```
 https://app.qase.io/project/QASE_PROJECT_CODE/settings/options
 ```
-
 option in the `Test Runs` block:
-
 ```
 Allow submitting results in bulk
 ```
-You can run your tests by providing custom reporter:
+To run tests and create a test run, execute the command (for example from folder examples):
 ```bash
 npx testcafe chrome test.js -r spec,qase
 ```
 or
-```
+```bash
 npm test
 ```
 

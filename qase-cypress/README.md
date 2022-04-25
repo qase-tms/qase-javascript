@@ -47,12 +47,25 @@ option in the `Test Runs` block:
 ```
 Allow submitting results in bulk
 ```
-To run tests and create a test run, execute the command:
+If you are going to use several specifications for execution and you have in config 
+```bash
+"runComplete": true
+```
+then it is necessary to additionally set in the project settings
+```
+Allow to add results for cases in closed runs.
+```
+
+To run tests and create a test run, execute the command (for example from folder examples):
 ```bash
 QASE_REPORT=1 npx cypress run
 ```
+or
+```bash
+npm test
+```
 <p align="center">
-  <img width="65%" src="./docs/stdout.png">
+  <img width="65%" src="./examples/screenshots/screenshot.png">
 </p>
 
 A test run will be performed and available at:
