@@ -1,14 +1,19 @@
 /* eslint-disable camelcase */
+/* eslint-disable max-len */
 /* eslint-disable no-console,no-underscore-dangle,@typescript-eslint/no-non-null-assertion */
 import {IdResponse, ResultCreate, ResultCreateStatusEnum} from 'qaseio/dist/src';
+import FormData from 'form-data';
 import {Formatter} from '@cucumber/cucumber';
 import {IFormatterOptions} from '@cucumber/cucumber/lib/formatter';
 import {QaseApi} from 'qaseio';
 import chalk from 'chalk';
+import crypto from 'crypto';
 import {execSync} from 'child_process';
 import fs from 'fs';
 import {io} from '@cucumber/messages/dist/src/messages';
+import mime from 'mime-types';
 import moment from 'moment';
+import os from 'os';
 import path from 'path';
 import IEnvelope = io.cucumber.messages.IEnvelope;
 import ITestCaseFinished = io.cucumber.messages.ITestCaseFinished;
@@ -45,6 +50,22 @@ const StatusMapping: Record<Status, ResultCreateStatusEnum | null> = {
     [Status.UNDEFINED]: null,
     [Status.UNKNOWN]: null,
 };
+
+let customBoundary = '----------------------------';
+crypto.randomBytes(24).forEach((value) => {
+    customBoundary += Math.floor(value * 10).toString(16);
+});
+
+class CustomBoundaryFormData extends FormData {
+    public constructor() {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        super();
+    }
+
+    public getBoundary(): string {
+        return customBoundary;
+    }
+}
 
 const loadJSON = (file: string): Config | undefined => {
     try {
@@ -114,10 +135,12 @@ class QaseReporter extends Formatter {
     private pickleInfo: Record<string, { tags: string[]; name: string }> = {};
     private testCaseStarts: Record<string, ITestCaseStarted> = {};
     private testCaseStartedResult: Record<string, ResultCreateStatusEnum> = {};
+    private testCaseStartedAttachment: Record<string, string[]> = {};
     private testCaseStartedErrors: Record<string, string[]> = {};
     private testCaseScenarioId: Record<string, string> = {};
     private pending: Array<(runId: string | number) => void> = [];
-    private results: ResultCreate[] = [];
+    private results: Record<string, ResultCreate> = {};
+    private uploadsInQueueCount = 0;
 
     public constructor(options: IFormatterOptions) {
         super(options);
@@ -127,6 +150,7 @@ class QaseReporter extends Formatter {
             this.config.apiToken,
             this.config.basePath,
             this.createHeaders(),
+            CustomBoundaryFormData
         );
         if (!this.enabled) {
             return;
@@ -140,6 +164,8 @@ class QaseReporter extends Formatter {
                     this.pickleInfo[envelope.pickle.id!] = {
                         tags: this.extractIds(envelope.pickle.tags!), name: envelope.pickle.name!,
                     };
+                } else if (envelope.attachment) {
+                    void this.upload(envelope.attachment);
                 } else if (envelope.testRunStarted) {
                     void this.checkProject(
                         this.config.projectCode,
@@ -168,12 +194,10 @@ class QaseReporter extends Formatter {
                                             if (created) {
                                                 this.saveRunId(created.result?.id);
                                                 this._log(
-                                                    // eslint-disable-next-line max-len
                                                     chalk`{green Using run ${this.config.runId as unknown as string} to publish test results}`
                                                 );
                                             } else {
                                                 this._log(
-                                                    // eslint-disable-next-line max-len
                                                     chalk`{red Could not create run in project ${this.config.projectCode}}`
                                                 );
                                             }
@@ -188,13 +212,13 @@ class QaseReporter extends Formatter {
                         }
                     );
                 } else if (envelope.testRunFinished) {
-                    if (this.results.length === 0) {
+                    if (Object.keys(this.results).length === 0) {
                         this._log('No testcases were matched. Ensure that your tests are declared correctly.');
 
                         return;
                     }
 
-                    this.publishResults();
+                    void this.publishResults();
                 } else if (envelope.testCase) {
                     this.testCaseScenarioId[envelope.testCase.id!] = envelope.testCase.pickleId!;
                 } else if (envelope.testCaseStarted) {
@@ -208,7 +232,6 @@ class QaseReporter extends Formatter {
                     const newStatus = StatusMapping[stepFin.testStepResult!.status!];
                     if (newStatus === null) {
                         this._log(
-                            // eslint-disable-next-line max-len
                             chalk`{redBright Unexpected finish status ${stepStatus as unknown as string} received for step ${stepMessage}}`
                         );
                         return;
@@ -235,7 +258,7 @@ class QaseReporter extends Formatter {
                         started: tcs,
                         finished: envelope.testCaseFinished,
                         tags: info.tags,
-                        // eslint-disable-next-line max-len, @typescript-eslint/no-unnecessary-type-assertion
+                        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
                         duration: Math.abs((envelope.testCaseFinished.timestamp!.seconds! as number - (tcs.timestamp!.seconds! as number))),
                         error: this.testCaseStartedErrors[tcs.id!]?.join('\n\n'),
                     };
@@ -246,12 +269,61 @@ class QaseReporter extends Formatter {
             });
     }
 
-    private publishResults() {
+    private async waitUploads() {
+        while (this.uploadsInQueueCount > 0) {
+            await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+    }
+
+    private async upload(attachment: io.cucumber.messages.IAttachment) {
+        const randomString = crypto.randomBytes(20).toString('hex');
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
+        const tmpFilePath = os.tmpdir().concat(randomString, '.', mime.extension(attachment.mediaType));
+
+        fs.writeFile(tmpFilePath, attachment.body as string, 'base64', (err) => {
+            if (err !== null) {
+                this._log(err.message);
+            }
+        });
+
+        this.uploadsInQueueCount++;
+        await this.api.attachments.uploadAttachment(
+            this.config.projectCode,
+            [fs.createReadStream(tmpFilePath)],
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data; boundary=' + customBoundary,
+                },
+            }
+        ).then((response) => {
+            const fileHash = response.data.result?.[0].hash as string;
+
+            const caseAttachments = this.testCaseStartedAttachment[attachment.testCaseStartedId as string] || [];
+            caseAttachments.push(fileHash);
+            this.testCaseStartedAttachment[attachment.testCaseStartedId as string] = caseAttachments;
+
+            this.uploadsInQueueCount--;
+        }).catch((err) => {
+            this.log(`Error on uploading file ${err as string}`);
+            this.uploadsInQueueCount--;
+        });
+    }
+
+    private async publishResults() {
+        await this.waitUploads();
+
+        const res: ResultCreate[] = [];
+        Object.keys(this.results).forEach((testCaseStartedId) => {
+            const result = this.results[testCaseStartedId];
+            result.attachments = this.testCaseStartedAttachment[testCaseStartedId] ?? [];
+            res.push(result);
+        });
+
         this.api.results.createResultBulk(
             this.config.projectCode,
             Number(this.config.runId),
             {
-                results: this.results,
+                results: res,
             }
         ).then(() => {
             this._log(chalk`{gray Results sent}`);
@@ -361,6 +433,7 @@ class QaseReporter extends Formatter {
             failed: chalk`{red Test ${name} ${status}}`,
             passed: chalk`{green Test ${name} ${status}}`,
             pending: chalk`{blueBright Test ${name} ${status}}`,
+            skipped: chalk`{bgGray Test ${name} ${status}}`,
         };
         if (status) {
             this._log(map[status]);
@@ -389,7 +462,7 @@ class QaseReporter extends Formatter {
                 comment: test.error ? test.error.split('\n')[0]:undefined,
             };
 
-            this.results.push(caseObject);
+            this.results[test.finished.testCaseStartedId as string] = caseObject;
         });
     }
 
@@ -399,13 +472,12 @@ class QaseReporter extends Formatter {
     }
 
     private createHeaders() {
-        const { version: nodeVersion, platform: os, arch } = process;
+        const { version: nodeVersion } = process;
         const npmVersion = execSync('npm -v', { encoding: 'utf8' }).replace(/['"\n]+/g, '');
         const qaseapiVersion = this.getPackageVersion('qaseio');
         const frameworkVersion = this.getPackageVersion('@cucumber/cucumber');
         const reporterVersion = this.getPackageVersion('cucumberjs-qase-reporter');
-        const xPlatformHeader = `node=${nodeVersion};npm=${npmVersion};os=${os};arch=${arch}`;
-        // eslint-disable-next-line max-len
+        const xPlatformHeader = `node=${nodeVersion};npm=${npmVersion};os=${os.platform()};arch=${os.arch()}`;
         const xClientHeader = `cucumberjs=${frameworkVersion as string};qase-cucumberjs=${reporterVersion as string};qaseapi=${qaseapiVersion as string}`;
 
         return {

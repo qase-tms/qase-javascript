@@ -44,3 +44,8 @@ Feature: Cucumber documentation
         When I go to the README file
         Then I should see a "Cool" section
         When I go to the README file
+
+    @sections @Q-8
+    Scenario: Usage documentation 5
+        Given I am on the cucumber.js GitHub repository
+        Then I should see nothing
