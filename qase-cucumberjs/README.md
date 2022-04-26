@@ -46,9 +46,12 @@ Allow submitting results in bulk
 ```
 
 To run tests and create a test run, execute the command (for example from folder examples):
-
+```bash
+cucumber-js -f cucumberjs-qase-reporter --format-options='{\"qaseConfig\": \"./.qaserc\"}' features -r examples/zombie/support -r examples/zombie/steps
 ```
-npm run test-zombie
+or
+```bash
+npm test
 ```
 <p align="center">
   <img width="65%" src="./examples/screenshots/screenshot.png">
