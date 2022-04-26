@@ -4,8 +4,8 @@
   "description": "> Some tests of using cucumber JS with zombie and selenium",
   "main": "index.js",
   "scripts": {
-    "test-zombie": "cucumber-js -f cucumberjs-qase-reporter --format-options='{\"qaseConfig\": \"./.qaserc\"}' features -r examples/zombie/support -r examples/zombie/steps",
-    "test-zombie1": "cucumber-js features -r examples/zombie/support -r examples/zombie/steps"
+    "test": "cucumber-js -f cucumberjs-qase-reporter --format-options='{\"qaseConfig\": \"./.qaserc\"}' features -r examples/zombie/support -r examples/zombie/steps",
+    "test:l": "cucumber-js features -r examples/zombie/support -r examples/zombie/steps"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^7.0.0",

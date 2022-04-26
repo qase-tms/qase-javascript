@@ -3,49 +3,28 @@ Feature: Cucumber documentation
     I want to have documentation on cucumber
     So I can write better applications
 
-    @sections @Q-2
+    @sections @Q-1
     Scenario: Usage documentation
         Given I am on the cucumber.js GitHub repository
         When I go to the README file
 #        Then I should see a "Cool" section
 #        When I go to the README file
 
-    @badges
+    @badges @q2
     Scenario: Status badges
         Given I am on the cucumber.js GitHub repository
         When I go to the README file
         Then I should see a "12412412" badge
             And I should see a "Dependencies" badge
 
-    @ignore @q4
+    @ignore @q3
     Scenario: Status badges 2
         Given I am on the cucumber.js GitHub repository
         When I go to the README file
         Then I should see a "Build Status" badge
         And I should see a "Dependencies" badge
 
-    @sections @Q-5
-    Scenario: Usage documentation 2
-        Given I am on the cucumber.js GitHub repository
-        When I go to the README file
-        Then I should see a "Cool" section
-        When I go to the README file
-
-    @sections @Q-6
-    Scenario: Usage documentation 3
-        Given I am on the cucumber.js GitHub repository
-        When I go to the README file
-        Then I should see a "Cool" section
-        When I go to the README file
-
-    @sections @Q-7
-    Scenario: Usage documentation 4
-        Given I am on the cucumber.js GitHub repository
-        When I go to the README file
-        Then I should see a "Cool" section
-        When I go to the README file
-
-    @sections @Q-8
+    @sections @Q-4
     Scenario: Usage documentation 5
         Given I am on the cucumber.js GitHub repository
         Then I should see nothing
