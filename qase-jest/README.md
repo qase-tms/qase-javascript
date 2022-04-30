@@ -72,6 +72,11 @@ A test run will be performed and available at:
 ```
 https://app.qase.io/run/QASE_PROJECT_CODE
 ```
+
+<p align="center">
+  <img src="./examples/screenshots/screenshot2.png">
+</p>
+
 To execute the tests locally, without sending the results, you can use the command:
 ```bash
 npm run test:local
