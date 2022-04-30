@@ -51,6 +51,10 @@ A test run will be performed and available at:
 ```
 https://app.qase.io/run/QASE_PROJECT_CODE
 ```
+To execute the tests locally, without sending the results, you can use the command:
+```bash
+npm run test:local
+```
 ## Configuration
 
 Qase reporter supports passing parameters using two ways: 

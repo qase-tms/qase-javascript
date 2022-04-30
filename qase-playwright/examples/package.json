@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "QASE_REPORT=1 npx playwright test"
+    "test": "QASE_REPORT=1 npx playwright test",
+    "test:local": "npx playwright test"
   },
   "author": "",
   "license": "ISC",

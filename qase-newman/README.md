@@ -44,6 +44,10 @@ newman run \
     --reporter-qase-runDescription "Check API consistency" \ # Specify Run description using CLI parameters
     -x # WA for issue https://github.com/postmanlabs/newman/issues/2148#issuecomment-665229759
 ```
+To run tests and create a test run, execute the command (for example from folder examples):
+```bash
+npm test
+```
 
 <p align="center">
   <img width="65%" src="./examples/screenshots/screenshot.png">
@@ -54,7 +58,10 @@ A test run will be performed and available at:
 ```
 https://app.qase.io/run/QASE_PROJECT_CODE
 ```
-
+To execute the tests locally, without sending the results, you can use the command:
+```bash
+npm run test:local
+```
 <!-- references -->
 
 [auth]: https://developers.qase.io/#authentication

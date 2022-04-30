@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "cypress": "cypress open",
-    "test": "QASE_REPORT=1 npx cypress run"
+    "test": "QASE_REPORT=1 npx cypress run",
+    "test:local": "npx cypress run"
   },
   "author": "",
   "license": "Apache-2.0",

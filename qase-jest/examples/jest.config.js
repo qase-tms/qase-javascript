@@ -8,7 +8,9 @@ module.exports = {
                 apiToken: 'api_key',
                 projectCode: 'project_code',
                 logging: true,
-                runComplete: true
+                runComplete: true,
+                basePath: 'https://api.qase.io/v1',
+                environmentId: 1
             },
         ],
     ],
