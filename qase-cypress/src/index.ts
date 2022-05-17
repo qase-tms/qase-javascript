@@ -36,30 +36,40 @@ interface QaseOptions {
     screenshotFolder?: string;
     sendScreenshot?: boolean;
     runComplete?: boolean;
+    rootSuiteTitle?: string;
 }
 
 interface BulkCaseObject {
-    case_id: number;
+    case_id?: number;
     status: ResultCreateStatusEnum;
     time_ms: number;
     stacktrace?: string;
     comment: string;
+    case?: {
+        title: string;
+        suite_title: string;
+    };
+}
+
+interface PreparedForReportingTestCase {
+    path: string;
+    result: ResultCreateStatusEnum;
+    duration: number | null | undefined;
+    status: ResultCreateStatusEnum;
+    title: string;
+    caseIds?: number[];
+    stacktrace?: string;
+    comment?: string;
 }
 
 class CypressQaseReporter extends reporters.Base {
     public testCasesForPublishingCount = 0;
     private api: QaseApi;
     private pending: Array<(runId: string | number) => void> = [];
-    private shouldPublish: Array<{ test: Test; status: ResultCreateStatusEnum }> =
-    [];
-    private results: Array<{
-        test: Test;
-        result: any;
-    }> = [];
     private options: QaseOptions;
     private runId?: number | string;
     private isDisabled = false;
-    private resultsForPublishing: BulkCaseObject[] = [];
+    private preparedForPublishingResults: PreparedForReportingTestCase[] = [];
 
     public constructor(runner: Runner, options: MochaOptions) {
         super(runner, options);
@@ -212,7 +222,10 @@ class CypressQaseReporter extends reporters.Base {
         });
 
         runner.on(EVENT_TEST_PENDING, (test: Test) => {
-            this.transformCaseResultToBulkObject(test, ResultCreateStatusEnum.SKIPPED);
+            this.transformCaseResultToBulkObject(
+                test,
+                ResultCreateStatusEnum.SKIPPED
+            );
         });
 
         runner.on(EVENT_TEST_FAIL, (test: Test) => {
@@ -220,28 +233,38 @@ class CypressQaseReporter extends reporters.Base {
         });
 
         runner.addListener(EVENT_RUN_END, () => {
-            if (this.resultsForPublishing.length === 0) {
+            const resultsForPublishing = this.transformItemsArrayToBulkCaseObjects();
+            if (resultsForPublishing.length === 0) {
                 this.log('Nothing to send.');
             } else if (this.runId) {
                 const config = {
-                    apiToken: CypressQaseReporter.getEnv(Envs.apiToken) || this.options.apiToken || '',
-                    basePath: CypressQaseReporter.getEnv(Envs.basePath) || this.options.basePath,
+                    apiToken:
+            CypressQaseReporter.getEnv(Envs.apiToken) ||
+            this.options.apiToken ||
+            '',
+                    basePath:
+            CypressQaseReporter.getEnv(Envs.basePath) || this.options.basePath,
                     headers: CypressQaseReporter.createHeaders(),
                     code: this.options.projectCode,
                     runId: Number(this.runId),
                     body: {
-                        results: this.resultsForPublishing,
+                        results: resultsForPublishing,
                     },
-                    runComplete: CypressQaseReporter.getEnv(Envs.runComplete) || this.options.runComplete || false,
+                    runComplete:
+            CypressQaseReporter.getEnv(Envs.runComplete) ||
+            this.options.runComplete ||
+            false,
                 };
 
                 const screenshotsConfig = {
-                    screenshotFolder: CypressQaseReporter.getEnv(Envs.screenshotFolder)
-                        || this.options.screenshotFolder
-                        || 'screenshots',
-                    sendScreenshot: CypressQaseReporter.getEnv(Envs.screenshotFolder)
-                        || this.options.sendScreenshot
-                        || false,
+                    screenshotFolder:
+            CypressQaseReporter.getEnv(Envs.screenshotFolder) ||
+            this.options.screenshotFolder ||
+            'screenshots',
+                    sendScreenshot:
+            CypressQaseReporter.getEnv(Envs.screenshotFolder) ||
+            this.options.sendScreenshot ||
+            false,
                 };
 
                 spawnSync('node', [`${__dirname}/reportBulk.js`], {
@@ -349,22 +372,73 @@ class CypressQaseReporter extends reporters.Base {
         }
     }
 
-    private transformCaseResultToBulkObject(test: Test, status: ResultCreateStatusEnum) {
+    private transformCaseResultToBulkObject(
+        test: Test,
+        status: ResultCreateStatusEnum
+    ) {
         this.logTestItem(test);
-        const caseIds = CypressQaseReporter.getCaseId(test);
+        const result = this.createResult(test, status);
+        this.preparedForPublishingResults.push(result);
+    }
 
-        caseIds.forEach((caseId) => {
-            if (caseId) {
-                const caseResultBulkObject = {
-                    status,
-                    case_id: caseId,
-                    time_ms: test.duration || 0,
-                    stacktrace: test.err?.stack,
-                    comment: test.err ? `${test.err.name}: ${test.err.message}` : '',
-                };
-                this.resultsForPublishing.push(caseResultBulkObject );
+    private createResult(testResult: Test, status: ResultCreateStatusEnum) {
+        const pathArray = testResult.titlePath();
+        // Remove the last item cause it is a name of case;
+        pathArray.pop();
+
+        const fullPathToCase = pathArray.join('\t');
+        const item: PreparedForReportingTestCase = {
+            path: this.options.rootSuiteTitle
+                ? `${this.options.rootSuiteTitle}\t${fullPathToCase}`
+                : fullPathToCase,
+            result: status,
+            duration: testResult.duration || 0,
+            status,
+            title: testResult.title,
+            stacktrace: testResult.err?.stack,
+            comment: testResult.err
+                ? `${testResult.err.name}: ${testResult.err.message}`
+                : '',
+        };
+
+        const caseIds = CypressQaseReporter.getCaseId(testResult);
+
+        if (caseIds.length > 0) {
+            item.caseIds = caseIds;
+        }
+
+        return item;
+    }
+
+    private transformItemsArrayToBulkCaseObjects() {
+        return this.preparedForPublishingResults.reduce((accum, item) => {
+            const transformedItems: BulkCaseObject[] = [];
+            if (item.caseIds) {
+                item.caseIds.forEach((caseId) => {
+                    const itemObject = {
+                        case_id: caseId,
+                        status: item.status,
+                        time_ms: item.duration || 0,
+                        stacktrace: item.stacktrace,
+                        comment: item.comment || '',
+                    };
+
+                    transformedItems.push(itemObject);
+                });
+            } else {
+                transformedItems.push({
+                    case: {
+                        title: item.title,
+                        suite_title: item.path,
+                    },
+                    status: item.status,
+                    time_ms: item.duration || 0,
+                    stacktrace: item.stacktrace,
+                    comment: item.comment || '',
+                });
             }
-        });
+            return [...accum, ...transformedItems];
+        }, [] as BulkCaseObject[]);
     }
 }
 
