@@ -24,6 +24,7 @@ interface Config {
     enabled: boolean;
     apiToken: string;
     basePath?: string;
+    rootSuiteTitle?: string;
     environmentId?: number;
     projectCode: string;
     runId: string | number | undefined;
@@ -37,8 +38,9 @@ interface Test {
     started: ITestCaseStarted;
     finished: ITestCaseFinished;
     duration: number;
-    tags: string[];
+    caseIds: string[];
     error?: string;
+    lastAstNodeId: string | null;
 }
 
 const StatusMapping: Record<Status, ResultCreateStatusEnum | null> = {
@@ -96,6 +98,7 @@ const prepareConfig = (options: Config = {} as Config, configFile = '.qaserc'): 
         enabled: process.env.QASE_ENABLED === 'true' || config.enabled || false,
         basePath: process.env.QASE_API_BASE_URL || config.basePath,
         apiToken: process.env.QASE_API_TOKEN || config.apiToken || '',
+        rootSuiteTitle: process.env.QASE_ROOT_SUITE_TITLE || config.rootSuiteTitle,
         environmentId: Number.parseInt(process.env.QASE_ENVIRONMENT_ID!, 10) || config.environmentId,
         projectCode: process.env.QASE_PROJECT || config.projectCode || '',
         runId: process.env.QASE_RUN_ID || config.runId || '',
@@ -132,7 +135,7 @@ class QaseReporter extends Formatter {
     private api: QaseApi;
     private enabled: boolean;
 
-    private pickleInfo: Record<string, { tags: string[]; name: string }> = {};
+    private pickleInfo: Record<string, { caseIds: string[]; name: string; lastAstNodeId: string | null }> = {};
     private testCaseStarts: Record<string, ITestCaseStarted> = {};
     private testCaseStartedResult: Record<string, ResultCreateStatusEnum> = {};
     private testCaseStartedAttachment: Record<string, string[]> = {};
@@ -140,6 +143,7 @@ class QaseReporter extends Formatter {
     private testCaseScenarioId: Record<string, string> = {};
     private pending: Array<(runId: string | number) => void> = [];
     private results: Record<string, ResultCreate> = {};
+    private scenarios: Record<string, string> = {};
     private uploadsInQueueCount = 0;
 
     public constructor(options: IFormatterOptions) {
@@ -160,9 +164,17 @@ class QaseReporter extends Formatter {
 
         options.eventBroadcaster
             .on('envelope', (envelope: IEnvelope) => {
-                if (envelope.pickle) {
+                if (envelope.gherkinDocument) {
+                    envelope.gherkinDocument.feature?.children?.forEach((featureChild) => {
+                        if (envelope.gherkinDocument?.feature?.name != null && featureChild.scenario?.id !== undefined && featureChild.scenario?.id !== null) {
+                            this.scenarios[featureChild.scenario?.id] = envelope.gherkinDocument?.feature?.name;
+                        }
+                    });
+                } else if (envelope.pickle) {
                     this.pickleInfo[envelope.pickle.id!] = {
-                        tags: this.extractIds(envelope.pickle.tags!), name: envelope.pickle.name!,
+                        caseIds: this.extractIds(envelope.pickle.tags!),
+                        name: envelope.pickle.name!,
+                        lastAstNodeId: envelope.pickle.astNodeIds ? envelope.pickle.astNodeIds[envelope.pickle.astNodeIds.length - 1] : null,
                     };
                 } else if (envelope.attachment) {
                     void this.upload(envelope.attachment);
@@ -257,10 +269,11 @@ class QaseReporter extends Formatter {
                         name: info.name,
                         started: tcs,
                         finished: envelope.testCaseFinished,
-                        tags: info.tags,
+                        caseIds: info.caseIds,
                         // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
                         duration: Math.abs((envelope.testCaseFinished.timestamp!.seconds! as number - (tcs.timestamp!.seconds! as number))),
                         error: this.testCaseStartedErrors[tcs.id!]?.join('\n\n'),
+                        lastAstNodeId: info.lastAstNodeId,
                     };
                     this.addForSending(test, status);
                 } else if (envelope.parseError) {
@@ -443,27 +456,54 @@ class QaseReporter extends Formatter {
     private addForSending(test: Test, status: ResultCreateStatusEnum){
         this.logTestItem(test.name, status);
 
-        const caseIds = test.tags;
-        caseIds.forEach((caseId) => {
+        if (test.caseIds.length) {
+            this.addKnownCasesForSending(test, status);
+        } else {
+            this.addNewCasesForSending(test, status);
+        }
+    }
+
+    private addKnownCasesForSending(test: Test, status: ResultCreateStatusEnum) {
+        test.caseIds.forEach((caseId) => {
             if (!caseId) {
                 return;
             }
 
-            const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}`:'';
+            const add = test.caseIds.length > 1 ? chalk` {white For case ${caseId}}` : '';
             this._log(
                 chalk`{gray Added for publishing: ${test.name}}${add}`
             );
 
-            const caseObject: ResultCreate = {
+            this.results[test.finished.testCaseStartedId as string] = {
                 status,
                 case_id: parseInt(caseId, 10),
                 time: test.duration,
                 stacktrace: test.error,
-                comment: test.error ? test.error.split('\n')[0]:undefined,
+                comment: test.error ? test.error.split('\n')[0] : undefined,
             };
-
-            this.results[test.finished.testCaseStartedId as string] = caseObject;
         });
+    }
+
+    private addNewCasesForSending(test: Test, status: ResultCreateStatusEnum) {
+        const suiteTitle: string[] = [test.lastAstNodeId ? this.scenarios[test.lastAstNodeId] : ''];
+        if (this.config.rootSuiteTitle) {
+            suiteTitle.unshift(this.config.rootSuiteTitle);
+        }
+
+        this._log(
+            chalk`{gray Added for publishing: ${suiteTitle.join('/')}/${test.name}}`
+        );
+
+        this.results[test.finished.testCaseStartedId as string] = {
+            case: {
+                title: test.name,
+                suite_title: suiteTitle.join('\t'),
+            },
+            status,
+            time: test.duration,
+            stacktrace: test.error,
+            comment: test.error ? test.error.split('\n')[0] : undefined,
+        };
     }
 
     private extractIds(tagsList: io.cucumber.messages.Pickle.IPickleTag[]): string[] {
