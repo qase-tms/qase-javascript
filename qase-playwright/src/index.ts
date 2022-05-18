@@ -1,5 +1,7 @@
 /* eslint-disable max-len */
 /* eslint-disable camelcase */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 import {
     IdResponse, ResultCreate,
     ResultCreateStatusEnum,
@@ -148,19 +150,15 @@ class PlaywrightReporter implements Reporter {
     }
 
     private static getSuitePath(suite): string {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         if (suite.parent) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             const parentSuite = String(PlaywrightReporter.getSuitePath(suite.parent));
             if (parentSuite) {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 return parentSuite + '\t' + String(suite?.title);
             } else {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 return String(suite?.title);
             }
         }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-member-access
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return suite.title;
     }
 
