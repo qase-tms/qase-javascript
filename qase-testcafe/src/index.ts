@@ -17,6 +17,7 @@ interface Config {
     enabled: boolean;
     apiToken: string;
     basePath?: string;
+    rootSuiteTitle?: string;
     projectCode: string;
     runId: string | number | undefined;
     runName: string;
@@ -85,6 +86,7 @@ const prepareConfig = (options: Config = {} as Config): Config => {
         enabled: process.env.QASE_ENABLED === 'true' || config.enabled || false,
         apiToken: process.env.QASE_API_TOKEN || config.apiToken,
         basePath: process.env.QASE_API_BASE_URL || config.basePath,
+        rootSuiteTitle: process.env.QASE_ROOT_SUITE_TITLE || config.rootSuiteTitle || '',
         projectCode: process.env.QASE_PROJECT || config.projectCode || '',
         runId: process.env.QASE_RUN_ID || config.runId || '',
         runName:
@@ -138,7 +140,7 @@ class TestcafeQaseReporter {
         [key: string]: Screenshot[];
     };
     private queued: number;
-    private sending = false;
+    private fixtureName: string;
 
     public constructor() {
         this.config = prepareConfig();
@@ -150,6 +152,7 @@ class TestcafeQaseReporter {
             CustomBoundaryFormData,
         );
         this.queued = 0;
+        this.fixtureName = '';
         this.screenshots = {};
     }
 
@@ -263,6 +266,10 @@ class TestcafeQaseReporter {
         );
     };
 
+    public reportFixtureStart = async (name) => {
+        this.fixtureName = String(name);
+    };
+
     public reportTestDone = async (
         name: string,
         testRunInfo: TestRunInfo,
@@ -272,33 +279,31 @@ class TestcafeQaseReporter {
         if (!this.enabled) {
             return;
         }
-        if (meta.CID) {
-            this.queued ++;
-            const hasErr = testRunInfo.errs.length;
-            let testStatus: ResultCreateStatusEnum;
+        this.queued ++;
+        const hasErr = testRunInfo.errs.length;
+        let testStatus: ResultCreateStatusEnum;
 
-            if (testRunInfo.skipped) {
-                testStatus = ResultCreateStatusEnum.SKIPPED;
-            } else if (hasErr > 0) {
-                testStatus = ResultCreateStatusEnum.FAILED;
-            } else {
-                testStatus = ResultCreateStatusEnum.PASSED;
-            }
-
-            const errorLog = testRunInfo.errs
-                .map((x: Record<string, unknown>) => formatError(x).replace(
-                    /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
-                    ''
-                ))
-                .join('\n');
-
-            let attachmentsArray: any[] = [];
-            if (this.config.uploadAttachments && testRunInfo.screenshots.length > 0) {
-                attachmentsArray = await this.uploadAttachments(testRunInfo);
-            }
-
-            this.prepareCaseResult({name, info: testRunInfo, meta, error: errorLog}, testStatus, attachmentsArray);
+        if (testRunInfo.skipped) {
+            testStatus = ResultCreateStatusEnum.SKIPPED;
+        } else if (hasErr > 0) {
+            testStatus = ResultCreateStatusEnum.FAILED;
+        } else {
+            testStatus = ResultCreateStatusEnum.PASSED;
         }
+
+        const errorLog = testRunInfo.errs
+            .map((x: Record<string, unknown>) => formatError(x).replace(
+                /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
+                ''
+            ))
+            .join('\n');
+
+        let attachmentsArray: any[] = [];
+        if (this.config.uploadAttachments && testRunInfo.screenshots.length > 0) {
+            attachmentsArray = await this.uploadAttachments(testRunInfo);
+        }
+
+        this.prepareCaseResult({name, info: testRunInfo, meta, error: errorLog}, testStatus, attachmentsArray);
     };
 
     public reportTaskDone = async () => {
@@ -444,28 +449,39 @@ class TestcafeQaseReporter {
     private prepareCaseResult(test: Test, status: ResultCreateStatusEnum, attachments: any[]){
         this.logTestItem(test.name, status);
         this.queued --;
-        const caseIds = TestcafeQaseReporter.getCaseId(test.meta);
-        caseIds.forEach((caseId) => {
-            if (caseId) {
-                const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}`:'';
-                this.log(
-                    chalk`{gray Ready for publishing: ${test.name}}${add}`
-                );
-                const caseObject: ResultCreate = {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                    case_id: parseInt(caseId, 10),
-                    status,
-                    time_ms: test.info.durationMs,
-                    stacktrace: test.error,
-                    comment: test.error ? test.error.split('\n')[0]:undefined,
-                    attachments: attachments.length > 0
-                        ? attachments
-                        : undefined,
-                };
-
-                this.results.push(caseObject);
-            }
-        });
+        const caseObject: ResultCreate = {
+            status,
+            time_ms: test.info.durationMs,
+            stacktrace: test.error,
+            comment: test.error ? test.error.split('\n')[0]:undefined,
+            attachments: attachments.length > 0
+                ? attachments
+                : undefined,
+        };
+        if (!test.meta.CID) {
+            caseObject.case = {
+                title: test.name,
+                suite_title: this.config.rootSuiteTitle
+                    ? this.config.rootSuiteTitle + '\t' + this.fixtureName
+                    : this.fixtureName,
+            };
+            this.results.push(caseObject);
+        } else {
+            const caseIds = TestcafeQaseReporter.getCaseId(test.meta);
+            caseIds.forEach((caseId) => {
+                if (caseId) {
+                    const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}`:'';
+                    this.log(
+                        chalk`{gray Ready for publishing: ${test.name}}${add}`
+                    );
+                    const caseObjectWithId: ResultCreate = {
+                        case_id: parseInt(caseId, 10),
+                        ...caseObject,
+                    };
+                    this.results.push(caseObjectWithId);
+                }
+            });
+        }
     }
 
     private async uploadAttachments(testRunInfo: TestRunInfo) {
@@ -498,7 +514,7 @@ export = () => {
     const reporter = new TestcafeQaseReporter();
     return {
         reportTaskStart: reporter.reportTaskStart,
-        reportFixtureStart: () => { /* Not Implemented */ },
+        reportFixtureStart: reporter.reportFixtureStart,
         async reportTestDone(
             name: string,
             testRunInfo: TestRunInfo,
