@@ -10,8 +10,13 @@ npm install testcafe testcafe-reporter-qase
 
 ## Example of usage
 
-In order to use reporter, you should add meta information to your tests. Meta key should be `CID`.
+The TestCafe reporter has the ability to auto-generate test cases
+and suites from your test data.
+
+But if necessary, you can independently register the ID of already
+existing test cases from TMS before the executing tests. Meta key should be `CID`.
 You should assign list of case IDs to it, e.g.:
+
 ```js
 test
     .meta('CID', [1])
@@ -29,10 +34,18 @@ You should also have an active item in the project settings at
 ```
 https://app.qase.io/project/QASE_PROJECT_CODE/settings/options
 ```
-option in the `Test Runs` block:
+
+options in the `Test Runs` block:
+
+```
+Auto create test cases
+```
+and
+
 ```
 Allow submitting results in bulk
 ```
+---
 To run tests and create a test run, execute the command (for example from folder examples):
 ```bash
 npx testcafe chrome test.js -r spec,qase
@@ -51,6 +64,11 @@ A test run will be performed and available at:
 ```
 https://app.qase.io/run/QASE_PROJECT_CODE
 ```
+
+<p align="center">
+  <img src="./examples/screenshots/demo.gif">
+</p>
+
 ## Configuration
 
 Qase reporter supports passing parameters using two ways: 
@@ -74,6 +92,7 @@ using `.qaserc` file and using ENV variables.
 - `uploadAttachments` - Uploading attachment to Qase TMS
 - `runComplete` - Complete run after all tests are finished
 - `logging` - Enabled debug logging from reporter or not
+- `rootSuiteTitle` - A parent suite for your autocreated tests
 
 Example configuration file:
 ```json
@@ -97,6 +116,7 @@ Supported ENV variables:
 - `QASE_RUN_COMPLETE` - Same as `runComplete`
 - `QASE_LOGGING` - Same as `logging`
 - `QASE_UPLOAD_ATTACHMENTS` - Same as `uploadAttachments`
+- `QASE_ROOT_SUITE_TITLE` - Same as `rootSuiteTitle`
 
 <!-- references -->
 
