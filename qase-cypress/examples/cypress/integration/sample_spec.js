@@ -1,7 +1,7 @@
 import { qase } from 'cypress-qase-reporter/dist/mocha';
 
 describe('My First Test', () => {
-    qase(1, it('clicking "type" navigates to a new url', () => {
+    qase(1, it('Clicking "type" navigates to a new url', () => {
         cy.visit('https://example.cypress.io');
 
         cy.contains('type').click();
