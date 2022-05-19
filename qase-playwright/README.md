@@ -11,7 +11,11 @@ npm install playwright-qase-reporter
 
 ## Example of usage
 
-If you want to decorate cake test with Qase case Id you could use case function. The Id in your test must be entered in accordance with the hierarchy of test case Ids in your TMS Qase. For example:
+The Playwright reporter has the ability to auto-generate test cases
+and suites from your test data.
+
+But if necessary, you can independently register the ID of already
+existing test cases from TMS before the executing tests. For example:
 
 ```typescript
 import { qase } from 'playwright-qase-reporter/dist/playwright';
@@ -39,10 +43,18 @@ You should also have an active item in the project settings at
 ```
 https://app.qase.io/project/QASE_PROJECT_CODE/settings/options
 ```
-option in the `Test Runs` block:
+
+options in the `Test Runs` block:
+
+```
+Auto create test cases
+```
+and
+
 ```
 Allow submitting results in bulk
 ```
+---
 To run tests and create a test run, execute the command (for example from folder examples):
 ```bash
 QASE_REPORT=1 npx playwright test
@@ -61,6 +73,11 @@ A test run will be performed and available at:
 ```
 https://app.qase.io/run/QASE_PROJECT_CODE
 ```
+
+<p align="center">
+  <img src="./examples/screenshots/demo.gif">
+</p>
+
 ## Configuration
 
 Reporter options (* - required):
@@ -76,6 +93,7 @@ Reporter options (* - required):
 - `logging` [true/false] - Enabled debug logging from reporter or not
 - `runComplete` [true/false] - Complete run after all tests are finished
 - `uploadAttachments` [true/false] - Uploading attachments (screenshot/video) after test ended
+- `rootSuiteTitle` - A parent suite for your autocreated tests
 
 Example `playwright.config.js` config:
 
@@ -115,6 +133,7 @@ Supported ENV variables:
 - `QASE_RUN_DESCRIPTION` - Set custom Run description, when new run is created
 - `QASE_RUN_COMPLETE` - Complete run after all tests are finished
 - `QASE_UPLOAD_ATTACHMENTS` - Uploading attachments (screenshot/video) after test ended
+- `QASE_ROOT_SUITE_TITLE` - Same as `rootSuiteTitle`
 
 <!-- references -->
 
