@@ -6,7 +6,7 @@
   "types": "./dist/index.d.ts",
   "homepage": "",
   "bugs": {
-    "url": ""
+    "url": "https://github.com/qase-tms/qase-javascript/"
   },
   "repository": {
     "type": "git",
