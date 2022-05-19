@@ -12,8 +12,9 @@
       "basePath": "https://api.qase.io/v1",
       "screenshotFolder": "screenshots",
       "sendScreenshot": true,
-      "runComplete": false,
-      "environmentId": 1
+      "runComplete": true,
+      "environmentId": 1,
+      "rootSuiteTitle": "Cypress tests"
     }
   },
   "video": false

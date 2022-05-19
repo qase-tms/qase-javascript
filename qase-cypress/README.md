@@ -10,7 +10,12 @@ npm install cypress-qase-reporter
 
 ## Example of usage
 
-If you want to decorate come test with Qase Case ID you could use qase function:
+The Cypress reporter has the ability to auto-generate test cases
+and suites from your test data.
+
+But if necessary, you can independently register the ID of already
+existing test cases from TMS before the executing tests. You can decorate your scenarios with Qase TMS case IDs. 
+Example:
 
 ```typescript
 import { qase } from 'cypress-qase-reporter/dist/mocha';
@@ -43,10 +48,15 @@ You should also have an active item in the project settings at
 ```
 https://app.qase.io/project/QASE_PROJECT_CODE/settings/options
 ```
-option in the `Test Runs` block:
+options in the `Test Runs` block:
+```
+Auto create test cases
+```
+and
 ```
 Allow submitting results in bulk
 ```
+---
 If you are going to use several specifications for execution and you have in config 
 ```bash
 "runComplete": true
@@ -55,7 +65,7 @@ then it is necessary to additionally set in the project settings
 ```
 Allow to add results for cases in closed runs.
 ```
-
+---
 To run tests and create a test run, execute the command (for example from folder examples):
 ```bash
 QASE_REPORT=1 npx cypress run
@@ -74,6 +84,10 @@ A test run will be performed and available at:
 https://app.qase.io/run/QASE_PROJECT_CODE
 ```
 
+<p align="center">
+  <img src="./examples/screenshots/demo.gif">
+</p>
+
 ## Configuration
 
 Reporter options (* - required):
@@ -90,6 +104,7 @@ Reporter options (* - required):
 - `screenshotFolder` - Folder for save screenshot cypress,
 - `sendScreenshot` [true/false] - Permission to send screenshots to Qase TMS
 - `runComplete` [true/false] - Permission for automatic completion of the test run
+- `rootSuiteTitle` - A parent suite for your autocreated tests
 
 Example `cypress.json` config:
 
@@ -101,7 +116,8 @@ Example `cypress.json` config:
         "projectCode": "project_code",
         "runId": 45,
         "logging": true,
-        "basePath": "https://api.qase.io/v1"
+        "basePath": "https://api.qase.io/v1",
+        "runComplete": false
     }
 }
 ```
@@ -120,8 +136,9 @@ Supported ENV variables:
 - `QASE_API_BASE_URL` - URL Qase.io, default value `https://api.qase.io/v1`
 - `QASE_ENVIRONMENT_ID` - To execute with the sending of the envinroment information
 - `QASE_SCREENSHOT_FOLDER` - Folder for save screenshot cypress
- - `QASE_SCREENSHOT_SENDING` - Permission to send screenshots to Qase TMS
- - `QASE_RUN_COMPLETE` - Permission for automatic completion of the test run
+- `QASE_SCREENSHOT_SENDING` - Permission to send screenshots to Qase TMS
+- `QASE_RUN_COMPLETE` - Permission for automatic completion of the test run
+- `QASE_ROOT_SUITE_TITLE` - Same as `rootSuiteTitle`
 
 <!-- references -->
 
