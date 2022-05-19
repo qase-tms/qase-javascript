@@ -4,7 +4,7 @@ fixture `Example page`
     .page `http://devexpress.github.io/testcafe/example/`;
 
 
-test.meta('CID', [1,2])('Check property of element', async (t) => {
+test.meta('CID', [2])('Check property of element', async (t) => {
     const developerNameInput = Selector('#developer-name');
 
     await t
@@ -15,7 +15,7 @@ test.meta('CID', [1,2])('Check property of element', async (t) => {
     ;
 });
 
-test.meta('CID', [3])('Check property of element', async (t) => {
+test('Check property of element 2', async (t) => {
     const developerNameInput = Selector('#developer-name');
 
     await t
@@ -26,7 +26,7 @@ test.meta('CID', [3])('Check property of element', async (t) => {
     ;
 });
 
-test.skip.meta('CID', [4])('Check property of element', async (t) => {
+test.skip('Check property of element 3', async (t) => {
     const developerNameInput = Selector('#developer-name');
 
     await t
