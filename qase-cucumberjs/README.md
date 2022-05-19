@@ -10,7 +10,11 @@ npm install cucumberjs-qase-reporter
 
 ## Example of usage
 
-Decorate your scenarios with Qase TMS case IDs in format `Q-<case id>` or `Q123`, also `q` can be in any case:
+The Cucumber JS reporter has the ability to auto-generate test cases
+and suites from your test data.
+
+But if necessary, you can independently register the ID of already
+existing test cases from TMS before the executing tests. You can decorate your scenarios with Qase TMS case IDs in format `Q-<case id>` or `Q123`, also `q` can be in any case:
 
 ```gherkin
 Feature: Cucumber documentation
@@ -32,19 +36,24 @@ Feature: Cucumber documentation
         Then I should see a "Build Status" badge
         And I should see a "Dependencies" badge
 ```
+
 You should also have an active item in the project settings at
 
 ```
 https://app.qase.io/project/QASE_PROJECT_CODE/settings/options
 ```
 
-option in the `Test Runs` block:
+options in the `Test Runs` block:
 
+```
+Auto create test cases
+```
+and
 
 ```
 Allow submitting results in bulk
 ```
-
+---
 To run tests and create a test run, execute the command (for example from folder examples):
 ```bash
 cucumber-js -f cucumberjs-qase-reporter --format-options='{\"qaseConfig\": \"./.qaserc\"}' features -r examples/zombie/support -r examples/zombie/steps
@@ -62,6 +71,10 @@ A test run will be performed and available at:
 ```
 https://app.qase.io/run/QASE_PROJECT_CODE
 ```
+
+<p align="center">
+  <img src="./examples/screenshots/demo.gif">
+</p>
 
 ## Configuration
 
@@ -83,6 +96,7 @@ using `.qaserc` file and using ENV variables.
     - `%DATE%`
 - `runDescription` - Set custom Run description, when new run is created
 - `logging` - Enabled debug logging from reporter or not
+- `rootSuiteTitle` - A parent suite for your autocreated tests
 
 Example configuration file:
 ```json
@@ -108,6 +122,7 @@ Supported ENV variables:
 - `QASE_RUN_DESCRIPTION` - Same as `runDescription`
 - `QASE_ENVIRONMENT_ID` - Same as `environmentId`
 - `QASE_LOGGING` - Same as `logging`
+- `QASE_ROOT_SUITE_TITLE` - Same as `rootSuiteTitle`
 
 To run using ENV you have to execute:
 ```bash
