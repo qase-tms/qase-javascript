@@ -13,6 +13,8 @@ const config = {
                 uploadAttachments: true,
                 runComplete: true,
                 logging: true,
+                rootSuiteTitle: 'Playwright tests',
+                environmentId: '1'
             }],
     ],
 };

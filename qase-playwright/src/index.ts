@@ -1,5 +1,7 @@
 /* eslint-disable max-len */
 /* eslint-disable camelcase */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 import {
     IdResponse, ResultCreate,
     ResultCreateStatusEnum,
@@ -17,6 +19,7 @@ enum Envs {
     report = 'QASE_REPORT',
     apiToken = 'QASE_API_TOKEN',
     basePath = 'QASE_API_BASE_URL',
+    rootSuiteTitle = 'QASE_ROOT_SUITE_TITLE',
     projectCode = 'QASE_PROJECT_CODE',
     runId = 'QASE_RUN_ID',
     runName = 'QASE_RUN_NAME',
@@ -37,6 +40,7 @@ const Statuses = {
 interface QaseOptions {
     apiToken: string;
     basePath?: string;
+    rootSuiteTitle?: string;
     projectCode: string;
     runId?: string;
     runPrefix?: string;
@@ -73,6 +77,7 @@ class PlaywrightReporter implements Reporter {
         this.options = _options;
         this.options.runComplete = !!PlaywrightReporter.getEnv(Envs.runComplete) || this.options.runComplete;
         this.options.uploadAttachments = !!PlaywrightReporter.getEnv(Envs.uploadAttachments) || this.options.uploadAttachments;
+        this.options.rootSuiteTitle = _options.rootSuiteTitle || PlaywrightReporter.getEnv(Envs.rootSuiteTitle) || '';
 
         this.api = new QaseApi(
             PlaywrightReporter.getEnv(Envs.apiToken) || this.options.apiToken || '',
@@ -143,6 +148,20 @@ class PlaywrightReporter implements Reporter {
             'X-Platform': xPlatformHeader,
         };
     }
+
+    private static getSuitePath(suite): string {
+        if (suite.parent) {
+            const parentSuite = String(PlaywrightReporter.getSuitePath(suite.parent));
+            if (parentSuite) {
+                return parentSuite + '\t' + String(suite?.title);
+            } else {
+                return String(suite?.title);
+            }
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return suite.title;
+    }
+
 
     public async onBegin(): Promise<void> {
         if (this.isDisabled) {
@@ -249,7 +268,6 @@ class PlaywrightReporter implements Reporter {
             body
         );
         this.log(chalk`{green ${this.resultsToBePublished.length} result(s) sent to Qase}`);
-
 
         if (!this.options.runComplete) {
             return;
@@ -382,32 +400,44 @@ class PlaywrightReporter implements Reporter {
         this.queued --;
         this.logTestItem(test, testResult);
         const caseIds = this.getCaseIds(test);
+        const caseObject: ResultCreate = {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            status: Statuses[testResult.status] || Statuses.failed,
+            time_ms: testResult.duration,
+            stacktrace: testResult.error?.stack?.replace(/\u001b\[.*?m/g, ''),
+            comment: testResult.error ? `${test.title}: ${testResult.error?.message?.replace(/\u001b\[.*?m/g, '') as string}` : undefined,
+            attachments: attachments.length > 0
+                ? attachments
+                : undefined,
+        };
+
         if (caseIds.length === 0) {
-            // TODO: autocreate case for result
-            return;
-        }
-
-        caseIds.forEach((caseId) => {
-            const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}` : '';
-            this.log(chalk`{gray Start publishing: ${test.title}}${add}`);
-
-            const caseObject: ResultCreate = {
-                case_id: caseId,
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                status: Statuses[testResult.status] || Statuses.failed,
-                time_ms: testResult.duration,
-                stacktrace: testResult.error?.stack?.replace(/\u001b\[.*?m/g, ''),
-                comment: testResult.error ? `${test.title}: ${testResult.error?.message?.replace(/\u001b\[.*?m/g, '') as string}` : undefined,
-                attachments: attachments.length > 0
-                    ? attachments
-                    : undefined,
+            caseObject.case = {
+                title: test.title,
+                suite_title: this.options.rootSuiteTitle
+                    ? `${this.options.rootSuiteTitle}\t${PlaywrightReporter.getSuitePath(test.parent)}`
+                    : PlaywrightReporter.getSuitePath(test.parent),
             };
-
             this.resultsToBePublished.push(caseObject);
             this.log(
-                chalk`{gray Result prepared for publish: ${test.title} }${add}`
+                chalk`{gray Result prepared for publish: ${test.title} }`
             );
-        });
+        } else {
+            caseIds.forEach((caseId) => {
+                const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}` : '';
+                this.log(chalk`{gray Start publishing: ${test.title}}${add}`);
+
+                const caseObjectWithId: ResultCreate = {
+                    case_id: caseId,
+                    ...caseObject,
+                };
+
+                this.resultsToBePublished.push(caseObjectWithId);
+                this.log(
+                    chalk`{gray Result prepared for publish: ${test.title} }${add}`
+                );
+            });
+        }
     }
 }
 
