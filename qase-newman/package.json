@@ -1,6 +1,6 @@
 {
   "name": "newman-reporter-qase",
-  "version": "v1.0.6-alpha.1",
+  "version": "v1.0.6-alpha.2",
   "description": "Qase TMS Newman Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
