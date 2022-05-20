@@ -52,7 +52,7 @@ interface Test {
 }
 
 interface BulkCaseObject {
-    case_id: number;
+    case_id?: number;
     status: ResultCreateStatusEnum;
     time_ms: number;
     stacktrace?: string;
@@ -155,50 +155,6 @@ class NewmanQaseReporter {
             if (this.isDisabled) {
                 return;
             }
-
-            void this.checkProject(this.options.projectCode, async (prjExists) => {
-                if (!prjExists) {
-                    this.log(
-                        chalk`{red Project ${this.options.projectCode} does not exist}`
-                    );
-                    this.isDisabled = true;
-                    return;
-                }
-                this.log(chalk`{green Project ${this.options.projectCode} exists}`);
-                const providedRunId = this.getEnv(Envs.runId) || this.options.runId;
-                if (providedRunId) {
-                    this.runId = providedRunId;
-                    return this.checkRun(this.runId, (runExists: boolean) => {
-                        if (runExists) {
-                            this.log(
-                                chalk`{green Using run ${this.runId} to publish test results}`
-                            );
-                        } else {
-                            this.log(chalk`{red Run ${this.runId} does not exist}`);
-                            this.isDisabled = true;
-                        }
-                    });
-                } else {
-                    return this.createRun(
-                        this.getEnv(Envs.runName) || this.options.runName,
-                        this.getEnv(Envs.runDescription) || this.options.runDescription,
-                        (created) => {
-                            if (created) {
-                                this.runId = created.result?.id;
-                                process.env.QASE_RUN_ID = String(this.runId);
-                                this.log(
-                                    chalk`{green Using run ${this.runId} to publish test results}`
-                                );
-                            } else {
-                                this.log(
-                                    chalk`{red Could not create run in project ${this.options.projectCode}}`
-                                );
-                                this.isDisabled = true;
-                            }
-                        }
-                    );
-                }
-            });
         });
 
         runner.on('beforeItem', (err, args: Record<string, unknown>) => {
@@ -243,22 +199,73 @@ class NewmanQaseReporter {
         });
 
         runner.on('beforeDone', () => {
-            const config = {
-                apiToken: this.getEnv(Envs.apiToken) || this.options.apiToken || '',
-                basePath: this.getEnv(Envs.basePath) || this.options.basePath,
-                headers: this.createHeaders(),
-                code: this.options.projectCode,
-                runId: Number(this.runId),
-                body: {
-                    results: this.createBulkResultsBodyObject(),
-                },
-            };
+            void this.checkProject(
+                this.options.projectCode,
+                async (prjExists) => {
+                    if (!prjExists) {
+                        this.log(
+                            chalk`{red Project ${this.options.projectCode} does not exist}`
+                        );
+                        this.isDisabled = true;
+                        return;
+                    }
+                    this.log(
+                        chalk`{green Project ${this.options.projectCode} exists}`
+                    );
+                    const providedRunId =
+                        this.getEnv(Envs.runId) || this.options.runId;
+                    if (providedRunId) {
+                        this.runId = providedRunId;
+                        return this.checkRun(this.runId, (runExists: boolean) => {
+                            if (runExists) {
+                                this.log(
+                                    chalk`{green Using run ${this.runId} to publish test results}`
+                                );
+                            } else {
+                                this.log(chalk`{red Run ${this.runId} does not exist}`);
+                                this.isDisabled = true;
+                            }
+                        });
+                    } else {
+                        return this.createRun(
+                            this.getEnv(Envs.runName) || this.options.runName,
+                            this.getEnv(Envs.runDescription) ||
+                            this.options.runDescription,
+                            (created) => {
+                                if (created) {
+                                    this.runId = created.result?.id;
+                                    process.env.QASE_RUN_ID = String(this.runId);
+                                    this.log(
+                                        chalk`{green Using run ${this.runId} to publish test results}`
+                                    );
+                                } else {
+                                    this.log(
+                                        chalk`{red Could not create run in project ${this.options.projectCode}}`
+                                    );
+                                    this.isDisabled = true;
+                                }
+                            }
+                        );
+                    }
+                }
+            ).then(() => {
+                const config = {
+                    apiToken: this.getEnv(Envs.apiToken) || this.options.apiToken || '',
+                    basePath: this.getEnv(Envs.basePath) || this.options.basePath,
+                    headers: this.createHeaders(),
+                    code: this.options.projectCode,
+                    runId: Number(this.runId),
+                    body: {
+                        results: this.createBulkResultsBodyObject(),
+                    },
+                };
 
-            spawnSync('node', [`${__dirname}/reportBulk.js`], {
-                stdio: 'inherit',
-                env: Object.assign(process.env, {
-                    reporting_config: JSON.stringify(config),
-                }),
+                spawnSync('node', [`${__dirname}/reportBulk.js`], {
+                    stdio: 'inherit',
+                    env: Object.assign(process.env, {
+                        reporting_config: JSON.stringify(config),
+                    }),
+                });
             });
         });
 
@@ -398,20 +405,36 @@ class NewmanQaseReporter {
         return prePandingValuesArray.reduce((accum, test) => {
             const { ids } = test;
 
-            const testsByIdArray = ids.map((id) => ({
-                case_id: Number(id),
-                status: test.result,
-                time_ms: test.duration,
-                stacktrace: test.err?.stack,
-                comment: test.err ? test.err.message : '',
-            })
-            );
+            if (ids && ids.length > 0) {
+                const testsByIdArray = ids.map((id) => ({
+                    case_id: Number(id),
+                    status: test.result,
+                    time_ms: test.duration,
+                    stacktrace: test.err?.stack,
+                    comment: test.err ? test.err.message : '',
+                }));
+                return [
+                    ...accum,
+                    ...testsByIdArray,
+                ];
+            } else {
+                const testByIdArray = [
+                    {
+                        case: {
+                            title: test.name,
+                            suite_title: this.options.rootSuiteTitle || 'Autocreated Root Suite',
+                        },
+                        status: test.result,
+                        time_ms: test.duration,
+                        stacktrace: test.err?.stack,
+                        comment: test.err ? test.err.message : '',
+                    },
+                ];
 
-            return [
-                ...accum,
-                ...testsByIdArray,
-            ];
-        },[] as BulkCaseObject[]);
+                return [...accum, ...testByIdArray];
+            }
+
+        }, [] as BulkCaseObject[]);
     }
 }
 

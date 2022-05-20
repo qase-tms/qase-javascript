@@ -13,7 +13,6 @@
                     "script": {
                         "type": "text/javascript",
                         "exec": [
-                            "// qase: 1,2,3,4 ",
                             "pm.test('expect response be 200', function () {",
                             "    pm.response.to.be.ok",
                             "})",
@@ -29,6 +28,31 @@
                 "url": "https://postman-echo.com/get?source=newman-sample-github-collection",
                 "method": "GET"
             }
+        },
+        {
+          "name": "A simple GET request with ids",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// qase: 1, 2, 3",
+                  "pm.test('expect response be 200', function () {",
+                  "    pm.response.to.be.ok",
+                  "})",
+                  "pm.test('expect response json contain args', function () {",
+                  "    pm.expect(pm.response.json().args).to.have.property('source')",
+                  "      .and.equal('newman-sample-github-collection')",
+                  "})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "url": "https://postman-echo.com/get?source=newman-sample-github-collection",
+            "method": "GET"
+          }
         }
     ]
 }
