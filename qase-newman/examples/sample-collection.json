@@ -1,58 +1,100 @@
 {
-    "info": {
-        "name": "Sample Postman Collection",
-        "schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
-        "description": "A sample collection to demonstrate collections as a set of related requests"
-    },
-    "item": [
-        {
-            "name": "A simple GET request",
-            "event": [
-                {
-                    "listen": "test",
-                    "script": {
-                        "type": "text/javascript",
-                        "exec": [
-                            "pm.test('expect response be 200', function () {",
-                            "    pm.response.to.be.ok",
-                            "})",
-                            "pm.test('expect response json contain args', function () {",
-                            "    pm.expect(pm.response.json().args).to.have.property('source')",
-                            "      .and.equal('newman-sample-github-collection')",
-                            "})"
-                        ]
-                    }
-                }
-            ],
+	"info": {
+		"_postman_id": "549b1242-0882-4fbe-8e6e-aa77b58dceec",
+		"name": "Example collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"description": "A sample collection to demonstrate collections as a set of related requests"
+	},
+	"item": [
+		{
+			"name": "Example folder",
+			"item": [
+				{
+					"name": "A simple GET request with ids",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// qase: 222 ",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"pm.test('expect response json contain args', function () {",
+									"    pm.expect(pm.response.json().args).to.have.property('source')",
+									"      .and.equal('newman-sample-github-collection')",
+									"})"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://postman-echo.com/get?source=newman-sample-github-collection",
+							"protocol": "https",
+							"host": [
+								"postman-echo",
+								"com"
+							],
+							"path": [
+								"get"
+							],
+							"query": [
+								{
+									"key": "source",
+									"value": "newman-sample-github-collection"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "A simple GET request without ids",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.be.ok;",
+							"})"
+						  ],
+						"type": "text/javascript"
+					}
+				}
+			],
+            "request": {
+                "url": "https://postman-echo.com/g",
+                "method": "GET"
+            },
+			"response": []
+		},
+		{
+			"name": "A simple GET request without ids 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Response time is less than 200ms', function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(10);",
+							"})"
+						  ],
+						"type": "text/javascript"
+					}
+				}
+			],
             "request": {
                 "url": "https://postman-echo.com/get?source=newman-sample-github-collection",
                 "method": "GET"
-            }
-        },
-        {
-          "name": "A simple GET request with ids",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "// qase: 1, 2, 3",
-                  "pm.test('expect response be 200', function () {",
-                  "    pm.response.to.be.ok",
-                  "})",
-                  "pm.test('expect response json contain args', function () {",
-                  "    pm.expect(pm.response.json().args).to.have.property('source')",
-                  "      .and.equal('newman-sample-github-collection')",
-                  "})"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "url": "https://postman-echo.com/get?source=newman-sample-github-collection",
-            "method": "GET"
-          }
-        }
-    ]
+            },
+			"response": []
+		}
+	]
 }
