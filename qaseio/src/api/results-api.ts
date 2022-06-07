@@ -21,6 +21,10 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
+import { CreateResult200Response } from '../model';
+// @ts-ignore
+import { GetResultsFiltersParameter } from '../model';
+// @ts-ignore
 import { HashResponse } from '../model';
 // @ts-ignore
 import { Response } from '../model';
@@ -224,13 +228,13 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
          * This method allows to retrieve all test run results stored in selected project. 
          * @summary Get all test run results.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {GetResultsFiltersParameter} [filters] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getResults: async (code: string, filters?: object, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getResults: async (code: string, filters?: GetResultsFiltersParameter, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getResults', 'code', code)
             const localVarPath = `/result/{code}`
@@ -342,7 +346,7 @@ export const ResultsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createResult(code: string, id: number, resultCreate: ResultCreate, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Response & object>> {
+        async createResult(code: string, id: number, resultCreate: ResultCreate, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateResult200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createResult(code, id, resultCreate, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -388,13 +392,13 @@ export const ResultsApiFp = function(configuration?: Configuration) {
          * This method allows to retrieve all test run results stored in selected project. 
          * @summary Get all test run results.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {GetResultsFiltersParameter} [filters] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getResults(code: string, filters?: object, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ResultListResponse>> {
+        async getResults(code: string, filters?: GetResultsFiltersParameter, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ResultListResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getResults(code, filters, limit, offset, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -431,7 +435,7 @@ export const ResultsApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createResult(code: string, id: number, resultCreate: ResultCreate, options?: any): AxiosPromise<Response & object> {
+        createResult(code: string, id: number, resultCreate: ResultCreate, options?: any): AxiosPromise<CreateResult200Response> {
             return localVarFp.createResult(code, id, resultCreate, options).then((request) => request(axios, basePath));
         },
         /**
@@ -473,13 +477,13 @@ export const ResultsApiFactory = function (configuration?: Configuration, basePa
          * This method allows to retrieve all test run results stored in selected project. 
          * @summary Get all test run results.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {GetResultsFiltersParameter} [filters] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getResults(code: string, filters?: object, limit?: number, offset?: number, options?: any): AxiosPromise<ResultListResponse> {
+        getResults(code: string, filters?: GetResultsFiltersParameter, limit?: number, offset?: number, options?: any): AxiosPromise<ResultListResponse> {
             return localVarFp.getResults(code, filters, limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
@@ -564,14 +568,14 @@ export class ResultsApi extends BaseAPI {
      * This method allows to retrieve all test run results stored in selected project. 
      * @summary Get all test run results.
      * @param {string} code Code of project, where to search entities.
-     * @param {object} [filters] 
+     * @param {GetResultsFiltersParameter} [filters] 
      * @param {number} [limit] A number of entities in result set.
      * @param {number} [offset] How many entities should be skipped.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ResultsApi
      */
-    public getResults(code: string, filters?: object, limit?: number, offset?: number, options?: AxiosRequestConfig) {
+    public getResults(code: string, filters?: GetResultsFiltersParameter, limit?: number, offset?: number, options?: AxiosRequestConfig) {
         return ResultsApiFp(this.configuration).getResults(code, filters, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
