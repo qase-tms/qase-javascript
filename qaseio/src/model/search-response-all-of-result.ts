@@ -13,6 +13,7 @@
  */
 
 
+import { lTestCase|Requirement|QqlDefect|QqlPlan|Result } from './l-test-case|requirement|qql-defect|qql-plan|result';
 import { QqlDefect } from './qql-defect';
 import { QqlPlan } from './qql-plan';
 import { QqlTestCase } from './qql-test-case';

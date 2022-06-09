@@ -13,7 +13,7 @@
  */
 
 
-import { CustomFieldCreateValue } from './custom-field-create-value';
+import { CustomFieldCreateValueInner } from './custom-field-create-value-inner';
 
 /**
  * 
@@ -29,10 +29,10 @@ export interface CustomFieldUpdate {
     'title': string;
     /**
      * 
-     * @type {Array<CustomFieldCreateValue>}
+     * @type {Array<CustomFieldCreateValueInner>}
      * @memberof CustomFieldUpdate
      */
-    'value'?: Array<CustomFieldCreateValue> | null;
+    'value'?: Array<CustomFieldCreateValueInner> | null;
     /**
      * Dictionary of old values and their replacemants
      * @type {{ [key: string]: string; }}
