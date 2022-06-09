@@ -106,7 +106,7 @@ Example `cypress.json` config:
 }
 ```
 
-You can check example configuration with multiple reporters in [demo project](./demo/cypress.json).
+You can check example configuration with multiple reporters in [demo project](./examples/cypress.json).
 
 Supported ENV variables:
 
