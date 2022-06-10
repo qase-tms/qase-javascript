@@ -123,6 +123,10 @@ Supported ENV variables:
  - `QASE_SCREENSHOT_SENDING` - Permission to send screenshots to Qase TMS
  - `QASE_RUN_COMPLETE` - Permission for automatic completion of the test run
 
+## Requirements
+
+We maintain the reporter on LTS versions of Node. You can find the current versions by following the [link](https://nodejs.org/en/about/releases/)
+
 <!-- references -->
 
 [auth]: https://developers.qase.io/#authentication
