@@ -69,6 +69,10 @@ https://app.qase.io/run/QASE_PROJECT_CODE
   <img src="./examples/screenshots/demo.gif">
 </p>
 
+## Requirements
+
+We maintain the reporter on LTS versions of Node. You can find the current versions by following the [link](https://nodejs.org/en/about/releases/)
+
 <!-- references -->
 
 [auth]: https://developers.qase.io/#authentication

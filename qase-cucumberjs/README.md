@@ -155,6 +155,9 @@ exports.config = {
 
 **Do not forget to add .qaserc file!**
 
+## Requirements
+
+We maintain the reporter on LTS versions of Node. You can find the current versions by following the [link](https://nodejs.org/en/about/releases/)
 <!-- references -->
 
 [auth]: https://developers.qase.io/#authentication

@@ -124,6 +124,10 @@ Supported ENV variables:
 - `QASE_RUN_DESCRIPTION` - Set custom Run description, when new run is created
 - `QASE_RUN_COMPLETE` - Complete run after all tests are finished
 
+## Requirements
+
+We maintain the reporter on LTS versions of Node. You can find the current versions by following the [link](https://nodejs.org/en/about/releases/)
+
 <!-- references -->
 
 [auth]: https://developers.qase.io/#authentication

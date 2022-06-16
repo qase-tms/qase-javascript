@@ -658,3 +658,7 @@ qase.users.exists(123).then((exists) => {
     console.log(exists)  // boolean
 })
 ```
+
+## Requirements
+
+We maintain the reporter on LTS versions of Node. You can find the current versions by following the [link](https://nodejs.org/en/about/releases/)

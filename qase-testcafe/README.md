@@ -118,6 +118,10 @@ Supported ENV variables:
 - `QASE_UPLOAD_ATTACHMENTS` - Same as `uploadAttachments`
 - `QASE_ROOT_SUITE_TITLE` - Same as `rootSuiteTitle`
 
+## Requirements
+
+We maintain the reporter on LTS versions of Node. You can find the current versions by following the [link](https://nodejs.org/en/about/releases/)
+
 <!-- references -->
 
 [auth]: https://developers.qase.io/#authentication
