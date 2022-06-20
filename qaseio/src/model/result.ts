@@ -14,7 +14,7 @@
 
 
 import { Attachment } from './attachment';
-import { ResultSteps } from './result-steps';
+import { ResultStepsInner } from './result-steps-inner';
 
 /**
  * 
@@ -54,10 +54,10 @@ export interface Result {
     'case_id'?: number;
     /**
      * 
-     * @type {Array<ResultSteps>}
+     * @type {Array<ResultStepsInner>}
      * @memberof Result
      */
-    'steps'?: Array<ResultSteps> | null;
+    'steps'?: Array<ResultStepsInner> | null;
     /**
      * 
      * @type {string}

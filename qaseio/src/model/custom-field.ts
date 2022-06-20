@@ -81,6 +81,12 @@ export interface CustomField {
      */
     'is_filterable'?: boolean;
     /**
+     * 
+     * @type {boolean}
+     * @memberof CustomField
+     */
+    'is_enabled_for_all_projects'?: boolean;
+    /**
      * Deprecated, use the `created_at` property instead.
      * @type {string}
      * @memberof CustomField
