@@ -13,7 +13,7 @@
  */
 
 
-import { CustomFieldCreateValue } from './custom-field-create-value';
+import { CustomFieldCreateValueInner } from './custom-field-create-value-inner';
 
 /**
  * 
@@ -41,10 +41,10 @@ export interface CustomFieldCreate {
     'type': number;
     /**
      * Required if type one of: 3 - selectbox; 5 - radio; 6 - multiselect; 
-     * @type {Array<CustomFieldCreateValue>}
+     * @type {Array<CustomFieldCreateValueInner>}
      * @memberof CustomFieldCreate
      */
-    'value'?: Array<CustomFieldCreateValue> | null;
+    'value'?: Array<CustomFieldCreateValueInner> | null;
     /**
      * 
      * @type {string}
