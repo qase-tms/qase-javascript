@@ -91,22 +91,7 @@ Reporter options (* - required):
 - `sendScreenshot` [true/false] - Permission to send screenshots to Qase TMS
 - `runComplete` [true/false] - Permission for automatic completion of the test run
 
-Example `cypress.json` config:
-
-```json
-{
-    "reporter": "cypress-qase-reporter",
-    "reporterOptions": {
-        "apiToken": "api_key",
-        "projectCode": "project_code",
-        "runId": 45,
-        "logging": true,
-        "basePath": "https://api.qase.io/v1"
-    }
-}
-```
-
-You can check example configuration with multiple reporters in [demo project](./examples/cypress.json).
+You can check example configuration with multiple reporters in [demo project](./examples/cypress.config.js).
 
 Supported ENV variables:
 
