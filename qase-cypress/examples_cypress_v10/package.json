@@ -1,0 +1,17 @@
+{
+  "name": "examples",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "cypress": "cypress open",
+    "test": "QASE_REPORT=1 npx cypress run"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "cypress": "^10.1.0",
+    "cypress-mochawesome-reporter": "^3.0.1",
+    "cypress-multi-reporters": "^1.4.0",
+    "cypress-qase-reporter": "../"
+  }
+}
