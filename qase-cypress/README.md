@@ -65,7 +65,7 @@ or
 npm test
 ```
 <p align="center">
-  <img width="65%" src="./examples/screenshots/screenshot.png">
+  <img width="65%" src="examples_cypress_v10/screenshots/screenshot.png">
 </p>
 
 A test run will be performed and available at:
@@ -91,7 +91,7 @@ Reporter options (* - required):
 - `sendScreenshot` [true/false] - Permission to send screenshots to Qase TMS
 - `runComplete` [true/false] - Permission for automatic completion of the test run
 
-You can check example configuration with multiple reporters in [demo project](./examples/cypress.config.js).
+#### You can check example configuration with multiple reporters in [demo project (cypress v10)](examples_cypress_v10/cypress.config.js) and [demo project (cypress v6)](examples_cypress_v6/cypress.json).
 
 Supported ENV variables:
 
