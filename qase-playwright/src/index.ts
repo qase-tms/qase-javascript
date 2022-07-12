@@ -5,6 +5,7 @@
 import {
     IdResponse, ResultCreate,
     ResultCreateStatusEnum,
+    ResultCreateStepsStatusEnum,
 } from 'qaseio/dist/src';
 
 import { Reporter, TestCase, TestResult } from '@playwright/test/reporter';
@@ -409,6 +410,17 @@ class PlaywrightReporter implements Reporter {
             attachments: attachments.length > 0
                 ? attachments
                 : undefined,
+            steps: testResult.steps.filter((step) => step.category === 'test.step').map((step, index) => (
+                {
+                    position: index + 1,
+                    status: step.error ? ResultCreateStepsStatusEnum.FAILED : ResultCreateStepsStatusEnum.PASSED,
+                    comment: null,
+                    attachments: null,
+                    action: step.title,
+                    expected_result: null,
+                    data: JSON.stringify(step.data),
+                }
+            )),
         };
 
         if (caseIds.length === 0) {
