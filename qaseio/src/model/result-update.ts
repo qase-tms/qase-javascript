@@ -13,7 +13,7 @@
  */
 
 
-import { ResultUpdateSteps } from './result-update-steps';
+import { ResultUpdateStepsInner } from './result-update-steps-inner';
 
 /**
  * 
@@ -59,10 +59,10 @@ export interface ResultUpdate {
     'comment'?: string | null;
     /**
      * 
-     * @type {Array<ResultUpdateSteps>}
+     * @type {Array<ResultUpdateStepsInner>}
      * @memberof ResultUpdate
      */
-    'steps'?: Array<ResultUpdateSteps> | null;
+    'steps'?: Array<ResultUpdateStepsInner> | null;
 }
 
 /**
