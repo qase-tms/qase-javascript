@@ -13,7 +13,7 @@
  */
 
 
-import { SharedStepCreateSteps } from './shared-step-create-steps';
+import { SharedStepCreateStepsInner } from './shared-step-create-steps-inner';
 
 /**
  * 
@@ -50,9 +50,9 @@ export interface SharedStepUpdate {
     'data'?: string;
     /**
      * 
-     * @type {Array<SharedStepCreateSteps>}
+     * @type {Array<SharedStepCreateStepsInner>}
      * @memberof SharedStepUpdate
      */
-    'steps'?: Array<SharedStepCreateSteps>;
+    'steps'?: Array<SharedStepCreateStepsInner>;
 }
 
