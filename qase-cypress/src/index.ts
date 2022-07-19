@@ -10,7 +10,7 @@ import { readFileSync } from 'fs';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const { EVENT_TEST_FAIL, EVENT_TEST_PASS, EVENT_TEST_PENDING, EVENT_RUN_END } =
-  Runner.constants;
+    Runner.constants;
 
 enum Envs {
     report = 'QASE_REPORT',
@@ -44,6 +44,7 @@ interface BulkCaseObject {
     time_ms: number;
     stacktrace?: string;
     comment: string;
+    defect: boolean;
 }
 
 class CypressQaseReporter extends reporters.Base {
@@ -163,8 +164,7 @@ class CypressQaseReporter extends reporters.Base {
             'cypress-qase-reporter'
         );
         const xPlatformHeader = `node=${nodeVersion}; npm=${npmVersion}; os=${os}; arch=${arch}`;
-        const xClientHeader = `cypress=${cypressVersion as string}; qase-cypress=${
-            cypressCaseReporterVersion as string
+        const xClientHeader = `cypress=${cypressVersion as string}; qase-cypress=${cypressCaseReporterVersion as string
         }; qaseapi=${qaseapiVersion as string}`;
 
         return {
@@ -276,8 +276,8 @@ class CypressQaseReporter extends reporters.Base {
     ): Promise<void> {
         try {
             const environmentId =
-        Number(CypressQaseReporter.getEnv(Envs.environmentId)) ||
-        this.options.environmentId;
+                Number(CypressQaseReporter.getEnv(Envs.environmentId)) ||
+                this.options.environmentId;
 
             const runObject = CypressQaseReporter.createRunObject(
                 name || `Automated run ${new Date().toISOString()}`,
@@ -313,8 +313,7 @@ class CypressQaseReporter extends reporters.Base {
             .getRun(this.options.projectCode, Number(runId))
             .then((resp) => {
                 this.log(
-                    `Get run result on checking run ${
-            resp.data.result?.id as unknown as string
+                    `Get run result on checking run ${resp.data.result?.id as unknown as string
                     }`
                 );
                 cb(Boolean(resp.data.result?.id));
@@ -361,8 +360,9 @@ class CypressQaseReporter extends reporters.Base {
                     time_ms: test.duration || 0,
                     stacktrace: test.err?.stack,
                     comment: test.err ? `${test.err.name}: ${test.err.message}` : '',
+                    defect: status === ResultCreateStatusEnum.FAILED,
                 };
-                this.resultsForPublishing.push(caseResultBulkObject );
+                this.resultsForPublishing.push(caseResultBulkObject);
             }
         });
     }
