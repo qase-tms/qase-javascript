@@ -70,7 +70,7 @@ describe('Client', () => {
         ];
 
         const runner = new mocha.Runner(new mocha.Suite('new'), false)
-        const options = { reporterOptions: { apiToken: "", autoAddDefect: true } };
+        const options = { reporterOptions: { apiToken: "" } };
         qReporter = new QaseCypressReporter(runner, options);
 
         testData.forEach(test => {
