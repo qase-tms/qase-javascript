@@ -224,7 +224,7 @@ class PlaywrightReporter implements Reporter {
         if (this.isDisabled) {
             return;
         }
-        this.queued ++;
+        this.queued++;
         let attachmentsArray: any[] = [];
         if (this.options.uploadAttachments && testResult.attachments.length > 0) {
             attachmentsArray = await this.uploadAttachments(testResult);
@@ -238,9 +238,9 @@ class PlaywrightReporter implements Reporter {
         }
 
         await new Promise((resolve, reject) => {
-            let timer  = 0;
-            const interval = setInterval( () => {
-                timer ++;
+            let timer = 0;
+            const interval = setInterval(() => {
+                timer++;
                 if (this.runId && this.queued === 0) {
                     clearInterval(interval);
                     resolve();
@@ -397,7 +397,7 @@ class PlaywrightReporter implements Reporter {
     }
 
     private prepareCaseResult(test: TestCase, testResult: TestResult, attachments: any[]) {
-        this.queued --;
+        this.queued--;
         this.logTestItem(test, testResult);
         const caseIds = this.getCaseIds(test);
         const caseObject: ResultCreate = {
@@ -409,6 +409,7 @@ class PlaywrightReporter implements Reporter {
             attachments: attachments.length > 0
                 ? attachments
                 : undefined,
+            defect: Statuses[testResult.status] === Statuses.failed,
         };
 
         if (caseIds.length === 0) {
