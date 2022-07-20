@@ -409,7 +409,7 @@ class PlaywrightReporter implements Reporter {
             attachments: attachments.length > 0
                 ? attachments
                 : undefined,
-            defect: testResult.status === Statuses.failed,
+            defect: Statuses[testResult.status] === Statuses.failed,
         };
 
         if (caseIds.length === 0) {
