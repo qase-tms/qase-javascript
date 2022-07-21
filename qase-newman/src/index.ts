@@ -57,6 +57,7 @@ interface BulkCaseObject {
     time_ms: number;
     stacktrace?: string;
     comment: string;
+    defect: boolean;
 }
 
 class NewmanQaseReporter {
@@ -412,6 +413,7 @@ class NewmanQaseReporter {
                     time_ms: test.duration,
                     stacktrace: test.err?.stack,
                     comment: test.err ? test.err.message : '',
+                    defect: test.result === ResultCreateStatusEnum.FAILED,
                 }));
                 return [
                     ...accum,
@@ -428,6 +430,7 @@ class NewmanQaseReporter {
                         time_ms: test.duration,
                         stacktrace: test.err?.stack,
                         comment: test.err ? test.err.message : '',
+                        defect: test.result === ResultCreateStatusEnum.FAILED,
                     },
                 ];
 
