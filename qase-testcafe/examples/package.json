@@ -4,7 +4,7 @@
   "description": "Test cafe example",
   "main": "test.js",
   "scripts": {
-    "test": "npx testcafe chrome test.js test2.js -r spec,qase -s path=screenshots,takeOnFails=true,fullPage=true"
+    "test": "npx testcafe chrome test.js test2.js -r spec,qase -s path=screenshots,takeOnFails=true"
   },
   "author": "",
   "license": "ISC",

@@ -5,10 +5,10 @@ import { CustomBoundaryFormData, customBoundary } from './CustomBoundaryFormData
 import {
     IdResponse, ResultCreate, ResultCreateStatusEnum,
 } from 'qaseio/dist/src';
-import {createReadStream, readFileSync} from 'fs';
+import { createReadStream, readFileSync } from 'fs';
 import { QaseApi } from 'qaseio';
 import chalk from 'chalk';
-import {execSync} from 'child_process';
+import { execSync } from 'child_process';
 import moment from 'moment';
 import path from 'path';
 import RuntimeError = WebAssembly.RuntimeError;
@@ -279,7 +279,7 @@ class TestcafeQaseReporter {
         if (!this.enabled) {
             return;
         }
-        this.queued ++;
+        this.queued++;
         const hasErr = testRunInfo.errs.length;
         let testStatus: ResultCreateStatusEnum;
 
@@ -303,7 +303,7 @@ class TestcafeQaseReporter {
             attachmentsArray = await this.uploadAttachments(testRunInfo);
         }
 
-        this.prepareCaseResult({name, info: testRunInfo, meta, error: errorLog}, testStatus, attachmentsArray);
+        this.prepareCaseResult({ name, info: testRunInfo, meta, error: errorLog }, testStatus, attachmentsArray);
     };
 
     public reportTaskDone = async () => {
@@ -311,9 +311,9 @@ class TestcafeQaseReporter {
             return;
         }
         await new Promise((resolve, reject) => {
-            let timer  = 0;
-            const interval = setInterval( () => {
-                timer ++;
+            let timer = 0;
+            const interval = setInterval(() => {
+                timer++;
                 if (this.config.runId && this.queued === 0) {
                     clearInterval(interval);
                     resolve();
@@ -361,7 +361,7 @@ class TestcafeQaseReporter {
     }
 
     private log(message?: any, ...optionalParams: any[]) {
-        if (this.config.logging){
+        if (this.config.logging) {
             console.log(chalk`{bold {blue qase:}} ${message}`, ...optionalParams);
         }
     }
@@ -446,17 +446,18 @@ class TestcafeQaseReporter {
         }
     }
 
-    private prepareCaseResult(test: Test, status: ResultCreateStatusEnum, attachments: any[]){
+    private prepareCaseResult(test: Test, status: ResultCreateStatusEnum, attachments: any[]) {
         this.logTestItem(test.name, status);
-        this.queued --;
+        this.queued--;
         const caseObject: ResultCreate = {
             status,
             time_ms: test.info.durationMs,
             stacktrace: test.error,
-            comment: test.error ? test.error.split('\n')[0]:undefined,
+            comment: test.error ? test.error.split('\n')[0] : undefined,
             attachments: attachments.length > 0
                 ? attachments
                 : undefined,
+            defect: status === ResultCreateStatusEnum.FAILED,
         };
         if (!test.meta.CID) {
             caseObject.case = {
@@ -470,7 +471,7 @@ class TestcafeQaseReporter {
             const caseIds = TestcafeQaseReporter.getCaseId(test.meta);
             caseIds.forEach((caseId) => {
                 if (caseId) {
-                    const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}`:'';
+                    const add = caseIds.length > 1 ? chalk` {white For case ${caseId}}` : '';
                     this.log(
                         chalk`{gray Ready for publishing: ${test.name}}${add}`
                     );
