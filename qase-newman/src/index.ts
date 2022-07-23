@@ -79,6 +79,7 @@ class NewmanQaseReporter {
         this.collectionOptions = collectionRunOptions;
         this.options.runComplete =
             !!this.getEnv(Envs.runComplete) || this.options.runComplete;
+        this.options.environmentId = Number(this.getEnv(Envs.environmentId)) || this.options.environmentId || undefined;
 
         this.api = new QaseApi(
             this.getEnv(Envs.apiToken) || this.options.apiToken || '',
@@ -327,6 +328,7 @@ class NewmanQaseReporter {
                 {
                     description: description || 'Newman automated run',
                     is_autotest: true,
+                    environment_id: this.options.environmentId,
                 }
             );
 
@@ -348,6 +350,7 @@ class NewmanQaseReporter {
         args?: {
             description?: string;
             is_autotest: boolean;
+            environment_id?: number;
         }
     ) {
         return {

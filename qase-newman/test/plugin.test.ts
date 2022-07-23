@@ -7,6 +7,26 @@ describe('Tests', () => {
         new NewmanQaseReporter(new EventEmitter(), { apiToken: "", projectCode: "" }, { collection: "" });
     });
 
+    describe('Options', () => {
+        describe('Support Optional Environmental ID', () => {
+            it('should set environmental Id to undefined by default', () => {
+                const reporter = new NewmanQaseReporter(new EventEmitter(), { apiToken: "", projectCode: "" }, { collection: "" });
+                expect(reporter['options'].environmentId).toBe(undefined);
+            });
+
+            it('should set environmental Id by reporter option - environmentalId', () => {
+                const reporter = new NewmanQaseReporter(new EventEmitter(), { apiToken: "", projectCode: "", environmentId: 5 }, { collection: "" });
+                expect(reporter['options'].environmentId).toBe(5);
+            });
+
+            it('should set environmental Id by environmental variable - QASE_ENVIRONMENT_ID', () => {
+                process.env.QASE_ENVIRONMENT_ID = '6';
+                const reporter = new NewmanQaseReporter(new EventEmitter(), { apiToken: "", projectCode: "" }, { collection: "" });
+                expect(reporter['options'].environmentId).toBe(6);
+            });
+        });
+    });
+
     describe('Auto Create Defect', () => {
         describe('known test cases', () => {
             const reporter = new NewmanQaseReporter(new EventEmitter(), { apiToken: "", projectCode: "" }, { collection: "" });
