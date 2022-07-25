@@ -84,5 +84,96 @@ describe('Client', () => {
                 expect(qReporter['resultsForPublishing'][index].defect).toBe(testData[index].defect);
             });
         }
-    })
+    });
+
+    describe('Auto create test case', () => {
+        const runner = new mocha.Runner(new mocha.Suite('new'), false)
+        let qReporter = new QaseCypressReporter(runner, { reporterOptions: { apiToken: "" } });
+        it('should use parent as root suite title', () => {
+            const test = {
+                parent: {
+                    title: 'Test Suite'
+                },
+                title: 'test 1',
+                status: 'passed',
+                duration: 1,
+                err: null,
+            };
+            qReporter['transformCaseResultToBulkObject'](test as any, test.status as any);
+            expect(qReporter['resultsForPublishing'][0]).toMatchObject({
+                case: {
+                    title: test.title,
+                    suite_title: 'Test Suite'
+                }
+            });
+        });
+
+        it('should account for nested test', () => {
+            const test = {
+                parent: {
+                    title: 'Level 1',
+                    parent: {
+                        title: 'Main Suite'
+                    }
+                },
+                title: 'test 1',
+                status: 'passed',
+                duration: 1,
+                err: null,
+            };
+            qReporter['transformCaseResultToBulkObject'](test as any, test.status as any);
+            expect(qReporter['resultsForPublishing'][1]).toMatchObject({
+                case: {
+                    title: test.title,
+                    suite_title: 'Main Suite\tLevel 1'
+                }
+            });
+        });
+
+        it('should use reporter rootSuiteTitle as top parent', () => {
+            qReporter = new QaseCypressReporter(runner, { reporterOptions: { apiToken: "", rootSuiteTitle: 'Top Parent' } });
+            const test = {
+                parent: {
+                    title: 'Level 1',
+                    parent: {
+                        title: 'Main Suite'
+                    }
+                },
+                title: 'test 1',
+                status: 'passed',
+                duration: 1,
+                err: null,
+            };
+            qReporter['transformCaseResultToBulkObject'](test as any, test.status as any);
+            expect(qReporter['resultsForPublishing'][0]).toMatchObject({
+                case: {
+                    title: test.title,
+                    suite_title: 'Top Parent\tMain Suite\tLevel 1'
+                }
+            });
+        });
+    });
+
+    describe('Options', () => {
+        describe('support for rootSuiteTitle', () => {
+            it('should set Root Suite Title to "" by default', () => {
+                const runner = new mocha.Runner(new mocha.Suite('new'), false)
+                const qReporter = new QaseCypressReporter(runner, { reporterOptions: { apiToken: "" } });
+                expect(qReporter['options'].rootSuiteTitle).toBe('');
+            });
+
+            it('should set Root Suite Title by reporter option - rootSuiteTitle', () => {
+                const runner = new mocha.Runner(new mocha.Suite('new'), false)
+                const qReporter = new QaseCypressReporter(runner, { reporterOptions: { apiToken: "", rootSuiteTitle: 'CY Test' } });
+                expect(qReporter['options'].rootSuiteTitle).toBe('CY Test');
+            });
+
+            it('should set Root Suite Title by environmental variable - QASE_ROOT_SUITE_TITLE', () => {
+                process.env.QASE_ROOT_SUITE_TITLE = 'CY Test ENV';
+                const runner = new mocha.Runner(new mocha.Suite('new'), false)
+                const qReporter = new QaseCypressReporter(runner, { reporterOptions: { apiToken: "" } });
+                expect(qReporter['options'].rootSuiteTitle).toBe('CY Test ENV');
+            });
+        });
+    });
 });
