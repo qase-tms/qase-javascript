@@ -7,5 +7,6 @@
   "environmentId": 1,
   "basePath": "https://api.qase.io/v1",
   "runId": 0,
-  "rootSuiteTitle": "CucumberJS tests"
+  "rootSuiteTitle": "CucumberJS tests",
+  "runComplete": true
 }

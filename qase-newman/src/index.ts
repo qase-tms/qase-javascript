@@ -57,6 +57,7 @@ interface BulkCaseObject {
     time_ms: number;
     stacktrace?: string;
     comment: string;
+    defect: boolean;
 }
 
 class NewmanQaseReporter {
@@ -77,7 +78,8 @@ class NewmanQaseReporter {
             _options.projectCode || this.getEnv(Envs.projectCode) || '';
         this.collectionOptions = collectionRunOptions;
         this.options.runComplete =
-            !!this.getEnv(Envs.runComplete) || this.options.runComplete;
+            !!this.getEnv(Envs.runComplete) || this.options.runComplete || false;
+        this.options.environmentId = Number(this.getEnv(Envs.environmentId)) || this.options.environmentId || undefined;
 
         this.api = new QaseApi(
             this.getEnv(Envs.apiToken) || this.options.apiToken || '',
@@ -258,6 +260,7 @@ class NewmanQaseReporter {
                     body: {
                         results: this.createBulkResultsBodyObject(),
                     },
+                    runComplete: this.options.runComplete,
                 };
 
                 spawnSync('node', [`${__dirname}/reportBulk.js`], {
@@ -326,6 +329,7 @@ class NewmanQaseReporter {
                 {
                     description: description || 'Newman automated run',
                     is_autotest: true,
+                    environment_id: this.options.environmentId,
                 }
             );
 
@@ -347,6 +351,7 @@ class NewmanQaseReporter {
         args?: {
             description?: string;
             is_autotest: boolean;
+            environment_id?: number;
         }
     ) {
         return {
@@ -412,6 +417,7 @@ class NewmanQaseReporter {
                     time_ms: test.duration,
                     stacktrace: test.err?.stack,
                     comment: test.err ? test.err.message : '',
+                    defect: test.result === ResultCreateStatusEnum.FAILED,
                 }));
                 return [
                     ...accum,
@@ -428,6 +434,7 @@ class NewmanQaseReporter {
                         time_ms: test.duration,
                         stacktrace: test.err?.stack,
                         comment: test.err ? test.err.message : '',
+                        defect: test.result === ResultCreateStatusEnum.FAILED,
                     },
                 ];
 

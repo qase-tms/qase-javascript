@@ -1,16 +1,16 @@
 /* eslint-disable camelcase */
 /* eslint-disable max-len */
 /* eslint-disable no-console,no-underscore-dangle,@typescript-eslint/no-non-null-assertion */
-import {IdResponse, ResultCreate, ResultCreateStatusEnum} from 'qaseio/dist/src';
+import { IdResponse, ResultCreate, ResultCreateStatusEnum } from 'qaseio/dist/src';
 import FormData from 'form-data';
-import {Formatter} from '@cucumber/cucumber';
-import {IFormatterOptions} from '@cucumber/cucumber/lib/formatter';
-import {QaseApi} from 'qaseio';
+import { Formatter } from '@cucumber/cucumber';
+import { IFormatterOptions } from '@cucumber/cucumber/lib/formatter';
+import { QaseApi } from 'qaseio';
 import chalk from 'chalk';
 import crypto from 'crypto';
-import {execSync} from 'child_process';
+import { execSync } from 'child_process';
 import fs from 'fs';
-import {io} from '@cucumber/messages/dist/src/messages';
+import { io } from '@cucumber/messages/dist/src/messages';
 import mime from 'mime-types';
 import moment from 'moment';
 import os from 'os';
@@ -31,6 +31,7 @@ interface Config {
     runName: string;
     runDescription?: string;
     logging: boolean;
+    runComplete?: boolean;
 }
 
 interface Test {
@@ -71,7 +72,7 @@ class CustomBoundaryFormData extends FormData {
 
 const loadJSON = (file: string): Config | undefined => {
     try {
-        const data = fs.readFileSync(file, {encoding: 'utf8'});
+        const data = fs.readFileSync(file, { encoding: 'utf8' });
 
         if (data) {
             return JSON.parse(data) as Config;
@@ -105,6 +106,7 @@ const prepareConfig = (options: Config = {} as Config, configFile = '.qaserc'): 
         runName: process.env.QASE_RUN_NAME || config.runName || 'Automated Run %DATE%',
         runDescription: process.env.QASE_RUN_DESCRIPTION || config.runDescription,
         logging: process.env.QASE_LOGGING !== '' || config.logging,
+        runComplete: process.env.QASE_RUN_COMPLETE === 'true' || config.runComplete || false,
     };
 };
 
@@ -117,7 +119,7 @@ const prepareReportName = (
 };
 
 const verifyConfig = (config: Config) => {
-    const {enabled, apiToken, projectCode} = config;
+    const { enabled, apiToken, projectCode } = config;
     if (enabled) {
         if (!projectCode) {
             console.log(chalk`{bold {blue qase:}} {red Project Code should be provided}`);
@@ -338,8 +340,13 @@ class QaseReporter extends Formatter {
             {
                 results: res,
             }
-        ).then(() => {
+        ).then(async () => {
             this._log(chalk`{gray Results sent}`);
+
+            if (this.config.runComplete) {
+                await this.api.runs.completeRun(this.config.projectCode, Number(this.config.runId));
+                this._log(chalk`{green Run completed}`);
+            }
         }).catch((err) => {
             this._log(err);
         });
@@ -356,7 +363,7 @@ class QaseReporter extends Formatter {
     }
 
     private _log(message?: any, ...optionalParams: any[]) {
-        if (this.config.logging){
+        if (this.config.logging) {
             console.log(chalk`{bold {blue qase:}} ${message}`, ...optionalParams);
         }
     }
@@ -453,7 +460,7 @@ class QaseReporter extends Formatter {
         }
     }
 
-    private addForSending(test: Test, status: ResultCreateStatusEnum){
+    private addForSending(test: Test, status: ResultCreateStatusEnum) {
         this.logTestItem(test.name, status);
 
         if (test.caseIds.length) {
@@ -480,6 +487,7 @@ class QaseReporter extends Formatter {
                 time: test.duration,
                 stacktrace: test.error,
                 comment: test.error ? test.error.split('\n')[0] : undefined,
+                defect: status === ResultCreateStatusEnum.FAILED,
             };
         });
     }
@@ -503,6 +511,7 @@ class QaseReporter extends Formatter {
             time: test.duration,
             stacktrace: test.error,
             comment: test.error ? test.error.split('\n')[0] : undefined,
+            defect: status === ResultCreateStatusEnum.FAILED,
         };
     }
 

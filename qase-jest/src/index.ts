@@ -330,6 +330,7 @@ class QaseReporter implements Reporter {
                 stacktrace: failureMessages.join('\n'),
                 comment: failureMessages.length > 0 ? failureMessages.map(
                     (value) => value.split('\n')[0]).join('\n') : undefined,
+                defect: Statuses[elem.status] === Statuses.failed,
             };
 
             // Verifies that the user defined the ID through the use of the 'qase' wrapper;
