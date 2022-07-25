@@ -78,7 +78,7 @@ class NewmanQaseReporter {
             _options.projectCode || this.getEnv(Envs.projectCode) || '';
         this.collectionOptions = collectionRunOptions;
         this.options.runComplete =
-            !!this.getEnv(Envs.runComplete) || this.options.runComplete;
+            !!this.getEnv(Envs.runComplete) || this.options.runComplete || false;
         this.options.environmentId = Number(this.getEnv(Envs.environmentId)) || this.options.environmentId || undefined;
 
         this.api = new QaseApi(
