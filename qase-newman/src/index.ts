@@ -78,7 +78,7 @@ class NewmanQaseReporter {
             _options.projectCode || this.getEnv(Envs.projectCode) || '';
         this.collectionOptions = collectionRunOptions;
         this.options.runComplete =
-            !!this.getEnv(Envs.runComplete) || this.options.runComplete;
+            !!this.getEnv(Envs.runComplete) || this.options.runComplete || false;
 
         this.api = new QaseApi(
             this.getEnv(Envs.apiToken) || this.options.apiToken || '',
@@ -259,6 +259,7 @@ class NewmanQaseReporter {
                     body: {
                         results: this.createBulkResultsBodyObject(),
                     },
+                    runComplete: this.options.runComplete,
                 };
 
                 spawnSync('node', [`${__dirname}/reportBulk.js`], {

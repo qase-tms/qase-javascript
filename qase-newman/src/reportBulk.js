@@ -21,6 +21,11 @@ const publishBulkResult = async () => {
             if (res.status === 200) {
                 console.log(chalk`{green Results are sent}`);
             }
+
+            if (config.runComplete) {
+                await api.runs.completeRun(config.code, config.runId);
+                console.log(chalk`{green Run completed}`);
+            }
         } catch (error) {
             console.log('Error till publishing', error);
         }

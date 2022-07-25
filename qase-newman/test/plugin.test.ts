@@ -7,6 +7,24 @@ describe('Tests', () => {
         new NewmanQaseReporter(new EventEmitter(), { apiToken: "", projectCode: "" }, { collection: "" });
     });
 
+    describe('runComplete option', () => {
+        it('should have runComplete option false by default', () => {
+            const reporter = new NewmanQaseReporter(new EventEmitter(), { apiToken: "", projectCode: "" }, { collection: "" });
+            expect(reporter['options'].runComplete).toBe(false);
+        });
+
+        it('should set runComplete from reporter options', () => {
+            const reporter = new NewmanQaseReporter(new EventEmitter(), { apiToken: "", projectCode: "", runComplete: true }, { collection: "" });
+            expect(reporter['options'].runComplete).toBe(true);
+        });
+
+        it('should set runComplete from environmental variable [QASE_RUN_COMPLETE=true]', () => {
+            process.env.QASE_RUN_COMPLETE = 'true';
+            const reporter = new NewmanQaseReporter(new EventEmitter(), { apiToken: "", projectCode: "" }, { collection: "" });
+            expect(reporter['options'].runComplete).toBe(true);
+        });
+    });
+
     describe('Auto Create Defect', () => {
         describe('known test cases', () => {
             const reporter = new NewmanQaseReporter(new EventEmitter(), { apiToken: "", projectCode: "" }, { collection: "" });
