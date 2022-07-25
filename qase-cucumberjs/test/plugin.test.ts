@@ -7,6 +7,24 @@ describe('Tests', () => {
         new Index({ parsedArgvOptions: {} } as unknown as IFormatterOptions);
     });
 
+    describe('runComplete option', () => {
+        it('should have runComplete option false by default', () => {
+            const qReporter = new Index({ parsedArgvOptions: {} } as unknown as IFormatterOptions);
+            expect(qReporter['config'].runComplete).toBe(false);
+        });
+
+        it('should set runComplete from reporter options', () => {
+            const qReporter = new Index({ parsedArgvOptions: { runComplete: true } } as unknown as IFormatterOptions);
+            expect(qReporter['config'].runComplete).toBe(true);
+        });
+
+        it('should set runComplete from environmental variable [QASE_RUN_COMPLETE=true]', () => {
+            process.env.QASE_RUN_COMPLETE = 'true';
+            const qReporter = new Index({ parsedArgvOptions: {} } as unknown as IFormatterOptions);
+            expect(qReporter['config'].runComplete).toBe(true);
+        });
+    });
+
     describe('Auto Create Defect', () => {
         const qReporter = new Index({ parsedArgvOptions: {} } as unknown as IFormatterOptions);
 
