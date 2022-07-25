@@ -7,21 +7,41 @@ describe('Tests', () => {
         new NewmanQaseReporter(new EventEmitter(), { apiToken: "", projectCode: "" }, { collection: "" });
     });
 
-    describe('runComplete option', () => {
-        it('should have runComplete option false by default', () => {
-            const reporter = new NewmanQaseReporter(new EventEmitter(), { apiToken: "", projectCode: "" }, { collection: "" });
-            expect(reporter['options'].runComplete).toBe(false);
+    describe('Options', () => {
+        describe('Support Optional Environmental ID', () => {
+            it('should set environmental Id to undefined by default', () => {
+                const reporter = new NewmanQaseReporter(new EventEmitter(), { apiToken: "", projectCode: "" }, { collection: "" });
+                expect(reporter['options'].environmentId).toBe(undefined);
+            });
+
+            it('should set environmental Id by reporter option - environmentalId', () => {
+                const reporter = new NewmanQaseReporter(new EventEmitter(), { apiToken: "", projectCode: "", environmentId: 5 }, { collection: "" });
+                expect(reporter['options'].environmentId).toBe(5);
+            });
+
+            it('should set environmental Id by environmental variable - QASE_ENVIRONMENT_ID', () => {
+                process.env.QASE_ENVIRONMENT_ID = '6';
+                const reporter = new NewmanQaseReporter(new EventEmitter(), { apiToken: "", projectCode: "" }, { collection: "" });
+                expect(reporter['options'].environmentId).toBe(6);
+            });
         });
 
-        it('should set runComplete from reporter options', () => {
-            const reporter = new NewmanQaseReporter(new EventEmitter(), { apiToken: "", projectCode: "", runComplete: true }, { collection: "" });
-            expect(reporter['options'].runComplete).toBe(true);
-        });
+        describe('Support Optional Run Complete Option', () => {
+            it('should have runComplete option false by default', () => {
+                const reporter = new NewmanQaseReporter(new EventEmitter(), { apiToken: "", projectCode: "" }, { collection: "" });
+                expect(reporter['options'].runComplete).toBe(false);
+            });
 
-        it('should set runComplete from environmental variable [QASE_RUN_COMPLETE=true]', () => {
-            process.env.QASE_RUN_COMPLETE = 'true';
-            const reporter = new NewmanQaseReporter(new EventEmitter(), { apiToken: "", projectCode: "" }, { collection: "" });
-            expect(reporter['options'].runComplete).toBe(true);
+            it('should set runComplete from reporter options', () => {
+                const reporter = new NewmanQaseReporter(new EventEmitter(), { apiToken: "", projectCode: "", runComplete: true }, { collection: "" });
+                expect(reporter['options'].runComplete).toBe(true);
+            });
+
+            it('should set runComplete from environmental variable [QASE_RUN_COMPLETE=true]', () => {
+                process.env.QASE_RUN_COMPLETE = 'true';
+                const reporter = new NewmanQaseReporter(new EventEmitter(), { apiToken: "", projectCode: "" }, { collection: "" });
+                expect(reporter['options'].runComplete).toBe(true);
+            });
         });
     });
 
@@ -76,6 +96,7 @@ describe('Tests', () => {
                 });
             }
         });
+
         describe('unknown test cases', () => {
             const reporter = new NewmanQaseReporter(new EventEmitter(), { apiToken: "", projectCode: "" }, { collection: "" });
             const tests = [
