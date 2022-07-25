@@ -260,6 +260,7 @@ class NewmanQaseReporter {
                     body: {
                         results: this.createBulkResultsBodyObject(),
                     },
+                    runComplete: this.options.runComplete,
                 };
 
                 spawnSync('node', [`${__dirname}/reportBulk.js`], {

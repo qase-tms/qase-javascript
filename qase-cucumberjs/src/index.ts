@@ -31,6 +31,7 @@ interface Config {
     runName: string;
     runDescription?: string;
     logging: boolean;
+    runComplete?: boolean;
 }
 
 interface Test {
@@ -105,6 +106,7 @@ const prepareConfig = (options: Config = {} as Config, configFile = '.qaserc'): 
         runName: process.env.QASE_RUN_NAME || config.runName || 'Automated Run %DATE%',
         runDescription: process.env.QASE_RUN_DESCRIPTION || config.runDescription,
         logging: process.env.QASE_LOGGING !== '' || config.logging,
+        runComplete: process.env.QASE_RUN_COMPLETE === 'true' || config.runComplete || false,
     };
 };
 
@@ -338,8 +340,13 @@ class QaseReporter extends Formatter {
             {
                 results: res,
             }
-        ).then(() => {
+        ).then(async () => {
             this._log(chalk`{gray Results sent}`);
+
+            if (this.config.runComplete) {
+                await this.api.runs.completeRun(this.config.projectCode, Number(this.config.runId));
+                this._log(chalk`{green Run completed}`);
+            }
         }).catch((err) => {
             this._log(err);
         });

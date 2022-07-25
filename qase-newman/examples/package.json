@@ -1,16 +1,16 @@
 {
-    "name": "example",
-    "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
-    "scripts": {
-        "test": "newman run ./sample-collection.json -r qase --reporter-qase-logging --reporter-qase-projectCode project_code --reporter-qase-apiToken api_key --reporter-qase-rootSuiteTitle 'Newman tests'"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "devDependencies": {
-        "newman": "^5.3.0",
-        "newman-reporter-qase": "../"
-    }
+  "name": "example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "newman run ./sample-collection.json -r qase --reporter-qase-logging --reporter-qase-projectCode project_code --reporter-qase-apiToken api_key --reporter-qase-rootSuiteTitle 'Newman tests' --reporter-qase-runComplete"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "newman": "^5.3.0",
+    "newman-reporter-qase": "../"
+  }
 }
