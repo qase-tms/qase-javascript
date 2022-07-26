@@ -14,7 +14,7 @@ describe('My First Test', () => {
         cy.visit('https://example.cypress.io');
 
         cy.contains('type').click();
-        
+
         // Should be on a new URL which includes '/commands/actions'
         cy.url().should('include', '/commands/actions');
         // Get an input, type into it and verify that the value has been updated
@@ -36,4 +36,24 @@ describe('My First Test', () => {
             .type('fake@email.com')
             .should('have.value', 'unexpected@email.com');
     }));
+
+    it('Go to utilities', () => {
+        cy.visit('https://example.cypress.io');
+
+        cy.contains('Utilities').click();
+
+        // Should be on a new URL which includes 'utilities'
+        cy.url().should('include', 'utilities');
+    });
+
+    describe('Test Suite - Level 2', () => {
+        it('Go to Cypress API', () => {
+            cy.visit('https://example.cypress.io');
+
+            cy.contains('Cypress API').click();
+
+            // Should be on a new URL which includes 'utilities'
+            cy.url().should('include', 'cypress-api');
+        });
+    });
 });

@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable camelcase */
 /* eslint-disable @typescript-eslint/unbound-method */
-import { IdResponse, ResultCreateStatusEnum } from 'qaseio/dist/src';
+import { IdResponse, ResultCreate, ResultCreateStatusEnum } from 'qaseio/dist/src';
 import { MochaOptions, Runner, Test, reporters } from 'mocha';
 import { execSync, spawnSync } from 'child_process';
 import { QaseApi } from 'qaseio';
@@ -23,6 +23,7 @@ enum Envs {
     screenshotFolder = 'QASE_SCREENSHOT_FOLDER',
     sendScreenshot = 'QASE_SCREENSHOT_SENDING',
     runComplete = 'QASE_RUN_COMPLETE',
+    rootSuiteTitle = 'QASE_ROOT_SUITE_TITLE',
 }
 
 interface QaseOptions {
@@ -36,15 +37,7 @@ interface QaseOptions {
     screenshotFolder?: string;
     sendScreenshot?: boolean;
     runComplete?: boolean;
-}
-
-interface BulkCaseObject {
-    case_id: number;
-    status: ResultCreateStatusEnum;
-    time_ms: number;
-    stacktrace?: string;
-    comment: string;
-    defect: boolean;
+    rootSuiteTitle?: string;
 }
 
 class CypressQaseReporter extends reporters.Base {
@@ -60,12 +53,15 @@ class CypressQaseReporter extends reporters.Base {
     private options: QaseOptions;
     private runId?: number | string;
     private isDisabled = false;
-    private resultsForPublishing: BulkCaseObject[] = [];
+    private resultsForPublishing: ResultCreate[] = [];
 
     public constructor(runner: Runner, options: MochaOptions) {
         super(runner, options);
 
         this.options = options.reporterOptions as QaseOptions;
+        this.options.rootSuiteTitle = CypressQaseReporter.getEnv(Envs.rootSuiteTitle) ||
+            options.reporterOptions.rootSuiteTitle
+            || '';
         this.api = new QaseApi(
             this.options.apiToken || CypressQaseReporter.getEnv(Envs.apiToken) || '',
             CypressQaseReporter.getEnv(Envs.basePath) || this.options.basePath,
@@ -171,6 +167,19 @@ class CypressQaseReporter extends reporters.Base {
             'X-Client': xClientHeader,
             'X-Platform': xPlatformHeader,
         };
+    }
+
+    private static getSuitePath(suite): string {
+        if (suite.parent) {
+            const parentSuite = String(CypressQaseReporter.getSuitePath(suite.parent));
+            if (parentSuite) {
+                return parentSuite + '\t' + String(suite?.title);
+            } else {
+                return String(suite?.title);
+            }
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return suite.title;
     }
 
     private static getPackageVersion(name: string) {
@@ -352,19 +361,33 @@ class CypressQaseReporter extends reporters.Base {
         this.logTestItem(test);
         const caseIds = CypressQaseReporter.getCaseId(test);
 
-        caseIds.forEach((caseId) => {
-            if (caseId) {
-                const caseResultBulkObject = {
-                    status,
-                    case_id: caseId,
-                    time_ms: test.duration || 0,
-                    stacktrace: test.err?.stack,
-                    comment: test.err ? `${test.err.name}: ${test.err.message}` : '',
-                    defect: status === ResultCreateStatusEnum.FAILED,
-                };
-                this.resultsForPublishing.push(caseResultBulkObject);
-            }
-        });
+        const caseObject: ResultCreate = {
+            status,
+            time_ms: test.duration || 0,
+            stacktrace: test.err?.stack,
+            comment: test.err ? `${test.err.name}: ${test.err.message}` : '',
+            defect: status === ResultCreateStatusEnum.FAILED,
+        };
+
+        if (caseIds.length === 0) {
+            caseObject.case = {
+                title: test.title,
+                suite_title: this.options.rootSuiteTitle
+                    ? `${this.options.rootSuiteTitle}\t${CypressQaseReporter.getSuitePath(test.parent)}`
+                    : CypressQaseReporter.getSuitePath(test.parent),
+            };
+            this.resultsForPublishing.push(caseObject);
+            this.log(
+                chalk`{gray Result prepared for publish: ${test.title} }`
+            );
+        } else {
+            caseIds.forEach((caseId) => {
+                const caseObjectWithId = { case_id: caseId, ...caseObject };
+                this.resultsForPublishing.push(caseObjectWithId);
+            });
+        }
+
+
     }
 }
 
