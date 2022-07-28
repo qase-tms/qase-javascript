@@ -303,7 +303,7 @@ class PlaywrightReporter implements Reporter {
     }
 
     private getParameterizedData(test: TestCase): ParameterizedTestData {
-        const regexp = /\(Qase Dataset: (#\d) (\(.*\))\)/;
+        const regexp = /\(Qase Dataset: (#\d+) (\(.*\))\)/;
         const results = regexp.exec(test.title) || [];
         if (results?.length > 0) {
             return {
@@ -315,7 +315,7 @@ class PlaywrightReporter implements Reporter {
     }
 
     private removeQaseDataset(title: string): string {
-        const regexp = /\(Qase Dataset: (#\d) (\(.*\))\)/;
+        const regexp = /\(Qase Dataset: (#\d+) (\(.*\))\)/;
         return title.replace(regexp, '');
     }
 
