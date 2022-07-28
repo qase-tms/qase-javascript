@@ -54,6 +54,11 @@ interface PreparedForReportingTestCase {
     caseIds?: number[];
 }
 
+interface ParameterizedTestData {
+    id: string;
+    dataset: string;
+}
+
 const alwaysUndefined = () => undefined;
 
 class QaseReporter implements Reporter {
@@ -319,18 +324,57 @@ class QaseReporter implements Reporter {
 
     }
 
+
+    private getParameterizedData(title: string): ParameterizedTestData {
+        const regexp = /\(Qase Dataset: (#\d+) (\(.*\))\)/;
+        const results = regexp.exec(title) || [];
+        if (results?.length > 0) {
+            return {
+                id: results[1],
+                dataset: results[2],
+            };
+        }
+        return undefined as unknown as ParameterizedTestData;
+    }
+
+
+    private removeQaseDataset(title: string): string {
+        const regexp = /\(Qase Dataset: (#\d+) (\(.*\))\)/;
+        return title.replace(regexp, '');
+    }
+
+
+    private formatComment(title: string, error: [string], parameterizedData: ParameterizedTestData): string {
+        let comment = `${parameterizedData ? this.removeQaseDataset(title) : title}`.trim();
+        const failureMessages = error.map((value) => value.split('\n')[0]).join('\n');
+
+        if (parameterizedData) {
+            comment += `::_using data set ${parameterizedData.id} 
+            ${parameterizedData.dataset}_ \n\n\n>${failureMessages}`;
+        } else {
+            comment += `: ${failureMessages}`;
+        }
+
+        return comment;
+    }
+
     private createResultCasesArray() {
         return this.preparedTestCases.map((elem) => {
             const failureMessages = elem.failureMessages.map((value) =>
                 value.replace(/\u001b\[.*?m/g, ''));
+            const parameterizedData = this.getParameterizedData(elem.title);
             const caseObject: ResultCreate = {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 status: Statuses[elem.status] || Statuses.failed,
                 time_ms: Number(elem.duration),
                 stacktrace: failureMessages.join('\n'),
-                comment: failureMessages.length > 0 ? failureMessages.map(
-                    (value) => value.split('\n')[0]).join('\n') : undefined,
+                comment: failureMessages.length > 0
+                    ? this.formatComment(elem.title, failureMessages as [string], parameterizedData)
+                    : undefined,
                 defect: Statuses[elem.status] === Statuses.failed,
+                param: parameterizedData
+                    ? { jest: parameterizedData.id }
+                    : undefined,
             };
 
             // Verifies that the user defined the ID through the use of the 'qase' wrapper;
@@ -338,7 +382,7 @@ class QaseReporter implements Reporter {
                 caseObject.case_id = elem.caseIds[0];
             } else {
                 caseObject.case = {
-                    title: elem.title,
+                    title: this.removeQaseDataset(elem.title),
                     suite_title: elem.path,
                 };
             }

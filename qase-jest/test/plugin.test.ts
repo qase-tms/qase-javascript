@@ -141,4 +141,14 @@ describe('Client', () => {
             };
         });
     });
+
+    // describe("Parameterized", () => {
+
+    //     const add = (a, b) => a + b;
+
+    //     const cases = [[1, 1, 2], [1, 2, 3], [1, 3, 4], [1, 4, 5], [1, 5, 6], [1, 6, 7], [1, 7, 8], [1, 8, 9], [1, 9, 10]];
+    //     it.each(cases)(`%i + %i = %i`, (a, b, expected) => {
+    //         expect(add(a, b)).toBe(expected);
+    //     });
+    // });
 });
