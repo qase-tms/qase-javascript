@@ -7,7 +7,7 @@ import {
     ResultCreateStatusEnum,
 } from 'qaseio/dist/src';
 
-import { Reporter, TestCase, TestResult } from '@playwright/test/reporter';
+import { Reporter, TestCase, TestError, TestResult } from '@playwright/test/reporter';
 import { createReadStream, readFileSync } from 'fs';
 import FormData from 'form-data';
 import { QaseApi } from 'qaseio';
@@ -48,6 +48,11 @@ interface QaseOptions {
     runComplete?: boolean;
     environmentId?: number;
     uploadAttachments?: boolean;
+}
+
+interface ParameterizedTestData {
+    id: number | string;
+    dataset: string | Object;
 }
 
 let customBoundary = '----------------------------';
@@ -297,6 +302,23 @@ class PlaywrightReporter implements Reporter {
         return [];
     }
 
+    private getParameterizedData(test: TestCase): ParameterizedTestData {
+        const regexp = /\(Qase Dataset: (#\d) (\(.*\))\)/;
+        const results = regexp.exec(test.title) || [];
+        if (results?.length > 0) {
+            return {
+                id: results[1],
+                dataset: results[2],
+            };
+        }
+        return undefined as unknown as ParameterizedTestData;
+    }
+
+    private removeQaseDataset(title: string): string {
+        const regexp = /\(Qase Dataset: (#\d) (\(.*\))\)/;
+        return title.replace(regexp, '');
+    }
+
     private logTestItem(test: TestCase, testResult: TestResult) {
         const map = {
             failed: chalk`{red Test ${test.title} ${testResult.status}}`,
@@ -396,25 +418,43 @@ class PlaywrightReporter implements Reporter {
         }
     }
 
+    private formatComment(title: string, error: TestError, parameterizedData: ParameterizedTestData): string {
+        let comment = `${parameterizedData ? this.removeQaseDataset(title) : title}`.trim();
+
+        if (parameterizedData) {
+            comment += `::_using data set ${parameterizedData.id as string} ${parameterizedData.dataset as string}_ \n\n\n>${error?.message?.replace(/\u001b\[.*?m/g, '') as string}`;
+        } else {
+            comment += `: ${error?.message?.replace(/\u001b\[.*?m/g, '') as string}`;
+        }
+
+        return comment;
+    }
+
     private prepareCaseResult(test: TestCase, testResult: TestResult, attachments: any[]) {
         this.queued--;
         this.logTestItem(test, testResult);
         const caseIds = this.getCaseIds(test);
+        const parameterizedData = this.getParameterizedData(test);
         const caseObject: ResultCreate = {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             status: Statuses[testResult.status] || Statuses.failed,
             time_ms: testResult.duration,
             stacktrace: testResult.error?.stack?.replace(/\u001b\[.*?m/g, ''),
-            comment: testResult.error ? `${test.title}: ${testResult.error?.message?.replace(/\u001b\[.*?m/g, '') as string}` : undefined,
+            comment: testResult.error
+                ? this.formatComment(test.title, testResult.error, parameterizedData)
+                : undefined,
             attachments: attachments.length > 0
                 ? attachments
                 : undefined,
             defect: Statuses[testResult.status] === Statuses.failed,
+            param: parameterizedData
+                ? { playwright: String(parameterizedData.id) }
+                : undefined,
         };
 
         if (caseIds.length === 0) {
             caseObject.case = {
-                title: test.title,
+                title: parameterizedData ? this.removeQaseDataset(test.title) : test.title,
                 suite_title: this.options.rootSuiteTitle
                     ? `${this.options.rootSuiteTitle}\t${PlaywrightReporter.getSuitePath(test.parent)}`
                     : PlaywrightReporter.getSuitePath(test.parent),
