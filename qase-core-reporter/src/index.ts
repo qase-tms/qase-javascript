@@ -1,14 +1,24 @@
-import { QaseApi } from 'qaseio';
+/* eslint-disable no-console */
+/* eslint-disable camelcase */
+/* eslint-disable sort-imports */
+/* eslint-disable @typescript-eslint/unbound-method */
+import {
+    createReadStream,
+    lstatSync,
+    readFileSync,
+    readdirSync,
+} from 'fs';
+import chalk from 'chalk';
 import crypto from 'crypto';
+import { execSync } from 'child_process';
+import { join } from 'path';
+import { QaseApi } from 'qaseio';
 import {
     IdResponse,
     ResultCreate,
     ResultCreateStatusEnum,
 } from 'qaseio/dist/src';
-import chalk from 'chalk';
-import { execSync } from 'child_process';
-import { readFileSync, createReadStream, readdirSync, lstatSync } from 'fs';
-import { join } from 'path';
+
 
 enum Envs {
     report = 'QASE_REPORT',
@@ -48,7 +58,7 @@ interface QaseOptions {
         reporterName: string;
         screenshotFolder?: string;
         sendScreenshot?: boolean;
-    }
+    };
 }
 
 interface TestResult {
@@ -57,7 +67,7 @@ interface TestResult {
     error?: Error;
     stacktrace?: string;
     duration?: number;
-    parent?: string;
+    parent?: TestResult | string;
 }
 
 
@@ -66,13 +76,14 @@ interface ParameterizedTestData {
     dataset: string;
 }
 
-interface FilePathByCaseId {
-    caseId: {
-        caseId: string;
-        file: string[];
-    }
+interface File {
+    caseId: string;
+    file: string[];
 }
 
+interface FilePathByCaseId {
+    caseId: File;
+}
 
 let customBoundary = '----------------------------';
 crypto.randomBytes(24).forEach((value) => {
@@ -93,6 +104,7 @@ const REGEX_QASE_DATASET = /\(Qase Dataset: (#\d) (\(.*\))\)/;
 const REGEX_QASE_ID = /\(Qase ID: (#\d)\)/;
 
 class QaseCoreReporter {
+    public static reporterPrettyName = 'Qase Core';
     private api: QaseApi;
     private options: QaseOptions;
     private pending: Array<(runId: string | number) => void> = [];
@@ -100,7 +112,6 @@ class QaseCoreReporter {
     private isDisabled = false;
     private resultsForPublishingCount = 0;
     private resultsForPublishing: ResultCreate[] = [];
-    static reporterPrettyName: string = 'Qase Core';
 
     public constructor(_: Record<string, unknown>, _options: QaseOptions) {
         this.options = _options;
@@ -127,6 +138,119 @@ class QaseCoreReporter {
             this.isDisabled = true;
             return;
         }
+    }
+
+    private static getSuitePath(suite: TestResult): string {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        if (suite.parent) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            const parentSuite = String(QaseCoreReporter.getSuitePath(suite.parent as TestResult));
+            if (parentSuite) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                return parentSuite + '\t' + String(suite.title);
+            } else {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                return String(suite.title);
+            }
+        }
+        return suite.title;
+    }
+
+    private static removeQaseDataset(title: string): string {
+        return title.replace(REGEX_QASE_DATASET, '');
+    }
+
+    private static getCaseIds(title: string): number[] {
+        const results = REGEX_QASE_ID.exec(title);
+        if (results && results.length === 3) {
+            return results[2].split(',').map((value) => Number.parseInt(value, 10));
+        }
+        return [];
+    }
+
+    private static getParameterizedData(title: string): ParameterizedTestData {
+        const results = REGEX_QASE_DATASET.exec(title) || [];
+        if (results?.length > 0) {
+            return {
+                id: results[1],
+                dataset: results[2],
+            };
+        }
+        return undefined as unknown as ParameterizedTestData;
+    }
+
+    private static createHeaders({ frameworkName, reporterName }: { frameworkName?: string; reporterName?: string }) {
+        const { version: nodeVersion, platform: os, arch } = process;
+        const npmVersion = execSync('npm -v', { encoding: 'utf8' }).replace(/['"\n]+/g, '');
+        const qaseapiVersion = QaseCoreReporter.getPackageVersion('qaseio');
+        const frameworkVersion = QaseCoreReporter.getPackageVersion(frameworkName);
+        const reporterVersion = QaseCoreReporter.getPackageVersion(reporterName);
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        const xPlatformHeader = `node=${nodeVersion}; npm=${npmVersion}; os=${os}; arch=${arch}`;
+        const fv = frameworkVersion && frameworkName ? `${frameworkName}=${frameworkVersion};` : '';
+        const rv = reporterVersion && reporterName ? `${reporterName}=${reporterVersion};` : '';
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        const xClientHeader = `${fv}; ${rv}; qaseapi=${qaseapiVersion as string}`;
+
+        return {
+            'X-Client': xClientHeader,
+            'X-Platform': xPlatformHeader,
+        };
+    }
+
+    private static getPackageVersion(name: string | undefined) {
+        const UNDEFINED = 'undefined';
+        try {
+            const pathToPackageJson = require.resolve(`${name || ''}/package.json`, { paths: [process.cwd()] });
+            if (pathToPackageJson) {
+                try {
+                    const packageString = readFileSync(pathToPackageJson, { encoding: 'utf8' });
+                    if (packageString) {
+                        const packageObject = JSON.parse(packageString) as { version: string };
+                        return packageObject.version;
+                    }
+                    return UNDEFINED;
+                } catch (error) {
+                    return UNDEFINED;
+                }
+            }
+        } catch (error) {
+            return UNDEFINED;
+        }
+    }
+
+    private static getFiles = (pathToFile: string) => {
+        const files: string[] = [];
+        for (const file of readdirSync(pathToFile)) {
+            const fullPath = `${pathToFile}/${file}`;
+
+            if (lstatSync(fullPath).isDirectory()) {
+                QaseCoreReporter.getFiles(fullPath).forEach((x) => files.push(`${file}/${x}`));
+            } else {
+                files.push(file);
+            }
+        }
+        return files;
+    };
+
+    private static getEnv(name: Envs) {
+        return process.env[name];
+    }
+
+    private static createRunObject(
+        name: string,
+        cases: number[],
+        args?: {
+            description?: string;
+            environment_id: number | undefined;
+            is_autotest: boolean;
+        }
+    ) {
+        return {
+            title: name,
+            cases,
+            ...args,
+        };
     }
 
     public async start(): Promise<void> {
@@ -221,11 +345,12 @@ class QaseCoreReporter {
                 const filePathByCaseIdMap = this.parseScreenshotDirectory();
 
                 if (filePathByCaseIdMap) {
-                    const filesMap = Object.values(filePathByCaseIdMap);
+                    const filesMap: File[] = Object.values(filePathByCaseIdMap) as File[];
                     const uploadAttachmentsPromisesArray = filesMap.map(async (failedCase) => {
                         const caseId = failedCase.caseId;
 
-                        const pathToFile = `${this.options.qaseCoreReporterOptions.screenshotFolder}/${failedCase.file[0]}`;
+                        const folder = this.options.qaseCoreReporterOptions.screenshotFolder || '';
+                        const pathToFile = `${folder}/${failedCase.file[0]}`;
 
                         const data = createReadStream(pathToFile);
 
@@ -261,7 +386,7 @@ class QaseCoreReporter {
                     }, {} as Record<string, unknown>);
                 }
             } catch (error) {
-                console.log(chalk`{red Error during sending screenshots ${error}}`);
+                this.log(chalk`{red Error during sending screenshots ${error}}`);
             }
         }
 
@@ -316,77 +441,14 @@ class QaseCoreReporter {
 
     }
 
-    public addTestResult(test: TestResult, status: ResultCreateStatusEnum) {
+    public addTestResult(test: TestResult, status: ResultCreateStatusEnum): void {
         this.transformTestToResultCreateObject(test, status);
     }
 
-    private logTestItem(test: TestResult) {
-        const map = {
-            failed: chalk`{red Test ${test.title} ${test.status}}`,
-            passed: chalk`{green Test ${test.title} ${test.status}}`,
-            pending: chalk`{blueBright Test ${test.title} ${test.status}}`,
-            skipped: chalk`{blueBright Test ${test.title} ${test.status}}`,
-            disabled: chalk`{grey Test ${test.title} ${test.status}}`,
-            in_process: chalk`{yellowBright Test ${test.title} ${test.status}}`,
-            invalid: chalk`{yellowBright Test ${test.title} ${test.status}}`,
-        };
-        if (test.status) {
-            this.log(map[test.status]);
-        }
-    }
-
-    private formatComment(title: string, error: Error, parameterizedData: ParameterizedTestData): string {
-        let comment = `${parameterizedData ? QaseCoreReporter.removeQaseDataset(title) : title}`.trim();
-
-        if (parameterizedData) {
-            comment += `::_using data set ${parameterizedData.id as string} ${parameterizedData.dataset as string}_ \n\n\n>${error?.message?.replace(/\u001b\[.*?m/g, '') as string}`;
-        } else {
-            comment += `: ${error?.message?.replace(/\u001b\[.*?m/g, '') as string}`;
-        }
-
-        return comment;
-    }
-
-    private transformTestToResultCreateObject(testResult: TestResult, status: ResultCreateStatusEnum, attachments?: any[]) {
-        this.resultsForPublishingCount++;
-        this.logTestItem(testResult);
-        const caseIds = QaseCoreReporter.getCaseIds(testResult.title);
-        const parameterizedData = QaseCoreReporter.getParameterizedData(testResult.title);
-
-        const caseObject: ResultCreate = {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            status: Statuses[testResult.status] || Statuses.failed,
-            time_ms: testResult.duration || 0,
-            stacktrace: testResult.error?.stack?.replace(/\u001b\[.*?m/g, ''),
-            comment: testResult.error
-                ? this.formatComment(testResult.title, testResult.error, parameterizedData)
-                : undefined,
-            attachments: attachments && attachments.length > 0
-                ? attachments
-                : undefined,
-            defect: Statuses[testResult.status] === Statuses.failed,
-            param: parameterizedData
-                ? { [this.options.qaseCoreReporterOptions.frameworkName]: String(parameterizedData.id) }
-                : undefined,
-        };
-
-        // known test cases
-        caseIds.forEach((caseId) => {
-            if (caseId) {
-                const createResultObject = {
-                    case_id: caseId,
-                    ...caseObject,
-                };
-                this.resultsForPublishing.push(createResultObject);
-            }
-        });
-    }
-
-
-    public async uploadAttachments(attachments: any[]) {
+    public async uploadAttachments(attachments: Array<{ path: string }>): Promise<string[]> {
         return await Promise.all(
             attachments.map(async (attachment) => {
-                const data = createReadStream(attachment?.path as string);
+                const data = createReadStream(attachment?.path);
 
                 const options = {
                     headers: {
@@ -404,6 +466,82 @@ class QaseCoreReporter {
                 return (response.data.result?.[0].hash as string);
             })
         );
+    }
+
+    private logTestItem(test: TestResult) {
+        const map = {
+            failed: chalk`{red Test ${test.title} ${test.status}}`,
+            passed: chalk`{green Test ${test.title} ${test.status}}`,
+            pending: chalk`{blueBright Test ${test.title} ${test.status}}`,
+            skipped: chalk`{blueBright Test ${test.title} ${test.status}}`,
+            disabled: chalk`{grey Test ${test.title} ${test.status}}`,
+            in_process: chalk`{yellowBright Test ${test.title} ${test.status}}`,
+            invalid: chalk`{yellowBright Test ${test.title} ${test.status}}`,
+        };
+        if (test.status) {
+            this.log(map[test.status]);
+        }
+    }
+
+
+    private transformTestToResultCreateObject(testResult: TestResult,
+        // eslint-disable-next-line @typescript-eslint/indent
+        status: ResultCreateStatusEnum,
+        // eslint-disable-next-line @typescript-eslint/indent
+        attachments?: any[]) {
+        this.resultsForPublishingCount++;
+        this.logTestItem(testResult);
+        const caseIds = QaseCoreReporter.getCaseIds(testResult.title);
+        const parameterizedData = QaseCoreReporter.getParameterizedData(testResult.title);
+
+        const caseObject: ResultCreate = {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            status: Statuses[status] || Statuses.failed,
+            time_ms: testResult.duration || 0,
+            stacktrace: testResult.error?.stack?.replace(/\u001b\[.*?m/g, ''),
+            comment: testResult.error
+                ? this.formatComment(testResult.title, testResult.error, parameterizedData)
+                : undefined,
+            attachments: attachments && attachments.length > 0
+                ? attachments
+                : undefined,
+            defect: Statuses[status] === Statuses.failed,
+            param: parameterizedData
+                ? { [this.options.qaseCoreReporterOptions.frameworkName]: String(parameterizedData.id) }
+                : undefined,
+        };
+
+        if (caseIds.length === 0) {
+            const suitePath = QaseCoreReporter.getSuitePath(testResult.parent as TestResult);
+            caseObject.case = {
+                title: testResult.title,
+                suite_title: this.options.rootSuiteTitle
+                    ? `${this.options.rootSuiteTitle}\t${suitePath}`
+                    : suitePath,
+            };
+            this.resultsForPublishing.push(caseObject);
+            this.log(
+                chalk`{gray Result prepared for publish: ${testResult.title} }`
+            );
+        } else {
+            caseIds.forEach((caseId) => {
+                const caseObjectWithId = { case_id: caseId, ...caseObject };
+                this.resultsForPublishing.push(caseObjectWithId);
+            });
+        }
+    }
+
+    private formatComment(title: string, error: Error, parameterizedData: ParameterizedTestData): string {
+        let comment = `${parameterizedData ? QaseCoreReporter.removeQaseDataset(title) : title}`.trim();
+
+        if (parameterizedData) {
+            comment += `::_using data set ${parameterizedData.id} ${parameterizedData.dataset}_
+            \n\n>${error?.message?.replace(/\u001b\[.*?m/g, '')}`;
+        } else {
+            comment += `: ${error?.message?.replace(/\u001b\[.*?m/g, '')}`;
+        }
+
+        return comment;
     }
 
     private async checkProject(
@@ -451,7 +589,8 @@ class QaseCoreReporter {
     ): Promise<void> {
         try {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const environmentId = Number.parseInt(QaseCoreReporter.getEnv(Envs.environmentId)!, 10) || this.options.environmentId;
+            const environmentId = Number.parseInt(QaseCoreReporter.getEnv(Envs.environmentId)!, 10)
+                || this.options.environmentId;
 
             const runObject = QaseCoreReporter.createRunObject(
                 name || `Automated run ${new Date().toISOString()}`,
@@ -471,26 +610,6 @@ class QaseCoreReporter {
             this.log(`Error on creating run ${err as string}`);
             this.isDisabled = true;
         }
-    }
-
-    private static createRunObject(
-        name: string,
-        cases: number[],
-        args?: {
-            description?: string;
-            environment_id: number | undefined;
-            is_autotest: boolean;
-        }
-    ) {
-        return {
-            title: name,
-            cases,
-            ...args,
-        };
-    }
-
-    private static getEnv(name: Envs) {
-        return process.env[name];
     }
 
     private log(message?: any, ...optionalParams: any[]) {
@@ -513,22 +632,8 @@ class QaseCoreReporter {
         }
     }
 
-    private static getFiles = (pathToFile) => {
-        const files: string[] = [];
-        for (const file of readdirSync(pathToFile)) {
-            const fullPath = `${pathToFile}/${file}`;
-
-            if (lstatSync(fullPath).isDirectory()) {
-                QaseCoreReporter.getFiles(fullPath).forEach((x) => files.push(`${file}/${x}`));
-            } else {
-                files.push(file);
-            }
-        }
-        return files;
-    };
-
     private parseScreenshotDirectory = () => {
-        const pathToScreenshotDir = join(process.cwd(), this.options.qaseCoreReporterOptions.screenshotDirectory || '');
+        const pathToScreenshotDir = join(process.cwd(), this.options.qaseCoreReporterOptions.screenshotFolder || '');
         const files = QaseCoreReporter.getFiles(pathToScreenshotDir);
         const filePathByCaseIdMap = {};
 
@@ -551,65 +656,6 @@ class QaseCoreReporter {
 
         return filePathByCaseIdMap as FilePathByCaseId;
     };
-
-    private static removeQaseDataset(title: string): string {
-        return title.replace(REGEX_QASE_DATASET, '');
-    }
-
-    private static getCaseIds(title: string): number[] {
-        const results = REGEX_QASE_ID.exec(title);
-        if (results && results.length === 3) {
-            return results[2].split(',').map((value) => Number.parseInt(value, 10));
-        }
-        return [];
-    }
-
-    private static getParameterizedData(title: string): ParameterizedTestData {
-        const results = REGEX_QASE_DATASET.exec(title) || [];
-        if (results?.length > 0) {
-            return {
-                id: results[1],
-                dataset: results[2],
-            };
-        }
-        return undefined as unknown as ParameterizedTestData;
-    }
-
-    private static createHeaders({ frameworkName, reporterName }: { frameworkName?: string, reporterName?: string }) {
-        const { version: nodeVersion, platform: os, arch } = process;
-        const npmVersion = execSync('npm -v', { encoding: 'utf8' }).replace(/['"\n]+/g, '');
-        const qaseapiVersion = QaseCoreReporter.getPackageVersion('qaseio');
-        const frameworkVersion = QaseCoreReporter.getPackageVersion(frameworkName);
-        const reporterVersion = QaseCoreReporter.getPackageVersion(reporterName);
-        const xPlatformHeader = `node=${nodeVersion}; npm=${npmVersion}; os=${os}; arch=${arch}`;
-        const xClientHeader = `${frameworkName}=${frameworkVersion as string};${reporterName}=${reporterVersion as string};qaseapi=${qaseapiVersion as string}`;
-
-        return {
-            'X-Client': xClientHeader,
-            'X-Platform': xPlatformHeader,
-        };
-    }
-
-    private static getPackageVersion(name: string | undefined) {
-        const UNDEFINED = 'undefined';
-        try {
-            const pathToPackageJson = require.resolve(`${name}/package.json`, { paths: [process.cwd()] });
-            if (pathToPackageJson) {
-                try {
-                    const packageString = readFileSync(pathToPackageJson, { encoding: 'utf8' });
-                    if (packageString) {
-                        const packageObject = JSON.parse(packageString) as { version: string };
-                        return packageObject.version;
-                    }
-                    return UNDEFINED;
-                } catch (error) {
-                    return UNDEFINED;
-                }
-            }
-        } catch (error) {
-            return UNDEFINED;
-        }
-    }
 }
 
 export = QaseCoreReporter;

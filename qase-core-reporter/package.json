@@ -16,7 +16,7 @@
     "node": ">=10"
   },
   "scripts": {
-    "dev": "npm run lint && tsc && cp ./src/reportBulk.js ./dist",
+    "dev": "npm run lint && tsc",
     "dev:watch": "nodemon --exec 'npm run dev || exit 1'",
     "lint": "eslint src/**",
     "lint:fix": "eslint --fix src/**",
