@@ -7,7 +7,8 @@ import {
 } from 'qaseio/dist/src';
 import chalk from 'chalk';
 import { execSync } from 'child_process';
-import { readFileSync, createReadStream } from 'fs';
+import { readFileSync, createReadStream, readdirSync, lstatSync } from 'fs';
+import { join } from 'path';
 
 enum Envs {
     report = 'QASE_REPORT',
@@ -45,6 +46,8 @@ interface QaseOptions {
     qaseCoreReporterOptions: {
         frameworkName: string;
         reporterName: string;
+        screenshotFolder?: string;
+        sendScreenshot?: boolean;
     }
 }
 
@@ -61,6 +64,13 @@ interface TestResult {
 interface ParameterizedTestData {
     id: string;
     dataset: string;
+}
+
+interface FilePathByCaseId {
+    caseId: {
+        caseId: string;
+        file: string[];
+    }
 }
 
 
@@ -90,6 +100,7 @@ class QaseCoreReporter {
     private isDisabled = false;
     private resultsForPublishingCount = 0;
     private resultsForPublishing: ResultCreate[] = [];
+    static reporterPrettyName: string = 'Qase Core';
 
     public constructor(_: Record<string, unknown>, _options: QaseOptions) {
         this.options = _options;
@@ -103,6 +114,9 @@ class QaseCoreReporter {
                 frameworkName: _options.qaseCoreReporterOptions.frameworkName,
                 reporterName: _options.qaseCoreReporterOptions.reporterName,
             }),
+            _options.qaseCoreReporterOptions.sendScreenshot
+                ? CustomBoundaryFormData
+                : undefined
         );
 
         this.log(chalk`{yellow Current PID: ${process.pid}}`);
@@ -113,6 +127,193 @@ class QaseCoreReporter {
             this.isDisabled = true;
             return;
         }
+    }
+
+    public async start(): Promise<void> {
+        if (this.isDisabled) {
+            return;
+        }
+
+        return this.checkProject(
+            this.options.projectCode,
+            async (prjExists): Promise<void> => {
+
+                if (!prjExists) {
+                    this.log(
+                        chalk`{red Project ${this.options.projectCode} does not exist}`
+                    );
+                    this.isDisabled = true;
+                    return;
+                }
+
+                this.log(chalk`{green Project ${this.options.projectCode} exists}`);
+                const userDefinedRunId = QaseCoreReporter.getEnv(Envs.runId) || this.options.runId;
+                if (userDefinedRunId) {
+                    this.saveRunId(
+                        QaseCoreReporter.getEnv(Envs.runId) || this.options.runId
+                    );
+                    return this.checkRun(this.runId, (runExists: boolean) => {
+                        if (runExists) {
+                            this.log(
+                                chalk`{green Using run ${this.runId} to publish test results}`
+                            );
+                        } else {
+                            this.log(chalk`{red Run ${this.runId} does not exist}`);
+                            this.isDisabled = true;
+                        }
+                    });
+                } else {
+                    return this.createRun(
+                        QaseCoreReporter.getEnv(Envs.runName),
+                        QaseCoreReporter.getEnv(Envs.runDescription),
+                        (created) => {
+                            if (created) {
+                                this.runId = created.result?.id;
+                                process.env.QASE_RUN_ID = String(this?.runId);
+                                this.log(
+                                    chalk`{green Using run ${this.runId} to publish test results}`
+                                );
+                            } else {
+                                this.log(
+                                    chalk`{red Could not create run in project ${this.options.projectCode}}`
+                                );
+                                this.isDisabled = true;
+                            }
+                        }
+                    );
+                }
+            }
+        );
+    }
+
+    public async end(): Promise<void> {
+        let hashesMap = {};
+        if (this.isDisabled) {
+            return;
+        }
+
+        await new Promise<void>((resolve, reject) => {
+            let timer = 0;
+            const interval = setInterval(() => {
+                timer++;
+                if (this.runId && this.resultsForPublishingCount === 0) {
+                    clearInterval(interval);
+                    resolve();
+                }
+                if (timer > 30) {
+                    clearInterval(interval);
+                    reject();
+                }
+            }, 1000);
+        });
+
+
+        if (this.resultsForPublishing.length === 0) {
+            this.log(
+                'No test cases were matched. Ensure that your tests are declared correctly.'
+            );
+            return;
+        }
+
+        if (this.options.qaseCoreReporterOptions.screenshotFolder
+            && this.options.qaseCoreReporterOptions.sendScreenshot) {
+            try {
+                const filePathByCaseIdMap = this.parseScreenshotDirectory();
+
+                if (filePathByCaseIdMap) {
+                    const filesMap = Object.values(filePathByCaseIdMap);
+                    const uploadAttachmentsPromisesArray = filesMap.map(async (failedCase) => {
+                        const caseId = failedCase.caseId;
+
+                        const pathToFile = `${this.options.qaseCoreReporterOptions.screenshotFolder}/${failedCase.file[0]}`;
+
+                        const data = createReadStream(pathToFile);
+
+                        const options = {
+                            headers: {
+                                'Content-Type':
+                                    'multipart/form-data; boundary=' + customBoundary,
+                            },
+                        };
+
+                        if (data) {
+                            const resp = await this.api.attachments.uploadAttachment(
+                                this.options.projectCode,
+                                [data],
+                                options
+                            );
+
+                            return {
+                                hash: resp.data.result?.[0].hash,
+                                caseId,
+                            };
+                        }
+                    });
+
+                    const responses = await Promise.all(uploadAttachmentsPromisesArray);
+
+                    hashesMap = responses.reduce((accum, value) => {
+                        if (value) {
+                            accum[value.caseId] = value.hash;
+                        }
+
+                        return accum;
+                    }, {} as Record<string, unknown>);
+                }
+            } catch (error) {
+                console.log(chalk`{red Error during sending screenshots ${error}}`);
+            }
+        }
+
+        const body = {
+            results: this.resultsForPublishing,
+        };
+
+        if (hashesMap) {
+            const results = body.results;
+
+            const resultsWithAttachmentHashes = results.map(((result) => {
+                const attachmentData = hashesMap[result.case_id as keyof typeof hashesMap];
+                if (attachmentData) {
+                    return {
+                        ...result,
+                        attachments: [attachmentData],
+                    };
+                }
+
+                return result;
+            }));
+
+            body.results = resultsWithAttachmentHashes;
+        }
+
+        try {
+            const response = await this.api.results.createResultBulk(
+                this.options.projectCode,
+                Number(this.runId),
+                body
+            );
+
+
+            if (response.status === 200) {
+                this.log(chalk`{green ${this.resultsForPublishing.length} result(s) sent to Qase}`);
+            }
+
+            if (!this.options.runComplete) {
+                return;
+            }
+
+            try {
+                await this.api.runs.completeRun(this.options.projectCode, Number(this.runId));
+                this.log(chalk`{green Run ${this.runId} completed}`);
+            } catch (err) {
+                this.log(`Error on completing run ${err as string}`);
+            }
+
+        } catch (error) {
+            this.log('Error while publishing:', error);
+        }
+
     }
 
     public addTestResult(test: TestResult, status: ResultCreateStatusEnum) {
@@ -169,6 +370,7 @@ class QaseCoreReporter {
                 : undefined,
         };
 
+        // known test cases
         caseIds.forEach((caseId) => {
             if (caseId) {
                 const createResultObject = {
@@ -181,7 +383,7 @@ class QaseCoreReporter {
     }
 
 
-    private async uploadAttachments(attachments: any[]) {
+    public async uploadAttachments(attachments: any[]) {
         return await Promise.all(
             attachments.map(async (attachment) => {
                 const data = createReadStream(attachment?.path as string);
@@ -242,6 +444,35 @@ class QaseCoreReporter {
             });
     }
 
+    private async createRun(
+        name: string | undefined,
+        description: string | undefined,
+        cb: (created: IdResponse | undefined) => void
+    ): Promise<void> {
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const environmentId = Number.parseInt(QaseCoreReporter.getEnv(Envs.environmentId)!, 10) || this.options.environmentId;
+
+            const runObject = QaseCoreReporter.createRunObject(
+                name || `Automated run ${new Date().toISOString()}`,
+                [],
+                {
+                    description: description || `${QaseCoreReporter.reporterPrettyName} automated run`,
+                    environment_id: environmentId,
+                    is_autotest: true,
+                }
+            );
+            const res = await this.api.runs.createRun(
+                this.options.projectCode,
+                runObject
+            );
+            cb(res.data);
+        } catch (err) {
+            this.log(`Error on creating run ${err as string}`);
+            this.isDisabled = true;
+        }
+    }
+
     private static createRunObject(
         name: string,
         cases: number[],
@@ -282,14 +513,51 @@ class QaseCoreReporter {
         }
     }
 
+    private static getFiles = (pathToFile) => {
+        const files: string[] = [];
+        for (const file of readdirSync(pathToFile)) {
+            const fullPath = `${pathToFile}/${file}`;
+
+            if (lstatSync(fullPath).isDirectory()) {
+                QaseCoreReporter.getFiles(fullPath).forEach((x) => files.push(`${file}/${x}`));
+            } else {
+                files.push(file);
+            }
+        }
+        return files;
+    };
+
+    private parseScreenshotDirectory = () => {
+        const pathToScreenshotDir = join(process.cwd(), this.options.qaseCoreReporterOptions.screenshotDirectory || '');
+        const files = QaseCoreReporter.getFiles(pathToScreenshotDir);
+        const filePathByCaseIdMap = {};
+
+        files.forEach((file) => {
+            if (file.includes('Qase ID')) {
+                const caseIds = QaseCoreReporter.getCaseIds(file);
+
+                if (caseIds) {
+                    caseIds.forEach((caseId) => {
+                        const attachmentObject = {
+                            caseId,
+                            file: [file],
+                        };
+
+                        filePathByCaseIdMap[caseId] = attachmentObject;
+                    });
+                }
+            }
+        });
+
+        return filePathByCaseIdMap as FilePathByCaseId;
+    };
+
     private static removeQaseDataset(title: string): string {
-        const regexp = /\(Qase Dataset: (#\d) (\(.*\))\)/;
-        return title.replace(regexp, '');
+        return title.replace(REGEX_QASE_DATASET, '');
     }
 
     private static getCaseIds(title: string): number[] {
-        const regexp = /(\(Qase ID: ([\d,]+)\))/;
-        const results = regexp.exec(title);
+        const results = REGEX_QASE_ID.exec(title);
         if (results && results.length === 3) {
             return results[2].split(',').map((value) => Number.parseInt(value, 10));
         }
@@ -297,8 +565,7 @@ class QaseCoreReporter {
     }
 
     private static getParameterizedData(title: string): ParameterizedTestData {
-        const regexp = /\(Qase Dataset: (#\d) (\(.*\))\)/;
-        const results = regexp.exec(title) || [];
+        const results = REGEX_QASE_DATASET.exec(title) || [];
         if (results?.length > 0) {
             return {
                 id: results[1],
