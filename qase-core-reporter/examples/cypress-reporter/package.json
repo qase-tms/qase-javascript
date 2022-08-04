@@ -1,0 +1,28 @@
+{
+  "name": "cypress-qase-reporter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "dev": "npm run lint && tsc",
+    "dev:watch": "nodemon --exec 'npm run dev || exit 1'",
+    "lint": "eslint src/**",
+    "lint:fix": "eslint --fix src/**",
+    "build": "npm run clean && npm run dev",
+    "test": "jest --coverage",
+    "clean": "rm -rf dist || true",
+    "test:cypress": "QASE_REPORT=1 npx cypress run"
+  },
+  "devDependencies": {
+    "cypress": "^10.1.0",
+    "cypress-mochawesome-reporter": "^3.0.1",
+    "cypress-multi-reporters": "^1.4.0",
+    "mocha": "^10.0.0",
+    "qase-core-reporter": "../../",
+    "cypress-qase-reporter": "./"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
