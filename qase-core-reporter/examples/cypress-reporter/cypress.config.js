@@ -8,8 +8,8 @@ module.exports = defineConfig({
       charts: true,
     },
     cypressQaseReporterReporterOptions: {
-      apiToken: 'a3187da5354d0d8ec6934719744ddf29ca9ab22c',
-      projectCode: 'QD',
+      apiToken: 'api_key',
+      projectCode: 'project_code',
       logging: true,
       basePath: 'https://api.qase.io/v1',
       screenshotFolder: 'screenshots',
