@@ -16,7 +16,7 @@
     "node": ">=10"
   },
   "scripts": {
-    "dev": "npm run lint && tsc",
+    "dev": "npm run lint && tsc && cp ./src/result-bulk-detached.js ./dist",
     "dev:watch": "nodemon --exec 'npm run dev || exit 1'",
     "lint": "eslint src/**",
     "lint:fix": "eslint --fix src/**",
@@ -47,7 +47,9 @@
     "handlebars": "^4.7.7",
     "jest": "^26.6.3",
     "json-schema": "^0.4.0",
+    "mocha": "^10.0.0",
     "nodemon": "^2.0.4",
+    "qase-core-reporter": "./",
     "ts-jest": "^26.5.6",
     "typescript": "^3.9.3"
   },

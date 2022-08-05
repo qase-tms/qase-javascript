@@ -49,8 +49,7 @@ class CypressQaseReporter extends reporters.Base {
 
         // eslint-disable-next-line  @typescript-eslint/no-misused-promises
         runner.addListener(EVENT_RUN_END, async () => {
-            console.log(this.reporter);
-            await this.reporter.end();
+            await this.reporter.end({ spawn: true });
         });
     }
 }

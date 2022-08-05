@@ -10,7 +10,7 @@ import {
 } from 'fs';
 import chalk from 'chalk';
 import crypto from 'crypto';
-import { execSync } from 'child_process';
+import { execSync, spawnSync } from 'child_process';
 import { join } from 'path';
 import { QaseApi } from 'qaseio';
 import FormData from 'form-data';
@@ -67,7 +67,7 @@ export interface QaseCoreReporterOptions {
 
 interface TestResult {
     title: string;
-    status: ResultCreateStatusEnum;
+    status: keyof typeof Statuses;
     error?: Error;
     stacktrace?: string;
     duration?: number;
@@ -145,6 +145,11 @@ export class QaseCoreReporter {
         }
     }
 
+    public static logger(message?: string, ...optionalParams: any[]): void {
+        // eslint-disable-next-line no-console
+        console.log(chalk`{bold {blue qase:}} ${message}`, ...optionalParams);
+    }
+
     private static getSuitePath(suite: TestResult): string {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         if (suite.parent) {
@@ -192,8 +197,8 @@ export class QaseCoreReporter {
         const reporterVersion = QaseCoreReporter.getPackageVersion(reporterName);
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         const xPlatformHeader = `node=${nodeVersion}; npm=${npmVersion}; os=${os}; arch=${arch}`;
-        const fv = frameworkVersion && frameworkName ? `${frameworkName}=${frameworkVersion};` : '';
-        const rv = reporterVersion && reporterName ? `${reporterName}=${reporterVersion};` : '';
+        const fv = frameworkVersion && frameworkName ? `${frameworkName}=${frameworkVersion}` : '';
+        const rv = reporterVersion && reporterName ? `${reporterName}=${reporterVersion}` : '';
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         const xClientHeader = `${fv}; ${rv}; qaseapi=${qaseapiVersion as string}`;
 
@@ -317,13 +322,50 @@ export class QaseCoreReporter {
         );
     }
 
-    public async end(): Promise<void> {
-        let hashesMap = {};
+    public async end({ spawn }: { spawn: boolean }): Promise<void> {
+        // let hashesMap = {};
         if (this.isDisabled) {
             return;
         }
 
-        await new Promise<void>((resolve, reject) => {
+        if (spawn) {
+            const { qaseCoreReporterOptions } = this.options;
+            const {
+                screenshotFolder,
+                sendScreenshot,
+            } = qaseCoreReporterOptions as QaseCoreReporterOptions;
+            const headers = QaseCoreReporter.createHeaders(
+                qaseCoreReporterOptions as { frameworkName?: string; reporterName?: string }
+            );
+            const config = {
+                apiToken: QaseCoreReporter.getEnv(Envs.apiToken) || this.options.apiToken || '',
+                basePath: QaseCoreReporter.getEnv(Envs.basePath) || this.options.basePath,
+                headers,
+                code: this.options.projectCode,
+                runId: Number(this.runId),
+                body: {
+                    results: this.resultsForPublishing,
+                },
+                runComplete: QaseCoreReporter.getEnv(Envs.runComplete) || this.options.runComplete || false,
+            };
+
+            const screenshotsConfig = {
+                screenshotFolder: screenshotFolder || 'screenshots',
+                sendScreenshot: sendScreenshot || false,
+            };
+
+            spawnSync('node', [`${__dirname}/result-bulk-detached.js`], {
+                stdio: 'inherit',
+                env: Object.assign(process.env, {
+                    NODE_NO_WARNINGS: '1',
+                    reporting_config: JSON.stringify(config),
+                    screenshots_config: JSON.stringify(screenshotsConfig),
+                }),
+            });
+            return;
+        }
+
+        await new Promise((resolve, reject) => {
             let timer = 0;
             const interval = setInterval(() => {
                 timer++;
@@ -338,114 +380,35 @@ export class QaseCoreReporter {
             }, 1000);
         });
 
-
         if (this.resultsForPublishing.length === 0) {
             this.log(
-                'No test cases were matched. Ensure that your tests are declared correctly.'
+                'No testcases were matched. Ensure that your tests are declared correctly.'
             );
             return;
-        }
-
-        if (this.options.qaseCoreReporterOptions && this.options.qaseCoreReporterOptions.screenshotFolder
-            && this.options.qaseCoreReporterOptions.sendScreenshot) {
-            try {
-                const filePathByCaseIdMap = this.parseScreenshotDirectory();
-
-                if (filePathByCaseIdMap) {
-                    const filesMap: File[] = Object.values(filePathByCaseIdMap) as File[];
-                    const uploadAttachmentsPromisesArray = filesMap.map(async (failedCase) => {
-                        const caseId = failedCase.caseId;
-
-                        const folder = this.options.qaseCoreReporterOptions
-                            && this.options.qaseCoreReporterOptions.screenshotFolder
-                            || '';
-                        const pathToFile = `${folder}/${failedCase.file[0]}`;
-
-                        const data = createReadStream(pathToFile);
-
-                        const options = {
-                            headers: {
-                                'Content-Type':
-                                    'multipart/form-data; boundary=' + customBoundary,
-                            },
-                        };
-
-                        if (data) {
-                            const resp = await this.api.attachments.uploadAttachment(
-                                this.options.projectCode,
-                                [data],
-                                options
-                            );
-
-                            return {
-                                hash: resp.data.result?.[0].hash,
-                                caseId,
-                            };
-                        }
-                    });
-
-                    const responses = await Promise.all(uploadAttachmentsPromisesArray);
-
-                    hashesMap = responses.reduce((accum, value) => {
-                        if (value) {
-                            accum[value.caseId] = value.hash;
-                        }
-
-                        return accum;
-                    }, {} as Record<string, unknown>);
-                }
-            } catch (error) {
-                this.log(chalk`{red Error during sending screenshots ${error}}`);
-            }
         }
 
         const body = {
             results: this.resultsForPublishing,
         };
 
-        if (hashesMap) {
-            const results = body.results;
+        await this.api.results.createResultBulk(
+            this.options.projectCode,
+            Number(this.runId),
+            body
+        );
 
-            const resultsWithAttachmentHashes = results.map(((result) => {
-                const attachmentData = hashesMap[result.case_id as keyof typeof hashesMap];
-                if (attachmentData) {
-                    return {
-                        ...result,
-                        attachments: [attachmentData],
-                    };
-                }
+        this.log(chalk`{green ${this.resultsForPublishing.length} result(s) sent to Qase}`);
 
-                return result;
-            }));
-
-            body.results = resultsWithAttachmentHashes;
+        if (!this.options.runComplete) {
+            return;
         }
 
-        return this.createResults(this.options.projectCode,
-            Number(this.runId),
-            // eslint-disable-next-line @typescript-eslint/no-misused-promises
-            body, async (response): Promise<void> => {
-                if (response) {
-                    this.log(chalk`{green ${this.resultsForPublishing.length} result(s) sent to Qase}`);
-
-                    if (this.options.runComplete) {
-                        try {
-                            return this.completeRun((completed) => {
-                                if (completed) {
-                                    this.log(chalk`{green Run ${this.runId} completed}`);
-                                } else {
-                                    this.log(chalk`{red Run ${this.runId} could not be completed}`);
-                                }
-                            });
-                        } catch (err) {
-                            this.log(`Error on completing run ${err as string}`);
-                        }
-                    }
-                } else {
-                    this.log(chalk`{red Error during publishing test results}`);
-                }
-            });
-
+        try {
+            await this.api.runs.completeRun(this.options.projectCode, Number(this.runId));
+            this.log(chalk`{green Run ${this.runId} completed}`);
+        } catch (err) {
+            this.log(`Error on completing run ${err as string}`);
+        }
     }
 
     public addTestResult(test: TestResult, status: ResultCreateStatusEnum): void {
@@ -658,8 +621,7 @@ export class QaseCoreReporter {
 
     private log(message?: any, ...optionalParams: any[]) {
         if (this.options.logging) {
-            // eslint-disable-next-line no-console
-            console.log(chalk`{bold {blue qase:}} ${message}`, ...optionalParams);
+            QaseCoreReporter.logger(message, ...optionalParams);
         }
     }
 
