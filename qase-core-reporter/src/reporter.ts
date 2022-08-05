@@ -35,7 +35,7 @@ enum Envs {
     rootSuiteTitle = 'QASE_ROOT_SUITE_TITLE'
 }
 
-const Statuses = {
+export const Statuses = {
     passed: ResultCreateStatusEnum.PASSED,
     failed: ResultCreateStatusEnum.FAILED,
     skipped: ResultCreateStatusEnum.SKIPPED,
@@ -65,13 +65,15 @@ export interface QaseCoreReporterOptions {
     sendScreenshot?: boolean;
 }
 
-interface TestResult {
+export interface TestResult {
     title: string;
     status: keyof typeof Statuses;
     error?: Error;
     stacktrace?: string;
     duration?: number;
     parent?: TestResult | string;
+    suitePath?: string;
+    comment?: string;
 }
 
 
@@ -365,21 +367,6 @@ export class QaseCoreReporter {
             return;
         }
 
-        await new Promise((resolve, reject) => {
-            let timer = 0;
-            const interval = setInterval(() => {
-                timer++;
-                if (this.runId && this.resultsForPublishingCount === 0) {
-                    clearInterval(interval);
-                    resolve();
-                }
-                if (timer > 30) {
-                    clearInterval(interval);
-                    reject();
-                }
-            }, 1000);
-        });
-
         if (this.resultsForPublishing.length === 0) {
             this.log(
                 'No testcases were matched. Ensure that your tests are declared correctly.'
@@ -470,7 +457,9 @@ export class QaseCoreReporter {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             status: Statuses[status] || Statuses.failed,
             time_ms: testResult.duration || 0,
-            stacktrace: testResult.error?.stack?.replace(/\u001b\[.*?m/g, ''),
+            stacktrace: testResult.stacktrace
+                ? testResult.stacktrace
+                : testResult.error?.stack?.replace(/\u001b\[.*?m/g, ''),
             comment: testResult.error
                 ? this.formatComment(testResult.title, testResult.error, parameterizedData)
                 : undefined,
@@ -484,7 +473,9 @@ export class QaseCoreReporter {
         };
 
         if (caseIds.length === 0) {
-            const suitePath = QaseCoreReporter.getSuitePath(testResult.parent as TestResult);
+            const suitePath = testResult.suitePath ?
+                testResult.suitePath
+                : QaseCoreReporter.getSuitePath(testResult.parent as TestResult);
             caseObject.case = {
                 title: testResult.title,
                 suite_title: this.options.rootSuiteTitle
