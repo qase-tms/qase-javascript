@@ -15,3 +15,14 @@ export const qase = <T>(caseId: number | string | number[] | string[], test: T):
     console.log(test);
     return test;
 };
+
+export const qaseTitle = (caseId: number | string | number[] | string[], name: string): string => {
+    let caseIds: number[] | string[];
+    if (typeof caseId === 'string' || typeof caseId === 'number') {
+        caseIds = [caseId.toString()];
+    } else {
+        caseIds = caseId;
+    }
+    const newName = `${name} (Qase ID: ${caseIds.join(',')})`;
+    return newName;
+};

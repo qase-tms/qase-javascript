@@ -51,7 +51,7 @@ const getFiles = (pathToFile) => {
 };
 
 const parseScreenshotDirectory = () => {
-    const pathToScreenshotDir = path.join(process.cwd(), `cypress/${screenshotsConfig.screenshotFolder}`);
+    const pathToScreenshotDir = path.join(process.cwd(), `${screenshotsConfig.screenshotFolder}`);
     const files = getFiles(pathToScreenshotDir);
     const filePathesByCaseIdMap = {};
 
@@ -90,7 +90,7 @@ const publishBulkResult = async () => {
                     const uploadAttachmentsPromisesArray = filesMap.map(async (failedCase) => {
                         const caseId = failedCase.caseId;
 
-                        const pathToFile = `./cypress/${screenshotsConfig.screenshotFolder}/${failedCase.file[0]}`;
+                        const pathToFile = `./${screenshotsConfig.screenshotFolder}/${failedCase.file[0]}`;
 
                         const data = fs.createReadStream(pathToFile);
 

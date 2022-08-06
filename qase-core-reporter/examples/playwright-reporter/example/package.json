@@ -1,0 +1,16 @@
+{
+  "name": "examples",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "QASE_REPORT=1 npx playwright test"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {},
+  "dependencies": {
+    "@playwright/test": "^1.16.3",
+    "playwright-qase-reporter": "../"
+  }
+}

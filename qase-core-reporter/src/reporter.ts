@@ -91,6 +91,10 @@ interface FilePathByCaseId {
     caseId: File;
 }
 
+interface IAttachment {
+    path: string;
+}
+
 let customBoundary = '----------------------------';
 crypto.randomBytes(24).forEach((value) => {
     customBoundary += Math.floor(value * 10).toString(16);
@@ -111,13 +115,14 @@ const REGEX_QASE_ID = /(\(Qase ID: ([\d,]+)\))/;
 
 export class QaseCoreReporter {
     public static reporterPrettyName = 'Qase Core';
+    public resultsForPublishingCount = 0;
+    public options: QaseOptions;
     private api: QaseApi;
-    private options: QaseOptions;
     private pending: Array<(runId: string | number) => void> = [];
     private runId?: number | string;
     private isDisabled = false;
-    private resultsForPublishingCount = 0;
     private resultsForPublishing: ResultCreate[] = [];
+    private attachments: Record<string, IAttachment[]>;
 
     public constructor(_reporterOptions: QaseOptions, _options: QaseCoreReporterOptions) {
         this.options = _reporterOptions;
@@ -125,6 +130,7 @@ export class QaseCoreReporter {
         this.options.projectCode = _reporterOptions.projectCode || QaseCoreReporter.getEnv(Envs.projectCode) || '';
         this.options.rootSuiteTitle = _reporterOptions.rootSuiteTitle || QaseCoreReporter.getEnv(Envs.rootSuiteTitle);
         this.options.runComplete = !!QaseCoreReporter.getEnv(Envs.runComplete) || _reporterOptions.runComplete;
+        this.attachments = {};
         this.api = new QaseApi(
             QaseCoreReporter.getEnv(Envs.apiToken) || this.options.apiToken || '',
             QaseCoreReporter.getEnv(Envs.basePath) || this.options.basePath,
@@ -152,7 +158,7 @@ export class QaseCoreReporter {
         console.log(chalk`{bold {blue qase:}} ${message}`, ...optionalParams);
     }
 
-    private static getSuitePath(suite: TestResult): string {
+    public static getSuitePath(suite: TestResult): string {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         if (suite.parent) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -166,6 +172,12 @@ export class QaseCoreReporter {
             }
         }
         return suite.title;
+    }
+
+    private static createObjectHash(data: ResultCreate): string {
+        return crypto.createHash('md5')
+            .update(JSON.stringify(data))
+            .digest('hex');
     }
 
     private static removeQaseDataset(title: string): string {
@@ -367,6 +379,33 @@ export class QaseCoreReporter {
             return;
         }
 
+        if (this.options.qaseCoreReporterOptions?.sendScreenshot
+            && Object.keys(this.attachments).length > 0) {
+            this.log(chalk`{yellow Uploading attachments to Qase}`);
+
+            const attachmentKeys = Object.keys(this.attachments);
+
+            const attachmentsToUpload = attachmentKeys.map(async (key) => {
+                const attachment = this.attachments[key];
+                const attachmentsHash = await this.uploadAttachments(attachment);
+                return {
+                    indexOfTestCase: key,
+                    attachmentsHash,
+                };
+
+            });
+
+            const attachmentsToUploadResult = await Promise.all(attachmentsToUpload);
+            this.resultsForPublishing = this.resultsForPublishing.map((result, index) => {
+                const attachmentMapping = attachmentsToUploadResult
+                    .find((data) => Number(data.indexOfTestCase) === index);
+                if (attachmentMapping) {
+                    result.attachments = attachmentMapping.attachmentsHash;
+                }
+                return result;
+            });
+        }
+
         if (this.resultsForPublishing.length === 0) {
             this.log(
                 'No testcases were matched. Ensure that your tests are declared correctly.'
@@ -398,8 +437,8 @@ export class QaseCoreReporter {
         }
     }
 
-    public addTestResult(test: TestResult, status: ResultCreateStatusEnum): void {
-        this.transformTestToResultCreateObject(test, status);
+    public addTestResult(test: TestResult, status: ResultCreateStatusEnum, attachment?: any[]): void {
+        this.transformTestToResultCreateObject(test, status, attachment);
     }
 
     public async uploadAttachments(attachments: Array<{ path: string }>): Promise<string[]> {
@@ -440,6 +479,10 @@ export class QaseCoreReporter {
         }
     }
 
+    private addToAttachments(attachments: any[]): void {
+        this.attachments[this.resultsForPublishing.length - 1]
+            = attachments as Array<{ path: string }>;
+    }
 
     private transformTestToResultCreateObject(testResult: TestResult,
         // eslint-disable-next-line @typescript-eslint/indent
@@ -463,9 +506,6 @@ export class QaseCoreReporter {
             comment: testResult.error
                 ? this.formatComment(testResult.title, testResult.error, parameterizedData)
                 : undefined,
-            attachments: attachments && attachments.length > 0
-                ? attachments
-                : undefined,
             defect: Statuses[status] === Statuses.failed,
             param: parameterizedData
                 ? { [frameworkName as string]: String(parameterizedData.id) }
@@ -482,6 +522,11 @@ export class QaseCoreReporter {
                     ? `${this.options.rootSuiteTitle}\t${suitePath}`
                     : suitePath,
             };
+
+            if (attachments && attachments.length > 0) {
+                this.addToAttachments(attachments);
+            }
+
             this.resultsForPublishing.push(caseObject);
             this.log(
                 chalk`{gray Result prepared for publish: ${testResult.title} }`
@@ -489,7 +534,11 @@ export class QaseCoreReporter {
         } else {
             caseIds.forEach((caseId) => {
                 const caseObjectWithId = { case_id: caseId, ...caseObject };
+
                 this.resultsForPublishing.push(caseObjectWithId);
+                if (attachments && attachments.length > 0) {
+                    this.addToAttachments(attachments);
+                }
             });
         }
     }
@@ -599,6 +648,7 @@ export class QaseCoreReporter {
                     is_autotest: true,
                 }
             );
+
             const res = await this.api.runs.createRun(
                 this.options.projectCode,
                 runObject
