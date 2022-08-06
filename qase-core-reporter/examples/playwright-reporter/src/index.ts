@@ -2,7 +2,7 @@
 /* eslint-disable  sort-imports*/
 import { ResultCreateStatusEnum } from 'qaseio/dist/src';
 import { Reporter, TestCase, TestResult } from '@playwright/test/reporter';
-import { QaseCoreReporter, QaseOptions, Statuses, TestResult as QTestResult } from 'qase-core-reporter';
+import { QaseCoreReporter, QaseOptions, Statuses, Suite as QSuite } from 'qase-core-reporter';
 
 class QasePlaywrightReporter implements Reporter {
 
@@ -35,7 +35,8 @@ class QasePlaywrightReporter implements Reporter {
             duration: testResult.duration,
             stacktrace: testResult.error?.stack?.replace(/\u001b\[.*?m/g, ''),
             error: testResult.error as Error,
-            parent: test.parent as unknown as QTestResult,
+            suitePath: test.parent ? QaseCoreReporter
+                .getSuitePath(test.parent as QSuite) : undefined,
         };
 
         this.reporter.addTestResult(testData, status, testResult.attachments);
