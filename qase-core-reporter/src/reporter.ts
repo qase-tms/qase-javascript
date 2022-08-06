@@ -66,6 +66,7 @@ export interface QaseCoreReporterOptions {
 }
 
 export interface TestResult {
+    caseIds?: number[];
     title: string;
     status: keyof typeof Statuses;
     error?: Error;
@@ -488,7 +489,9 @@ export class QaseCoreReporter {
         attachments?: any[]) {
         this.resultsForPublishingCount++;
         this.logTestItem(testResult);
-        const caseIds = QaseCoreReporter.getCaseIds(testResult.title);
+        const caseIds = testResult.caseIds
+            ? testResult.caseIds
+            : QaseCoreReporter.getCaseIds(testResult.title);
         const parameterizedData = QaseCoreReporter.getParameterizedData(testResult.title);
         const frameworkName = this.options.qaseCoreReporterOptions
             && this.options.qaseCoreReporterOptions.frameworkName;
