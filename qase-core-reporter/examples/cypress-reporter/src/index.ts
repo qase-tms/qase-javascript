@@ -35,15 +35,18 @@ class CypressQaseReporter extends reporters.Base {
         });
 
         runner.on(EVENT_TEST_PASS, (test: Test) => {
+            test.suitePath = QaseCoreReporter.getSuitePath(test.parent);
             this.reporter.addTestResult(test, ResultCreateStatusEnum.PASSED);
         });
 
         runner.on(EVENT_TEST_PENDING, (test: Test) => {
+            test.suitePath = QaseCoreReporter.getSuitePath(test.parent);
             this.reporter.addTestResult(test, ResultCreateStatusEnum.SKIPPED);
         });
 
         runner.on(EVENT_TEST_FAIL, (test: Test) => {
             test.error = test.err;
+            test.suitePath = QaseCoreReporter.getSuitePath(test.parent);
             this.reporter.addTestResult(test, ResultCreateStatusEnum.FAILED);
         });
 
