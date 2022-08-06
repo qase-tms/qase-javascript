@@ -71,11 +71,14 @@ export interface TestResult {
     error?: Error;
     stacktrace?: string;
     duration?: number;
-    parent?: TestResult | string;
     suitePath?: string;
     comment?: string;
 }
 
+export interface Suite {
+    parent: Suite | string;
+    title: string;
+}
 
 interface ParameterizedTestData {
     id: string;
@@ -158,11 +161,11 @@ export class QaseCoreReporter {
         console.log(chalk`{bold {blue qase:}} ${message}`, ...optionalParams);
     }
 
-    public static getSuitePath(suite: TestResult): string {
+    public static getSuitePath(suite: Suite): string {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         if (suite.parent) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            const parentSuite = String(QaseCoreReporter.getSuitePath(suite.parent as TestResult));
+            const parentSuite = String(QaseCoreReporter.getSuitePath(suite.parent as Suite));
             if (parentSuite) {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 return parentSuite + '\t' + String(suite.title);
@@ -172,12 +175,6 @@ export class QaseCoreReporter {
             }
         }
         return suite.title;
-    }
-
-    private static createObjectHash(data: ResultCreate): string {
-        return crypto.createHash('md5')
-            .update(JSON.stringify(data))
-            .digest('hex');
     }
 
     private static removeQaseDataset(title: string): string {
@@ -513,14 +510,11 @@ export class QaseCoreReporter {
         };
 
         if (caseIds.length === 0) {
-            const suitePath = testResult.suitePath ?
-                testResult.suitePath
-                : QaseCoreReporter.getSuitePath(testResult.parent as TestResult);
             caseObject.case = {
                 title: testResult.title,
                 suite_title: this.options.rootSuiteTitle
-                    ? `${this.options.rootSuiteTitle}\t${suitePath}`
-                    : suitePath,
+                    ? `${this.options.rootSuiteTitle}\t${testResult.suitePath as string}`
+                    : testResult.suitePath,
             };
 
             if (attachments && attachments.length > 0) {
