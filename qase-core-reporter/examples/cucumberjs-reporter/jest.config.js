@@ -1,21 +1,17 @@
 module.exports = {
-    globals: {},
-    reporters: [
-        'default',
-        [
-            'jest-qase-reporter',
-            {
-                apiToken: 'a3187da5354d0d8ec6934719744ddf29ca9ab22c',
-                projectCode: 'TP',
-                logging: true,
-                runComplete: true,
-                rootSuiteTitle: 'Jest tests',
+    globals: {
+        'ts-jest': {
+            diagnostics: {
+                ignoreCodes: [2341],
             },
-        ],
-    ],
+        },
+    },
     roots: [
         '<rootDir>/test',
     ],
+    transform: {
+        '^.+\\.tsx?$': 'ts-jest',
+    },
     testMatch: [
         '**/__tests__/**/*.js?(x)',
         '**/?(*.)+(spec|test).js?(x)',

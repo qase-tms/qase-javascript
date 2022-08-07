@@ -35,6 +35,7 @@
     "@types/newman": "^5.1.0",
     "@types/node": "^18.6.3",
     "@types/postman-collection": "^3.5.4",
+    "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^3.0.2",
     "@typescript-eslint/eslint-plugin-tslint": "^3.0.2",
     "@typescript-eslint/parser": "^3.0.2",
@@ -56,6 +57,7 @@
   "dependencies": {
     "chalk": "^4.1.0",
     "form-data": "^4.0.0",
-    "qaseio": "^2.0.0"
+    "qaseio": "^2.0.0",
+    "uuid": "^8.3.2"
   }
 }
