@@ -37,14 +37,14 @@ reporter.end({ spawn: false }); // spawn true will finish reporting in a child p
 
 ## reporter(qaseOptions, qaseCoreReporterOptions) ⇒ <code>QaseCoreReporter</code>
 
-| Param                                    | Type      | Required | Description                                          |
-| ---------------------------------------- | --------- | -------- | ---------------------------------------------------- |
-| qaseOptions                              | `object`  | yes      |                                                      |
-| qaseCoreReporterOptions                  | `object`  | yes      |                                                      |
-| qaseCoreReporterOptions.frameworkName    | `string`  | yes      | Test automation framework/package name               |
-| qaseCoreReporterOptions.reporterName     | `string`  | yes      | Current qase reporter package name                   |
-| qaseCoreReporterOptions.sendScreenshot   | `boolean` | no       | Wether or not to upload attachments                  |
-| qaseCoreReporterOptions.screenshotFolder | `string`  | no       | Folder to find screenshots with Qase ID in file name |
+| Param                                      | Type      | Required | Description                                          |
+| ------------------------------------------ | --------- | -------- | ---------------------------------------------------- |
+| qaseOptions                                | `object`  | yes      |                                                      |
+| qaseCoreReporterOptions                    | `object`  | yes      |                                                      |
+| qaseCoreReporterOptions.`frameworkName`    | `string`  | yes      | Test automation framework/package name               |
+| qaseCoreReporterOptions.`reporterName`     | `string`  | yes      | Current qase reporter package name                   |
+| qaseCoreReporterOptions.`sendScreenshot`   | `boolean` | no       | Wether or not to upload attachments                  |
+| qaseCoreReporterOptions.`screenshotFolder` | `string`  | no       | Folder to find screenshots with Qase ID in file name |
 
 ## API (public methods)
 
