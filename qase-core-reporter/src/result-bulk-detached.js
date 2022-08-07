@@ -50,10 +50,10 @@ const getFiles = (pathToFile) => {
     return files;
 };
 
-const parseScreenshotDirectory = () => {
-    const pathToScreenshotDir = path.join(process.cwd(), `${screenshotsConfig.screenshotFolder}`);
+const parseScreenshotDirectory = (screenshotFolder) => {
+    const pathToScreenshotDir = path.join(process.cwd(), screenshotFolder);
     const files = getFiles(pathToScreenshotDir);
-    const filePathesByCaseIdMap = {};
+    const filePathByCaseIdMap = {};
 
     files.forEach((file) => {
         if (file.includes('Qase ID')) {
@@ -66,13 +66,13 @@ const parseScreenshotDirectory = () => {
                         file: [file],
                     };
 
-                    filePathesByCaseIdMap[caseId] = attachmentObject;
+                    filePathByCaseIdMap[caseId] = attachmentObject;
                 });
             }
         }
     });
 
-    return filePathesByCaseIdMap;
+    return filePathByCaseIdMap;
 };
 
 const publishBulkResult = async () => {
@@ -82,8 +82,9 @@ const publishBulkResult = async () => {
         const api = new QaseApi(config.apiToken, config.basePath, config.headers, CustomBoundaryFormData);
 
         if (screenshotsConfig.screenshotFolder && screenshotsConfig.sendScreenshot) {
+            QaseCoreReporter.logger('Uploading screenshots to Qase...');
             try {
-                const filePathesByCaseIdMap = parseScreenshotDirectory();
+                const filePathesByCaseIdMap = parseScreenshotDirectory(screenshotsConfig.screenshotFolder);
 
                 if (filePathesByCaseIdMap) {
                     const filesMap = Object.values(filePathesByCaseIdMap);

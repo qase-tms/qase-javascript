@@ -46,6 +46,7 @@ export const Statuses = {
 };
 
 export interface QaseOptions {
+    report?: boolean;
     apiToken: string;
     basePath?: string;
     rootSuiteTitle?: string;
@@ -55,6 +56,8 @@ export interface QaseOptions {
     logging?: boolean;
     runComplete?: boolean;
     environmentId?: number;
+    runDescription?: string;
+    runName?: string;
     qaseCoreReporterOptions?: QaseCoreReporterOptions;
 }
 
@@ -131,6 +134,8 @@ export class QaseCoreReporter {
     public constructor(_reporterOptions: QaseOptions, _options: QaseCoreReporterOptions) {
         this.options = _reporterOptions;
         this.options.qaseCoreReporterOptions = _options;
+        this.options.runName = QaseCoreReporter.getEnv(Envs.runName) || _reporterOptions.runName;
+        this.options.runDescription = QaseCoreReporter.getEnv(Envs.runDescription) || _reporterOptions.runDescription;
         this.options.projectCode = _reporterOptions.projectCode || QaseCoreReporter.getEnv(Envs.projectCode) || '';
         this.options.rootSuiteTitle = _reporterOptions.rootSuiteTitle || QaseCoreReporter.getEnv(Envs.rootSuiteTitle);
         this.options.runComplete = !!QaseCoreReporter.getEnv(Envs.runComplete) || _reporterOptions.runComplete;
@@ -149,7 +154,11 @@ export class QaseCoreReporter {
 
         this.log(chalk`{yellow Current PID: ${process.pid}}`);
 
-        if (!QaseCoreReporter.getEnv(Envs.report)) {
+        const report = QaseCoreReporter.getEnv(Envs.report)
+            || _reporterOptions.report
+            || false;
+
+        if (!report) {
             this.log(
                 chalk`{yellow QASE_REPORT env variable is not set. Reporting to qase.io is disabled.}`);
             this.isDisabled = true;
@@ -177,6 +186,31 @@ export class QaseCoreReporter {
         }
         return suite.title;
     }
+
+    public static parseScreenshotDirectory = (screenshotFolder: string): FilePathByCaseId => {
+        const pathToScreenshotDir = join(process.cwd(), screenshotFolder);
+        const files = QaseCoreReporter.getFiles(pathToScreenshotDir);
+        const filePathByCaseIdMap = {};
+
+        files.forEach((file) => {
+            if (file.includes('Qase ID')) {
+                const caseIds = QaseCoreReporter.getCaseIds(file);
+
+                if (caseIds) {
+                    caseIds.forEach((caseId) => {
+                        const attachmentObject = {
+                            caseId,
+                            file: [file],
+                        };
+
+                        filePathByCaseIdMap[caseId] = attachmentObject;
+                    });
+                }
+            }
+        });
+
+        return filePathByCaseIdMap as FilePathByCaseId;
+    };
 
     private static removeQaseDataset(title: string): string {
         return title.replace(REGEX_QASE_DATASET, '');
@@ -244,6 +278,7 @@ export class QaseCoreReporter {
     private static getFiles = (pathToFile: string) => {
         const files: string[] = [];
         for (const file of readdirSync(pathToFile)) {
+            QaseCoreReporter.logger(`File: ${pathToFile}/${file}`);
             const fullPath = `${pathToFile}/${file}`;
 
             if (lstatSync(fullPath).isDirectory()) {
@@ -312,8 +347,8 @@ export class QaseCoreReporter {
                     });
                 } else {
                     return this.createRun(
-                        QaseCoreReporter.getEnv(Envs.runName),
-                        QaseCoreReporter.getEnv(Envs.runDescription),
+                        this.options.runName,
+                        this.options.runDescription,
                         (created) => {
                             if (created) {
                                 this.runId = created.result?.id;
@@ -359,6 +394,7 @@ export class QaseCoreReporter {
                     results: this.resultsForPublishing,
                 },
                 runComplete: QaseCoreReporter.getEnv(Envs.runComplete) || this.options.runComplete || false,
+                qaseCoreReporterOptions,
             };
 
             const screenshotsConfig = {
@@ -675,32 +711,4 @@ export class QaseCoreReporter {
             }
         }
     }
-
-    private parseScreenshotDirectory = () => {
-        const screenshotFolder = this.options.qaseCoreReporterOptions
-            && this.options.qaseCoreReporterOptions.screenshotFolder
-            || '';
-        const pathToScreenshotDir = join(process.cwd(), screenshotFolder);
-        const files = QaseCoreReporter.getFiles(pathToScreenshotDir);
-        const filePathByCaseIdMap = {};
-
-        files.forEach((file) => {
-            if (file.includes('Qase ID')) {
-                const caseIds = QaseCoreReporter.getCaseIds(file);
-
-                if (caseIds) {
-                    caseIds.forEach((caseId) => {
-                        const attachmentObject = {
-                            caseId,
-                            file: [file],
-                        };
-
-                        filePathByCaseIdMap[caseId] = attachmentObject;
-                    });
-                }
-            }
-        });
-
-        return filePathByCaseIdMap as FilePathByCaseId;
-    };
 }
