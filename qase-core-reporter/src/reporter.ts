@@ -14,11 +14,11 @@ import { execSync, spawnSync } from 'child_process';
 import { join } from 'path';
 import { QaseApi } from 'qaseio';
 import FormData from 'form-data';
+import { v4 as uuidv4 } from 'uuid';
 import {
     IdResponse,
     ResultCreate,
     ResultCreateStatusEnum,
-    ResultCreateBulk,
 } from 'qaseio/dist/src';
 
 
@@ -69,6 +69,7 @@ export interface QaseCoreReporterOptions {
 }
 
 export interface TestResult {
+    id?: string;
     caseIds?: number[];
     title: string;
     status: keyof typeof Statuses;
@@ -77,6 +78,7 @@ export interface TestResult {
     duration?: number;
     suitePath?: string;
     comment?: string;
+    attachments?: string[];
 }
 
 export interface Suite {
@@ -101,6 +103,8 @@ interface FilePathByCaseId {
 interface IAttachment {
     path: string;
 }
+
+type ResultsForPublishing = Array<ResultCreate & { id: string }>;
 
 let customBoundary = '----------------------------';
 crypto.randomBytes(24).forEach((value) => {
@@ -128,7 +132,7 @@ export class QaseCoreReporter {
     private pending: Array<(runId: string | number) => void> = [];
     private runId?: number | string;
     private isDisabled = false;
-    private resultsForPublishing: ResultCreate[] = [];
+    private resultsForPublishing: ResultsForPublishing = [];
     private attachments: Record<string, IAttachment[]>;
 
     public constructor(_reporterOptions: QaseOptions, _options: QaseCoreReporterOptions) {
@@ -423,16 +427,16 @@ export class QaseCoreReporter {
                 const attachment = this.attachments[key];
                 const attachmentsHash = await this.uploadAttachments(attachment);
                 return {
-                    indexOfTestCase: key,
+                    testCaseId: key,
                     attachmentsHash,
                 };
 
             });
 
             const attachmentsToUploadResult = await Promise.all(attachmentsToUpload);
-            this.resultsForPublishing = this.resultsForPublishing.map((result, index) => {
+            this.resultsForPublishing = this.resultsForPublishing.map((result) => {
                 const attachmentMapping = attachmentsToUploadResult
-                    .find((data) => Number(data.indexOfTestCase) === index);
+                    .find((data) => data.testCaseId === result.id);
                 if (attachmentMapping) {
                     result.attachments = attachmentMapping.attachmentsHash;
                 }
@@ -513,8 +517,8 @@ export class QaseCoreReporter {
         }
     }
 
-    private addToAttachments(attachments: any[]): void {
-        this.attachments[this.resultsForPublishing.length - 1]
+    private addToAttachments(attachments: any[], id: string): void {
+        this.attachments[id]
             = attachments as Array<{ path: string }>;
     }
 
@@ -532,7 +536,8 @@ export class QaseCoreReporter {
         const frameworkName = this.options.qaseCoreReporterOptions
             && this.options.qaseCoreReporterOptions.frameworkName;
 
-        const caseObject: ResultCreate = {
+        const caseObject: ResultCreate & { id: string } = {
+            id: testResult.id ? testResult.id : uuidv4(),
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             status: Statuses[status] || Statuses.failed,
             time_ms: testResult.duration || 0,
@@ -546,7 +551,12 @@ export class QaseCoreReporter {
             param: parameterizedData
                 ? { [frameworkName as string]: String(parameterizedData.id) }
                 : undefined,
+            attachments: testResult.attachments ? testResult.attachments : undefined,
         };
+
+        if (attachments && attachments.length > 0 && !testResult.attachments) {
+            this.addToAttachments(attachments, caseObject.id);
+        }
 
         if (caseIds.length === 0) {
             caseObject.case = {
@@ -555,10 +565,6 @@ export class QaseCoreReporter {
                     ? `${this.options.rootSuiteTitle}\t${testResult.suitePath as string}`
                     : testResult.suitePath,
             };
-
-            if (attachments && attachments.length > 0) {
-                this.addToAttachments(attachments);
-            }
 
             this.resultsForPublishing.push(caseObject);
             this.log(
@@ -569,9 +575,6 @@ export class QaseCoreReporter {
                 const caseObjectWithId = { case_id: caseId, ...caseObject };
 
                 this.resultsForPublishing.push(caseObjectWithId);
-                if (attachments && attachments.length > 0) {
-                    this.addToAttachments(attachments);
-                }
             });
         }
     }
@@ -625,41 +628,6 @@ export class QaseCoreReporter {
                 this.log(`Error on checking run ${err as string}`);
                 this.isDisabled = true;
             });
-    }
-
-    private async completeRun(cb: (completed: boolean) => void): Promise<void> {
-        if (this.runId === undefined) {
-            cb(false);
-            return;
-        }
-
-        return this.api.runs
-            .completeRun(this.options.projectCode, Number(this.runId))
-            .then((resp) => {
-                this.log(
-                    `Run ${this.runId as string} completed`
-                );
-                cb(Boolean(resp.data));
-            })
-            .catch((err) => {
-                this.log(`Error on completing run ${err as string}`);
-                this.isDisabled = true;
-            });
-    }
-
-    private async createResults(
-        code: string,
-        runId: number,
-        body: ResultCreateBulk,
-        cb: (response: IdResponse | undefined) => void
-    ): Promise<void> {
-        try {
-            const res = await this.api.results.createResultBulk(code, runId, body);
-            cb(res.data);
-        } catch (error) {
-            this.log(`Error on creating results ${error as string}`);
-            this.isDisabled = true;
-        }
     }
 
     private async createRun(
