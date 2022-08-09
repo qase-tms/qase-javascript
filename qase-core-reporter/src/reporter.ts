@@ -7,6 +7,7 @@ import {
     lstatSync,
     readFileSync,
     readdirSync,
+    existsSync
 } from 'fs';
 import chalk from 'chalk';
 import crypto from 'crypto';
@@ -282,16 +283,21 @@ export class QaseCoreReporter {
 
     private static getFiles = (pathToFile: string) => {
         const files: string[] = [];
-        for (const file of readdirSync(pathToFile)) {
-            QaseCoreReporter.logger(`File: ${pathToFile}/${file}`);
-            const fullPath = `${pathToFile}/${file}`;
+        if (existsSync(pathToFile)) {
+            for (const file of readdirSync(pathToFile)) {
+                QaseCoreReporter.logger(`File: ${pathToFile}/${file}`);
+                const fullPath = `${pathToFile}/${file}`;
 
-            if (lstatSync(fullPath).isDirectory()) {
-                QaseCoreReporter.getFiles(fullPath).forEach((x) => files.push(`${file}/${x}`));
-            } else {
-                files.push(file);
+                if (lstatSync(fullPath).isDirectory()) {
+                    QaseCoreReporter.getFiles(fullPath).forEach((x) => files.push(`${file}/${x}`));
+                } else {
+                    files.push(file);
+                }
             }
+        } else {
+            QaseCoreReporter.logger(`Directory ${pathToFile} not found!`);
         }
+
         return files;
     };
 
