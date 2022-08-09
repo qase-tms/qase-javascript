@@ -32,7 +32,8 @@ enum Envs {
     runDescription = 'QASE_RUN_DESCRIPTION',
     runComplete = 'QASE_RUN_COMPLETE',
     environmentId = 'QASE_ENVIRONMENT_ID',
-    rootSuiteTitle = 'QASE_ROOT_SUITE_TITLE'
+    rootSuiteTitle = 'QASE_ROOT_SUITE_TITLE',
+    logging = 'QASE_LOGGING',
 }
 
 export const Statuses = {
@@ -662,7 +663,11 @@ export class QaseCoreReporter {
     }
 
     private log(message?: any, ...optionalParams: any[]) {
-        if (this.options.logging) {
+        const logging = QaseCoreReporter.getEnv(Envs.logging) === 'true'
+            || this.options.logging
+            || false;
+
+        if (logging) {
             QaseCoreReporter.logger(message, ...optionalParams);
         }
     }
