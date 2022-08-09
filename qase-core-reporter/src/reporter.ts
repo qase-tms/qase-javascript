@@ -141,12 +141,12 @@ export class QaseCoreReporter {
         this.options.qaseCoreReporterOptions = _options;
         this.options.runName = QaseCoreReporter.getEnv(Envs.runName) || _reporterOptions.runName;
         this.options.runDescription = QaseCoreReporter.getEnv(Envs.runDescription) || _reporterOptions.runDescription;
-        this.options.projectCode = _reporterOptions.projectCode || QaseCoreReporter.getEnv(Envs.projectCode) || '';
-        this.options.rootSuiteTitle = _reporterOptions.rootSuiteTitle || QaseCoreReporter.getEnv(Envs.rootSuiteTitle);
+        this.options.projectCode = QaseCoreReporter.getEnv(Envs.projectCode) || _reporterOptions.projectCode;
+        this.options.rootSuiteTitle = QaseCoreReporter.getEnv(Envs.rootSuiteTitle) || _reporterOptions.rootSuiteTitle;
         this.options.runComplete = !!QaseCoreReporter.getEnv(Envs.runComplete) || _reporterOptions.runComplete;
         this.attachments = {};
         this.api = new QaseApi(
-            QaseCoreReporter.getEnv(Envs.apiToken) || this.options.apiToken || '',
+            QaseCoreReporter.getEnv(Envs.apiToken) || this.options.apiToken,
             QaseCoreReporter.getEnv(Envs.basePath) || this.options.basePath,
             QaseCoreReporter.createHeaders({
                 frameworkName: _options.frameworkName,
