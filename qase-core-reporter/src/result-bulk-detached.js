@@ -1,6 +1,6 @@
 /* eslint-disable */
 const { QaseApi } = require('qaseio');
-const { QaseCoreReporter } = require('./reporter')
+const { QaseCoreReporter } = require('qase-core-reporter');
 const FormData = require('form-data');
 const chalk = require('chalk');
 const crypto = require('crypto');
