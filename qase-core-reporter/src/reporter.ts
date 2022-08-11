@@ -63,6 +63,8 @@ export interface QaseOptions {
     qaseCoreReporterOptions?: QaseCoreReporterOptions;
 }
 
+type CaseId = number;
+
 export interface QaseCoreReporterOptions {
     frameworkName: string;
     reporterName: string;
@@ -70,7 +72,7 @@ export interface QaseCoreReporterOptions {
     videoFolder?: string;
     uploadAttachments?: boolean;
     loadConfig?: boolean;
-    fileMatchFunction?: () => boolean;
+    fileCaseIdMatchFunction?: (file: string) => CaseId[];
 }
 
 export interface TestResult {
@@ -232,9 +234,9 @@ export class QaseCoreReporter {
         return suite.title;
     }
 
-    public static parseScreenshotDirectory = (screenshotFolder: string): FilePathByCaseId => {
-        const pathToScreenshotDir = join(process.cwd(), screenshotFolder);
-        const files = QaseCoreReporter.getFiles(pathToScreenshotDir);
+    public static parseAttachmentDirectory = (folder: string): FilePathByCaseId => {
+        const pathToAttachmentDir = join(process.cwd(), folder);
+        const files = QaseCoreReporter.getFiles(pathToAttachmentDir);
         const filePathByCaseIdMap = {};
 
         files.forEach((file) => {

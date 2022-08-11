@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 
 const config = JSON.parse(process.env?.reporting_config);
-const screenshotsConfig = JSON.parse(process.env?.screenshots_config);
+const attachmentsConfig = JSON.parse(process.env?.attachments_config);
 
 let hashesMap = {};
 
@@ -50,9 +50,9 @@ const getFiles = (pathToFile) => {
     return files;
 };
 
-const parseScreenshotDirectory = (screenshotFolder) => {
-    const pathToScreenshotDir = path.join(process.cwd(), screenshotFolder);
-    const files = getFiles(pathToScreenshotDir);
+const parseAttachmentDirectory = (folder) => {
+    const pathToAttachmentDir = path.join(process.cwd(), folder);
+    const files = getFiles(pathToAttachmentDir);
     const filePathByCaseIdMap = {};
 
     files.forEach((file) => {
@@ -81,10 +81,10 @@ const publishBulkResult = async () => {
 
         const api = new QaseApi(config.apiToken, config.basePath, config.headers, CustomBoundaryFormData);
 
-        if (screenshotsConfig.screenshotFolder && screenshotsConfig.sendScreenshot) {
+        if (attachmentsConfig.screenshotFolder && attachmentsConfig.uploadAttachments) {
             QaseCoreReporter.logger('Uploading screenshots to Qase...');
             try {
-                const filePathesByCaseIdMap = parseScreenshotDirectory(screenshotsConfig.screenshotFolder);
+                const filePathesByCaseIdMap = parseAttachmentDirectory(attachmentsConfig.screenshotFolder);
 
                 if (filePathesByCaseIdMap) {
                     const filesMap = Object.values(filePathesByCaseIdMap);
