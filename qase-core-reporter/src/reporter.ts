@@ -7,7 +7,7 @@ import {
     lstatSync,
     readFileSync,
     readdirSync,
-    existsSync
+    existsSync,
 } from 'fs';
 import chalk from 'chalk';
 import crypto from 'crypto';
@@ -67,7 +67,10 @@ export interface QaseCoreReporterOptions {
     frameworkName: string;
     reporterName: string;
     screenshotFolder?: string;
-    sendScreenshot?: boolean;
+    videoFolder?: string;
+    uploadAttachments?: boolean;
+    loadConfig?: boolean;
+    fileMatchFunction?: () => boolean;
 }
 
 export interface TestResult {
@@ -135,16 +138,26 @@ export class QaseCoreReporter {
     private runId?: number | string;
     private isDisabled = false;
     private resultsForPublishing: ResultsForPublishing = [];
-    private attachments: Record<string, IAttachment[]>;
+    private attachments: Record<string, IAttachment[]> = {};
 
     public constructor(_reporterOptions: QaseOptions, _options: QaseCoreReporterOptions) {
-        this.options = _reporterOptions;
+        // check if loadConfig is set to true and if so, load the config from the file
+        const reporterOptions = _options.loadConfig
+            ? QaseCoreReporter.loadConfig() as QaseOptions
+            : _reporterOptions || undefined;
+
+        if (!reporterOptions) {
+            this.isDisabled = true;
+            throw new Error('No config provided, skipping Qase reporting');
+        }
+
+        this.options = reporterOptions;
         this.options.qaseCoreReporterOptions = _options;
-        this.options.runName = QaseCoreReporter.getEnv(Envs.runName) || _reporterOptions.runName;
-        this.options.runDescription = QaseCoreReporter.getEnv(Envs.runDescription) || _reporterOptions.runDescription;
-        this.options.projectCode = QaseCoreReporter.getEnv(Envs.projectCode) || _reporterOptions.projectCode;
-        this.options.rootSuiteTitle = QaseCoreReporter.getEnv(Envs.rootSuiteTitle) || _reporterOptions.rootSuiteTitle;
-        this.options.runComplete = !!QaseCoreReporter.getEnv(Envs.runComplete) || _reporterOptions.runComplete;
+        this.options.runName = QaseCoreReporter.getEnv(Envs.runName) || reporterOptions.runName;
+        this.options.runDescription = QaseCoreReporter.getEnv(Envs.runDescription) || reporterOptions.runDescription;
+        this.options.projectCode = QaseCoreReporter.getEnv(Envs.projectCode) || reporterOptions.projectCode;
+        this.options.rootSuiteTitle = QaseCoreReporter.getEnv(Envs.rootSuiteTitle) || reporterOptions.rootSuiteTitle;
+        this.options.runComplete = !!QaseCoreReporter.getEnv(Envs.runComplete) || reporterOptions.runComplete;
         this.attachments = {};
         this.api = new QaseApi(
             QaseCoreReporter.getEnv(Envs.apiToken) || this.options.apiToken,
@@ -153,7 +166,7 @@ export class QaseCoreReporter {
                 frameworkName: _options.frameworkName,
                 reporterName: _options.reporterName,
             }),
-            _options.sendScreenshot
+            _options.uploadAttachments
                 ? CustomBoundaryFormData
                 : undefined
         );
@@ -161,7 +174,7 @@ export class QaseCoreReporter {
         this.log(chalk`{yellow Current PID: ${process.pid}}`);
 
         const report = QaseCoreReporter.getEnv(Envs.report)
-            || _reporterOptions.report
+            || reporterOptions.report
             || false;
 
         if (!report) {
@@ -170,6 +183,32 @@ export class QaseCoreReporter {
             this.isDisabled = true;
             return;
         }
+    }
+
+    public static loadConfig(file?: string): QaseOptions | undefined {
+        let config: QaseOptions | undefined;
+        let data = '';
+
+        const qaseConfigJson = existsSync(join(process.cwd(), 'qase.conf.json'));
+        const qaseConfigRC = existsSync(join(process.cwd(), '.qaserc'));
+
+        if (file) {
+            data = readFileSync(file, 'utf8');
+        } else if (qaseConfigJson) {
+            data = readFileSync(join(process.cwd(), 'qase.conf.json'), 'utf8');
+        } else if (qaseConfigRC) {
+            data = readFileSync(join(process.cwd(), '.qaserc'), 'utf8');
+        }
+
+        if (data) {
+            try {
+                config = JSON.parse(data) as QaseOptions;
+            } catch {
+                QaseCoreReporter.logger('Failed to parse config file, please check the file format');
+            }
+        }
+
+        return config;
     }
 
     public static logger(message?: string, ...optionalParams: any[]): void {
@@ -390,7 +429,8 @@ export class QaseCoreReporter {
             const { qaseCoreReporterOptions } = this.options;
             const {
                 screenshotFolder,
-                sendScreenshot,
+                videoFolder,
+                uploadAttachments,
             } = qaseCoreReporterOptions as QaseCoreReporterOptions;
             const headers = QaseCoreReporter.createHeaders(
                 qaseCoreReporterOptions as { frameworkName?: string; reporterName?: string }
@@ -408,9 +448,10 @@ export class QaseCoreReporter {
                 qaseCoreReporterOptions,
             };
 
-            const screenshotsConfig = {
+            const attachmentsConfig = {
                 screenshotFolder: screenshotFolder || 'screenshots',
-                sendScreenshot: sendScreenshot || false,
+                videoFolder: videoFolder || 'videos',
+                uploadAttachments: uploadAttachments || false,
             };
 
             spawnSync('node', [`${__dirname}/result-bulk-detached.js`], {
@@ -418,13 +459,13 @@ export class QaseCoreReporter {
                 env: Object.assign(process.env, {
                     NODE_NO_WARNINGS: '1',
                     reporting_config: JSON.stringify(config),
-                    screenshots_config: JSON.stringify(screenshotsConfig),
+                    screenshots_config: JSON.stringify(attachmentsConfig),
                 }),
             });
             return;
         }
 
-        if (this.options.qaseCoreReporterOptions?.sendScreenshot
+        if (this.options.qaseCoreReporterOptions?.uploadAttachments
             && Object.keys(this.attachments).length > 0) {
             this.log(chalk`{yellow Uploading attachments to Qase}`);
 
