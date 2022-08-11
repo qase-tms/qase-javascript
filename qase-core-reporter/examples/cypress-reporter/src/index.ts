@@ -21,7 +21,7 @@ class CypressQaseReporter extends reporters.Base {
             frameworkName: 'cypress',
             reporterName: 'qase-cypress-reporter',
             screenshotFolder: options.reporterOptions.screenshotFolder as string || '',
-            sendScreenshot: options.reporterOptions.sendScreenshot as boolean || false,
+            uploadAttachments: options.reporterOptions.uploadAttachments as boolean || false,
         } as QaseCoreReporterOptions);
 
         this.addRunnerListeners(runner);
