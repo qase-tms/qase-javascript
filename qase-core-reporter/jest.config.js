@@ -27,4 +27,6 @@ module.exports = {
         'node',
     ],
     testEnvironment: 'node',
+    setupFilesAfterEnv: ['<rootDir>/test/__mock__/setup-env.ts'],
+    coveragePathIgnorePatterns: ['__mock__'],
 };
