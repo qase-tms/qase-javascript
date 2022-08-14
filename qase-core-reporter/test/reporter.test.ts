@@ -1,7 +1,7 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { unlinkSync, writeFileSync } from 'fs'
 import { ResultCreateStatusEnum } from 'qaseio/dist/src'
-import { QaseCoreReporter, qase, qaseTitle, TestResult, QaseOptions } from '../src';
+import { QaseCoreReporter, qase, qaseTitle, TestResult, qaseParam } from '../src';
 
 describe('QaseCoreReporter', () => {
     describe('Logging', () => {
@@ -556,6 +556,38 @@ describe('QaseCoreReporter', () => {
                 };
                 const newTest = qase([1, 2], test);
                 expect(newTest.title).toBe('test (Qase ID: 1,2)');
+            });
+
+            it('should return test title with param format - object, caseId array', () => {
+                const test = {
+                    title: 'test',
+                };
+                const newTest = qaseParam([1, 2], [0, { a: 'a', b: 'b', expected: 'ab' }], test.title);
+                expect(newTest).toBe('test (Qase ID: 1,2) (Qase Dataset: #0 (a: a, b: b, expected: ab))');
+            });
+
+            it('should return test title with param format - string, caseId array', () => {
+                const test = {
+                    title: 'test',
+                };
+                const newTest = qaseParam([1, 2], [0, 'a: a, b: b, expected: ab'], test.title);
+                expect(newTest).toBe('test (Qase ID: 1,2) (Qase Dataset: #0 (a: a, b: b, expected: ab))');
+            });
+
+            it('should return test title with param format - string, no caseId', () => {
+                const test = {
+                    title: 'test',
+                };
+                const newTest = qaseParam(null, [0, 'a: a, b: b, expected: ab'], test.title);
+                expect(newTest).toBe('test (Qase Dataset: #0 (a: a, b: b, expected: ab))');
+            });
+
+            it('should return test title with param format - string, caseId string|number', () => {
+                const test = {
+                    title: 'test',
+                };
+                const newTest = qaseParam('1', [0, 'a: a, b: b, expected: ab'], test.title);
+                expect(newTest).toBe('test (Qase Dataset: #0 (a: a, b: b, expected: ab))');
             });
         });
 
