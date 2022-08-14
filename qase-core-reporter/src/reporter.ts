@@ -143,15 +143,16 @@ export class QaseCoreReporter {
     private attachments: Record<string, IAttachment[]> = {};
 
     public constructor(_reporterOptions: QaseOptions, _options: QaseCoreReporterOptions) {
+        if (process.env.QASE_LOGGING === undefined) {
+            process.env.QASE_LOGGING = _reporterOptions.logging
+                ? String(_reporterOptions.logging)
+                : 'false';
+        }
+
         // check if loadConfig is set to true and if so, load the config from the file
         const reporterOptions = _options.loadConfig
-            ? QaseCoreReporter.loadConfig() as QaseOptions
-            : _reporterOptions || undefined;
-
-        if (!reporterOptions) {
-            this.isDisabled = true;
-            throw new Error('No config provided, skipping Qase reporting');
-        }
+            ? QaseCoreReporter.loadConfig()
+            : _reporterOptions;
 
         this.options = reporterOptions;
         this.options.qaseCoreReporterOptions = _options;
@@ -173,31 +174,31 @@ export class QaseCoreReporter {
                 : undefined
         );
 
-        this.log(chalk`{yellow Current PID: ${process.pid}}`);
+        QaseCoreReporter.logger(chalk`{yellow Current PID: ${process.pid}}`);
 
         const report = QaseCoreReporter.getEnv(Envs.report)
-            || reporterOptions.report
+            || this.options.report
             || false;
 
         if (!report) {
-            this.log(
+            QaseCoreReporter.logger(
                 chalk`{yellow QASE_REPORT env variable is not set. Reporting to qase.io is disabled.}`);
             this.isDisabled = true;
             return;
         }
     }
 
-    public static loadConfig(file?: string): QaseOptions | undefined {
-        let config: QaseOptions | undefined;
+    public static loadConfig(file?: string): QaseOptions {
+        let config = {} as QaseOptions;
         let data = '';
 
-        const qaseConfigJson = existsSync(join(process.cwd(), 'qase.conf.json'));
+        const qaseConfigJson = existsSync(join(process.cwd(), 'qase.config.json'));
         const qaseConfigRC = existsSync(join(process.cwd(), '.qaserc'));
 
         if (file) {
             data = readFileSync(file, 'utf8');
         } else if (qaseConfigJson) {
-            data = readFileSync(join(process.cwd(), 'qase.conf.json'), 'utf8');
+            data = readFileSync(join(process.cwd(), 'qase.config.json'), 'utf8');
         } else if (qaseConfigRC) {
             data = readFileSync(join(process.cwd(), '.qaserc'), 'utf8');
         }
@@ -215,7 +216,12 @@ export class QaseCoreReporter {
 
     public static logger(message?: string, ...optionalParams: any[]): void {
         // eslint-disable-next-line no-console
-        console.log(chalk`{bold {blue qase:}} ${message}`, ...optionalParams);
+        const logging = QaseCoreReporter.getEnv(Envs.logging) === 'true'
+            ? true
+            : false;
+        if (logging) {
+            console.log(chalk`{bold {blue qase:}} ${message}`, ...optionalParams);
+        }
     }
 
     public static getSuitePath(suite: Suite): string {
@@ -367,33 +373,33 @@ export class QaseCoreReporter {
             return;
         }
 
-        this.log(chalk`{yellow Starting QASE reporter}`);
+        QaseCoreReporter.logger(chalk`{yellow Starting QASE reporter}`);
 
         return this.checkProject(
             this.options.projectCode,
             async (prjExists): Promise<void> => {
 
                 if (!prjExists) {
-                    this.log(
+                    QaseCoreReporter.logger(
                         chalk`{red Project ${this.options.projectCode} does not exist}`
                     );
                     this.isDisabled = true;
                     return;
                 }
 
-                this.log(chalk`{green Project ${this.options.projectCode} exists}`);
+                QaseCoreReporter.logger(chalk`{green Project ${this.options.projectCode} exists}`);
                 const userDefinedRunId = QaseCoreReporter.getEnv(Envs.runId) || this.options.runId;
                 if (userDefinedRunId) {
                     this.saveRunId(
-                        QaseCoreReporter.getEnv(Envs.runId) || this.options.runId
+                        userDefinedRunId
                     );
                     return this.checkRun(this.runId, (runExists: boolean) => {
                         if (runExists) {
-                            this.log(
+                            QaseCoreReporter.logger(
                                 chalk`{green Using run ${this.runId} to publish test results}`
                             );
                         } else {
-                            this.log(chalk`{red Run ${this.runId} does not exist}`);
+                            QaseCoreReporter.logger(chalk`{red Run ${this.runId} does not exist}`);
                             this.isDisabled = true;
                         }
                     });
@@ -405,11 +411,11 @@ export class QaseCoreReporter {
                             if (created) {
                                 this.runId = created.result?.id;
                                 process.env.QASE_RUN_ID = String(this?.runId);
-                                this.log(
+                                QaseCoreReporter.logger(
                                     chalk`{green Using run ${this.runId} to publish test results}`
                                 );
                             } else {
-                                this.log(
+                                QaseCoreReporter.logger(
                                     chalk`{red Could not create run in project ${this.options.projectCode}}`
                                 );
                                 this.isDisabled = true;
@@ -424,6 +430,14 @@ export class QaseCoreReporter {
     public async end({ spawn }: { spawn: boolean }): Promise<void> {
         // let hashesMap = {};
         if (this.isDisabled) {
+            return;
+        }
+
+        if (this.resultsForPublishing.length === 0) {
+            this.isDisabled = true;
+            QaseCoreReporter.logger(
+                'No test cases were matched. Ensure that your tests are declared correctly.'
+            );
             return;
         }
 
@@ -459,9 +473,10 @@ export class QaseCoreReporter {
             spawnSync('node', [`${__dirname}/result-bulk-detached.js`], {
                 stdio: 'inherit',
                 env: Object.assign(process.env, {
+                    QASE_LOGGING: process.env.QASE_LOGGING,
                     NODE_NO_WARNINGS: '1',
                     reporting_config: JSON.stringify(config),
-                    screenshots_config: JSON.stringify(attachmentsConfig),
+                    attachments_config: JSON.stringify(attachmentsConfig),
                 }),
             });
             return;
@@ -469,7 +484,7 @@ export class QaseCoreReporter {
 
         if (this.options.qaseCoreReporterOptions?.uploadAttachments
             && Object.keys(this.attachments).length > 0) {
-            this.log(chalk`{yellow Uploading attachments to Qase}`);
+            QaseCoreReporter.logger(chalk`{yellow Uploading attachments to Qase}`);
 
             const attachmentKeys = Object.keys(this.attachments);
 
@@ -494,13 +509,6 @@ export class QaseCoreReporter {
             });
         }
 
-        if (this.resultsForPublishing.length === 0) {
-            this.log(
-                'No testcases were matched. Ensure that your tests are declared correctly.'
-            );
-            return;
-        }
-
         const body = {
             results: this.resultsForPublishing,
         };
@@ -511,7 +519,7 @@ export class QaseCoreReporter {
             body
         );
 
-        this.log(chalk`{green ${this.resultsForPublishing.length} result(s) sent to Qase}`);
+        QaseCoreReporter.logger(chalk`{green ${this.resultsForPublishing.length} result(s) sent to Qase}`);
 
         if (!this.options.runComplete) {
             return;
@@ -519,9 +527,9 @@ export class QaseCoreReporter {
 
         try {
             await this.api.runs.completeRun(this.options.projectCode, Number(this.runId));
-            this.log(chalk`{green Run ${this.runId} completed}`);
+            QaseCoreReporter.logger(chalk`{green Run ${this.runId} completed}`);
         } catch (err) {
-            this.log(`Error on completing run ${err as string}`);
+            QaseCoreReporter.logger(`Error on completing run ${err as string}`);
         }
     }
 
@@ -563,7 +571,7 @@ export class QaseCoreReporter {
             invalid: chalk`{yellowBright Test ${test.title} ${test.status}}`,
         };
         if (test.status) {
-            this.log(map[test.status]);
+            QaseCoreReporter.logger(map[test.status]);
         }
     }
 
@@ -609,15 +617,16 @@ export class QaseCoreReporter {
         }
 
         if (caseIds.length === 0) {
+            const suitePath = testResult.suitePath || '';
             caseObject.case = {
                 title: testResult.title,
                 suite_title: this.options.rootSuiteTitle
-                    ? `${this.options.rootSuiteTitle}\t${testResult.suitePath as string}`
-                    : testResult.suitePath,
+                    ? `${this.options.rootSuiteTitle}${suitePath ? `\t${suitePath}` : ''}`
+                    : suitePath,
             };
 
             this.resultsForPublishing.push(caseObject);
-            this.log(
+            QaseCoreReporter.logger(
                 chalk`{gray Result prepared for publish: ${testResult.title} }`
             );
         } else {
@@ -651,7 +660,7 @@ export class QaseCoreReporter {
 
             await cb(Boolean(resp.data.result?.code));
         } catch (err) {
-            this.log(err);
+            QaseCoreReporter.logger(err as string);
             this.isDisabled = true;
         }
     }
@@ -668,14 +677,14 @@ export class QaseCoreReporter {
         return this.api.runs
             .getRun(this.options.projectCode, Number(runId))
             .then((resp) => {
-                this.log(
+                QaseCoreReporter.logger(
                     `Get run result on checking run ${resp.data.result?.id as unknown as string
                     }`
                 );
                 cb(Boolean(resp.data.result?.id));
             })
             .catch((err) => {
-                this.log(`Error on checking run ${err as string}`);
+                QaseCoreReporter.logger(`Error on checking run ${err as string}`);
                 this.isDisabled = true;
             });
     }
@@ -706,18 +715,8 @@ export class QaseCoreReporter {
             );
             cb(res.data);
         } catch (err) {
-            this.log(`Error on creating run ${err as string}`);
+            QaseCoreReporter.logger(`Error on creating run ${err as string}`);
             this.isDisabled = true;
-        }
-    }
-
-    private log(message?: any, ...optionalParams: any[]) {
-        const logging = QaseCoreReporter.getEnv(Envs.logging) === 'true'
-            || this.options.logging
-            || false;
-
-        if (logging) {
-            QaseCoreReporter.logger(message, ...optionalParams);
         }
     }
 
@@ -725,7 +724,7 @@ export class QaseCoreReporter {
         this.runId = runId;
         if (this.runId) {
             while (this.pending.length) {
-                this.log(`Number of pending: ${this.pending.length}`);
+                QaseCoreReporter.logger(`Number of pending: ${this.pending.length}`);
                 const cb = this.pending.shift();
                 if (cb) {
                     cb(this.runId);
