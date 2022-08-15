@@ -135,7 +135,7 @@ describe('QaseCoreReporter', () => {
     });
 
     describe('Invalid', () => {
-        it('should be disabled if project is non-existent', async () => {
+        it('should be disabled if projectCode is non-existent', async () => {
             const reporter = new QaseCoreReporter(
                 {
                     apiToken: '123',
@@ -150,6 +150,45 @@ describe('QaseCoreReporter', () => {
             expect(reporter['isDisabled']).toBeTruthy();
         });
 
+        it('should be disabled if runId is non-existent', async () => {
+            const reporter = new QaseCoreReporter(
+                {
+                    apiToken: '123',
+                    projectCode: 'TP',
+                    runId: '404', // mock server will return 404
+                    report: true,
+                    logging: true
+                },
+                {
+                    frameworkName: 'jest',
+                    reporterName: 'qase-core-reporter'
+                });
+            await reporter.start();
+            expect(reporter['isDisabled']).toBeTruthy();
+        });
+
+        it('should throw error if there was an issue with runComplete request', async () => {
+            const reporter = new QaseCoreReporter(
+                {
+                    apiToken: '123',
+                    projectCode: 'TP-run-incomplete',
+                    runId: '3',
+                    runComplete: true,
+                    report: true,
+                    logging: true
+                },
+                {
+                    frameworkName: 'jest',
+                    reporterName: 'qase-core-reporter'
+                });
+            await reporter.start();
+            reporter.addTestResult(
+                { title: 'test', status: ResultCreateStatusEnum.INVALID },
+                ResultCreateStatusEnum.INVALID
+            );
+            await reporter.end({ spawn: false });
+            expect(reporter['isDisabled']).toBeTruthy();
+        });
     });
 
     describe('qaseOptions', () => {
@@ -587,7 +626,7 @@ describe('QaseCoreReporter', () => {
                     title: 'test',
                 };
                 const newTest = qaseParam('1', [0, 'a: a, b: b, expected: ab'], test.title);
-                expect(newTest).toBe('test (Qase Dataset: #0 (a: a, b: b, expected: ab))');
+                expect(newTest).toBe('test (Qase ID: 1) (Qase Dataset: #0 (a: a, b: b, expected: ab))');
             });
         });
 
