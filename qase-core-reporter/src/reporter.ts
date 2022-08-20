@@ -141,6 +141,7 @@ export class QaseCoreReporter {
     private isDisabled = false;
     private resultsForPublishing: ResultsForPublishing = [];
     private attachments: Record<string, IAttachment[]> = {};
+    private headers: Record<string, any> = {};
 
     public constructor(_reporterOptions: QaseOptions, _options: QaseCoreReporterOptions) {
         if (process.env.QASE_LOGGING === undefined) {
@@ -156,19 +157,28 @@ export class QaseCoreReporter {
 
         this.options = reporterOptions;
         this.options.qaseCoreReporterOptions = _options;
+        // All reporter options can be set via environment variables
+        // add default value if not set
         this.options.runName = QaseCoreReporter.getEnv(Envs.runName) || reporterOptions.runName;
-        this.options.runDescription = QaseCoreReporter.getEnv(Envs.runDescription) || reporterOptions.runDescription;
+        this.options.runDescription = QaseCoreReporter.getEnv(Envs.runDescription)
+            || reporterOptions.runDescription
+            || '';
         this.options.projectCode = QaseCoreReporter.getEnv(Envs.projectCode) || reporterOptions.projectCode;
         this.options.rootSuiteTitle = QaseCoreReporter.getEnv(Envs.rootSuiteTitle) || reporterOptions.rootSuiteTitle;
         this.options.runComplete = !!QaseCoreReporter.getEnv(Envs.runComplete) || reporterOptions.runComplete;
+        this.options.environmentId = Number.parseInt(QaseCoreReporter.getEnv(Envs.environmentId)!, 10)
+            || reporterOptions.environmentId;
+        this.options.basePath = QaseCoreReporter.getEnv(Envs.basePath) || reporterOptions.basePath;
+        this.options.apiToken = QaseCoreReporter.getEnv(Envs.apiToken) || reporterOptions.apiToken;
+        this.headers = QaseCoreReporter.createHeaders({
+            frameworkName: _options.frameworkName,
+            reporterName: _options.reporterName,
+        });
         this.attachments = {};
         this.api = new QaseApi(
-            QaseCoreReporter.getEnv(Envs.apiToken) || this.options.apiToken,
-            QaseCoreReporter.getEnv(Envs.basePath) || this.options.basePath,
-            QaseCoreReporter.createHeaders({
-                frameworkName: _options.frameworkName,
-                reporterName: _options.reporterName,
-            }),
+            this.options.apiToken,
+            this.options.basePath,
+            this.headers,
             _options.uploadAttachments
                 ? CustomBoundaryFormData
                 : undefined
@@ -182,7 +192,8 @@ export class QaseCoreReporter {
 
         if (!report) {
             QaseCoreReporter.logger(
-                chalk`{yellow QASE_REPORT env variable is not set. Reporting to qase.io is disabled.}`);
+                chalk`{yellow QASE_REPORT env variable is not set or qaseReporterOptions.report is false. 
+      Reporting to qase.io is disabled.}`);
             this.isDisabled = true;
             return;
         }
@@ -468,6 +479,7 @@ export class QaseCoreReporter {
                 screenshotFolder: screenshotFolder || 'screenshots',
                 videoFolder: videoFolder || 'videos',
                 uploadAttachments: uploadAttachments || false,
+                attachmentsMap: this.attachments,
             };
 
             spawnSync('node', [`${__dirname}/result-bulk-detached.js`], {
@@ -495,7 +507,6 @@ export class QaseCoreReporter {
                     testCaseId: key,
                     attachmentsHash,
                 };
-
             });
 
             const attachmentsToUploadResult = await Promise.all(attachmentsToUpload);
@@ -696,15 +707,14 @@ export class QaseCoreReporter {
     ): Promise<void> {
         try {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const environmentId = Number.parseInt(QaseCoreReporter.getEnv(Envs.environmentId)!, 10)
-                || this.options.environmentId;
+
 
             const runObject = QaseCoreReporter.createRunObject(
                 name || `Automated run ${new Date().toISOString()}`,
                 [],
                 {
                     description: description || `${QaseCoreReporter.reporterPrettyName} automated run`,
-                    environment_id: environmentId,
+                    environment_id: this.options.environmentId,
                     is_autotest: true,
                 }
             );
