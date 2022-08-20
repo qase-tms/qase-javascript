@@ -77,10 +77,14 @@ const parseAttachmentDirectory = (folder) => {
 
 const publishBulkResult = async () => {
     if (config) {
+        const { body } = config;
+        const results = body.results;
+
         QaseCoreReporter.logger('Publishing bulk result/s...');
 
         const api = new QaseApi(config.apiToken, config.basePath, config.headers, CustomBoundaryFormData);
 
+        // upload attachments from attachment directory
         if (attachmentsConfig.screenshotFolder && attachmentsConfig.uploadAttachments) {
             QaseCoreReporter.logger('Uploading screenshots to Qase...');
             try {
@@ -128,12 +132,38 @@ const publishBulkResult = async () => {
             }
         }
 
+        // upload attachments from attachment map
+        if (attachmentsConfig.attachmentsMap
+            && attachmentsConfig.uploadAttachments
+            && Object.keys(attachmentsConfig.attachmentsMap).length > 0) {
+            const attachmentsMap = attachmentsConfig.attachmentsMap;
+
+            QaseCoreReporter.logger(chalk`{yellow Uploading attachments to Qase}`);
+
+            const attachmentKeys = Object.keys(attachmentsMap);
+
+            const attachmentsToUpload = attachmentKeys.map(async (key) => {
+                const attachment = attachmentsMap[key];
+                const attachmentsHash = await QaseCoreReporter.uploadAttachments(attachment);
+                return {
+                    testCaseId: key,
+                    attachmentsHash,
+                };
+            });
+
+            const attachmentsToUploadResult = await Promise.all(attachmentsToUpload);
+            body.results = results.map((result) => {
+                const attachmentMapping = attachmentsToUploadResult
+                    .find((data) => data.testCaseId === result.id);
+                if (attachmentMapping) {
+                    result.attachments = attachmentMapping.attachmentsHash;
+                }
+                return result;
+            });
+        }
+
         try {
-            const { body } = config;
-
             if (hashesMap) {
-                const results = body.results;
-
                 const resultsWithAttachmentHashes = results.map(((result) => {
                     if (hashesMap[result.case_id]) {
                         return {
@@ -144,7 +174,6 @@ const publishBulkResult = async () => {
 
                     return result;
                 }));
-
                 body.results = resultsWithAttachmentHashes;
             }
 
