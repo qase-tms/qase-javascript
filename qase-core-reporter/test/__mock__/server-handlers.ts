@@ -44,7 +44,6 @@ const handlers = [
 
     // https://developers.qase.io/reference/create-run
     rest.post(qaseio('/run/:code'), (request, response, context) => {
-        console.log(JSON.stringify(request));
         if (request.params.code === 'run-404') {
             return response(
                 context.status(404)
