@@ -72,7 +72,6 @@ export interface QaseCoreReporterOptions {
     videoFolder?: string;
     uploadAttachments?: boolean;
     loadConfig?: boolean;
-    fileCaseIdMatchFunction?: (file: string) => CaseId[];
 }
 
 export interface TestResult {
@@ -165,7 +164,7 @@ export class QaseCoreReporter {
             || '';
         this.options.projectCode = QaseCoreReporter.getEnv(Envs.projectCode) || reporterOptions.projectCode;
         this.options.rootSuiteTitle = QaseCoreReporter.getEnv(Envs.rootSuiteTitle) || reporterOptions.rootSuiteTitle;
-        this.options.runComplete = !!QaseCoreReporter.getEnv(Envs.runComplete) || reporterOptions.runComplete;
+        this.options.runComplete = !!QaseCoreReporter.getEnv(Envs.runComplete) || reporterOptions.runComplete || false;
         this.options.environmentId = Number.parseInt(QaseCoreReporter.getEnv(Envs.environmentId)!, 10)
             || reporterOptions.environmentId;
         this.options.basePath = QaseCoreReporter.getEnv(Envs.basePath) || reporterOptions.basePath;
@@ -277,7 +276,7 @@ export class QaseCoreReporter {
     };
 
     private static removeQaseDataset(title: string): string {
-        return title.replace(REGEX_QASE_DATASET, '');
+        return title.replace(REGEX_QASE_DATASET, '').trim();
     }
 
     private static getCaseIds(title: string): number[] {
@@ -476,8 +475,8 @@ export class QaseCoreReporter {
             };
 
             const attachmentsConfig = {
-                screenshotFolder: screenshotFolder || 'screenshots',
-                videoFolder: videoFolder || 'videos',
+                screenshotFolder: screenshotFolder || undefined,
+                videoFolder: videoFolder || undefined,
                 uploadAttachments: uploadAttachments || false,
                 attachmentsMap: this.attachments,
             };
@@ -488,7 +487,7 @@ export class QaseCoreReporter {
                     QASE_LOGGING: process.env.QASE_LOGGING,
                     NODE_NO_WARNINGS: '1',
                     reporting_config: JSON.stringify(config),
-                    attachments_config: JSON.stringify(attachmentsConfig),
+                    attachments_config: JSON.stringify(attachmentsConfig) || {},
                 }),
             });
             return;
@@ -615,7 +614,9 @@ export class QaseCoreReporter {
                 : testResult.error?.stack?.replace(/\u001b\[.*?m/g, ''),
             comment: testResult.error
                 ? this.formatComment(testResult.title, testResult.error, parameterizedData)
-                : undefined,
+                : parameterizedData
+                    ? `::_using data set ${parameterizedData.id} ${parameterizedData.dataset}_`
+                    : undefined,
             defect: Statuses[status] === Statuses.failed,
             param: parameterizedData
                 ? { [frameworkName as string]: String(parameterizedData.id) }
@@ -630,7 +631,9 @@ export class QaseCoreReporter {
         if (caseIds.length === 0) {
             const suitePath = testResult.suitePath || '';
             caseObject.case = {
-                title: testResult.title,
+                title: parameterizedData
+                    ? QaseCoreReporter.removeQaseDataset(testResult.title)
+                    : testResult.title,
                 suite_title: this.options.rootSuiteTitle
                     ? `${this.options.rootSuiteTitle}${suitePath ? `\t${suitePath}` : ''}`
                     : suitePath,
@@ -668,7 +671,6 @@ export class QaseCoreReporter {
     ): Promise<void> {
         try {
             const resp = await this.api.projects.getProject(projectCode);
-
             await cb(Boolean(resp.data.result?.code));
         } catch (err) {
             QaseCoreReporter.logger(err as string);
@@ -732,14 +734,5 @@ export class QaseCoreReporter {
 
     private saveRunId(runId?: string | number) {
         this.runId = runId;
-        if (this.runId) {
-            while (this.pending.length) {
-                QaseCoreReporter.logger(`Number of pending: ${this.pending.length}`);
-                const cb = this.pending.shift();
-                if (cb) {
-                    cb(this.runId);
-                }
-            }
-        }
     }
 }

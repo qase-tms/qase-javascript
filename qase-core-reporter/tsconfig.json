@@ -18,7 +18,13 @@
     "types": ["node", "jest"],
     "resolveJsonModule": true
   },
-  "exclude": ["node_modules", "dist", "examples", "**/**.test.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "examples",
+    "**/**.test.ts",
+    "test/__mock__"
+  ],
   "compilation": {
     "compiler": {
       "context": "./src",

@@ -56,6 +56,7 @@ const parseAttachmentDirectory = (folder) => {
     const filePathByCaseIdMap = {};
 
     files.forEach((file) => {
+
         if (file.includes('Qase ID')) {
             const caseIds = getCaseId(file);
 
@@ -84,7 +85,7 @@ const publishBulkResult = async () => {
 
         const api = new QaseApi(config.apiToken, config.basePath, config.headers, CustomBoundaryFormData);
 
-        // upload attachments from attachment directory
+        // upload attachments from screenshot directory
         if (attachmentsConfig.screenshotFolder && attachmentsConfig.uploadAttachments) {
             QaseCoreReporter.logger('Uploading screenshots to Qase...');
             try {
@@ -95,7 +96,7 @@ const publishBulkResult = async () => {
                     const uploadAttachmentsPromisesArray = filesMap.map(async (failedCase) => {
                         const caseId = failedCase.caseId;
 
-                        const pathToFile = `./${screenshotsConfig.screenshotFolder}/${failedCase.file[0]}`;
+                        const pathToFile = `./${attachmentsConfig.screenshotFolder}/${failedCase.file[0]}`;
 
                         const data = fs.createReadStream(pathToFile);
 
@@ -125,7 +126,55 @@ const publishBulkResult = async () => {
                     hashesMap = responses.reduce((accum, value) => {
                         accum[value.caseId] = value.hash;
                         return accum;
-                    }, {});
+                    }, hashesMap);
+                }
+            } catch (error) {
+                QaseCoreReporter.logger(chalk`{red Error during sending screenshots ${error}}`);
+            }
+        }
+
+        // upload attachments from video directory
+        if (attachmentsConfig.videoFolder && attachmentsConfig.uploadAttachments) {
+            QaseCoreReporter.logger('Uploading videos to Qase...');
+            try {
+                const filePathesByCaseIdMap = parseAttachmentDirectory(attachmentsConfig.videoFolder);
+
+                if (filePathesByCaseIdMap) {
+                    const filesMap = Object.values(filePathesByCaseIdMap);
+                    const uploadAttachmentsPromisesArray = filesMap.map(async (failedCase) => {
+                        const caseId = failedCase.caseId;
+
+                        const pathToFile = `./${attachmentsConfig.videoFolder}/${failedCase.file[0]}`;
+
+                        const data = fs.createReadStream(pathToFile);
+
+                        const options = {
+                            headers: {
+                                'Content-Type':
+                                    'multipart/form-data; boundary=' + customBoundary,
+                            },
+                        };
+
+                        if (data) {
+                            const resp = await api.attachments.uploadAttachment(
+                                config.code,
+                                [data],
+                                options
+                            );
+
+                            return {
+                                hash: resp.data.result?.[0].hash,
+                                caseId,
+                            };
+                        }
+                    });
+
+                    const responses = await Promise.all(uploadAttachmentsPromisesArray);
+
+                    hashesMap = responses.reduce((accum, value) => {
+                        accum[value.caseId] = value.hash;
+                        return accum;
+                    }, hashesMap);
                 }
             } catch (error) {
                 QaseCoreReporter.logger(chalk`{red Error during sending screenshots ${error}}`);

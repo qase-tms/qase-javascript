@@ -18,8 +18,8 @@ const handlers = [
     rest.get(qaseio('/project/:code'), (request, response, context) => {
         if (request.params.code.includes('invalid')) {
             return response(
-                context.json({ errorMessage: 'Project not found!' }),
-                context.status(404)
+                context.json({ result: { code: undefined } }),
+                context.status(500)
             );
         }
         return response(context.json({ result: { code: request.params.code } }));
@@ -30,7 +30,7 @@ const handlers = [
         if (request.params.id === '404') {
             return response(
                 context.json({ errorMessage: 'Run not found!' }),
-                context.status(404)
+                context.status(500)
             );
         }
         if (request.params.id.includes('invalid')) {
@@ -46,13 +46,13 @@ const handlers = [
     rest.post(qaseio('/run/:code'), (request, response, context) => {
         if (request.params.code === 'run-404') {
             return response(
-                context.status(404)
+                context.status(500)
             );
         }
         if (request.params.code.includes('invalid')) {
             return response(
                 context.json({ errorMessage: 'Could not create run!' }),
-                context.status(404)
+                context.status(500)
             );
         }
         return response(context.json({ result: { id: 1 } }));
