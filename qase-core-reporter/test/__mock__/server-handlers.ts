@@ -39,6 +39,13 @@ const handlers = [
                 context.status(404)
             );
         }
+
+        if (request.params.id.includes('999')) {
+            return response(
+                context.json({ result: { id: undefined } }),
+                context.status(200)
+            );
+        }
         if (request.params.id.includes('invalid')) {
             return response(
                 context.json({ result: { id: undefined } }),
@@ -56,6 +63,13 @@ const handlers = [
                 context.status(500)
             );
         }
+
+        if (request.params.code.includes('run-403')) {
+            return response(
+                context.status(200)
+            );
+        }
+
         if (request.params.code.includes('invalid')) {
             return response(
                 context.json({ errorMessage: 'Could not create run!' }),

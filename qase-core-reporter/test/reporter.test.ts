@@ -114,6 +114,25 @@ describe('QaseCoreReporter', () => {
                 expect(reporter['isDisabled']).toBe(true);
             });
 
+            it('should disable if run does not exist', async () => {
+                process.env.QASE_RUN_ID = '999';
+                const reporter = new QaseCoreReporter(
+                    {
+                        report: true,
+                        apiToken: '123',
+                        projectCode: 'TP',
+                        logging: true,
+                        basePath: 'https://api.qase.io/v1',
+                        runComplete: true,
+                        environmentId: 1,
+                        rootSuiteTitle: 'Cypress tests',
+                    },
+                    qaseCoreReporterOptions);
+
+                await reporter.start();
+                expect(reporter['isDisabled']).toBe(true);
+            });
+
             it('should disable if there is an issue while checking project', async () => {
                 const reporter = new QaseCoreReporter(
                     {
@@ -147,6 +166,26 @@ describe('QaseCoreReporter', () => {
                     },
                     qaseCoreReporterOptions);
                 await reporter.start();
+                expect(reporter['isDisabled']).toBe(true);
+            });
+
+            it('should disable if cannot create run in project', async () => {
+                delete process.env.QASE_RUN_ID;
+                const reporter = new QaseCoreReporter(
+                    {
+                        report: true,
+                        apiToken: '123',
+                        projectCode: 'run-403',
+                        basePath: 'https://api.qase.io/v1',
+                        runComplete: true,
+                        environmentId: 1,
+                        rootSuiteTitle: 'Cypress tests',
+
+                    },
+                    qaseCoreReporterOptions);
+
+                await reporter.start();
+
                 expect(reporter['isDisabled']).toBe(true);
             });
 
@@ -232,6 +271,58 @@ describe('QaseCoreReporter', () => {
 
                 const reporter = new QaseCoreReporter(options, qaseCoreOptions);
                 reporter.addTestResult(testData, ResultCreateStatusEnum.PASSED, [{ path: process.cwd() + '/screenshots/' + 'screenshot.png' }]);
+                expect(reporter['resultsForPublishing'][0])
+                    .toEqual(expect.objectContaining(expectedData));
+            });
+
+            it('should add unknown case even without root suite title', () => {
+                const testData: TestResult = {
+                    id: '1245643254',
+                    title: 'Test 1',
+                    status: ResultCreateStatusEnum.PASSED,
+                    duration: 100,
+                    suitePath: 'Test Suite',
+                };
+
+                const expectedData = {
+                    id: '1245643254',
+                    status: 'passed',
+                    time_ms: 100,
+                    stacktrace: undefined,
+                    comment: undefined,
+                    defect: false,
+                    param: undefined,
+                    attachments: undefined,
+                    case: {
+                        title: 'Test 1',
+                        suite_title: 'Test Suite'
+                    }
+                };
+
+                options.rootSuiteTitle = undefined as any
+
+                const reporter = new QaseCoreReporter(options, qaseCoreOptions);
+                reporter.addTestResult(testData, ResultCreateStatusEnum.PASSED, []);
+                expect(reporter['resultsForPublishing'][0])
+                    .toEqual(expect.objectContaining(expectedData));
+
+                options.rootSuiteTitle = 'Cypress tests'
+            });
+
+            it('should add failed as default status if no status/unknown is provided', () => {
+                const testData: TestResult = {
+                    id: '1245643254',
+                    title: 'Test 1',
+                    duration: 100,
+                } as any
+
+                const expectedData = {
+                    id: '1245643254',
+                    status: 'failed',
+                    time_ms: 100,
+                }
+                const reporter = new QaseCoreReporter(options, qaseCoreOptions);
+                reporter.addTestResult(testData, 'unknown-status' as any, []);
                 expect(reporter['resultsForPublishing'][0])
                     .toEqual(expect.objectContaining(expectedData));
             });
