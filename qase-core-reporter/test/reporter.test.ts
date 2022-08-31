@@ -77,6 +77,7 @@ describe('QaseCoreReporter', () => {
     describe('public methods', () => {
         delete process.env.QASE_PROJECT_CODE;
         describe('start', () => {
+            process.env.QASE_LOGGING = 'true';
             it('should check valid project, and existing run', async () => {
                 const reporter = new QaseCoreReporter(
                     {
@@ -100,7 +101,80 @@ describe('QaseCoreReporter', () => {
                     {
                         report: true,
                         apiToken: '123',
+                        projectCode: 'TP-not-exist',
+                        logging: true,
+                        basePath: 'https://api.qase.io/v1',
+                        runComplete: true,
+                        environmentId: 1,
+                        rootSuiteTitle: 'Cypress tests',
+                    },
+                    qaseCoreReporterOptions);
+
+                await reporter.start();
+                expect(reporter['isDisabled']).toBe(true);
+            });
+
+            it('should disable if there is an issue while checking project', async () => {
+                const reporter = new QaseCoreReporter(
+                    {
+                        report: true,
+                        apiToken: '123',
                         projectCode: 'TP-invalid',
+                        logging: true,
+                        basePath: 'https://api.qase.io/v1',
+                        runComplete: true,
+                        environmentId: 1,
+                        rootSuiteTitle: 'Cypress tests',
+                    },
+                    qaseCoreReporterOptions);
+
+                await reporter.start();
+                expect(reporter['isDisabled']).toBe(true);
+            });
+
+            it('should disable if there is an issue while creating run', async () => {
+                delete process.env.QASE_RUN_ID;
+                const reporter = new QaseCoreReporter(
+                    {
+                        report: true,
+                        apiToken: '123',
+                        projectCode: 'run-404',
+                        basePath: 'https://api.qase.io/v1',
+                        runComplete: true,
+                        environmentId: 1,
+                        rootSuiteTitle: 'Cypress tests',
+                        runName: 'Run error',
+                    },
+                    qaseCoreReporterOptions);
+                await reporter.start();
+                expect(reporter['isDisabled']).toBe(true);
+            });
+
+            it('should disable if there is an issue while checking run', async () => {
+                process.env.QASE_RUN_ID = '404';
+                const reporter = new QaseCoreReporter(
+                    {
+                        report: true,
+                        apiToken: '123',
+                        projectCode: 'TP',
+                        basePath: 'https://api.qase.io/v1',
+                        runComplete: true,
+                        environmentId: 1,
+                        rootSuiteTitle: 'Cypress tests',
+                    },
+                    qaseCoreReporterOptions);
+
+                await reporter.start();
+                expect(reporter['isDisabled']).toBe(true);
+                process.env.QASE_RUN_ID = undefined;
+            });
+
+            it('should not run start if disabled', async () => {
+                const reporter = new QaseCoreReporter(
+                    {
+                        report: false,
+                        apiToken: '123',
+                        projectCode: 'TP',
                         logging: true,
                         basePath: 'https://api.qase.io/v1',
                         runComplete: true,
@@ -337,6 +411,7 @@ describe('QaseCoreReporter', () => {
             });
 
             it('add test result with attachments', async () => {
+                process.env.QASE_RUN_ID = '1';
                 const reporter = new QaseCoreReporter(
                     { apiToken: '123', projectCode: 'TP', runComplete: true, report: true },
                     { frameworkName: 'jest', reporterName: 'qase', uploadAttachments: true }

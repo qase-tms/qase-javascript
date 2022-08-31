@@ -22,6 +22,12 @@ const handlers = [
                 context.status(500)
             );
         }
+        if (request.params.code.includes('not-exist')) {
+            return response(
+                context.json({ result: { code: undefined } }),
+                context.status(200)
+            );
+        }
         return response(context.json({ result: { code: request.params.code } }));
     }),
 
@@ -29,23 +35,24 @@ const handlers = [
     rest.get(qaseio('/run/:code/:id'), (request, response, context) => {
         if (request.params.id === '404') {
             return response(
-                context.json({ errorMessage: 'Run not found!' }),
-                context.status(500)
+                context.json({ result: { id: undefined } }),
+                context.status(404)
             );
         }
         if (request.params.id.includes('invalid')) {
             return response(
-                context.json({ errorMessage: 'Run not found!' }),
-                context.status(404)
+                context.json({ result: { id: undefined } }),
+                context.status(500)
             );
         }
-        return response(context.json({ result: { id: request.params.id } }));
+        return response(context.json({ result: { id: 1 } }));
     }),
 
     // https://developers.qase.io/reference/create-run
     rest.post(qaseio('/run/:code'), (request, response, context) => {
-        if (request.params.code === 'run-404') {
+        if (request.params.code.includes('run-404')) {
             return response(
+                context.json(undefined),
                 context.status(500)
             );
         }

@@ -682,10 +682,6 @@ export class QaseCoreReporter {
         runId: string | number | undefined,
         cb: (exists: boolean) => void
     ): Promise<void> {
-        if (runId === undefined) {
-            cb(false);
-            return;
-        }
 
         return this.api.runs
             .getRun(this.options.projectCode, Number(runId))
