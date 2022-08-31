@@ -490,18 +490,75 @@ describe('QaseCoreReporter', () => {
 
         describe('end', () => {
 
-            it('no test results added', async () => {
+            it('should not run end if disabled', async () => {
+                const reporter = new QaseCoreReporter(
+                    { apiToken: '123', projectCode: 'TP-invalid', report: true, runComplete: true },
+                    { frameworkName: 'jest', reporterName: 'qase' }
+                );
+                const spyOnLog = vi.spyOn(console, 'log');
+
+                await reporter.start();
+                await reporter.end({ spawn: false });
+                expect(spyOnLog).toHaveBeenCalledWith(
+                    expect.not.stringContaining('No test cases were matched. Ensure that your tests are declared correctly.')
+                );
+            });
+
+            it('should support sending results without completing run', async () => {
+                const reporter = new QaseCoreReporter(
+                    { apiToken: '123', projectCode: 'TP', runId: '1', report: true, runComplete: false },
+                    { frameworkName: 'jest', reporterName: 'qase' }
+                );
+                const spyOnLog = vi.spyOn(console, 'log');
+                await reporter.start();
+
+                reporter.addTestResult({ title: 'test', status: ResultCreateStatusEnum.PASSED }, ResultCreateStatusEnum.PASSED);
+
+                await reporter.end({ spawn: false });
+                expect(spyOnLog).toHaveBeenCalledWith(
+                    expect.not.stringContaining('Run 1 completed')
+                );
+            });
+
+            it('should display log for no test results added', async () => {
                 const reporter = new QaseCoreReporter(
                     { apiToken: '123', projectCode: 'TP', report: true, runComplete: true },
                     { frameworkName: 'jest', reporterName: 'qase' }
                 );
+                const spyOnLog = vi.spyOn(console, 'log');
 
                 await reporter.start();
                 await reporter.end({ spawn: false });
+                expect(spyOnLog)
+                    .toHaveBeenCalledWith(
+                        expect.stringContaining('No test cases were matched. Ensure that your tests are declared correctly.')
+                    );
                 expect(reporter.resultsForPublishingCount).toEqual(0);
             });
 
-            it('add test result with attachments', async () => {
+            it('should log error if there is an issue completing run', async () => {
+                const reporter = new QaseCoreReporter(
+                    {
+                        apiToken: '123',
+                        projectCode: 'run-incomplete',
+                        runId: '1',
+                        report: true,
+                        runComplete: true
+                    },
+                    { frameworkName: 'jest', reporterName: 'qase' }
+                );
+                const spyOnLog = vi.spyOn(console, 'log');
+                await reporter.start();
+
+                reporter.addTestResult({ title: 'incomplete run test', status: ResultCreateStatusEnum.PASSED }, ResultCreateStatusEnum.PASSED);
+
+                await reporter.end({ spawn: false });
+                expect(spyOnLog).toHaveBeenCalledWith(
+                    expect.stringContaining('Error on completing run')
+                );
+            });
+
+            it('should add test result with attachments', async () => {
                 process.env.QASE_RUN_ID = '1';
                 const reporter = new QaseCoreReporter(
                     { apiToken: '123', projectCode: 'TP', runComplete: true, report: true },
@@ -536,7 +593,7 @@ describe('QaseCoreReporter', () => {
                 expect(reporter['attachments']).toEqual({ 123: [{ path: attachmentPath }] });
             });
 
-            it.skip('end report using spawn', async () => {
+            it.skip('should end report using spawn', async () => {
 
                 const reporter = new QaseCoreReporter(
                     { apiToken: '123', projectCode: 'TP', report: true },
