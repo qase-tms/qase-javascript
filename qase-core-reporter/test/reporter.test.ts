@@ -9,7 +9,6 @@ import {
     qaseTitle,
     TestResult,
     qaseParam,
-    Statuses
 } from '../src';
 
 describe('QaseCoreReporter', () => {
@@ -228,7 +227,7 @@ describe('QaseCoreReporter', () => {
         });
 
         describe('addTestResult', () => {
-            const options = {
+            const options: QaseOptions = {
                 report: true,
                 apiToken: '123',
                 projectCode: 'TP',
@@ -593,18 +592,29 @@ describe('QaseCoreReporter', () => {
                 expect(reporter['attachments']).toEqual({ 123: [{ path: attachmentPath }] });
             });
 
-            it.skip('should end report using spawn', async () => {
-
+            it('should end report using spawn', async () => {
                 const reporter = new QaseCoreReporter(
-                    { apiToken: '123', projectCode: 'TP', report: true },
-                    { frameworkName: 'jest', reporterName: 'qase', uploadAttachments: true, screenshotFolder: 'screenshots' }
+                    {
+                        apiToken: '123',
+                        projectCode: 'TP',
+                        report: true,
+                        runComplete: true
+                    },
+                    {
+                        frameworkName: 'jest', reporterName: 'qase',
+                        uploadAttachments: true,
+                        screenshotFolder: 'screenshots',
+                        videoFolder: 'videos'
+                    }
                 );
                 const endSpy = vi.spyOn(reporter, 'end');
 
                 // start mock server in separate process
                 await reporter.start();
 
-                reporter.addTestResult({ title: 'test', status: ResultCreateStatusEnum.PASSED }, ResultCreateStatusEnum.PASSED);
+                reporter.addTestResult({ title: 'test', status: ResultCreateStatusEnum.PASSED },
+                    ResultCreateStatusEnum.PASSED,
+                    [{ path: process.cwd() + '/screenshots/screenshot.png' }]);
 
                 await reporter.end({ spawn: true });
 
