@@ -377,7 +377,6 @@ describe('QaseCoreReporter', () => {
                     { frameworkName: 'jest', reporterName: 'qase', uploadAttachments: true, screenshotFolder: 'screenshots' }
                 );
                 const endSpy = vi.spyOn(reporter, 'end');
-                reporter['end'] = vi.fn(reporter.end);
 
                 // start mock server in separate process
                 await reporter.start();
