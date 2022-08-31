@@ -19,6 +19,61 @@ describe('QaseCoreReporter', () => {
         frameworkName: 'qase-core-reporter',
     };
 
+    describe('load Qase config', () => {
+        it('should load config from setting loadConfig=true,qase.config.json', () => {
+            const testConfigData = require('../qase.config.json');
+            const reporter = new QaseCoreReporter(
+                {} as any,
+                {
+                    frameworkName: 'jest',
+                    reporterName: 'qase-core-reporter',
+                    loadConfig: true
+                });
+            expect(reporter.options.apiToken).toEqual(testConfigData.apiToken);
+        });
+
+        it('should load config from setting loadConfig=true,.qaserc', () => {
+            // delete qase.config.json
+            const testConfigData = require('../qase.config.json');
+            unlinkSync(process.cwd() + '/qase.config.json');
+            const reporter = new QaseCoreReporter(
+                {} as any,
+                {
+                    frameworkName: 'jest',
+                    reporterName: 'qase-core-reporter',
+                    loadConfig: true
+                });
+            expect(reporter.options.projectCode).toEqual('ConfigRCProject');
+            // restore qase.config.json
+            writeFileSync(process.cwd() + '/qase.config.json', JSON.stringify(testConfigData, null, 2));
+        });
+
+        it('should load config from loadConfig public method - qase.config.json', () => {
+            const loadedConfig = QaseCoreReporter.loadConfig('qase.config.json');
+            const testConfigData = require('../qase.config.json');
+            expect(testConfigData).toEqual(loadedConfig);
+        });
+
+        it('should load config from loadConfig public method - .qaserc', () => {
+            const loadedConfig = QaseCoreReporter.loadConfig('.qaserc');
+            expect(loadedConfig).toEqual({
+                "projectCode": "ConfigRCProject",
+                "apiToken": "11235678909"
+            });
+        });
+
+        it('should return empty object when config parsing throws error', () => {
+            const testConfigData = require('../qase.config.json');
+            // create invalid json
+            writeFileSync(process.cwd() + '/qase.config.json', 'invalid json');
+            const loadedConfig = QaseCoreReporter.loadConfig('qase.config.json');
+            expect(loadedConfig).toEqual({});
+            // restore qase.config.json
+            writeFileSync(process.cwd() + '/qase.config.json', JSON.stringify(testConfigData, null, 2));
+        });
+
+    });
+
     describe('public methods', () => {
         delete process.env.QASE_PROJECT_CODE;
         describe('start', () => {
@@ -315,17 +370,20 @@ describe('QaseCoreReporter', () => {
                 expect(reporter['attachments']).toEqual({ 123: [{ path: attachmentPath }] });
             });
 
-            it('end report using spawn', async () => {
+            it.skip('end report using spawn', async () => {
 
                 const reporter = new QaseCoreReporter(
                     { apiToken: '123', projectCode: 'TP', report: true },
                     { frameworkName: 'jest', reporterName: 'qase', uploadAttachments: true, screenshotFolder: 'screenshots' }
                 );
                 const endSpy = vi.spyOn(reporter, 'end');
+                reporter['end'] = vi.fn(reporter.end);
 
                 // start mock server in separate process
                 await reporter.start();
+
                 reporter.addTestResult({ title: 'test', status: ResultCreateStatusEnum.PASSED }, ResultCreateStatusEnum.PASSED);
+
                 await reporter.end({ spawn: true });
 
                 // check on child process
@@ -853,61 +911,6 @@ describe('QaseCoreReporter', () => {
                     .toBe(true);
             });
         });
-    });
-
-    describe.skip('load Qase config', () => {
-        it('should load config from setting loadConfig=true,qase.config.json', () => {
-            const testConfigData = require('../qase.config.json');
-            const reporter = new QaseCoreReporter(
-                {} as any,
-                {
-                    frameworkName: 'jest',
-                    reporterName: 'qase-core-reporter',
-                    loadConfig: true
-                });
-            expect(reporter.options.apiToken).toEqual(testConfigData.apiToken);
-        });
-
-        it('should load config from setting loadConfig=true,.qaserc', () => {
-            // delete qase.config.json
-            const testConfigData = require('../qase.config.json');
-            unlinkSync(process.cwd() + '/qase.config.json');
-            const reporter = new QaseCoreReporter(
-                {} as any,
-                {
-                    frameworkName: 'jest',
-                    reporterName: 'qase-core-reporter',
-                    loadConfig: true
-                });
-            expect(reporter.options.projectCode).toEqual('ConfigRCProject');
-            // restore qase.config.json
-            writeFileSync(process.cwd() + '/qase.config.json', JSON.stringify(testConfigData, null, 2));
-        });
-
-        it('should load config from loadConfig public method - qase.config.json', () => {
-            const loadedConfig = QaseCoreReporter.loadConfig('qase.config.json');
-            const testConfigData = require('../qase.config.json');
-            expect(testConfigData).toEqual(loadedConfig);
-        });
-
-        it('should load config from loadConfig public method - .qaserc', () => {
-            const loadedConfig = QaseCoreReporter.loadConfig('.qaserc');
-            expect(loadedConfig).toEqual({
-                "projectCode": "ConfigRCProject",
-                "apiToken": "11235678909"
-            });
-        });
-
-        it('should return empty object when config parsing throws error', () => {
-            const testConfigData = require('../qase.config.json');
-            // create invalid json
-            writeFileSync(process.cwd() + '/qase.config.json', 'invalid json');
-            const loadedConfig = QaseCoreReporter.loadConfig('qase.config.json');
-            expect(loadedConfig).toEqual({});
-            // restore qase.config.json
-            writeFileSync(process.cwd() + '/qase.config.json', JSON.stringify(testConfigData, null, 2));
-        });
-
     });
 
     describe('qase exports', () => {
