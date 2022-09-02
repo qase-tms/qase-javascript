@@ -1,0 +1,12 @@
+{
+  "report": true,
+  "logging": true,
+  "environmentId": 1,
+  "apiToken": "ac807c16ac4faeb074721a02e11586393b8caf87",
+  "runComplete": true,
+  "projectCode": "TP",
+  "runName": "TestCafe run %DATE% %AGENTS%",
+  "basePath": "https://api.qase.io/v1",
+  "uploadAttachments": true,
+  "rootSuiteTitle": "TestCafe tests"
+}
