@@ -1,5 +1,6 @@
 
 /* eslint-disable  sort-imports*/
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ResultCreateStatusEnum } from 'qaseio/dist/src';
 import { QaseCoreReporter, QaseOptions, Statuses, TestResult } from 'qase-core-reporter';
 import { Formatter } from '@cucumber/cucumber';
@@ -22,22 +23,9 @@ import ITestStepFinished = io.cucumber.messages.ITestStepFinished;
 import IAttachment = io.cucumber.messages.IAttachment;
 import Status = io.cucumber.messages.TestStepFinished.TestStepResult.Status;
 
-const loadJSON = (file: string): QaseOptions | undefined => {
-    try {
-        const data = fs.readFileSync(file, { encoding: 'utf8' });
-
-        if (data) {
-            return JSON.parse(data) as QaseOptions;
-        }
-    } catch (error) {
-        // Ignore error when file does not exist or it's malformed
-    }
-
-    return undefined;
-};
 
 const prepareConfig = (options: QaseOptions = {} as QaseOptions, configFile = '.qaserc'): QaseOptions => {
-    const loaded = loadJSON(path.join(process.cwd(), configFile || '.qaserc'));
+    const loaded = QaseCoreReporter.loadConfig(path.join(process.cwd(), configFile || '.qaserc'));
     if (!loaded) {
         // eslint-disable-next-line no-throw-literal
         QaseCoreReporter.logger(chalk`{red Missing .qaserc file}`);
@@ -47,19 +35,7 @@ const prepareConfig = (options: QaseOptions = {} as QaseOptions, configFile = '.
         options,
     );
 
-    return {
-        report: process.env.QASE_REPORT === 'true' || config.report || false,
-        basePath: process.env.QASE_API_BASE_URL || config.basePath,
-        apiToken: process.env.QASE_API_TOKEN || config.apiToken || '',
-        rootSuiteTitle: process.env.QASE_ROOT_SUITE_TITLE || config.rootSuiteTitle,
-        environmentId: Number.parseInt(process.env.QASE_ENVIRONMENT_ID!, 10) || config.environmentId,
-        projectCode: process.env.QASE_PROJECT || config.projectCode || '',
-        runId: process.env.QASE_RUN_ID || config.runId || '',
-        runName: process.env.QASE_RUN_NAME || config.runName || 'Automated Run %DATE%',
-        runDescription: process.env.QASE_RUN_DESCRIPTION || config.runDescription,
-        logging: process.env.QASE_LOGGING !== '' || config.logging,
-        runComplete: process.env.QASE_RUN_COMPLETE === 'true' || config.runComplete || false,
-    };
+    return config;
 };
 
 const prepareReportName = (
@@ -94,16 +70,17 @@ class CucumberJSQaseReporter extends Formatter {
         super(options);
         QaseCoreReporter.reporterPrettyName = 'CucumberJS';
         options.eventBroadcaster.on('envelope', this.parseEnvelope.bind(this));
-        const qOptions: QaseOptions = prepareConfig(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const qOptions: QaseOptions & { uploadAttachments: boolean } = prepareConfig(
             options.parsedArgvOptions as QaseOptions,
             options.parsedArgvOptions?.qaseConfig
-        );
+        ) as any;
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         qOptions.runName = prepareReportName(qOptions);
         this.reporter = new QaseCoreReporter(qOptions, {
             frameworkName: '@cucumber/cucumber',
             reporterName: 'cucumberjs-qase-reporter',
-            uploadAttachments: true,
+            uploadAttachments: qOptions.uploadAttachments,
         });
     }
 
