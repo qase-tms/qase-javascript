@@ -1,0 +1,18 @@
+{
+  "name": "examples-cypress-v10",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "QASE_REPORT=1 npx cypress run"
+  },
+  "devDependencies": {
+    "cypress": "^10.1.0",
+    "cypress-mochawesome-reporter": "^3.0.1",
+    "cypress-multi-reporters": "^1.4.0",
+    "mocha": "^10.0.0",
+    "cypress-qase-reporter": "../../"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

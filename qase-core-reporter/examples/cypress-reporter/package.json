@@ -11,8 +11,7 @@
     "lint:fix": "eslint --fix src/**",
     "build": "npm run clean && npm run dev",
     "test": "jest --coverage",
-    "clean": "rm -rf dist || true",
-    "test:cypress": "QASE_REPORT=1 npx cypress run"
+    "clean": "rm -rf dist || true"
   },
   "devDependencies": {
     "cypress": "^10.1.0",
