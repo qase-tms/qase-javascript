@@ -35,6 +35,7 @@ enum Envs {
     environmentId = 'QASE_ENVIRONMENT_ID',
     rootSuiteTitle = 'QASE_ROOT_SUITE_TITLE',
     logging = 'QASE_LOGGING',
+    uploadAttachments = 'QASE_UPLOAD_ATTACHMENTS',
 }
 
 export const Statuses = {
@@ -62,8 +63,6 @@ export interface QaseOptions {
     runName?: string;
     qaseCoreReporterOptions?: QaseCoreReporterOptions;
 }
-
-type CaseId = number;
 
 export interface QaseCoreReporterOptions {
     frameworkName: string;
@@ -156,6 +155,9 @@ export class QaseCoreReporter {
 
         this.options = reporterOptions;
         this.options.qaseCoreReporterOptions = _options;
+        this.options.qaseCoreReporterOptions.uploadAttachments = !!QaseCoreReporter.getEnv(Envs.uploadAttachments)
+            || this.options.qaseCoreReporterOptions.uploadAttachments
+            || false;
         // All reporter options can be set via environment variables
         // add default value if not set
         this.options.runName = QaseCoreReporter.getEnv(Envs.runName) || reporterOptions.runName;
@@ -178,7 +180,7 @@ export class QaseCoreReporter {
             this.options.apiToken,
             this.options.basePath,
             this.headers,
-            _options.uploadAttachments
+            this.options.qaseCoreReporterOptions.uploadAttachments
                 ? CustomBoundaryFormData
                 : undefined
         );

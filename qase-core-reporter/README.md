@@ -98,4 +98,5 @@ reporter.end({ spawn: false }); // spawn true will finish reporting in a child p
 | `QASE_RUN_COMPLETE` | string | Whether or not to complete a test run when results are posted |
 | `QASE_ENVIRONMENT_ID` | string | Qase environment ID |
 | `QASE_ROOT_SUITE_TITLE` | string | The root suite that unknown test cases will be added to |
+| `QASE_UPLOAD_ATTACHMENTS` | string | Whether or not to upload attachments
 | `QASE_LOGGING` | boolean | Whether or not to output Qase logs while testing and reporting |
