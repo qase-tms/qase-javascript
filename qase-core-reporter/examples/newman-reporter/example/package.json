@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "QASE_REPORT=1 newman run ./sample-collection.json -r qase --reporter-qase-logging --reporter-qase-projectCode TP --reporter-qase-apiToken a3187da5354d0d8ec6934719744ddf29ca9ab22c --reporter-qase-rootSuiteTitle 'Newman tests' --reporter-qase-runComplete"
+    "test": "QASE_REPORT=1 newman run ./sample-collection.json -r qase --reporter-qase-logging --reporter-qase-projectCode project_code --reporter-qase-apiToken api_key --reporter-qase-rootSuiteTitle 'Newman tests' --reporter-qase-runComplete"
   },
   "keywords": [],
   "author": "",
