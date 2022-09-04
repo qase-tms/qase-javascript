@@ -177,7 +177,7 @@ const publishBulkResult = async () => {
                     }, hashesMap);
                 }
             } catch (error) {
-                QaseCoreReporter.logger(chalk`{red Error during sending screenshots ${error}}`);
+                QaseCoreReporter.logger(chalk`{red Error during sending videos ${error}}`);
             }
         }
 

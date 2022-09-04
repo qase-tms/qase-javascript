@@ -17,10 +17,13 @@ class CypressQaseReporter extends reporters.Base {
     public constructor(runner: Runner, options: MochaOptions) {
         super(runner, options);
 
+        QaseCoreReporter.reporterPrettyName = 'Cypress';
+
         this.reporter = new QaseCoreReporter(options.reporterOptions as QaseOptions, {
             frameworkName: 'cypress',
             reporterName: 'qase-cypress-reporter',
             screenshotFolder: options.reporterOptions.screenshotFolder as string || '',
+            videoFolder: options.reporterOptions.videoFolder as string || '',
             uploadAttachments: options.reporterOptions.uploadAttachments as boolean || false,
         } as QaseCoreReporterOptions);
 

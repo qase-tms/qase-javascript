@@ -23,7 +23,8 @@
     "dist",
     "examples",
     "**/**.test.ts",
-    "test/__mock__"
+    "test/__mock__",
+    "vite.config.ts"
   ],
   "compilation": {
     "compiler": {
