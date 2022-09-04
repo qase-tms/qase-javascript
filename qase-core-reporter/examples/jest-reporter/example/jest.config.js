@@ -5,8 +5,8 @@ module.exports = {
         [
             'jest-qase-reporter',
             {
-                apiToken: 'a3187da5354d0d8ec6934719744ddf29ca9ab22c',
-                projectCode: 'TP',
+                apiToken: 'api_key',
+                projectCode: 'project_code',
                 logging: true,
                 runComplete: true,
                 rootSuiteTitle: 'Jest tests',
