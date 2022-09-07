@@ -279,6 +279,7 @@ class PlaywrightReporter implements Reporter {
         } catch (err) {
             this.log(`Error on completing run ${err as string}`);
         }
+        this.log(chalk`{blue https://app.qase.io/run/${this.options.projectCode}/dashboard/${this.runId}}`);
     }
 
     private log(message?: any, ...optionalParams: any[]) {
