@@ -43,7 +43,7 @@
     "long": "^4.0.0",
     "nodemon": "^2.0.7",
     "ts-jest": "^26.4.4",
-    "typescript": "^3.9.3"
+    "typescript": "^3.9.7"
   },
   "dependencies": {
     "chalk": "^4.1.0",

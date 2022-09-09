@@ -6,7 +6,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { MochaOptions, Runner, Test, reporters } from 'mocha';
 import { ResultCreateStatusEnum } from 'qaseio/dist/src';
-import { QaseCoreReporter, QaseCoreReporterOptions, QaseOptions } from 'qase-core-reporter';
+import { QaseCoreReporter, QaseCoreReporterOptions, QaseOptions, Suite, TestResult } from 'qase-core-reporter';
 import fs from 'fs';
 import path from 'path';
 
@@ -20,6 +20,8 @@ const readdirSync = (p: string, a: string[] = []) => {
     }
     return a;
 };
+
+type CombinedTestResult = TestResult & Test;
 
 class CypressQaseReporter extends reporters.Base {
     private reporter: QaseCoreReporter;
@@ -46,19 +48,19 @@ class CypressQaseReporter extends reporters.Base {
             await this.reporter.start();
         });
 
-        runner.on(EVENT_TEST_PASS, (test: Test) => {
-            test.suitePath = QaseCoreReporter.getSuitePath(test.parent);
+        runner.on(EVENT_TEST_PASS, (test: CombinedTestResult) => {
+            test.suitePath = QaseCoreReporter.getSuitePath(test.parent as Suite);
             this.reporter.addTestResult(test, ResultCreateStatusEnum.PASSED);
         });
 
-        runner.on(EVENT_TEST_PENDING, (test: Test) => {
-            test.suitePath = QaseCoreReporter.getSuitePath(test.parent);
+        runner.on(EVENT_TEST_PENDING, (test: CombinedTestResult) => {
+            test.suitePath = QaseCoreReporter.getSuitePath(test.parent as Suite);
             this.reporter.addTestResult(test, ResultCreateStatusEnum.SKIPPED);
         });
 
-        runner.on(EVENT_TEST_FAIL, (test: Test) => {
+        runner.on(EVENT_TEST_FAIL, (test: CombinedTestResult) => {
             test.error = test.err;
-            test.suitePath = QaseCoreReporter.getSuitePath(test.parent);
+            test.suitePath = QaseCoreReporter.getSuitePath(test.parent as Suite);
             const cOptions = this.reporter.options.qaseCoreReporterOptions;
 
             let attachmentPaths: Array<{ path: string }> = [];
