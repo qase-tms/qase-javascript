@@ -76,6 +76,49 @@ const parseAttachmentDirectory = (folder) => {
     return filePathByCaseIdMap;
 };
 
+const uploadMappedAttachments = async (attachmentsMap, api, code, results) => {
+    const attachmentKeys = Object.keys(attachmentsMap);
+
+    const attachmentsToUpload = attachmentKeys.map(async (key) => {
+        const attachments = attachmentsMap[key];
+
+        const pathToFile = attachments[0].path;
+
+        const data = fs.createReadStream(pathToFile);
+
+        const options = {
+            headers: {
+                'Content-Type':
+                    'multipart/form-data; boundary=' + customBoundary,
+            },
+        };
+
+        if (data) {
+            const resp = await api.uploadAttachment(
+                code,
+                [data],
+                options
+            );
+
+            return {
+                hash: resp.data.result?.[0].hash,
+                testCaseId: key
+            };
+        }
+    });
+
+    const attachmentsToUploadResult = await Promise.all(attachmentsToUpload);
+
+    return results.map((result) => {
+        const attachmentMapping = attachmentsToUploadResult
+            .find((data) => data.testCaseId === result.id);
+        if (attachmentMapping) {
+            result.attachments = [attachmentMapping.hash];
+        }
+        return result;
+    });
+};
+
 const publishBulkResult = async () => {
     if (config) {
         const { body } = config;
@@ -187,28 +230,15 @@ const publishBulkResult = async () => {
             && Object.keys(attachmentsConfig.attachmentsMap).length > 0) {
             const attachmentsMap = attachmentsConfig.attachmentsMap;
 
-            QaseCoreReporter.logger(chalk`{yellow Uploading attachments to Qase}`);
+            QaseCoreReporter.logger('Uploading mapped attachments to Qase');
 
-            const attachmentKeys = Object.keys(attachmentsMap);
+            try {
+                const results = await uploadMappedAttachments(attachmentsMap, api.attachments, config.code, body.results);
+                body.results = results;
+            } catch (error) {
+                QaseCoreReporter.logger(chalk`{red Error during sending mapped attachments ${error}}`);
+            }
 
-            const attachmentsToUpload = attachmentKeys.map(async (key) => {
-                const attachment = attachmentsMap[key];
-                const attachmentsHash = await QaseCoreReporter.uploadAttachments(attachment);
-                return {
-                    testCaseId: key,
-                    attachmentsHash,
-                };
-            });
-
-            const attachmentsToUploadResult = await Promise.all(attachmentsToUpload);
-            body.results = results.map((result) => {
-                const attachmentMapping = attachmentsToUploadResult
-                    .find((data) => data.testCaseId === result.id);
-                if (attachmentMapping) {
-                    result.attachments = attachmentMapping.attachmentsHash;
-                }
-                return result;
-            });
         }
 
         try {
