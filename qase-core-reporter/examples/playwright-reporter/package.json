@@ -1,6 +1,6 @@
 {
   "name": "qase-playwright-reporter",
-  "version": "1.0.0",
+  "version": "1.2.0-alpha.3",
   "description": "",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
