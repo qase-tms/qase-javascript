@@ -270,6 +270,8 @@ const publishBulkResult = async () => {
                 await api.runs.completeRun(config.code, config.runId);
                 QaseCoreReporter.logger(chalk`{green Run completed}`);
             }
+
+            QaseCoreReporter.logger(chalk`{blue Test run link: ${config.runUrl}}`);
         } catch (error) {
             console.log('Error while publishing', error);
         }

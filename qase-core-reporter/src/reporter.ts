@@ -139,6 +139,7 @@ export class QaseCoreReporter {
     private resultsForPublishing: ResultsForPublishing = [];
     private attachments: Record<string, IAttachment[]> = {};
     private headers: Record<string, any> = {};
+    private host = 'https://app.qase.io';
 
     public constructor(_reporterOptions: QaseOptions, _options: QaseCoreReporterOptions) {
         if (process.env.QASE_LOGGING === undefined) {
@@ -453,6 +454,8 @@ export class QaseCoreReporter {
             return;
         }
 
+        const runUrl = `${this.host}/run/${this.options.projectCode}/dashboard/${this.runId as string}`;
+
         if (spawn) {
             const { qaseCoreReporterOptions } = this.options;
             const {
@@ -469,6 +472,7 @@ export class QaseCoreReporter {
                 headers,
                 code: this.options.projectCode,
                 runId: Number(this.runId),
+                runUrl,
                 body: {
                     results: this.resultsForPublishing,
                 },
@@ -543,6 +547,8 @@ export class QaseCoreReporter {
         } catch (err) {
             QaseCoreReporter.logger(`Error on completing run ${err as string}`);
         }
+
+        QaseCoreReporter.logger(chalk`{blue Test run link: ${runUrl}}`);
     }
 
     public addTestResult(test: TestResult, status: ResultCreateStatusEnum, attachment?: any[]): void {
