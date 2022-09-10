@@ -105,3 +105,6 @@ dist
 
 # reports & screenshots
 **/**/**/reports
+
+# mac
+.DS_Store

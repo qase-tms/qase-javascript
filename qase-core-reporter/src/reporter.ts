@@ -22,7 +22,7 @@ import {
     ResultCreateStatusEnum,
 } from 'qaseio/dist/src';
 
-
+// eslint-disable-next-line no-shadow
 enum Envs {
     report = 'QASE_REPORT',
     apiToken = 'QASE_API_TOKEN',
@@ -134,7 +134,6 @@ export class QaseCoreReporter {
     public resultsForPublishingCount = 0;
     public options: QaseOptions;
     private api: QaseApi;
-    private pending: Array<(runId: string | number) => void> = [];
     private runId?: number | string;
     private isDisabled = false;
     private resultsForPublishing: ResultsForPublishing = [];
@@ -167,7 +166,7 @@ export class QaseCoreReporter {
         this.options.projectCode = QaseCoreReporter.getEnv(Envs.projectCode) || reporterOptions.projectCode;
         this.options.rootSuiteTitle = QaseCoreReporter.getEnv(Envs.rootSuiteTitle) || reporterOptions.rootSuiteTitle;
         this.options.runComplete = !!QaseCoreReporter.getEnv(Envs.runComplete) || reporterOptions.runComplete || false;
-        this.options.environmentId = Number.parseInt(QaseCoreReporter.getEnv(Envs.environmentId)!, 10)
+        this.options.environmentId = Number.parseInt(QaseCoreReporter.getEnv(Envs.environmentId) as string, 10)
             || reporterOptions.environmentId;
         this.options.basePath = QaseCoreReporter.getEnv(Envs.basePath) || reporterOptions.basePath;
         this.options.apiToken = QaseCoreReporter.getEnv(Envs.apiToken) || reporterOptions.apiToken;
@@ -232,6 +231,7 @@ export class QaseCoreReporter {
             ? true
             : false;
         if (logging) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             console.log(chalk`{bold {blue qase:}} ${message}`, ...optionalParams);
         }
     }

@@ -92,6 +92,7 @@ class TestcafeRepoter extends QaseCoreReporter {
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export = function () {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const options: QaseOptions & { uploadAttachments: boolean } = QaseCoreReporter
@@ -108,9 +109,12 @@ export = function () {
 
             reporter.userAgents = userAgents;
 
-            reporter.options.runName = reporter.options.runName!
-                .replace('%DATE%', new Date().toISOString())
-                .replace('%AGENTS%', userAgents.join(', '));
+            if (reporter.options.runName) {
+                reporter.options.runName = reporter.options.runName
+                    .replace('%DATE%', new Date().toISOString())
+                    .replace('%AGENTS%', userAgents.join(', '));
+            }
+
 
             await reporter.start();
         },

@@ -1,4 +1,5 @@
 module.exports = {
+    "root": true,
     "env": {
         "browser": true,
         "es6": true
@@ -15,7 +16,7 @@ module.exports = {
     "plugins": [
         "@typescript-eslint",
         "jsdoc",
-        "prefer-arrow"
+        "prefer-arrow-functions"
     ],
     "rules": {
         "@typescript-eslint/adjacent-overload-signatures": "error",
@@ -228,7 +229,7 @@ module.exports = {
             "error",
             "never"
         ],
-        "prefer-arrow/prefer-arrow-functions": "error",
+        "prefer-arrow-functions/prefer-arrow-functions": "error",
         "prefer-const": "error",
         "quote-props": [
             "error",
