@@ -163,7 +163,7 @@ const publishBulkResult = async () => {
 
             if(config.runComplete) {
                 await api.runs.completeRun(config.code, config.runId);
-                console.log(chalk`{green Run compleated}`);
+                console.log(chalk`{green Run completed}`);
             }
         } catch (error) {
             console.log('Error till publishing', error);
