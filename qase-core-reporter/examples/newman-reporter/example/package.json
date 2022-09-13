@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "newman": "^5.3.0",
+    "newman": "^5.3.2",
     "newman-reporter-qase": "../"
   }
 }
