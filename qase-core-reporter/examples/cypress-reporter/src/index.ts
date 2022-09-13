@@ -33,6 +33,7 @@ class CypressQaseReporter extends reporters.Base {
         this.reporter = new QaseCoreReporter(options.reporterOptions as QaseOptions, {
             frameworkName: 'cypress',
             reporterName: 'cypress-qase-reporter',
+            customReporterName: 'qase-cypress',
             screenshotFolder: options.reporterOptions.screenshotFolder as string || '',
             videoFolder: options.reporterOptions.videoFolder as string || '',
             uploadAttachments: options.reporterOptions.uploadAttachments as boolean || false,
