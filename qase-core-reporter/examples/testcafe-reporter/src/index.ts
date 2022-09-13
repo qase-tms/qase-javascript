@@ -97,6 +97,7 @@ export = function () {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const options: QaseOptions & { uploadAttachments: boolean } = QaseCoreReporter
         .loadConfig(process.cwd() + '/.qaserc') as any;
+    QaseCoreReporter.reporterPrettyName = 'Testcafe';
     const reporter = new TestcafeRepoter(options, {
         frameworkName: 'testcafe',
         reporterName: 'testcafe-reporter-qase',
