@@ -14,7 +14,8 @@ class QasePlaywrightReporter implements Reporter {
         this.uploadAttachments = _options.uploadAttachments || false;
         this.reporter = new QaseCoreReporter(_options, {
             frameworkName: 'playwright',
-            reporterName: 'qase-playwright-reporter',
+            reporterName: 'playwright-qase-reporter',
+            customReporterName: 'playwright-qase',
             uploadAttachments: this.uploadAttachments,
         });
     }

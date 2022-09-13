@@ -67,6 +67,8 @@ export interface QaseOptions {
 export interface QaseCoreReporterOptions {
     frameworkName: string;
     reporterName: string;
+    customFrameworkName?: string;
+    customReporterName?: string;
     screenshotFolder?: string;
     videoFolder?: string;
     uploadAttachments?: boolean;
@@ -108,6 +110,14 @@ interface FilePathByCaseId {
 interface IAttachment {
     path: string;
 }
+
+interface HeadersInput {
+    frameworkName: string;
+    reporterName: string;
+    customFrameworkName?: string;
+    customReporterName?: string;
+}
+
 
 type ResultsForPublishing = Array<ResultCreate & { id: string }>;
 
@@ -174,6 +184,8 @@ export class QaseCoreReporter {
         this.headers = QaseCoreReporter.createHeaders({
             frameworkName: _options.frameworkName,
             reporterName: _options.reporterName,
+            customFrameworkName: _options.customFrameworkName,
+            customReporterName: _options.customReporterName,
         });
         this.attachments = {};
         this.api = new QaseApi(
@@ -301,18 +313,27 @@ export class QaseCoreReporter {
         return undefined as unknown as ParameterizedTestData;
     }
 
-    private static createHeaders({ frameworkName, reporterName }: { frameworkName?: string; reporterName?: string }) {
+    private static createHeaders({
+        frameworkName,
+        reporterName,
+        customFrameworkName,
+        customReporterName,
+    }: HeadersInput) {
         const { version: nodeVersion, platform: os, arch } = process;
         const npmVersion = execSync('npm -v', { encoding: 'utf8' }).replace(/['"\n]+/g, '');
         const qaseapiVersion = QaseCoreReporter.getPackageVersion('qaseio');
         const frameworkVersion = QaseCoreReporter.getPackageVersion(frameworkName);
         const reporterVersion = QaseCoreReporter.getPackageVersion(reporterName);
+        const qaseCoreReporter = QaseCoreReporter.getPackageVersion('qase-core-reporter');
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         const xPlatformHeader = `node=${nodeVersion}; npm=${npmVersion}; os=${os}; arch=${arch}`;
-        const fv = frameworkVersion && frameworkName ? `${frameworkName}=${frameworkVersion}` : '';
-        const rv = reporterVersion && reporterName ? `${reporterName}=${reporterVersion}` : '';
+        const fv = frameworkVersion && frameworkName ?
+            `${customFrameworkName || frameworkName}=${frameworkVersion}` : '';
+        const rv = reporterVersion && reporterName ?
+            `${customReporterName || reporterName}=${reporterVersion}` : '';
+        const qcr = qaseCoreReporter ? `qase-core-reporter=${qaseCoreReporter}` : '';
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        const xClientHeader = `${fv}; ${rv}; qaseapi=${qaseapiVersion as string}`;
+        const xClientHeader = `${fv}; ${rv}; ${qcr}; qaseapi=${qaseapiVersion as string}`;
 
         return {
             'X-Client': xClientHeader,
@@ -464,7 +485,7 @@ export class QaseCoreReporter {
                 uploadAttachments,
             } = qaseCoreReporterOptions as QaseCoreReporterOptions;
             const headers = QaseCoreReporter.createHeaders(
-                qaseCoreReporterOptions as { frameworkName?: string; reporterName?: string }
+                qaseCoreReporterOptions as HeadersInput
             );
             const config = {
                 apiToken: QaseCoreReporter.getEnv(Envs.apiToken) || this.options.apiToken || '',
