@@ -100,6 +100,7 @@ export = function () {
     const reporter = new TestcafeRepoter(options, {
         frameworkName: 'testcafe',
         reporterName: 'testcafe-reporter-qase',
+        customReporterName: 'qase-testcafe',
         uploadAttachments: options.uploadAttachments,
     } as QaseCoreReporterOptions);
 
