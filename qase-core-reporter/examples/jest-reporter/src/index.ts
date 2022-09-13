@@ -14,6 +14,7 @@ class JestQaseReporter implements Reporter {
         this.reporter = new QaseCoreReporter(_options, {
             frameworkName: 'jest',
             reporterName: 'jest-qase-reporter',
+            customReporterName: 'qase-jest',
         });
     }
 
