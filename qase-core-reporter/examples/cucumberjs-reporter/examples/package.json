@@ -8,7 +8,7 @@
     "test:l": "cucumber-js features -r examples/zombie/support -r examples/zombie/steps"
   },
   "devDependencies": {
-    "@cucumber/cucumber": "^7.0.0",
+    "@cucumber/cucumber": "^8.5.3",
     "@cucumber/pretty-formatter": "^1.0.0-alpha.0",
     "cucumberjs-qase-reporter": "../",
     "phantom": "^2.0.4",

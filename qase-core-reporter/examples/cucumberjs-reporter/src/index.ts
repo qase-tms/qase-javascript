@@ -80,6 +80,8 @@ class CucumberJSQaseReporter extends Formatter {
         this.reporter = new QaseCoreReporter(qOptions, {
             frameworkName: '@cucumber/cucumber',
             reporterName: 'cucumberjs-qase-reporter',
+            customFrameworkName: 'cucumberjs',
+            customReporterName: 'qase-cucumberjs',
             uploadAttachments: qOptions.uploadAttachments,
         });
     }
