@@ -1,6 +1,6 @@
 {
-  "name": "qase-newman-reporter",
-  "version": "1.0.6-alpha.2",
+  "name": "newman-reporter-qase",
+  "version": "v1.0.6-alpha.2",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "engines": {

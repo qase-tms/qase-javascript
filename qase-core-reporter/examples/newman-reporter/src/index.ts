@@ -28,7 +28,8 @@ class NewmanQaseReporter {
         QaseCoreReporter.reporterPrettyName = 'Newman';
         this.reporter = new QaseCoreReporter(_options, {
             frameworkName: 'newman',
-            reporterName: 'qase-newman-reporter',
+            reporterName: 'newman-reporter-qase',
+            customReporterName: 'qase-newman',
         });
 
         this.addRunnerListeners(emitter);
