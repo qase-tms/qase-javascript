@@ -104,7 +104,7 @@ Reporter options (\* - required):
 - `basePath` - URL Qase.io
 - `screenshotFolder` - Folder for save screenshot cypress,
 - `videoFolder` - Folder for save videos cypress,
-- `uploadAttachments` [true/false] - Permission to send screenshots/video to Qase TMS
+- `sendScreenshot` [true/false] - Permission to send screenshots/video to Qase TMS
 - `runComplete` [true/false] - Permission for automatic completion of the test run
 
 #### You can check example configuration with multiple reporters in [demo project (cypress v10)](examples/cypress-v10/cypress.config.js) and [demo project (cypress v6)](examples/cypress-c6/cypress.json).
@@ -122,7 +122,7 @@ Supported ENV variables:
 - `QASE_ENVIRONMENT_ID` - To execute with the sending of the environment information
 - `QASE_SCREENSHOT_FOLDER` - Folder for save screenshot cypress
 - `QASE_VIDEO_FOLDER` - Folder for save video cypress
-- `QASE_UPLOAD_ATTACHMENTS` - Permission to send screenshots/videos to Qase TMS
+- `QASE_SCREENSHOT_SENDING` - Permission to send screenshots/videos to Qase TMS
 - `QASE_RUN_COMPLETE` - Permission for automatic completion of the test run
 
 ## Requirements

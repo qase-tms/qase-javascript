@@ -13,7 +13,7 @@ module.exports = defineConfig({
       logging: true,
       basePath: 'https://api.qase.io/v1',
       screenshotFolder: 'cypress/screenshots',
-      uploadAttachments: true,
+      sendScreenshot: true,
       runComplete: true,
       environmentId: 1,
       rootSuiteTitle: 'Cypress tests',
