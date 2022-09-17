@@ -83,7 +83,7 @@ using `.qaserc` file and using ENV variables.
 
 `.qaserc` parameters:
 
-- `report` - Enable reporter
+- `enabled` - Enable reporter
 - `apiToken` - Token for API access, you can find more information
   [here](https://developers.qase.io/#authentication)
 - `basePath` - Qase.io URL
@@ -118,7 +118,7 @@ Example configuration file `.qaserc`:
 
 Supported ENV variables:
 
-- `QASE_REPORT` - Same as `report`
+- `QASE_ENABLED` - Same as `report`
 - `QASE_API_TOKEN` - Same as `apiToken`
 - `QASE_PROJECT` - Same as `projectCode`
 - `QASE_RUN_ID` - Pass Run ID from ENV and override reporter options

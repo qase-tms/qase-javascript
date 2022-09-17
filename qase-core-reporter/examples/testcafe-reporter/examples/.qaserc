@@ -1,5 +1,5 @@
 {
-  "report": true,
+  "enabled": true,
   "logging": true,
   "environmentId": 1,
   "apiToken": "api_key",

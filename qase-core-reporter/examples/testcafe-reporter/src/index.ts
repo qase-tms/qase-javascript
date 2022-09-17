@@ -2,7 +2,7 @@
 /* eslint-disable space-before-function-paren */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/dot-notation */
-import { QaseCoreReporter, QaseCoreReporterOptions, QaseOptions, TestResult } from 'qase-core-reporter';
+import { Envs, QaseCoreReporter, QaseCoreReporterOptions, QaseOptions, TestResult } from 'qase-core-reporter';
 import { ResultCreateStatusEnum } from 'qaseio/dist/src';
 
 interface Screenshot {
@@ -95,9 +95,16 @@ class TestcafeRepoter extends QaseCoreReporter {
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export = function () {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const options: QaseOptions & { uploadAttachments: boolean } = QaseCoreReporter
+    const options: QaseOptions & { uploadAttachments: boolean; enabled: boolean } = QaseCoreReporter
         .loadConfig(process.cwd() + '/.qaserc') as any;
     QaseCoreReporter.reporterPrettyName = 'Testcafe';
+
+    // support enabled over report
+    options.report = QaseCoreReporter.getEnv(Envs.enabled) as unknown as boolean
+        || options.enabled
+        || options.report as boolean
+        || undefined;
+
     const reporter = new TestcafeRepoter(options, {
         frameworkName: 'testcafe',
         reporterName: 'testcafe-reporter-qase',

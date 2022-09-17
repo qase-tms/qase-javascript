@@ -23,8 +23,9 @@ import {
 } from 'qaseio/dist/src';
 
 // eslint-disable-next-line no-shadow
-enum Envs {
+export enum Envs {
     report = 'QASE_REPORT',
+    enabled = 'QASE_ENABLED',
     apiToken = 'QASE_API_TOKEN',
     basePath = 'QASE_API_BASE_URL',
     projectCode = 'QASE_PROJECT_CODE',
@@ -36,6 +37,9 @@ enum Envs {
     rootSuiteTitle = 'QASE_ROOT_SUITE_TITLE',
     logging = 'QASE_LOGGING',
     uploadAttachments = 'QASE_UPLOAD_ATTACHMENTS',
+    sendScreenshot = 'QASE_SCREENSHOT_SENDING',
+    screenshotFolder = 'QASE_SCREENSHOT_FOLDER',
+    videoFolder = 'QASE_VIDEO_FOLDER',
 }
 
 export const Statuses = {
@@ -290,6 +294,10 @@ export class QaseCoreReporter {
         return filePathByCaseIdMap as FilePathByCaseId;
     };
 
+    public static getEnv(name: Envs) {
+        return process.env[name];
+    }
+
     private static removeQaseDataset(title: string): string {
         return title.replace(REGEX_QASE_DATASET, '').trim();
     }
@@ -381,10 +389,6 @@ export class QaseCoreReporter {
 
         return files;
     };
-
-    private static getEnv(name: Envs) {
-        return process.env[name];
-    }
 
     private static createRunObject(
         name: string,
