@@ -29,6 +29,7 @@ export enum Envs {
     apiToken = 'QASE_API_TOKEN',
     basePath = 'QASE_API_BASE_URL',
     projectCode = 'QASE_PROJECT_CODE',
+    project = 'QASE_PROJECT',
     runId = 'QASE_RUN_ID',
     runName = 'QASE_RUN_NAME',
     runDescription = 'QASE_RUN_DESCRIPTION',

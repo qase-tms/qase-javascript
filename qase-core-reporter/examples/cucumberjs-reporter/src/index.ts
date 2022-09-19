@@ -81,6 +81,9 @@ class CucumberJSQaseReporter extends Formatter {
             || qOptions.enabled
             || qOptions.report
             || undefined;
+        qOptions.projectCode = QaseCoreReporter.getEnv(Envs.project) as unknown as string
+            || qOptions.projectCode
+            || '';
         this.reporter = new QaseCoreReporter(qOptions, {
             frameworkName: '@cucumber/cucumber',
             reporterName: 'cucumberjs-qase-reporter',
