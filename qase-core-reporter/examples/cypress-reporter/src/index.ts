@@ -6,7 +6,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { MochaOptions, Runner, Test, reporters } from 'mocha';
 import { ResultCreateStatusEnum } from 'qaseio/dist/src';
-import { QaseCoreReporter, QaseCoreReporterOptions, QaseOptions, Suite, TestResult } from 'qase-core-reporter';
+import { Envs, QaseCoreReporter, QaseCoreReporterOptions, QaseOptions, Suite, TestResult } from 'qase-core-reporter';
 import fs from 'fs';
 import path from 'path';
 
@@ -36,7 +36,8 @@ class CypressQaseReporter extends reporters.Base {
             customReporterName: 'qase-cypress',
             screenshotFolder: options.reporterOptions.screenshotFolder as string || '',
             videoFolder: options.reporterOptions.videoFolder as string || '',
-            uploadAttachments: options.reporterOptions.sendScreenshot as boolean
+            uploadAttachments: !!QaseCoreReporter.getEnv(Envs.sendScreenshot)
+                || options.reporterOptions.sendScreenshot as boolean
                 || options.reporterOptions.uploadAttachments as boolean
                 || false,
         } as QaseCoreReporterOptions);
