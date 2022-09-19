@@ -110,6 +110,7 @@ export = function () {
         reporterName: 'testcafe-reporter-qase',
         customReporterName: 'qase-testcafe',
         uploadAttachments: options.uploadAttachments,
+        enabledSupport: true,
     } as QaseCoreReporterOptions);
 
     return {
