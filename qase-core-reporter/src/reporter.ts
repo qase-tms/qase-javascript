@@ -77,6 +77,7 @@ export interface QaseCoreReporterOptions {
     videoFolder?: string;
     uploadAttachments?: boolean;
     loadConfig?: boolean;
+    enabledSupport?: boolean;
 }
 
 export interface TestResult {
@@ -172,6 +173,7 @@ export class QaseCoreReporter {
         this.options.qaseCoreReporterOptions.uploadAttachments = !!QaseCoreReporter.getEnv(Envs.uploadAttachments)
             || this.options.qaseCoreReporterOptions.uploadAttachments
             || false;
+        this.options.qaseCoreReporterOptions.enabledSupport = _options.enabledSupport || false;
         // All reporter options can be set via environment variables
         // add default value if not set
         this.options.runName = QaseCoreReporter.getEnv(Envs.runName) || reporterOptions.runName;
@@ -208,9 +210,17 @@ export class QaseCoreReporter {
             || false;
 
         if (!report) {
-            QaseCoreReporter.logger(
-                chalk`{yellow QASE_REPORT env variable is not set or qaseReporterOptions.report is false. 
-      Reporting to qase.io is disabled.}`);
+            // if enabledSupport is true, then that means the reporter is using enabled instead of report
+            if (this.options.qaseCoreReporterOptions.enabledSupport) {
+                QaseCoreReporter.logger(
+                    chalk`{yellow QASE_ENABLED env variable is not set or Qase reporter option "enabled" is false. 
+          Reporting to qase.io is disabled.}`);
+            } else {
+                QaseCoreReporter.logger(
+                    chalk`{yellow QASE_REPORT env variable is not set or Qase reporter option "report" is false. 
+          Reporting to qase.io is disabled.}`);
+            }
+
             this.isDisabled = true;
             return;
         }

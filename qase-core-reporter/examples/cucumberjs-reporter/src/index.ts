@@ -2,7 +2,7 @@
 /* eslint-disable  sort-imports*/
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ResultCreateStatusEnum } from 'qaseio/dist/src';
-import { QaseCoreReporter, QaseOptions, Statuses, TestResult } from 'qase-core-reporter';
+import { Envs, QaseCoreReporter, QaseOptions, Statuses, TestResult } from 'qase-core-reporter';
 import { Formatter } from '@cucumber/cucumber';
 import { IFormatterOptions } from '@cucumber/cucumber/lib/formatter';
 import chalk from 'chalk';
@@ -71,18 +71,23 @@ class CucumberJSQaseReporter extends Formatter {
         QaseCoreReporter.reporterPrettyName = 'CucumberJS';
         options.eventBroadcaster.on('envelope', this.parseEnvelope.bind(this));
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const qOptions: QaseOptions & { uploadAttachments: boolean } = prepareConfig(
+        const qOptions: QaseOptions & { uploadAttachments: boolean; enabled: boolean } = prepareConfig(
             options.parsedArgvOptions as QaseOptions,
             options.parsedArgvOptions?.qaseConfig
         ) as any;
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         qOptions.runName = prepareReportName(qOptions);
+        qOptions.report = QaseCoreReporter.getEnv(Envs.enabled) as unknown as boolean
+            || qOptions.enabled
+            || qOptions.report
+            || undefined;
         this.reporter = new QaseCoreReporter(qOptions, {
             frameworkName: '@cucumber/cucumber',
             reporterName: 'cucumberjs-qase-reporter',
             customFrameworkName: 'cucumberjs',
             customReporterName: 'qase-cucumberjs',
             uploadAttachments: qOptions.uploadAttachments,
+            enabledSupport: true,
         });
     }
 
@@ -171,11 +176,10 @@ class CucumberJSQaseReporter extends Formatter {
         const stepStatus = stepFin.testStepResult!.status!;
         const stepMessage = stepFin.testStepResult!.message!;
         const oldStatus = this.testCaseStartedResult[stepFin.testCaseStartedId!];
-        const newStatus = StatusMapping[stepFin.testStepResult!.status!];
-        const sStatus = stepStatus as unknown as string;
+        const newStatus = this.getNormalizedTestStatus(stepStatus);
         if (newStatus === null) {
             QaseCoreReporter.logger(
-                chalk`{redBright Unexpected finish status ${sStatus} received for step ${stepMessage}}`
+                chalk`{redBright Unexpected finish status ${stepStatus} received for step ${stepMessage}}`
             );
             return;
         }
@@ -231,6 +235,14 @@ class CucumberJSQaseReporter extends Formatter {
             } else {
                 this.testCaseStartedErrors[tcsid] = [error];
             }
+        }
+    }
+
+    private getNormalizedTestStatus(status: Status): ResultCreateStatusEnum {
+        if (typeof status === 'number') {
+            return StatusMapping[status] as ResultCreateStatusEnum;
+        } else {
+            return String(status).toLowerCase() as ResultCreateStatusEnum;
         }
     }
 }

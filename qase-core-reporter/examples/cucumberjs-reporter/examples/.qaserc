@@ -1,5 +1,5 @@
 {
-  "report": true,
+  "enabled": true,
   "logging": true,
   "apiToken": "api_key",
   "projectCode": "project_code",
