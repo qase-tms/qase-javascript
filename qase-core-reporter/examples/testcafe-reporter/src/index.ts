@@ -104,7 +104,9 @@ export = function () {
         || options.enabled
         || options.report as boolean
         || undefined;
-
+    options.projectCode = QaseCoreReporter.getEnv(Envs.project) as unknown as string
+        || options.projectCode
+        || '';
     const reporter = new TestcafeRepoter(options, {
         frameworkName: 'testcafe',
         reporterName: 'testcafe-reporter-qase',
