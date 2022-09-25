@@ -22,6 +22,7 @@
     "lint:fix": "eslint --fix src/**",
     "build": "npm run clean && npm run dev",
     "test": "vitest --coverage",
+    "test:ci": "npm run test -- run",
     "clean": "rm -rf dist || true"
   },
   "author": {
