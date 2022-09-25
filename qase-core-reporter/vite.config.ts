@@ -3,7 +3,7 @@ import { defineConfig, configDefaults } from 'vitest/config'
 export default defineConfig({
     test: {
         coverage: {
-            provider: 'c8', // or 'c8'
+            provider: 'istanbul', // or 'c8'
             reporter: ['text', 'json', 'html'],
         },
         exclude: [...configDefaults.exclude, 'examples', 'test/__mock__'],

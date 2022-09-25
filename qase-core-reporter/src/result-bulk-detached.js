@@ -7,11 +7,6 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
-const config = JSON.parse(process.env?.reporting_config);
-const attachmentsConfig = JSON.parse(process.env?.attachments_config);
-
-let hashesMap = {};
-
 let customBoundary = '----------------------------';
 crypto.randomBytes(24).forEach((value) => {
     customBoundary += Math.floor(value * 10).toString(16);
@@ -120,6 +115,23 @@ const uploadMappedAttachments = async (attachmentsMap, api, code, results) => {
 };
 
 const publishBulkResult = async () => {
+    const config = JSON.parse(process.env?.reporting_config);
+    const attachmentsConfig = JSON.parse(process.env?.attachments_config);
+
+    if (config.isDisabled) {
+        return;
+    }
+
+    if (config.body && config.body.results.length === 0) {
+        config.isDisabled = true;
+        QaseCoreReporter.logger(
+            'No test cases were matched. Ensure that your tests are declared correctly.'
+        );
+        return;
+    }
+
+    let hashesMap = {};
+
     if (config) {
         const { body } = config;
         const results = body.results;
@@ -132,10 +144,10 @@ const publishBulkResult = async () => {
         if (attachmentsConfig.screenshotFolder && attachmentsConfig.uploadAttachments) {
             QaseCoreReporter.logger('Uploading screenshots to Qase...');
             try {
-                const filePathesByCaseIdMap = parseAttachmentDirectory(attachmentsConfig.screenshotFolder);
+                const filePathsByCaseIdMap = parseAttachmentDirectory(attachmentsConfig.screenshotFolder);
 
-                if (filePathesByCaseIdMap) {
-                    const filesMap = Object.values(filePathesByCaseIdMap);
+                if (filePathsByCaseIdMap) {
+                    const filesMap = Object.values(filePathsByCaseIdMap);
                     const uploadAttachmentsPromisesArray = filesMap.map(async (failedCase) => {
                         const caseId = failedCase.caseId;
 
@@ -180,10 +192,10 @@ const publishBulkResult = async () => {
         if (attachmentsConfig.videoFolder && attachmentsConfig.uploadAttachments) {
             QaseCoreReporter.logger('Uploading videos to Qase...');
             try {
-                const filePathesByCaseIdMap = parseAttachmentDirectory(attachmentsConfig.videoFolder);
+                const filePathsByCaseIdMap = parseAttachmentDirectory(attachmentsConfig.videoFolder);
 
-                if (filePathesByCaseIdMap) {
-                    const filesMap = Object.values(filePathesByCaseIdMap);
+                if (filePathsByCaseIdMap) {
+                    const filesMap = Object.values(filePathsByCaseIdMap);
                     const uploadAttachmentsPromisesArray = filesMap.map(async (failedCase) => {
                         const caseId = failedCase.caseId;
 
@@ -267,15 +279,21 @@ const publishBulkResult = async () => {
             }
 
             if (config.runComplete) {
-                await api.runs.completeRun(config.code, config.runId);
-                QaseCoreReporter.logger(chalk`{green Run completed}`);
+                try {
+                    await api.runs.completeRun(config.code, config.runId);
+                    QaseCoreReporter.logger(chalk`{green Run ${config.runId} completed}`);
+                } catch (error) {
+                    QaseCoreReporter.logger(chalk`{red Error on completing run}`);
+                }
             }
 
             QaseCoreReporter.logger(chalk`{blue Test run link: ${config.runUrl}}`);
         } catch (error) {
-            console.log('Error while publishing', error);
+            QaseCoreReporter.logger(chalk`{red Error while publishing ${error}}`);
         }
     }
 };
 
-publishBulkResult();
+module.exports = {
+    publishBulkResult,
+}

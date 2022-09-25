@@ -477,19 +477,6 @@ export class QaseCoreReporter {
     }
 
     public async end({ spawn }: { spawn: boolean }): Promise<void> {
-        // let hashesMap = {};
-        if (this.isDisabled) {
-            return;
-        }
-
-        if (this.resultsForPublishing.length === 0) {
-            this.isDisabled = true;
-            QaseCoreReporter.logger(
-                'No test cases were matched. Ensure that your tests are declared correctly.'
-            );
-            return;
-        }
-
         const runUrl = `${this.host}/run/${this.options.projectCode}/dashboard/${this.runId as string}`;
 
         if (spawn) {
@@ -514,6 +501,7 @@ export class QaseCoreReporter {
                 },
                 runComplete: QaseCoreReporter.getEnv(Envs.runComplete) || this.options.runComplete || false,
                 qaseCoreReporterOptions,
+                isDisabled: this.isDisabled,
             };
 
             const attachmentsConfig = {
@@ -523,7 +511,7 @@ export class QaseCoreReporter {
                 attachmentsMap: this.attachments,
             };
 
-            spawnSync('node', [`${__dirname}/result-bulk-detached.js`], {
+            spawnSync('node', ['-e', `require('${__dirname}/result-bulk-detached.js').publishBulkResult()`], {
                 stdio: 'inherit',
                 env: Object.assign(process.env, {
                     QASE_LOGGING: process.env.QASE_LOGGING,
@@ -532,6 +520,18 @@ export class QaseCoreReporter {
                     attachments_config: JSON.stringify(attachmentsConfig) || {},
                 }),
             });
+            return;
+        }
+
+        if (this.isDisabled) {
+            return;
+        }
+
+        if (this.resultsForPublishing.length === 0) {
+            this.isDisabled = true;
+            QaseCoreReporter.logger(
+                'No test cases were matched. Ensure that your tests are declared correctly.'
+            );
             return;
         }
 

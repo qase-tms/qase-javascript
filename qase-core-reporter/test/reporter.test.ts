@@ -592,35 +592,6 @@ describe('QaseCoreReporter', () => {
                 expect(reporter['attachments']).toEqual({ 123: [{ path: attachmentPath }] });
             });
 
-            it('should end report using spawn', async () => {
-                const reporter = new QaseCoreReporter(
-                    {
-                        apiToken: '123',
-                        projectCode: 'TP',
-                        report: true,
-                        runComplete: true
-                    },
-                    {
-                        frameworkName: 'jest', reporterName: 'qase',
-                        uploadAttachments: true,
-                        screenshotFolder: 'screenshots',
-                        videoFolder: 'videos'
-                    }
-                );
-                const endSpy = vi.spyOn(reporter, 'end');
-
-                // start mock server in separate process
-                await reporter.start();
-
-                reporter.addTestResult({ title: 'test', status: ResultCreateStatusEnum.PASSED },
-                    ResultCreateStatusEnum.PASSED,
-                    [{ path: process.cwd() + '/screenshots/screenshot.png' }]);
-
-                await reporter.end({ spawn: true });
-
-                // check on child process
-                expect(endSpy).toHaveBeenCalled();
-            });
         });
     });
 
@@ -691,6 +662,26 @@ describe('QaseCoreReporter', () => {
                         qaseCoreReporterOptions);
 
                     expect(reporter['isDisabled']).toBe(false);
+                });
+
+                it('should log QASE_ENABLED message if qaseCoreReporterOptions.enabledSupport is true', () => {
+                    delete process.env.QASE_REPORT;
+                    const consoleSpy = vi.spyOn(console, 'log');
+                    const qaseCoreReporterOptions: QaseCoreReporterOptions = {
+                        reporterName: 'qase-core-reporter',
+                        frameworkName: 'qase-core-reporter',
+                        enabledSupport: true,
+                    };
+                    const reporter = new QaseCoreReporter(
+                        {
+                            apiToken: 'token',
+                            projectCode: 'code',
+                        },
+                        qaseCoreReporterOptions);
+
+                    expect(consoleSpy).toBeCalledWith(
+                        expect.stringContaining('QASE_ENABLED env variable is not set or Qase reporter option "enabled" is false.')
+                    );
                 });
             });
 

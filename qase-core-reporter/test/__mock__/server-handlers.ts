@@ -5,6 +5,12 @@ const qaseio = (path) => `https://api.qase.io/v1${path}`;
 const handlers = [
     // https://developers.qase.io/reference/create-result-bulk
     rest.post(qaseio('/result/:code/:id/bulk'), (request, response, context) => {
+        if (request.params.code.includes('-error-publish')) {
+            return response(
+                context.json({ errorMessage: 'Error while publishing' }),
+                context.status(500)
+            );
+        }
         if (request.params.code.includes('invalid')) {
             return response(
                 context.json({ errorMessage: 'Could not send results' }),
@@ -92,6 +98,13 @@ const handlers = [
 
     // https://developers.qase.io/reference/upload-attachment
     rest.post(qaseio('/attachment/:code'), (request, response, context) => {
+        if (request.params.code.includes('error-mapped-attachments')) {
+            return response(
+                context.json({ errorMessage: 'Could not upload mapped attachment!' }),
+                context.status(500)
+            );
+        }
+
         if (request.params.code.includes('invalid')) {
             return response(
                 context.json({ errorMessage: 'Could not upload attachment!' }),
