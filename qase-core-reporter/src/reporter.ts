@@ -49,7 +49,7 @@ export const Statuses = {
     skipped: ResultCreateStatusEnum.SKIPPED,
     pending: ResultCreateStatusEnum.SKIPPED,
     disabled: ResultCreateStatusEnum.BLOCKED,
-    in_process: ResultCreateStatusEnum.IN_PROGRESS,
+    in_progress: ResultCreateStatusEnum.IN_PROGRESS,
     invalid: ResultCreateStatusEnum.INVALID,
 };
 
