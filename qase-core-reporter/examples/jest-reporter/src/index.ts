@@ -28,7 +28,7 @@ class JestQaseReporter implements Reporter {
             const status = Statuses[currentTestResult.status] as ResultCreateStatusEnum;
 
             const failureMessages = currentTestResult.failureMessages.map((value) =>
-                value.replace(/\u001b\[.*?m/g, ''));
+                QaseCoreReporter.removeAnsiEscapeCodes(value));
 
             const test = {
                 title: currentTestResult.title,

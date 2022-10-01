@@ -34,7 +34,7 @@ class QasePlaywrightReporter implements Reporter {
             title: test.title,
             status: status as keyof typeof Statuses,
             duration: testResult.duration,
-            stacktrace: testResult.error?.stack?.replace(/\u001b\[.*?m/g, ''),
+            stacktrace: QaseCoreReporter.removeAnsiEscapeCodes(testResult.error?.stack?.toString() || ''),
             error: testResult.error as Error,
             suitePath: test.parent ? QaseCoreReporter
                 .getSuitePath(test.parent as QSuite) : undefined,

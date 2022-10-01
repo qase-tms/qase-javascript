@@ -62,10 +62,7 @@ class TestcafeRepoter extends QaseCoreReporter {
         }
 
         const errorLog = testRunInfo.errs
-            .map((x: Record<string, unknown>) => formatError(x).replace(
-                /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
-                ''
-            ))
+            .map((x: Record<string, unknown>) => QaseCoreReporter.removeAnsiEscapeCodes(formatError(x)))
             .join('\n');
 
         // pull out the screenshot path from the meta data
