@@ -10,6 +10,7 @@ import {
     existsSync,
 } from 'fs';
 import chalk from 'chalk';
+import stripAnsi from 'strip-ansi';
 import crypto from 'crypto';
 import { execSync, spawnSync } from 'child_process';
 import { join } from 'path';
@@ -307,6 +308,10 @@ export class QaseCoreReporter {
 
     public static getEnv(name: Envs) {
         return process.env[name];
+    }
+
+    public static removeAnsiEscapeCodes(str: string): string {
+        return stripAnsi(str);
     }
 
     private static removeQaseDataset(title: string): string {
@@ -625,7 +630,7 @@ export class QaseCoreReporter {
             invalid: chalk`{yellowBright Test ${test.title} ${test.status}}`,
         };
         if (test.status) {
-            QaseCoreReporter.logger(map[test.status]);
+            QaseCoreReporter.logger(map[test.status] as string);
         }
     }
 
@@ -655,7 +660,7 @@ export class QaseCoreReporter {
             time_ms: testResult.duration || 0,
             stacktrace: testResult.stacktrace
                 ? testResult.stacktrace
-                : testResult.error?.stack?.replace(/\u001b\[.*?m/g, ''),
+                : QaseCoreReporter.removeAnsiEscapeCodes(testResult.error?.stack?.toString() || ''),
             comment: testResult.error
                 ? this.formatComment(testResult.title, testResult.error, parameterizedData)
                 : parameterizedData
@@ -698,12 +703,13 @@ export class QaseCoreReporter {
 
     private formatComment(title: string, error: Error, parameterizedData: ParameterizedTestData): string {
         let comment = `${parameterizedData ? QaseCoreReporter.removeQaseDataset(title) : title}`.trim();
+        const errorMessage = QaseCoreReporter.removeAnsiEscapeCodes(error?.message?.toString() || '');
 
         if (parameterizedData) {
             comment += `::_using data set ${parameterizedData.id} ${parameterizedData.dataset}_
-            \n\n>${error?.message?.replace(/\u001b\[.*?m/g, '')}`;
+            \n\n>${errorMessage}`;
         } else {
-            comment += `: ${error?.message?.replace(/\u001b\[.*?m/g, '')}`;
+            comment += `: ${errorMessage}`;
         }
 
         return comment;
