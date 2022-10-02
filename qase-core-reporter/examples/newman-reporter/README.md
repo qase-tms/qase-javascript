@@ -58,6 +58,8 @@ newman run \
     --reporter-qase-apiToken api_token \ # Specify API token
     --reporter-qase-runId 34 \ # Specify Run ID using CLI parameters
     --reporter-qase-basePath https://api.qase.io/v1 \ # URL Qase.io
+    --reporter-qase-runComplete \ # Closure of the test run after passing
+    --reporter-qase-basePath https://api.qase.io/v1 \ # URL Qase.io
     --reporter-qase-runName 'API test Execution' \ # Specify Run name using CLI parameters
     --reporter-qase-runDescription 'Check API consistency' \ # Specify Run description using CLI parameters
     --reporter-qase-rootSuiteTitle 'Newman tests' \ # A parent suite for your autocreated tests
@@ -65,7 +67,7 @@ newman run \
 ```
 
 <p align="center">
-  <img width="65%" src="./examples/screenshots/screenshot.png">
+  <img width="65%" src="screenshots/screenshot.png">
 </p>
 
 A test run will be performed and available at:
@@ -75,23 +77,33 @@ https://app.qase.io/run/QASE_PROJECT_CODE
 ```
 
 <p align="center">
-  <img src="./examples/screenshots/demo.gif">
+  <img src="screenshots/demo.gif">
 </p>
 
 You can check example setup in [example project](./example).
 
-Supported ENV variables:
+---
 
-- `QASE_REPORT` - You **should** pass this ENV if you want to use qase reporter
-- `QASE_API_TOKEN` - API token
-- `QASE_PROJECT_CODE` - Code of your project (can be extracted from main page of your project: https://app.qase.io/project/TP - TP is project code here)
-- `QASE_API_BASE_URL` - Qase.io url
-- `QASE_RUN_ID` - Pass Run ID from ENV and override reporter options
-- `QASE_ENVIRONMENT_ID` - Pass Environment ID from ENV and override reporter options
-- `QASE_RUN_NAME` - Set custom Run name, when new run is created
-- `QASE_RUN_DESCRIPTION` - Set custom Run description, when new run is created
-- `QASE_RUN_COMPLETE` - Complete run after all tests are finished
-- `QASE_ROOT_SUITE_TITLE` - Same as `--reporter-qase-rootSuiteTitle`
+> Qase environmental variables are first class options, which means the user can change all default/static reporter options by using these variables.
+
+```
+Supported ENV variables:
+```
+
+| Variable | Description |
+| -- | -- |
+| `QASE_REPORT` | Same as `report` |
+| `QASE_API_TOKEN` | Same as `apiToken` |
+| `QASE_API_BASE_URL` | Same as `basePath` |
+| `QASE_PROJECT_CODE` | Same as `projectCode` |
+| `QASE_ROOT_SUITE_TITLE` | Same as `rootSuiteTitle` |
+| `QASE_RUN_ID` | Same as `runId` |
+| `QASE_ENVIRONMENT_ID` | Same as `environmentId` |
+| `QASE_RUN_NAME` | Same as `runName` |
+| `QASE_RUN_DESCRIPTION` | Same as `runDescription` |
+| `QASE_RUN_COMPLETE` | Same as `runComplete` |
+| `QASE_LOGGING` | Same as `logging` |
+
 
 ## Requirements
 
