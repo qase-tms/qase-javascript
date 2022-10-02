@@ -653,7 +653,7 @@ export class QaseCoreReporter {
         const frameworkName = this.options.qaseCoreReporterOptions
             && this.options.qaseCoreReporterOptions.frameworkName;
 
-        const errorTrace = QaseCoreReporter.removeAnsiEscapeCodes(testResult.error?.stack?.toString() || '')
+        const errorTrace = QaseCoreReporter.removeAnsiEscapeCodes(testResult.error?.stack?.toString() || '');
 
         const caseObject: ResultCreate & { id: string } = {
             id: testResult.id ? testResult.id : uuidv4(),
