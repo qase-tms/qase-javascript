@@ -653,6 +653,8 @@ export class QaseCoreReporter {
         const frameworkName = this.options.qaseCoreReporterOptions
             && this.options.qaseCoreReporterOptions.frameworkName;
 
+        const errorTrace = QaseCoreReporter.removeAnsiEscapeCodes(testResult.error?.stack?.toString() || '')
+
         const caseObject: ResultCreate & { id: string } = {
             id: testResult.id ? testResult.id : uuidv4(),
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -660,7 +662,7 @@ export class QaseCoreReporter {
             time_ms: testResult.duration || 0,
             stacktrace: testResult.stacktrace
                 ? testResult.stacktrace
-                : QaseCoreReporter.removeAnsiEscapeCodes(testResult.error?.stack?.toString() || ''),
+                : errorTrace || undefined,
             comment: testResult.error
                 ? this.formatComment(testResult.title, testResult.error, parameterizedData)
                 : parameterizedData
