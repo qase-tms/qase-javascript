@@ -5,7 +5,7 @@ import {
 
 describe('parseScreenshotDirectory', () => {
     it('should return screenshot directory', () => {
-        const screenshotDirectory = QaseCoreReporter.parseAttachmentDirectory('/screenshots');
+        const screenshotDirectory = QaseCoreReporter.parseAttachmentDirectory('/test/__artifacts__/screenshots');
         expect(screenshotDirectory).toEqual({
             2: {
                 caseId: 2,

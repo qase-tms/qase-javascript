@@ -41,8 +41,8 @@ beforeAll(async () => {
         {
             frameworkName: 'vitest', reporterName: 'qase-core-reporter',
             uploadAttachments: true,
-            screenshotFolder: 'screenshots',
-            videoFolder: 'videos'
+            screenshotFolder: '/test/__artifacts__/screenshots',
+            videoFolder: '/test/__artifacts__/videos'
         }
     );
 
@@ -83,8 +83,8 @@ describe('ResultBulkDetached', () => {
             {
                 frameworkName: 'jest', reporterName: 'qase',
                 uploadAttachments: true,
-                screenshotFolder: 'screenshots',
-                videoFolder: 'videos'
+                screenshotFolder: '/test/__artifacts__/screenshots',
+                videoFolder: '/test/__artifacts__/videos'
             }
         );
         const endSpy = vi.spyOn(reporter, 'end');
@@ -93,7 +93,7 @@ describe('ResultBulkDetached', () => {
 
         reporter.addTestResult({ title: 'test', status: ResultCreateStatusEnum.PASSED },
             ResultCreateStatusEnum.PASSED,
-            [{ path: process.cwd() + '/screenshots/screenshot.png' }]);
+            [{ path: process.cwd() + '/test/__artifacts__/screenshots/screenshot.png' }]);
 
         await reporter.end({ spawn: true });
 
@@ -192,7 +192,7 @@ describe('ResultBulkDetached', () => {
 
         reporter.addTestResult({ title: 'test', status: ResultCreateStatusEnum.PASSED },
             ResultCreateStatusEnum.PASSED,
-            [{ path: process.cwd() + '/screenshots/screenshot.png' }]);
+            [{ path: process.cwd() + '/test/__artifacts__/screenshots/screenshot.png' }]);
 
         const config = deepCopy(reporting_config);
         const attachments = deepCopy(attachments_config);
@@ -226,8 +226,8 @@ describe('ResultBulkDetached', () => {
             {
                 frameworkName: 'jest', reporterName: 'qase',
                 uploadAttachments: true,
-                screenshotFolder: 'screenshots',
-                videoFolder: 'videos'
+                screenshotFolder: '/test/__artifacts__/screenshots',
+                videoFolder: '/test/__artifacts__/videos'
             }
         );
 
@@ -235,11 +235,11 @@ describe('ResultBulkDetached', () => {
 
         reporter.addTestResult({ title: 'test', status: ResultCreateStatusEnum.PASSED },
             ResultCreateStatusEnum.PASSED,
-            [{ path: process.cwd() + '/screenshots/screenshot.png' }]);
+            [{ path: process.cwd() + '/test/__artifacts__/screenshots/screenshot.png' }]);
 
         reporter.addTestResult({ title: 'test 2', status: ResultCreateStatusEnum.PASSED, caseIds: [2] },
             ResultCreateStatusEnum.PASSED,
-            [{ path: process.cwd() + '/screenshots/screenshot.png' }]);
+            [{ path: process.cwd() + '/test/__artifacts__/screenshots/screenshot.png' }]);
 
 
         const config = deepCopy(reporting_config);

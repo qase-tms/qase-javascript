@@ -89,7 +89,7 @@ describe('end', () => {
             status: ResultCreateStatusEnum.PASSED,
         };
 
-        const attachmentPath = process.cwd() + '/screenshots/screenshot.png';
+        const attachmentPath = process.cwd() + '/test/__artifacts__/screenshots/screenshot.png';
         await reporter.start();
         reporter.addTestResult(testResult, ResultCreateStatusEnum.PASSED, [{ path: attachmentPath }]);
         await reporter.end({ spawn: false });
