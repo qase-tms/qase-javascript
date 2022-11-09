@@ -69,5 +69,11 @@ export interface TestStep {
      * @memberof TestStep
      */
     'attachments'?: Array<Attachment>;
+    /**
+     * 
+     * @type {Array<TestStep>}
+     * @memberof TestStep
+     */
+    'steps'?: Array<TestStep>;
 }
 

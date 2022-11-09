@@ -21,6 +21,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
+import { GetMilestonesFiltersParameter } from '../model';
+// @ts-ignore
 import { IdResponse } from '../model';
 // @ts-ignore
 import { SuiteCreate } from '../model';
@@ -168,16 +170,16 @@ export const SuitesApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * This method allows to retrieve all test suites stored in selected project.. 
+         * This method allows to retrieve all test suites stored in selected project. 
          * @summary Get all test suites.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {GetMilestonesFiltersParameter} [filters] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSuites: async (code: string, filters?: object, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getSuites: async (code: string, filters?: GetMilestonesFiltersParameter, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getSuites', 'code', code)
             const localVarPath = `/suite/{code}`
@@ -314,16 +316,16 @@ export const SuitesApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * This method allows to retrieve all test suites stored in selected project.. 
+         * This method allows to retrieve all test suites stored in selected project. 
          * @summary Get all test suites.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {GetMilestonesFiltersParameter} [filters] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getSuites(code: string, filters?: object, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SuiteListResponse>> {
+        async getSuites(code: string, filters?: GetMilestonesFiltersParameter, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SuiteListResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getSuites(code, filters, limit, offset, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -385,16 +387,16 @@ export const SuitesApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.getSuite(code, id, options).then((request) => request(axios, basePath));
         },
         /**
-         * This method allows to retrieve all test suites stored in selected project.. 
+         * This method allows to retrieve all test suites stored in selected project. 
          * @summary Get all test suites.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {GetMilestonesFiltersParameter} [filters] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSuites(code: string, filters?: object, limit?: number, offset?: number, options?: any): AxiosPromise<SuiteListResponse> {
+        getSuites(code: string, filters?: GetMilestonesFiltersParameter, limit?: number, offset?: number, options?: any): AxiosPromise<SuiteListResponse> {
             return localVarFp.getSuites(code, filters, limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
@@ -460,17 +462,17 @@ export class SuitesApi extends BaseAPI {
     }
 
     /**
-     * This method allows to retrieve all test suites stored in selected project.. 
+     * This method allows to retrieve all test suites stored in selected project. 
      * @summary Get all test suites.
      * @param {string} code Code of project, where to search entities.
-     * @param {object} [filters] 
+     * @param {GetMilestonesFiltersParameter} [filters] 
      * @param {number} [limit] A number of entities in result set.
      * @param {number} [offset] How many entities should be skipped.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof SuitesApi
      */
-    public getSuites(code: string, filters?: object, limit?: number, offset?: number, options?: AxiosRequestConfig) {
+    public getSuites(code: string, filters?: GetMilestonesFiltersParameter, limit?: number, offset?: number, options?: AxiosRequestConfig) {
         return SuitesApiFp(this.configuration).getSuites(code, filters, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 

@@ -29,6 +29,8 @@ import { CustomFieldUpdate } from '../model';
 // @ts-ignore
 import { CustomFieldsResponse } from '../model';
 // @ts-ignore
+import { GetCustomFieldsFiltersParameter } from '../model';
+// @ts-ignore
 import { IdResponse } from '../model';
 // @ts-ignore
 import { Response } from '../model';
@@ -154,13 +156,13 @@ export const CustomFieldsApiAxiosParamCreator = function (configuration?: Config
         /**
          * This method allows to retrieve and filter custom fields. 
          * @summary Get all Custom Fields.
-         * @param {object} [filters] 
+         * @param {GetCustomFieldsFiltersParameter} [filters] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCustomFields: async (filters?: object, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getCustomFields: async (filters?: GetCustomFieldsFiltersParameter, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/custom_field`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -288,13 +290,13 @@ export const CustomFieldsApiFp = function(configuration?: Configuration) {
         /**
          * This method allows to retrieve and filter custom fields. 
          * @summary Get all Custom Fields.
-         * @param {object} [filters] 
+         * @param {GetCustomFieldsFiltersParameter} [filters] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getCustomFields(filters?: object, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CustomFieldsResponse>> {
+        async getCustomFields(filters?: GetCustomFieldsFiltersParameter, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CustomFieldsResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getCustomFields(filters, limit, offset, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -353,13 +355,13 @@ export const CustomFieldsApiFactory = function (configuration?: Configuration, b
         /**
          * This method allows to retrieve and filter custom fields. 
          * @summary Get all Custom Fields.
-         * @param {object} [filters] 
+         * @param {GetCustomFieldsFiltersParameter} [filters] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCustomFields(filters?: object, limit?: number, offset?: number, options?: any): AxiosPromise<CustomFieldsResponse> {
+        getCustomFields(filters?: GetCustomFieldsFiltersParameter, limit?: number, offset?: number, options?: any): AxiosPromise<CustomFieldsResponse> {
             return localVarFp.getCustomFields(filters, limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
@@ -422,14 +424,14 @@ export class CustomFieldsApi extends BaseAPI {
     /**
      * This method allows to retrieve and filter custom fields. 
      * @summary Get all Custom Fields.
-     * @param {object} [filters] 
+     * @param {GetCustomFieldsFiltersParameter} [filters] 
      * @param {number} [limit] A number of entities in result set.
      * @param {number} [offset] How many entities should be skipped.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CustomFieldsApi
      */
-    public getCustomFields(filters?: object, limit?: number, offset?: number, options?: AxiosRequestConfig) {
+    public getCustomFields(filters?: GetCustomFieldsFiltersParameter, limit?: number, offset?: number, options?: AxiosRequestConfig) {
         return CustomFieldsApiFp(this.configuration).getCustomFields(filters, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
