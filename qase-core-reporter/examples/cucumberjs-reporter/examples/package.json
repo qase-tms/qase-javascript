@@ -1,0 +1,17 @@
+{
+  "name": "cucumber-js-test",
+  "version": "0.0.0",
+  "description": "> Some tests of using cucumber JS with zombie and selenium",
+  "main": "index.js",
+  "scripts": {
+    "test": "cucumber-js -f cucumberjs-qase-reporter --format-options='{\"qaseConfig\": \"./.qaserc\"}' features -r examples/zombie/support -r examples/zombie/steps  --publish-quiet",
+    "test:l": "cucumber-js features -r examples/zombie/support -r examples/zombie/steps"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^8.5.3",
+    "@cucumber/pretty-formatter": "^1.0.0-alpha.0",
+    "cucumberjs-qase-reporter": "../",
+    "phantom": "^2.0.4",
+    "zombie": "^6.1.4"
+  }
+}

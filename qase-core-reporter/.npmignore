@@ -1,0 +1,15 @@
+.*
+**/tsconfig.json
+**/nodemon.json
+**/tslint.json
+**/webpack.config.ts
+**/vite.config.ts
+test
+src
+examples
+.qaserc
+qase.config.json
+coverage
+
+# Output of 'npm pack'
+*.tgz
