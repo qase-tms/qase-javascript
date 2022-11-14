@@ -37,25 +37,6 @@ describe("My First Test", () => {
   });
 });
 ```
-
-You should also have an active item in the project settings at
-
-```
-https://app.qase.io/project/QASE_PROJECT_CODE/settings/options
-```
-
-options in the `Test Runs` block:
-
-```
-Auto create test cases
-```
-
-and
-
-```
-Allow submitting results in bulk
-```
-
 To run tests and create a test run, execute the command (for example from folder examples):
 
 ```bash
