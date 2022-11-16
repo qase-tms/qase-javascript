@@ -21,6 +21,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
+import { GetRunsFiltersParameter } from '../model';
+// @ts-ignore
 import { IdResponse } from '../model';
 // @ts-ignore
 import { Response } from '../model';
@@ -170,7 +172,7 @@ export const RunsApiAxiosParamCreator = function (configuration?: Configuration)
          * @summary Get a specific run.
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
-         * @param {string} [include] Add this param to include a list of test cases into response. Possible value: cases 
+         * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -215,14 +217,14 @@ export const RunsApiAxiosParamCreator = function (configuration?: Configuration)
          * This method allows to retrieve all runs stored in selected project. 
          * @summary Get all runs.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {GetRunsFiltersParameter} [filters] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
-         * @param {string} [include] Add this param to include a list of test cases into response. Possible value: cases 
+         * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRuns: async (code: string, filters?: object, limit?: number, offset?: number, include?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getRuns: async (code: string, filters?: GetRunsFiltersParameter, limit?: number, offset?: number, include?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getRuns', 'code', code)
             const localVarPath = `/run/{code}`
@@ -366,7 +368,7 @@ export const RunsApiFp = function(configuration?: Configuration) {
          * @summary Get a specific run.
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
-         * @param {string} [include] Add this param to include a list of test cases into response. Possible value: cases 
+         * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -378,14 +380,14 @@ export const RunsApiFp = function(configuration?: Configuration) {
          * This method allows to retrieve all runs stored in selected project. 
          * @summary Get all runs.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {GetRunsFiltersParameter} [filters] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
-         * @param {string} [include] Add this param to include a list of test cases into response. Possible value: cases 
+         * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getRuns(code: string, filters?: object, limit?: number, offset?: number, include?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunListResponse>> {
+        async getRuns(code: string, filters?: GetRunsFiltersParameter, limit?: number, offset?: number, include?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunListResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getRuns(code, filters, limit, offset, include, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -450,7 +452,7 @@ export const RunsApiFactory = function (configuration?: Configuration, basePath?
          * @summary Get a specific run.
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
-         * @param {string} [include] Add this param to include a list of test cases into response. Possible value: cases 
+         * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -461,14 +463,14 @@ export const RunsApiFactory = function (configuration?: Configuration, basePath?
          * This method allows to retrieve all runs stored in selected project. 
          * @summary Get all runs.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {GetRunsFiltersParameter} [filters] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
-         * @param {string} [include] Add this param to include a list of test cases into response. Possible value: cases 
+         * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRuns(code: string, filters?: object, limit?: number, offset?: number, include?: string, options?: any): AxiosPromise<RunListResponse> {
+        getRuns(code: string, filters?: GetRunsFiltersParameter, limit?: number, offset?: number, include?: string, options?: any): AxiosPromise<RunListResponse> {
             return localVarFp.getRuns(code, filters, limit, offset, include, options).then((request) => request(axios, basePath));
         },
         /**
@@ -537,7 +539,7 @@ export class RunsApi extends BaseAPI {
      * @summary Get a specific run.
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
-     * @param {string} [include] Add this param to include a list of test cases into response. Possible value: cases 
+     * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RunsApi
@@ -550,15 +552,15 @@ export class RunsApi extends BaseAPI {
      * This method allows to retrieve all runs stored in selected project. 
      * @summary Get all runs.
      * @param {string} code Code of project, where to search entities.
-     * @param {object} [filters] 
+     * @param {GetRunsFiltersParameter} [filters] 
      * @param {number} [limit] A number of entities in result set.
      * @param {number} [offset] How many entities should be skipped.
-     * @param {string} [include] Add this param to include a list of test cases into response. Possible value: cases 
+     * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RunsApi
      */
-    public getRuns(code: string, filters?: object, limit?: number, offset?: number, include?: string, options?: AxiosRequestConfig) {
+    public getRuns(code: string, filters?: GetRunsFiltersParameter, limit?: number, offset?: number, include?: string, options?: AxiosRequestConfig) {
         return RunsApiFp(this.configuration).getRuns(code, filters, limit, offset, include, options).then((request) => request(this.axios, this.basePath));
     }
 

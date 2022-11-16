@@ -13,7 +13,7 @@
  */
 
 
-import { TestCaseCreateSteps } from './test-case-create-steps';
+import { TestStepCreate } from './test-step-create';
 
 /**
  * 
@@ -113,10 +113,10 @@ export interface TestCaseUpdate {
     'attachments'?: Array<string>;
     /**
      * 
-     * @type {Array<TestCaseCreateSteps>}
+     * @type {Array<TestStepCreate>}
      * @memberof TestCaseUpdate
      */
-    'steps'?: Array<TestCaseCreateSteps>;
+    'steps'?: Array<TestStepCreate>;
     /**
      * 
      * @type {Array<string>}
