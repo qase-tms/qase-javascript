@@ -31,6 +31,8 @@ import { DefectStatus } from '../model';
 // @ts-ignore
 import { DefectUpdate } from '../model';
 // @ts-ignore
+import { GetDefectsFiltersParameter } from '../model';
+// @ts-ignore
 import { IdResponse } from '../model';
 // @ts-ignore
 import { Response } from '../model';
@@ -169,13 +171,13 @@ export const DefectsApiAxiosParamCreator = function (configuration?: Configurati
          * This method allows to retrieve all defects stored in selected project. 
          * @summary Get all defects.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {GetDefectsFiltersParameter} [filters] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getDefects: async (code: string, filters?: object, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getDefects: async (code: string, filters?: GetDefectsFiltersParameter, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getDefects', 'code', code)
             const localVarPath = `/defect/{code}`
@@ -402,13 +404,13 @@ export const DefectsApiFp = function(configuration?: Configuration) {
          * This method allows to retrieve all defects stored in selected project. 
          * @summary Get all defects.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {GetDefectsFiltersParameter} [filters] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getDefects(code: string, filters?: object, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DefectListResponse>> {
+        async getDefects(code: string, filters?: GetDefectsFiltersParameter, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DefectListResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getDefects(code, filters, limit, offset, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -497,13 +499,13 @@ export const DefectsApiFactory = function (configuration?: Configuration, basePa
          * This method allows to retrieve all defects stored in selected project. 
          * @summary Get all defects.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {GetDefectsFiltersParameter} [filters] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getDefects(code: string, filters?: object, limit?: number, offset?: number, options?: any): AxiosPromise<DefectListResponse> {
+        getDefects(code: string, filters?: GetDefectsFiltersParameter, limit?: number, offset?: number, options?: any): AxiosPromise<DefectListResponse> {
             return localVarFp.getDefects(code, filters, limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
@@ -594,14 +596,14 @@ export class DefectsApi extends BaseAPI {
      * This method allows to retrieve all defects stored in selected project. 
      * @summary Get all defects.
      * @param {string} code Code of project, where to search entities.
-     * @param {object} [filters] 
+     * @param {GetDefectsFiltersParameter} [filters] 
      * @param {number} [limit] A number of entities in result set.
      * @param {number} [offset] How many entities should be skipped.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefectsApi
      */
-    public getDefects(code: string, filters?: object, limit?: number, offset?: number, options?: AxiosRequestConfig) {
+    public getDefects(code: string, filters?: GetDefectsFiltersParameter, limit?: number, offset?: number, options?: AxiosRequestConfig) {
         return DefectsApiFp(this.configuration).getDefects(code, filters, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
