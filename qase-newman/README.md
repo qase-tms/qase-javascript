@@ -27,18 +27,6 @@ pm.test('expect response be 200', function () {
     pm.response.to.be.info
 })
 ```
-You should also have an active item in the project settings at
-```
-https://app.qase.io/project/QASE_PROJECT_CODE/settings/options
-```
-options in the `Test Runs` block:
-```
-Auto create test cases
-```
-and
-```
-Allow submitting results in bulk
-```
 ### Execute rom CLI:
 ```
 QASE_RUN_ID=34 # Specify Run ID using ENV

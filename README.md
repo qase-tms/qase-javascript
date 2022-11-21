@@ -5,6 +5,7 @@ This is a monorepo for all JavaScript-related projects
 ## Projects
 
 - [qaseio](/qaseio) - JavaScript API
+- [qase-core-reporter](/qase-core-reporter) - Core reporter
 - [qase-cypress](/qase-cypress) - Cypress reporter
 - [qase-cucumberjs](/qase-cucumberjs) - CucumberJS reporter
 - [qase-newman](/qase-newman) - Newman reporter

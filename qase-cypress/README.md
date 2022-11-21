@@ -39,14 +39,6 @@ describe('My First Test', () => {
 });
 
 ```
-You should also have an active item in the project settings at
-```
-https://app.qase.io/project/QASE_PROJECT_CODE/settings/options
-```
-option in the `Test Runs` block:
-```
-Allow submitting results in bulk
-```
 If you are going to use several specifications for execution and you have in config 
 ```bash
 "runComplete": true
