@@ -1,0 +1,20 @@
+// eslint-disable-next-line no-shadow
+export enum Envs {
+    report = 'QASE_REPORT',
+    enabled = 'QASE_ENABLED',
+    apiToken = 'QASE_API_TOKEN',
+    basePath = 'QASE_API_BASE_URL',
+    projectCode = 'QASE_PROJECT_CODE',
+    project = 'QASE_PROJECT',
+    runId = 'QASE_RUN_ID',
+    runName = 'QASE_RUN_NAME',
+    runDescription = 'QASE_RUN_DESCRIPTION',
+    runComplete = 'QASE_RUN_COMPLETE',
+    environmentId = 'QASE_ENVIRONMENT_ID',
+    rootSuiteTitle = 'QASE_ROOT_SUITE_TITLE',
+    logging = 'QASE_LOGGING',
+    uploadAttachments = 'QASE_UPLOAD_ATTACHMENTS',
+    sendScreenshot = 'QASE_SCREENSHOT_SENDING',
+    screenshotFolder = 'QASE_SCREENSHOT_FOLDER',
+    videoFolder = 'QASE_VIDEO_FOLDER',
+}

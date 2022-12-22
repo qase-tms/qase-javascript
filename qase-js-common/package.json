@@ -1,7 +1,7 @@
 {
-  "name": "qase-core-reporter",
+  "name": "qase-js-commons",
   "version": "v1.0.0",
-  "description": "Qase TMS Core JS Reporter",
+  "description": "Qase Core JS Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "homepage": "",
@@ -50,7 +50,7 @@
     "eslint-plugin-prefer-arrow-functions": "^3.1.4",
     "msw": "^0.47.1",
     "nodemon": "^2.0.19",
-    "qase-core-reporter": "./",
+    "qase-js-commons": "./",
     "typescript": "^4.8.3",
     "vitest": "^0.22.1"
   },

@@ -1,4 +1,4 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './test-wrappers'
+export * from './common/test-wrappers'
 export * from './reporter';
