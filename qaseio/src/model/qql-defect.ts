@@ -82,12 +82,6 @@ export interface QqlDefect {
      * @type {number}
      * @memberof QqlDefect
      */
-    'project_id'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof QqlDefect
-     */
     'member_id'?: number;
     /**
      * 

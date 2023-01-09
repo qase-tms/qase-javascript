@@ -82,12 +82,6 @@ export interface Defect {
      * @type {number}
      * @memberof Defect
      */
-    'project_id'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof Defect
-     */
     'member_id'?: number;
     /**
      * 
