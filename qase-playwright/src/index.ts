@@ -262,24 +262,38 @@ class PlaywrightReporter implements Reporter {
         const body = {
             results: this.resultsToBePublished,
         };
-        await this.api.results.createResultBulk(
-            this.options.projectCode,
-            Number(this.runId),
-            body
-        );
-        this.log(chalk`{green ${this.resultsToBePublished.length} result(s) sent to Qase}`);
-
-        if (!this.options.runComplete) {
-            return;
-        }
 
         try {
-            await this.api.runs.completeRun(this.options.projectCode, Number(this.runId));
-            this.log(chalk`{green Run ${this.runId} completed}`);
-        } catch (err) {
-            this.log(`Error on completing run ${err as string}`);
+            await this.api.results.createResultBulk(
+                this.options.projectCode,
+                Number(this.runId),
+                body
+            );
+
+            this.log(chalk`{green ${this.resultsToBePublished.length} result(s) sent to Qase}`);
+
+            if (!this.options.runComplete) {
+                return;
+            }
+
+            try {
+                await this.api.runs.completeRun(this.options.projectCode, Number(this.runId));
+                this.log(chalk`{green Run ${this.runId} completed}`);
+            } catch (err) {
+                this.log(`Error on completing run ${err as string}`);
+            }
+
+            this.log(chalk`{blue https://app.qase.io/run/${this.options.projectCode}/dashboard/${this.runId}}`);
+        } catch (error) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unnecessary-type-assertion
+            const err: any = error as any;
+            this.log(chalk`{red Unable to send results into Qase. ${err}}`);
+
+            if (err?.response?.status >= 400 && err?.response?.status < 500) {
+                this.log(chalk`{red Erorr message: ${err?.response?.data?.errorMessage}}`);
+                this.log(chalk`{red Erorrs: ${JSON.stringify(err?.response?.data?.errorFields)}}`);
+            }
         }
-        this.log(chalk`{blue https://app.qase.io/run/${this.options.projectCode}/dashboard/${this.runId}}`);
     }
 
     private log(message?: any, ...optionalParams: any[]) {
