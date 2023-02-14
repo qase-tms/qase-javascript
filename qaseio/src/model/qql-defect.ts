@@ -78,17 +78,18 @@ export interface QqlDefect {
      */
     'resolved'?: string | null;
     /**
-     * 
+     * Deprecated, use `author_id` instead.
      * @type {number}
      * @memberof QqlDefect
+     * @deprecated
      */
-    'project_id'?: number;
+    'member_id'?: number;
     /**
      * 
      * @type {number}
      * @memberof QqlDefect
      */
-    'member_id'?: number;
+    'author_id'?: number;
     /**
      * 
      * @type {string}

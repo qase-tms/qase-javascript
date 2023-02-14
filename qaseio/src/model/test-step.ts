@@ -43,6 +43,7 @@ export interface TestStep {
      * 
      * @type {number}
      * @memberof TestStep
+     * @deprecated
      */
     'position'?: number;
     /**
@@ -69,5 +70,11 @@ export interface TestStep {
      * @memberof TestStep
      */
     'attachments'?: Array<Attachment>;
+    /**
+     * Nested steps will be here. The same structure is used for them.
+     * @type {Array<object>}
+     * @memberof TestStep
+     */
+    'steps'?: Array<object>;
 }
 

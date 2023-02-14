@@ -74,5 +74,11 @@ export interface RunCreate {
      * @memberof RunCreate
      */
     'tags'?: Array<string>;
+    /**
+     * A map of custom fields values (id => value)
+     * @type {{ [key: string]: string; }}
+     * @memberof RunCreate
+     */
+    'custom_field'?: { [key: string]: string; };
 }
 
