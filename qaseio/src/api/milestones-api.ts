@@ -21,6 +21,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
+import { GetMilestonesFiltersParameter } from '../model';
+// @ts-ignore
 import { IdResponse } from '../model';
 // @ts-ignore
 import { MilestoneCreate } from '../model';
@@ -165,13 +167,13 @@ export const MilestonesApiAxiosParamCreator = function (configuration?: Configur
          * This method allows to retrieve all milestones stored in selected project. 
          * @summary Get all milestones.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {GetMilestonesFiltersParameter} [filters] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMilestones: async (code: string, filters?: object, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getMilestones: async (code: string, filters?: GetMilestonesFiltersParameter, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getMilestones', 'code', code)
             const localVarPath = `/milestone/{code}`
@@ -310,13 +312,13 @@ export const MilestonesApiFp = function(configuration?: Configuration) {
          * This method allows to retrieve all milestones stored in selected project. 
          * @summary Get all milestones.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {GetMilestonesFiltersParameter} [filters] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getMilestones(code: string, filters?: object, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MilestoneListResponse>> {
+        async getMilestones(code: string, filters?: GetMilestonesFiltersParameter, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MilestoneListResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getMilestones(code, filters, limit, offset, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -380,13 +382,13 @@ export const MilestonesApiFactory = function (configuration?: Configuration, bas
          * This method allows to retrieve all milestones stored in selected project. 
          * @summary Get all milestones.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {GetMilestonesFiltersParameter} [filters] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMilestones(code: string, filters?: object, limit?: number, offset?: number, options?: any): AxiosPromise<MilestoneListResponse> {
+        getMilestones(code: string, filters?: GetMilestonesFiltersParameter, limit?: number, offset?: number, options?: any): AxiosPromise<MilestoneListResponse> {
             return localVarFp.getMilestones(code, filters, limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
@@ -454,14 +456,14 @@ export class MilestonesApi extends BaseAPI {
      * This method allows to retrieve all milestones stored in selected project. 
      * @summary Get all milestones.
      * @param {string} code Code of project, where to search entities.
-     * @param {object} [filters] 
+     * @param {GetMilestonesFiltersParameter} [filters] 
      * @param {number} [limit] A number of entities in result set.
      * @param {number} [offset] How many entities should be skipped.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MilestonesApi
      */
-    public getMilestones(code: string, filters?: object, limit?: number, offset?: number, options?: AxiosRequestConfig) {
+    public getMilestones(code: string, filters?: GetMilestonesFiltersParameter, limit?: number, offset?: number, options?: AxiosRequestConfig) {
         return MilestonesApiFp(this.configuration).getMilestones(code, filters, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 

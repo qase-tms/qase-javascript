@@ -78,17 +78,18 @@ export interface Defect {
      */
     'resolved_at'?: string | null;
     /**
-     * 
+     * Deprecated, use `author_id` instead.
      * @type {number}
      * @memberof Defect
+     * @deprecated
      */
-    'project_id'?: number;
+    'member_id'?: number;
     /**
      * 
      * @type {number}
      * @memberof Defect
      */
-    'member_id'?: number;
+    'author_id'?: number;
     /**
      * 
      * @type {string}

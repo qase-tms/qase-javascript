@@ -21,6 +21,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
+import { GetCasesFiltersParameter } from '../model';
+// @ts-ignore
 import { IdResponse } from '../model';
 // @ts-ignore
 import { TestCaseCreate } from '../model';
@@ -165,13 +167,13 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
          * This method allows to retrieve all test cases stored in selected project. 
          * @summary Get all test cases.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {GetCasesFiltersParameter} [filters] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCases: async (code: string, filters?: object, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getCases: async (code: string, filters?: GetCasesFiltersParameter, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getCases', 'code', code)
             const localVarPath = `/case/{code}`
@@ -310,13 +312,13 @@ export const CasesApiFp = function(configuration?: Configuration) {
          * This method allows to retrieve all test cases stored in selected project. 
          * @summary Get all test cases.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {GetCasesFiltersParameter} [filters] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getCases(code: string, filters?: object, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TestCaseListResponse>> {
+        async getCases(code: string, filters?: GetCasesFiltersParameter, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TestCaseListResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getCases(code, filters, limit, offset, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -380,13 +382,13 @@ export const CasesApiFactory = function (configuration?: Configuration, basePath
          * This method allows to retrieve all test cases stored in selected project. 
          * @summary Get all test cases.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {GetCasesFiltersParameter} [filters] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCases(code: string, filters?: object, limit?: number, offset?: number, options?: any): AxiosPromise<TestCaseListResponse> {
+        getCases(code: string, filters?: GetCasesFiltersParameter, limit?: number, offset?: number, options?: any): AxiosPromise<TestCaseListResponse> {
             return localVarFp.getCases(code, filters, limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
@@ -454,14 +456,14 @@ export class CasesApi extends BaseAPI {
      * This method allows to retrieve all test cases stored in selected project. 
      * @summary Get all test cases.
      * @param {string} code Code of project, where to search entities.
-     * @param {object} [filters] 
+     * @param {GetCasesFiltersParameter} [filters] 
      * @param {number} [limit] A number of entities in result set.
      * @param {number} [offset] How many entities should be skipped.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CasesApi
      */
-    public getCases(code: string, filters?: object, limit?: number, offset?: number, options?: AxiosRequestConfig) {
+    public getCases(code: string, filters?: GetCasesFiltersParameter, limit?: number, offset?: number, options?: AxiosRequestConfig) {
         return CasesApiFp(this.configuration).getCases(code, filters, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
