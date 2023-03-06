@@ -16,6 +16,7 @@ enum Envs {
     report = 'QASE_REPORT',
     apiToken = 'QASE_API_TOKEN',
     basePath = 'QASE_API_BASE_URL',
+    projectCode = 'QASE_PROJECT_CODE',
     runId = 'QASE_RUN_ID',
     runName = 'QASE_RUN_NAME',
     runDescription = 'QASE_RUN_DESCRIPTION',
@@ -62,6 +63,7 @@ class CypressQaseReporter extends reporters.Base {
         this.options.rootSuiteTitle = CypressQaseReporter.getEnv(Envs.rootSuiteTitle) ||
             options.reporterOptions.rootSuiteTitle
             || '';
+        this.options.projectCode = options.reporterOptions.projectCode || CypressQaseReporter.getEnv(Envs.projectCode);
         this.api = new QaseApi(
             this.options.apiToken || CypressQaseReporter.getEnv(Envs.apiToken) || '',
             CypressQaseReporter.getEnv(Envs.basePath) || this.options.basePath,
