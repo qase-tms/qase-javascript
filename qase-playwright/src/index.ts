@@ -78,6 +78,7 @@ class PlaywrightReporter implements Reporter {
         this.options.runComplete = !!PlaywrightReporter.getEnv(Envs.runComplete) || this.options.runComplete;
         this.options.uploadAttachments = !!PlaywrightReporter.getEnv(Envs.uploadAttachments) || this.options.uploadAttachments;
         this.options.rootSuiteTitle = _options.rootSuiteTitle || PlaywrightReporter.getEnv(Envs.rootSuiteTitle) || '';
+        this.options.projectCode = _options.projectCode || PlaywrightReporter.getEnv(Envs.projectCode) || '';
 
         this.api = new QaseApi(
             PlaywrightReporter.getEnv(Envs.apiToken) || this.options.apiToken || '',
