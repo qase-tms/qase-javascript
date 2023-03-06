@@ -12,6 +12,6 @@
     "testcafe-reporter-qase": "../"
   },
   "dependencies": {
-    "testcafe": "^1.17.1"
+    "testcafe": "^2.3.1"
   }
 }
