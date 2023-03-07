@@ -1,0 +1,18 @@
+{
+  "name": "test-qase-gh-action",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "npx playwright test"
+  },
+  "author": "",
+  "license": "Apache License 2.0",
+  "dependencies": {
+    "@playwright/test": "^1.31.1",
+    "playwright-qase-reporter": "^1.2.0-alpha.5"
+  }
+}
