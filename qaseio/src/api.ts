@@ -15,6 +15,7 @@
 
 
 export * from './api/attachments-api';
+export * from './api/authors-api';
 export * from './api/cases-api';
 export * from './api/custom-fields-api';
 export * from './api/defects-api';

@@ -21,6 +21,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
+import { CreateResult200Response } from '../model';
+// @ts-ignore
 import { HashResponse } from '../model';
 // @ts-ignore
 import { Response } from '../model';
@@ -88,7 +90,7 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * This method allows to create a lot of test run result at once. 
+         * This method allows to create a lot of test run result at once.  If you try to send more than 2,000 results in a single bulk request, you will receive an error with code 413 - Payload Too Large.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
          * @summary Bulk create test run result.
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
@@ -224,13 +226,19 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
          * This method allows to retrieve all test run results stored in selected project. 
          * @summary Get all test run results.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {string} [status] A single test run result status. Possible values: in_progress, passed, failed, blocked, skipped, invalid. 
+         * @param {string} [run] A list of run IDs separated by comma.
+         * @param {string} [caseId] A list of case IDs separated by comma.
+         * @param {string} [member] A list of member IDs separated by comma.
+         * @param {boolean} [api] 
+         * @param {string} [fromEndTime] Will return all results created after provided datetime. Allowed format: &#x60;Y-m-d H:i:s&#x60;. 
+         * @param {string} [toEndTime] Will return all results created before provided datetime. Allowed format: &#x60;Y-m-d H:i:s&#x60;. 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getResults: async (code: string, filters?: object, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getResults: async (code: string, status?: string, run?: string, caseId?: string, member?: string, api?: boolean, fromEndTime?: string, toEndTime?: string, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getResults', 'code', code)
             const localVarPath = `/result/{code}`
@@ -249,8 +257,32 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
             // authentication TokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Token", configuration)
 
-            if (filters !== undefined) {
-                localVarQueryParameter['filters'] = filters;
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
+            }
+
+            if (run !== undefined) {
+                localVarQueryParameter['run'] = run;
+            }
+
+            if (caseId !== undefined) {
+                localVarQueryParameter['case_id'] = caseId;
+            }
+
+            if (member !== undefined) {
+                localVarQueryParameter['member'] = member;
+            }
+
+            if (api !== undefined) {
+                localVarQueryParameter['api'] = api;
+            }
+
+            if (fromEndTime !== undefined) {
+                localVarQueryParameter['from_end_time'] = fromEndTime;
+            }
+
+            if (toEndTime !== undefined) {
+                localVarQueryParameter['to_end_time'] = toEndTime;
             }
 
             if (limit !== undefined) {
@@ -342,12 +374,12 @@ export const ResultsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createResult(code: string, id: number, resultCreate: ResultCreate, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Response & object>> {
+        async createResult(code: string, id: number, resultCreate: ResultCreate, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateResult200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createResult(code, id, resultCreate, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * This method allows to create a lot of test run result at once. 
+         * This method allows to create a lot of test run result at once.  If you try to send more than 2,000 results in a single bulk request, you will receive an error with code 413 - Payload Too Large.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
          * @summary Bulk create test run result.
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
@@ -388,14 +420,20 @@ export const ResultsApiFp = function(configuration?: Configuration) {
          * This method allows to retrieve all test run results stored in selected project. 
          * @summary Get all test run results.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {string} [status] A single test run result status. Possible values: in_progress, passed, failed, blocked, skipped, invalid. 
+         * @param {string} [run] A list of run IDs separated by comma.
+         * @param {string} [caseId] A list of case IDs separated by comma.
+         * @param {string} [member] A list of member IDs separated by comma.
+         * @param {boolean} [api] 
+         * @param {string} [fromEndTime] Will return all results created after provided datetime. Allowed format: &#x60;Y-m-d H:i:s&#x60;. 
+         * @param {string} [toEndTime] Will return all results created before provided datetime. Allowed format: &#x60;Y-m-d H:i:s&#x60;. 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getResults(code: string, filters?: object, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ResultListResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getResults(code, filters, limit, offset, options);
+        async getResults(code: string, status?: string, run?: string, caseId?: string, member?: string, api?: boolean, fromEndTime?: string, toEndTime?: string, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ResultListResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getResults(code, status, run, caseId, member, api, fromEndTime, toEndTime, limit, offset, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -431,11 +469,11 @@ export const ResultsApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createResult(code: string, id: number, resultCreate: ResultCreate, options?: any): AxiosPromise<Response & object> {
+        createResult(code: string, id: number, resultCreate: ResultCreate, options?: any): AxiosPromise<CreateResult200Response> {
             return localVarFp.createResult(code, id, resultCreate, options).then((request) => request(axios, basePath));
         },
         /**
-         * This method allows to create a lot of test run result at once. 
+         * This method allows to create a lot of test run result at once.  If you try to send more than 2,000 results in a single bulk request, you will receive an error with code 413 - Payload Too Large.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
          * @summary Bulk create test run result.
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
@@ -473,14 +511,20 @@ export const ResultsApiFactory = function (configuration?: Configuration, basePa
          * This method allows to retrieve all test run results stored in selected project. 
          * @summary Get all test run results.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {string} [status] A single test run result status. Possible values: in_progress, passed, failed, blocked, skipped, invalid. 
+         * @param {string} [run] A list of run IDs separated by comma.
+         * @param {string} [caseId] A list of case IDs separated by comma.
+         * @param {string} [member] A list of member IDs separated by comma.
+         * @param {boolean} [api] 
+         * @param {string} [fromEndTime] Will return all results created after provided datetime. Allowed format: &#x60;Y-m-d H:i:s&#x60;. 
+         * @param {string} [toEndTime] Will return all results created before provided datetime. Allowed format: &#x60;Y-m-d H:i:s&#x60;. 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getResults(code: string, filters?: object, limit?: number, offset?: number, options?: any): AxiosPromise<ResultListResponse> {
-            return localVarFp.getResults(code, filters, limit, offset, options).then((request) => request(axios, basePath));
+        getResults(code: string, status?: string, run?: string, caseId?: string, member?: string, api?: boolean, fromEndTime?: string, toEndTime?: string, limit?: number, offset?: number, options?: any): AxiosPromise<ResultListResponse> {
+            return localVarFp.getResults(code, status, run, caseId, member, api, fromEndTime, toEndTime, limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
          * This method allows to update test run result. 
@@ -520,7 +564,7 @@ export class ResultsApi extends BaseAPI {
     }
 
     /**
-     * This method allows to create a lot of test run result at once. 
+     * This method allows to create a lot of test run result at once.  If you try to send more than 2,000 results in a single bulk request, you will receive an error with code 413 - Payload Too Large.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
      * @summary Bulk create test run result.
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
@@ -564,15 +608,21 @@ export class ResultsApi extends BaseAPI {
      * This method allows to retrieve all test run results stored in selected project. 
      * @summary Get all test run results.
      * @param {string} code Code of project, where to search entities.
-     * @param {object} [filters] 
+     * @param {string} [status] A single test run result status. Possible values: in_progress, passed, failed, blocked, skipped, invalid. 
+     * @param {string} [run] A list of run IDs separated by comma.
+     * @param {string} [caseId] A list of case IDs separated by comma.
+     * @param {string} [member] A list of member IDs separated by comma.
+     * @param {boolean} [api] 
+     * @param {string} [fromEndTime] Will return all results created after provided datetime. Allowed format: &#x60;Y-m-d H:i:s&#x60;. 
+     * @param {string} [toEndTime] Will return all results created before provided datetime. Allowed format: &#x60;Y-m-d H:i:s&#x60;. 
      * @param {number} [limit] A number of entities in result set.
      * @param {number} [offset] How many entities should be skipped.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ResultsApi
      */
-    public getResults(code: string, filters?: object, limit?: number, offset?: number, options?: AxiosRequestConfig) {
-        return ResultsApiFp(this.configuration).getResults(code, filters, limit, offset, options).then((request) => request(this.axios, this.basePath));
+    public getResults(code: string, status?: string, run?: string, caseId?: string, member?: string, api?: boolean, fromEndTime?: string, toEndTime?: string, limit?: number, offset?: number, options?: AxiosRequestConfig) {
+        return ResultsApiFp(this.configuration).getResults(code, status, run, caseId, member, api, fromEndTime, toEndTime, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

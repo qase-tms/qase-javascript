@@ -165,13 +165,13 @@ export const SharedStepsApiAxiosParamCreator = function (configuration?: Configu
          * This method allows to retrieve all shared steps stored in selected project. 
          * @summary Get all shared steps.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {string} [search] Provide a string that will be used to search by name.
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSharedSteps: async (code: string, filters?: object, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getSharedSteps: async (code: string, search?: string, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getSharedSteps', 'code', code)
             const localVarPath = `/shared_step/{code}`
@@ -190,8 +190,8 @@ export const SharedStepsApiAxiosParamCreator = function (configuration?: Configu
             // authentication TokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Token", configuration)
 
-            if (filters !== undefined) {
-                localVarQueryParameter['filters'] = filters;
+            if (search !== undefined) {
+                localVarQueryParameter['search'] = search;
             }
 
             if (limit !== undefined) {
@@ -310,14 +310,14 @@ export const SharedStepsApiFp = function(configuration?: Configuration) {
          * This method allows to retrieve all shared steps stored in selected project. 
          * @summary Get all shared steps.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {string} [search] Provide a string that will be used to search by name.
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getSharedSteps(code: string, filters?: object, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SharedStepListResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getSharedSteps(code, filters, limit, offset, options);
+        async getSharedSteps(code: string, search?: string, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SharedStepListResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getSharedSteps(code, search, limit, offset, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -380,14 +380,14 @@ export const SharedStepsApiFactory = function (configuration?: Configuration, ba
          * This method allows to retrieve all shared steps stored in selected project. 
          * @summary Get all shared steps.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {string} [search] Provide a string that will be used to search by name.
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSharedSteps(code: string, filters?: object, limit?: number, offset?: number, options?: any): AxiosPromise<SharedStepListResponse> {
-            return localVarFp.getSharedSteps(code, filters, limit, offset, options).then((request) => request(axios, basePath));
+        getSharedSteps(code: string, search?: string, limit?: number, offset?: number, options?: any): AxiosPromise<SharedStepListResponse> {
+            return localVarFp.getSharedSteps(code, search, limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
          * This method updates a shared step. 
@@ -454,15 +454,15 @@ export class SharedStepsApi extends BaseAPI {
      * This method allows to retrieve all shared steps stored in selected project. 
      * @summary Get all shared steps.
      * @param {string} code Code of project, where to search entities.
-     * @param {object} [filters] 
+     * @param {string} [search] Provide a string that will be used to search by name.
      * @param {number} [limit] A number of entities in result set.
      * @param {number} [offset] How many entities should be skipped.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof SharedStepsApi
      */
-    public getSharedSteps(code: string, filters?: object, limit?: number, offset?: number, options?: AxiosRequestConfig) {
-        return SharedStepsApiFp(this.configuration).getSharedSteps(code, filters, limit, offset, options).then((request) => request(this.axios, this.basePath));
+    public getSharedSteps(code: string, search?: string, limit?: number, offset?: number, options?: AxiosRequestConfig) {
+        return SharedStepsApiFp(this.configuration).getSharedSteps(code, search, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
