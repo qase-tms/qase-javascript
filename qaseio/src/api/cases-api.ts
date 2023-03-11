@@ -165,13 +165,21 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
          * This method allows to retrieve all test cases stored in selected project. 
          * @summary Get all test cases.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {string} [search] Provide a string that will be used to search by name.
+         * @param {number} [milestoneId] ID of milestone.
+         * @param {number} [suiteId] ID of test suite.
+         * @param {string} [severity] A list of severity values separated by comma. Possible values: undefined, blocker, critical, major, normal, minor, trivial 
+         * @param {string} [priority] A list of priority values separated by comma. Possible values: undefined, high, medium, low 
+         * @param {string} [type] A list of type values separated by comma. Possible values: other, functional smoke, regression, security, usability, performance, acceptance 
+         * @param {string} [behavior] A list of behavior values separated by comma. Possible values: undefined, positive negative, destructive 
+         * @param {string} [automation] A list of values separated by comma. Possible values: is-not-automated, automated to-be-automated 
+         * @param {string} [status] A list of values separated by comma. Possible values: actual, draft deprecated 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCases: async (code: string, filters?: object, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getCases: async (code: string, search?: string, milestoneId?: number, suiteId?: number, severity?: string, priority?: string, type?: string, behavior?: string, automation?: string, status?: string, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getCases', 'code', code)
             const localVarPath = `/case/{code}`
@@ -190,8 +198,40 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
             // authentication TokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Token", configuration)
 
-            if (filters !== undefined) {
-                localVarQueryParameter['filters'] = filters;
+            if (search !== undefined) {
+                localVarQueryParameter['search'] = search;
+            }
+
+            if (milestoneId !== undefined) {
+                localVarQueryParameter['milestone_id'] = milestoneId;
+            }
+
+            if (suiteId !== undefined) {
+                localVarQueryParameter['suite_id'] = suiteId;
+            }
+
+            if (severity !== undefined) {
+                localVarQueryParameter['severity'] = severity;
+            }
+
+            if (priority !== undefined) {
+                localVarQueryParameter['priority'] = priority;
+            }
+
+            if (type !== undefined) {
+                localVarQueryParameter['type'] = type;
+            }
+
+            if (behavior !== undefined) {
+                localVarQueryParameter['behavior'] = behavior;
+            }
+
+            if (automation !== undefined) {
+                localVarQueryParameter['automation'] = automation;
+            }
+
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
             }
 
             if (limit !== undefined) {
@@ -310,14 +350,22 @@ export const CasesApiFp = function(configuration?: Configuration) {
          * This method allows to retrieve all test cases stored in selected project. 
          * @summary Get all test cases.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {string} [search] Provide a string that will be used to search by name.
+         * @param {number} [milestoneId] ID of milestone.
+         * @param {number} [suiteId] ID of test suite.
+         * @param {string} [severity] A list of severity values separated by comma. Possible values: undefined, blocker, critical, major, normal, minor, trivial 
+         * @param {string} [priority] A list of priority values separated by comma. Possible values: undefined, high, medium, low 
+         * @param {string} [type] A list of type values separated by comma. Possible values: other, functional smoke, regression, security, usability, performance, acceptance 
+         * @param {string} [behavior] A list of behavior values separated by comma. Possible values: undefined, positive negative, destructive 
+         * @param {string} [automation] A list of values separated by comma. Possible values: is-not-automated, automated to-be-automated 
+         * @param {string} [status] A list of values separated by comma. Possible values: actual, draft deprecated 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getCases(code: string, filters?: object, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TestCaseListResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getCases(code, filters, limit, offset, options);
+        async getCases(code: string, search?: string, milestoneId?: number, suiteId?: number, severity?: string, priority?: string, type?: string, behavior?: string, automation?: string, status?: string, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TestCaseListResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCases(code, search, milestoneId, suiteId, severity, priority, type, behavior, automation, status, limit, offset, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -380,14 +428,22 @@ export const CasesApiFactory = function (configuration?: Configuration, basePath
          * This method allows to retrieve all test cases stored in selected project. 
          * @summary Get all test cases.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {string} [search] Provide a string that will be used to search by name.
+         * @param {number} [milestoneId] ID of milestone.
+         * @param {number} [suiteId] ID of test suite.
+         * @param {string} [severity] A list of severity values separated by comma. Possible values: undefined, blocker, critical, major, normal, minor, trivial 
+         * @param {string} [priority] A list of priority values separated by comma. Possible values: undefined, high, medium, low 
+         * @param {string} [type] A list of type values separated by comma. Possible values: other, functional smoke, regression, security, usability, performance, acceptance 
+         * @param {string} [behavior] A list of behavior values separated by comma. Possible values: undefined, positive negative, destructive 
+         * @param {string} [automation] A list of values separated by comma. Possible values: is-not-automated, automated to-be-automated 
+         * @param {string} [status] A list of values separated by comma. Possible values: actual, draft deprecated 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCases(code: string, filters?: object, limit?: number, offset?: number, options?: any): AxiosPromise<TestCaseListResponse> {
-            return localVarFp.getCases(code, filters, limit, offset, options).then((request) => request(axios, basePath));
+        getCases(code: string, search?: string, milestoneId?: number, suiteId?: number, severity?: string, priority?: string, type?: string, behavior?: string, automation?: string, status?: string, limit?: number, offset?: number, options?: any): AxiosPromise<TestCaseListResponse> {
+            return localVarFp.getCases(code, search, milestoneId, suiteId, severity, priority, type, behavior, automation, status, limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
          * This method updates a test case. 
@@ -454,15 +510,23 @@ export class CasesApi extends BaseAPI {
      * This method allows to retrieve all test cases stored in selected project. 
      * @summary Get all test cases.
      * @param {string} code Code of project, where to search entities.
-     * @param {object} [filters] 
+     * @param {string} [search] Provide a string that will be used to search by name.
+     * @param {number} [milestoneId] ID of milestone.
+     * @param {number} [suiteId] ID of test suite.
+     * @param {string} [severity] A list of severity values separated by comma. Possible values: undefined, blocker, critical, major, normal, minor, trivial 
+     * @param {string} [priority] A list of priority values separated by comma. Possible values: undefined, high, medium, low 
+     * @param {string} [type] A list of type values separated by comma. Possible values: other, functional smoke, regression, security, usability, performance, acceptance 
+     * @param {string} [behavior] A list of behavior values separated by comma. Possible values: undefined, positive negative, destructive 
+     * @param {string} [automation] A list of values separated by comma. Possible values: is-not-automated, automated to-be-automated 
+     * @param {string} [status] A list of values separated by comma. Possible values: actual, draft deprecated 
      * @param {number} [limit] A number of entities in result set.
      * @param {number} [offset] How many entities should be skipped.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CasesApi
      */
-    public getCases(code: string, filters?: object, limit?: number, offset?: number, options?: AxiosRequestConfig) {
-        return CasesApiFp(this.configuration).getCases(code, filters, limit, offset, options).then((request) => request(this.axios, this.basePath));
+    public getCases(code: string, search?: string, milestoneId?: number, suiteId?: number, severity?: string, priority?: string, type?: string, behavior?: string, automation?: string, status?: string, limit?: number, offset?: number, options?: AxiosRequestConfig) {
+        return CasesApiFp(this.configuration).getCases(code, search, milestoneId, suiteId, severity, priority, type, behavior, automation, status, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

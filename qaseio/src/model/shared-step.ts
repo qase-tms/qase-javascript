@@ -13,7 +13,7 @@
  */
 
 
-import { SharedStepSteps } from './shared-step-steps';
+import { SharedStepContent } from './shared-step-content';
 
 /**
  * 
@@ -47,10 +47,10 @@ export interface SharedStep {
     'expected_result'?: string;
     /**
      * 
-     * @type {Array<SharedStepSteps>}
+     * @type {Array<SharedStepContent>}
      * @memberof SharedStep
      */
-    'steps'?: Array<SharedStepSteps>;
+    'steps'?: Array<SharedStepContent>;
     /**
      * 
      * @type {string}

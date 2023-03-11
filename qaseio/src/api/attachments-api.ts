@@ -155,11 +155,11 @@ export const AttachmentsApiAxiosParamCreator = function (configuration?: Configu
          * This method allows to upload attachment to Qase. Max upload size: * Up to 32 Mb per file * Up to 128 Mb per single request * Up to 20 files per single request  If there is no free space left in your team account, you will receive an error with code 507 - Insufficient Storage. 
          * @summary Upload attachment.
          * @param {string} code Code of project, where to search entities.
-         * @param {Array<any>} [file] 
+         * @param {Array<File>} [file] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        uploadAttachment: async (code: string, file?: Array<any>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        uploadAttachment: async (code: string, file?: Array<File>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('uploadAttachment', 'code', code)
             const localVarPath = `/attachment/{code}`
@@ -247,11 +247,11 @@ export const AttachmentsApiFp = function(configuration?: Configuration) {
          * This method allows to upload attachment to Qase. Max upload size: * Up to 32 Mb per file * Up to 128 Mb per single request * Up to 20 files per single request  If there is no free space left in your team account, you will receive an error with code 507 - Insufficient Storage. 
          * @summary Upload attachment.
          * @param {string} code Code of project, where to search entities.
-         * @param {Array<any>} [file] 
+         * @param {Array<File>} [file] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async uploadAttachment(code: string, file?: Array<any>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AttachmentUploadsResponse>> {
+        async uploadAttachment(code: string, file?: Array<File>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AttachmentUploadsResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.uploadAttachment(code, file, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -300,11 +300,11 @@ export const AttachmentsApiFactory = function (configuration?: Configuration, ba
          * This method allows to upload attachment to Qase. Max upload size: * Up to 32 Mb per file * Up to 128 Mb per single request * Up to 20 files per single request  If there is no free space left in your team account, you will receive an error with code 507 - Insufficient Storage. 
          * @summary Upload attachment.
          * @param {string} code Code of project, where to search entities.
-         * @param {Array<any>} [file] 
+         * @param {Array<File>} [file] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        uploadAttachment(code: string, file?: Array<any>, options?: any): AxiosPromise<AttachmentUploadsResponse> {
+        uploadAttachment(code: string, file?: Array<File>, options?: any): AxiosPromise<AttachmentUploadsResponse> {
             return localVarFp.uploadAttachment(code, file, options).then((request) => request(axios, basePath));
         },
     };
@@ -358,12 +358,12 @@ export class AttachmentsApi extends BaseAPI {
      * This method allows to upload attachment to Qase. Max upload size: * Up to 32 Mb per file * Up to 128 Mb per single request * Up to 20 files per single request  If there is no free space left in your team account, you will receive an error with code 507 - Insufficient Storage. 
      * @summary Upload attachment.
      * @param {string} code Code of project, where to search entities.
-     * @param {Array<any>} [file] 
+     * @param {Array<File>} [file] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AttachmentsApi
      */
-    public uploadAttachment(code: string, file?: Array<any>, options?: AxiosRequestConfig) {
+    public uploadAttachment(code: string, file?: Array<File>, options?: AxiosRequestConfig) {
         return AttachmentsApiFp(this.configuration).uploadAttachment(code, file, options).then((request) => request(this.axios, this.basePath));
     }
 }

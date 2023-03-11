@@ -14,7 +14,7 @@
 
 
 import { ResultCreateCase } from './result-create-case';
-import { ResultCreateSteps } from './result-create-steps';
+import { TestStepResultCreate } from './test-step-result-create';
 
 /**
  * 
@@ -81,13 +81,13 @@ export interface ResultCreate {
      * @type {{ [key: string]: string; }}
      * @memberof ResultCreate
      */
-    'param'?: { [key: string]: string; };
+    'param'?: { [key: string]: string; } | null;
     /**
      * 
-     * @type {Array<ResultCreateSteps>}
+     * @type {Array<TestStepResultCreate>}
      * @memberof ResultCreate
      */
-    'steps'?: Array<ResultCreateSteps> | null;
+    'steps'?: Array<TestStepResultCreate> | null;
 }
 
 /**

@@ -165,13 +165,13 @@ export const MilestonesApiAxiosParamCreator = function (configuration?: Configur
          * This method allows to retrieve all milestones stored in selected project. 
          * @summary Get all milestones.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {string} [search] Provide a string that will be used to search by name.
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMilestones: async (code: string, filters?: object, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getMilestones: async (code: string, search?: string, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getMilestones', 'code', code)
             const localVarPath = `/milestone/{code}`
@@ -190,8 +190,8 @@ export const MilestonesApiAxiosParamCreator = function (configuration?: Configur
             // authentication TokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Token", configuration)
 
-            if (filters !== undefined) {
-                localVarQueryParameter['filters'] = filters;
+            if (search !== undefined) {
+                localVarQueryParameter['search'] = search;
             }
 
             if (limit !== undefined) {
@@ -310,14 +310,14 @@ export const MilestonesApiFp = function(configuration?: Configuration) {
          * This method allows to retrieve all milestones stored in selected project. 
          * @summary Get all milestones.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {string} [search] Provide a string that will be used to search by name.
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getMilestones(code: string, filters?: object, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MilestoneListResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getMilestones(code, filters, limit, offset, options);
+        async getMilestones(code: string, search?: string, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MilestoneListResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMilestones(code, search, limit, offset, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -380,14 +380,14 @@ export const MilestonesApiFactory = function (configuration?: Configuration, bas
          * This method allows to retrieve all milestones stored in selected project. 
          * @summary Get all milestones.
          * @param {string} code Code of project, where to search entities.
-         * @param {object} [filters] 
+         * @param {string} [search] Provide a string that will be used to search by name.
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMilestones(code: string, filters?: object, limit?: number, offset?: number, options?: any): AxiosPromise<MilestoneListResponse> {
-            return localVarFp.getMilestones(code, filters, limit, offset, options).then((request) => request(axios, basePath));
+        getMilestones(code: string, search?: string, limit?: number, offset?: number, options?: any): AxiosPromise<MilestoneListResponse> {
+            return localVarFp.getMilestones(code, search, limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
          * This method updates a milestone. 
@@ -454,15 +454,15 @@ export class MilestonesApi extends BaseAPI {
      * This method allows to retrieve all milestones stored in selected project. 
      * @summary Get all milestones.
      * @param {string} code Code of project, where to search entities.
-     * @param {object} [filters] 
+     * @param {string} [search] Provide a string that will be used to search by name.
      * @param {number} [limit] A number of entities in result set.
      * @param {number} [offset] How many entities should be skipped.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MilestonesApi
      */
-    public getMilestones(code: string, filters?: object, limit?: number, offset?: number, options?: AxiosRequestConfig) {
-        return MilestonesApiFp(this.configuration).getMilestones(code, filters, limit, offset, options).then((request) => request(this.axios, this.basePath));
+    public getMilestones(code: string, search?: string, limit?: number, offset?: number, options?: AxiosRequestConfig) {
+        return MilestonesApiFp(this.configuration).getMilestones(code, search, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

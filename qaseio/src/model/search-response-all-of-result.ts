@@ -13,12 +13,7 @@
  */
 
 
-import { QqlDefect } from './qql-defect';
-import { QqlPlan } from './qql-plan';
-import { QqlTestCase } from './qql-test-case';
-import { Requirement } from './requirement';
-import { Result } from './result';
-import { Run } from './run';
+import { lTestCase|Requirement|QqlDefect|QqlPlan|Result } from './l-test-case|requirement|qql-defect|qql-plan|result';
 
 /**
  * 

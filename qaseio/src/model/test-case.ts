@@ -16,6 +16,7 @@
 import { Attachment } from './attachment';
 import { CustomFieldValue } from './custom-field-value';
 import { TagValue } from './tag-value';
+import { TestCaseParams } from './test-case-params';
 import { TestStep } from './test-step';
 
 /**
@@ -146,10 +147,10 @@ export interface TestCase {
     'steps'?: Array<TestStep>;
     /**
      * 
-     * @type {Array<any> | object}
+     * @type {TestCaseParams}
      * @memberof TestCase
      */
-    'params'?: Array<any> | object;
+    'params'?: TestCaseParams;
     /**
      * 
      * @type {Array<TagValue>}
@@ -157,9 +158,10 @@ export interface TestCase {
      */
     'tags'?: Array<TagValue>;
     /**
-     * 
+     * Deprecated, use `author_id` instead.
      * @type {number}
      * @memberof TestCase
+     * @deprecated
      */
     'member_id'?: number;
     /**
@@ -167,7 +169,7 @@ export interface TestCase {
      * @type {number}
      * @memberof TestCase
      */
-    'project_id'?: number;
+    'author_id'?: number;
     /**
      * 
      * @type {string}
