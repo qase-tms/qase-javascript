@@ -1,7 +1,7 @@
 {
-  "name": "qase-core-reporter",
+  "name": "qase-javascript-commons",
   "version": "v1.0.0",
-  "description": "Qase TMS Core JS Reporter",
+  "description": "Qase JS Reporters",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "homepage": "",

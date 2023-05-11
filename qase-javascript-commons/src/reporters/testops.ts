@@ -9,114 +9,20 @@ import {
     readdirSync,
     existsSync,
 } from 'fs';
-import chalk from 'chalk';
+import { Reporter } from '../interfaces/reporter';
+import { QaseOptions } from '../interfaces/options';
+import { BaseReporter } from './base';
+
 import stripAnsi from 'strip-ansi';
-import crypto from 'crypto';
 import { execSync, spawnSync } from 'child_process';
 import { join } from 'path';
 import { QaseApi } from 'qaseio';
-import FormData from 'form-data';
-import { v4 as uuidv4 } from 'uuid';
 import {
     IdResponse,
     ResultCreate,
     ResultCreateStatusEnum,
 } from 'qaseio/dist/src';
-
-// eslint-disable-next-line no-shadow
-export enum Envs {
-    report = 'QASE_REPORT',
-    enabled = 'QASE_ENABLED',
-    apiToken = 'QASE_API_TOKEN',
-    basePath = 'QASE_API_BASE_URL',
-    projectCode = 'QASE_PROJECT_CODE',
-    project = 'QASE_PROJECT',
-    runId = 'QASE_RUN_ID',
-    runName = 'QASE_RUN_NAME',
-    runDescription = 'QASE_RUN_DESCRIPTION',
-    runComplete = 'QASE_RUN_COMPLETE',
-    environmentId = 'QASE_ENVIRONMENT_ID',
-    rootSuiteTitle = 'QASE_ROOT_SUITE_TITLE',
-    logging = 'QASE_LOGGING',
-    uploadAttachments = 'QASE_UPLOAD_ATTACHMENTS',
-    sendScreenshot = 'QASE_SCREENSHOT_SENDING',
-    screenshotFolder = 'QASE_SCREENSHOT_FOLDER',
-    videoFolder = 'QASE_VIDEO_FOLDER',
-}
-
-export const Statuses = {
-    passed: ResultCreateStatusEnum.PASSED,
-    failed: ResultCreateStatusEnum.FAILED,
-    skipped: ResultCreateStatusEnum.SKIPPED,
-    pending: ResultCreateStatusEnum.SKIPPED,
-    disabled: ResultCreateStatusEnum.BLOCKED,
-    in_progress: ResultCreateStatusEnum.IN_PROGRESS,
-    invalid: ResultCreateStatusEnum.INVALID,
-};
-
-export interface QaseOptions {
-    report?: boolean;
-    apiToken: string;
-    basePath?: string;
-    rootSuiteTitle?: string;
-    projectCode: string;
-    runId?: string;
-    runPrefix?: string;
-    logging?: boolean;
-    runComplete?: boolean;
-    environmentId?: number;
-    runDescription?: string;
-    runName?: string;
-    qaseCoreReporterOptions?: QaseCoreReporterOptions;
-}
-
-export interface QaseCoreReporterOptions {
-    frameworkName: string;
-    reporterName: string;
-    customFrameworkName?: string;
-    customReporterName?: string;
-    screenshotFolder?: string;
-    videoFolder?: string;
-    uploadAttachments?: boolean;
-    loadConfig?: boolean;
-    enabledSupport?: boolean;
-}
-
-export interface TestResult {
-    id?: string;
-    caseIds?: number[];
-    title: string;
-    status: keyof typeof Statuses;
-    error?: Error;
-    stacktrace?: string;
-    duration?: number;
-    suitePath?: string;
-    comment?: string;
-    attachments?: string[];
-}
-
-export interface Suite {
-    parent: Suite | string;
-    title: string;
-}
-
-interface ParameterizedTestData {
-    id: string;
-    dataset: string;
-}
-
-interface File {
-    caseId: string;
-    file: string[];
-}
-
-interface FilePathByCaseId {
-    caseId: File;
-}
-
-interface IAttachment {
-    path: string;
-}
+import { Attachment } from '../models/attachment';
 
 interface HeadersInput {
     frameworkName: string;
@@ -128,46 +34,25 @@ interface HeadersInput {
 
 type ResultsForPublishing = Array<ResultCreate & { id: string }>;
 
-let customBoundary = '----------------------------';
-crypto.randomBytes(24).forEach((value) => {
-    customBoundary += Math.floor(value * 10).toString(16);
-});
-
-class CustomBoundaryFormData extends FormData {
-    public constructor() {
-        super();
-    }
-
-    public getBoundary(): string {
-        return customBoundary;
-    }
-}
-
 const REGEX_QASE_DATASET = /\(Qase Dataset: (#\d) (\(.*\))\)/;
 const REGEX_QASE_ID = /(\(Qase ID: ([\d,]+)\))/;
 
-export class QaseCoreReporter {
-    public static reporterPrettyName = 'Qase Core';
-    public resultsForPublishingCount = 0;
+export class TestOpsReporter extends BaseReporter implements Reporter
+{
     public options: QaseOptions;
-    private api: QaseApi;
-    private runId?: number | string;
-    private isDisabled = false;
-    private resultsForPublishing: ResultsForPublishing = [];
-    private attachments: Record<string, IAttachment[]> = {};
-    private headers: Record<string, any> = {};
-    private host = 'https://app.qase.io';
 
-    public constructor(_reporterOptions: QaseOptions, _options: QaseCoreReporterOptions) {
-        if (process.env.QASE_LOGGING === undefined) {
-            process.env.QASE_LOGGING = _reporterOptions.logging
-                ? String(_reporterOptions.logging)
-                : 'false';
-        }
+    private api: QaseApi;
+    private isDisabled: boolean = false;
+    private resultsForPublishing: ResultsForPublishing = [];
+    private attachments: Record<string, Attachment[]> = {};
+    private headers: Record<string, any> = {};
+
+    public constructor(_reporterOptions: QaseOptions, _testOpsOptions: QaseTestOpsOptions) {
+        super(_reporterOptions);
 
         // check if loadConfig is set to true and if so, load the config from the file
         const reporterOptions = _options.loadConfig
-            ? QaseCoreReporter.loadConfig()
+            ? TestOpsReporter.loadConfig()
             : _reporterOptions;
 
         this.options = reporterOptions;
@@ -178,24 +63,25 @@ export class QaseCoreReporter {
         this.options.qaseCoreReporterOptions.enabledSupport = _options.enabledSupport || false;
         // All reporter options can be set via environment variables
         // add default value if not set
-        this.options.runName = QaseCoreReporter.getEnv(Envs.runName) || reporterOptions.runName;
-        this.options.runDescription = QaseCoreReporter.getEnv(Envs.runDescription)
+        this.options.runName = TestOpsReporter.getEnv(Envs.runName) || reporterOptions.runName;
+        this.options.runDescription = TestOpsReporter.getEnv(Envs.runDescription)
             || reporterOptions.runDescription
             || '';
-        this.options.projectCode = QaseCoreReporter.getEnv(Envs.projectCode) || reporterOptions.projectCode;
-        this.options.rootSuiteTitle = QaseCoreReporter.getEnv(Envs.rootSuiteTitle) || reporterOptions.rootSuiteTitle;
-        this.options.runComplete = !!QaseCoreReporter.getEnv(Envs.runComplete) || reporterOptions.runComplete || false;
-        this.options.environmentId = Number.parseInt(QaseCoreReporter.getEnv(Envs.environmentId) as string, 10)
+        this.options.projectCode = TestOpsReporter.getEnv(Envs.projectCode) || reporterOptions.projectCode;
+        this.options.rootSuiteTitle = TestOpsReporter.getEnv(Envs.rootSuiteTitle) || reporterOptions.rootSuiteTitle;
+        this.options.runComplete = !!TestOpsReporter.getEnv(Envs.runComplete) || reporterOptions.runComplete || false;
+        this.options.environmentId = Number.parseInt(TestOpsReporter.getEnv(Envs.environmentId) as string, 10)
             || reporterOptions.environmentId;
-        this.options.basePath = QaseCoreReporter.getEnv(Envs.basePath) || reporterOptions.basePath;
-        this.options.apiToken = QaseCoreReporter.getEnv(Envs.apiToken) || reporterOptions.apiToken;
-        this.headers = QaseCoreReporter.createHeaders({
+        this.options.basePath = TestOpsReporter.getEnv(Envs.basePath) || reporterOptions.basePath;
+        this.options.apiToken = TestOpsReporter.getEnv(Envs.apiToken) || reporterOptions.apiToken;
+        this.headers = TestOpsReporter.createHeaders({
             frameworkName: _options.frameworkName,
             reporterName: _options.reporterName,
             customFrameworkName: _options.customFrameworkName,
             customReporterName: _options.customReporterName,
         });
         this.attachments = {};
+
         this.api = new QaseApi(
             this.options.apiToken,
             this.options.basePath,
@@ -205,7 +91,7 @@ export class QaseCoreReporter {
                 : undefined
         );
 
-        QaseCoreReporter.logger(chalk`{yellow Current PID: ${process.pid}}`);
+        super.logger(chalk`{yellow Current PID: ${process.pid}}`);
 
         const report = QaseCoreReporter.getEnv(Envs.report)
             || this.options.report
@@ -214,11 +100,11 @@ export class QaseCoreReporter {
         if (!report) {
             // if enabledSupport is true, then that means the reporter is using enabled instead of report
             if (this.options.qaseCoreReporterOptions.enabledSupport) {
-                QaseCoreReporter.logger(
+                super.logger(
                     chalk`{yellow QASE_ENABLED env variable is not set or Qase reporter option "enabled" is false. 
           Reporting to qase.io is disabled.}`);
             } else {
-                QaseCoreReporter.logger(
+                super.logger(
                     chalk`{yellow QASE_REPORT env variable is not set or Qase reporter option "report" is false. 
           Reporting to qase.io is disabled.}`);
             }
@@ -252,17 +138,6 @@ export class QaseCoreReporter {
         }
 
         return config;
-    }
-
-    public static logger(message?: string, ...optionalParams: any[]): void {
-        // eslint-disable-next-line no-console
-        const logging = QaseCoreReporter.getEnv(Envs.logging) === 'true'
-            ? true
-            : false;
-        if (logging) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            console.log(chalk`{bold {blue qase:}} ${message}`, ...optionalParams);
-        }
     }
 
     public static getSuitePath(suite: Suite): string {
@@ -306,9 +181,6 @@ export class QaseCoreReporter {
         return filePathByCaseIdMap as FilePathByCaseId;
     };
 
-    public static getEnv(name: Envs) {
-        return process.env[name];
-    }
 
     public static removeAnsiEscapeCodes(str: string): string {
         return stripAnsi(str);
@@ -422,27 +294,27 @@ export class QaseCoreReporter {
         };
     }
 
-    public async start(): Promise<void> {
+    public async startRun(): Promise<void> {
         if (this.isDisabled) {
             return;
         }
 
-        QaseCoreReporter.logger(chalk`{yellow Starting QASE reporter}`);
+        TestOpsReporter.logger(chalk`{yellow Starting QASE reporter}`);
 
         return this.checkProject(
             this.options.projectCode,
             async (prjExists): Promise<void> => {
 
                 if (!prjExists) {
-                    QaseCoreReporter.logger(
+                    TestOpsReporter.logger(
                         chalk`{red Project ${this.options.projectCode} does not exist}`
                     );
                     this.isDisabled = true;
                     return;
                 }
 
-                QaseCoreReporter.logger(chalk`{green Project ${this.options.projectCode} exists}`);
-                const userDefinedRunId = QaseCoreReporter.getEnv(Envs.runId) || this.options.runId;
+                TestOpsReporter.logger(chalk`{green Project ${this.options.projectCode} exists}`);
+                const userDefinedRunId = TestOpsReporter.getEnv(Envs.runId) || this.options.runId;
                 if (userDefinedRunId) {
                     this.saveRunId(
                         userDefinedRunId

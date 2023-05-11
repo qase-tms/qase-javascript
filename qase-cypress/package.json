@@ -1,10 +1,10 @@
 {
   "name": "cypress-qase-reporter",
-  "version": "v1.4.2-alpha.2",
-  "description": "Qase TMS Cypress Reporter",
+  "version": "v2.0.0",
+  "description": "Qase Cypress Reporter",
+  "homepage": "https://github.com/qase-tms/qase-cypress",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "homepage": "https://github.com/qase-tms/qase-cypress",
   "bugs": {
     "url": "https://github.com/qase-tms/qase-cypress/issues"
   },
@@ -16,7 +16,7 @@
     "node": ">=10"
   },
   "scripts": {
-    "dev": "npm run lint && tsc && cp ./src/reportBulk.js ./dist",
+    "dev": "npm run lint && tsc",
     "dev:watch": "nodemon --exec 'npm run dev || exit 1'",
     "lint": "eslint --fix src/**",
     "build": "npm run clean && npm run dev",
@@ -24,14 +24,10 @@
     "clean": "rm -rf dist || true"
   },
   "author": {
-    "name": "Parviz Khavari",
-    "email": "csctclan@gmail.com"
+    "name": "Nikita Fedorov",
+    "email": "nik333r@gmail.com"
   },
   "license": "Apache-2.0",
-  "dependencies": {
-    "form-data": "^4.0.0",
-    "qaseio": "^2.0.1"
-  },
   "devDependencies": {
     "@hutson/npm-deploy-git-tag": "^6.0.0",
     "@types/chalk": "^2.2.0",
@@ -43,7 +39,7 @@
     "ansi-regex": "^6.0.1",
     "axios-mock-adapter": "^1.19.0",
     "chalk": "^4.1.0",
-    "cypress": "^4.12.1",
+    "cypress": "^10",
     "eslint": "^7.14.0",
     "eslint-plugin-jsdoc": "^26.0.1",
     "eslint-plugin-prefer-arrow": "^1.2.2",
