@@ -11,6 +11,8 @@ import chalk from 'chalk';
 import { execSync } from 'child_process';
 import { readFileSync } from 'fs';
 
+import '@jest/core'
+
 enum Envs {
     report = 'QASE_REPORT',
     apiToken = 'QASE_API_TOKEN',

@@ -1,23 +1,47 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-import { AttachmentsApi } from './api/attachments-api';
-import { CasesApi } from './api/cases-api';
-import { Configuration } from '.';
-import { CustomFieldsApi } from './api/custom-fields-api';
-import { DefectsApi } from './api/defects-api';
-import { MilestonesApi } from './api/milestones-api';
-import { PlansApi } from './api/plans-api';
-import { ProjectsApi } from './api/projects-api';
-import { ResultsApi } from './api/results-api';
-import { RunsApi } from './api/runs-api';
-import { SharedStepsApi } from './api/shared-steps-api';
-import { SuitesApi } from './api/suites-api';
+import axios from 'axios';
+import axiosRetry from 'axios-retry';
 
-export interface AnalyticsHeaders {
-    'X-Platform': string;
-    'X-Client': string;
+import {
+    ProjectsApi,
+    CasesApi,
+    ResultsApi,
+    RunsApi,
+    AttachmentsApi,
+    PlansApi,
+    SuitesApi,
+    MilestonesApi,
+    SharedStepsApi,
+    DefectsApi,
+    CustomFieldsApi,
+    AuthorsApi,
+    Configuration,
+} from './generated';
+
+export interface QaseApiInterface {
+    projects: ProjectsApi;
+    cases: CasesApi;
+    results: ResultsApi;
+    runs: RunsApi;
+    attachments: AttachmentsApi;
+    plans: PlansApi;
+    suites: SuitesApi;
+    milestones: MilestonesApi;
+    sharedSteps: SharedStepsApi;
+    defects: DefectsApi;
+    customFields: CustomFieldsApi;
+    authors: AuthorsApi;
 }
 
-export class QaseApi {
+export interface QaseApiOptionsInterface {
+    apiToken: string;
+    baseUrl?: string;
+    headers?: Record<string, string>;
+    retries?: number;
+    retryDelay?: number;
+    formDataCtor?: new () => unknown;
+}
+
+export class QaseApi implements QaseApiInterface {
     public projects: ProjectsApi;
     public cases: CasesApi;
     public results: ResultsApi;
@@ -29,53 +53,53 @@ export class QaseApi {
     public sharedSteps: SharedStepsApi;
     public defects: DefectsApi;
     public customFields: CustomFieldsApi;
+    public authors: AuthorsApi;
 
-    private api: AxiosInstance;
-    private configuration: Configuration;
+    public constructor(options: QaseApiOptionsInterface) {
+        const {
+            apiToken,
+            baseUrl,
+            headers,
+            retries = 3,
+            retryDelay = 0,
+            formDataCtor,
+        } = options;
 
-    public constructor(
-        apiToken: string,
-        basePath?: string,
-        headers?: { [key: string]: string },
-        formDataCtor?: new () => any,
-    ) {
-        const baseURL = basePath || 'https://api.qase.io/v1';
-        const config: AxiosRequestConfig = {
-            headers: {
-                Token: apiToken,
-                ...headers,
-            },
-            baseURL,
-        };
-        this.api = axios.create(config);
-        this.configuration = new Configuration({
+        const transport = axios.create({ headers });
+
+        axiosRetry(transport, {
+            retries,
+            retryDelay: () => retryDelay,
+        });
+
+        const configuration = new Configuration({
             apiKey: apiToken,
-            basePath: baseURL,
             formDataCtor,
         });
 
-        this.projects = new ProjectsApi(this.configuration, baseURL, this.api);
-        this.cases = new CasesApi(this.configuration, baseURL, this.api);
-        this.results = new ResultsApi(this.configuration, baseURL, this.api);
-        this.runs = new RunsApi(this.configuration, baseURL, this.api);
+        this.projects = new ProjectsApi(configuration, baseUrl, transport);
+        this.cases = new CasesApi(configuration, baseUrl, transport);
+        this.results = new ResultsApi(configuration, baseUrl, transport);
+        this.runs = new RunsApi(configuration, baseUrl, transport);
         this.attachments = new AttachmentsApi(
-            this.configuration,
-            baseURL,
-            this.api
+            configuration,
+            baseUrl,
+            transport
         );
-        this.plans = new PlansApi(this.configuration, baseURL, this.api);
-        this.suites = new SuitesApi(this.configuration, baseURL, this.api);
-        this.milestones = new MilestonesApi(this.configuration, baseURL, this.api);
+        this.plans = new PlansApi(configuration, baseUrl, transport);
+        this.suites = new SuitesApi(configuration, baseUrl, transport);
+        this.milestones = new MilestonesApi(configuration, baseUrl, transport);
         this.sharedSteps = new SharedStepsApi(
-            this.configuration,
-            baseURL,
-            this.api
+            configuration,
+            baseUrl,
+            transport
         );
-        this.defects = new DefectsApi(this.configuration, baseURL, this.api);
+        this.defects = new DefectsApi(configuration, baseUrl, transport);
         this.customFields = new CustomFieldsApi(
-            this.configuration,
-            baseURL,
-            this.api
+            configuration,
+            baseUrl,
+            transport
         );
+        this.authors = new AuthorsApi(configuration, baseUrl, transport);
     }
 }

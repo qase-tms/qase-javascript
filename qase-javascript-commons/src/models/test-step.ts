@@ -1,12 +1,12 @@
-import { Attachment } from "./attachment";
-import { Statuses } from "./status";
+import { AttachmentType } from "./attachment";
+import { StatusesEnum } from "./status";
 
-export interface TestStep {
+export type TestStepType = {
     title: string;
-    status: keyof typeof Statuses;
+    status: keyof typeof StatusesEnum;
     duration?: number;
     error?: Error;
     stacktrace?: string;
-    steps?: TestStep[];
-    attachements?: Attachment[];
+    steps?: TestStepType[];
+    attachements?: AttachmentType[];
 }

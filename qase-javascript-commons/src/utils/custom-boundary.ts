@@ -1,17 +1,31 @@
 import crypto from 'crypto';
+import { ReadableOptions } from 'stream';
+
 import FormData from 'form-data';
 
-let customBoundary = '----------------------------';
-crypto.randomBytes(24).forEach((value) => {
-    customBoundary += Math.floor(value * 10).toString(16);
-});
+// `form-data` compatible `ReadableOptions` type
+type ReadableOptionsType = {
+    [K in keyof ReadableOptions]?: undefined extends ReadableOptions[K] ? never : ReadableOptions[K];
+}
 
+// `form-data` doesn't export `Options` interface
+export interface OptionsInterface extends ReadableOptionsType {
+    writable?: boolean;
+    readable?: boolean;
+    dataSize?: number;
+    maxDataSize?: number;
+    pauseStreams?: boolean;
+}
+
+// `FormData` with cryptographically strong random boundary
 export class CustomBoundaryFormData extends FormData {
-    public constructor() {
-        super();
-    }
+    constructor(options?: OptionsInterface) {
+        super(options);
 
-    public getBoundary(): string {
-        return customBoundary;
+        try {
+            const bytes = crypto.randomBytes(12);
+
+            this.setBoundary(bytes.toString('hex').padStart(50, '-'));
+        } catch (e) {/* ignore crypto failures, the FormData will fall back to the `Math.random` */}
     }
 }

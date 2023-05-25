@@ -1,18 +1,19 @@
-import { Attachment } from './attachment';
-import { Statuses } from './status';
-import { TestStep } from './test-step';
+import { StatusesEnum } from './status';
+import { TestStepType } from './test-step';
+import { AttachmentType } from './attachment';
+import { ParamType } from './param';
 
-export interface TestResult {
-    id?: string;
+export type TestResultType = {
+    id: string;
     testOpsId?: number[];
     title: string;
-    status: keyof typeof Statuses;
+    status: keyof typeof StatusesEnum;
     error?: Error;
     stacktrace?: string;
     duration?: number;
     suitePath?: string;
     comment?: string;
-    steps?: TestStep[];
-    attachments?: Attachment[];
-    param?: {};
+    steps?: TestStepType[];
+    attachments?: AttachmentType[];
+    param?: ParamType;
 }

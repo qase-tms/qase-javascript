@@ -1,30 +1,16 @@
+/* eslint-disable */
 module.exports = {
-    globals: {
-        'ts-jest': {
-            diagnostics: {
-                ignoreCodes: [2341],
-            },
-        },
-    },
-    roots: [
-        '<rootDir>/test',
-    ],
+    preset: 'ts-jest',
+    // roots: ['<rootDir>/test'],
     transform: {
-        '^.+\\.tsx?$': 'ts-jest',
+        '^.+\\.ts$': 'ts-jest',
     },
-    testMatch: [
-        '**/__tests__/**/*.js?(x)',
-        '**/?(*.)+(spec|test).js?(x)',
-        '**/__tests__/**/*.ts?(x)',
-        '**/?(*.)+(spec|test).ts?(x)',
-    ],
-    moduleFileExtensions: [
-        'ts',
-        'tsx',
-        'js',
-        'jsx',
-        'json',
-        'node',
-    ],
+    testMatch: ['**/*.test.ts'],
+    moduleFileExtensions: ['js', 'ts'],
+    moduleNameMapper: {
+        '^@qaseio$': '<rootDir>/src/index.ts',
+    },
+    collectCoverage: true,
+    coveragePathIgnorePatterns: ['<rootDir>/src/generated/'],
     testEnvironment: 'node',
 };

@@ -1,15 +1,7 @@
 .*
 **/tsconfig.json
-**/nodemon.json
-**/tslint.json
-**/webpack.config.ts
-**/vite.config.ts
-test
-src
+**/jest.config.js
 examples
-.qaserc
-qase.config.json
+test
 coverage
-
-# Output of 'npm pack'
-*.tgz
+src

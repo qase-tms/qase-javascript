@@ -1,9 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable camelcase */
-/* eslint-disable @typescript-eslint/unbound-method */
-/* eslint-disable  sort-imports*/
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { MochaOptions, Runner, Test, reporters, Suite } from 'mocha';
 import { QaseBaseReporter, TestOpsReporter, ReportReporter } from 'qase-javascript-commons';
 // import { Envs, QaseCoreReporter, QaseCoreReporterOptions, QaseOptions, Suite, TestResult } from 'qase-core-reporter';

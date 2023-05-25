@@ -1,6 +1,6 @@
 {
   "name": "playwright-qase-reporter",
-  "version": "v1.2.0-alpha.4",
+  "version": "2.0.0",
   "description": "Qase TMS Playwright Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -10,45 +10,23 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/qase-tms/qase-javascript.git"
+    "url": "git+https://github.com/qase-tms/qase-javascript.git"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=14"
   },
   "scripts": {
-    "dev": "npm run lint && tsc",
-    "dev:watch": "nodemon --exec npm run dev || exit 1",
-    "lint": "eslint src/**",
-    "lint:fix": "eslint --fix src/**",
-    "build": "npm run clean && npm run dev",
-    "test": "npx playwright test",
-    "clean": "rm -rf dist || true"
+    "build": "tsc",
+    "lint": "eslint .",
+    "test": "jest",
+    "clean": "rm -rf dist"
   },
-  "author": {
-    "name": "Aleksei Galagan",
-    "email": "alexneo2003@gmail.com",
-    "url": "https://github.com/alexneo2003/"
-  },
+  "author": "Aleksei Galagan <alexneo2003@gmail.com> (https://github.com/alexneo2003/)",
   "license": "Apache-2.0",
   "dependencies": {
-    "qaseio": "^2.0.1",
-    "form-data": "^3.0.0",
-    "chalk": "^4.1.0"
+    "qase-javascript-commons": "^2.0.0"
   },
-  "devDependencies": {
-    "@hutson/npm-deploy-git-tag": "^6.0.0",
-    "@playwright/test": "^1.16.3",
-    "@types/chalk": "^2.2.0",
-    "@types/deasync": "^0.1.1",
-    "@typescript-eslint/eslint-plugin": "^3.10.1",
-    "@typescript-eslint/eslint-plugin-tslint": "^3.10.1",
-    "@typescript-eslint/parser": "^3.10.1",
-    "axios-mock-adapter": "^1.19.0",
-    "eslint": "^7.14.0",
-    "eslint-plugin-jsdoc": "^26.0.1",
-    "eslint-plugin-prefer-arrow": "^1.2.2",
-    "handlebars": "^4.7.7",
-    "nodemon": "^2.0.6",
-    "typescript": "^3.9.7"
+  "peerDependencies": {
+    "@playwright/test": "^1.34.3"
   }
 }

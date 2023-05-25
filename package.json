@@ -1,0 +1,43 @@
+{
+  "name": "qase-javascript",
+  "version": "2.0.0",
+  "description": "This is a monorepo for all JavaScript-related projects",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qase-tms/qase-javascript.git"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/qase-tms/qase-javascript/issues"
+  },
+  "homepage": "https://github.com/qase-tms/qase-javascript#readme",
+  "workspaces": [
+    "qaseio",
+    "qase-javascript-commons",
+    "qase-cypress",
+    "qase-jest",
+    "qase-cucumberjs",
+    "qase-newman",
+    "qase-playwright",
+    "qase-testcafe"
+  ],
+  "devDependencies": {
+    "@types/jest": "^29.5.1",
+    "@typescript-eslint/eslint-plugin": "^5.59.6",
+    "@typescript-eslint/parser": "^5.59.6",
+    "eslint": "^8.40.0",
+    "eslint-import-resolver-typescript": "^3.5.5",
+    "eslint-plugin-import": "^2.27.5",
+    "jest": "^29.5.0",
+    "prettier": "^2.8.8",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.4"
+  }
+}

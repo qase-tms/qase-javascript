@@ -1,6 +1,6 @@
 {
   "name": "jest-qase-reporter",
-  "version": "v1.3.0-alpha.4",
+  "version": "2.0.0",
   "description": "Qase TMS Jest Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -10,46 +10,27 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/qase-tms/qase-javascript.git"
+    "url": "git+https://github.com/qase-tms/qase-javascript.git"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=14"
   },
   "scripts": {
-    "dev": "npm run lint && tsc",
-    "dev:watch": "nodemon --exec 'npm run dev || exit 1'",
-    "lint": "eslint src/**",
-    "lint:fix": "eslint --fix src/**",
-    "build": "npm run clean && npm run dev",
-    "test": "jest --coverage",
-    "clean": "rm -rf dist || true"
+    "build": "tsc",
+    "lint": "eslint .",
+    "test": "jest",
+    "clean": "rm -rf dist"
   },
-  "author": {
-    "name": "Parviz Khavari",
-    "email": "csctclan@gmail.com"
-  },
+  "author": "Parviz Khavari <csctclan@gmail.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "qaseio": "^2.0.0-alpha.5"
+    "qase-javascript-commons": "^2.0.0"
   },
   "devDependencies": {
-    "@hutson/npm-deploy-git-tag": "^6.0.0",
-    "@jest/reporters": "^27.0.4",
-    "@types/chalk": "^2.2.0",
-    "@types/deasync": "^0.1.1",
-    "@types/jest": "^23.3.7",
-    "@typescript-eslint/eslint-plugin": "^3.10.1",
-    "@typescript-eslint/eslint-plugin-tslint": "^3.10.1",
-    "@typescript-eslint/parser": "^3.10.1",
-    "axios-mock-adapter": "^1.19.0",
-    "chalk": "^4.1.0",
-    "eslint": "^7.14.0",
-    "eslint-plugin-jsdoc": "^26.0.1",
-    "eslint-plugin-prefer-arrow": "^1.2.2",
-    "handlebars": "^4.7.7",
-    "jest": "^26.6.3",
-    "nodemon": "^2.0.6",
-    "ts-jest": "^26.4.4",
-    "typescript": "^3.9.7"
+    "@jest/reporters": "^29.5.0",
+    "@types/jest": "^29.5.1"
+  },
+  "peerDependencies": {
+    "jest": "^29.5.0"
   }
 }
