@@ -26,7 +26,8 @@
     "qase-cucumberjs",
     "qase-newman",
     "qase-playwright",
-    "qase-testcafe"
+    "qase-testcafe",
+    "./examples/*"
   ],
   "devDependencies": {
     "@types/jest": "^29.5.1",

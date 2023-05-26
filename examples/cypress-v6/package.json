@@ -1,0 +1,13 @@
+{
+  "name": "examples-cypress-v6",
+  "scripts": {
+    "cypress": "cypress open",
+    "test": "QASE_REPORT=1 npx cypress run"
+  },
+  "devDependencies": {
+    "cypress": "^6.9.1",
+    "cypress-mochawesome-reporter": "^3.5.0",
+    "cypress-multi-reporters": "^1.6.3",
+    "cypress-qase-reporter": "^2.0.0"
+  }
+}

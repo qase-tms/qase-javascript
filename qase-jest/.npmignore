@@ -1,8 +1,7 @@
 .*
 **/tsconfig.json
-**/nodemon.json
-**/tslint.json
-**/webpack.config.ts
 **/jest.config.js
+examples
+test
+coverage
 src
-demo

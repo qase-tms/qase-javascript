@@ -3,7 +3,7 @@
 
   "compilerOptions": {
     "outDir": "dist",
-    "noEmit": false,
+    "noEmit": false
   },
 
   "include": ["./src/**/*.ts"],

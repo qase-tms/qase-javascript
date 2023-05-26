@@ -1,0 +1,20 @@
+{
+  "reporter": "cypress-multi-reporters",
+  "reporterOptions": {
+    "reporterEnabled": "cypress-mochawesome-reporter, cypress-qase-reporter",
+    "cypressMochawesomeReporterReporterOptions": {
+      "charts": true
+    },
+    "cypressQaseReporterReporterOptions": {
+      "apiToken": "api_key",
+      "projectCode": "project_code",
+      "logging": true,
+      "basePath": "https://api.qase.io/v1",
+      "screenshotFolder": "screenshots",
+      "sendScreenshot": true,
+      "runComplete": false,
+      "environmentId": 1
+    }
+  },
+  "video": false
+}

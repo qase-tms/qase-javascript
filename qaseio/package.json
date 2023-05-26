@@ -2,8 +2,8 @@
   "name": "qaseio",
   "version": "2.0.1",
   "description": "Qase TMS Javascript Api Client",
-  "main": "./dist/qaseio.js",
-  "types": "./dist/qaseio.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "bugs": {
     "url": "https://github.com/qase-tms/qase-javascript/issues"

@@ -2,7 +2,7 @@ import { execSync } from 'child_process';
 import { createReadStream } from 'fs';
 
 import chalk from 'chalk';
-import { QaseApi, QaseApiInterface, BASE_URL } from 'qaseio';
+import { QaseApi, QaseApiInterface, BASE_URL, ResultCreate, ResultCreateStatusEnum } from 'qaseio';
 
 import { AbstractReporter, ReporterOptionsType, LoggerInterface } from './reporter';
 
@@ -10,7 +10,6 @@ import { AttachmentType, StatusesEnum, TestResultType } from '../models';
 
 import { getPackageVersion } from '../utils/get-package-version';
 import { CustomBoundaryFormData } from '../utils/custom-boundary';
-import { ResultCreate, ResultCreateStatusEnum } from 'qaseio/dist';
 import stripAnsi from 'strip-ansi';
 import { ParamType } from '../models/param';
 

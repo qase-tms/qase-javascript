@@ -9,7 +9,7 @@
     "noEmit": true,
     "noEmitOnError": true,
     "skipLibCheck": true,
-
+    "declaration": true,
     "strict": true,
 
     "allowUnreachableCode": false,
