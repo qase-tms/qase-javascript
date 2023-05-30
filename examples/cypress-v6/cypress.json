@@ -6,14 +6,21 @@
       "charts": true
     },
     "cypressQaseReporterReporterOptions": {
-      "apiToken": "api_key",
-      "projectCode": "project_code",
       "logging": true,
-      "basePath": "https://api.qase.io/v1",
       "screenshotFolder": "screenshots",
-      "sendScreenshot": true,
-      "runComplete": false,
-      "environmentId": 1
+
+      "testops": {
+        "apiToken": "api_key",
+        "projectCode": "project_code",
+        "baseUrl": "https://qase.io",
+        "uploadAttachments": true,
+        "runComplete": true,
+        "environmentId": 1
+      },
+
+      "report": {
+        "path": "./qase/reports"
+      }
     }
   },
   "video": false

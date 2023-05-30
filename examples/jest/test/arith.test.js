@@ -1,16 +1,17 @@
-const { add, mul, sub, div } = require('./arith');
-const { qase } = require('jest-qase-reporter/dist/jest');
+import { qase } from 'jest-qase-reporter/jest';
+
+import { add, mul } from './arith';
 
 describe("Test suite", () => {
-  test('2 + 3 = 5 without qase wrapper', () => {
+  test(qase(1, '2 + 3 = 5 without qase wrapper'), () => {
     expect(add(2, 3)).toBe(5);
   });
 
-  test.skip('2 + 3 = 5 skipped', () => {
+  test.skip(qase(2, '2 + 3 = 5 skipped'), () => {
     expect(add(2, 3)).toBe(5);
   });
 
-  test('2 + 3 = 6', () => {
+  test(qase(3, '2 + 3 = 6'), () => {
     expect(add(2, 3)).toBe(6);
   });
 

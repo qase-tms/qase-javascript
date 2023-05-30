@@ -1,6 +1,8 @@
-const { defineConfig } = require('cypress')
+import cypress from 'cypress';
 
-module.exports = defineConfig({
+import plugins from './cypress/plugins/index.js';
+
+module.exports = cypress.defineConfig({
   reporter: 'cypress-multi-reporters',
   reporterOptions: {
     reporterEnabled: 'cypress-mochawesome-reporter, cypress-qase-reporter',
@@ -8,15 +10,21 @@ module.exports = defineConfig({
       charts: true,
     },
     cypressQaseReporterReporterOptions: {
-      apiToken: 'api_key',
-      projectCode: 'project_code',
       logging: true,
-      basePath: 'https://api.qase.io/v1',
       screenshotFolder: 'screenshots',
-      sendScreenshot: true,
-      runComplete: true,
-      environmentId: 1,
-      rootSuiteTitle: 'Cypress tests',
+
+      testops: {
+        apiToken: 'api_key',
+        projectCode: 'project_code',
+        baseUrl: 'https://qase.io',
+        uploadAttachments: true,
+        runComplete: true,
+        environmentId: 1,
+      },
+
+      report: {
+        path: './qase/reports',
+      },
     },
   },
   video: false,
@@ -24,7 +32,7 @@ module.exports = defineConfig({
     // We've imported your old cypress plugins here.
     // You may want to clean this up later by importing these.
     setupNodeEvents(on, config) {
-      return require('./cypress/plugins/index.js')(on, config)
+      return plugins(on, config)
     },
   },
 })

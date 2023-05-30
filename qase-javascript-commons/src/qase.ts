@@ -1,24 +1,30 @@
 import { join } from 'path';
 import { readFileSync } from 'fs';
+import { execSync } from "child_process";
 
 import envSchema from 'env-schema';
 import chalk from 'chalk';
+import { QaseApi } from "qaseio";
 
 import { AbstractReporter, ReporterInterface, TestOpsReporter, FileReporter, LoggerInterface } from './reporters';
 import { ModeEnum, OptionsType } from './options';
 import { configValidationSchema } from './config';
-import { EnvEnum, envToOptions, envValidationSchema } from './env';
+import { EnvReportEnum, EnvTestOpsEnum, envToOptions, envValidationSchema } from './env';
 import { TestResultType } from './models';
 
 import { JSONValidationError, validateJson } from './utils/validate-json';
 import { omitEmpty } from './utils/omit-empty';
 import { merge } from './utils/merge';
+import { getPackageVersion } from "./utils/get-package-version";
+import { CustomBoundaryFormData } from "./utils/custom-boundary";
+
+const BASE_URL = 'https://qase.io/';
 
 const resultLogMap = {
     failed: (test: TestResultType) => chalk`{red Test ${test.title} ${test.status}}`,
     passed: (test: TestResultType) => chalk`{green Test ${test.title} ${test.status}}`,
-    pending: (test: TestResultType) => chalk`{blueBright Test ${test.title} ${test.status}}`,
     skipped: (test: TestResultType) => chalk`{blueBright Test ${test.title} ${test.status}}`,
+    blocked: (test: TestResultType) => chalk`{blueBright Test ${test.title} ${test.status}}`,
     disabled: (test: TestResultType) => chalk`{grey Test ${test.title} ${test.status}}`,
     invalid: (test: TestResultType) => chalk`{yellowBright Test ${test.title} ${test.status}}`,
 };
@@ -76,14 +82,37 @@ export class QaseReporter extends AbstractReporter {
             throw error;
         }
 
-        return null;
+        return {};
+    }
+
+    private static createHeaders(
+      frameworkName: string,
+      reporterName: string,
+      customFrameworkName?: string,
+      customReporterName?: string,
+    ) {
+        const { version: nodeVersion, platform: os, arch } = process;
+        const npmVersion = execSync('npm -v', { encoding: 'utf8' }).replace(/['"\n]+/g, '');
+        const qaseApiVersion = getPackageVersion('qaseio');
+        const qaseReporterVersion = getPackageVersion('qase-javascript-commons');
+        const frameworkVersion = getPackageVersion(frameworkName);
+        const reporterVersion = getPackageVersion(reporterName);
+
+        const fv = frameworkVersion ? `${customFrameworkName || frameworkName}=${frameworkVersion}` : '';
+        const rv = reporterVersion ? `${customReporterName || reporterName}=${reporterVersion}` : '';
+        const qcr = qaseReporterVersion ? `qase-core-reporter=${qaseReporterVersion}` : '';
+
+        return {
+            'X-Client': `${fv}; ${rv}; ${qcr}; qaseapi=${String(qaseApiVersion)}`,
+            'X-Platform': `node=${nodeVersion}; npm=${npmVersion}; os=${os}; arch=${arch}`,
+        };
     }
 
     private upstreamReporter: ReporterInterface;
 
     private disabled = false;
 
-    constructor(options: Partial<OptionsType>, logger?: LoggerInterface) {
+    constructor(options: OptionsType, logger?: LoggerInterface) {
         const composedOptions = merge(
             options,
             QaseReporter.loadConfig(),
@@ -120,65 +149,76 @@ export class QaseReporter extends AbstractReporter {
         }
     }
 
+    // TODO: implement mode registry
     private createUpstreamReporter(
-        options: Partial<OptionsType>,
+        options: OptionsType,
         logger?: LoggerInterface,
     ): ReporterInterface {
         const {
-            mode,
-            report,
-            testops,
+            frameworkName,
+            reporterName,
+            mode = ModeEnum.testops,
+            report = {},
+            testops = {},
             ...commonOptions
         } = options;
 
         switch (mode) {
-            case ModeEnum.testops:
+            case ModeEnum.testops: {
                 const {
                     apiToken,
+                    baseUrl = BASE_URL,
                     projectCode,
-                    frameworkName,
-                    reporterName,
+                    frameworkName: customFrameworkName = frameworkName,
+                    reporterName: customReporterName = reporterName,
                     runId,
+                    runName,
+                    runDescription,
                     environmentId,
                     ...restTestops
-                } = testops || {};
+                } = testops;
 
                 if (!apiToken) {
-                    throw new Error(`Either "apiToken" parameter or "${EnvEnum.testopsApiToken}" environment variable is required in "testops" mode`);
+                    throw new Error(`Either "apiToken" parameter or "${EnvTestOpsEnum.apiToken}" environment variable is required in "testops" mode`);
                 }
 
                 if (!projectCode) {
-                    throw new Error(`Either "projectCode" parameter or "${EnvEnum.testopsProjectCode}" environment variable is required in "testops" mode`);
+                    throw new Error(`Either "projectCode" parameter or "${EnvTestOpsEnum.projectCode}" environment variable is required in "testops" mode`);
                 }
 
                 if (!runId && !environmentId) {
-                    throw new Error(`Either "runId"/"${EnvEnum.testopsRunId}" or "environmentId"/"${EnvEnum.testopsEnvironmentId}" is required in "testops" mode`);
+                    throw new Error(`Either "runId"/"${EnvTestOpsEnum.runId}" or "environmentId"/"${EnvTestOpsEnum.environmentId}" is required in "testops" mode`);
                 }
 
-                if (!frameworkName) {
-                    throw new Error('"frameworkName" parameter is required in "testops" mode');
-                }
-
-                if (!reporterName) {
-                    throw new Error('"reporterName" parameter is required in "testops" mode');
-                }
+                const apiClient = new QaseApi({
+                    apiToken,
+                    headers: QaseReporter.createHeaders(
+                      frameworkName,
+                      reporterName,
+                      customFrameworkName,
+                      customReporterName,
+                    ),
+                    formDataCtor: CustomBoundaryFormData
+                });
 
                 return new TestOpsReporter({
-                    apiToken,
+                    baseUrl,
                     projectCode,
-                    frameworkName,
-                    reporterName,
                     runId,
+                    runName: runName || `Automated run ${new Date().toISOString()}`,
+                    runDescription: runDescription || `${customReporterName} automated run`,
+                    frameworkName: customFrameworkName,
                     environmentId,
                     ...commonOptions,
                     ...restTestops,
-                }, logger);
+                }, apiClient, logger);
+            }
 
-            case ModeEnum.report:
-                const { path, ...restReport } = report || {};
+            case ModeEnum.report: {
+                const { path, ...restReport } = report;
 
                 if (!path) {
-                    throw new Error('Either "path" parameter or "QASE_REPORT_PATH" environment variable is required in "report" mode');
+                    throw new Error(`Either \"path\" parameter or \"${EnvReportEnum.path}\" environment variable is required in \"report\" mode`);
                 }
 
                 return new FileReporter({
@@ -186,6 +226,7 @@ export class QaseReporter extends AbstractReporter {
                     ...commonOptions,
                     ...restReport,
                 }, logger);
+            }
 
             default:
                 throw new Error(`Unknown mode type`);

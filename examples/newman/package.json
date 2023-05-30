@@ -1,7 +1,7 @@
 {
   "name": "examples-newman",
   "scripts": {
-    "test": "newman run ./sample-collection.json -r qase --reporter-qase-logging --reporter-qase-projectCode project_code --reporter-qase-apiToken api_key --reporter-qase-rootSuiteTitle 'Newman tests' --reporter-qase-runComplete"
+    "test": "newman run ./sample-collection.json -r qase"
   },
   "devDependencies": {
     "newman": "^5.3.2",

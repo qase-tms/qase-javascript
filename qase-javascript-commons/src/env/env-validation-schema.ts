@@ -1,7 +1,7 @@
 import { JSONSchemaType } from 'env-schema';
 
 import { EnvType } from './env-type';
-import { EnvEnum } from './env-enum';
+import { EnvEnum, EnvTestOpsEnum, EnvReportEnum } from './env-enum';
 
 import { ModeEnum } from '../options';
 
@@ -20,44 +20,52 @@ export const envValidationSchema: JSONSchemaType<EnvType> = {
             nullable: true,
         },
 
-        [EnvEnum.testopsApiToken]: {
+        [EnvTestOpsEnum.apiToken]: {
             type: 'string',
             nullable: true,
         },
-        [EnvEnum.testopsProjectCode]: {
+        [EnvTestOpsEnum.projectCode]: {
             type: 'string',
             nullable: true,
         },
-        [EnvEnum.testopsUploadAttachments]: {
+        [EnvTestOpsEnum.frameworkName]: {
+            type: 'string',
+            nullable: true,
+        },
+        [EnvTestOpsEnum.reporterName]: {
+            type: 'string',
+            nullable: true,
+        },
+        [EnvTestOpsEnum.uploadAttachments]: {
             type: 'boolean',
             nullable: true,
         },
-        [EnvEnum.testopsBaseUrl]: {
+        [EnvTestOpsEnum.baseUrl]: {
             type: 'string',
             nullable: true,
         },
-        [EnvEnum.testopsRunId]: {
+        [EnvTestOpsEnum.runId]: {
             type: 'number',
             nullable: true,
         },
-        [EnvEnum.testopsRunName]: {
+        [EnvTestOpsEnum.runName]: {
             type: 'string',
             nullable: true,
         },
-        [EnvEnum.testopsRunDescription]: {
+        [EnvTestOpsEnum.runDescription]: {
             type: 'string',
             nullable: true,
         },
-        [EnvEnum.testopsRunComplete]: {
+        [EnvTestOpsEnum.runComplete]: {
             type: 'boolean',
             nullable: true,
         },
-        [EnvEnum.testopsEnvironmentId]: {
+        [EnvTestOpsEnum.environmentId]: {
             type: 'number',
             nullable: true,
         },
 
-        [EnvEnum.reportPath]: {
+        [EnvReportEnum.path]: {
             type: 'string',
             nullable: true,
         },

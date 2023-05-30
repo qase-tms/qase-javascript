@@ -1,16 +1,26 @@
 module.exports = {
     globals: {},
+    transform: {
+        "^.+\\.(js|jsx)$": "babel-jest",
+    },
     reporters: [
         'default',
-        [
-            'jest-qase-reporter',
-            {
+        ['jest-qase-reporter', {
+            logging: true,
+
+            testops: {
                 apiToken: 'api_key',
                 projectCode: 'project_code',
-                logging: true,
-                runComplete: true
+                baseUrl: 'https://qase.io',
+                uploadAttachments: true,
+                runComplete: true,
+                environmentId: 1,
             },
-        ],
+
+            report: {
+                path: './qase/reports',
+            },
+        }],
     ],
     roots: [
         '<rootDir>/test',

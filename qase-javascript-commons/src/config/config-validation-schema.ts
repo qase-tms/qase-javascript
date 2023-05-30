@@ -33,11 +33,11 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
                     nullable: true,
                 },
 
-                customFrameworkName: {
+                frameworkName: {
                     type: 'string',
                     nullable: true,
                 },
-                customReporterName: {
+                reporterName: {
                     type: 'string',
                     nullable: true,
                 },

@@ -1,7 +1,7 @@
 {
   "name": "examples-playwright",
   "scripts": {
-    "test": "QASE_REPORT=1 npx playwright test"
+    "test": "npx playwright test"
   },
   "devDependencies": {
     "@playwright/test": "^1.34.3",

@@ -4,6 +4,18 @@
   "description": "Qase TMS Playwright Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./playwright": "./dist/playwright.js",
+    "./reporter": "./dist/reporter.js"
+  },
+  "typesVersions": {
+    "*": {
+      ".": ["./dist/index.d.ts"],
+      "playwright": ["./dist/playwright.d.ts"],
+      "reporter": ["./dist/reporter.d.ts"]
+    }
+  },
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "bugs": {
     "url": "https://github.com/qase-tms/qase-javascript/issues"
@@ -24,7 +36,8 @@
   "author": "Aleksei Galagan <alexneo2003@gmail.com> (https://github.com/alexneo2003/)",
   "license": "Apache-2.0",
   "dependencies": {
-    "qase-javascript-commons": "^2.0.0"
+    "qase-javascript-commons": "^2.0.0",
+    "uuid": "^9.0.0"
   },
   "peerDependencies": {
     "@playwright/test": "^1.34.3"

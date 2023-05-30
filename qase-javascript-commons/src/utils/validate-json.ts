@@ -3,8 +3,11 @@ import Ajv, { ErrorObject, JSONSchemaType } from 'ajv';
 const validator = new Ajv();
 
 export class JSONValidationError extends Error {
-    constructor(public validationErrors: ErrorObject[]) {
-        super();
+    constructor(
+        public validationErrors: ErrorObject[],
+        message?: string,
+    ) {
+        super(message);
     }
 }
 

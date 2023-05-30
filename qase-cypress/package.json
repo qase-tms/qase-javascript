@@ -3,8 +3,21 @@
   "version": "2.0.0",
   "description": "Qase Cypress Reporter",
   "homepage": "https://github.com/qase-tms/qase-javascript",
+  "sideEffects": false,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./mocha": "./dist/mocha.js",
+    "./reporter": "./dist/reporter.js"
+  },
+  "typesVersions": {
+    "*": {
+      ".": ["./dist/index.d.ts"],
+      "mocha": ["./dist/mocha.d.ts"],
+      "reporter": ["./dist/reporter.d.ts"]
+    }
+  },
   "bugs": {
     "url": "https://github.com/qase-tms/qase-javascript/issues"
   },
@@ -28,5 +41,9 @@
   },
   "peerDependencies": {
     "cypress": "^12.13.0"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.1",
+    "mocha": "^10.2.0"
   }
 }

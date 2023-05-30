@@ -1,9 +1,3 @@
-import { ModeEnum } from '../options';
-import { FileReporterOptionsType, TestOpsOptionsType } from '../reporters';
+import { OptionsType } from "../options";
 
-export type ConfigType = {
-    mode?: `${ModeEnum}`;
-    logging?: boolean;
-    testops?: Partial<Omit<TestOpsOptionsType, 'frameworkName' | 'reporterName'>>;
-    report?: Partial<FileReporterOptionsType>;
-};
+export type ConfigType = Omit<OptionsType, 'frameworkName' | 'reporterName'>;

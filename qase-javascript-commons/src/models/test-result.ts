@@ -1,19 +1,15 @@
 import { StatusesEnum } from './status';
 import { TestStepType } from './test-step';
-import { AttachmentType } from './attachment';
 import { ParamType } from './param';
 
 export type TestResultType = {
     id: string;
-    testOpsId?: number[];
+    testOpsId: [number, ...number[]];
     title: string;
-    status: keyof typeof StatusesEnum;
-    error?: Error;
-    stacktrace?: string;
-    duration?: number;
-    suitePath?: string;
-    comment?: string;
-    steps?: TestStepType[];
-    attachments?: AttachmentType[];
-    param?: ParamType;
+    status: `${StatusesEnum}`;
+    error?: Error | undefined;
+    duration?: number | undefined;
+    steps?: TestStepType[] | undefined;
+    attachments?: string[] | undefined;
+    param?: ParamType | undefined;
 }

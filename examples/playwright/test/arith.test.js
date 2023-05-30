@@ -1,6 +1,7 @@
-const { add, mul, sub, div } = require('./arith');
-const { qase } = require('playwright-qase-reporter/dist/playwright');
-const { test, expect } = require('@playwright/test');
+import { test, expect } from '@playwright/test';
+import { qase } from 'playwright-qase-reporter/playwright';
+
+import { add, mul, sub, div } from './arith';
 
 test.describe.parallel('Test suite. Level 1', () => {
     test(qase(6, 'open page and check title'), async ({ page }) => {

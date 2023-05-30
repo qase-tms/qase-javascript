@@ -1,25 +1,27 @@
-import { EnvEnum } from './env-enum';
+import { EnvEnum, EnvTestOpsEnum, EnvReportEnum } from './env-enum';
 import { EnvType } from './env-type';
 
 import { omitEmpty } from '../utils/omit-empty';
 
 export const envToOptions = (env: EnvType) => {
     const testops = {
-        apiToken: env[EnvEnum.testopsApiToken],
-        projectCode: env[EnvEnum.testopsProjectCode],
-        baseUrl: env[EnvEnum.testopsBaseUrl],
-        uploadAttachments: env[EnvEnum.testopsUploadAttachments],
-        runId: env[EnvEnum.testopsRunId],
-        runName: env[EnvEnum.testopsRunName],
-        runDescription: env[EnvEnum.testopsRunDescription],
-        runComplete: env[EnvEnum.testopsRunComplete],
-        environmentId: env[EnvEnum.testopsEnvironmentId],
+        apiToken: env[EnvTestOpsEnum.apiToken],
+        projectCode: env[EnvTestOpsEnum.projectCode],
+        baseUrl: env[EnvTestOpsEnum.baseUrl],
+        frameworkName: env[EnvTestOpsEnum.frameworkName],
+        reporterName: env[EnvTestOpsEnum.reporterName],
+        uploadAttachments: env[EnvTestOpsEnum.uploadAttachments],
+        runId: env[EnvTestOpsEnum.runId],
+        runName: env[EnvTestOpsEnum.runName],
+        runDescription: env[EnvTestOpsEnum.runDescription],
+        runComplete: env[EnvTestOpsEnum.runComplete],
+        environmentId: env[EnvTestOpsEnum.environmentId],
     };
 
     omitEmpty(testops);
 
     const report = {
-        path: env[EnvEnum.reportPath],
+        path: env[EnvReportEnum.path],
     };
 
     omitEmpty(report);

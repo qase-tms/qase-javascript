@@ -5,17 +5,22 @@ const config = {
     },
     reporter: [
         ['list'],
-        ['playwright-qase-reporter',
-            {
+        ['playwright-qase-reporter', {
+            logging: true,
+
+            testops: {
                 apiToken: 'api_key',
                 projectCode: 'project_code',
-                basePath: 'https://api.qase.io/v1',
+                baseUrl: 'https://qase.io',
                 uploadAttachments: true,
                 runComplete: true,
-                logging: true,
-                rootSuiteTitle: 'Playwright tests',
-                environmentId: '1'
-            }],
+                environmentId: 1,
+            },
+
+            report: {
+                path: './qase/reports',
+            },
+        }],
     ],
 };
 module.exports = config;

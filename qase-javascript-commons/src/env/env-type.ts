@@ -1,20 +1,22 @@
-import { EnvEnum } from './env-enum';
+import { EnvEnum, EnvTestOpsEnum, EnvReportEnum } from './env-enum';
 
 import { ModeEnum } from '../options';
 
-export interface EnvType {
+export type EnvType = {
     [EnvEnum.mode]?: `${ModeEnum}`;
     [EnvEnum.logging]?: boolean;
 
-    [EnvEnum.testopsApiToken]?: string;
-    [EnvEnum.testopsProjectCode]?: string;
-    [EnvEnum.testopsBaseUrl]?: string;
-    [EnvEnum.testopsUploadAttachments]?: boolean;
-    [EnvEnum.testopsRunId]?: number;
-    [EnvEnum.testopsRunName]?: string;
-    [EnvEnum.testopsRunDescription]?: string;
-    [EnvEnum.testopsRunComplete]?: boolean;
-    [EnvEnum.testopsEnvironmentId]?: number;
+    [EnvTestOpsEnum.apiToken]?: string;
+    [EnvTestOpsEnum.projectCode]?: string;
+    [EnvTestOpsEnum.baseUrl]?: string;
+    [EnvTestOpsEnum.uploadAttachments]?: boolean;
+    [EnvTestOpsEnum.frameworkName]?: string;
+    [EnvTestOpsEnum.reporterName]?: string;
+    [EnvTestOpsEnum.runId]?: number;
+    [EnvTestOpsEnum.runName]?: string;
+    [EnvTestOpsEnum.runDescription]?: string;
+    [EnvTestOpsEnum.runComplete]?: boolean;
+    [EnvTestOpsEnum.environmentId]?: number;
 
-    [EnvEnum.reportPath]?: string;
+    [EnvReportEnum.path]?: string;
 }

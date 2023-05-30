@@ -1,74 +1,62 @@
-import { execSync } from 'child_process';
 import { createReadStream } from 'fs';
 
 import chalk from 'chalk';
-import { QaseApi, QaseApiInterface, BASE_URL, ResultCreate, ResultCreateStatusEnum } from 'qaseio';
+import stripAnsi from 'strip-ansi';
+import { QaseApiInterface, ResultCreate, ResultCreateStatusEnum } from 'qaseio';
 
 import { AbstractReporter, ReporterOptionsType, LoggerInterface } from './reporter';
 
-import { AttachmentType, StatusesEnum, TestResultType } from '../models';
+import { StatusesEnum, TestResultType, ParamType } from '../models';
 
-import { getPackageVersion } from '../utils/get-package-version';
-import { CustomBoundaryFormData } from '../utils/custom-boundary';
-import stripAnsi from 'strip-ansi';
-import { ParamType } from '../models/param';
+const statusMap = {
+    [StatusesEnum.passed]: ResultCreateStatusEnum.PASSED,
+    [StatusesEnum.failed]: ResultCreateStatusEnum.FAILED,
+    [StatusesEnum.skipped]: ResultCreateStatusEnum.SKIPPED,
+    [StatusesEnum.disabled]: ResultCreateStatusEnum.SKIPPED,
+    [StatusesEnum.blocked]: ResultCreateStatusEnum.BLOCKED,
+    [StatusesEnum.invalid]: ResultCreateStatusEnum.INVALID,
+}
 
 export type TestOpsOptionsType = {
-    apiToken: string;
+    baseUrl: string;
     projectCode: string;
-
     frameworkName: string;
-    reporterName: string;
-
-    baseUrl?: string;
-
-    customFrameworkName?: string | undefined;
-    customReporterName?: string | undefined;
-
     uploadAttachments?: boolean | undefined;
-
+    runName: string;
+    runDescription: string;
     runId?: number | undefined;
-    runName?: string | undefined;
-    runDescription?: string | undefined;
     runComplete?: boolean | undefined;
     environmentId?: number | undefined;
 }
 
 export class TestOpsReporter extends AbstractReporter {
+    private baseUrl: string;
     private projectCode: string;
 
     private frameworkName: string;
-    private reporterName: string;
-
-    private baseUrl: string;
-
-    private customFrameworkName: string | undefined;
-    private customReporterName: string | undefined;
 
     private uploadAttachments: boolean | undefined;
 
     private runId: number | undefined;
-    private runName: string | undefined;
-    private runDescription: string | undefined;
+    private runName: string;
+    private runDescription: string;
     private runComplete: boolean | undefined;
     private environmentId: number | undefined;
 
     private api: QaseApiInterface;
-    private results: Array<ResultCreate & Record<'id', string>> = [];
-    private attachments: Record<string, AttachmentType[]> = {};
+    private results: ResultCreate[] = [];
+    private attachments: Record<string, string[]> = {};
 
-    constructor(options: ReporterOptionsType & TestOpsOptionsType, logger?: LoggerInterface) {
+    constructor(
+       options: ReporterOptionsType & TestOpsOptionsType,
+       apiClient: QaseApiInterface,
+       logger?: LoggerInterface,
+    ) {
         const {
-            apiToken,
+            baseUrl,
             projectCode,
 
             frameworkName,
-            reporterName,
-
-            baseUrl = BASE_URL,
-
-            customFrameworkName,
-            customReporterName,
 
             uploadAttachments,
 
@@ -83,12 +71,9 @@ export class TestOpsReporter extends AbstractReporter {
 
         super(restOptions, logger);
 
+        this.baseUrl = baseUrl;
         this.projectCode = projectCode;
         this.frameworkName = frameworkName;
-        this.reporterName = reporterName;
-        this.baseUrl = baseUrl;
-        this.customFrameworkName = customFrameworkName;
-        this.customReporterName = customReporterName;
         this.uploadAttachments = uploadAttachments;
         this.runId = runId;
         this.runName = runName;
@@ -96,11 +81,7 @@ export class TestOpsReporter extends AbstractReporter {
         this.runComplete = runComplete;
         this.environmentId = environmentId;
 
-        this.api = new QaseApi({
-            apiToken,
-            headers: this.createHeaders(),
-            formDataCtor: CustomBoundaryFormData,
-        });
+        this.api = apiClient;
     }
 
     public addTestResult(result: TestResultType) {
@@ -120,10 +101,9 @@ export class TestOpsReporter extends AbstractReporter {
             runId = this.runId;
         } else if (this.environmentId !== undefined) {
             const { result } = await this.createRun(
-                this.environmentId,
-                this.customReporterName || this.reporterName,
                 this.runName,
                 this.runDescription,
+                this.environmentId,
             );
 
             if (!result?.id) {
@@ -162,7 +142,9 @@ export class TestOpsReporter extends AbstractReporter {
             const attachmentsMap = Object.fromEntries(attachmentHashes);
 
             this.results.forEach((result) => {
-                result.attachments = attachmentsMap[result.id]?.filter((hash): hash is string => !!hash) || null;
+                if (result.case_id) {
+                    result.attachments = attachmentsMap[result.case_id]?.filter((hash): hash is string => !!hash) || null;
+                }
             });
         }
 
@@ -188,34 +170,18 @@ export class TestOpsReporter extends AbstractReporter {
         const runUrl = `${this.baseUrl}/run/${this.projectCode}/dashboard/${runId}`;
 
         this.log(chalk`{blue Test run link: ${runUrl}}`);
+
+        return runId;
     }
 
-    private createHeaders() {
-        const { version: nodeVersion, platform: os, arch } = process;
-        const npmVersion = execSync('npm -v', { encoding: 'utf8' }).replace(/['"\n]+/g, '');
-        const qaseApiVersion = getPackageVersion('qaseio');
-        const qaseReporterVersion = getPackageVersion('qase-javascript-commons');
-        const frameworkVersion = getPackageVersion(this.frameworkName);
-        const reporterVersion = getPackageVersion(this.reporterName);
-
-        const fv = frameworkVersion ? `${this.customFrameworkName || this.frameworkName}=${frameworkVersion}` : '';
-        const rv = reporterVersion ? `${this.customReporterName || this.reporterName}=${reporterVersion}` : '';
-        const qcr = qaseReporterVersion ? `qase-core-reporter=${qaseReporterVersion}` : '';
-
-        return {
-            'X-Client': `${fv}; ${rv}; ${qcr}; qaseapi=${String(qaseApiVersion)}`,
-            'X-Platform': `node=${nodeVersion}; npm=${npmVersion}; os=${os}; arch=${arch}`,
-        };
-    }
-
-    private transformTestToResultCreateObject(result: TestResultType): ResultCreate & Record<'id', string> {
+    private transformTestToResultCreateObject(result: TestResultType): ResultCreate {
         if (result.attachments?.length) {
-            this.attachments[result.id] = result.attachments;
+            this.attachments[result.testOpsId[0]] = result.attachments;
         }
 
         return {
-            id: result.id,
-            status: result.status as ResultCreateStatusEnum,
+            case_id: result.testOpsId[0],
+            status: statusMap[result.status],
             time_ms: result.duration || 0,
             stacktrace: stripAnsi(String(result.error?.stack || '')) || null,
             comment: this.formatComment(result.title, result.error, result.param),
@@ -248,19 +214,18 @@ export class TestOpsReporter extends AbstractReporter {
     }
 
     private async createRun(
+        title: string,
+        description: string,
         environmentId: number,
-        reporterName: string,
-        name?: string,
-        description?: string,
     ) {
         try {
             const runObject = {
-                title: name || `Automated run ${new Date().toISOString()}`,
-                description: description || `${reporterName} automated run`,
+                title,
+                description,
                 environment_id: environmentId,
                 is_autotest: true,
                 cases: [],
-            }
+            };
 
             const { data } = await this.api.runs.createRun(
                 this.projectCode,
@@ -273,10 +238,10 @@ export class TestOpsReporter extends AbstractReporter {
         }
     }
 
-    private async doUploadAttachments(attachments: AttachmentType[]) {
+    private async doUploadAttachments(attachments: string[]) {
         return await Promise.all(
             attachments.map(async (attachment) => {
-                const data = createReadStream(attachment.path);
+                const data = createReadStream(attachment);
 
                 const response = await this.api.attachments.uploadAttachment(
                     this.projectCode,

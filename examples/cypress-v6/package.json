@@ -1,8 +1,7 @@
 {
   "name": "examples-cypress-v6",
   "scripts": {
-    "cypress": "cypress open",
-    "test": "QASE_REPORT=1 npx cypress run"
+    "test": "cypress open"
   },
   "devDependencies": {
     "cypress": "^6.9.1",
