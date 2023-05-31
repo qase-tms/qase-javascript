@@ -1,5 +1,6 @@
 {
   "name": "examples-newman",
+  "private": true,
   "scripts": {
     "test": "newman run ./sample-collection.json -r qase"
   },

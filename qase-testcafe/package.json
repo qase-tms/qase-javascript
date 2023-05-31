@@ -4,6 +4,20 @@
   "description": "Qase TMS TestCafe Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./reporter": "./dist/reporter.js"
+  },
+  "typesVersions": {
+    "*": {
+      ".": [
+        "./dist/index.d.ts"
+      ],
+      "reporter": [
+        "./dist/reporter.d.ts"
+      ]
+    }
+  },
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "bugs": {
     "url": "https://github.com/qase-tms/qase-javascript/issues"
@@ -24,7 +38,8 @@
   "author": "Parviz Khavari <havaripa@gmail.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "qase-javascript-commons": "^2.0.0"
+    "qase-javascript-commons": "^2.0.0",
+    "uuid": "^9.0.0"
   },
   "peerDependencies": {
     "testcafe": "^2.6.0"

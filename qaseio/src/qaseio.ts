@@ -65,7 +65,11 @@ export class QaseApi implements QaseApiInterface {
             formDataCtor,
         } = options;
 
-        const transport = axios.create({ headers });
+        const transport = axios.create({
+            headers,
+            maxBodyLength: Infinity,
+            maxContentLength: Infinity,
+        });
 
         axiosRetry(transport, {
             retries,

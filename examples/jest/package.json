@@ -1,5 +1,6 @@
 {
   "name": "examples-jest",
+  "private": true,
   "scripts": {
     "test": "jest"
   },

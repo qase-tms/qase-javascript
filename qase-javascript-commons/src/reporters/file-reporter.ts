@@ -30,7 +30,8 @@ export class FileReporter extends AbstractReporter {
         this.results.push(result);
     }
 
-    public publish() {
+    // eslint-disable-next-line @typescript-eslint/require-await
+    public async publish() {
         try {
             mkdirSync(this.path, { recursive: true });
         } catch (error) {/* ignore */}

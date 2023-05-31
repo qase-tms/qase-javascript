@@ -137,10 +137,10 @@ export class QaseReporter extends AbstractReporter {
         }
     }
 
-    public publish() {
+    public async publish() {
         if (!this.disabled) {
             try {
-                this.upstreamReporter.publish();
+                await this.upstreamReporter.publish();
             } catch (error) {
                 this.log(`Unable to publish run results: ${String(error)}`);
 

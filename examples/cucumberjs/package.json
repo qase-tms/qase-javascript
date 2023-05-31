@@ -1,5 +1,6 @@
 {
   "name": "examples-cucumberjs",
+  "private": true,
   "scripts": {
     "test": "cucumber-js -f cucumberjs-qase-reporter --format-options='{\"qaseConfig\": \"./.qaserc\"}' features -r zombie/support -r zombie/steps  --publish-quiet",
     "test:l": "cucumber-js features -r zombie/support -r zombie/steps"

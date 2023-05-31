@@ -1,4 +1,4 @@
-import { Selector } from 'testcafe';
+import { Selector, test } from 'testcafe';
 
 fixture `Another page`
     .page `http://devexpress.github.io/testcafe/example/`;
@@ -14,7 +14,7 @@ test('Check property of element without case id', async (t) => {
     ;
 });
 
-test.meta('CID', [1])('Check property of element without case id 2', async (t) => {
+test.meta('CID', '1')('Check property of element without case id 2', async (t) => {
     const developerNameInput = Selector('#developer-name');
 
     await t

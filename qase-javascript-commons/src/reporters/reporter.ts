@@ -10,14 +10,14 @@ export type ReporterOptionsType = {
 
 export interface ReporterInterface {
     addTestResult(result: TestResultType): void;
-    publish(): void;
+    publish(): Promise<void>;
 }
 
 export abstract class AbstractReporter implements ReporterInterface {
     private logging?: boolean;
 
     abstract addTestResult(result: TestResultType): void;
-    abstract publish(): void;
+    abstract publish(): Promise<void>;
 
     protected constructor(
         options: ReporterOptionsType,

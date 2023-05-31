@@ -170,8 +170,6 @@ export class TestOpsReporter extends AbstractReporter {
         const runUrl = `${this.baseUrl}/run/${this.projectCode}/dashboard/${runId}`;
 
         this.log(chalk`{blue Test run link: ${runUrl}}`);
-
-        return runId;
     }
 
     private transformTestToResultCreateObject(result: TestResultType): ResultCreate {

@@ -1,5 +1,3 @@
-import { v4 as uuid4 } from "uuid";
-import { FullProject } from "@playwright/test";
 import { Reporter, TestCase, TestError, TestResult, TestStep } from "@playwright/test/reporter";
 import { OptionsType, QaseReporter, ReporterInterface, StatusesEnum, TestStepType } from "qase-javascript-commons";
 
@@ -15,7 +13,7 @@ const statusMap = {
   interrupted: StatusesEnum.failed,
 };
 
-const qaseIdRegExp = /(\(Qase ID: ([\d,]+)\))/;
+const qaseIdRegExp = /\(Qase ID: ([\d,]+)\)/;
 
 export type PlaywrightQaseOptionsType = Omit<OptionsType, 'frameworkName' | 'reporterName'>;
 
@@ -36,45 +34,31 @@ export class PlaywrightQaseReporter implements Reporter {
     });
   }
 
-  public onTestEnd(test: TestCase, testResult: TestResult) {
+  public onTestEnd(test: TestCase, result: TestResult) {
     const [id, ...restIds] = PlaywrightQaseReporter.getCaseIds(test.title);
 
     if (id) {
-      const project = test.parent.project();
-
       this.reporter.addTestResult({
         id: test.id,
         testOpsId: [id, ...restIds],
         title: test.title,
-        status: statusMap[testResult.status],
-        error: testResult.error ? this.transformError(testResult.error) : undefined,
-        duration: testResult.duration,
-        steps: this.transformSteps(testResult.steps),
-        attachments: this.transformAttachments(testResult.attachments),
-        param: project ? this.transformParam(project) : undefined,
+        status: statusMap[result.status],
+        error: result.error ? this.transformError(result.error) : undefined,
+        duration: result.duration,
+        steps: this.transformSteps(result.steps),
+        attachments: this.transformAttachments(result.attachments),
       });
     }
   }
 
-  public onEnd() {
-    this.reporter.publish();
+  public async onEnd() {
+    await this.reporter.publish();
   }
 
   private transformAttachments(testAttachments: AttachmentType[]) {
     return testAttachments
       .map(({ path }) => path)
       .filter((attachment): attachment is string => !!attachment);
-  }
-
-  private transformParam(project: FullProject) {
-    try {
-      return {
-        id: uuid4(),
-        dataset: JSON.stringify(project.use),
-      };
-    } catch (error) {/* ignore */}
-
-    return undefined;
   }
 
   private transformError(testError: TestError) {
@@ -87,14 +71,14 @@ export class PlaywrightQaseReporter implements Reporter {
 
   private transformSteps(testSteps: TestStep[]): TestStepType[] {
     return testSteps.map(({
-                            error,
-                            steps,
-                            title,
-                            ...step
-                          }) => ({
-      ...step,
+      title,
+      duration,
+      error,
+      steps,
+    }) => ({
       title,
       status: error ? StatusesEnum.failed : StatusesEnum.passed,
+      duration,
       error: error ? this.transformError(error) : undefined,
       steps: this.transformSteps(steps),
     }));

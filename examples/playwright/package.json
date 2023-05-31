@@ -1,5 +1,6 @@
 {
   "name": "examples-playwright",
+  "private": true,
   "scripts": {
     "test": "npx playwright test"
   },

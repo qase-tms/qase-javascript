@@ -1,5 +1,6 @@
 {
   "name": "examples-cypress-v6",
+  "private": true,
   "scripts": {
     "test": "cypress open"
   },

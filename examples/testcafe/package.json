@@ -1,7 +1,8 @@
 {
   "name": "examples-testcafe",
+  "private": true,
   "scripts": {
-    "test": "npx testcafe chrome test.js test2.js -r spec,qase -s path=screenshots,takeOnFails=true"
+    "test": "npx testcafe \"chromium:headless\" test.js test2.js -r spec,qase -s path=screenshots,takeOnFails=true"
   },
   "devDependencies": {
     "testcafe": "^2.6.0",
