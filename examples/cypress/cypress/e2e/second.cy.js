@@ -18,9 +18,8 @@ describe('My First Test', () => {
     // Should be on a new URL which includes '/commands/actions'
     cy.url().should('include', '/commands/actions');
     // Get an input, type into it and verify that the value has been updated
-    cy.get('.action-email')
-      .type('fake@email.com')
-      .should('have.value', 'unexpected@email.com');
+    cy.get('.action-email').type('fake@email.com')
+    cy.get('.action-email').should('have.value', 'unexpected@email.com');
   }));
 
   qase(3, it.skip('Gets, types and asserts', () => {
@@ -32,9 +31,8 @@ describe('My First Test', () => {
     cy.url().should('include', '/commands/actions');
 
     // Get an input, type into it and verify that the value has been updated
-    cy.get('.action-email')
-      .type('fake@email.com')
-      .should('have.value', 'unexpected@email.com');
+    cy.get('.action-email').type('fake@email.com')
+    cy.get('.action-email').should('have.value', 'unexpected@email.com');
   }));
 
   it('Go to utilities', () => {

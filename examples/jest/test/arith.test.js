@@ -1,3 +1,5 @@
+import { describe, test, expect } from '@jest/globals';
+
 import { qase } from 'jest-qase-reporter/jest';
 
 import { add, mul } from './arith';

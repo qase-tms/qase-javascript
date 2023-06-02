@@ -5,6 +5,7 @@
     "test": "npx testcafe \"chromium:headless\" test.js test2.js -r spec,qase -s path=screenshots,takeOnFails=true"
   },
   "devDependencies": {
+    "eslint-plugin-testcafe": "^0.2.1",
     "testcafe": "^2.6.0",
     "testcafe-reporter-qase": "^2.0.0"
   }

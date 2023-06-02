@@ -28,6 +28,7 @@
     "axios-retry": "^3.5.0"
   },
   "devDependencies": {
+    "@jest/globals": "^27.5.1",
     "@types/jest": "^27.5.2",
     "@types/node": "^12.11.5",
     "axios-mock-adapter": "^1.21.4",

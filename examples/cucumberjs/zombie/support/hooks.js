@@ -2,7 +2,7 @@ var beforeCallCount = 0;
 var beforeFeatureCallCount = 0;
 
 module.exports = function () {
-  this.Before(function (scenario) {
+  this.Before(function () {
     console.log(
       '---> Before hook called',
       ++beforeCallCount,
@@ -10,11 +10,11 @@ module.exports = function () {
     );
   });
 
-  this.Before('@sections', function (scenario) {
+  this.Before('@sections', function () {
     console.log('---> A test tagged with @sections is about to be run');
   });
 
-  this.Before('@badges', function (scenario) {
+  this.Before('@badges', function () {
     console.log('---> A test tagged with @badges is about to be run');
   });
 

@@ -257,7 +257,7 @@ export class QaseReporter extends AbstractReporter {
 
         if (!path) {
           throw new Error(
-            `Either \"path\" parameter or \"${EnvReportEnum.path}\" environment variable is required in \"report\" mode`,
+            `Either "path" parameter or "${EnvReportEnum.path}" environment variable is required in "report" mode`,
           );
         }
 

@@ -1,4 +1,5 @@
-import 'jest';
+import { jest, describe, beforeEach, it, expect } from '@jest/globals';
+
 import {
   QaseApi,
   ProjectsApi,
@@ -51,15 +52,12 @@ describe('Client', () => {
       formDataCtor: FormData,
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const expectedConfiguration: NonNullable<unknown> = expect.objectContaining(
-      {
-        apiKey: apiToken,
-        formDataCtor: FormData,
-      },
-    );
+    const expectedConfiguration = {
+      apiKey: apiToken,
+      formDataCtor: FormData,
+    };
 
-    const expectedHeaders: unknown = expect.objectContaining(headers);
+    const expectedHeaders = expect.objectContaining(headers);
 
     expect(ProjectsApiMock.mock.calls[0]?.[0]).toMatchObject(
       expectedConfiguration,
