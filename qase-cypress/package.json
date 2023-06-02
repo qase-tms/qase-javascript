@@ -35,7 +35,7 @@
     "node": ">=14"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "npm run clean && tsc --project tsconfig.build.json",
     "lint": "eslint .",
     "test": "jest",
     "clean": "rm -rf dist"

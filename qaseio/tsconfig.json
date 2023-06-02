@@ -6,10 +6,11 @@
     "declaration": true,
     "skipLibCheck": true,
     "noImplicitAny": true,
+    "noEmit": true,
+    "noEmitOnError": true,
 
     "typeRoots": ["node_modules/@types"]
   },
 
-  "include": ["./src/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["dist", "node_modules"]
 }
