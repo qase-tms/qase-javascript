@@ -5,34 +5,34 @@ fixture `Example page`
 
 
 test.meta('CID', '2')('Check property of element', async (t) => {
-    const developerNameInput = Selector('#developer-name');
+  const developerNameInput = Selector('#developer-name');
 
-    await t
-        .expect(developerNameInput.value).eql('', 'input is empty')
-        .typeText(developerNameInput, 'Peter Parker')
-        .expect(developerNameInput.value)
-        .contains('Peter', 'input contains text "Peter"')
-    ;
+  await t
+    .expect(developerNameInput.value)
+    .eql('', 'input is empty')
+    .typeText(developerNameInput, 'Peter Parker')
+    .expect(developerNameInput.value)
+    .contains('Peter', 'input contains text "Peter"');
 });
 
 test.meta('CID', '3')('Check property of element 2', async (t) => {
-    const developerNameInput = Selector('#developer-name');
+  const developerNameInput = Selector('#developer-name');
 
-    await t
-        .expect(developerNameInput.value).eql('', 'input is empty')
-        .typeText(developerNameInput, 'Peter Porker')
-        .expect(developerNameInput.value)
-        .contains('Parker', 'input contains text "Parker"')
-    ;
+  await t
+    .expect(developerNameInput.value)
+    .eql('', 'input is empty')
+    .typeText(developerNameInput, 'Peter Porker')
+    .expect(developerNameInput.value)
+    .contains('Parker', 'input contains text "Parker"');
 });
 
 test.skip('Check property of element 3', async (t) => {
-    const developerNameInput = Selector('#developer-name');
+  const developerNameInput = Selector('#developer-name');
 
-    await t
-        .expect(developerNameInput.value).eql('', 'input is empty')
-        .typeText(developerNameInput, 'Peter Parker')
-        .expect(developerNameInput.value)
-        .contains('Peter', 'input contains text "Peter"')
-    ;
+  await t
+    .expect(developerNameInput.value)
+    .eql('', 'input is empty')
+    .typeText(developerNameInput, 'Peter Parker')
+    .expect(developerNameInput.value)
+    .contains('Peter', 'input contains text "Peter"');
 });

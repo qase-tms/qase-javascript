@@ -1,7 +1,12 @@
-import { Formatter, IFormatterOptions, Status } from "@cucumber/cucumber";
-import { Envelope, PickleTag, TestCaseStarted } from "@cucumber/messages";
-import { OptionsType, QaseReporter, ReporterInterface, StatusesEnum } from "qase-javascript-commons";
-import { EventEmitter } from "events";
+import { Formatter, IFormatterOptions, Status } from '@cucumber/cucumber';
+import { Envelope, PickleTag, TestCaseStarted } from '@cucumber/messages';
+import {
+  OptionsType,
+  QaseReporter,
+  ReporterInterface,
+  StatusesEnum,
+} from 'qase-javascript-commons';
+import { EventEmitter } from 'events';
 
 const StatusMapping = {
   [Status.PASSED]: StatusesEnum.passed,
@@ -23,7 +28,7 @@ type PickleInfoType = {
 
 export type CucumberQaseOptionsType = IFormatterOptions & {
   qase?: Omit<OptionsType, 'frameworkName' | 'reporterName'>;
-}
+};
 
 export class CucumberQaseReporter extends Formatter {
   private static getCaseIds(tagsList: readonly PickleTag[]) {
@@ -82,19 +87,27 @@ export class CucumberQaseReporter extends Formatter {
         this.pickleInfo[envelope.pickle.id] = {
           caseIds: CucumberQaseReporter.getCaseIds(envelope.pickle.tags),
           name: envelope.pickle.name,
-          lastAstNodeId: envelope.pickle.astNodeIds[envelope.pickle.astNodeIds.length - 1],
+          lastAstNodeId:
+            envelope.pickle.astNodeIds[envelope.pickle.astNodeIds.length - 1],
         };
       } else if (envelope.attachment) {
-        if (envelope.attachment.testCaseStartedId && envelope.attachment.fileName) {
-          this.attachments[envelope.attachment.testCaseStartedId] = envelope.attachment.fileName
+        if (
+          envelope.attachment.testCaseStartedId &&
+          envelope.attachment.fileName
+        ) {
+          this.attachments[envelope.attachment.testCaseStartedId] =
+            envelope.attachment.fileName;
         }
       } else if (envelope.testRunFinished) {
         void this.publishResults();
       } else if (envelope.testCase) {
-        this.testCaseScenarioId[envelope.testCase.id] = envelope.testCase.pickleId;
+        this.testCaseScenarioId[envelope.testCase.id] =
+          envelope.testCase.pickleId;
       } else if (envelope.testCaseStarted) {
-        this.testCaseStarts[envelope.testCaseStarted.id] = envelope.testCaseStarted;
-        this.testCaseStartedResult[envelope.testCaseStarted.id] = StatusesEnum.passed;
+        this.testCaseStarts[envelope.testCaseStarted.id] =
+          envelope.testCaseStarted;
+        this.testCaseStartedResult[envelope.testCaseStarted.id] =
+          StatusesEnum.passed;
       } else if (envelope.testStepFinished) {
         const stepFin = envelope.testStepFinished;
         const oldStatus = this.testCaseStartedResult[stepFin.testCaseStartedId];
@@ -106,7 +119,8 @@ export class CucumberQaseReporter extends Formatter {
 
         if (newStatus !== StatusesEnum.passed) {
           if (stepFin.testStepResult.message) {
-            const errors = this.testCaseStartedErrors[stepFin.testCaseStartedId] || [];
+            const errors =
+              this.testCaseStartedErrors[stepFin.testCaseStartedId] || [];
 
             if (!this.testCaseStartedErrors[stepFin.testCaseStartedId]) {
               this.testCaseStartedErrors[stepFin.testCaseStartedId] = errors;
@@ -124,7 +138,8 @@ export class CucumberQaseReporter extends Formatter {
           }
         }
       } else if (envelope.testCaseFinished) {
-        const tcs = this.testCaseStarts[envelope.testCaseFinished.testCaseStartedId];
+        const tcs =
+          this.testCaseStarts[envelope.testCaseFinished.testCaseStartedId];
 
         if (!tcs) {
           return;
@@ -155,8 +170,14 @@ export class CucumberQaseReporter extends Formatter {
             id: tcs.id,
             testOpsId: [id, ...restIds],
             title: info.name,
-            status: this.testCaseStartedResult[envelope.testCaseFinished.testCaseStartedId] ?? StatusesEnum.passed,
-            duration: Math.abs((envelope.testCaseFinished.timestamp.seconds - tcs.timestamp.seconds)),
+            status:
+              this.testCaseStartedResult[
+                envelope.testCaseFinished.testCaseStartedId
+              ] ?? StatusesEnum.passed,
+            duration: Math.abs(
+              envelope.testCaseFinished.timestamp.seconds -
+                tcs.timestamp.seconds,
+            ),
             error,
           });
         }

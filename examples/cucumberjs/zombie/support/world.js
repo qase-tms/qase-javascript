@@ -4,13 +4,13 @@
 var zombie = require('zombie');
 var worldCallCount = 0;
 
-const { setWorldConstructor, World } = require('@cucumber/cucumber')
+const { setWorldConstructor, World } = require('@cucumber/cucumber');
 
 class CustomWorld extends World {
-    browser = new zombie({ runScripts: false });
-    constructor(options) {
-        super(options)
-    }
+  browser = new zombie({ runScripts: false });
+  constructor(options) {
+    super(options);
+  }
 }
 
-setWorldConstructor(CustomWorld)
+setWorldConstructor(CustomWorld);

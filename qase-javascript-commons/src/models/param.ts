@@ -1,4 +1,4 @@
 export type ParamType = {
-    id: string;
-    dataset: string;
-}
+  id: string;
+  dataset: string;
+};

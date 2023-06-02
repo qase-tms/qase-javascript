@@ -1,36 +1,36 @@
 import { TestResultType } from '../models';
 
 export interface LoggerInterface {
-    log(message: string): void;
+  log(message: string): void;
 }
 
 export type ReporterOptionsType = {
-    logging?: boolean | undefined;
-}
+  logging?: boolean | undefined;
+};
 
 export interface ReporterInterface {
-    addTestResult(result: TestResultType): void;
-    publish(): Promise<void>;
+  addTestResult(result: TestResultType): void;
+  publish(): Promise<void>;
 }
 
 export abstract class AbstractReporter implements ReporterInterface {
-    private logging?: boolean;
+  private logging?: boolean;
 
-    abstract addTestResult(result: TestResultType): void;
-    abstract publish(): Promise<void>;
+  abstract addTestResult(result: TestResultType): void;
+  abstract publish(): Promise<void>;
 
-    protected constructor(
-        options: ReporterOptionsType,
-        private logger: LoggerInterface = console,
-    ) {
-        const { logging = true } = options;
+  protected constructor(
+    options: ReporterOptionsType,
+    private logger: LoggerInterface = console,
+  ) {
+    const { logging = true } = options;
 
-        this.logging = logging;
+    this.logging = logging;
+  }
+
+  protected log(message: string) {
+    if (this.logging) {
+      this.logger.log(`qase: ${message}`);
     }
-
-    protected log(message: string) {
-        if (this.logging) {
-            this.logger.log(`qase: ${message}`);
-        }
-    }
+  }
 }

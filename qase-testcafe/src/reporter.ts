@@ -1,5 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
-import { OptionsType, QaseReporter, ReporterInterface, StatusesEnum } from "qase-javascript-commons";
+import {
+  OptionsType,
+  QaseReporter,
+  ReporterInterface,
+  StatusesEnum,
+} from 'qase-javascript-commons';
 
 type CallsiteRecordType = {
   filename?: string;
@@ -7,7 +12,7 @@ type CallsiteRecordType = {
   callsiteFrameIdx?: number;
   stackFrames?: Array<unknown>;
   isV8Frames?: boolean;
-}
+};
 
 type TestRunErrorFormattableAdapterType = {
   userAgent: string;
@@ -20,7 +25,7 @@ type TestRunErrorFormattableAdapterType = {
   errMsg?: string;
   diff?: boolean;
   id?: string;
-}
+};
 
 type ScreenshotType = {
   screenshotPath: string;
@@ -28,7 +33,7 @@ type ScreenshotType = {
   userAgent: string;
   quarantineAttempt: number;
   takenOnFail: boolean;
-}
+};
 
 export type TestRunInfoType = {
   errs: TestRunErrorFormattableAdapterType[];
@@ -39,9 +44,12 @@ export type TestRunInfoType = {
   screenshots: ScreenshotType[];
   quarantine: Record<string, Record<'passed', boolean>>;
   skipped: boolean;
-}
+};
 
-export type TestcafeQaseOptionsType = Omit<OptionsType, "frameworkName" | "reporterName">;
+export type TestcafeQaseOptionsType = Omit<
+  OptionsType,
+  'frameworkName' | 'reporterName'
+>;
 
 export class TestcafeQaseReporter {
   private static getCaseId(meta: Record<string, string>) {
@@ -68,7 +76,8 @@ export class TestcafeQaseReporter {
 
   private static transformErrors(errors: TestRunErrorFormattableAdapterType[]) {
     const errorStrings = errors.map((error) => {
-      const stack = error.callsite?.stackFrames?.map((line) => String(line)) || [];
+      const stack =
+        error.callsite?.stackFrames?.map((line) => String(line)) || [];
 
       return `${error.errMsg || 'Error:'}\n${stack.join('\n')}\n`;
     });
@@ -109,7 +118,9 @@ export class TestcafeQaseReporter {
         status: TestcafeQaseReporter.getStatus(testRunInfo),
         error: TestcafeQaseReporter.transformErrors(testRunInfo.errs),
         duration: testRunInfo.durationMs,
-        attachments: TestcafeQaseReporter.transformAttachments(testRunInfo.screenshots),
+        attachments: TestcafeQaseReporter.transformAttachments(
+          testRunInfo.screenshots,
+        ),
       });
     }
   };

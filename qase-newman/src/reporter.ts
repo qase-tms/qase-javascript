@@ -1,12 +1,21 @@
 import { EventEmitter } from 'events';
 
-import semver from "semver";
-import { NewmanRunExecution } from "newman";
+import semver from 'semver';
+import { NewmanRunExecution } from 'newman';
 import newmanPackage from 'newman/package.json';
 import { EventList } from 'postman-collection';
-import { OptionsType, QaseReporter, ReporterInterface, StatusesEnum, TestResultType } from "qase-javascript-commons";
+import {
+  OptionsType,
+  QaseReporter,
+  ReporterInterface,
+  StatusesEnum,
+  TestResultType,
+} from 'qase-javascript-commons';
 
-export type NewmanQaseOptionsType = Omit<OptionsType, 'frameworkName' | 'reporterName'>;
+export type NewmanQaseOptionsType = Omit<
+  OptionsType,
+  'frameworkName' | 'reporterName'
+>;
 
 const qaseIdRegExp = /\/\/\s*?[qQ]ase:\s?((?:[\d]+[\s,]{0,})+)/;
 
@@ -33,10 +42,7 @@ export class NewmanQaseReporter {
   private pendingResultMap = new Map<string, TestResultType>();
   private timerMap = new Map<string, number>();
 
-  public constructor(
-    emitter: EventEmitter,
-    options: NewmanQaseOptionsType,
-  ) {
+  public constructor(emitter: EventEmitter, options: NewmanQaseOptionsType) {
     console.log('newman-reporter-qase', options);
     this.reporter = new QaseReporter({
       ...options,
@@ -48,32 +54,38 @@ export class NewmanQaseReporter {
   }
 
   private addRunnerListeners(runner: EventEmitter) {
-    runner.on('beforeItem', (_err: Error | undefined, exec: NewmanRunExecution) => {
-      const { item } = exec;
-      const [id, ...restIds] = NewmanQaseReporter.getCaseIds(item.events);
+    runner.on(
+      'beforeItem',
+      (_err: Error | undefined, exec: NewmanRunExecution) => {
+        const { item } = exec;
+        const [id, ...restIds] = NewmanQaseReporter.getCaseIds(item.events);
 
-      if (id) {
-        this.pendingResultMap.set(item.id, {
-          id: item.id,
-          testOpsId: [id, ...restIds],
-          title: item.name,
-          status: StatusesEnum.passed,
-          duration: 0,
-        });
+        if (id) {
+          this.pendingResultMap.set(item.id, {
+            id: item.id,
+            testOpsId: [id, ...restIds],
+            title: item.name,
+            status: StatusesEnum.passed,
+            duration: 0,
+          });
 
-        this.timerMap.set(item.id, Date.now());
-      }
-    });
+          this.timerMap.set(item.id, Date.now());
+        }
+      },
+    );
 
-    runner.on('assertion', (err: Error | undefined, exec: NewmanRunExecution) => {
-      const { item } = exec;
-      const pendingResult = this.pendingResultMap.get(item.id);
+    runner.on(
+      'assertion',
+      (err: Error | undefined, exec: NewmanRunExecution) => {
+        const { item } = exec;
+        const pendingResult = this.pendingResultMap.get(item.id);
 
-      if (pendingResult && err) {
-        pendingResult.status = StatusesEnum.failed;
-        pendingResult.error = err;
-      }
-    });
+        if (pendingResult && err) {
+          pendingResult.status = StatusesEnum.failed;
+          pendingResult.error = err;
+        }
+      },
+    );
 
     runner.on('item', (_err: Error | undefined, exec: NewmanRunExecution) => {
       const { item } = exec;

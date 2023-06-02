@@ -1,6 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Reporter, Test, TestResult, Config } from '@jest/reporters';
-import { QaseReporter, OptionsType, ReporterInterface, StatusesEnum } from "qase-javascript-commons";
+import {
+  QaseReporter,
+  OptionsType,
+  ReporterInterface,
+  StatusesEnum,
+} from 'qase-javascript-commons';
 
 const statusMap = {
   passed: StatusesEnum.passed,
@@ -14,7 +19,10 @@ const statusMap = {
 
 const qaseIdRegExp = /\(Qase ID: ([\d,]+)\)/;
 
-export type JestQaseOptionsType = Omit<OptionsType, 'frameworkName' | 'reporterName'>;
+export type JestQaseOptionsType = Omit<
+  OptionsType,
+  'frameworkName' | 'reporterName'
+>;
 
 export class JestQaseReporter implements Reporter {
   private static getCaseId(title: string) {
@@ -36,36 +44,41 @@ export class JestQaseReporter implements Reporter {
   public onRunStart() {/* empty */}
 
   public onTestResult(_: Test, result: TestResult) {
-    result.testResults.forEach(({
-      ancestorTitles,
-      title,
-      status,
-      duration,
-      failureMessages,
-      failureDetails,
-    }) => {
-      const ids = JestQaseReporter.getCaseId(title);
-      const [id, ...restIds] = ids;
+    result.testResults.forEach(
+      ({
+        ancestorTitles,
+        title,
+        status,
+        duration,
+        failureMessages,
+        failureDetails,
+      }) => {
+        const ids = JestQaseReporter.getCaseId(title);
+        const [id, ...restIds] = ids;
 
-      if (id) {
-        const error = status === 'failed'
-          ? new Error(`${failureMessages.join(', ')}: ${failureDetails.join(', ')}`)
-          : undefined;
+        if (id) {
+          const error =
+            status === 'failed'
+              ? new Error(
+                  `${failureMessages.join(', ')}: ${failureDetails.join(', ')}`,
+                )
+              : undefined;
 
-        if (error) {
-          error.stack = '';
+          if (error) {
+            error.stack = '';
+          }
+
+          this.reporter.addTestResult({
+            id: uuidv4(),
+            testOpsId: [id, ...restIds],
+            title: `${ancestorTitles.join('\t')}\t${title}`,
+            status: statusMap[status],
+            duration: duration || 0,
+            error,
+          });
         }
-
-        this.reporter.addTestResult({
-          id: uuidv4(),
-          testOpsId: [id, ...restIds],
-          title: `${ancestorTitles.join('\t')}\t${title}`,
-          status:  statusMap[status],
-          duration: duration || 0,
-          error,
-        });
-      }
-    });
+      },
+    );
   }
 
   public getLastError() {/* empty */}

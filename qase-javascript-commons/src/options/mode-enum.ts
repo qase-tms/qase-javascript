@@ -1,4 +1,4 @@
 export enum ModeEnum {
-    report = 'report',
-    testops = 'testops',
+  report = 'report',
+  testops = 'testops',
 }

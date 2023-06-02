@@ -8,7 +8,6 @@
 npm install playwright-qase-reporter
 ```
 
-
 ## Example of usage
 
 The Playwright reporter has the ability to auto-generate test cases
@@ -21,30 +20,34 @@ existing test cases from TMS before the executing tests. For example:
 import { qase } from 'playwright-qase-reporter/dist/playwright';
 
 describe('Test suite', () => {
-    test(qase([1,2], 'Several ids'), () => {
-        expect(true).toBe(true);
-    })
+  test(qase([1, 2], 'Several ids'), () => {
+    expect(true).toBe(true);
+  });
 
-    test(qase(3, 'Correct test'), () => {
-        expect(true).toBe(true);
-    })
+  test(qase(3, 'Correct test'), () => {
+    expect(true).toBe(true);
+  });
 
-    test.skip(qase("4", 'Skipped test'), () => {
-        expect(true).toBe(true);
-    })
+  test.skip(qase('4', 'Skipped test'), () => {
+    expect(true).toBe(true);
+  });
 
-    test(qase(["5", "6"], 'Failed test'), () => {
-        expect(true).toBe(false);
-    })
+  test(qase(['5', '6'], 'Failed test'), () => {
+    expect(true).toBe(false);
+  });
 });
-
 ```
+
 ---
+
 To run tests and create a test run, execute the command (for example from folder examples):
+
 ```bash
 QASE_REPORT=1 npx playwright test
 ```
+
 or
+
 ```bash
 npm test
 ```
@@ -65,12 +68,12 @@ https://app.qase.io/run/QASE_PROJECT_CODE
 
 ## Configuration
 
-Reporter options (* - required):
+Reporter options (\* - required):
 
-- *`apiToken` - Token for API access, you can find more information
+- \*`apiToken` - Token for API access, you can find more information
   [here](https://developers.qase.io/#authentication)
-- *`projectCode` - Code of your project (can be extracted from main 
-  page of your project: `https://app.qase.io/project/DEMOTR` - 
+- \*`projectCode` - Code of your project (can be extracted from main
+  page of your project: `https://app.qase.io/project/DEMOTR` -
   `DEMOTR` is project code here)
   `basePath` - Qase.io url
 - `runId` - Run ID from Qase TMS (also can be got from run URL)
@@ -84,22 +87,24 @@ Example `playwright.config.js` config:
 
 ```js
 const config = {
-    use: {
-        screenshot: 'only-on-failure',
-        video: 'retain-on-failure',
-    },
-    reporter: [
-        ['list'],
-        ['playwright-qase-reporter',
-            {
-                apiToken: 'api_key',
-                projectCode: 'project_code',
-                runComplete: true,
-                basePath: 'https://api.qase.io/v1',
-                logging: true,
-                uploadAttachments: true,
-            }],
+  use: {
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+  },
+  reporter: [
+    ['list'],
+    [
+      'playwright-qase-reporter',
+      {
+        apiToken: 'api_key',
+        projectCode: 'project_code',
+        runComplete: true,
+        basePath: 'https://api.qase.io/v1',
+        logging: true,
+        uploadAttachments: true,
+      },
     ],
+  ],
 };
 module.exports = config;
 ```

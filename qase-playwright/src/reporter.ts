@@ -1,7 +1,21 @@
-import { Reporter, TestCase, TestError, TestResult, TestStep } from "@playwright/test/reporter";
-import { OptionsType, QaseReporter, ReporterInterface, StatusesEnum, TestStepType } from "qase-javascript-commons";
+import {
+  Reporter,
+  TestCase,
+  TestError,
+  TestResult,
+  TestStep,
+} from '@playwright/test/reporter';
+import {
+  OptionsType,
+  QaseReporter,
+  ReporterInterface,
+  StatusesEnum,
+  TestStepType,
+} from 'qase-javascript-commons';
 
-type AttachmentType = TestResult['attachments'] extends Array<infer T> ? T : never;
+type AttachmentType = TestResult['attachments'] extends Array<infer T>
+  ? T
+  : never;
 
 const statusMap = {
   passed: StatusesEnum.passed,
@@ -15,7 +29,10 @@ const statusMap = {
 
 const qaseIdRegExp = /\(Qase ID: ([\d,]+)\)/;
 
-export type PlaywrightQaseOptionsType = Omit<OptionsType, 'frameworkName' | 'reporterName'>;
+export type PlaywrightQaseOptionsType = Omit<
+  OptionsType,
+  'frameworkName' | 'reporterName'
+>;
 
 export class PlaywrightQaseReporter implements Reporter {
   private static getCaseIds(title: string): number[] {
@@ -70,12 +87,7 @@ export class PlaywrightQaseReporter implements Reporter {
   }
 
   private transformSteps(testSteps: TestStep[]): TestStepType[] {
-    return testSteps.map(({
-      title,
-      duration,
-      error,
-      steps,
-    }) => ({
+    return testSteps.map(({ title, duration, error, steps }) => ({
       title,
       status: error ? StatusesEnum.failed : StatusesEnum.passed,
       duration,

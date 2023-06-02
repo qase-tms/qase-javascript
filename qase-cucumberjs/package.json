@@ -11,8 +11,12 @@
   },
   "typesVersions": {
     "*": {
-      ".": ["./dist/index.d.ts"],
-      "reporter": ["./dist/reporter.d.ts"]
+      ".": [
+        "./dist/index.d.ts"
+      ],
+      "reporter": [
+        "./dist/reporter.d.ts"
+      ]
     }
   },
   "bugs": {

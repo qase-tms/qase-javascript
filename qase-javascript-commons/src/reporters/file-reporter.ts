@@ -1,52 +1,60 @@
 import path from 'path';
 import { writeFileSync, mkdirSync } from 'fs';
 
-import { AbstractReporter, ReporterOptionsType, LoggerInterface } from './reporter';
+import {
+  AbstractReporter,
+  ReporterOptionsType,
+  LoggerInterface,
+} from './reporter';
 
 import { TestResultType } from '../models';
-import stripAnsi from "strip-ansi";
+import stripAnsi from 'strip-ansi';
 
 export type FileReporterOptionsType = {
-    path: string;
+  path: string;
 };
 
 export class FileReporter extends AbstractReporter {
-    private path: string;
-    private results: TestResultType[] = [];
+  private path: string;
+  private results: TestResultType[] = [];
 
-    // TODO: reporter should take writer and formatter instances
-    constructor(
-        options: ReporterOptionsType & FileReporterOptionsType,
-        logger?: LoggerInterface,
-    ) {
-        const { path, ...restOptions } = options;
+  // TODO: reporter should take writer and formatter instances
+  constructor(
+    options: ReporterOptionsType & FileReporterOptionsType,
+    logger?: LoggerInterface,
+  ) {
+    const { path, ...restOptions } = options;
 
-        super(restOptions, logger);
+    super(restOptions, logger);
 
-        this.path = path;
-    }
+    this.path = path;
+  }
 
-    public addTestResult(result: TestResultType) {
-        this.results.push(result);
-    }
+  public addTestResult(result: TestResultType) {
+    this.results.push(result);
+  }
 
-    // eslint-disable-next-line @typescript-eslint/require-await
-    public async publish() {
-        try {
-            mkdirSync(this.path, { recursive: true });
-        } catch (error) {/* ignore */}
+  // eslint-disable-next-line @typescript-eslint/require-await
+  public async publish() {
+    try {
+      mkdirSync(this.path, { recursive: true });
+    } catch (error) {/* ignore */}
 
-        const filePath = path.join(this.path, `results-${Date.now()}.json`);
-        const json = JSON.stringify(this.results, (key, value: unknown) => {
-            if (key === 'error' && value instanceof Error) {
-                return stripAnsi(String(value));
-            }
+    const filePath = path.join(this.path, `results-${Date.now()}.json`);
+    const json = JSON.stringify(
+      this.results,
+      (key, value: unknown) => {
+        if (key === 'error' && value instanceof Error) {
+          return stripAnsi(String(value));
+        }
 
-            return value;
-        }, 4)
+        return value;
+      },
+      4,
+    );
 
-        writeFileSync(filePath, json);
+    writeFileSync(filePath, json);
 
-        this.log(`Report saved to ${filePath}`);
-    }
+    this.log(`Report saved to ${filePath}`);
+  }
 }

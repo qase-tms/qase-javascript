@@ -18,24 +18,28 @@ existing test cases from TMS before the executing tests. Meta key should be `CID
 You should assign list of case IDs to it, e.g.:
 
 ```js
-test
-    .meta('CID', [1])
-    ('Text typing basics', async (t) => {
-        await t
-    });
+test.meta('CID', [1])('Text typing basics', async (t) => {
+  await t;
+});
 
-test
-    .meta({ CID: [2, 3] })
-    ('Click check boxes and then verify their state', async (t) => {
-        await t
-    });
+test.meta({ CID: [2, 3] })(
+  'Click check boxes and then verify their state',
+  async (t) => {
+    await t;
+  },
+);
 ```
+
 ---
+
 To run tests and create a test run, execute the command (for example from folder examples):
+
 ```bash
 npx testcafe chrome test.js -r spec,qase
 ```
+
 or
+
 ```bash
 npm test
 ```
@@ -56,10 +60,11 @@ https://app.qase.io/run/QASE_PROJECT_CODE
 
 ## Configuration
 
-Qase reporter supports passing parameters using two ways: 
+Qase reporter supports passing parameters using two ways:
 using `.qaserc` file and using ENV variables.
 
 `.qaserc` parameters:
+
 - `enabled` - Enable reporter
 - `apiToken` - Token for API access, you can find more information
   [here](https://developers.qase.io/#authentication)
@@ -71,8 +76,8 @@ using `.qaserc` file and using ENV variables.
 - `environmentId` - Environment ID from Qase TMS
 - `runName` - Set custom Run name, when new run is created.
   Supports two parameters:
-    - `%DATE%`
-    - `%AGENTS%`
+  - `%DATE%`
+  - `%AGENTS%`
 - `runDescription` - Set custom Run description, when new run is created
 - `uploadAttachments` - Uploading attachment to Qase TMS
 - `runComplete` - Complete run after all tests are finished
@@ -80,13 +85,14 @@ using `.qaserc` file and using ENV variables.
 - `rootSuiteTitle` - A parent suite for your autocreated tests
 
 Example configuration file:
+
 ```json
 {
-    "enabled": true,
-    "logging": true,
-    "apiToken": "api_key",
-    "projectCode": "project_code",
-    "runName": "TestCafe run %DATE% %AGENTS%"
+  "enabled": true,
+  "logging": true,
+  "apiToken": "api_key",
+  "projectCode": "project_code",
+  "runName": "TestCafe run %DATE% %AGENTS%"
 }
 ```
 

@@ -1,14 +1,15 @@
-import { MochaOptions, reporters, Runner, Test } from "mocha";
-import { OptionsType, QaseReporter, ReporterInterface, StatusesEnum } from "qase-javascript-commons";
+import { MochaOptions, reporters, Runner, Test } from 'mocha';
+import {
+  OptionsType,
+  QaseReporter,
+  ReporterInterface,
+  StatusesEnum,
+} from 'qase-javascript-commons';
 
-import { traverseDir } from "./utils/traverse-dir";
+import { traverseDir } from './utils/traverse-dir';
 
-const {
-  EVENT_TEST_FAIL,
-  EVENT_TEST_PASS,
-  EVENT_TEST_PENDING,
-  EVENT_RUN_END,
-} = Runner.constants;
+const { EVENT_TEST_FAIL, EVENT_TEST_PASS, EVENT_TEST_PENDING, EVENT_RUN_END } =
+  Runner.constants;
 
 const qaseIdRegExp = /\(Qase ID: ([\d,]+)\)/;
 
@@ -18,7 +19,10 @@ const statusMap = {
   pending: StatusesEnum.blocked,
 };
 
-export type ReporterOptionsType = Omit<OptionsType, 'frameworkName' | 'reporterName'> & {
+export type ReporterOptionsType = Omit<
+  OptionsType,
+  'frameworkName' | 'reporterName'
+> & {
   screenshotsFolder?: string;
 };
 
@@ -39,7 +43,11 @@ export class CypressQaseReporter extends reporters.Base {
 
     try {
       traverseDir(dir, (filePath) => {
-        if (CypressQaseReporter.getCaseId(filePath).some((item) => idSet.has(item))) {
+        if (
+          CypressQaseReporter.getCaseId(filePath).some((item) =>
+            idSet.has(item),
+          )
+        ) {
           attachments.push(filePath);
         }
       });
@@ -69,7 +77,7 @@ export class CypressQaseReporter extends reporters.Base {
   }
 
   private addRunnerListeners(runner: Runner) {
-    runner.on(EVENT_TEST_PASS, (test: Test) =>  {
+    runner.on(EVENT_TEST_PASS, (test: Test) => {
       this.addTestResult(test);
     });
 
@@ -116,6 +124,6 @@ export class CypressQaseReporter extends reporters.Base {
     mutableProcess.exit = (code: number) => {
       process.exitCode = code || 0;
       process.exit = _exit;
-    }
+    };
   }
 }

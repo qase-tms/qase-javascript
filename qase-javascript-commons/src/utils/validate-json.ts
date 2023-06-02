@@ -3,16 +3,18 @@ import Ajv, { ErrorObject, JSONSchemaType } from 'ajv';
 const validator = new Ajv();
 
 export class JSONValidationError extends Error {
-    constructor(
-        public validationErrors: ErrorObject[],
-        message?: string,
-    ) {
-        super(message);
-    }
+  constructor(public validationErrors: ErrorObject[], message?: string) {
+    super(message);
+  }
 }
 
-export function validateJson<T>(schema: JSONSchemaType<T>, json: unknown): asserts json is T {
-    if (!validator.validate<T>(schema, json)) {
-        throw new JSONValidationError(validator.errors ? [...validator.errors] : []);
-    }
+export function validateJson<T>(
+  schema: JSONSchemaType<T>,
+  json: unknown,
+): asserts json is T {
+  if (!validator.validate<T>(schema, json)) {
+    throw new JSONValidationError(
+      validator.errors ? [...validator.errors] : [],
+    );
+  }
 }

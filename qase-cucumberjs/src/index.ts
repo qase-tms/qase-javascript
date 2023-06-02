@@ -1,3 +1,3 @@
-import { CucumberQaseReporter } from "./reporter";
+import { CucumberQaseReporter } from './reporter';
 
 export = CucumberQaseReporter;

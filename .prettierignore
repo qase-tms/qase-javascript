@@ -1,0 +1,6 @@
+# Required to run prettier from the root folder since it doesn't respoect nested .prettierignore files
+examples/*/qase/
+examples/cypress/cypress/reports/
+*/dist
+*/coverage
+qaseio/src/generated

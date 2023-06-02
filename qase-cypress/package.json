@@ -13,9 +13,15 @@
   },
   "typesVersions": {
     "*": {
-      ".": ["./dist/index.d.ts"],
-      "mocha": ["./dist/mocha.d.ts"],
-      "reporter": ["./dist/reporter.d.ts"]
+      ".": [
+        "./dist/index.d.ts"
+      ],
+      "mocha": [
+        "./dist/mocha.d.ts"
+      ],
+      "reporter": [
+        "./dist/reporter.d.ts"
+      ]
     }
   },
   "bugs": {

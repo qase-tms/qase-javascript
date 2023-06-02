@@ -1,5 +1,5 @@
-import { readdirSync } from "fs";
-import path from "path";
+import { readdirSync } from 'fs';
+import path from 'path';
 
 // TODO: get rid of recursion
 export const traverseDir = (
@@ -19,4 +19,4 @@ export const traverseDir = (
       } catch (error) {/* ignore */}
     }
   });
-}
+};
