@@ -10,8 +10,12 @@
   },
   "typesVersions": {
     "*": {
-      ".": ["./dist/index.d.ts"],
-      "reporter": ["./dist/reporter.d.ts"]
+      ".": [
+        "./dist/index.d.ts"
+      ],
+      "reporter": [
+        "./dist/reporter.d.ts"
+      ]
     }
   },
   "homepage": "https://github.com/qase-tms/qase-javascript",
@@ -42,6 +46,7 @@
     "@types/postman-collection": "^3.5.7"
   },
   "peerDependencies": {
-    "newman": "^5.3.2"
+    "newman": "^5.3.2",
+    "postman-collection": "^4.1.1"
   }
 }

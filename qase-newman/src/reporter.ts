@@ -30,8 +30,8 @@ export class NewmanQaseReporter {
   }
 
   private reporter: ReporterInterface;
-  private pendingResultMap: Map<string, TestResultType>;
-  private timerMap: Map<string, number>;
+  private pendingResultMap = new Map<string, TestResultType>();
+  private timerMap = new Map<string, number>();
 
   public constructor(
     emitter: EventEmitter,
@@ -43,9 +43,6 @@ export class NewmanQaseReporter {
       frameworkName: 'newman',
       reporterName: 'newman-reporter-qase',
     });
-
-    this.pendingResultMap = new Map();
-    this.timerMap = new Map();
 
     this.addRunnerListeners(emitter);
   }
@@ -94,7 +91,7 @@ export class NewmanQaseReporter {
     });
 
     runner.on('beforeDone', () => {
-      this.reporter.publish();
+      void this.reporter.publish();
     });
 
     runner.on('done', () => {

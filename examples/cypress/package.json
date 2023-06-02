@@ -1,11 +1,11 @@
 {
-  "name": "examples-cypress-v6",
+  "name": "examples-cypress",
   "private": true,
   "scripts": {
     "test": "cypress open"
   },
   "devDependencies": {
-    "cypress": "^6.9.1",
+    "cypress": "^12.13.0",
     "cypress-mochawesome-reporter": "^3.5.0",
     "cypress-multi-reporters": "^1.6.3",
     "cypress-qase-reporter": "^2.0.0"

@@ -82,7 +82,7 @@ export class CypressQaseReporter extends reporters.Base {
     });
 
     runner.once(EVENT_RUN_END, () => {
-      this.reporter.publish();
+      void this.reporter.publish();
       this.preventExit();
     });
   }

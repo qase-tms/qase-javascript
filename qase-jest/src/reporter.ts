@@ -71,6 +71,6 @@ export class JestQaseReporter implements Reporter {
   public getLastError() {/* empty */}
 
   public onRunComplete() {
-    this.reporter.publish();
+    void this.reporter.publish();
   }
 }

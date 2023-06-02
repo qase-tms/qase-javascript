@@ -5,6 +5,16 @@
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./reporter": "./dist/reporter.js"
+  },
+  "typesVersions": {
+    "*": {
+      ".": ["./dist/index.d.ts"],
+      "reporter": ["./dist/reporter.d.ts"]
+    }
+  },
   "bugs": {
     "url": "https://github.com/qase-tms/qase-javascript/issues"
   },
@@ -24,6 +34,7 @@
   "author": "Parviz Khavari <havaripa@gmail.com>",
   "license": "Apache-2.0",
   "dependencies": {
+    "@cucumber/messages": "^22.0.0",
     "qase-javascript-commons": "^2.0.0"
   },
   "peerDependencies": {
