@@ -46,6 +46,8 @@ export class QaseApi {
                 ...headers,
             },
             baseURL,
+            maxContentLength: Infinity,
+            maxBodyLength: Infinity,
         };
         this.api = axios.create(config);
         this.configuration = new Configuration({
