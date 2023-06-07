@@ -1,5 +1,5 @@
 import axios from 'axios';
-import axiosRetry from 'axios-retry';
+import axiosRetry, { isIdempotentRequestError } from "axios-retry";
 
 import {
   ProjectsApi,
@@ -17,6 +17,15 @@ import {
   Configuration,
 } from './generated';
 
+export type QaseApiOptionsType = {
+  apiToken: string;
+  baseUrl?: string;
+  headers?: Record<string, string>;
+  retries?: number;
+  retryDelay?: number;
+  formDataCtor?: new () => unknown;
+}
+
 export interface QaseApiInterface {
   projects: ProjectsApi;
   cases: CasesApi;
@@ -30,15 +39,6 @@ export interface QaseApiInterface {
   defects: DefectsApi;
   customFields: CustomFieldsApi;
   authors: AuthorsApi;
-}
-
-export interface QaseApiOptionsInterface {
-  apiToken: string;
-  baseUrl?: string;
-  headers?: Record<string, string>;
-  retries?: number;
-  retryDelay?: number;
-  formDataCtor?: new () => unknown;
 }
 
 export class QaseApi implements QaseApiInterface {
@@ -55,7 +55,7 @@ export class QaseApi implements QaseApiInterface {
   public customFields: CustomFieldsApi;
   public authors: AuthorsApi;
 
-  public constructor(options: QaseApiOptionsInterface) {
+  public constructor(options: QaseApiOptionsType) {
     const {
       apiToken,
       baseUrl,
@@ -74,6 +74,7 @@ export class QaseApi implements QaseApiInterface {
     axiosRetry(transport, {
       retries,
       retryDelay: () => retryDelay,
+      retryCondition: isIdempotentRequestError,
     });
 
     const configuration = new Configuration({
