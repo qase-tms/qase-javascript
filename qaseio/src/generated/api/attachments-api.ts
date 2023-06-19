@@ -35,7 +35,7 @@ import { HashResponse } from '../model';
 export const AttachmentsApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * This method allows to remove attachment by Hash. 
+         * This method allows to remove attachment by Hash.
          * @summary Remove attachment by Hash.
          * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
@@ -61,7 +61,7 @@ export const AttachmentsApiAxiosParamCreator = function (configuration?: Configu
             await setApiKeyToObject(localVarHeaderParameter, "Token", configuration)
 
 
-    
+
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -72,7 +72,7 @@ export const AttachmentsApiAxiosParamCreator = function (configuration?: Configu
             };
         },
         /**
-         * This method allows to retrieve attachment by Hash. 
+         * This method allows to retrieve attachment by Hash.
          * @summary Get attachment by Hash.
          * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
@@ -98,7 +98,7 @@ export const AttachmentsApiAxiosParamCreator = function (configuration?: Configu
             await setApiKeyToObject(localVarHeaderParameter, "Token", configuration)
 
 
-    
+
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -109,7 +109,7 @@ export const AttachmentsApiAxiosParamCreator = function (configuration?: Configu
             };
         },
         /**
-         * This method allows to retrieve attachments. 
+         * This method allows to retrieve attachments.
          * @summary Get all attachments.
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
@@ -141,7 +141,7 @@ export const AttachmentsApiAxiosParamCreator = function (configuration?: Configu
             }
 
 
-    
+
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -152,10 +152,10 @@ export const AttachmentsApiAxiosParamCreator = function (configuration?: Configu
             };
         },
         /**
-         * This method allows to upload attachment to Qase. Max upload size: * Up to 32 Mb per file * Up to 128 Mb per single request * Up to 20 files per single request  If there is no free space left in your team account, you will receive an error with code 507 - Insufficient Storage. 
+         * This method allows to upload attachment to Qase. Max upload size: * Up to 32 Mb per file * Up to 128 Mb per single request * Up to 20 files per single request  If there is no free space left in your team account, you will receive an error with code 507 - Insufficient Storage.
          * @summary Upload attachment.
          * @param {string} code Code of project, where to search entities.
-         * @param {Array<File>} [file] 
+         * @param {Array<File>} [file]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -185,10 +185,10 @@ export const AttachmentsApiAxiosParamCreator = function (configuration?: Configu
                 })
             }
 
-    
-    
-            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
-    
+
+
+            localVarHeaderParameter['Content-Type'] = 'multipart/form-data; boundary=' + localVarFormParams.getBoundary();
+
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -210,7 +210,7 @@ export const AttachmentsApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = AttachmentsApiAxiosParamCreator(configuration)
     return {
         /**
-         * This method allows to remove attachment by Hash. 
+         * This method allows to remove attachment by Hash.
          * @summary Remove attachment by Hash.
          * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
@@ -221,7 +221,7 @@ export const AttachmentsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * This method allows to retrieve attachment by Hash. 
+         * This method allows to retrieve attachment by Hash.
          * @summary Get attachment by Hash.
          * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
@@ -232,7 +232,7 @@ export const AttachmentsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * This method allows to retrieve attachments. 
+         * This method allows to retrieve attachments.
          * @summary Get all attachments.
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
@@ -244,10 +244,10 @@ export const AttachmentsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * This method allows to upload attachment to Qase. Max upload size: * Up to 32 Mb per file * Up to 128 Mb per single request * Up to 20 files per single request  If there is no free space left in your team account, you will receive an error with code 507 - Insufficient Storage. 
+         * This method allows to upload attachment to Qase. Max upload size: * Up to 32 Mb per file * Up to 128 Mb per single request * Up to 20 files per single request  If there is no free space left in your team account, you will receive an error with code 507 - Insufficient Storage.
          * @summary Upload attachment.
          * @param {string} code Code of project, where to search entities.
-         * @param {Array<File>} [file] 
+         * @param {Array<File>} [file]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -266,7 +266,7 @@ export const AttachmentsApiFactory = function (configuration?: Configuration, ba
     const localVarFp = AttachmentsApiFp(configuration)
     return {
         /**
-         * This method allows to remove attachment by Hash. 
+         * This method allows to remove attachment by Hash.
          * @summary Remove attachment by Hash.
          * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
@@ -276,7 +276,7 @@ export const AttachmentsApiFactory = function (configuration?: Configuration, ba
             return localVarFp.deleteAttachment(hash, options).then((request) => request(axios, basePath));
         },
         /**
-         * This method allows to retrieve attachment by Hash. 
+         * This method allows to retrieve attachment by Hash.
          * @summary Get attachment by Hash.
          * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
@@ -286,7 +286,7 @@ export const AttachmentsApiFactory = function (configuration?: Configuration, ba
             return localVarFp.getAttachment(hash, options).then((request) => request(axios, basePath));
         },
         /**
-         * This method allows to retrieve attachments. 
+         * This method allows to retrieve attachments.
          * @summary Get all attachments.
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
@@ -297,10 +297,10 @@ export const AttachmentsApiFactory = function (configuration?: Configuration, ba
             return localVarFp.getAttachments(limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
-         * This method allows to upload attachment to Qase. Max upload size: * Up to 32 Mb per file * Up to 128 Mb per single request * Up to 20 files per single request  If there is no free space left in your team account, you will receive an error with code 507 - Insufficient Storage. 
+         * This method allows to upload attachment to Qase. Max upload size: * Up to 32 Mb per file * Up to 128 Mb per single request * Up to 20 files per single request  If there is no free space left in your team account, you will receive an error with code 507 - Insufficient Storage.
          * @summary Upload attachment.
          * @param {string} code Code of project, where to search entities.
-         * @param {Array<File>} [file] 
+         * @param {Array<File>} [file]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -318,7 +318,7 @@ export const AttachmentsApiFactory = function (configuration?: Configuration, ba
  */
 export class AttachmentsApi extends BaseAPI {
     /**
-     * This method allows to remove attachment by Hash. 
+     * This method allows to remove attachment by Hash.
      * @summary Remove attachment by Hash.
      * @param {string} hash Hash.
      * @param {*} [options] Override http request option.
@@ -330,7 +330,7 @@ export class AttachmentsApi extends BaseAPI {
     }
 
     /**
-     * This method allows to retrieve attachment by Hash. 
+     * This method allows to retrieve attachment by Hash.
      * @summary Get attachment by Hash.
      * @param {string} hash Hash.
      * @param {*} [options] Override http request option.
@@ -342,7 +342,7 @@ export class AttachmentsApi extends BaseAPI {
     }
 
     /**
-     * This method allows to retrieve attachments. 
+     * This method allows to retrieve attachments.
      * @summary Get all attachments.
      * @param {number} [limit] A number of entities in result set.
      * @param {number} [offset] How many entities should be skipped.
@@ -355,10 +355,10 @@ export class AttachmentsApi extends BaseAPI {
     }
 
     /**
-     * This method allows to upload attachment to Qase. Max upload size: * Up to 32 Mb per file * Up to 128 Mb per single request * Up to 20 files per single request  If there is no free space left in your team account, you will receive an error with code 507 - Insufficient Storage. 
+     * This method allows to upload attachment to Qase. Max upload size: * Up to 32 Mb per file * Up to 128 Mb per single request * Up to 20 files per single request  If there is no free space left in your team account, you will receive an error with code 507 - Insufficient Storage.
      * @summary Upload attachment.
      * @param {string} code Code of project, where to search entities.
-     * @param {Array<File>} [file] 
+     * @param {Array<File>} [file]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AttachmentsApi

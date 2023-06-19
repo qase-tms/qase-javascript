@@ -3,7 +3,7 @@ Feature: Cucumber documentation
     I want to have documentation on cucumber
     So I can write better applications
 
-    @sections
+    @sections @Q-1
     Scenario: Usage documentation
         Given I am on the cucumber.js GitHub repository
         When I go to the README file

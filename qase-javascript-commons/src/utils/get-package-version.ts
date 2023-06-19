@@ -1,5 +1,9 @@
 import { readFileSync } from 'fs';
 
+/**
+ * @param {string} name
+ * @returns {undefined | string}
+ */
 export const getPackageVersion = (name: string) => {
   try {
     const pathToPackageJson = require.resolve(`${name}/package.json`, {

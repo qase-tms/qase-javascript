@@ -1,8 +1,12 @@
-import { StatusesEnum } from './status';
+export enum StepStatusEnum {
+  passed = 'passed',
+  failed = 'failed',
+  blocked = 'blocked',
+}
 
 export type TestStepType = {
   title: string;
-  status: `${StatusesEnum}`;
+  status: `${StepStatusEnum}`;
   duration?: number | undefined;
   error?: Error | undefined;
   steps?: TestStepType[] | undefined;

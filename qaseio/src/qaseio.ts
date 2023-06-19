@@ -18,12 +18,11 @@ import {
 } from './generated';
 
 export type QaseApiOptionsType = {
-  apiToken: string;
-  baseUrl?: string;
-  headers?: Record<string, string>;
-  retries?: number;
-  retryDelay?: number;
-  formDataCtor?: new () => unknown;
+  token: string;
+  baseUrl?: string | undefined;
+  headers?: Record<string, string | undefined> | undefined;
+  retries?: number | undefined;
+  retryDelay?: number | undefined;
 }
 
 export interface QaseApiInterface {
@@ -41,6 +40,10 @@ export interface QaseApiInterface {
   authors: AuthorsApi;
 }
 
+/**
+ * @class QaseApi
+ * @implements QaseApiInterface
+ */
 export class QaseApi implements QaseApiInterface {
   public projects: ProjectsApi;
   public cases: CasesApi;
@@ -55,14 +58,17 @@ export class QaseApi implements QaseApiInterface {
   public customFields: CustomFieldsApi;
   public authors: AuthorsApi;
 
-  public constructor(options: QaseApiOptionsType) {
+  /**
+   * @param {QaseApiOptionsType} options
+   * @param {{new(): unknown}} formDataCtor
+   */
+  public constructor(options: QaseApiOptionsType, formDataCtor?: new () => unknown) {
     const {
-      apiToken,
+      token,
       baseUrl,
       headers,
       retries = 3,
       retryDelay = 0,
-      formDataCtor,
     } = options;
 
     const transport = axios.create({
@@ -78,7 +84,7 @@ export class QaseApi implements QaseApiInterface {
     });
 
     const configuration = new Configuration({
-      apiKey: apiToken,
+      apiKey: token,
       formDataCtor,
     });
 

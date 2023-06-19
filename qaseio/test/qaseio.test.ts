@@ -47,10 +47,9 @@ describe('Client', () => {
     const FormData = jest.fn();
 
     new QaseApi({
-      apiToken,
+      token: apiToken,
       headers,
-      formDataCtor: FormData,
-    });
+    }, FormData);
 
     const expectedConfiguration = {
       apiKey: apiToken,

@@ -19,8 +19,16 @@ export interface OptionsInterface extends ReadableOptionsType {
   pauseStreams?: boolean;
 }
 
-// `FormData` with cryptographically strong random boundary
+/**
+ * `FormData` with cryptographically strong random boundary
+ *
+ * @class CustomBoundaryFormData
+ * @extends FormData
+ */
 export class CustomBoundaryFormData extends FormData {
+  /**
+   * @param {OptionsInterface} options
+   */
   constructor(options?: OptionsInterface) {
     super(options);
 
@@ -29,7 +37,7 @@ export class CustomBoundaryFormData extends FormData {
 
       this.setBoundary(bytes.toString('hex').padStart(50, '-'));
     } catch (e) {
-      /* ignore crypto failures, the FormData will fall back to the `Math.random` */
+      // ignore crypto failures, the FormData will fall back to the `Math.random`
     }
   }
 }

@@ -2,10 +2,13 @@ import { JSONSchemaType } from 'ajv';
 
 import { ModeEnum } from '../options';
 import { ConfigType } from './config-type';
+import { DriverEnum } from "../writer";
 
+/**
+ * @type {JSONSchemaType<ConfigType>}
+ */
 export const configValidationSchema: JSONSchemaType<ConfigType> = {
   type: 'object',
-  additionalProperties: true,
 
   properties: {
     mode: {
@@ -13,7 +16,7 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
       enum: [ModeEnum.report, ModeEnum.testops],
       nullable: true,
     },
-    logging: {
+    debug: {
       type: 'boolean',
       nullable: true,
     },
@@ -21,26 +24,51 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
     testops: {
       type: 'object',
       nullable: true,
-      additionalProperties: true,
 
       properties: {
-        apiToken: {
-          type: 'string',
+        api: {
+          type: 'object',
           nullable: true,
+
+          properties: {
+            token: {
+              type: 'string',
+              nullable: true,
+            },
+
+            baseUrl: {
+              type: 'string',
+              nullable: true,
+            },
+
+            headers: {
+              type: 'object',
+              nullable: true,
+              additionalProperties: false,
+              patternProperties: {
+                "^.*$": {
+                  type: 'string',
+                },
+              },
+            },
+
+            retries: {
+              type: 'number',
+              nullable: true,
+            },
+
+            retryDelay: {
+              type: 'number',
+              nullable: true,
+            },
+          },
         },
+
         projectCode: {
           type: 'string',
           nullable: true,
         },
 
-        frameworkName: {
-          type: 'string',
-          nullable: true,
-        },
-        reporterName: {
-          type: 'string',
-          nullable: true,
-        },
         uploadAttachments: {
           type: 'boolean',
           nullable: true,
@@ -51,25 +79,32 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
           nullable: true,
         },
 
-        runId: {
-          type: 'number',
+        run: {
+          type: 'object',
           nullable: true,
-        },
-        runName: {
-          type: 'string',
-          nullable: true,
-        },
-        runDescription: {
-          type: 'string',
-          nullable: true,
-        },
-        runComplete: {
-          type: 'boolean',
-          nullable: true,
-        },
-        environmentId: {
-          type: 'number',
-          nullable: true,
+
+          properties: {
+            id: {
+              type: 'number',
+              nullable: true,
+            },
+            title: {
+              type: 'string',
+              nullable: true,
+            },
+            description: {
+              type: 'string',
+              nullable: true,
+            },
+            complete: {
+              type: 'boolean',
+              nullable: true,
+            },
+            environment: {
+              type: 'number',
+              nullable: true,
+            },
+          },
         },
       },
     },
@@ -77,12 +112,36 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
     report: {
       type: 'object',
       nullable: true,
-      additionalProperties: true,
 
       properties: {
-        path: {
+        driver: {
           type: 'string',
+          enum: [DriverEnum.local],
           nullable: true,
+        },
+
+        connections: {
+          type: 'object',
+          nullable: true,
+
+          properties: {
+            [DriverEnum.local]: {
+              type: 'object',
+              nullable: true,
+
+              properties: {
+                path: {
+                  type: 'string',
+                  nullable: true,
+                },
+
+                ext: {
+                  type: 'string',
+                  nullable: true,
+                },
+              },
+            },
+          },
         },
       },
     },

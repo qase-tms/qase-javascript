@@ -17,7 +17,7 @@ But if necessary, you can independently register the ID of already
 existing test cases from TMS before the executing tests. For example:
 
 ```typescript
-import { qase } from 'playwright-qase-reporter/dist/playwright';
+import { qase } from 'playwright-qase-reporter/playwright';
 
 describe('Test suite', () => {
   test(qase([1, 2], 'Several ids'), () => {
@@ -43,7 +43,7 @@ describe('Test suite', () => {
 To run tests and create a test run, execute the command (for example from folder examples):
 
 ```bash
-QASE_REPORT=1 npx playwright test
+QASE_MODE=testops npx playwright test
 ```
 
 or
@@ -53,7 +53,7 @@ npm test
 ```
 
 <p align="center">
-  <img width="65%" src="./examples/screenshots/screenshot.png">
+  <img width="65%" src="./screenshots/screenshot.png">
 </p>
 
 A test run will be performed and available at:
@@ -63,25 +63,26 @@ https://app.qase.io/run/QASE_PROJECT_CODE
 ```
 
 <p align="center">
-  <img src="./examples/screenshots/demo.gif">
+  <img src="./screenshots/demo.gif">
 </p>
 
 ## Configuration
 
 Reporter options (\* - required):
 
-- \*`apiToken` - Token for API access, you can find more information
+- `mode` - `testops`/`off` Enables reporter, default - `off`
+- `debug` - Enables debug logging, defaule - `false`
+- *`testops.api.token` - Token for API access, you can find more information
   [here](https://developers.qase.io/#authentication)
-- \*`projectCode` - Code of your project (can be extracted from main
+- *`testops.projectCode` - Code of your project (can be extracted from main
   page of your project: `https://app.qase.io/project/DEMOTR` -
   `DEMOTR` is project code here)
-  `basePath` - Qase.io url
-- `runId` - Run ID from Qase TMS (also can be got from run URL)
-- `environmentId` - Environment ID from Qase TMS
-- `logging` [true/false] - Enabled debug logging from reporter or not
-- `runComplete` [true/false] - Complete run after all tests are finished
-- `uploadAttachments` [true/false] - Uploading attachments (screenshot/video) after test ended
-- `rootSuiteTitle` - A parent suite for your autocreated tests
+- `testops.uploadAttachments` - Permission to send screenshots to Qase TMS
+- `testops.run.id` - Pass Run ID
+- `testops.run.title` - Set custom Run name, when new run is created
+- `testops.run.description` - Set custom Run description, when new run is created
+- `testops.run.complete` - Whether the run should be completed
+- `testops.run.environment` - To execute with the sending of the envinroment information
 
 Example `playwright.config.js` config:
 
@@ -96,12 +97,17 @@ const config = {
     [
       'playwright-qase-reporter',
       {
-        apiToken: 'api_key',
-        projectCode: 'project_code',
-        runComplete: true,
-        basePath: 'https://api.qase.io/v1',
-        logging: true,
-        uploadAttachments: true,
+        debug: true,
+        testops: {
+          api: {
+            token: 'api_key',
+          },
+          projectCode: 'project_code',
+          uploadAttachments: true,
+          run: {
+            complete: true,
+          },
+        },
       },
     ],
   ],
@@ -109,21 +115,18 @@ const config = {
 module.exports = config;
 ```
 
-You can check example configuration with multiple reporters in [example project](./examples/playwright.config.js).
+You can check example configuration with multiple reporters in [example project](../examples/playwright/playwright.config.js).
 
 Supported ENV variables:
 
-- `QASE_REPORT` - You **should** pass this ENV if you want to use qase reporter
-- `QASE_API_TOKEN` - API token
-- `QASE_PROJECT_CODE` - Code of your project (can be extracted from main page of your project: https://app.qase.io/project/DEMOTR - DEMOTR is project code here)
-- `QASE_API_BASE_URL` - Qase.io url
-- `QASE_RUN_ID` - Pass Run ID from ENV and override reporter options
-- `QASE_ENVIRONMENT_ID` - Pass Environment ID from ENV and override reporter options
-- `QASE_RUN_NAME` - Set custom Run name, when new run is created
-- `QASE_RUN_DESCRIPTION` - Set custom Run description, when new run is created
-- `QASE_RUN_COMPLETE` - Complete run after all tests are finished
-- `QASE_UPLOAD_ATTACHMENTS` - Uploading attachments (screenshot/video) after test ended
-- `QASE_ROOT_SUITE_TITLE` - Same as `rootSuiteTitle`
+- `QASE_MODE` - Same as `mode`
+- `QASE_DEBUG` - Same as `debug`
+- `QASE_TESTOPS_API_TOKEN` - Same as `testops.api.token`
+- `QASE_TESTOPS_PROJECT_CODE` - Same as `testops.projectCode`
+- `QASE_TESTOPS_RUN_ID` - Pass Run ID from ENV and override reporter option `testops.run.id`
+- `QASE_TESTOPS_RUN_TITLE` - Same as `testops.run.title`
+- `QASE_TESTOPS_RUN_DESCRIPTION` - Same as `testops.run.description`
+- `QASE_TESTOPS_RUN_ENVIRONMENT` - Same as `testops.run.environment`
 
 ## Requirements
 

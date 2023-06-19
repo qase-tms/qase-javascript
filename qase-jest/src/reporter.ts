@@ -1,38 +1,61 @@
+import has from 'lodash.has';
+import get from 'lodash.get';
 import { v4 as uuidv4 } from 'uuid';
 import { Reporter, Test, TestResult, Config } from '@jest/reporters';
+import { Status } from "@jest/test-result";
 import {
   QaseReporter,
-  OptionsType,
+  ConfigType,
   ReporterInterface,
-  StatusesEnum,
-} from 'qase-javascript-commons';
+  TestStatusEnum,
+} from "qase-javascript-commons";
 
-const statusMap = {
-  passed: StatusesEnum.passed,
-  failed: StatusesEnum.failed,
-  skipped: StatusesEnum.skipped,
-  disabled: StatusesEnum.disabled,
-  pending: StatusesEnum.blocked,
-  todo: StatusesEnum.disabled,
-  focused: StatusesEnum.passed,
-};
+export type JestQaseOptionsType = ConfigType;
 
-const qaseIdRegExp = /\(Qase ID: ([\d,]+)\)/;
-
-export type JestQaseOptionsType = Omit<
-  OptionsType,
-  'frameworkName' | 'reporterName'
->;
-
+/**
+ * @class JestQaseReporter
+ * @implements Reporter
+ */
 export class JestQaseReporter implements Reporter {
+  /**
+   * @type {Record<Status, TestStatusEnum>}
+   */
+  static statusMap: Record<Status, TestStatusEnum> = {
+    passed: TestStatusEnum.passed,
+    failed: TestStatusEnum.failed,
+    skipped: TestStatusEnum.skipped,
+    disabled: TestStatusEnum.disabled,
+    pending: TestStatusEnum.blocked,
+    todo: TestStatusEnum.disabled,
+    focused: TestStatusEnum.passed,
+  };
+
+  /**
+   * @type {RegExp}
+   */
+  static qaseIdRegExp = /\(Qase ID: ([\d,]+)\)/;
+
+  /**
+   * @param {string} title
+   * @returns {any}
+   * @private
+   */
   private static getCaseId(title: string) {
-    const [, ids] = title.match(qaseIdRegExp) ?? [];
+    const [, ids] = title.match(JestQaseReporter.qaseIdRegExp) ?? [];
 
     return ids ? ids.split(',').map((id) => Number(id)) : [];
   }
 
+  /**
+   * @type {ReporterInterface}
+   * @private
+   */
   private reporter: ReporterInterface;
 
+  /**
+   * @param {Config.GlobalConfig} _
+   * @param {JestQaseOptionsType} options
+   */
   public constructor(_: Config.GlobalConfig, options: JestQaseOptionsType) {
     this.reporter = new QaseReporter({
       ...options,
@@ -41,8 +64,15 @@ export class JestQaseReporter implements Reporter {
     });
   }
 
+  /**
+   * @see {Reporter.onRunStart}
+   */
   public onRunStart() {/* empty */}
 
+  /**
+   * @param {Test} _
+   * @param {TestResult} result
+   */
   public onTestResult(_: Test, result: TestResult) {
     result.testResults.forEach(
       ({
@@ -53,36 +83,41 @@ export class JestQaseReporter implements Reporter {
         failureMessages,
         failureDetails,
       }) => {
-        const ids = JestQaseReporter.getCaseId(title);
-        const [id, ...restIds] = ids;
+        let error;
 
-        if (id) {
-          const error =
-            status === 'failed'
-              ? new Error(
-                  `${failureMessages.join(', ')}: ${failureDetails.join(', ')}`,
-                )
-              : undefined;
+        if (status === 'failed') {
+          error = new Error(failureDetails.map((item) => {
+            if (has(item, 'matcherResult.message')) {
+              return String(get(item, 'matcherResult.message'));
+            }
 
-          if (error) {
-            error.stack = '';
-          }
+            return 'Runtime exception';
+          }).join('\n\n'));
 
-          this.reporter.addTestResult({
-            id: uuidv4(),
-            testOpsId: [id, ...restIds],
-            title: `${ancestorTitles.join('\t')}\t${title}`,
-            status: statusMap[status],
-            duration: duration || 0,
-            error,
-          });
+          error.stack = failureMessages.join('\n\n');
         }
+
+        this.reporter.addTestResult({
+          id: uuidv4(),
+          testOpsId: JestQaseReporter.getCaseId(title),
+          title: title,
+          suiteTitle: ancestorTitles,
+          status: JestQaseReporter.statusMap[status],
+          duration: duration ?? 0,
+          error,
+        });
       },
     );
   }
 
+  /**
+   * @see {Reporter.getLastError}
+   */
   public getLastError() {/* empty */}
 
+  /**
+   * @see {Reporter.onRunComplete}
+   */
   public onRunComplete() {
     void this.reporter.publish();
   }

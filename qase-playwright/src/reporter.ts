@@ -4,45 +4,108 @@ import {
   TestError,
   TestResult,
   TestStep,
+  TestStatus,
 } from '@playwright/test/reporter';
 import {
-  OptionsType,
+  ConfigType,
   QaseReporter,
   ReporterInterface,
-  StatusesEnum,
+  TestStatusEnum,
   TestStepType,
-} from 'qase-javascript-commons';
+} from "qase-javascript-commons";
 
-type AttachmentType = TestResult['attachments'] extends Array<infer T>
-  ? T
-  : never;
+type ArrayItemType<T> = T extends Array<infer R> ? R : never;
 
-const statusMap = {
-  passed: StatusesEnum.passed,
-  failed: StatusesEnum.failed,
-  skipped: StatusesEnum.skipped,
-  disabled: StatusesEnum.disabled,
-  pending: StatusesEnum.blocked,
-  timedOut: StatusesEnum.failed,
-  interrupted: StatusesEnum.failed,
-};
+export type PlaywrightQaseOptionsType = ConfigType;
 
-const qaseIdRegExp = /\(Qase ID: ([\d,]+)\)/;
-
-export type PlaywrightQaseOptionsType = Omit<
-  OptionsType,
-  'frameworkName' | 'reporterName'
->;
-
+/**
+ * @class PlaywrightQaseReporter
+ * @implements Reporter
+ */
 export class PlaywrightQaseReporter implements Reporter {
+  /**
+   * @type {Record<TestStatus, TestStatusEnum>}
+   */
+  static statusMap: Record<TestStatus, TestStatusEnum> = {
+    passed: TestStatusEnum.passed,
+    failed: TestStatusEnum.failed,
+    skipped: TestStatusEnum.skipped,
+    timedOut: TestStatusEnum.failed,
+    interrupted: TestStatusEnum.failed,
+  };
+
+  /**
+   * @type {RegExp}
+   */
+  static qaseIdRegExp = /\(Qase ID: ([\d,]+)\)/;
+
+  /**
+   * @param {string} title
+   * @returns {number[]}
+   * @private
+   */
   private static getCaseIds(title: string): number[] {
-    const [, ids] = title.match(qaseIdRegExp) ?? [];
+    const [, ids] = title.match(PlaywrightQaseReporter.qaseIdRegExp) ?? [];
 
     return ids ? ids.split(',').map((id) => Number(id)) : [];
   }
 
+  private static transformSuiteTitle(test: TestCase) {
+    const [, ...titles] = test.titlePath();
+
+    return titles;
+  }
+
+  /**
+   * @param {ArrayItemType<TestResult["attachments"]>[]} testAttachments
+   * @returns {string[]}
+   * @private
+   */
+  private static transformAttachments(
+    testAttachments: ArrayItemType<TestResult["attachments"]>[],
+  ) {
+    return testAttachments
+      .map(({ path }) => path)
+      .filter((attachment): attachment is string => !!attachment);
+  }
+
+  /**
+   * @param {TestError} testError
+   * @returns {Error}
+   * @private
+   */
+  private static transformError(testError: TestError) {
+    const error = new Error(testError.message);
+
+    error.stack = testError.stack ?? '';
+
+    return error;
+  }
+
+  /**
+   * @param {TestStep[]} testSteps
+   * @returns {TestStepType[]}
+   * @private
+   */
+  private static transformSteps(testSteps: TestStep[]): TestStepType[] {
+    return testSteps.map(({ title, duration, error, steps }) => ({
+      title,
+      status: error ? TestStatusEnum.failed : TestStatusEnum.passed,
+      duration,
+      error: error ? PlaywrightQaseReporter.transformError(error) : undefined,
+      steps: PlaywrightQaseReporter.transformSteps(steps),
+    }));
+  }
+
+  /**
+   * @type {ReporterInterface}
+   * @private
+   */
   private reporter: ReporterInterface;
 
+  /**
+   * @param {PlaywrightQaseOptionsType} options
+   */
   public constructor(options: PlaywrightQaseOptionsType) {
     this.reporter = new QaseReporter({
       ...options,
@@ -51,48 +114,30 @@ export class PlaywrightQaseReporter implements Reporter {
     });
   }
 
+  /**
+   * @param {TestCase} test
+   * @param {TestResult} result
+   */
   public onTestEnd(test: TestCase, result: TestResult) {
-    const [id, ...restIds] = PlaywrightQaseReporter.getCaseIds(test.title);
-
-    if (id) {
-      this.reporter.addTestResult({
-        id: test.id,
-        testOpsId: [id, ...restIds],
-        title: test.title,
-        status: statusMap[result.status],
-        error: result.error ? this.transformError(result.error) : undefined,
-        duration: result.duration,
-        steps: this.transformSteps(result.steps),
-        attachments: this.transformAttachments(result.attachments),
-      });
-    }
+    this.reporter.addTestResult({
+      id: test.id,
+      testOpsId: PlaywrightQaseReporter.getCaseIds(test.title),
+      title: test.title,
+      suiteTitle: PlaywrightQaseReporter.transformSuiteTitle(test),
+      status: PlaywrightQaseReporter.statusMap[result.status],
+      error: result.error
+        ? PlaywrightQaseReporter.transformError(result.error)
+        : undefined,
+      duration: result.duration,
+      steps: PlaywrightQaseReporter.transformSteps(result.steps),
+      attachments: PlaywrightQaseReporter.transformAttachments(result.attachments),
+    });
   }
 
+  /**
+   * @returns {Promise<void>}
+   */
   public async onEnd() {
     await this.reporter.publish();
-  }
-
-  private transformAttachments(testAttachments: AttachmentType[]) {
-    return testAttachments
-      .map(({ path }) => path)
-      .filter((attachment): attachment is string => !!attachment);
-  }
-
-  private transformError(testError: TestError) {
-    const error = new Error(testError.message);
-
-    error.stack = testError.stack || '';
-
-    return error;
-  }
-
-  private transformSteps(testSteps: TestStep[]): TestStepType[] {
-    return testSteps.map(({ title, duration, error, steps }) => ({
-      title,
-      status: error ? StatusesEnum.failed : StatusesEnum.passed,
-      duration,
-      error: error ? this.transformError(error) : undefined,
-      steps: this.transformSteps(steps),
-    }));
   }
 }

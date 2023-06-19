@@ -13,7 +13,7 @@ npm install cypress-qase-reporter
 If you want to decorate come test with Qase Case ID you could use qase function:
 
 ```typescript
-import { qase } from 'cypress-qase-reporter/dist/mocha';
+import { qase } from 'cypress-qase-reporter';
 
 describe('My First Test', () => {
     qase([1,2],
@@ -40,8 +40,12 @@ describe('My First Test', () => {
 
 ```
 If you are going to use several specifications for execution and you have in config 
-```bash
-"runComplete": true
+```json
+"testops": {
+  "run": {
+    "complete": true
+  }
+}
 ```
 then it is necessary to additionally set in the project settings
 ```
@@ -50,14 +54,14 @@ Allow to add results for cases in closed runs.
 
 To run tests and create a test run, execute the command (for example from folder examples):
 ```bash
-QASE_REPORT=1 npx cypress run
+QASE_MODE=testops npx cypress run
 ```
 or
 ```bash
 npm test
 ```
 <p align="center">
-  <img width="65%" src="examples_cypress_v10/screenshots/screenshot.png">
+  <img width="65%" src="./screenshots/screenshot.png">
 </p>
 
 A test run will be performed and available at:
@@ -70,35 +74,33 @@ https://app.qase.io/run/QASE_PROJECT_CODE
 
 Reporter options (* - required):
 
-- *`apiToken` - Token for API access, you can find more information
+- `mode` - `testops`/`off` Enables reporter, default - `off`
+- `debug` - Enables debug logging, defaule - `false`
+- *`testops.api.token` - Token for API access, you can find more information
   [here](https://developers.qase.io/#authentication)
-- *`projectCode` - Code of your project (can be extracted from main 
-  page of your project: `https://app.qase.io/project/DEMOTR` - 
+- *`testops.projectCode` - Code of your project (can be extracted from main
+  page of your project: `https://app.qase.io/project/DEMOTR` -
   `DEMOTR` is project code here)
-- `runId` - Run ID from Qase TMS (also can be got from run URL)
-- `logging` [true/false] - Enabled debug logging from reporter or not
-- `environmentId` - To execute with the sending of the envinroment information
-- `basePath` - URL Qase.io
-- `screenshotFolder` - Folder for save screenshot cypress,
-- `sendScreenshot` [true/false] - Permission to send screenshots to Qase TMS
-- `runComplete` [true/false] - Permission for automatic completion of the test run
+- `testops.uploadAttachments` - Permission to send screenshots to Qase TMS
+- `testops.run.id` - Pass Run ID
+- `testops.run.title` - Set custom Run name, when new run is created
+- `testops.run.description` - Set custom Run description, when new run is created
+- `testops.run.complete` - Whether the run should be completed
+- `testops.run.environment` - To execute with the sending of the envinroment information
+- `screenshotFolder` - Folder for save screenshot cypress
 
-#### You can check example configuration with multiple reporters in [demo project (cypress v10)](examples_cypress_v10/cypress.config.js) and [demo project (cypress v6)](examples_cypress_v6/cypress.json).
+#### You can check example configuration with multiple reporters in [demo project](../examples/cypress/cypress.config.js).
 
 Supported ENV variables:
 
-- `QASE_REPORT` - You **should** pass this ENV if you want to use 
-  qase reporter
-- `QASE_RUN_ID` - Pass Run ID from ENV and override reporter options
-- `QASE_RUN_NAME` - Set custom Run name, when new run is created
-- `QASE_RUN_DESCRIPTION` - Set custom Run description, when new run is created
-- `QASE_API_TOKEN` - Token for API access, you can find more information
-  [here](https://developers.qase.io/#authentication)
-- `QASE_API_BASE_URL` - URL Qase.io, default value `https://api.qase.io/v1`
-- `QASE_ENVIRONMENT_ID` - To execute with the sending of the envinroment information
-- `QASE_SCREENSHOT_FOLDER` - Folder for save screenshot cypress
- - `QASE_SCREENSHOT_SENDING` - Permission to send screenshots to Qase TMS
- - `QASE_RUN_COMPLETE` - Permission for automatic completion of the test run
+- `QASE_MODE` - Same as `mode`
+- `QASE_DEBUG` - Same as `debug`
+- `QASE_TESTOPS_API_TOKEN` - Same as `testops.api.token`
+- `QASE_TESTOPS_PROJECT_CODE` - Same as `testops.projectCode`
+- `QASE_TESTOPS_RUN_ID` - Pass Run ID from ENV and override reporter option `testops.run.id`
+- `QASE_TESTOPS_RUN_TITLE` - Same as `testops.run.title`
+- `QASE_TESTOPS_RUN_DESCRIPTION` - Same as `testops.run.description`
+- `QASE_TESTOPS_RUN_ENVIRONMENT` - Same as `testops.run.environment`
 
 ## Requirements
 

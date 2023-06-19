@@ -10,20 +10,23 @@ module.exports = cypress.defineConfig({
       charts: true,
     },
     cypressQaseReporterReporterOptions: {
-      logging: true,
-      screenshotFolder: 'screenshots',
+      mode: 'testops',
+      debug: true,
+      screenshotsFolder: 'cypress/screenshots',
 
       testops: {
-        apiToken: 'api_key',
-        projectCode: 'project_code',
-        baseUrl: 'https://qase.io',
-        uploadAttachments: true,
-        runComplete: true,
-        environmentId: 1,
-      },
+        api: {
+          token: 'api_key',
+          baseUrl: 'http://api.qase.lo/v1',
+        },
 
-      report: {
-        path: './qase/reports',
+        projectCode: 'project_code',
+        uploadAttachments: true,
+
+        run: {
+          complete: true,
+          environment: 1,
+        },
       },
     },
   },

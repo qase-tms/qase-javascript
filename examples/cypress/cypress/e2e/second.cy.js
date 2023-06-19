@@ -1,4 +1,4 @@
-import { qase } from 'cypress-qase-reporter/mocha';
+import { qase } from 'cypress-qase-reporter';
 
 describe('My First Test', () => {
   qase(1, it('clicking "type" navigates to a new url', () => {

@@ -8,19 +8,20 @@ module.exports = {
     [
       'jest-qase-reporter',
       {
-        logging: true,
+        debug: true,
 
         testops: {
-          apiToken: 'api_key',
-          projectCode: 'project_code',
-          baseUrl: 'https://qase.io',
-          uploadAttachments: true,
-          runComplete: true,
-          environmentId: 1,
-        },
+          api: {
+            token: 'api_key',
+            baseUrl: 'http://api.qase.lo/v1',
+          },
 
-        report: {
-          path: './qase/reports',
+          projectCode: 'project_code',
+
+          run: {
+            complete: true,
+            environment: 1,
+          },
         },
       },
     ],

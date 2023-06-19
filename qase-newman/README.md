@@ -29,22 +29,11 @@ pm.test('expect response be 200', function () {
 ```
 ### Execute rom CLI:
 ```
-QASE_RUN_ID=34 # Specify Run ID using ENV
-newman run \
-    -r qase \ # Enable Qase logger
-    --reporter-qase-logging \ # Use reporter logger (like debug)
-    --reporter-qase-projectCode project_code \ # Specify Project Code
-    --reporter-qase-apiToken api_token \ # Specify API token
-    --reporter-qase-runId 34 \ # Specify Run ID using CLI parameters
-    --reporter-qase-basePath https://api.qase.io/v1 \ # URL Qase.io
-    --reporter-qase-runName 'API test Execution' \ # Specify Run name using CLI parameters
-    --reporter-qase-runDescription 'Check API consistency' \ # Specify Run description using CLI parameters
-    --reporter-qase-rootSuiteTitle 'Newman tests' \ # A parent suite for your autocreated tests
-    -x # WA for issue https://github.com/postmanlabs/newman/issues/2148#issuecomment-665229759
+QASE_MODE=testops newman run ./sample-collection.json -r qase
 ```
 
 <p align="center">
-  <img width="65%" src="./examples/screenshots/screenshot.png">
+  <img width="65%" src="./screenshots/screenshot.png">
 </p>
 
 A test run will be performed and available at:
@@ -54,8 +43,56 @@ https://app.qase.io/run/QASE_PROJECT_CODE
 ```
 
 <p align="center">
-  <img src="./examples/screenshots/demo.gif">
+  <img src="./screenshots/demo.gif">
 </p>
+
+## Configuration
+
+Qase reporter supports passing parameters using two ways:
+using `.qaserc`/`qase.config.json` file and using ENV variables.
+
+`.qaserc` parameters, (* - required):
+- `mode` - `testops`/`off` Enables reporter, default - `off`
+- `debug` - Enables debug logging, defaule - `false`
+- *`testops.api.token` - Token for API access, you can find more information
+  [here](https://developers.qase.io/#authentication)
+- *`testops.projectCode` - Code of your project (can be extracted from main
+  page of your project: `https://app.qase.io/project/DEMOTR` -
+  `DEMOTR` is project code here)
+- `testops.run.id` - Pass Run ID
+- `testops.run.title` - Set custom Run name, when new run is created
+- `testops.run.description` - Set custom Run description, when new run is created
+- `testops.run.complete` - Whether the run should be completed
+- `testops.run.environment` - To execute with the sending of the envinroment information
+
+Example configuration file:
+
+```json
+{
+  "mode": "testops",
+  "debug": true,
+  "testops": {
+    "api": {
+      "token": "api_key"
+    },
+    "projectCode": "project_code",
+    "run": {
+      "environment": 1
+    }
+  }
+}
+```
+
+Supported ENV variables:
+
+- `QASE_MODE` - Same as `mode`
+- `QASE_DEBUG` - Same as `debug`
+- `QASE_TESTOPS_API_TOKEN` - Same as `testops.api.token`
+- `QASE_TESTOPS_PROJECT_CODE` - Same as `testops.projectCode`
+- `QASE_TESTOPS_RUN_ID` - Pass Run ID from ENV and override reporter option `testops.run.id`
+- `QASE_TESTOPS_RUN_TITLE` - Same as `testops.run.title`
+- `QASE_TESTOPS_RUN_DESCRIPTION` - Same as `testops.run.description`
+- `QASE_TESTOPS_RUN_ENVIRONMENT` - Same as `testops.run.environment`
 
 ## Requirements
 

@@ -1,38 +1,34 @@
 import { JSONSchemaType } from 'env-schema';
 
 import { EnvType } from './env-type';
-import { EnvEnum, EnvTestOpsEnum, EnvReportEnum } from './env-enum';
+import {
+  EnvApiEnum,
+  EnvEnum,
+  EnvLocalEnum,
+  EnvRunEnum,
+  EnvTestOpsEnum,
+} from "./env-enum";
 
 import { ModeEnum } from '../options';
 
+/**
+ * @type {JSONSchemaType<EnvType>}
+ */
 export const envValidationSchema: JSONSchemaType<EnvType> = {
   type: 'object',
-  additionalProperties: true,
 
   properties: {
     [EnvEnum.mode]: {
       type: 'string',
-      enum: [ModeEnum.report, ModeEnum.testops],
+      enum: [ModeEnum.report, ModeEnum.testops, ModeEnum.off],
       nullable: true,
     },
-    [EnvEnum.logging]: {
+    [EnvEnum.debug]: {
       type: 'boolean',
       nullable: true,
     },
 
-    [EnvTestOpsEnum.apiToken]: {
-      type: 'string',
-      nullable: true,
-    },
     [EnvTestOpsEnum.projectCode]: {
-      type: 'string',
-      nullable: true,
-    },
-    [EnvTestOpsEnum.frameworkName]: {
-      type: 'string',
-      nullable: true,
-    },
-    [EnvTestOpsEnum.reporterName]: {
       type: 'string',
       nullable: true,
     },
@@ -44,28 +40,42 @@ export const envValidationSchema: JSONSchemaType<EnvType> = {
       type: 'string',
       nullable: true,
     },
-    [EnvTestOpsEnum.runId]: {
+
+    [EnvApiEnum.token]: {
+      type: 'string',
+      nullable: true,
+    },
+    [EnvApiEnum.baseUrl]: {
+      type: 'string',
+      nullable: true,
+    },
+
+    [EnvRunEnum.id]: {
       type: 'number',
       nullable: true,
     },
-    [EnvTestOpsEnum.runName]: {
+    [EnvRunEnum.title]: {
       type: 'string',
       nullable: true,
     },
-    [EnvTestOpsEnum.runDescription]: {
+    [EnvRunEnum.description]: {
       type: 'string',
       nullable: true,
     },
-    [EnvTestOpsEnum.runComplete]: {
+    [EnvRunEnum.complete]: {
       type: 'boolean',
       nullable: true,
     },
-    [EnvTestOpsEnum.environmentId]: {
+    [EnvRunEnum.environment]: {
       type: 'number',
       nullable: true,
     },
 
-    [EnvReportEnum.path]: {
+    [EnvLocalEnum.path]: {
+      type: 'string',
+      nullable: true,
+    },
+    [EnvLocalEnum.ext]: {
       type: 'string',
       nullable: true,
     },

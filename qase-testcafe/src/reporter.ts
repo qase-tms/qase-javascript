@@ -1,10 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
 import {
-  OptionsType,
+  ConfigType,
   QaseReporter,
   ReporterInterface,
-  StatusesEnum,
-} from 'qase-javascript-commons';
+  TestStatusEnum
+} from "qase-javascript-commons";
 
 type CallsiteRecordType = {
   filename?: string;
@@ -35,6 +35,13 @@ type ScreenshotType = {
   takenOnFail: boolean;
 };
 
+type FixtureType = {
+  id: string;
+  name: string;
+  path?: string;
+  meta: Record<string, unknown>;
+}
+
 export type TestRunInfoType = {
   errs: TestRunErrorFormattableAdapterType[];
   warnings: string[];
@@ -44,57 +51,94 @@ export type TestRunInfoType = {
   screenshots: ScreenshotType[];
   quarantine: Record<string, Record<'passed', boolean>>;
   skipped: boolean;
+  fixture: FixtureType;
 };
 
-export type TestcafeQaseOptionsType = Omit<
-  OptionsType,
-  'frameworkName' | 'reporterName'
->;
+export type TestcafeQaseOptionsType = ConfigType;
 
+/**
+ * @class TestcafeQaseReporter
+ */
 export class TestcafeQaseReporter {
+  /**
+   * @param {Record<string, string>} meta
+   * @returns {number[]}
+   * @private
+   */
   private static getCaseId(meta: Record<string, string>) {
     if (!meta['CID']) {
       return [];
     }
 
-    const ids = Array.isArray(meta['CID'])
+    const ids: string[] = Array.isArray(meta['CID'])
       ? meta['CID']
       : meta['CID'].split(',');
 
     return ids.map((id) => Number(id));
   }
 
+  /**
+   * @param {TestRunInfoType} testRunInfo
+   * @returns {TestStatusEnum}
+   * @private
+   */
   private static getStatus(testRunInfo: TestRunInfoType) {
     if (testRunInfo.skipped) {
-      return StatusesEnum.skipped;
+      return TestStatusEnum.skipped;
     } else if (testRunInfo.errs.length > 0) {
-      return StatusesEnum.failed;
+      return TestStatusEnum.failed;
     }
 
-    return StatusesEnum.passed;
+    return TestStatusEnum.passed;
   }
 
+  /**
+   * @param {TestRunErrorFormattableAdapterType[]} errors
+   * @returns {Error}
+   * @private
+   */
   private static transformErrors(errors: TestRunErrorFormattableAdapterType[]) {
-    const errorStrings = errors.map((error) => {
+    const [
+      errorMessages,
+      errorStacks,
+    ] = errors.reduce<[string[], string[]]>((
+      [messages, stacks],
+      error,
+    ) => {
       const stack =
-        error.callsite?.stackFrames?.map((line) => String(line)) || [];
+        error.callsite?.stackFrames?.map((line) => String(line)) ?? [];
 
-      return `${error.errMsg || 'Error:'}\n${stack.join('\n')}\n`;
-    });
+      messages.push(error.errMsg ?? 'Error');
+      stacks.push(stack.join('\n'));
 
-    const error = new Error(errorStrings.join('\n'));
+      return [messages, stacks];
+    }, [[], []]);
 
-    error.stack = '';
+    const error = new Error(errorMessages.join('\n\n'));
+
+    error.stack = errorStacks.join('\n\n');
 
     return error;
   }
 
+  /**
+   * @param {ScreenshotType[]} attachments
+   * @returns {string[]}
+   * @private
+   */
   private static transformAttachments(attachments: ScreenshotType[]) {
     return attachments.map(({ screenshotPath }) => screenshotPath);
   }
 
+  /**
+   * @type {ReporterInterface}
+   * @private
+   */
   private reporter: ReporterInterface;
 
+  /**
+   * @param {TestcafeQaseOptionsType} options
+   */
   public constructor(options: TestcafeQaseOptionsType) {
     this.reporter = new QaseReporter({
       ...options,
@@ -103,28 +147,33 @@ export class TestcafeQaseReporter {
     });
   }
 
+  /**
+   * @param {string} title
+   * @param {TestRunInfoType} testRunInfo
+   * @param {Record<string, string>} meta
+   */
   public reportTestDone = (
     title: string,
     testRunInfo: TestRunInfoType,
     meta: Record<string, string>,
   ) => {
-    const [id, ...restIds] = TestcafeQaseReporter.getCaseId(meta);
-
-    if (id) {
-      this.reporter.addTestResult({
-        id: uuidv4(),
-        testOpsId: [id, ...restIds],
-        title: title,
-        status: TestcafeQaseReporter.getStatus(testRunInfo),
-        error: TestcafeQaseReporter.transformErrors(testRunInfo.errs),
-        duration: testRunInfo.durationMs,
-        attachments: TestcafeQaseReporter.transformAttachments(
-          testRunInfo.screenshots,
-        ),
-      });
-    }
+    this.reporter.addTestResult({
+      id: uuidv4(),
+      testOpsId: TestcafeQaseReporter.getCaseId(meta),
+      title: title,
+      suiteTitle: testRunInfo.fixture.name,
+      status: TestcafeQaseReporter.getStatus(testRunInfo),
+      error: TestcafeQaseReporter.transformErrors(testRunInfo.errs),
+      duration: testRunInfo.durationMs,
+      attachments: TestcafeQaseReporter.transformAttachments(
+        testRunInfo.screenshots,
+      ),
+    });
   };
 
+  /**
+   * @returns {Promise<void>}
+   */
   public reportTaskDone = async () => {
     await this.reporter.publish();
   };

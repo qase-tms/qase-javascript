@@ -1,5 +1,9 @@
 import { TestcafeQaseOptionsType, TestcafeQaseReporter } from './reporter';
 
+/**
+ * @param {TestcafeQaseOptionsType} options
+ * @returns {object}
+ */
 export const factory = (options: TestcafeQaseOptionsType) => {
   const reporter = new TestcafeQaseReporter(options);
 

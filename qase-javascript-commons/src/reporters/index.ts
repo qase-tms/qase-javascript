@@ -3,6 +3,6 @@ export {
   type ReporterInterface,
   type ReporterOptionsType,
   type LoggerInterface,
-} from './reporter';
-export { FileReporter, type FileReporterOptionsType } from './file-reporter';
+} from './abstract-reporter';
+export { ReportReporter } from './report-reporter';
 export { TestOpsReporter, type TestOpsOptionsType } from './testops-reporter';

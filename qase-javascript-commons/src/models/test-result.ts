@@ -1,15 +1,25 @@
-import { StatusesEnum } from './status';
 import { TestStepType } from './test-step';
-import { ParamType } from './param';
+
+/**
+ * @enum {string}
+ */
+export enum TestStatusEnum {
+  passed = 'passed',
+  failed = 'failed',
+  skipped = 'skipped',
+  disabled = 'disabled',
+  blocked = 'blocked',
+  invalid = 'invalid',
+}
 
 export type TestResultType = {
   id: string;
-  testOpsId: [number, ...number[]];
+  testOpsId: number[];
   title: string;
-  status: `${StatusesEnum}`;
+  status: `${TestStatusEnum}`;
+  suiteTitle?: string | string[] | undefined;
   error?: Error | undefined;
   duration?: number | undefined;
   steps?: TestStepType[] | undefined;
   attachments?: string[] | undefined;
-  param?: ParamType | undefined;
 };

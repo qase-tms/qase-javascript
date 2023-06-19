@@ -1,4 +1,11 @@
-export { EnvEnum, EnvTestOpsEnum, EnvReportEnum } from './env-enum';
+export {
+  EnvEnum,
+  EnvTestOpsEnum,
+  EnvApiEnum,
+  EnvRunEnum,
+  EnvLocalEnum,
+} from './env-enum';
+
 export { type EnvType } from './env-type';
 export { envValidationSchema } from './env-validation-schema';
-export { envToOptions } from './env-to-options';
+export { envToConfig } from './env-to-config';

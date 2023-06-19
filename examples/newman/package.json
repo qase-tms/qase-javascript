@@ -2,7 +2,7 @@
   "name": "examples-newman",
   "private": true,
   "scripts": {
-    "test": "newman run ./sample-collection.json -r qase"
+    "test": "QASE_MODE=testops newman run ./sample-collection.json -r qase"
   },
   "devDependencies": {
     "newman": "^5.3.2",

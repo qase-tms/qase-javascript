@@ -1,24 +1,12 @@
 import { Formatter, IFormatterOptions, Status } from '@cucumber/cucumber';
 import { Envelope, PickleTag, TestCaseStarted } from '@cucumber/messages';
 import {
-  OptionsType,
+  ConfigType,
   QaseReporter,
   ReporterInterface,
-  StatusesEnum,
+  TestStatusEnum,
 } from 'qase-javascript-commons';
 import { EventEmitter } from 'events';
-
-const StatusMapping = {
-  [Status.PASSED]: StatusesEnum.passed,
-  [Status.FAILED]: StatusesEnum.failed,
-  [Status.SKIPPED]: StatusesEnum.skipped,
-  [Status.AMBIGUOUS]: null,
-  [Status.PENDING]: StatusesEnum.blocked,
-  [Status.UNDEFINED]: null,
-  [Status.UNKNOWN]: null,
-};
-
-const qaseIdRegExp = /[Qq]-(\d+)/g;
 
 type PickleInfoType = {
   caseIds: number[];
@@ -26,14 +14,43 @@ type PickleInfoType = {
   lastAstNodeId: string | undefined;
 };
 
+type TestStepResultStatus = (typeof Status)[keyof typeof Status];
+
 export type CucumberQaseOptionsType = IFormatterOptions & {
-  qase?: Omit<OptionsType, 'frameworkName' | 'reporterName'>;
+  qase?: ConfigType;
 };
 
+/**
+ * @class CucumberQaseReporter
+ * @extends Formatter
+ */
 export class CucumberQaseReporter extends Formatter {
+  /**
+   * @type {Record<TestStepResultStatus, TestStatusEnum | null>}
+   */
+  static statusMap: Record<TestStepResultStatus, TestStatusEnum | null> = {
+    [Status.PASSED]: TestStatusEnum.passed,
+    [Status.FAILED]: TestStatusEnum.failed,
+    [Status.SKIPPED]: TestStatusEnum.skipped,
+    [Status.AMBIGUOUS]: null,
+    [Status.PENDING]: TestStatusEnum.blocked,
+    [Status.UNDEFINED]: null,
+    [Status.UNKNOWN]: null,
+  };
+
+  /**
+   * @type {RegExp}
+   */
+  static qaseIdRegExp = /^@[Qq]-?(\d+)$/g;
+
+  /**
+   * @param {readonly PickleTag[]} tagsList
+   * @returns {number[]}
+   * @private
+   */
   private static getCaseIds(tagsList: readonly PickleTag[]) {
     return tagsList.reduce<number[]>((acc, tagInfo) => {
-      const ids = Array.from(tagInfo.name.matchAll(qaseIdRegExp))
+      const ids = Array.from(tagInfo.name.matchAll(CucumberQaseReporter.qaseIdRegExp))
         .map(([, id]) => Number(id))
         .filter((id): id is number => id !== undefined);
 
@@ -41,20 +58,58 @@ export class CucumberQaseReporter extends Formatter {
 
       return acc;
     }, []);
-    // .filter((id): id is string => id !== undefined);
   }
 
+  /**
+   * @type {Record<string, PickleInfoType>}
+   * @private
+   */
   private pickleInfo: Record<string, PickleInfoType> = {};
+  /**
+   * @type {Record<string, TestCaseStarted>}
+   * @private
+   */
   private testCaseStarts: Record<string, TestCaseStarted> = {};
-  private testCaseStartedResult: Record<string, StatusesEnum> = {};
+  /**
+   * @type {Record<string, >}
+   * @private
+   */
+  private testCaseStartedResult: Record<string, TestStatusEnum> = {};
+  /**
+   * @type {Record<string, string[]>}
+   * @private
+   */
   private testCaseStartedErrors: Record<string, string[]> = {};
+  /**
+   * @type {Record<string, string>}
+   * @private
+   */
   private testCaseScenarioId: Record<string, string> = {};
+  /**
+   * @type {Record<string, string>}
+   * @private
+   */
   private scenarios: Record<string, string> = {};
+  /**
+   * @type {Record<string, string>}
+   * @private
+   */
   private attachments: Record<string, string> = {};
 
+  /**
+   * @type {ReporterInterface}
+   * @private
+   */
   private reporter: ReporterInterface;
+  /**
+   * @type {EventEmitter}
+   * @private
+   */
   private eventBroadcaster: EventEmitter;
 
+  /**
+   * @param {CucumberQaseOptionsType} options
+   */
   public constructor(options: CucumberQaseOptionsType) {
     const { qase, ...formatterOptions } = options;
 
@@ -71,6 +126,9 @@ export class CucumberQaseReporter extends Formatter {
     this.bindEventListeners();
   }
 
+  /**
+   * @private
+   */
   private bindEventListeners() {
     this.eventBroadcaster.on('envelope', (envelope: Envelope) => {
       if (envelope.gherkinDocument) {
@@ -107,20 +165,20 @@ export class CucumberQaseReporter extends Formatter {
         this.testCaseStarts[envelope.testCaseStarted.id] =
           envelope.testCaseStarted;
         this.testCaseStartedResult[envelope.testCaseStarted.id] =
-          StatusesEnum.passed;
+          TestStatusEnum.passed;
       } else if (envelope.testStepFinished) {
         const stepFin = envelope.testStepFinished;
         const oldStatus = this.testCaseStartedResult[stepFin.testCaseStartedId];
-        const newStatus = StatusMapping[stepFin.testStepResult.status];
+        const newStatus = CucumberQaseReporter.statusMap[stepFin.testStepResult.status];
 
         if (newStatus === null) {
           return;
         }
 
-        if (newStatus !== StatusesEnum.passed) {
+        if (newStatus !== TestStatusEnum.passed) {
           if (stepFin.testStepResult.message) {
             const errors =
-              this.testCaseStartedErrors[stepFin.testCaseStartedId] || [];
+              this.testCaseStartedErrors[stepFin.testCaseStartedId] ?? [];
 
             if (!this.testCaseStartedErrors[stepFin.testCaseStartedId]) {
               this.testCaseStartedErrors[stepFin.testCaseStartedId] = errors;
@@ -130,7 +188,7 @@ export class CucumberQaseReporter extends Formatter {
           }
 
           if (oldStatus) {
-            if (oldStatus !== StatusesEnum.failed) {
+            if (oldStatus !== TestStatusEnum.failed) {
               this.testCaseStartedResult[stepFin.testCaseStartedId] = newStatus;
             }
           } else {
@@ -163,28 +221,29 @@ export class CucumberQaseReporter extends Formatter {
           error = new Error(this.testCaseStartedErrors[tcs.id]?.join('\n\n'));
         }
 
-        const [id, ...restIds] = info.caseIds;
-
-        if (id) {
-          this.reporter.addTestResult({
-            id: tcs.id,
-            testOpsId: [id, ...restIds],
-            title: info.name,
-            status:
-              this.testCaseStartedResult[
-                envelope.testCaseFinished.testCaseStartedId
-              ] ?? StatusesEnum.passed,
-            duration: Math.abs(
-              envelope.testCaseFinished.timestamp.seconds -
-                tcs.timestamp.seconds,
-            ),
-            error,
-          });
-        }
+        this.reporter.addTestResult({
+          id: tcs.id,
+          testOpsId: info.caseIds,
+          title: info.name,
+          suiteTitle: info.lastAstNodeId && this.scenarios[info.lastAstNodeId],
+          status:
+            this.testCaseStartedResult[
+              envelope.testCaseFinished.testCaseStartedId
+            ] ?? TestStatusEnum.passed,
+          duration: Math.abs(
+            envelope.testCaseFinished.timestamp.seconds -
+              tcs.timestamp.seconds,
+          ),
+          error,
+        });
       }
     });
   }
 
+  /**
+   * @returns {Promise<void>}
+   * @private
+   */
   private async publishResults() {
     await this.reporter.publish();
   }

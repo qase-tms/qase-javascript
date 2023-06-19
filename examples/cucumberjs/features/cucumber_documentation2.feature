@@ -3,7 +3,7 @@ Feature: Cucumber documentation 2
     I want to have documentation on cucumber
     So I can write better applications
 
-    @badges
+    @badges @q2
     Scenario: Status badges
         Given I am on the cucumber.js GitHub repository
         When I go to the README file
@@ -17,7 +17,7 @@ Feature: Cucumber documentation 2
         Then I should see a "Build Status" badge
         And I should see a "Dependencies" badge
 
-    @sections
+    @sections @q-3
     Scenario: Usage documentation 5
         Given I am on the cucumber.js GitHub repository
         Then I should see nothing
