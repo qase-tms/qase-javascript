@@ -42,7 +42,7 @@
     "uuid": "^9.0.0"
   },
   "peerDependencies": {
-    "testcafe": "^2.6.0"
+    "testcafe": ">=2.0.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",

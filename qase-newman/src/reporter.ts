@@ -3,7 +3,11 @@ import { EventEmitter } from 'events';
 import semver from 'semver';
 import { NewmanRunExecution } from "newman";
 import newmanPackage from 'newman/package.json';
-import { EventList, PropertyBase, PropertyBaseDefinition } from "postman-collection";
+import {
+  EventList,
+  PropertyBase,
+  PropertyBaseDefinition,
+} from "postman-collection";
 import {
   ConfigType,
   QaseReporter,

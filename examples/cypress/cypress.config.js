@@ -10,7 +10,6 @@ module.exports = cypress.defineConfig({
       charts: true,
     },
     cypressQaseReporterReporterOptions: {
-      mode: 'testops',
       debug: true,
       screenshotsFolder: 'cypress/screenshots',
 

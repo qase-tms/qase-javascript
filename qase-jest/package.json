@@ -57,6 +57,6 @@
     "ts-jest": "^29.1.0"
   },
   "peerDependencies": {
-    "jest": "^29.5.0"
+    "jest": ">=28.0.0"
   }
 }

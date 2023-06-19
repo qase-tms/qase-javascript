@@ -42,7 +42,7 @@
     "qase-javascript-commons": "^2.0.0"
   },
   "peerDependencies": {
-    "@cucumber/cucumber": "^9.1.2"
+    "@cucumber/cucumber": ">=7.0.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",

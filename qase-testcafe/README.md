@@ -111,6 +111,8 @@ Supported ENV variables:
 
 We maintain the reporter on LTS versions of Node. You can find the current versions by following the [link](https://nodejs.org/en/about/releases/)
 
+`testcafe >= 2.0.0`
+
 <!-- references -->
 
 [auth]: https://developers.qase.io/#authentication

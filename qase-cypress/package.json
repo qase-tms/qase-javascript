@@ -46,7 +46,7 @@
     "qase-javascript-commons": "^2.0.0"
   },
   "peerDependencies": {
-    "cypress": "^12.13.0"
+    "cypress": ">=8.0.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",

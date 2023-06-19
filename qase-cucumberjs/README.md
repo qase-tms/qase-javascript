@@ -142,4 +142,6 @@ exports.config = {
 We maintain the reporter on LTS versions of Node. You can find the current versions by following the [link](https://nodejs.org/en/about/releases/)
 <!-- references -->
 
+`@cucumber/cucumber >= 7.0.0`
+
 [auth]: https://developers.qase.io/#authentication
