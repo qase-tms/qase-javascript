@@ -3,8 +3,7 @@
 
   "testops": {
     "api": {
-      "token": "api_key",
-      "baseUrl": "http://api.qase.lo/v1"
+      "token": "api_key"
     },
 
     "projectCode": "project_code",

@@ -16,7 +16,6 @@ module.exports = cypress.defineConfig({
       testops: {
         api: {
           token: 'api_key',
-          baseUrl: 'http://api.qase.lo/v1',
         },
 
         projectCode: 'project_code',
