@@ -1,7 +1,15 @@
+import { AxiosError } from 'axios';
+import get from 'lodash.get';
+
 import { TestResultType } from '../models';
+
+import { QaseError } from '../utils/qase-error';
+import { isAxiosError } from '../utils/is-axios-error';
 
 export interface LoggerInterface {
   log(message: string): void;
+  group(): void;
+  groupEnd(): void;
 }
 
 export type ReporterOptionsType = {
@@ -57,5 +65,82 @@ export abstract class AbstractReporter implements ReporterInterface {
     if (this.debug) {
       this.logger.log(`qase: ${message}`);
     }
+  }
+
+  /**
+   * @param {string} message
+   * @param error
+   * @protected
+   */
+  protected logError(message: string, error?: unknown): void {
+    this.doLogError(`qase: ${message}`, error);
+  }
+
+  /**
+   * @param {string} message
+   * @param error
+   * @private
+   */
+  private doLogError(message: string, error?: unknown): void {
+    this.logger.log(String(message));
+    this.logger.group();
+
+    if (error instanceof Error) {
+      this.logger.log(`${error.stack || `${error.name}: ${error.message}`}`);
+
+      if (isAxiosError(error)) {
+        this.logApiError(error);
+      } else if (error instanceof QaseError && error.cause) {
+        this.doLogError('Caused by:', error.cause);
+      }
+    } else {
+      this.logger.log(String(error));
+    }
+
+    this.logger.groupEnd();
+  }
+
+  /**
+   * @param {AxiosError} error
+   * @private
+   */
+  private logApiError(error: AxiosError) {
+    const errorMessage: unknown = get(error, 'response.data.errorMessage')
+      ?? get(error, 'response.statusText')
+      ?? 'Unknown error';
+
+    const errorFields = this.formatErrorFields(
+      get(error, 'response.data.errorFields'),
+    );
+
+    this.logger.log(String(errorMessage));
+
+    if (errorFields) {
+      this.logger.group();
+      this.logger.log(errorFields);
+      this.logger.groupEnd();
+    }
+  }
+
+  /**
+   * @param errorFields
+   * @returns {string | undefined}
+   * @private
+   */
+  private formatErrorFields(errorFields: unknown): string | undefined {
+    if (Array.isArray(errorFields)) {
+      return errorFields.reduce<string>((acc, item: unknown) => {
+        const field: unknown = get(item, 'field');
+        const error: unknown = get(item, 'error');
+
+        if (field && error) {
+          return acc + `${String(field)}: ${String(error)}\n`;
+        }
+
+        return acc;
+      }, '');
+    }
+
+    return undefined;
   }
 }

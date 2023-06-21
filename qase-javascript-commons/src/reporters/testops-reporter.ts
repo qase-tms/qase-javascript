@@ -18,7 +18,7 @@ import {
 
 import { StepStatusEnum, TestResultType, TestStatusEnum, TestStepType } from "../models";
 
-import { errorMessage } from "../utils/error-message";
+import { QaseError } from '../utils/qase-error';
 
 export type TestOpsRunType = {
   id?: number | undefined;
@@ -186,7 +186,7 @@ export class TestOpsReporter extends AbstractReporter {
       await this.api.runs.completeRun(this.projectCode, runId);
       this.log(chalk`{green Run ${runId} completed}`);
     } catch (error) {
-      throw new Error(`Error on completing run ${errorMessage(error)}`);
+      throw new QaseError('Error on completing run', { cause: error });
     }
 
     const runUrl = `${this.baseUrl}/run/${this.projectCode}/dashboard/${runId}`;
@@ -267,7 +267,7 @@ export class TestOpsReporter extends AbstractReporter {
         `Get run result on checking run "${String(resp.data.result?.id)}"`,
       );
     } catch (error) {
-      throw new Error(`Error on checking run: ${errorMessage(error)}`);
+      throw new QaseError('Error on checking run', { cause: error });
     }
   }
 
@@ -302,7 +302,7 @@ export class TestOpsReporter extends AbstractReporter {
 
       return data;
     } catch (error) {
-      throw new Error(`Cannot create run: ${errorMessage(error)}`);
+      throw new QaseError('Cannot create run', { cause: error });
     }
   }
 
@@ -354,8 +354,7 @@ export class TestOpsReporter extends AbstractReporter {
 
           return response.data.result?.[0]?.hash;
         } catch (error) {
-          console.log(error);
-          this.log(`Cannot upload attachment '${attachment}': ${errorMessage(error)}`);
+          this.logError('Cannot upload attachment:', error);
 
           return undefined;
         }

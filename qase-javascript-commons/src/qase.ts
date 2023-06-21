@@ -25,8 +25,8 @@ import { JsonValidationError, validateJson } from './utils/validate-json';
 import { omitEmpty } from './utils/omit-empty';
 import { getPackageVersion } from './utils/get-package-version';
 import { CustomBoundaryFormData } from './utils/custom-boundary';
-import { errorMessage } from "./utils/error-message";
 import { DisabledException } from "./utils/disabled-exception";
+import { QaseError } from "./utils/qase-error";
 
 /**
  * @type {Record<TestStatusEnum, (test: TestResultType) => string>}
@@ -67,7 +67,7 @@ export class QaseReporter extends AbstractReporter {
           (error.code === 'ENOENT' || error.code === 'EISDIR');
 
         if (!isNotFound) {
-          throw new Error(`Cannot read config file: ${errorMessage(error)}`);
+          throw new QaseError('Cannot read config file', { cause: error });
         }
       }
     }
@@ -199,7 +199,7 @@ export class QaseReporter extends AbstractReporter {
         this.logTestItem(result);
         this.upstreamReporter?.addTestResult(result);
       } catch (error) {
-        this.log(`Unable to process result: ${errorMessage(error)}`);
+        this.logError('Unable to process result:', error);
 
         this.disabled = true;
       }
@@ -214,7 +214,7 @@ export class QaseReporter extends AbstractReporter {
       try {
         await this.upstreamReporter?.publish();
       } catch (error) {
-        this.log(`Unable to publish run results: ${errorMessage(error)}`);
+        this.logError('Unable to publish run results:', error);
 
         this.disabled = true;
       }
