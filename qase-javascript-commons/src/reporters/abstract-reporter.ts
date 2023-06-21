@@ -82,7 +82,7 @@ export abstract class AbstractReporter implements ReporterInterface {
    * @private
    */
   private doLogError(message: string, error?: unknown): void {
-    this.logger.log(String(message));
+    this.logger.log(message);
     this.logger.group();
 
     if (error instanceof Error) {
