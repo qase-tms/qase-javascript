@@ -5,10 +5,10 @@ import {
   EnvApiEnum,
   EnvRunEnum,
   EnvLocalEnum,
-} from "./env-enum";
+} from './env-enum';
 
-import { DriverEnum } from "../writer";
-import { ConfigType } from "../config";
+import { DriverEnum } from '../writer';
+import { ConfigType } from '../config';
 
 /**
  * @param {EnvType} env

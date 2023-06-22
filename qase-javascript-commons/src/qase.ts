@@ -2,7 +2,7 @@ import { join } from 'path';
 import { readFileSync } from 'fs';
 import { execSync } from 'child_process';
 
-import mergeWith from "lodash.mergewith";
+import mergeWith from 'lodash.mergewith';
 import envSchema from 'env-schema';
 import chalk from 'chalk';
 import { QaseApi } from 'qaseio';
@@ -15,18 +15,22 @@ import {
   LoggerInterface,
 } from './reporters';
 import { ModeEnum, OptionsType } from './options';
-import { ConfigType, configValidationSchema } from "./config";
-import { EnvApiEnum, EnvTestOpsEnum, envToConfig, envValidationSchema } from "./env";
-import { TestStatusEnum, TestResultType } from "./models";
-import { DriverEnum, FsWriter } from "./writer";
-import { JsonFormatter } from "./formatter";
+import { ConfigType, configValidationSchema } from './config';
+import {
+  EnvApiEnum,
+  EnvTestOpsEnum,
+  envToConfig,
+  envValidationSchema,
+} from './env';
+import { TestStatusEnum, TestResultType } from './models';
+import { DriverEnum, FsWriter } from './writer';
+import { JsonFormatter } from './formatter';
 
 import { JsonValidationError, validateJson } from './utils/validate-json';
-import { omitEmpty } from './utils/omit-empty';
 import { getPackageVersion } from './utils/get-package-version';
 import { CustomBoundaryFormData } from './utils/custom-boundary';
-import { DisabledException } from "./utils/disabled-exception";
-import { QaseError } from "./utils/qase-error";
+import { DisabledException } from './utils/disabled-exception';
+import { QaseError } from './utils/qase-error';
 
 /**
  * @type {Record<TestStatusEnum, (test: TestResultType) => string>}
@@ -87,7 +91,6 @@ export class QaseReporter extends AbstractReporter {
         const json: unknown = JSON.parse(data);
 
         validateJson(configValidationSchema, json);
-        omitEmpty(json);
 
         return json;
       }
@@ -171,7 +174,7 @@ export class QaseReporter extends AbstractReporter {
       options,
       QaseReporter.loadConfig(),
       envToConfig(envSchema({ schema: envValidationSchema })),
-      (value: unknown, src: unknown) => src === undefined ? value : undefined,
+      (value: unknown, src: unknown) => (src === undefined ? value : undefined),
     );
 
     super({ debug: composedOptions.debug }, logger);
@@ -288,7 +291,7 @@ export class QaseReporter extends AbstractReporter {
             run: {
               title: title ?? `Automated run ${new Date().toISOString()}`,
               description: description ?? `${reporterName} automated run`,
-              ...run
+              ...run,
             },
             ...commonOptions,
           },

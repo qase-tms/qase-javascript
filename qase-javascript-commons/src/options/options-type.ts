@@ -1,9 +1,9 @@
-import { QaseApiOptionsType } from "qaseio/dist/qaseio";
+import { QaseApiOptionsType } from 'qaseio/dist/qaseio';
 
 import { ModeEnum } from './mode-enum';
 
 import { TestOpsOptionsType } from '../reporters';
-import { DriverEnum, FsWriterOptionsType } from "../writer";
+import { DriverEnum, FsWriterOptionsType } from '../writer';
 
 type RecursivePartial<T> = {
   [K in keyof T]?: RecursivePartial<T[K]> | undefined;
@@ -15,10 +15,10 @@ export type AdditionalTestOpsOptionsType = {
 
 export type ConnectionsType = {
   [DriverEnum.local]?: FsWriterOptionsType;
-}
+};
 
 export type AdditionalReportOptionsType = {
-  driver?: `${DriverEnum}`,
+  driver?: `${DriverEnum}`;
   connections?: ConnectionsType;
 };
 

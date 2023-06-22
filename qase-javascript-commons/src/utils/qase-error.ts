@@ -1,6 +1,6 @@
 export type ErrorOptionsType = {
   cause?: unknown;
-}
+};
 
 export interface QaseErrorInterface extends Error {
   cause?: unknown;

@@ -1,8 +1,9 @@
 import { JSONSchemaType } from 'ajv';
 
 import { ModeEnum } from '../options';
+import { DriverEnum } from '../writer';
+
 import { ConfigType } from './config-type';
-import { DriverEnum } from "../writer";
 
 /**
  * @type {JSONSchemaType<ConfigType>}
@@ -46,7 +47,7 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
               nullable: true,
               additionalProperties: false,
               patternProperties: {
-                "^.*$": {
+                '^.*$': {
                   type: 'string',
                 },
               },

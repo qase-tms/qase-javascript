@@ -7,7 +7,7 @@ module.exports = {
   },
 
   parserOptions: {
-    ecmaVersion: "latest",
+    ecmaVersion: 'latest',
     project: ['tsconfig.json'],
     tsconfigRootDir: __dirname,
   },
@@ -19,17 +19,14 @@ module.exports = {
     },
   },
 
-  extends: [
-    'eslint:recommended',
-    'plugin:import/recommended',
-  ],
+  extends: ['eslint:recommended', 'plugin:import/recommended'],
 
   rules: {
     'import/no-extraneous-dependencies': 'error',
   },
 
   overrides: [{
-    files: "**/*.ts",
+    files: '**/*.ts',
 
     extends: [
       'plugin:import/typescript',
@@ -37,5 +34,5 @@ module.exports = {
       'plugin:@typescript-eslint/recommended-requiring-type-checking',
       'plugin:@typescript-eslint/strict',
     ],
-  }]
+  }],
 };

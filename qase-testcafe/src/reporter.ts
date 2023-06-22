@@ -3,8 +3,8 @@ import {
   ConfigType,
   QaseReporter,
   ReporterInterface,
-  TestStatusEnum
-} from "qase-javascript-commons";
+  TestStatusEnum,
+} from 'qase-javascript-commons';
 
 type CallsiteRecordType = {
   filename?: string;
@@ -40,7 +40,7 @@ type FixtureType = {
   name: string;
   path?: string;
   meta: Record<string, unknown>;
-}
+};
 
 export type TestRunInfoType = {
   errs: TestRunErrorFormattableAdapterType[];
@@ -98,21 +98,18 @@ export class TestcafeQaseReporter {
    * @private
    */
   private static transformErrors(errors: TestRunErrorFormattableAdapterType[]) {
-    const [
-      errorMessages,
-      errorStacks,
-    ] = errors.reduce<[string[], string[]]>((
-      [messages, stacks],
-      error,
-    ) => {
-      const stack =
-        error.callsite?.stackFrames?.map((line) => String(line)) ?? [];
+    const [errorMessages, errorStacks] = errors.reduce<[string[], string[]]>(
+      ([messages, stacks], error) => {
+        const stack =
+          error.callsite?.stackFrames?.map((line) => String(line)) ?? [];
 
-      messages.push(error.errMsg ?? 'Error');
-      stacks.push(stack.join('\n'));
+        messages.push(error.errMsg ?? 'Error');
+        stacks.push(stack.join('\n'));
 
-      return [messages, stacks];
-    }, [[], []]);
+        return [messages, stacks];
+      },
+      [[], []],
+    );
 
     const error = new Error(errorMessages.join('\n\n'));
 

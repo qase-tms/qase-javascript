@@ -1,20 +1,20 @@
 import { EventEmitter } from 'events';
 
 import semver from 'semver';
-import { NewmanRunExecution } from "newman";
+import { NewmanRunExecution } from 'newman';
 import newmanPackage from 'newman/package.json';
 import {
   EventList,
   PropertyBase,
   PropertyBaseDefinition,
-} from "postman-collection";
+} from 'postman-collection';
 import {
   ConfigType,
   QaseReporter,
   ReporterInterface,
   TestStatusEnum,
-  TestResultType
-} from "qase-javascript-commons";
+  TestResultType,
+} from 'qase-javascript-commons';
 
 export type NewmanQaseOptionsType = ConfigType;
 

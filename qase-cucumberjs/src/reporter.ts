@@ -169,7 +169,8 @@ export class CucumberQaseReporter extends Formatter {
       } else if (envelope.testStepFinished) {
         const stepFin = envelope.testStepFinished;
         const oldStatus = this.testCaseStartedResult[stepFin.testCaseStartedId];
-        const newStatus = CucumberQaseReporter.statusMap[stepFin.testStepResult.status];
+        const newStatus =
+          CucumberQaseReporter.statusMap[stepFin.testStepResult.status];
 
         if (newStatus === null) {
           return;
@@ -231,8 +232,7 @@ export class CucumberQaseReporter extends Formatter {
               envelope.testCaseFinished.testCaseStartedId
             ] ?? TestStatusEnum.passed,
           duration: Math.abs(
-            envelope.testCaseFinished.timestamp.seconds -
-              tcs.timestamp.seconds,
+            envelope.testCaseFinished.timestamp.seconds - tcs.timestamp.seconds,
           ),
           error,
         });

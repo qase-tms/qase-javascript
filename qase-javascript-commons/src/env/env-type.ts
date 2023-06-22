@@ -4,7 +4,7 @@ import {
   EnvApiEnum,
   EnvRunEnum,
   EnvLocalEnum,
-} from "./env-enum";
+} from './env-enum';
 
 import { ModeEnum } from '../options';
 

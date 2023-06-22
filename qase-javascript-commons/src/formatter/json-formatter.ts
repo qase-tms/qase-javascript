@@ -4,7 +4,7 @@ import { FormatterInterface } from './formatter-interface';
 
 export type JsonFormatterOptionsType = {
   space?: number | undefined;
-}
+};
 
 /**
  * @class JsonFormatter

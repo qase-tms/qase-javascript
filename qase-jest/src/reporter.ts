@@ -2,13 +2,13 @@ import has from 'lodash.has';
 import get from 'lodash.get';
 import { v4 as uuidv4 } from 'uuid';
 import { Reporter, Test, TestResult, Config } from '@jest/reporters';
-import { Status } from "@jest/test-result";
+import { Status } from '@jest/test-result';
 import {
   QaseReporter,
   ConfigType,
   ReporterInterface,
   TestStatusEnum,
-} from "qase-javascript-commons";
+} from 'qase-javascript-commons';
 
 export type JestQaseOptionsType = ConfigType;
 

@@ -12,7 +12,7 @@ import {
   ReporterInterface,
   TestStatusEnum,
   TestStepType,
-} from "qase-javascript-commons";
+} from 'qase-javascript-commons';
 
 type ArrayItemType<T> = T extends Array<infer R> ? R : never;
 
@@ -62,7 +62,7 @@ export class PlaywrightQaseReporter implements Reporter {
    * @private
    */
   private static transformAttachments(
-    testAttachments: ArrayItemType<TestResult["attachments"]>[],
+    testAttachments: ArrayItemType<TestResult['attachments']>[],
   ) {
     return testAttachments
       .map(({ path }) => path)
@@ -130,7 +130,9 @@ export class PlaywrightQaseReporter implements Reporter {
         : undefined,
       duration: result.duration,
       steps: PlaywrightQaseReporter.transformSteps(result.steps),
-      attachments: PlaywrightQaseReporter.transformAttachments(result.attachments),
+      attachments: PlaywrightQaseReporter.transformAttachments(
+        result.attachments,
+      ),
     });
   }
 

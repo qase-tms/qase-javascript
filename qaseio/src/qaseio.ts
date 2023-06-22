@@ -1,5 +1,5 @@
 import axios from 'axios';
-import axiosRetry, { isIdempotentRequestError } from "axios-retry";
+import axiosRetry, { isIdempotentRequestError } from 'axios-retry';
 
 import {
   ProjectsApi,
@@ -23,7 +23,7 @@ export type QaseApiOptionsType = {
   headers?: Record<string, string | undefined> | undefined;
   retries?: number | undefined;
   retryDelay?: number | undefined;
-}
+};
 
 export interface QaseApiInterface {
   projects: ProjectsApi;
@@ -62,7 +62,10 @@ export class QaseApi implements QaseApiInterface {
    * @param {QaseApiOptionsType} options
    * @param {{new(): unknown}} formDataCtor
    */
-  public constructor(options: QaseApiOptionsType, formDataCtor?: new () => unknown) {
+  public constructor(
+    options: QaseApiOptionsType,
+    formDataCtor?: new () => unknown,
+  ) {
     const {
       token,
       baseUrl,

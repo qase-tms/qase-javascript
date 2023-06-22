@@ -5,7 +5,7 @@ import {
 } from './abstract-reporter';
 
 import { TestResultType } from '../models';
-import { WriterInterface } from "../writer";
+import { WriterInterface } from '../writer';
 
 /**
  * @class ReportReporter

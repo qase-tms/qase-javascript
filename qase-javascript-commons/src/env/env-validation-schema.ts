@@ -7,7 +7,7 @@ import {
   EnvLocalEnum,
   EnvRunEnum,
   EnvTestOpsEnum,
-} from "./env-enum";
+} from './env-enum';
 
 import { ModeEnum } from '../options';
 

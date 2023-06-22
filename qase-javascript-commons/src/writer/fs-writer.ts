@@ -3,13 +3,13 @@ import * as path from 'path';
 
 import { WriterInterface } from './writer-interface';
 
-import { TestResultType } from "../models";
-import { FormatterInterface } from "../formatter";
+import { TestResultType } from '../models';
+import { FormatterInterface } from '../formatter';
 
 export type FsWriterOptionsType = {
   path?: string | undefined;
   ext?: string | undefined;
-}
+};
 
 /**
  * @class FsWriter

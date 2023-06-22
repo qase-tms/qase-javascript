@@ -1,22 +1,28 @@
-import { createReadStream } from "fs";
+import { createReadStream } from 'fs';
 
-import chalk from "chalk";
-import stripAnsi from "strip-ansi";
+import chalk from 'chalk';
+import stripAnsi from 'strip-ansi';
 import {
   QaseApiInterface,
   ResultCreate,
   ResultCreateStatusEnum,
-  RunCreate, TestStepResultCreate,
-  TestStepResultCreateStatusEnum
-} from "qaseio";
+  RunCreate,
+  TestStepResultCreate,
+  TestStepResultCreateStatusEnum,
+} from 'qaseio';
 
 import {
   AbstractReporter,
   LoggerInterface,
   ReporterOptionsType,
-} from "./abstract-reporter";
+} from './abstract-reporter';
 
-import { StepStatusEnum, TestResultType, TestStatusEnum, TestStepType } from "../models";
+import {
+  StepStatusEnum,
+  TestResultType,
+  TestStatusEnum,
+  TestStepType,
+} from '../models';
 
 import { QaseError } from '../utils/qase-error';
 
@@ -173,7 +179,9 @@ export class TestOpsReporter extends AbstractReporter {
     }
 
     await this.api.results.createResultBulk(this.projectCode, runId, {
-      results: this.results.map((result) => this.transformTestToResultCreateObject(result)),
+      results: this.results.map((result) =>
+        this.transformTestToResultCreateObject(result),
+      ),
     });
 
     this.log(chalk`{green ${this.results.length} result(s) sent to Qase}`);
@@ -219,7 +227,7 @@ export class TestOpsReporter extends AbstractReporter {
         title: result.title,
         suite_title: Array.isArray(result.suiteTitle)
           ? result.suiteTitle.join('\t')
-          : (result.suiteTitle ?? null),
+          : result.suiteTitle ?? null,
       };
     }
 
