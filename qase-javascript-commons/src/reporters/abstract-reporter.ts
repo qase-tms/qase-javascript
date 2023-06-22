@@ -106,6 +106,7 @@ export abstract class AbstractReporter implements ReporterInterface {
    */
   private logApiError(error: AxiosError) {
     const errorMessage: unknown = get(error, 'response.data.errorMessage')
+      ?? get(error, 'response.data.error')
       ?? get(error, 'response.statusText')
       ?? 'Unknown error';
 
