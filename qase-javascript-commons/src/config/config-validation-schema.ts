@@ -14,7 +14,7 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
   properties: {
     mode: {
       type: 'string',
-      enum: [ModeEnum.report, ModeEnum.testops],
+      enum: [ModeEnum.report, ModeEnum.testops, ModeEnum.off],
       nullable: true,
     },
     debug: {

@@ -6,3 +6,5 @@ export * from './models';
 export * from './options';
 export * from './reporters';
 export * from './writer';
+
+export * from './utils/get-package-version';

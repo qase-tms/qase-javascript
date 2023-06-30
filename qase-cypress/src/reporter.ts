@@ -123,9 +123,14 @@ export class CypressQaseReporter extends reporters.Base {
     runner.on(EVENT_TEST_PENDING, (test: Test) => this.addTestResult(test));
     runner.on(EVENT_TEST_FAIL, (test: Test) => this.addTestResult(test));
 
-    runner.once(EVENT_RUN_END, () => {
-      void this.reporter.publish();
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    runner.once(EVENT_RUN_END, async () => {
       this.preventExit();
+      await this.reporter.publish();
+
+      if (process.exitCode !== undefined) {
+        process.exit(process.exitCode);
+      }
     });
   }
 

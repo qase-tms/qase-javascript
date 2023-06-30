@@ -2,7 +2,6 @@ import { EventEmitter } from 'events';
 
 import semver from 'semver';
 import { NewmanRunExecution } from 'newman';
-import newmanPackage from 'newman/package.json';
 import {
   EventList,
   PropertyBase,
@@ -14,6 +13,7 @@ import {
   ReporterInterface,
   TestStatusEnum,
   TestResultType,
+  getPackageVersion,
 } from 'qase-javascript-commons';
 
 export type NewmanQaseOptionsType = ConfigType;
@@ -164,7 +164,9 @@ export class NewmanQaseReporter {
    * @private
    */
   private preventExit() {
-    if (semver.lt(newmanPackage.version, '5.3.2')) {
+    const newmanVersion = getPackageVersion('newman');
+
+    if (!newmanVersion || semver.lt(newmanVersion, '5.3.2')) {
       // eslint-disable-next-line @typescript-eslint/unbound-method
       const _exit = process.exit;
 

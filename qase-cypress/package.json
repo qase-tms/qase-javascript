@@ -9,7 +9,8 @@
   "exports": {
     ".": "./dist/index.js",
     "./mocha": "./dist/mocha.js",
-    "./reporter": "./dist/reporter.js"
+    "./reporter": "./dist/reporter.js",
+    "./package.json": "./package.json"
   },
   "typesVersions": {
     "*": {

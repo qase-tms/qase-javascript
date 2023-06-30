@@ -115,16 +115,12 @@ export class QaseReporter extends AbstractReporter {
   /**
    * @param {string} frameworkName
    * @param {string} reporterName
-   * @param {string} customFrameworkName
-   * @param {string} customReporterName
    * @returns {Record<string, string>}
    * @private
    */
   private static createHeaders(
     frameworkName: string,
     reporterName: string,
-    customFrameworkName?: string,
-    customReporterName?: string,
   ): Record<string, string> {
     const { version: nodeVersion, platform: os, arch } = process;
     const npmVersion = execSync('npm -v', { encoding: 'utf8' }).replace(
@@ -136,18 +132,26 @@ export class QaseReporter extends AbstractReporter {
     const frameworkVersion = getPackageVersion(frameworkName);
     const reporterVersion = getPackageVersion(reporterName);
 
-    const fv = frameworkVersion
-      ? `${customFrameworkName || frameworkName}=${frameworkVersion}`
-      : '';
-    const rv = reporterVersion
-      ? `${customReporterName || reporterName}=${reporterVersion}`
-      : '';
-    const qcr = qaseReporterVersion
-      ? `qase-core-reporter=${qaseReporterVersion}`
-      : '';
+    const client: string[] = [];
+
+    if (frameworkVersion) {
+      client.push(`${frameworkName}=${frameworkVersion}`);
+    }
+
+    if (reporterVersion) {
+      client.push(`qase-${frameworkName}=${reporterVersion}`);
+    }
+
+    if (qaseReporterVersion) {
+      client.push(`qase-core-reporter=${qaseReporterVersion}`);
+    }
+
+    if (qaseApiVersion) {
+      client.push(`qaseapi=${String(qaseApiVersion)}`);
+    }
 
     return {
-      'X-Client': `${fv}; ${rv}; ${qcr}; qaseapi=${String(qaseApiVersion)}`,
+      'X-Client': client.join('; '),
       'X-Platform': `node=${nodeVersion}; npm=${npmVersion}; os=${os}; arch=${arch}`,
     };
   }
