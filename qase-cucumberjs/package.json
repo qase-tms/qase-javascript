@@ -32,7 +32,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@cucumber/cucumber": "^7.0.0",
-    "@cucumber/messages": "^14.0.1",
+    "@cucumber/messages": "^22.0.0",
     "@hutson/npm-deploy-git-tag": "^6.0.0",
     "@types/jest": "^23.3.7",
     "@types/long": "^4.0.1",
