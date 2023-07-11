@@ -109,6 +109,7 @@ export class PlaywrightQaseReporter implements Reporter {
   public constructor(options: PlaywrightQaseOptionsType) {
     this.reporter = new QaseReporter({
       ...options,
+      frameworkPackage: '@playwright/test',
       frameworkName: 'playwright',
       reporterName: 'playwright-qase-reporter',
     });

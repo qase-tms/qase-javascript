@@ -23,6 +23,7 @@ export type AdditionalReportOptionsType = {
 };
 
 export type OptionsType = {
+  frameworkPackage: string;
   frameworkName: string;
   reporterName: string;
   mode?: `${ModeEnum}` | undefined;

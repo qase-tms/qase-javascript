@@ -59,6 +59,7 @@ export class JestQaseReporter implements Reporter {
   public constructor(_: Config.GlobalConfig, options: JestQaseOptionsType) {
     this.reporter = new QaseReporter({
       ...options,
+      frameworkPackage: 'jest',
       frameworkName: 'jest',
       reporterName: 'jest-qase-reporter',
     });

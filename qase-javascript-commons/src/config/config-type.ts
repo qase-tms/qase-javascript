@@ -1,3 +1,3 @@
 import { OptionsType } from '../options';
 
-export type ConfigType = Omit<OptionsType, 'frameworkName' | 'reporterName'>;
+export type ConfigType = Omit<OptionsType, 'frameworkPackage' | 'frameworkName' | 'reporterName'>;

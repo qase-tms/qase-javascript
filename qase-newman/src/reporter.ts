@@ -92,6 +92,7 @@ export class NewmanQaseReporter {
   public constructor(emitter: EventEmitter, options: NewmanQaseOptionsType) {
     this.reporter = new QaseReporter({
       ...options,
+      frameworkPackage: 'newman',
       frameworkName: 'newman',
       reporterName: 'newman-reporter-qase',
     });

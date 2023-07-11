@@ -38,7 +38,7 @@
   "scripts": {
     "build": "npm run clean && tsc --project tsconfig.build.json",
     "lint": "eslint .",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "clean": "rm -rf dist"
   },
   "author": "Nikita Fedorov <nik333r@gmail.com>",

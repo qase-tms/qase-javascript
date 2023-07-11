@@ -113,12 +113,14 @@ export class QaseReporter extends AbstractReporter {
   }
 
   /**
+   * @param {string} frameworkPackage
    * @param {string} frameworkName
    * @param {string} reporterName
    * @returns {Record<string, string>}
    * @private
    */
   private static createHeaders(
+    frameworkPackage: string,
     frameworkName: string,
     reporterName: string,
   ): Record<string, string> {
@@ -129,7 +131,7 @@ export class QaseReporter extends AbstractReporter {
     );
     const qaseApiVersion = getPackageVersion('qaseio');
     const qaseReporterVersion = getPackageVersion('qase-javascript-commons');
-    const frameworkVersion = getPackageVersion(frameworkName);
+    const frameworkVersion = getPackageVersion(frameworkPackage);
     const reporterVersion = getPackageVersion(reporterName);
 
     const client: string[] = [];
@@ -240,6 +242,7 @@ export class QaseReporter extends AbstractReporter {
     logger?: LoggerInterface,
   ): ReporterInterface {
     const {
+      frameworkPackage,
       frameworkName,
       reporterName,
       mode = ModeEnum.off,
@@ -282,7 +285,11 @@ export class QaseReporter extends AbstractReporter {
           token,
           headers: {
             ...headers,
-            ...QaseReporter.createHeaders(frameworkName, reporterName),
+            ...QaseReporter.createHeaders(
+              frameworkPackage,
+              frameworkName,
+              reporterName,
+            ),
           },
           ...api
         }, CustomBoundaryFormData);

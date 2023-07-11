@@ -107,6 +107,7 @@ export class CypressQaseReporter extends reporters.Base {
 
     this.reporter = new QaseReporter({
       ...reporterOptions,
+      frameworkPackage: 'cypress',
       frameworkName: 'cypress',
       reporterName: 'cypress-qase-reporter',
     });

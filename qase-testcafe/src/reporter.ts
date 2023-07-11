@@ -139,6 +139,7 @@ export class TestcafeQaseReporter {
   public constructor(options: TestcafeQaseOptionsType) {
     this.reporter = new QaseReporter({
       ...options,
+      frameworkPackage: 'testcafe',
       frameworkName: 'testcafe',
       reporterName: 'testcafe-reporter-qase',
     });
