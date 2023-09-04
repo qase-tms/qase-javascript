@@ -135,5 +135,17 @@ export interface TestCaseCreate {
      * @memberof TestCaseCreate
      */
     'custom_field'?: { [key: string]: string; };
+    /**
+     * 
+     * @type {string}
+     * @memberof TestCaseCreate
+     */
+    'created_at'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TestCaseCreate
+     */
+    'updated_at'?: string;
 }
 

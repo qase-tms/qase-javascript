@@ -7,6 +7,7 @@ import {
   PropertyBase,
   PropertyBaseDefinition,
 } from 'postman-collection';
+
 import {
   ConfigType,
   QaseReporter,
@@ -14,6 +15,8 @@ import {
   TestStatusEnum,
   TestResultType,
   getPackageVersion,
+  ConfigLoader,
+  composeOptions,
 } from 'qase-javascript-commons';
 
 export type NewmanQaseOptionsType = ConfigType;
@@ -89,9 +92,22 @@ export class NewmanQaseReporter {
    */
   private timerMap = new Map<string, number>();
 
-  public constructor(emitter: EventEmitter, options: NewmanQaseOptionsType) {
+  /**
+   * @param {EventEmitter} emitter
+   * @param {NewmanQaseOptionsType} options
+   * @param {unknown} _
+   * @param {ConfigLoaderInterface} configLoader
+   */
+  public constructor(
+    emitter: EventEmitter,
+    options: NewmanQaseOptionsType,
+    _: unknown,
+    configLoader = new ConfigLoader(),
+  ) {
+    const config = configLoader.load();
+
     this.reporter = new QaseReporter({
-      ...options,
+      ...composeOptions(options, config),
       frameworkPackage: 'newman',
       frameworkName: 'newman',
       reporterName: 'newman-reporter-qase',
@@ -145,7 +161,11 @@ export class NewmanQaseReporter {
         const timer = this.timerMap.get(item.id);
 
         if (timer) {
-          pendingResult.duration = Date.now() - timer;
+          const now = Date.now();
+
+          pendingResult.startTime = timer;
+          pendingResult.duration = now - timer;
+          pendingResult.endTime = now;
         }
 
         this.reporter.addTestResult(pendingResult);

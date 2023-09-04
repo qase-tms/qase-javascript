@@ -17,9 +17,10 @@ import { ConfigType } from '../config';
 export const envToConfig = (env: EnvType): ConfigType => ({
   mode: env[EnvEnum.mode],
   debug: env[EnvEnum.debug],
+  environment: env[EnvEnum.environment],
 
   testops: {
-    projectCode: env[EnvTestOpsEnum.projectCode],
+    project: env[EnvTestOpsEnum.project],
     baseUrl: env[EnvTestOpsEnum.baseUrl],
     uploadAttachments: env[EnvTestOpsEnum.uploadAttachments],
 

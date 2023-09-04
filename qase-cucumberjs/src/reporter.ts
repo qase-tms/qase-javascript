@@ -1,12 +1,16 @@
+import { EventEmitter } from 'events';
+
 import { Formatter, IFormatterOptions, Status } from '@cucumber/cucumber';
 import { Envelope, PickleTag, TestCaseStarted } from '@cucumber/messages';
+
 import {
   ConfigType,
+  ConfigLoader,
   QaseReporter,
   ReporterInterface,
   TestStatusEnum,
+  composeOptions,
 } from 'qase-javascript-commons';
-import { EventEmitter } from 'events';
 
 type PickleInfoType = {
   caseIds: number[];
@@ -109,14 +113,19 @@ export class CucumberQaseReporter extends Formatter {
 
   /**
    * @param {CucumberQaseOptionsType} options
+   * @param {ConfigLoaderInterface} configLoader
    */
-  public constructor(options: CucumberQaseOptionsType) {
+  public constructor(
+    options: CucumberQaseOptionsType,
+    configLoader = new ConfigLoader(),
+  ) {
     const { qase, ...formatterOptions } = options;
+    const config = configLoader.load();
 
     super(formatterOptions);
 
     this.reporter = new QaseReporter({
-      ...qase,
+      ...composeOptions(qase, config),
       frameworkPackage: '@cucumber/cucumber',
       frameworkName: 'cucumberjs',
       reporterName: 'cucumberjs-qase-reporter',
@@ -232,6 +241,8 @@ export class CucumberQaseReporter extends Formatter {
             this.testCaseStartedResult[
               envelope.testCaseFinished.testCaseStartedId
             ] ?? TestStatusEnum.passed,
+          startTime: tcs.timestamp.seconds,
+          endTime: envelope.testCaseFinished.timestamp.seconds,
           duration: Math.abs(
             envelope.testCaseFinished.timestamp.seconds - tcs.timestamp.seconds,
           ),

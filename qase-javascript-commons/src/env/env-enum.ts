@@ -4,13 +4,14 @@
 export enum EnvEnum {
   mode = 'QASE_MODE',
   debug = 'QASE_DEBUG',
+  environment = 'QASE_ENVIRONMENT',
 }
 
 /**
  * @enum {string}
  */
 export enum EnvTestOpsEnum {
-  projectCode = 'QASE_TESTOPS_PROJECT_CODE',
+  project = 'QASE_TESTOPS_PROJECT',
   baseUrl = 'QASE_TESTOPS_BASE_URL',
   uploadAttachments = 'QASE_TESTOPS_UPLOAD_ATTACHMENTS',
 }

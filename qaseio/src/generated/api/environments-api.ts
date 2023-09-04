@@ -49,7 +49,7 @@ export const EnvironmentsApiAxiosParamCreator = function (configuration?: Config
             assertParamExists('createEnvironment', 'code', code)
             // verify required parameter 'environmentCreate' is not null or undefined
             assertParamExists('createEnvironment', 'environmentCreate', environmentCreate)
-            const localVarPath = `/environment/{code}`
+            const localVarPath = `/v1/environment/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -92,7 +92,7 @@ export const EnvironmentsApiAxiosParamCreator = function (configuration?: Config
             assertParamExists('deleteEnvironment', 'code', code)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('deleteEnvironment', 'id', id)
-            const localVarPath = `/environment/{code}/{id}`
+            const localVarPath = `/v1/environment/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -133,7 +133,7 @@ export const EnvironmentsApiAxiosParamCreator = function (configuration?: Config
             assertParamExists('getEnvironment', 'code', code)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('getEnvironment', 'id', id)
-            const localVarPath = `/environment/{code}/{id}`
+            const localVarPath = `/v1/environment/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -173,7 +173,7 @@ export const EnvironmentsApiAxiosParamCreator = function (configuration?: Config
         getEnvironments: async (code: string, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getEnvironments', 'code', code)
-            const localVarPath = `/environment/{code}`
+            const localVarPath = `/v1/environment/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -224,7 +224,7 @@ export const EnvironmentsApiAxiosParamCreator = function (configuration?: Config
             assertParamExists('updateEnvironment', 'id', id)
             // verify required parameter 'environmentUpdate' is not null or undefined
             assertParamExists('updateEnvironment', 'environmentUpdate', environmentUpdate)
-            const localVarPath = `/environment/{code}/{id}`
+            const localVarPath = `/v1/environment/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.

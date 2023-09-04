@@ -3,7 +3,9 @@ import Ajv, { ErrorObject, JSONSchemaType } from 'ajv';
 /**
  * @type {Ajv}
  */
-const validator = new Ajv();
+const validator = new Ajv({
+  allowUnionTypes: true,
+});
 
 /**
  * @class JsonValidationError

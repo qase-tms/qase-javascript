@@ -15,11 +15,10 @@ module.exports = {
             token: 'api_key',
           },
 
-          projectCode: 'project_code',
+          project: 'project_code',
 
           run: {
             complete: true,
-            environment: 1,
           },
         },
       },

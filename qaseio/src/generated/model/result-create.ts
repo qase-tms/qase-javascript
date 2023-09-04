@@ -45,6 +45,12 @@ export interface ResultCreate {
      * @type {number}
      * @memberof ResultCreate
      */
+    'start_time'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof ResultCreate
+     */
     'time'?: number | null;
     /**
      * 
@@ -88,6 +94,12 @@ export interface ResultCreate {
      * @memberof ResultCreate
      */
     'steps'?: Array<TestStepResultCreate> | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof ResultCreate
+     */
+    'author_id'?: number | null;
 }
 
 /**

@@ -49,7 +49,7 @@ export const PlansApiAxiosParamCreator = function (configuration?: Configuration
             assertParamExists('createPlan', 'code', code)
             // verify required parameter 'planCreate' is not null or undefined
             assertParamExists('createPlan', 'planCreate', planCreate)
-            const localVarPath = `/plan/{code}`
+            const localVarPath = `/v1/plan/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -92,7 +92,7 @@ export const PlansApiAxiosParamCreator = function (configuration?: Configuration
             assertParamExists('deletePlan', 'code', code)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('deletePlan', 'id', id)
-            const localVarPath = `/plan/{code}/{id}`
+            const localVarPath = `/v1/plan/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -133,7 +133,7 @@ export const PlansApiAxiosParamCreator = function (configuration?: Configuration
             assertParamExists('getPlan', 'code', code)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('getPlan', 'id', id)
-            const localVarPath = `/plan/{code}/{id}`
+            const localVarPath = `/v1/plan/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -173,7 +173,7 @@ export const PlansApiAxiosParamCreator = function (configuration?: Configuration
         getPlans: async (code: string, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getPlans', 'code', code)
-            const localVarPath = `/plan/{code}`
+            const localVarPath = `/v1/plan/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -224,7 +224,7 @@ export const PlansApiAxiosParamCreator = function (configuration?: Configuration
             assertParamExists('updatePlan', 'id', id)
             // verify required parameter 'planUpdate' is not null or undefined
             assertParamExists('updatePlan', 'planUpdate', planUpdate)
-            const localVarPath = `/plan/{code}/{id}`
+            const localVarPath = `/v1/plan/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.

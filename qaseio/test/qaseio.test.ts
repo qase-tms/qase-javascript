@@ -4,6 +4,7 @@ import {
   QaseApi,
   ProjectsApi,
   CasesApi,
+  ResultApi,
   ResultsApi,
   RunsApi,
   AttachmentsApi,
@@ -21,6 +22,7 @@ jest.mock('../src/generated/api');
 describe('Client', () => {
   const ProjectsApiMock = jest.mocked(ProjectsApi);
   const CasesApiMock = jest.mocked(CasesApi);
+  const ResultApiMock = jest.mocked(ResultApi);
   const ResultsApiMock = jest.mocked(ResultsApi);
   const RunsApiMock = jest.mocked(RunsApi);
   const AttachmentsApiMock = jest.mocked(AttachmentsApi);
@@ -72,6 +74,15 @@ describe('Client', () => {
     );
     expect(CasesApiMock.mock.calls[0]?.[1]).toBeUndefined();
     expect(CasesApiMock.mock.calls[0]?.[2]).toHaveProperty(
+      'defaults.headers',
+      expectedHeaders,
+    );
+
+    expect(ResultApiMock.mock.calls[0]?.[0]).toMatchObject(
+      expectedConfiguration,
+    );
+    expect(ResultApiMock.mock.calls[0]?.[1]).toBeUndefined();
+    expect(ResultApiMock.mock.calls[0]?.[2]).toHaveProperty(
       'defaults.headers',
       expectedHeaders,
     );

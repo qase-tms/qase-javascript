@@ -53,7 +53,7 @@ export const RunsApiAxiosParamCreator = function (configuration?: Configuration)
             assertParamExists('completeRun', 'code', code)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('completeRun', 'id', id)
-            const localVarPath = `/run/{code}/{id}/complete`
+            const localVarPath = `/v1/run/{code}/{id}/complete`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -94,7 +94,7 @@ export const RunsApiAxiosParamCreator = function (configuration?: Configuration)
             assertParamExists('createRun', 'code', code)
             // verify required parameter 'runCreate' is not null or undefined
             assertParamExists('createRun', 'runCreate', runCreate)
-            const localVarPath = `/run/{code}`
+            const localVarPath = `/v1/run/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -137,7 +137,7 @@ export const RunsApiAxiosParamCreator = function (configuration?: Configuration)
             assertParamExists('deleteRun', 'code', code)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('deleteRun', 'id', id)
-            const localVarPath = `/run/{code}/{id}`
+            const localVarPath = `/v1/run/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -179,7 +179,7 @@ export const RunsApiAxiosParamCreator = function (configuration?: Configuration)
             assertParamExists('getRun', 'code', code)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('getRun', 'id', id)
-            const localVarPath = `/run/{code}/{id}`
+            const localVarPath = `/v1/run/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -230,7 +230,7 @@ export const RunsApiAxiosParamCreator = function (configuration?: Configuration)
         getRuns: async (code: string, search?: string, status?: string, milestone?: number, environment?: number, fromStartTime?: number, toStartTime?: number, limit?: number, offset?: number, include?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getRuns', 'code', code)
-            const localVarPath = `/run/{code}`
+            const localVarPath = `/v1/run/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -309,7 +309,7 @@ export const RunsApiAxiosParamCreator = function (configuration?: Configuration)
             assertParamExists('updateRunPublicity', 'id', id)
             // verify required parameter 'runPublic' is not null or undefined
             assertParamExists('updateRunPublicity', 'runPublic', runPublic)
-            const localVarPath = `/run/{code}/{id}/public`
+            const localVarPath = `/v1/run/{code}/{id}/public`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.

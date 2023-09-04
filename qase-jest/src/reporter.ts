@@ -3,11 +3,14 @@ import get from 'lodash.get';
 import { v4 as uuidv4 } from 'uuid';
 import { Reporter, Test, TestResult, Config } from '@jest/reporters';
 import { Status } from '@jest/test-result';
+
 import {
   QaseReporter,
   ConfigType,
   ReporterInterface,
   TestStatusEnum,
+  ConfigLoader,
+  composeOptions,
 } from 'qase-javascript-commons';
 
 export type JestQaseOptionsType = ConfigType;
@@ -55,10 +58,19 @@ export class JestQaseReporter implements Reporter {
   /**
    * @param {Config.GlobalConfig} _
    * @param {JestQaseOptionsType} options
+   * @param {unknown} _state
+   * @param {ConfigLoaderInterface} configLoader
    */
-  public constructor(_: Config.GlobalConfig, options: JestQaseOptionsType) {
+  public constructor(
+    _: Config.GlobalConfig,
+    options: JestQaseOptionsType,
+    _state: unknown,
+    configLoader = new ConfigLoader(),
+  ) {
+    const config = configLoader.load();
+
     this.reporter = new QaseReporter({
-      ...options,
+      ...composeOptions(options, config),
       frameworkPackage: 'jest',
       frameworkName: 'jest',
       reporterName: 'jest-qase-reporter',

@@ -21,6 +21,10 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
+import { Bulk200Response } from '../model';
+// @ts-ignore
+import { BulkRequest } from '../model';
+// @ts-ignore
 import { IdResponse } from '../model';
 // @ts-ignore
 import { TestCaseCreate } from '../model';
@@ -37,6 +41,49 @@ import { TestCaseUpdate } from '../model';
 export const CasesApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
+         * This method allows to bulk create new test cases in a project. 
+         * @summary Create test cases in bulk.
+         * @param {string} code Code of project, where to search entities.
+         * @param {BulkRequest} bulkRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        bulk: async (code: string, bulkRequest: BulkRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'code' is not null or undefined
+            assertParamExists('bulk', 'code', code)
+            // verify required parameter 'bulkRequest' is not null or undefined
+            assertParamExists('bulk', 'bulkRequest', bulkRequest)
+            const localVarPath = `/v1/case/{code}/bulk`
+                .replace(`{${"code"}}`, encodeURIComponent(String(code)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication TokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Token", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(bulkRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * This method allows to create a new test case in selected project. 
          * @summary Create a new test case.
          * @param {string} code Code of project, where to search entities.
@@ -49,7 +96,7 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
             assertParamExists('createCase', 'code', code)
             // verify required parameter 'testCaseCreate' is not null or undefined
             assertParamExists('createCase', 'testCaseCreate', testCaseCreate)
-            const localVarPath = `/case/{code}`
+            const localVarPath = `/v1/case/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -92,7 +139,7 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
             assertParamExists('deleteCase', 'code', code)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('deleteCase', 'id', id)
-            const localVarPath = `/case/{code}/{id}`
+            const localVarPath = `/v1/case/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -133,7 +180,7 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
             assertParamExists('getCase', 'code', code)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('getCase', 'id', id)
-            const localVarPath = `/case/{code}/{id}`
+            const localVarPath = `/v1/case/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -182,7 +229,7 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
         getCases: async (code: string, search?: string, milestoneId?: number, suiteId?: number, severity?: string, priority?: string, type?: string, behavior?: string, automation?: string, status?: string, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getCases', 'code', code)
-            const localVarPath = `/case/{code}`
+            const localVarPath = `/v1/case/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -269,7 +316,7 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
             assertParamExists('updateCase', 'id', id)
             // verify required parameter 'testCaseUpdate' is not null or undefined
             assertParamExists('updateCase', 'testCaseUpdate', testCaseUpdate)
-            const localVarPath = `/case/{code}/{id}`
+            const localVarPath = `/v1/case/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -310,6 +357,18 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
 export const CasesApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = CasesApiAxiosParamCreator(configuration)
     return {
+        /**
+         * This method allows to bulk create new test cases in a project. 
+         * @summary Create test cases in bulk.
+         * @param {string} code Code of project, where to search entities.
+         * @param {BulkRequest} bulkRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async bulk(code: string, bulkRequest: BulkRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Bulk200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.bulk(code, bulkRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
         /**
          * This method allows to create a new test case in selected project. 
          * @summary Create a new test case.
@@ -392,6 +451,17 @@ export const CasesApiFactory = function (configuration?: Configuration, basePath
     const localVarFp = CasesApiFp(configuration)
     return {
         /**
+         * This method allows to bulk create new test cases in a project. 
+         * @summary Create test cases in bulk.
+         * @param {string} code Code of project, where to search entities.
+         * @param {BulkRequest} bulkRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        bulk(code: string, bulkRequest: BulkRequest, options?: any): AxiosPromise<Bulk200Response> {
+            return localVarFp.bulk(code, bulkRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * This method allows to create a new test case in selected project. 
          * @summary Create a new test case.
          * @param {string} code Code of project, where to search entities.
@@ -467,6 +537,19 @@ export const CasesApiFactory = function (configuration?: Configuration, basePath
  * @extends {BaseAPI}
  */
 export class CasesApi extends BaseAPI {
+    /**
+     * This method allows to bulk create new test cases in a project. 
+     * @summary Create test cases in bulk.
+     * @param {string} code Code of project, where to search entities.
+     * @param {BulkRequest} bulkRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CasesApi
+     */
+    public bulk(code: string, bulkRequest: BulkRequest, options?: AxiosRequestConfig) {
+        return CasesApiFp(this.configuration).bulk(code, bulkRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * This method allows to create a new test case in selected project. 
      * @summary Create a new test case.

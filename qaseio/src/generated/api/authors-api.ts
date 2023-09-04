@@ -40,7 +40,7 @@ export const AuthorsApiAxiosParamCreator = function (configuration?: Configurati
         getAuthor: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('getAuthor', 'id', id)
-            const localVarPath = `/author/{id}`
+            const localVarPath = `/v1/author/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -78,7 +78,7 @@ export const AuthorsApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getAuthors: async (search?: string, type?: 'app' | 'user', limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/author`;
+            const localVarPath = `/v1/author`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

@@ -6,12 +6,16 @@ import {
   TestStep,
   TestStatus,
 } from '@playwright/test/reporter';
+import { v4 as uuidv4 } from 'uuid';
+
 import {
+  ConfigLoader,
   ConfigType,
   QaseReporter,
   ReporterInterface,
   TestStatusEnum,
   TestStepType,
+  composeOptions,
 } from 'qase-javascript-commons';
 
 type ArrayItemType<T> = T extends Array<infer R> ? R : never;
@@ -51,9 +55,7 @@ export class PlaywrightQaseReporter implements Reporter {
   }
 
   private static transformSuiteTitle(test: TestCase) {
-    const [, ...titles] = test.titlePath();
-
-    return titles;
+    return test.titlePath().filter(Boolean);
   }
 
   /**
@@ -89,6 +91,7 @@ export class PlaywrightQaseReporter implements Reporter {
    */
   private static transformSteps(testSteps: TestStep[]): TestStepType[] {
     return testSteps.map(({ title, duration, error, steps }) => ({
+      id: uuidv4(),
       title,
       status: error ? TestStatusEnum.failed : TestStatusEnum.passed,
       duration,
@@ -105,10 +108,16 @@ export class PlaywrightQaseReporter implements Reporter {
 
   /**
    * @param {PlaywrightQaseOptionsType} options
+   * @param {ConfigLoaderInterface} configLoader
    */
-  public constructor(options: PlaywrightQaseOptionsType) {
+  public constructor(
+    options: PlaywrightQaseOptionsType,
+    configLoader = new ConfigLoader(),
+  ) {
+    const config = configLoader.load();
+
     this.reporter = new QaseReporter({
-      ...options,
+      ...composeOptions(options, config),
       frameworkPackage: '@playwright/test',
       frameworkName: 'playwright',
       reporterName: 'playwright-qase-reporter',
@@ -129,6 +138,7 @@ export class PlaywrightQaseReporter implements Reporter {
       error: result.error
         ? PlaywrightQaseReporter.transformError(result.error)
         : undefined,
+      startTime: result.startTime.valueOf(),
       duration: result.duration,
       steps: PlaywrightQaseReporter.transformSteps(result.steps),
       attachments: PlaywrightQaseReporter.transformAttachments(

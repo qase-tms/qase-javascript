@@ -19,7 +19,9 @@ export type TestResultType = {
   status: `${TestStatusEnum}`;
   suiteTitle?: string | string[] | undefined;
   error?: Error | undefined;
+  startTime?: number | undefined;
   duration?: number | undefined;
+  endTime?: number | undefined;
   steps?: TestStepType[] | undefined;
   attachments?: string[] | undefined;
 };

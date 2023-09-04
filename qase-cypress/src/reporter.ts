@@ -1,14 +1,18 @@
 import path from 'path';
 
 import { MochaOptions, reporters, Runner, Test } from 'mocha';
+
 import {
-  ConfigType,
+  ConfigLoader,
   QaseReporter,
   ReporterInterface,
   TestStatusEnum,
+  composeOptions,
 } from 'qase-javascript-commons';
 
 import { traverseDir } from './utils/traverse-dir';
+import { configSchema } from './configSchema'
+import { ReporterOptionsType } from './options';
 
 const {
   EVENT_TEST_FAIL,
@@ -18,10 +22,6 @@ const {
 } = Runner.constants;
 
 type CypressState = 'failed' | 'passed' | 'pending';
-
-export type ReporterOptionsType = ConfigType & {
-  screenshotsFolder?: string;
-};
 
 export type CypressQaseOptionsType = Omit<MochaOptions, 'reporterOptions'> & {
   reporterOptions: ReporterOptionsType;
@@ -97,16 +97,23 @@ export class CypressQaseReporter extends reporters.Base {
   /**
    * @param {Runner} runner
    * @param {CypressQaseOptionsType} options
+   * @param {ConfigLoaderInterface} configLoader
    */
-  public constructor(runner: Runner, options: CypressQaseOptionsType) {
+  public constructor(
+    runner: Runner,
+    options: CypressQaseOptionsType,
+    configLoader = new ConfigLoader(configSchema)
+  ) {
     super(runner, options);
 
-    const { screenshotsFolder, ...reporterOptions } = options.reporterOptions;
+    const { reporterOptions } = options;
+    const config = configLoader.load();
+    const { framework, ...composedOptions } = composeOptions(reporterOptions, config)
 
-    this.screenshotsFolder = screenshotsFolder;
+    this.screenshotsFolder = framework?.cypress?.screenshotsFolder;
 
     this.reporter = new QaseReporter({
-      ...reporterOptions,
+      ...composedOptions,
       frameworkPackage: 'cypress',
       frameworkName: 'cypress',
       reporterName: 'cypress-qase-reporter',

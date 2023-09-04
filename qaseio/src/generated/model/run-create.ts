@@ -80,5 +80,17 @@ export interface RunCreate {
      * @memberof RunCreate
      */
     'custom_field'?: { [key: string]: string; };
+    /**
+     * 
+     * @type {string}
+     * @memberof RunCreate
+     */
+    'start_time'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RunCreate
+     */
+    'end_time'?: string;
 }
 

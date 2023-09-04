@@ -1,8 +1,5 @@
-import { join } from 'path';
-import { readFileSync } from 'fs';
 import { execSync } from 'child_process';
 
-import mergeWith from 'lodash.mergewith';
 import envSchema from 'env-schema';
 import chalk from 'chalk';
 import { QaseApi } from 'qaseio';
@@ -14,8 +11,7 @@ import {
   ReportReporter,
   LoggerInterface,
 } from './reporters';
-import { ModeEnum, OptionsType } from './options';
-import { ConfigType, configValidationSchema } from './config';
+import { composeOptions, ModeEnum, OptionsType } from './options'
 import {
   EnvApiEnum,
   EnvTestOpsEnum,
@@ -26,11 +22,9 @@ import { TestStatusEnum, TestResultType } from './models';
 import { DriverEnum, FsWriter } from './writer';
 import { JsonFormatter } from './formatter';
 
-import { JsonValidationError, validateJson } from './utils/validate-json';
 import { getPackageVersion } from './utils/get-package-version';
 import { CustomBoundaryFormData } from './utils/custom-boundary';
 import { DisabledException } from './utils/disabled-exception';
-import { QaseError } from './utils/qase-error';
 
 /**
  * @type {Record<TestStatusEnum, (test: TestResultType) => string>}
@@ -49,69 +43,6 @@ const resultLogMap: Record<TestStatusEnum, (test: TestResultType) => string> = {
  * @implements AbstractReporter
  */
 export class QaseReporter extends AbstractReporter {
-  /**
-   * @type {string[]}
-   */
-  public static configFiles = ['qase.config.json', '.qaserc'];
-
-  /**
-   * @returns {null | string}
-   * @private
-   */
-  private static readConfig() {
-    for (const file of QaseReporter.configFiles) {
-      const filePath = join(process.cwd(), file);
-
-      try {
-        return readFileSync(filePath, 'utf8');
-      } catch (error) {
-        const isNotFound =
-          error instanceof Error &&
-          'code' in error &&
-          (error.code === 'ENOENT' || error.code === 'EISDIR');
-
-        if (!isNotFound) {
-          throw new QaseError('Cannot read config file', { cause: error });
-        }
-      }
-    }
-
-    return null;
-  }
-
-  /**
-   * @returns {ConfigType}
-   * @private
-   */
-  private static loadConfig(): ConfigType {
-    try {
-      const data = QaseReporter.readConfig();
-
-      if (data) {
-        const json: unknown = JSON.parse(data);
-
-        validateJson(configValidationSchema, json);
-
-        return json;
-      }
-    } catch (error) {
-      if (error instanceof JsonValidationError) {
-        const [validationError] = error.validationErrors;
-
-        const { instancePath = '', message = '' } = validationError ?? {};
-        const configPath = instancePath
-          ? `\`${instancePath.substring(1).replace('/', '.')}\``
-          : 'it';
-
-        throw new Error(`Invalid config: "${configPath}" ${message}`);
-      }
-
-      throw error;
-    }
-
-    return {};
-  }
-
   /**
    * @param {string} frameworkPackage
    * @param {string} frameworkName
@@ -175,13 +106,8 @@ export class QaseReporter extends AbstractReporter {
    * @param {LoggerInterface} logger
    */
   constructor(options: OptionsType, logger?: LoggerInterface) {
-    const composedOptions = mergeWith(
-      {},
-      options,
-      QaseReporter.loadConfig(),
-      envToConfig(envSchema({ schema: envValidationSchema })),
-      (value: unknown, src: unknown) => (src === undefined ? value : undefined),
-    );
+    const env = envToConfig(envSchema({ schema: envValidationSchema }));
+    const composedOptions = composeOptions(options, env);
 
     super({ debug: composedOptions.debug }, logger);
 
@@ -246,6 +172,7 @@ export class QaseReporter extends AbstractReporter {
       frameworkName,
       reporterName,
       mode = ModeEnum.off,
+      environment,
       report = {},
       testops = {},
       ...commonOptions
@@ -260,7 +187,7 @@ export class QaseReporter extends AbstractReporter {
             ...api
           } = {},
           baseUrl,
-          projectCode,
+          project,
           run: {
             title,
             description,
@@ -275,9 +202,9 @@ export class QaseReporter extends AbstractReporter {
           );
         }
 
-        if (!projectCode) {
+        if (!project) {
           throw new Error(
-            `Either "testops.projectCode" parameter or "${EnvTestOpsEnum.projectCode}" environment variable is required in "testops" mode`,
+            `Either "testops.project" parameter or "${EnvTestOpsEnum.project}" environment variable is required in "testops" mode`,
           );
         }
 
@@ -297,11 +224,12 @@ export class QaseReporter extends AbstractReporter {
         return new TestOpsReporter(
           {
             baseUrl,
-            projectCode,
+            project,
             uploadAttachments,
             run: {
               title: title ?? `Automated run ${new Date().toISOString()}`,
               description: description ?? `${reporterName} automated run`,
+              environment: typeof environment === 'number' ? environment : undefined,
               ...run,
             },
             ...commonOptions,

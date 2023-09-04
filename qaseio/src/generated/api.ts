@@ -23,6 +23,7 @@ export * from './api/environments-api';
 export * from './api/milestones-api';
 export * from './api/plans-api';
 export * from './api/projects-api';
+export * from './api/result-api';
 export * from './api/results-api';
 export * from './api/runs-api';
 export * from './api/search-api';

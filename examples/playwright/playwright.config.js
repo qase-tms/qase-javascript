@@ -15,12 +15,11 @@ const config = {
             token: 'api_key',
           },
 
-          projectCode: 'project_code',
+          project: 'project_code',
           uploadAttachments: true,
 
           run: {
             complete: true,
-            environment: 1,
           },
         },
       },

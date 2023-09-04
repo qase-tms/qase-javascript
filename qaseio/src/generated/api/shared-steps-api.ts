@@ -49,7 +49,7 @@ export const SharedStepsApiAxiosParamCreator = function (configuration?: Configu
             assertParamExists('createSharedStep', 'code', code)
             // verify required parameter 'sharedStepCreate' is not null or undefined
             assertParamExists('createSharedStep', 'sharedStepCreate', sharedStepCreate)
-            const localVarPath = `/shared_step/{code}`
+            const localVarPath = `/v1/shared_step/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -92,7 +92,7 @@ export const SharedStepsApiAxiosParamCreator = function (configuration?: Configu
             assertParamExists('deleteSharedStep', 'code', code)
             // verify required parameter 'hash' is not null or undefined
             assertParamExists('deleteSharedStep', 'hash', hash)
-            const localVarPath = `/shared_step/{code}/{hash}`
+            const localVarPath = `/v1/shared_step/{code}/{hash}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"hash"}}`, encodeURIComponent(String(hash)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -133,7 +133,7 @@ export const SharedStepsApiAxiosParamCreator = function (configuration?: Configu
             assertParamExists('getSharedStep', 'code', code)
             // verify required parameter 'hash' is not null or undefined
             assertParamExists('getSharedStep', 'hash', hash)
-            const localVarPath = `/shared_step/{code}/{hash}`
+            const localVarPath = `/v1/shared_step/{code}/{hash}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"hash"}}`, encodeURIComponent(String(hash)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -174,7 +174,7 @@ export const SharedStepsApiAxiosParamCreator = function (configuration?: Configu
         getSharedSteps: async (code: string, search?: string, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getSharedSteps', 'code', code)
-            const localVarPath = `/shared_step/{code}`
+            const localVarPath = `/v1/shared_step/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -229,7 +229,7 @@ export const SharedStepsApiAxiosParamCreator = function (configuration?: Configu
             assertParamExists('updateSharedStep', 'hash', hash)
             // verify required parameter 'sharedStepUpdate' is not null or undefined
             assertParamExists('updateSharedStep', 'sharedStepUpdate', sharedStepUpdate)
-            const localVarPath = `/shared_step/{code}/{hash}`
+            const localVarPath = `/v1/shared_step/{code}/{hash}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"hash"}}`, encodeURIComponent(String(hash)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.

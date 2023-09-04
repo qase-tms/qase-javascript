@@ -11,21 +11,25 @@ module.exports = cypress.defineConfig({
     },
     cypressQaseReporterReporterOptions: {
       debug: true,
-      screenshotsFolder: 'cypress/screenshots',
 
       testops: {
         api: {
           token: 'api_key',
         },
 
-        projectCode: 'project_code',
+        project: 'project_code',
         uploadAttachments: true,
 
         run: {
           complete: true,
-          environment: 1,
         },
       },
+
+      framework: {
+        cypress: {
+          screenshotsFolder: 'cypress/screenshots',
+        }
+      }
     },
   },
   video: false,

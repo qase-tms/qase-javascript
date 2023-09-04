@@ -4,6 +4,7 @@ import axiosRetry, { isIdempotentRequestError } from 'axios-retry';
 import {
   ProjectsApi,
   CasesApi,
+  ResultApi,
   ResultsApi,
   RunsApi,
   AttachmentsApi,
@@ -28,6 +29,7 @@ export type QaseApiOptionsType = {
 export interface QaseApiInterface {
   projects: ProjectsApi;
   cases: CasesApi;
+  result: ResultApi;
   results: ResultsApi;
   runs: RunsApi;
   attachments: AttachmentsApi;
@@ -47,6 +49,7 @@ export interface QaseApiInterface {
 export class QaseApi implements QaseApiInterface {
   public projects: ProjectsApi;
   public cases: CasesApi;
+  public result: ResultApi;
   public results: ResultsApi;
   public runs: RunsApi;
   public attachments: AttachmentsApi;
@@ -93,6 +96,7 @@ export class QaseApi implements QaseApiInterface {
 
     this.projects = new ProjectsApi(configuration, baseUrl, transport);
     this.cases = new CasesApi(configuration, baseUrl, transport);
+    this.result = new ResultApi(configuration, baseUrl, transport);
     this.results = new ResultsApi(configuration, baseUrl, transport);
     this.runs = new RunsApi(configuration, baseUrl, transport);
     this.attachments = new AttachmentsApi(configuration, baseUrl, transport);

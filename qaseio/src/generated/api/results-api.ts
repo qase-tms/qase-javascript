@@ -58,7 +58,7 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('createResult', 'id', id)
             // verify required parameter 'resultCreate' is not null or undefined
             assertParamExists('createResult', 'resultCreate', resultCreate)
-            const localVarPath = `/result/{code}/{id}`
+            const localVarPath = `/v1/result/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -105,7 +105,7 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('createResultBulk', 'id', id)
             // verify required parameter 'resultCreateBulk' is not null or undefined
             assertParamExists('createResultBulk', 'resultCreateBulk', resultCreateBulk)
-            const localVarPath = `/result/{code}/{id}/bulk`
+            const localVarPath = `/v1/result/{code}/{id}/bulk`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -152,7 +152,7 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('deleteResult', 'id', id)
             // verify required parameter 'hash' is not null or undefined
             assertParamExists('deleteResult', 'hash', hash)
-            const localVarPath = `/result/{code}/{id}/{hash}`
+            const localVarPath = `/v1/result/{code}/{id}/{hash}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)))
                 .replace(`{${"hash"}}`, encodeURIComponent(String(hash)));
@@ -194,7 +194,7 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('getResult', 'code', code)
             // verify required parameter 'hash' is not null or undefined
             assertParamExists('getResult', 'hash', hash)
-            const localVarPath = `/result/{code}/{hash}`
+            const localVarPath = `/v1/result/{code}/{hash}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"hash"}}`, encodeURIComponent(String(hash)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -241,7 +241,7 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
         getResults: async (code: string, status?: string, run?: string, caseId?: string, member?: string, api?: boolean, fromEndTime?: string, toEndTime?: string, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getResults', 'code', code)
-            const localVarPath = `/result/{code}`
+            const localVarPath = `/v1/result/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -323,7 +323,7 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('updateResult', 'hash', hash)
             // verify required parameter 'resultUpdate' is not null or undefined
             assertParamExists('updateResult', 'resultUpdate', resultUpdate)
-            const localVarPath = `/result/{code}/{id}/{hash}`
+            const localVarPath = `/v1/result/{code}/{id}/{hash}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)))
                 .replace(`{${"hash"}}`, encodeURIComponent(String(hash)));

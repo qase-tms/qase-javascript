@@ -51,7 +51,7 @@ export const SuitesApiAxiosParamCreator = function (configuration?: Configuratio
             assertParamExists('createSuite', 'code', code)
             // verify required parameter 'suiteCreate' is not null or undefined
             assertParamExists('createSuite', 'suiteCreate', suiteCreate)
-            const localVarPath = `/suite/{code}`
+            const localVarPath = `/v1/suite/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -95,7 +95,7 @@ export const SuitesApiAxiosParamCreator = function (configuration?: Configuratio
             assertParamExists('deleteSuite', 'code', code)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('deleteSuite', 'id', id)
-            const localVarPath = `/suite/{code}/{id}`
+            const localVarPath = `/v1/suite/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -139,7 +139,7 @@ export const SuitesApiAxiosParamCreator = function (configuration?: Configuratio
             assertParamExists('getSuite', 'code', code)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('getSuite', 'id', id)
-            const localVarPath = `/suite/{code}/{id}`
+            const localVarPath = `/v1/suite/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -180,7 +180,7 @@ export const SuitesApiAxiosParamCreator = function (configuration?: Configuratio
         getSuites: async (code: string, search?: string, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getSuites', 'code', code)
-            const localVarPath = `/suite/{code}`
+            const localVarPath = `/v1/suite/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -235,7 +235,7 @@ export const SuitesApiAxiosParamCreator = function (configuration?: Configuratio
             assertParamExists('updateSuite', 'id', id)
             // verify required parameter 'suiteUpdate' is not null or undefined
             assertParamExists('updateSuite', 'suiteUpdate', suiteUpdate)
-            const localVarPath = `/suite/{code}/{id}`
+            const localVarPath = `/v1/suite/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.

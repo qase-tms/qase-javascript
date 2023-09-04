@@ -48,7 +48,7 @@ export const ProjectsApiAxiosParamCreator = function (configuration?: Configurat
         createProject: async (projectCreate: ProjectCreate, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'projectCreate' is not null or undefined
             assertParamExists('createProject', 'projectCreate', projectCreate)
-            const localVarPath = `/project`;
+            const localVarPath = `/v1/project`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -87,7 +87,7 @@ export const ProjectsApiAxiosParamCreator = function (configuration?: Configurat
         deleteProject: async (code: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('deleteProject', 'code', code)
-            const localVarPath = `/project/{code}`
+            const localVarPath = `/v1/project/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -124,7 +124,7 @@ export const ProjectsApiAxiosParamCreator = function (configuration?: Configurat
         getProject: async (code: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getProject', 'code', code)
-            const localVarPath = `/project/{code}`
+            const localVarPath = `/v1/project/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -160,7 +160,7 @@ export const ProjectsApiAxiosParamCreator = function (configuration?: Configurat
          * @throws {RequiredError}
          */
         getProjects: async (limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/project`;
+            const localVarPath = `/v1/project`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -207,7 +207,7 @@ export const ProjectsApiAxiosParamCreator = function (configuration?: Configurat
             assertParamExists('grantAccessToProject', 'code', code)
             // verify required parameter 'projectAccess' is not null or undefined
             assertParamExists('grantAccessToProject', 'projectAccess', projectAccess)
-            const localVarPath = `/project/{code}/access`
+            const localVarPath = `/v1/project/{code}/access`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -250,7 +250,7 @@ export const ProjectsApiAxiosParamCreator = function (configuration?: Configurat
             assertParamExists('revokeAccessToProject', 'code', code)
             // verify required parameter 'projectAccess' is not null or undefined
             assertParamExists('revokeAccessToProject', 'projectAccess', projectAccess)
-            const localVarPath = `/project/{code}/access`
+            const localVarPath = `/v1/project/{code}/access`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);

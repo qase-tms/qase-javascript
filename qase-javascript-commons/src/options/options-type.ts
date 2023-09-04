@@ -28,8 +28,13 @@ export type OptionsType = {
   reporterName: string;
   mode?: `${ModeEnum}` | undefined;
   debug?: boolean | undefined;
+  environment?: string | number | undefined;
   testops?:
     | (RecursivePartial<TestOpsOptionsType> & AdditionalTestOpsOptionsType)
     | undefined;
   report?: RecursivePartial<AdditionalReportOptionsType> | undefined;
 };
+
+export type FrameworkOptionsType<F extends string, O> = {
+  framework?: Partial<Record<F, O>>
+}

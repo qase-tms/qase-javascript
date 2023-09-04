@@ -40,7 +40,7 @@ export const SearchApiAxiosParamCreator = function (configuration?: Configuratio
         search: async (query: string, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'query' is not null or undefined
             assertParamExists('search', 'query', query)
-            const localVarPath = `/search`;
+            const localVarPath = `/v1/search`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

@@ -5,6 +5,7 @@ export enum StepStatusEnum {
 }
 
 export type TestStepType = {
+  id: string;
   title: string;
   status: `${StepStatusEnum}`;
   duration?: number | undefined;

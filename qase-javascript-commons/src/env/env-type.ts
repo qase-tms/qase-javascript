@@ -11,8 +11,9 @@ import { ModeEnum } from '../options';
 export type EnvType = {
   [EnvEnum.mode]?: `${ModeEnum}`;
   [EnvEnum.debug]?: boolean;
+  [EnvEnum.environment]?: string | number;
 
-  [EnvTestOpsEnum.projectCode]?: string;
+  [EnvTestOpsEnum.project]?: string;
   [EnvTestOpsEnum.baseUrl]?: string;
   [EnvTestOpsEnum.uploadAttachments]?: boolean;
 

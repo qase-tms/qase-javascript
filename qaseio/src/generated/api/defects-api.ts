@@ -53,7 +53,7 @@ export const DefectsApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('createDefect', 'code', code)
             // verify required parameter 'defectCreate' is not null or undefined
             assertParamExists('createDefect', 'defectCreate', defectCreate)
-            const localVarPath = `/defect/{code}`
+            const localVarPath = `/v1/defect/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -96,7 +96,7 @@ export const DefectsApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('deleteDefect', 'code', code)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('deleteDefect', 'id', id)
-            const localVarPath = `/defect/{code}/{id}`
+            const localVarPath = `/v1/defect/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -137,7 +137,7 @@ export const DefectsApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('getDefect', 'code', code)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('getDefect', 'id', id)
-            const localVarPath = `/defect/{code}/{id}`
+            const localVarPath = `/v1/defect/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -178,7 +178,7 @@ export const DefectsApiAxiosParamCreator = function (configuration?: Configurati
         getDefects: async (code: string, status?: 'open' | 'resolved' | 'in_progress' | 'invalid', limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getDefects', 'code', code)
-            const localVarPath = `/defect/{code}`
+            const localVarPath = `/v1/defect/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -230,7 +230,7 @@ export const DefectsApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('resolveDefect', 'code', code)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('resolveDefect', 'id', id)
-            const localVarPath = `/defect/{code}/resolve/{id}`
+            const localVarPath = `/v1/defect/{code}/resolve/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -274,7 +274,7 @@ export const DefectsApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('updateDefect', 'id', id)
             // verify required parameter 'defectUpdate' is not null or undefined
             assertParamExists('updateDefect', 'defectUpdate', defectUpdate)
-            const localVarPath = `/defect/{code}/{id}`
+            const localVarPath = `/v1/defect/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -321,7 +321,7 @@ export const DefectsApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('updateDefectStatus', 'id', id)
             // verify required parameter 'defectStatus' is not null or undefined
             assertParamExists('updateDefectStatus', 'defectStatus', defectStatus)
-            const localVarPath = `/defect/{code}/status/{id}`
+            const localVarPath = `/v1/defect/{code}/status/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.

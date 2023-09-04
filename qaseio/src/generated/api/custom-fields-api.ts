@@ -48,7 +48,7 @@ export const CustomFieldsApiAxiosParamCreator = function (configuration?: Config
         createCustomField: async (customFieldCreate: CustomFieldCreate, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'customFieldCreate' is not null or undefined
             assertParamExists('createCustomField', 'customFieldCreate', customFieldCreate)
-            const localVarPath = `/custom_field`;
+            const localVarPath = `/v1/custom_field`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -87,7 +87,7 @@ export const CustomFieldsApiAxiosParamCreator = function (configuration?: Config
         deleteCustomField: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('deleteCustomField', 'id', id)
-            const localVarPath = `/custom_field/{id}`
+            const localVarPath = `/v1/custom_field/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -124,7 +124,7 @@ export const CustomFieldsApiAxiosParamCreator = function (configuration?: Config
         getCustomField: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('getCustomField', 'id', id)
-            const localVarPath = `/custom_field/{id}`
+            const localVarPath = `/v1/custom_field/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -162,7 +162,7 @@ export const CustomFieldsApiAxiosParamCreator = function (configuration?: Config
          * @throws {RequiredError}
          */
         getCustomFields: async (entity?: 'case' | 'run' | 'defect', type?: 'string' | 'text' | 'number' | 'checkbox' | 'selectbox' | 'radio' | 'multiselect' | 'url' | 'user' | 'datetime', limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/custom_field`;
+            const localVarPath = `/v1/custom_field`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -217,7 +217,7 @@ export const CustomFieldsApiAxiosParamCreator = function (configuration?: Config
             assertParamExists('updateCustomField', 'id', id)
             // verify required parameter 'customFieldUpdate' is not null or undefined
             assertParamExists('updateCustomField', 'customFieldUpdate', customFieldUpdate)
-            const localVarPath = `/custom_field/{id}`
+            const localVarPath = `/v1/custom_field/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);

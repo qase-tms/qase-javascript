@@ -76,9 +76,10 @@ Reporter options (* - required):
 
 - `mode` - `testops`/`off` Enables reporter, default - `off`
 - `debug` - Enables debug logging, defaule - `false`
+- `environment` - To execute with the sending of the envinroment information
 - *`testops.api.token` - Token for API access, you can find more information
   [here](https://developers.qase.io/#authentication)
-- *`testops.projectCode` - Code of your project (can be extracted from main
+- *`testops.project` - Code of your project (can be extracted from main
   page of your project: `https://app.qase.io/project/DEMOTR` -
   `DEMOTR` is project code here)
 - `testops.uploadAttachments` - Permission to send screenshots to Qase TMS
@@ -86,8 +87,7 @@ Reporter options (* - required):
 - `testops.run.title` - Set custom Run name, when new run is created
 - `testops.run.description` - Set custom Run description, when new run is created
 - `testops.run.complete` - Whether the run should be completed
-- `testops.run.environment` - To execute with the sending of the envinroment information
-- `screenshotFolder` - Folder for save screenshot cypress
+- `framework.cypress.screenshotFolder` - Folder for save screenshot cypress
 
 #### You can check example configuration with multiple reporters in [demo project](../examples/cypress/cypress.config.js).
 
@@ -95,12 +95,12 @@ Supported ENV variables:
 
 - `QASE_MODE` - Same as `mode`
 - `QASE_DEBUG` - Same as `debug`
+- `QASE_ENVIRONMENT` - Same as `environment`
 - `QASE_TESTOPS_API_TOKEN` - Same as `testops.api.token`
-- `QASE_TESTOPS_PROJECT_CODE` - Same as `testops.projectCode`
+- `QASE_TESTOPS_PROJECT` - Same as `testops.project`
 - `QASE_TESTOPS_RUN_ID` - Pass Run ID from ENV and override reporter option `testops.run.id`
 - `QASE_TESTOPS_RUN_TITLE` - Same as `testops.run.title`
 - `QASE_TESTOPS_RUN_DESCRIPTION` - Same as `testops.run.description`
-- `QASE_TESTOPS_RUN_ENVIRONMENT` - Same as `testops.run.environment`
 
 ## Requirements
 

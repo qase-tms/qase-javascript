@@ -49,7 +49,7 @@ export const MilestonesApiAxiosParamCreator = function (configuration?: Configur
             assertParamExists('createMilestone', 'code', code)
             // verify required parameter 'milestoneCreate' is not null or undefined
             assertParamExists('createMilestone', 'milestoneCreate', milestoneCreate)
-            const localVarPath = `/milestone/{code}`
+            const localVarPath = `/v1/milestone/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -92,7 +92,7 @@ export const MilestonesApiAxiosParamCreator = function (configuration?: Configur
             assertParamExists('deleteMilestone', 'code', code)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('deleteMilestone', 'id', id)
-            const localVarPath = `/milestone/{code}/{id}`
+            const localVarPath = `/v1/milestone/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -133,7 +133,7 @@ export const MilestonesApiAxiosParamCreator = function (configuration?: Configur
             assertParamExists('getMilestone', 'code', code)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('getMilestone', 'id', id)
-            const localVarPath = `/milestone/{code}/{id}`
+            const localVarPath = `/v1/milestone/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -174,7 +174,7 @@ export const MilestonesApiAxiosParamCreator = function (configuration?: Configur
         getMilestones: async (code: string, search?: string, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getMilestones', 'code', code)
-            const localVarPath = `/milestone/{code}`
+            const localVarPath = `/v1/milestone/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -229,7 +229,7 @@ export const MilestonesApiAxiosParamCreator = function (configuration?: Configur
             assertParamExists('updateMilestone', 'id', id)
             // verify required parameter 'milestoneUpdate' is not null or undefined
             assertParamExists('updateMilestone', 'milestoneUpdate', milestoneUpdate)
-            const localVarPath = `/milestone/{code}/{id}`
+            const localVarPath = `/v1/milestone/{code}/{id}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.

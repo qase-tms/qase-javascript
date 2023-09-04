@@ -21,6 +21,10 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
       type: 'boolean',
       nullable: true,
     },
+    environment: {
+      type: ['string', 'number'],
+      nullable: true,
+    },
 
     testops: {
       type: 'object',
@@ -65,7 +69,7 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
           },
         },
 
-        projectCode: {
+        project: {
           type: 'string',
           nullable: true,
         },

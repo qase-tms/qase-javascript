@@ -1,9 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
+
 import {
+  ConfigLoader,
   ConfigType,
   QaseReporter,
   ReporterInterface,
   TestStatusEnum,
+  composeOptions
 } from 'qase-javascript-commons';
 
 type CallsiteRecordType = {
@@ -135,10 +138,16 @@ export class TestcafeQaseReporter {
 
   /**
    * @param {TestcafeQaseOptionsType} options
+   * @param {ConfigLoaderInterface} configLoader
    */
-  public constructor(options: TestcafeQaseOptionsType) {
+  public constructor(
+    options: TestcafeQaseOptionsType,
+    configLoader = new ConfigLoader(),
+  ) {
+    const config = configLoader.load();
+
     this.reporter = new QaseReporter({
-      ...options,
+      ...composeOptions(options, config),
       frameworkPackage: 'testcafe',
       frameworkName: 'testcafe',
       reporterName: 'testcafe-reporter-qase',
