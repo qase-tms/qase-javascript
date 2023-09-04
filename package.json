@@ -1,7 +1,7 @@
 {
   "name": "qase-javascript",
   "private": true,
-  "version": "2.0.0",
+  "version": "2.0.0-beta.0",
   "description": "This is a monorepo for all JavaScript-related projects",
   "repository": {
     "type": "git",
