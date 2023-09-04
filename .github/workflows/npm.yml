@@ -9,7 +9,7 @@ jobs:
       max-parallel: 5
       matrix:
         node-version: [ '16', '18' ]
-        prefix: [ "qaseio", "qase-cypress", "qase-cucumberjs", "qase-newman", "qase-testcafe", "qase-jest", "qase-playwright" ]
+        prefix: [ "qaseio", "qase-javascript-commons", "qase-cypress", "qase-cucumberjs", "qase-newman", "qase-testcafe", "qase-jest", "qase-playwright" ]
     name: Project ${{ matrix.prefix }} - Node ${{ matrix.node-version }}
     steps:
     - uses: actions/checkout@v2
@@ -26,7 +26,7 @@ jobs:
     strategy:
       max-parallel: 5
       matrix:
-        prefix: [ "qaseio", "qase-cypress", "qase-cucumberjs", "qase-newman", "qase-testcafe", "qase-jest", "qase-playwright" ]
+        prefix: [ "qaseio", "qase-javascript-commons", "qase-cypress", "qase-cucumberjs", "qase-newman", "qase-testcafe", "qase-jest", "qase-playwright" ]
     if: startsWith(github.event.ref, 'refs/tags')
     name: Publish ${{ matrix.prefix }}
     steps:
