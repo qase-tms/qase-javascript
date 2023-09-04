@@ -1,5 +1,5 @@
 import axios from 'axios';
-import axiosRetry, { isIdempotentRequestError } from 'axios-retry';
+import * as axiosRetry from 'axios-retry';
 
 import {
   ProjectsApi,
@@ -86,7 +86,7 @@ export class QaseApi implements QaseApiInterface {
     axiosRetry(transport, {
       retries,
       retryDelay: () => retryDelay,
-      retryCondition: isIdempotentRequestError,
+      retryCondition: axiosRetry.isIdempotentRequestError,
     });
 
     const configuration = new Configuration({
