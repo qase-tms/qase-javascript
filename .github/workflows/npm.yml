@@ -34,7 +34,7 @@ jobs:
     - uses: actions/setup-node@v1
       if: contains(github.event.ref, matrix.prefix)
       with:
-        node-version: '14'
+        node-version: '16'
         registry-url: 'https://registry.npmjs.org'
     - if: contains(github.event.ref, matrix.prefix)
       run: npm install
