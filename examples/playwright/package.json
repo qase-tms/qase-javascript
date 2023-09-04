@@ -6,6 +6,6 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.34.3",
-    "playwright-qase-reporter": "^2.0.0"
+    "playwright-qase-reporter": "^2.0.0-beta.0"
   }
 }
