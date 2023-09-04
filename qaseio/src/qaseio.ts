@@ -86,6 +86,7 @@ export class QaseApi implements QaseApiInterface {
     axiosRetry(transport, {
       retries,
       retryDelay: () => retryDelay,
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       retryCondition: axiosRetry.isIdempotentRequestError,
     });
 
