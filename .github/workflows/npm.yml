@@ -16,10 +16,14 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm install
-    - run: npm run build -ws --if-present
-    - run: npm run lint -w ${{ matrix.prefix }}
-    - run: npm run test -w ${{ matrix.prefix }}
+    - working-directory: .
+      run: npm install
+    - working-directory: .
+      run: npm run build -ws --if-present
+    - working-directory: .
+      run: npm run lint -w ${{ matrix.prefix }}
+    - working-directory: .
+      run: npm run test -w ${{ matrix.prefix }}
   build-n-publish:
     runs-on: ubuntu-latest
     needs: test
