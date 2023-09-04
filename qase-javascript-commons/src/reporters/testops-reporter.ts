@@ -149,7 +149,7 @@ export class TestOpsReporter extends AbstractReporter {
     }
 
     if (resultOrStep.steps) {
-      for (let step of resultOrStep.steps) {
+      for (const step of resultOrStep.steps) {
         this.addAttachments(step);
       }
     }
