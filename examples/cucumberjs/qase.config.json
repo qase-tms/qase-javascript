@@ -3,11 +3,10 @@
 
   "testops": {
     "api": {
-      "token": "f59e24cef95dd7aa833bc2ec69aa21e9c889dd0161d307e389f4074c00e0e6c1",
-      "baseUrl": "https://api.stage.qase.io"
+      "token": "api_key"
     },
 
-    "project": "FOOBAR",
+    "project": "project_code",
 
     "run": {
       "complete": true

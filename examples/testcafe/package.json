@@ -7,6 +7,6 @@
   "devDependencies": {
     "eslint-plugin-testcafe": "^0.2.1",
     "testcafe": "^2.6.0",
-    "testcafe-reporter-qase": "^2.0.0-beta.0"
+    "testcafe-reporter-qase": "^2.0.0-beta.1"
   }
 }
