@@ -18,7 +18,7 @@ import {
   composeOptions,
 } from 'qase-javascript-commons';
 
-type ArrayItemType<T> = T extends Array<infer R> ? R : never;
+type ArrayItemType<T> = T extends (infer R)[] ? R : never;
 
 export type PlaywrightQaseOptionsType = ConfigType;
 
@@ -138,7 +138,7 @@ export class PlaywrightQaseReporter implements Reporter {
       error: result.error
         ? PlaywrightQaseReporter.transformError(result.error)
         : undefined,
-      startTime: result.startTime.valueOf(),
+      startTime: result.startTime.valueOf() / 1000,
       duration: result.duration,
       steps: PlaywrightQaseReporter.transformSteps(result.steps),
       attachments: PlaywrightQaseReporter.transformAttachments(
