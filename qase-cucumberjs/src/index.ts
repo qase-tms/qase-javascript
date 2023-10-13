@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable max-len */
 /* eslint-disable no-console,no-underscore-dangle,@typescript-eslint/no-non-null-assertion */
+import { Attachment, Envelope, PickleTag, TestCaseFinished, TestCaseStarted, TestStepResultStatus } from '@cucumber/messages';
 import { IdResponse, ResultCreate, ResultCreateStatusEnum } from 'qaseio/dist/src';
 import FormData from 'form-data';
 import { Formatter } from '@cucumber/cucumber';
@@ -10,15 +11,10 @@ import chalk from 'chalk';
 import crypto from 'crypto';
 import { execSync } from 'child_process';
 import fs from 'fs';
-import { io } from '@cucumber/messages/dist/src/messages';
 import mime from 'mime-types';
 import moment from 'moment';
 import os from 'os';
 import path from 'path';
-import IEnvelope = io.cucumber.messages.IEnvelope;
-import ITestCaseFinished = io.cucumber.messages.ITestCaseFinished;
-import ITestCaseStarted = io.cucumber.messages.ITestCaseStarted;
-import Status = io.cucumber.messages.TestStepFinished.TestStepResult.Status;
 
 interface Config {
     enabled: boolean;
@@ -36,22 +32,22 @@ interface Config {
 
 interface Test {
     name: string;
-    started: ITestCaseStarted;
-    finished: ITestCaseFinished;
+    started: TestCaseStarted;
+    finished: TestCaseFinished;
     duration: number;
     caseIds: string[];
     error?: string;
     lastAstNodeId: string | null;
 }
 
-const StatusMapping: Record<Status, ResultCreateStatusEnum | null> = {
-    [Status.PASSED]: ResultCreateStatusEnum.PASSED,
-    [Status.FAILED]: ResultCreateStatusEnum.FAILED,
-    [Status.SKIPPED]: ResultCreateStatusEnum.SKIPPED,
-    [Status.AMBIGUOUS]: null,
-    [Status.PENDING]: null,
-    [Status.UNDEFINED]: null,
-    [Status.UNKNOWN]: null,
+const StatusMapping: Record<TestStepResultStatus, ResultCreateStatusEnum | null> = {
+    [TestStepResultStatus.PASSED]: ResultCreateStatusEnum.PASSED,
+    [TestStepResultStatus.FAILED]: ResultCreateStatusEnum.FAILED,
+    [TestStepResultStatus.SKIPPED]: ResultCreateStatusEnum.SKIPPED,
+    [TestStepResultStatus.AMBIGUOUS]: null,
+    [TestStepResultStatus.PENDING]: null,
+    [TestStepResultStatus.UNDEFINED]: null,
+    [TestStepResultStatus.UNKNOWN]: null,
 };
 
 let customBoundary = '----------------------------';
@@ -138,7 +134,7 @@ class QaseReporter extends Formatter {
     private enabled: boolean;
 
     private pickleInfo: Record<string, { caseIds: string[]; name: string; lastAstNodeId: string | null }> = {};
-    private testCaseStarts: Record<string, ITestCaseStarted> = {};
+    private testCaseStarts: Record<string, TestCaseStarted> = {};
     private testCaseStartedResult: Record<string, ResultCreateStatusEnum> = {};
     private testCaseStartedAttachment: Record<string, string[]> = {};
     private testCaseStartedErrors: Record<string, string[]> = {};
@@ -165,7 +161,7 @@ class QaseReporter extends Formatter {
         this.config.runName = prepareReportName(this.config);
 
         options.eventBroadcaster
-            .on('envelope', (envelope: IEnvelope) => {
+            .on('envelope', (envelope: Envelope) => {
                 if (envelope.gherkinDocument) {
                     envelope.gherkinDocument.feature?.children?.forEach((featureChild) => {
                         if (envelope.gherkinDocument?.feature?.name != null && featureChild.scenario?.id !== undefined && featureChild.scenario?.id !== null) {
@@ -173,9 +169,9 @@ class QaseReporter extends Formatter {
                         }
                     });
                 } else if (envelope.pickle) {
-                    this.pickleInfo[envelope.pickle.id!] = {
-                        caseIds: this.extractIds(envelope.pickle.tags!),
-                        name: envelope.pickle.name!,
+                    this.pickleInfo[envelope.pickle.id] = {
+                        caseIds: this.extractIds(envelope.pickle.tags),
+                        name: envelope.pickle.name,
                         lastAstNodeId: envelope.pickle.astNodeIds ? envelope.pickle.astNodeIds[envelope.pickle.astNodeIds.length - 1] : null,
                     };
                 } else if (envelope.attachment) {
@@ -234,16 +230,16 @@ class QaseReporter extends Formatter {
 
                     void this.publishResults();
                 } else if (envelope.testCase) {
-                    this.testCaseScenarioId[envelope.testCase.id!] = envelope.testCase.pickleId!;
+                    this.testCaseScenarioId[envelope.testCase.id] = envelope.testCase.pickleId;
                 } else if (envelope.testCaseStarted) {
-                    this.testCaseStarts[envelope.testCaseStarted.id!] = envelope.testCaseStarted;
-                    this.testCaseStartedResult[envelope.testCaseStarted.id!] = ResultCreateStatusEnum.PASSED;
+                    this.testCaseStarts[envelope.testCaseStarted.id] = envelope.testCaseStarted;
+                    this.testCaseStartedResult[envelope.testCaseStarted.id] = ResultCreateStatusEnum.PASSED;
                 } else if (envelope.testStepFinished) {
                     const stepFin = envelope.testStepFinished;
-                    const stepStatus = stepFin.testStepResult!.status!;
-                    const stepMessage = stepFin.testStepResult!.message!;
-                    const oldStatus = this.testCaseStartedResult[stepFin.testCaseStartedId!];
-                    const newStatus = StatusMapping[stepFin.testStepResult!.status!];
+                    const stepStatus = stepFin.testStepResult.status;
+                    const stepMessage = stepFin.testStepResult.message!;
+                    const oldStatus = this.testCaseStartedResult[stepFin.testCaseStartedId];
+                    const newStatus = StatusMapping[stepFin.testStepResult.status];
                     if (newStatus === null) {
                         this._log(
                             chalk`{redBright Unexpected finish status ${stepStatus as unknown as string} received for step ${stepMessage}}`
@@ -251,22 +247,22 @@ class QaseReporter extends Formatter {
                         return;
                     }
                     if (newStatus !== ResultCreateStatusEnum.PASSED) {
-                        this.addErrorMessage(stepFin.testCaseStartedId!, stepFin.testStepResult?.message);
+                        this.addErrorMessage(stepFin.testCaseStartedId, stepFin.testStepResult?.message);
                         if (oldStatus) {
                             if (oldStatus !== ResultCreateStatusEnum.FAILED && newStatus) {
-                                this.testCaseStartedResult[stepFin.testCaseStartedId!] = newStatus;
+                                this.testCaseStartedResult[stepFin.testCaseStartedId] = newStatus;
                             }
                         } else {
                             if (newStatus) {
-                                this.testCaseStartedResult[stepFin.testCaseStartedId!] = newStatus;
+                                this.testCaseStartedResult[stepFin.testCaseStartedId] = newStatus;
                             }
                         }
                     }
                 } else if (envelope.testCaseFinished) {
-                    const tcs = this.testCaseStarts[envelope.testCaseFinished.testCaseStartedId!];
-                    const pickleId = this.testCaseScenarioId[tcs.testCaseId!];
+                    const tcs = this.testCaseStarts[envelope.testCaseFinished.testCaseStartedId];
+                    const pickleId = this.testCaseScenarioId[tcs.testCaseId];
                     const info = this.pickleInfo[pickleId];
-                    const status = this.testCaseStartedResult[envelope.testCaseFinished.testCaseStartedId!];
+                    const status = this.testCaseStartedResult[envelope.testCaseFinished.testCaseStartedId];
                     const test: Test = {
                         name: info.name,
                         started: tcs,
@@ -274,7 +270,7 @@ class QaseReporter extends Formatter {
                         caseIds: info.caseIds,
                         // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
                         duration: Math.abs((envelope.testCaseFinished.timestamp!.seconds! as number - (tcs.timestamp!.seconds! as number))),
-                        error: this.testCaseStartedErrors[tcs.id!]?.join('\n\n'),
+                        error: this.testCaseStartedErrors[tcs.id]?.join('\n\n'),
                         lastAstNodeId: info.lastAstNodeId,
                     };
                     this.addForSending(test, status);
@@ -290,12 +286,12 @@ class QaseReporter extends Formatter {
         }
     }
 
-    private async upload(attachment: io.cucumber.messages.IAttachment) {
+    private async upload(attachment: Attachment) {
         const randomString = crypto.randomBytes(20).toString('hex');
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
         const tmpFilePath = os.tmpdir().concat(randomString, '.', mime.extension(attachment.mediaType));
 
-        fs.writeFile(tmpFilePath, attachment.body as string, 'base64', (err) => {
+        fs.writeFile(tmpFilePath, attachment.body, 'base64', (err) => {
             if (err !== null) {
                 this._log(err.message);
             }
@@ -481,7 +477,7 @@ class QaseReporter extends Formatter {
                 chalk`{gray Added for publishing: ${test.name}}${add}`
             );
 
-            this.results[test.finished.testCaseStartedId as string] = {
+            this.results[test.finished.testCaseStartedId] = {
                 status,
                 case_id: parseInt(caseId, 10),
                 time: test.duration,
@@ -502,7 +498,7 @@ class QaseReporter extends Formatter {
             chalk`{gray Added for publishing: ${suiteTitle.join('/')}/${test.name}}`
         );
 
-        this.results[test.finished.testCaseStartedId as string] = {
+        this.results[test.finished.testCaseStartedId] = {
             case: {
                 title: test.name,
                 suite_title: suiteTitle.join('\t'),
@@ -515,9 +511,9 @@ class QaseReporter extends Formatter {
         };
     }
 
-    private extractIds(tagsList: io.cucumber.messages.Pickle.IPickleTag[]): string[] {
+    private extractIds(tagsList: readonly PickleTag[]): string[] {
         const regex = /[Qq]-*(\d+)/;
-        return tagsList.filter((tagInfo) => regex.test(tagInfo.name!)).map((tagInfo) => regex.exec(tagInfo.name!)![1]);
+        return tagsList.filter((tagInfo) => regex.test(tagInfo.name)).map((tagInfo) => regex.exec(tagInfo.name)![1]);
     }
 
     private createHeaders() {
