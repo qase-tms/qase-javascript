@@ -80,6 +80,7 @@ Reporter options (__*__ - required):
 - `runId` - Run ID from Qase TMS (also can be got from run URL)
 - `logging` [true/false] - Enabled debug logging from reporter or not
 - `environmentId` - To execute with the sending of the envinroment information
+- `planId` - Pass the Test Plan id (optional) to be associated with this run.
 - `basePath` - URL Qase.io
 - `screenshotFolder` - Folder for save screenshot cypress,
 - `sendScreenshot` [true/false] - Permission to send screenshots to Qase TMS
@@ -105,6 +106,7 @@ Supported ENV variables:
   [here](https://developers.qase.io/#authentication)
 - `QASE_API_BASE_URL` - URL Qase.io, default value `https://api.qase.io/v1`
 - `QASE_ENVIRONMENT_ID` - To execute with the sending of the envinroment information
+- `QASE_PLAN_ID` - Pass the Test Plan id (optional) to be associated with this run.
 - `QASE_SCREENSHOT_FOLDER` - Folder for save screenshot cypress
  - `QASE_SCREENSHOT_SENDING` - Permission to send screenshots to Qase TMS
  - `QASE_RUN_COMPLETE` - Permission for automatic completion of the test run

@@ -19,6 +19,7 @@ enum Envs {
     projectCode = 'QASE_PROJECT_CODE',
     runId = 'QASE_RUN_ID',
     runName = 'QASE_RUN_NAME',
+    planId = 'QASE_PLAN_ID',
     runDescription = 'QASE_RUN_DESCRIPTION',
     environmentId = 'QASE_ENVIRONMENT_ID',
     screenshotFolder = 'QASE_SCREENSHOT_FOLDER',
@@ -32,6 +33,7 @@ interface QaseOptions {
     basePath?: string;
     projectCode: string;
     runId?: string;
+    planId?: number;
     runPrefix?: string;
     logging?: boolean;
     environmentId?: number;
@@ -140,6 +142,7 @@ class CypressQaseReporter extends reporters.Base {
         args?: {
             description?: string;
             environment_id: number | undefined;
+            plan_id?: number;
             is_autotest: boolean;
         }
     ) {
@@ -290,12 +293,17 @@ class CypressQaseReporter extends reporters.Base {
                 Number(CypressQaseReporter.getEnv(Envs.environmentId)) ||
                 this.options.environmentId;
 
+            const planId =
+                Number(CypressQaseReporter.getEnv(Envs.planId)) ||
+                this.options.environmentId;
+
             const runObject = CypressQaseReporter.createRunObject(
                 name || `Automated run ${new Date().toISOString()}`,
                 [],
                 {
                     description: description || 'Cypress automated run',
                     environment_id: environmentId,
+                    plan_id: planId,
                     is_autotest: true,
                 }
             );

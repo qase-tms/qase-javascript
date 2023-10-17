@@ -13,7 +13,8 @@
       "screenshotFolder": "screenshots",
       "sendScreenshot": true,
       "runComplete": false,
-      "environmentId": 1
+      "environmentId": 1,
+      "planId": 1
     }
   },
   "video": false

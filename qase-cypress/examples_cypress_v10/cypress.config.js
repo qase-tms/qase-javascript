@@ -16,6 +16,7 @@ module.exports = defineConfig({
       sendScreenshot: true,
       runComplete: true,
       environmentId: 1,
+      planId: 1,
       rootSuiteTitle: 'Cypress tests',
     },
   },
