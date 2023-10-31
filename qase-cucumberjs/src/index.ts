@@ -148,6 +148,8 @@ class QaseReporter extends Formatter {
     private scenarios: Record<string, string> = {};
     private uploadsInQueueCount = 0;
 
+    private checkOperation: Promise<unknown> | null = null
+
     public constructor(options: IFormatterOptions) {
         super(options);
         this.config = prepareConfig(options.parsedArgvOptions as Config, options.parsedArgvOptions?.qaseConfig);
@@ -181,7 +183,7 @@ class QaseReporter extends Formatter {
                 } else if (envelope.attachment) {
                     void this.upload(envelope.attachment);
                 } else if (envelope.testRunStarted) {
-                    void this.checkProject(
+                    this.checkOperation = this.checkProject(
                         this.config.projectCode,
                         async (prjExists): Promise<void> => {
                             if (prjExists) {
@@ -325,6 +327,7 @@ class QaseReporter extends Formatter {
     }
 
     private async publishResults() {
+        await this.checkOperation;
         await this.waitUploads();
 
         const res: ResultCreate[] = [];
