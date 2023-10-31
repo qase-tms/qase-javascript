@@ -148,7 +148,7 @@ class QaseReporter extends Formatter {
     private scenarios: Record<string, string> = {};
     private uploadsInQueueCount = 0;
 
-    private checkOperation: Promise<unknown> | null = null
+    private checkOperation: Promise<unknown> | null = null;
 
     public constructor(options: IFormatterOptions) {
         super(options);
