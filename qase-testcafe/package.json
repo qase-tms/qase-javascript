@@ -1,6 +1,6 @@
 {
   "name": "testcafe-reporter-qase",
-  "version": "v1.2.0-alpha.2",
+  "version": "v1.2.1",
   "description": "Qase TMS TestCafe Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -53,6 +53,6 @@
   "dependencies": {
     "chalk": "^4.1.0",
     "form-data": "^3.0.0",
-    "qaseio": "^2.0.1"
+    "qaseio": "^2.0.2"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "cypress-qase-reporter",
-  "version": "v1.4.2-alpha.3",
+  "version": "v1.4.3",
   "description": "Qase TMS Cypress Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -30,7 +30,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "form-data": "^4.0.0",
-    "qaseio": "^2.0.1"
+    "qaseio": "^2.0.2"
   },
   "devDependencies": {
     "@hutson/npm-deploy-git-tag": "^6.0.0",
