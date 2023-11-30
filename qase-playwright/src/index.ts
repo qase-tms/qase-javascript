@@ -32,8 +32,10 @@ enum Envs {
 const Statuses = {
     passed: ResultCreateStatusEnum.PASSED,
     failed: ResultCreateStatusEnum.FAILED,
+    timedOut: ResultCreateStatusEnum.FAILED,
     skipped: ResultCreateStatusEnum.SKIPPED,
     pending: ResultCreateStatusEnum.SKIPPED,
+    interrupted: ResultCreateStatusEnum.SKIPPED,
     disabled: ResultCreateStatusEnum.BLOCKED,
 };
 
