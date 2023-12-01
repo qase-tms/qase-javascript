@@ -52,6 +52,7 @@ interface PreparedForReportingTestCase {
     title: string;
     failureMessages: string[];
     caseIds?: number[];
+    parameters?: object;
 }
 
 const alwaysUndefined = () => undefined;
@@ -189,6 +190,16 @@ class QaseReporter implements Reporter {
         return [];
     }
 
+    private getCaseParameters(test: AssertionResult): object {
+        const regexp = /(\[Parameters: ({[\w\d\s":,]+})\])/;
+        const results = regexp.exec(test.title);
+        if (results && results.length === 3) {
+            return JSON.parse(results[2]);
+        }
+
+        return {};
+    }
+
     private logTestItem(test: AssertionResult) {
         const map = {
             failed: chalk`{red Test ${test.title} ${test.status}}`,
@@ -218,9 +229,14 @@ class QaseReporter implements Reporter {
             };
 
             const caseIds = this.getCaseIds(result);
+            const parameters = this.getCaseParameters(result);
 
             if (caseIds) {
                 item.caseIds = caseIds;
+            }
+
+            if (parameters) {
+                item.parameters = parameters;
             }
 
             return item;
@@ -341,6 +357,11 @@ class QaseReporter implements Reporter {
                     title: elem.title,
                     suite_title: elem.path,
                 };
+            }
+
+            // Verifies that the user defined the parameters through the use of the 'qase' wrapper;
+            if (elem.parameters) {
+                caseObject.params = elem.parameters;
             }
 
             return caseObject;
