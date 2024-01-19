@@ -1,6 +1,6 @@
 {
-  "name": "cypress-qase-reporter",
-  "version": "v1.4.3",
+  "name": "@ventionco/cypress-qase-reporter",
+  "version": "v1.5.1",
   "description": "Qase TMS Cypress Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/qase-tms/qase-cypress.git"
+    "url": "https://github.com/VentionCo/qase-javascript"
   },
   "engines": {
     "node": ">=10"
