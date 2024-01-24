@@ -52,7 +52,7 @@
     "uglify-js": "^3.4.9"
   },
   "dependencies": {
-    "axios": "^0.25.0",
+    "axios": "^1.6.0",
     "form-data": "^3.0.0"
   }
 }
