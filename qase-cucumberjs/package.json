@@ -57,7 +57,7 @@
     "file-type": "^17.1.1",
     "mime-types": "^2.1.35",
     "moment": "^2.29.1",
-    "qaseio": "^2.0.2",
+    "qaseio": "^2.0.3",
     "read-chunk": "^4.0.2"
   }
 }
