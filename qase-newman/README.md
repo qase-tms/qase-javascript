@@ -27,7 +27,7 @@ pm.test('expect response be 200', function () {
     pm.response.to.be.info
 })
 ```
-### Execute rom CLI:
+### Execute from CLI:
 ```
 QASE_RUN_ID=34 # Specify Run ID using ENV
 newman run \
