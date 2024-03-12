@@ -12,7 +12,7 @@ jobs:
     strategy:
       max-parallel: 5
       matrix:
-        node-version: [ '14', '15', '16' ]
+        node-version: [ '16' ]
         package:
           - "qase-cucumberjs"
           - "qase-cypress"
@@ -53,7 +53,7 @@ jobs:
     - uses: actions/setup-node@v1
       if: contains(github.event.ref, matrix.package)
       with:
-        node-version: '14'
+        node-version: '16'
         registry-url: 'https://registry.npmjs.org'
     - if: contains(github.event.ref, matrix.package)
       working-directory: ./${{ matrix.package }}
