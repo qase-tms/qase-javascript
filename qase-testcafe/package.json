@@ -53,6 +53,6 @@
   "dependencies": {
     "chalk": "^4.1.0",
     "form-data": "^3.0.0",
-    "qaseio": "^2.0.2"
+    "qaseio": "^2.0.3"
   }
 }

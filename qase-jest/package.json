@@ -30,7 +30,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "qaseio": "^2.0.2"
+    "qaseio": "^2.0.3"
   },
   "devDependencies": {
     "@hutson/npm-deploy-git-tag": "^6.0.0",
