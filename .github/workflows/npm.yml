@@ -7,48 +7,62 @@ on:
 
 jobs:
   test:
+    name: Test ${{ matrix.package }} at Node v${{ matrix.node-version }}
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 5
       matrix:
         node-version: [ '14', '15', '16' ]
-        prefix: [ "qaseio", "qase-cypress", "qase-cucumberjs", "qase-newman", "qase-testcafe", "qase-jest", "qase-playwright" ]
-    name: Project ${{ matrix.prefix }} - Node ${{ matrix.node-version }}
+        package:
+          - "qase-cucumberjs"
+          - "qase-cypress"
+          - "qase-jest"
+          - "qase-newman"
+          - "qase-playwright"
+          - "qase-testcafe"
+          - "qaseio"
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - working-directory: ./${{ matrix.prefix }}
+    - working-directory: ./${{ matrix.package }}
       run: npm install
-    - working-directory: ./${{ matrix.prefix }}
+    - working-directory: ./${{ matrix.package }}
       run: npm run lint
-    - working-directory: ./${{ matrix.prefix }}
+    - working-directory: ./${{ matrix.package }}
       run: npm run test
   build-n-publish:
+    name: Build and publish ${{ matrix.package }}
     runs-on: ubuntu-latest
     needs: test
     strategy:
       max-parallel: 5
       matrix:
-        prefix: [ "qaseio", "qase-cypress", "qase-cucumberjs", "qase-newman", "qase-testcafe", "qase-jest", "qase-playwright" ]
+        package:
+        - "qase-cucumberjs"
+        - "qase-cypress"
+        - "qase-jest"
+        - "qase-newman"
+        - "qase-playwright"
+        - "qase-testcafe"
+        - "qaseio"
     if: startsWith(github.event.ref, 'refs/tags')
-    name: Publish ${{ matrix.prefix }}
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
-      if: contains(github.event.ref, matrix.prefix)
+      if: contains(github.event.ref, matrix.package)
       with:
         node-version: '14'
         registry-url: 'https://registry.npmjs.org'
-    - if: contains(github.event.ref, matrix.prefix)
-      working-directory: ./${{ matrix.prefix }}
+    - if: contains(github.event.ref, matrix.package)
+      working-directory: ./${{ matrix.package }}
       run: npm install
-    - if: contains(github.event.ref, matrix.prefix)
-      working-directory: ./${{ matrix.prefix }}
+    - if: contains(github.event.ref, matrix.package)
+      working-directory: ./${{ matrix.package }}
       run: npm run build
-    - if: contains(github.event.ref, matrix.prefix)
-      working-directory: ./${{ matrix.prefix }}
+    - if: contains(github.event.ref, matrix.package)
+      working-directory: ./${{ matrix.package }}
       run: npm publish
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
