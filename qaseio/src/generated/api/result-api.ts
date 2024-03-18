@@ -43,7 +43,7 @@ export const ResultApiAxiosParamCreator = function (configuration?: Configuratio
             assertParamExists('createResultsV2', 'runId', runId)
             // verify required parameter 'createResultsRequestV2' is not null or undefined
             assertParamExists('createResultsV2', 'createResultsRequestV2', createResultsRequestV2)
-            const localVarPath = `/{project_code}/run/{run_id}/results`
+            const localVarPath = `/v2/{project_code}/run/{run_id}/results`
                 .replace(`{${"project_code"}}`, encodeURIComponent(String(projectCode)))
                 .replace(`{${"run_id"}}`, encodeURIComponent(String(runId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
