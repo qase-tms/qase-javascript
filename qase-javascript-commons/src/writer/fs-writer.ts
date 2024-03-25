@@ -5,10 +5,11 @@ import { WriterInterface } from './writer-interface';
 
 import { TestResultType } from '../models';
 import { FormatterInterface } from '../formatter';
+import { FormatEnum } from './driver-enum';
 
 export type FsWriterOptionsType = {
   path?: string | undefined;
-  ext?: string | undefined;
+  format?: `${FormatEnum}` | undefined;
 };
 
 /**
@@ -17,7 +18,7 @@ export type FsWriterOptionsType = {
  */
 export class FsWriter implements WriterInterface {
   private path: string;
-  private ext: string;
+  private format: string;
 
   /**
    * @param {FsWriterOptionsType | undefined} options
@@ -29,11 +30,11 @@ export class FsWriter implements WriterInterface {
   ) {
     const {
       path: pathOptions = path.join('build', 'qase-report'),
-      ext = 'json',
+      format = FormatEnum.json,
     } = options ?? {};
 
     this.path = pathOptions;
-    this.ext = ext;
+    this.format = format;
   }
 
   /**
@@ -46,7 +47,7 @@ export class FsWriter implements WriterInterface {
       mkdirSync(this.path, { recursive: true });
     } catch (error) {/* ignore */}
 
-    const filePath = path.join(this.path, `results-${Date.now()}.${this.ext}`);
+    const filePath = path.join(this.path, `results-${Date.now()}.${this.format}`);
 
     writeFileSync(filePath, await this.formatter.format(results));
 

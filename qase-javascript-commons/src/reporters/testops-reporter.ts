@@ -35,14 +35,19 @@ export type TestOpsRunType = {
   title: string;
   description: string;
   complete?: boolean | undefined;
-  environment?: number | undefined;
+};
+
+export type TestOpsPlanType = {
+  id?: number | undefined;
 };
 
 export type TestOpsOptionsType = {
   project: string;
-  baseUrl?: string | undefined;
   uploadAttachments?: boolean | undefined;
   run: TestOpsRunType;
+  plan: TestOpsPlanType;
+  chunk?: number | undefined;
+  defect?: boolean | undefined;
 };
 
 /**
@@ -93,6 +98,12 @@ export class TestOpsReporter extends AbstractReporter {
   private run: TestOpsRunType;
 
   /**
+   * @type { number | undefined}
+   * @private
+   */
+  private environment: number | undefined;
+
+  /**
    * @type {TestResultType[]}
    * @private
    */
@@ -117,10 +128,10 @@ export class TestOpsReporter extends AbstractReporter {
     options: ReporterOptionsType & TestOpsOptionsType,
     private api: QaseApiInterface,
     logger?: LoggerInterface,
+    environment?: number,
   ) {
     const {
       project,
-      baseUrl = 'https://app.qase.io',
       uploadAttachments,
       run,
 
@@ -129,10 +140,13 @@ export class TestOpsReporter extends AbstractReporter {
 
     super(restOptions, logger);
 
+    const baseUrl = 'https://app.qase.io';
+
     this.baseUrl = baseUrl.replace(/\/$/, '');
     this.projectCode = project;
     this.uploadAttachments = uploadAttachments;
     this.run = { complete: true, ...run };
+    this.environment = environment;
   }
 
   /**
@@ -169,7 +183,7 @@ export class TestOpsReporter extends AbstractReporter {
       const { result } = await this.createRun(
         this.run.title,
         this.run.description,
-        this.run.environment,
+        this.environment,
       );
 
       if (!result?.id) {
