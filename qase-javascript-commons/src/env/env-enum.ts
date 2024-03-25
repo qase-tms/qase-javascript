@@ -3,6 +3,7 @@
  */
 export enum EnvEnum {
   mode = 'QASE_MODE',
+  fallback = 'QASE_FALLBACK',
   debug = 'QASE_DEBUG',
   environment = 'QASE_ENVIRONMENT',
 }
@@ -12,8 +13,9 @@ export enum EnvEnum {
  */
 export enum EnvTestOpsEnum {
   project = 'QASE_TESTOPS_PROJECT',
-  baseUrl = 'QASE_TESTOPS_BASE_URL',
   uploadAttachments = 'QASE_TESTOPS_UPLOAD_ATTACHMENTS',
+  chunk = 'QASE_TESTOPS_CHUNK',
+  defect = 'QASE_TESTOPS_DEFECT',
 }
 
 /**
@@ -21,7 +23,7 @@ export enum EnvTestOpsEnum {
  */
 export enum EnvApiEnum {
   token = 'QASE_TESTOPS_API_TOKEN',
-  baseUrl = 'QASE_TESTOPS_API_BASE_URL',
+  baseUrl = 'QASE_TESTOPS_API_HOST',
 }
 
 /**
@@ -31,14 +33,20 @@ export enum EnvRunEnum {
   id = 'QASE_TESTOPS_RUN_ID',
   title = 'QASE_TESTOPS_RUN_TITLE',
   description = 'QASE_TESTOPS_RUN_DESCRIPTION',
-  complete = 'QASE_TESTOPS_RUN_COMPLETE',
-  environment = 'QASE_TESTOPS_ENVIRONMENT',
+  complete = 'QASE_TESTOPS_RUN_COMPLETE'
+}
+
+/**
+ * @enum {string}
+ */
+export enum EnvPlanEnum {
+  id = 'QASE_TESTOPS_PLAN_ID',
 }
 
 /**
  * @enum {string}
  */
 export enum EnvLocalEnum {
-  path = 'QASE_REPORT_CONNECTIONS_LOCAL_PATH',
-  ext = 'QASE_REPORT_CONNECTIONS_LOCAL_EXT',
+  path = 'QASE_REPORT_CONNECTION_PATH',
+  format = 'QASE_REPORT_CONNECTION_FORMAT',
 }

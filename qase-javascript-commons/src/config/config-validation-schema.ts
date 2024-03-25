@@ -1,8 +1,7 @@
 import { JSONSchemaType } from 'ajv';
 
 import { ModeEnum } from '../options';
-import { DriverEnum } from '../writer';
-
+import { DriverEnum, FormatEnum } from '../writer';
 import { ConfigType } from './config-type';
 
 /**
@@ -13,6 +12,11 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
 
   properties: {
     mode: {
+      type: 'string',
+      enum: [ModeEnum.report, ModeEnum.testops, ModeEnum.off],
+      nullable: true,
+    },
+    fallback: {
       type: 'string',
       enum: [ModeEnum.report, ModeEnum.testops, ModeEnum.off],
       nullable: true,
@@ -79,11 +83,6 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
           nullable: true,
         },
 
-        baseUrl: {
-          type: 'string',
-          nullable: true,
-        },
-
         run: {
           type: 'object',
           nullable: true,
@@ -105,11 +104,29 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
               type: 'boolean',
               nullable: true,
             },
-            environment: {
+          },
+        },
+
+        plan: {
+          type: 'object',
+          nullable: true,
+
+          properties: {
+            id: {
               type: 'number',
               nullable: true,
             },
           },
+        },
+
+        chunk: {
+          type: 'number',
+          nullable: true,
+        },
+
+        defect: {
+          type: 'boolean',
+          nullable: true,
         },
       },
     },
@@ -140,8 +157,9 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
                   nullable: true,
                 },
 
-                ext: {
+                format: {
                   type: 'string',
+                  enum: [FormatEnum.json, FormatEnum.jsonb],
                   nullable: true,
                 },
               },

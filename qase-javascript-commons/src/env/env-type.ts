@@ -4,18 +4,22 @@ import {
   EnvApiEnum,
   EnvRunEnum,
   EnvLocalEnum,
+  EnvPlanEnum,
 } from './env-enum';
 
 import { ModeEnum } from '../options';
+import { FormatEnum } from '../writer';
 
 export type EnvType = {
   [EnvEnum.mode]?: `${ModeEnum}`;
+  [EnvEnum.fallback]?: `${ModeEnum}`;
   [EnvEnum.debug]?: boolean;
   [EnvEnum.environment]?: string | number;
 
   [EnvTestOpsEnum.project]?: string;
-  [EnvTestOpsEnum.baseUrl]?: string;
   [EnvTestOpsEnum.uploadAttachments]?: boolean;
+  [EnvTestOpsEnum.chunk]?: number;
+  [EnvTestOpsEnum.defect]?: boolean;
 
   [EnvApiEnum.token]?: string;
   [EnvApiEnum.baseUrl]?: string;
@@ -24,8 +28,9 @@ export type EnvType = {
   [EnvRunEnum.title]?: string;
   [EnvRunEnum.description]?: string;
   [EnvRunEnum.complete]?: boolean;
-  [EnvRunEnum.environment]?: number;
+
+  [EnvPlanEnum.id]?: number;
 
   [EnvLocalEnum.path]?: string;
-  [EnvLocalEnum.ext]?: string;
+  [EnvLocalEnum.format]?: `${FormatEnum}`;
 };

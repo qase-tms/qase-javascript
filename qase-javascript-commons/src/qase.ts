@@ -186,13 +186,13 @@ export class QaseReporter extends AbstractReporter {
             headers,
             ...api
           } = {},
-          baseUrl,
           project,
           run: {
             title,
             description,
             ...run
           } = {},
+          plan = {},
           uploadAttachments,
         } = testops;
 
@@ -223,19 +223,19 @@ export class QaseReporter extends AbstractReporter {
 
         return new TestOpsReporter(
           {
-            baseUrl,
             project,
             uploadAttachments,
             run: {
               title: title ?? `Automated run ${new Date().toISOString()}`,
               description: description ?? `${reporterName} automated run`,
-              environment: typeof environment === 'number' ? environment : undefined,
               ...run,
             },
+            plan,
             ...commonOptions,
           },
           apiClient,
           logger,
+          typeof environment === 'number' ? environment : undefined
         );
       }
 

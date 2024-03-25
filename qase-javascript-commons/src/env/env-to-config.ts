@@ -5,6 +5,7 @@ import {
   EnvApiEnum,
   EnvRunEnum,
   EnvLocalEnum,
+  EnvPlanEnum,
 } from './env-enum';
 
 import { DriverEnum } from '../writer';
@@ -21,7 +22,6 @@ export const envToConfig = (env: EnvType): ConfigType => ({
 
   testops: {
     project: env[EnvTestOpsEnum.project],
-    baseUrl: env[EnvTestOpsEnum.baseUrl],
     uploadAttachments: env[EnvTestOpsEnum.uploadAttachments],
 
     api: {
@@ -34,15 +34,21 @@ export const envToConfig = (env: EnvType): ConfigType => ({
       title: env[EnvRunEnum.title],
       description: env[EnvRunEnum.description],
       complete: env[EnvRunEnum.complete],
-      environment: env[EnvRunEnum.environment],
     },
+
+    plan: {
+      id: env[EnvPlanEnum.id],
+    },
+
+    chunk: env[EnvTestOpsEnum.chunk],
+    defect: env[EnvTestOpsEnum.defect],
   },
 
   report: {
     connections: {
       [DriverEnum.local]: {
         path: env[EnvLocalEnum.path],
-        ext: env[EnvLocalEnum.ext],
+        format: env[EnvLocalEnum.format],
       },
     },
   },

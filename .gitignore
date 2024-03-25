@@ -70,3 +70,7 @@ jspm_packages/
 
 # macos artifacts
 .DS_Store
+
+# IDE files
+.idea
+.vscode
