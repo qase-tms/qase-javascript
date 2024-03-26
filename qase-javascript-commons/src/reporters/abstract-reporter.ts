@@ -104,13 +104,13 @@ export abstract class AbstractReporter implements ReporterInterface {
     this.logger.group();
 
     if (error instanceof Error) {
-      this.logger.log(`${error.stack || `${error.name}: ${error.message}`}`);
-
       if (isAxiosError(error)) {
         this.logApiError(error);
       } else if (error instanceof QaseError && error.cause) {
         this.doLogError('Caused by:', error.cause);
       }
+
+      this.logger.log(`${error.stack || `${error.name}: ${error.message}`}`);
     } else {
       this.logger.log(String(error));
     }
@@ -132,7 +132,7 @@ export abstract class AbstractReporter implements ReporterInterface {
       get(error, 'response.data.errorFields'),
     );
 
-    this.logger.log(String(errorMessage));
+    this.logger.log(`Message: ${String(errorMessage)}`);
 
     if (errorFields) {
       this.logger.group();
