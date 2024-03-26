@@ -292,6 +292,7 @@ export class QaseReporter extends AbstractReporter {
             ...run
           } = {},
           plan = {},
+          chunk,
           uploadAttachments,
         } = testops;
 
@@ -330,6 +331,7 @@ export class QaseReporter extends AbstractReporter {
               ...run,
             },
             plan,
+            chunk,
             ...commonOptions,
           },
           apiClient,

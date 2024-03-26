@@ -30,6 +30,8 @@ import {
 
 import { QaseError } from '../utils/qase-error';
 
+const defaultChunkSize = 200;
+
 export type TestOpsRunType = {
   id?: number | undefined;
   title: string;
@@ -96,13 +98,16 @@ export class TestOpsReporter extends AbstractReporter {
    * @private
    */
   private run: TestOpsRunType;
-
   /**
    * @type { number | undefined}
    * @private
    */
   private environment: number | undefined;
-
+  /**
+   * @type {TestResultType[]}
+   * @private
+   */
+  private chunk: number;
   /**
    * @type {Record<string, string[]>}
    * @private
@@ -142,6 +147,7 @@ export class TestOpsReporter extends AbstractReporter {
     this.uploadAttachments = uploadAttachments;
     this.run = { complete: true, ...run };
     this.environment = environment;
+    this.chunk = options.chunk || defaultChunkSize;
   }
 
   /**
@@ -200,11 +206,13 @@ export class TestOpsReporter extends AbstractReporter {
       await this.prepareAttachments();
     }
 
-    await this.api.result.createResultsV2(this.projectCode, runId, {
-      results: this.results.map((result) =>
-        this.transformTestResult(result),
-      ),
-    });
+    const results = this.results.map((result) => this.transformTestResult(result));
+
+    for (let i = 0; i < results.length; i += this.chunk) {
+      await this.api.result.createResultsV2(this.projectCode, runId, {
+        results: results.slice(i, i + this.chunk),
+      });
+    }
 
     this.log(chalk`{green ${this.results.length} result(s) sent to Qase}`);
 
