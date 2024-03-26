@@ -159,7 +159,7 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
 
                 format: {
                   type: 'string',
-                  enum: [FormatEnum.json, FormatEnum.jsonb],
+                  enum: [FormatEnum.json, FormatEnum.jsonp],
                   nullable: true,
                 },
               },

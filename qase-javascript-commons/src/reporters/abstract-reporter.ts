@@ -19,6 +19,8 @@ export type ReporterOptionsType = {
 export interface ReporterInterface {
   addTestResult(result: TestResultType): void;
   publish(): Promise<void>;
+  getTestResults(): TestResultType[];
+  setTestResults(results: TestResultType[]): void;
 }
 
 /**
@@ -32,6 +34,8 @@ export abstract class AbstractReporter implements ReporterInterface {
    * @private
    */
   private debug: boolean | undefined;
+
+  protected results: TestResultType[] = [];
 
   /**
    * @param {TestResultType} result
@@ -55,6 +59,20 @@ export abstract class AbstractReporter implements ReporterInterface {
     const { debug } = options ?? {};
 
     this.debug = debug;
+  }
+
+  /**
+   * @returns {TestResultType[]}
+   */
+  public getTestResults(): TestResultType[] {
+    return this.results;
+  }
+
+  /**
+   * @param {TestResultType[]} results
+   */
+  public setTestResults(results: TestResultType[]): void {
+    this.results = results;
   }
 
   /**
