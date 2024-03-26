@@ -11,5 +11,5 @@ export enum DriverEnum {
  */
 export enum FormatEnum {
   json = 'json',
-  jsonb = 'jsonb',
+  jsonp = 'jsonp',
 }

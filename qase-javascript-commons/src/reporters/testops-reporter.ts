@@ -104,11 +104,6 @@ export class TestOpsReporter extends AbstractReporter {
   private environment: number | undefined;
 
   /**
-   * @type {TestResultType[]}
-   * @private
-   */
-  private results: TestResultType[] = [];
-  /**
    * @type {Record<string, string[]>}
    * @private
    */

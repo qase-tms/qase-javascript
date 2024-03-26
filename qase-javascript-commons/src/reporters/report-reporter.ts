@@ -12,11 +12,6 @@ import { WriterInterface } from '../writer';
  * @extends AbstractReporter
  */
 export class ReportReporter extends AbstractReporter {
-  /**
-   * @type {TestResultType[]}
-   * @private
-   */
-  private results: TestResultType[] = [];
 
   /**
    * @param {ReporterOptionsType} options

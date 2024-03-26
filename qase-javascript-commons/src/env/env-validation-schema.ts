@@ -93,7 +93,7 @@ export const envValidationSchema: JSONSchemaType<EnvType> = {
     },
     [EnvLocalEnum.format]: {
       type: 'string',
-      enum: [FormatEnum.json, FormatEnum.jsonb],
+      enum: [FormatEnum.json, FormatEnum.jsonp],
       nullable: true,
     },
   },

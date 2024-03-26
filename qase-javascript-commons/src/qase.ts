@@ -96,10 +96,23 @@ export class QaseReporter extends AbstractReporter {
   private upstreamReporter?: ReporterInterface;
 
   /**
+   * @type {ReporterInterface}
+   * @private
+   */
+  private fallbackReporter?: ReporterInterface;
+
+
+  /**
    * @type {boolean}
    * @private
    */
   private disabled = false;
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  private useFallback = false;
 
   /**
    * @param {OptionsType} options
@@ -112,7 +125,8 @@ export class QaseReporter extends AbstractReporter {
     super({ debug: composedOptions.debug }, logger);
 
     try {
-      this.upstreamReporter = this.createUpstreamReporter(
+      this.upstreamReporter = this.createReporter(
+        composedOptions.mode as ModeEnum || ModeEnum.off,
         composedOptions,
         logger,
       );
@@ -120,7 +134,34 @@ export class QaseReporter extends AbstractReporter {
       if (error instanceof DisabledException) {
         this.disabled = true;
       } else {
-        throw error;
+        this.logError('Unable to create upstream reporter:', error);
+
+        if (composedOptions.fallback != undefined) {
+          this.disabled = true;
+          return;
+        }
+
+        this.useFallback = true;
+      }
+    }
+
+    try {
+      this.fallbackReporter = this.createReporter(
+        composedOptions.fallback as ModeEnum || ModeEnum.off,
+        composedOptions,
+        logger,
+      );
+    } catch (error) {
+      if (error instanceof DisabledException) {
+        if (this.useFallback) {
+          this.disabled = true;
+        }
+      } else {
+        this.logError('Unable to create fallback reporter:', error);
+
+        if (this.useFallback && this.upstreamReporter === undefined) {
+          this.disabled = true;
+        }
       }
     }
   }
@@ -130,13 +171,73 @@ export class QaseReporter extends AbstractReporter {
    */
   public addTestResult(result: TestResultType) {
     if (!this.disabled) {
-      try {
-        this.logTestItem(result);
-        this.upstreamReporter?.addTestResult(result);
-      } catch (error) {
-        this.logError('Unable to process result:', error);
+      this.logTestItem(result);
 
-        this.disabled = true;
+      if (this.useFallback) {
+        this.addTestResultToFallback(result);
+        return;
+      }
+
+      try {
+        this.upstreamReporter?.addTestResult(result);
+      }
+      catch (error) {
+        this.logError('Unable to add the result to the upstream reporter:', error);
+
+        if (this.fallbackReporter == undefined) {
+          this.disabled = true;
+          return;
+        }
+
+        if (!this.useFallback) {
+          this.fallbackReporter?.setTestResults(this.upstreamReporter?.getTestResults() ?? []);
+          this.useFallback = true;
+        }
+
+        this.addTestResultToFallback(result);
+      }
+    }
+  }
+
+  /**
+   * @param {TestResultType} result
+   * @private
+   */
+  private addTestResultToFallback(result: TestResultType): void {
+    try {
+      this.fallbackReporter?.addTestResult(result);
+    }
+    catch (error) {
+      this.logError('Unable to add the result to the fallback reporter:', error);
+      this.disabled = true;
+    }
+  }
+
+  /**
+   * @returns {Promise<void>}
+   */
+  public async publish(): Promise<void> {
+    if (!this.disabled) {
+      if (this.useFallback) {
+        await this.publishFallback();
+      }
+
+      try {
+        await this.upstreamReporter?.publish();
+      } catch (error) {
+        this.logError('Unable to publish the run results to the upstream reporter:', error);
+
+        if (this.fallbackReporter == undefined) {
+          this.disabled = true;
+          return;
+        }
+
+        if (!this.useFallback) {
+          this.fallbackReporter?.setTestResults(this.upstreamReporter?.getTestResults() ?? []);
+          this.useFallback = true;
+        }
+
+        await this.publishFallback();
       }
     }
   }
@@ -144,15 +245,13 @@ export class QaseReporter extends AbstractReporter {
   /**
    * @returns {Promise<void>}
    */
-  public async publish() {
-    if (!this.disabled) {
-      try {
-        await this.upstreamReporter?.publish();
-      } catch (error) {
-        this.logError('Unable to publish run results:', error);
-
-        this.disabled = true;
-      }
+  private async publishFallback(): Promise<void> {
+    try {
+      await this.fallbackReporter?.publish();
+    }
+    catch (error) {
+      this.logError('Unable to publish the run results to the fallback reporter:', error);
+      this.disabled = true;
     }
   }
 
@@ -163,7 +262,8 @@ export class QaseReporter extends AbstractReporter {
    * @returns {ReporterInterface}
    * @private
    */
-  private createUpstreamReporter(
+  private createReporter(
+    mode: ModeEnum,
     options: OptionsType,
     logger?: LoggerInterface,
   ): ReporterInterface {
@@ -171,7 +271,6 @@ export class QaseReporter extends AbstractReporter {
       frameworkPackage,
       frameworkName,
       reporterName,
-      mode = ModeEnum.off,
       environment,
       report = {},
       testops = {},
