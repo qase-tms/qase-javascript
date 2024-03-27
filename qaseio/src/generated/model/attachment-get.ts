@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -56,5 +56,11 @@ export interface AttachmentGet {
      * @memberof AttachmentGet
      */
     'full_path'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AttachmentGet
+     */
+    'url'?: string;
 }
 

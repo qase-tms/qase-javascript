@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -17,14 +17,20 @@
 /**
  * 
  * @export
- * @interface Filters7
+ * @interface ExternalIssueIssuesInner
  */
-export interface Filters7 {
+export interface ExternalIssueIssuesInner {
     /**
-     * Provide a string that will be used to search by name.
+     * 
      * @type {string}
-     * @memberof Filters7
+     * @memberof ExternalIssueIssuesInner
      */
-    'search'?: string;
+    'id'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ExternalIssueIssuesInner
+     */
+    'link'?: string;
 }
 

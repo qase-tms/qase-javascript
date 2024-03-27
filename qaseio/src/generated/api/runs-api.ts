@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -21,9 +21,9 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
-import { IdResponse } from '../model';
+import { BaseResponse } from '../model';
 // @ts-ignore
-import { Response } from '../model';
+import { IdResponse } from '../model';
 // @ts-ignore
 import { RunCreate } from '../model';
 // @ts-ignore
@@ -42,7 +42,7 @@ export const RunsApiAxiosParamCreator = function (configuration?: Configuration)
     return {
         /**
          * This method allows to complete a specific run. 
-         * @summary Complete a specific run.
+         * @summary Complete a specific run
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -83,7 +83,7 @@ export const RunsApiAxiosParamCreator = function (configuration?: Configuration)
         },
         /**
          * This method allows to create a run in selected project. 
-         * @summary Create a new run.
+         * @summary Create a new run
          * @param {string} code Code of project, where to search entities.
          * @param {RunCreate} runCreate 
          * @param {*} [options] Override http request option.
@@ -126,7 +126,7 @@ export const RunsApiAxiosParamCreator = function (configuration?: Configuration)
         },
         /**
          * This method completely deletes a run from repository. 
-         * @summary Delete run.
+         * @summary Delete run
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -167,7 +167,7 @@ export const RunsApiAxiosParamCreator = function (configuration?: Configuration)
         },
         /**
          * This method allows to retrieve a specific run. 
-         * @summary Get a specific run.
+         * @summary Get a specific run
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects 
@@ -213,10 +213,10 @@ export const RunsApiAxiosParamCreator = function (configuration?: Configuration)
         },
         /**
          * This method allows to retrieve all runs stored in selected project. 
-         * @summary Get all runs.
+         * @summary Get all runs
          * @param {string} code Code of project, where to search entities.
          * @param {string} [search] 
-         * @param {string} [status] A list of status values separated by comma. Possible values: active, complete, abort. 
+         * @param {string} [status] A list of status values separated by comma. Possible values: in_progress, passed, failed, aborted, active (deprecated), complete (deprecated), abort (deprecated). 
          * @param {number} [milestone] 
          * @param {number} [environment] 
          * @param {number} [fromStartTime] 
@@ -295,7 +295,7 @@ export const RunsApiAxiosParamCreator = function (configuration?: Configuration)
         },
         /**
          * This method allows to update a publicity of specific run. 
-         * @summary Update publicity of a specific run.
+         * @summary Update publicity of a specific run
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {RunPublic} runPublic 
@@ -352,19 +352,19 @@ export const RunsApiFp = function(configuration?: Configuration) {
     return {
         /**
          * This method allows to complete a specific run. 
-         * @summary Complete a specific run.
+         * @summary Complete a specific run
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async completeRun(code: string, id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Response>> {
+        async completeRun(code: string, id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.completeRun(code, id, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * This method allows to create a run in selected project. 
-         * @summary Create a new run.
+         * @summary Create a new run
          * @param {string} code Code of project, where to search entities.
          * @param {RunCreate} runCreate 
          * @param {*} [options] Override http request option.
@@ -376,7 +376,7 @@ export const RunsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method completely deletes a run from repository. 
-         * @summary Delete run.
+         * @summary Delete run
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -388,7 +388,7 @@ export const RunsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to retrieve a specific run. 
-         * @summary Get a specific run.
+         * @summary Get a specific run
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects 
@@ -401,10 +401,10 @@ export const RunsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to retrieve all runs stored in selected project. 
-         * @summary Get all runs.
+         * @summary Get all runs
          * @param {string} code Code of project, where to search entities.
          * @param {string} [search] 
-         * @param {string} [status] A list of status values separated by comma. Possible values: active, complete, abort. 
+         * @param {string} [status] A list of status values separated by comma. Possible values: in_progress, passed, failed, aborted, active (deprecated), complete (deprecated), abort (deprecated). 
          * @param {number} [milestone] 
          * @param {number} [environment] 
          * @param {number} [fromStartTime] 
@@ -421,7 +421,7 @@ export const RunsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to update a publicity of specific run. 
-         * @summary Update publicity of a specific run.
+         * @summary Update publicity of a specific run
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {RunPublic} runPublic 
@@ -444,18 +444,18 @@ export const RunsApiFactory = function (configuration?: Configuration, basePath?
     return {
         /**
          * This method allows to complete a specific run. 
-         * @summary Complete a specific run.
+         * @summary Complete a specific run
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        completeRun(code: string, id: number, options?: any): AxiosPromise<Response> {
+        completeRun(code: string, id: number, options?: any): AxiosPromise<BaseResponse> {
             return localVarFp.completeRun(code, id, options).then((request) => request(axios, basePath));
         },
         /**
          * This method allows to create a run in selected project. 
-         * @summary Create a new run.
+         * @summary Create a new run
          * @param {string} code Code of project, where to search entities.
          * @param {RunCreate} runCreate 
          * @param {*} [options] Override http request option.
@@ -466,7 +466,7 @@ export const RunsApiFactory = function (configuration?: Configuration, basePath?
         },
         /**
          * This method completely deletes a run from repository. 
-         * @summary Delete run.
+         * @summary Delete run
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -477,7 +477,7 @@ export const RunsApiFactory = function (configuration?: Configuration, basePath?
         },
         /**
          * This method allows to retrieve a specific run. 
-         * @summary Get a specific run.
+         * @summary Get a specific run
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects 
@@ -489,10 +489,10 @@ export const RunsApiFactory = function (configuration?: Configuration, basePath?
         },
         /**
          * This method allows to retrieve all runs stored in selected project. 
-         * @summary Get all runs.
+         * @summary Get all runs
          * @param {string} code Code of project, where to search entities.
          * @param {string} [search] 
-         * @param {string} [status] A list of status values separated by comma. Possible values: active, complete, abort. 
+         * @param {string} [status] A list of status values separated by comma. Possible values: in_progress, passed, failed, aborted, active (deprecated), complete (deprecated), abort (deprecated). 
          * @param {number} [milestone] 
          * @param {number} [environment] 
          * @param {number} [fromStartTime] 
@@ -508,7 +508,7 @@ export const RunsApiFactory = function (configuration?: Configuration, basePath?
         },
         /**
          * This method allows to update a publicity of specific run. 
-         * @summary Update publicity of a specific run.
+         * @summary Update publicity of a specific run
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {RunPublic} runPublic 
@@ -530,7 +530,7 @@ export const RunsApiFactory = function (configuration?: Configuration, basePath?
 export class RunsApi extends BaseAPI {
     /**
      * This method allows to complete a specific run. 
-     * @summary Complete a specific run.
+     * @summary Complete a specific run
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {*} [options] Override http request option.
@@ -543,7 +543,7 @@ export class RunsApi extends BaseAPI {
 
     /**
      * This method allows to create a run in selected project. 
-     * @summary Create a new run.
+     * @summary Create a new run
      * @param {string} code Code of project, where to search entities.
      * @param {RunCreate} runCreate 
      * @param {*} [options] Override http request option.
@@ -556,7 +556,7 @@ export class RunsApi extends BaseAPI {
 
     /**
      * This method completely deletes a run from repository. 
-     * @summary Delete run.
+     * @summary Delete run
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {*} [options] Override http request option.
@@ -569,7 +569,7 @@ export class RunsApi extends BaseAPI {
 
     /**
      * This method allows to retrieve a specific run. 
-     * @summary Get a specific run.
+     * @summary Get a specific run
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects 
@@ -583,10 +583,10 @@ export class RunsApi extends BaseAPI {
 
     /**
      * This method allows to retrieve all runs stored in selected project. 
-     * @summary Get all runs.
+     * @summary Get all runs
      * @param {string} code Code of project, where to search entities.
      * @param {string} [search] 
-     * @param {string} [status] A list of status values separated by comma. Possible values: active, complete, abort. 
+     * @param {string} [status] A list of status values separated by comma. Possible values: in_progress, passed, failed, aborted, active (deprecated), complete (deprecated), abort (deprecated). 
      * @param {number} [milestone] 
      * @param {number} [environment] 
      * @param {number} [fromStartTime] 
@@ -604,7 +604,7 @@ export class RunsApi extends BaseAPI {
 
     /**
      * This method allows to update a publicity of specific run. 
-     * @summary Update publicity of a specific run.
+     * @summary Update publicity of a specific run
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {RunPublic} runPublic 

@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -21,9 +21,9 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
-import { Bulk200Response } from '../model';
+import { BaseResponse } from '../model';
 // @ts-ignore
-import { BulkRequest } from '../model';
+import { Bulk200Response } from '../model';
 // @ts-ignore
 import { IdResponse } from '../model';
 // @ts-ignore
@@ -34,6 +34,10 @@ import { TestCaseListResponse } from '../model';
 import { TestCaseResponse } from '../model';
 // @ts-ignore
 import { TestCaseUpdate } from '../model';
+// @ts-ignore
+import { TestCasebulk } from '../model';
+// @ts-ignore
+import { TestCaseexternalIssues } from '../model';
 /**
  * CasesApi - axios parameter creator
  * @export
@@ -42,17 +46,17 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
     return {
         /**
          * This method allows to bulk create new test cases in a project. 
-         * @summary Create test cases in bulk.
+         * @summary Create test cases in bulk
          * @param {string} code Code of project, where to search entities.
-         * @param {BulkRequest} bulkRequest 
+         * @param {TestCasebulk} testCasebulk 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        bulk: async (code: string, bulkRequest: BulkRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        bulk: async (code: string, testCasebulk: TestCasebulk, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('bulk', 'code', code)
-            // verify required parameter 'bulkRequest' is not null or undefined
-            assertParamExists('bulk', 'bulkRequest', bulkRequest)
+            // verify required parameter 'testCasebulk' is not null or undefined
+            assertParamExists('bulk', 'testCasebulk', testCasebulk)
             const localVarPath = `/v1/case/{code}/bulk`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -76,7 +80,93 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(bulkRequest, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(testCasebulk, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Attach the external issues to the test cases
+         * @param {string} code Code of project, where to search entities.
+         * @param {TestCaseexternalIssues} testCaseexternalIssues 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        caseAttachExternalIssue: async (code: string, testCaseexternalIssues: TestCaseexternalIssues, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'code' is not null or undefined
+            assertParamExists('caseAttachExternalIssue', 'code', code)
+            // verify required parameter 'testCaseexternalIssues' is not null or undefined
+            assertParamExists('caseAttachExternalIssue', 'testCaseexternalIssues', testCaseexternalIssues)
+            const localVarPath = `/v1/case/{code}/external-issue/attach`
+                .replace(`{${"code"}}`, encodeURIComponent(String(code)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication TokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Token", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(testCaseexternalIssues, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Detach the external issues from the test cases
+         * @param {string} code Code of project, where to search entities.
+         * @param {TestCaseexternalIssues} testCaseexternalIssues 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        caseDetachExternalIssue: async (code: string, testCaseexternalIssues: TestCaseexternalIssues, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'code' is not null or undefined
+            assertParamExists('caseDetachExternalIssue', 'code', code)
+            // verify required parameter 'testCaseexternalIssues' is not null or undefined
+            assertParamExists('caseDetachExternalIssue', 'testCaseexternalIssues', testCaseexternalIssues)
+            const localVarPath = `/v1/case/{code}/external-issue/detach`
+                .replace(`{${"code"}}`, encodeURIComponent(String(code)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication TokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Token", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(testCaseexternalIssues, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -85,7 +175,7 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
         },
         /**
          * This method allows to create a new test case in selected project. 
-         * @summary Create a new test case.
+         * @summary Create a new test case
          * @param {string} code Code of project, where to search entities.
          * @param {TestCaseCreate} testCaseCreate 
          * @param {*} [options] Override http request option.
@@ -128,7 +218,7 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
         },
         /**
          * This method completely deletes a test case from repository. 
-         * @summary Delete test case.
+         * @summary Delete test case
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -169,7 +259,7 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
         },
         /**
          * This method allows to retrieve a specific test case. 
-         * @summary Get a specific test case.
+         * @summary Get a specific test case
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -210,7 +300,7 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
         },
         /**
          * This method allows to retrieve all test cases stored in selected project. 
-         * @summary Get all test cases.
+         * @summary Get all test cases
          * @param {string} code Code of project, where to search entities.
          * @param {string} [search] Provide a string that will be used to search by name.
          * @param {number} [milestoneId] ID of milestone.
@@ -221,12 +311,15 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
          * @param {string} [behavior] A list of behavior values separated by comma. Possible values: undefined, positive negative, destructive 
          * @param {string} [automation] A list of values separated by comma. Possible values: is-not-automated, automated to-be-automated 
          * @param {string} [status] A list of values separated by comma. Possible values: actual, draft deprecated 
+         * @param {'asana' | 'azure-devops' | 'clickup-app' | 'github-app' | 'gitlab-app' | 'jira-cloud' | 'jira-server' | 'linear' | 'monday' | 'redmine-app' | 'trello-app' | 'youtrack-app'} [externalIssuesType] An integration type. 
+         * @param {Array<string>} [externalIssuesIds] A list of issue IDs.
+         * @param {string} [include] A list of entities to include in response separated by comma. Possible values: external_issues. 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCases: async (code: string, search?: string, milestoneId?: number, suiteId?: number, severity?: string, priority?: string, type?: string, behavior?: string, automation?: string, status?: string, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getCases: async (code: string, search?: string, milestoneId?: number, suiteId?: number, severity?: string, priority?: string, type?: string, behavior?: string, automation?: string, status?: string, externalIssuesType?: 'asana' | 'azure-devops' | 'clickup-app' | 'github-app' | 'gitlab-app' | 'jira-cloud' | 'jira-server' | 'linear' | 'monday' | 'redmine-app' | 'trello-app' | 'youtrack-app', externalIssuesIds?: Array<string>, include?: string, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getCases', 'code', code)
             const localVarPath = `/v1/case/{code}`
@@ -281,6 +374,18 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
                 localVarQueryParameter['status'] = status;
             }
 
+            if (externalIssuesType !== undefined) {
+                localVarQueryParameter['external_issues[type]'] = externalIssuesType;
+            }
+
+            if (externalIssuesIds) {
+                localVarQueryParameter['external_issues[ids][]'] = externalIssuesIds.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (include !== undefined) {
+                localVarQueryParameter['include'] = include;
+            }
+
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
             }
@@ -302,7 +407,7 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
         },
         /**
          * This method updates a test case. 
-         * @summary Update test case.
+         * @summary Update test case
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {TestCaseUpdate} testCaseUpdate 
@@ -359,19 +464,43 @@ export const CasesApiFp = function(configuration?: Configuration) {
     return {
         /**
          * This method allows to bulk create new test cases in a project. 
-         * @summary Create test cases in bulk.
+         * @summary Create test cases in bulk
          * @param {string} code Code of project, where to search entities.
-         * @param {BulkRequest} bulkRequest 
+         * @param {TestCasebulk} testCasebulk 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async bulk(code: string, bulkRequest: BulkRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Bulk200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.bulk(code, bulkRequest, options);
+        async bulk(code: string, testCasebulk: TestCasebulk, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Bulk200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.bulk(code, testCasebulk, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Attach the external issues to the test cases
+         * @param {string} code Code of project, where to search entities.
+         * @param {TestCaseexternalIssues} testCaseexternalIssues 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async caseAttachExternalIssue(code: string, testCaseexternalIssues: TestCaseexternalIssues, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.caseAttachExternalIssue(code, testCaseexternalIssues, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Detach the external issues from the test cases
+         * @param {string} code Code of project, where to search entities.
+         * @param {TestCaseexternalIssues} testCaseexternalIssues 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async caseDetachExternalIssue(code: string, testCaseexternalIssues: TestCaseexternalIssues, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.caseDetachExternalIssue(code, testCaseexternalIssues, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * This method allows to create a new test case in selected project. 
-         * @summary Create a new test case.
+         * @summary Create a new test case
          * @param {string} code Code of project, where to search entities.
          * @param {TestCaseCreate} testCaseCreate 
          * @param {*} [options] Override http request option.
@@ -383,7 +512,7 @@ export const CasesApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method completely deletes a test case from repository. 
-         * @summary Delete test case.
+         * @summary Delete test case
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -395,7 +524,7 @@ export const CasesApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to retrieve a specific test case. 
-         * @summary Get a specific test case.
+         * @summary Get a specific test case
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -407,7 +536,7 @@ export const CasesApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to retrieve all test cases stored in selected project. 
-         * @summary Get all test cases.
+         * @summary Get all test cases
          * @param {string} code Code of project, where to search entities.
          * @param {string} [search] Provide a string that will be used to search by name.
          * @param {number} [milestoneId] ID of milestone.
@@ -418,18 +547,21 @@ export const CasesApiFp = function(configuration?: Configuration) {
          * @param {string} [behavior] A list of behavior values separated by comma. Possible values: undefined, positive negative, destructive 
          * @param {string} [automation] A list of values separated by comma. Possible values: is-not-automated, automated to-be-automated 
          * @param {string} [status] A list of values separated by comma. Possible values: actual, draft deprecated 
+         * @param {'asana' | 'azure-devops' | 'clickup-app' | 'github-app' | 'gitlab-app' | 'jira-cloud' | 'jira-server' | 'linear' | 'monday' | 'redmine-app' | 'trello-app' | 'youtrack-app'} [externalIssuesType] An integration type. 
+         * @param {Array<string>} [externalIssuesIds] A list of issue IDs.
+         * @param {string} [include] A list of entities to include in response separated by comma. Possible values: external_issues. 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getCases(code: string, search?: string, milestoneId?: number, suiteId?: number, severity?: string, priority?: string, type?: string, behavior?: string, automation?: string, status?: string, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TestCaseListResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getCases(code, search, milestoneId, suiteId, severity, priority, type, behavior, automation, status, limit, offset, options);
+        async getCases(code: string, search?: string, milestoneId?: number, suiteId?: number, severity?: string, priority?: string, type?: string, behavior?: string, automation?: string, status?: string, externalIssuesType?: 'asana' | 'azure-devops' | 'clickup-app' | 'github-app' | 'gitlab-app' | 'jira-cloud' | 'jira-server' | 'linear' | 'monday' | 'redmine-app' | 'trello-app' | 'youtrack-app', externalIssuesIds?: Array<string>, include?: string, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TestCaseListResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCases(code, search, milestoneId, suiteId, severity, priority, type, behavior, automation, status, externalIssuesType, externalIssuesIds, include, limit, offset, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * This method updates a test case. 
-         * @summary Update test case.
+         * @summary Update test case
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {TestCaseUpdate} testCaseUpdate 
@@ -452,18 +584,40 @@ export const CasesApiFactory = function (configuration?: Configuration, basePath
     return {
         /**
          * This method allows to bulk create new test cases in a project. 
-         * @summary Create test cases in bulk.
+         * @summary Create test cases in bulk
          * @param {string} code Code of project, where to search entities.
-         * @param {BulkRequest} bulkRequest 
+         * @param {TestCasebulk} testCasebulk 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        bulk(code: string, bulkRequest: BulkRequest, options?: any): AxiosPromise<Bulk200Response> {
-            return localVarFp.bulk(code, bulkRequest, options).then((request) => request(axios, basePath));
+        bulk(code: string, testCasebulk: TestCasebulk, options?: any): AxiosPromise<Bulk200Response> {
+            return localVarFp.bulk(code, testCasebulk, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Attach the external issues to the test cases
+         * @param {string} code Code of project, where to search entities.
+         * @param {TestCaseexternalIssues} testCaseexternalIssues 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        caseAttachExternalIssue(code: string, testCaseexternalIssues: TestCaseexternalIssues, options?: any): AxiosPromise<BaseResponse> {
+            return localVarFp.caseAttachExternalIssue(code, testCaseexternalIssues, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Detach the external issues from the test cases
+         * @param {string} code Code of project, where to search entities.
+         * @param {TestCaseexternalIssues} testCaseexternalIssues 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        caseDetachExternalIssue(code: string, testCaseexternalIssues: TestCaseexternalIssues, options?: any): AxiosPromise<BaseResponse> {
+            return localVarFp.caseDetachExternalIssue(code, testCaseexternalIssues, options).then((request) => request(axios, basePath));
         },
         /**
          * This method allows to create a new test case in selected project. 
-         * @summary Create a new test case.
+         * @summary Create a new test case
          * @param {string} code Code of project, where to search entities.
          * @param {TestCaseCreate} testCaseCreate 
          * @param {*} [options] Override http request option.
@@ -474,7 +628,7 @@ export const CasesApiFactory = function (configuration?: Configuration, basePath
         },
         /**
          * This method completely deletes a test case from repository. 
-         * @summary Delete test case.
+         * @summary Delete test case
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -485,7 +639,7 @@ export const CasesApiFactory = function (configuration?: Configuration, basePath
         },
         /**
          * This method allows to retrieve a specific test case. 
-         * @summary Get a specific test case.
+         * @summary Get a specific test case
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -496,7 +650,7 @@ export const CasesApiFactory = function (configuration?: Configuration, basePath
         },
         /**
          * This method allows to retrieve all test cases stored in selected project. 
-         * @summary Get all test cases.
+         * @summary Get all test cases
          * @param {string} code Code of project, where to search entities.
          * @param {string} [search] Provide a string that will be used to search by name.
          * @param {number} [milestoneId] ID of milestone.
@@ -507,17 +661,20 @@ export const CasesApiFactory = function (configuration?: Configuration, basePath
          * @param {string} [behavior] A list of behavior values separated by comma. Possible values: undefined, positive negative, destructive 
          * @param {string} [automation] A list of values separated by comma. Possible values: is-not-automated, automated to-be-automated 
          * @param {string} [status] A list of values separated by comma. Possible values: actual, draft deprecated 
+         * @param {'asana' | 'azure-devops' | 'clickup-app' | 'github-app' | 'gitlab-app' | 'jira-cloud' | 'jira-server' | 'linear' | 'monday' | 'redmine-app' | 'trello-app' | 'youtrack-app'} [externalIssuesType] An integration type. 
+         * @param {Array<string>} [externalIssuesIds] A list of issue IDs.
+         * @param {string} [include] A list of entities to include in response separated by comma. Possible values: external_issues. 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCases(code: string, search?: string, milestoneId?: number, suiteId?: number, severity?: string, priority?: string, type?: string, behavior?: string, automation?: string, status?: string, limit?: number, offset?: number, options?: any): AxiosPromise<TestCaseListResponse> {
-            return localVarFp.getCases(code, search, milestoneId, suiteId, severity, priority, type, behavior, automation, status, limit, offset, options).then((request) => request(axios, basePath));
+        getCases(code: string, search?: string, milestoneId?: number, suiteId?: number, severity?: string, priority?: string, type?: string, behavior?: string, automation?: string, status?: string, externalIssuesType?: 'asana' | 'azure-devops' | 'clickup-app' | 'github-app' | 'gitlab-app' | 'jira-cloud' | 'jira-server' | 'linear' | 'monday' | 'redmine-app' | 'trello-app' | 'youtrack-app', externalIssuesIds?: Array<string>, include?: string, limit?: number, offset?: number, options?: any): AxiosPromise<TestCaseListResponse> {
+            return localVarFp.getCases(code, search, milestoneId, suiteId, severity, priority, type, behavior, automation, status, externalIssuesType, externalIssuesIds, include, limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
          * This method updates a test case. 
-         * @summary Update test case.
+         * @summary Update test case
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {TestCaseUpdate} testCaseUpdate 
@@ -539,20 +696,46 @@ export const CasesApiFactory = function (configuration?: Configuration, basePath
 export class CasesApi extends BaseAPI {
     /**
      * This method allows to bulk create new test cases in a project. 
-     * @summary Create test cases in bulk.
+     * @summary Create test cases in bulk
      * @param {string} code Code of project, where to search entities.
-     * @param {BulkRequest} bulkRequest 
+     * @param {TestCasebulk} testCasebulk 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CasesApi
      */
-    public bulk(code: string, bulkRequest: BulkRequest, options?: AxiosRequestConfig) {
-        return CasesApiFp(this.configuration).bulk(code, bulkRequest, options).then((request) => request(this.axios, this.basePath));
+    public bulk(code: string, testCasebulk: TestCasebulk, options?: AxiosRequestConfig) {
+        return CasesApiFp(this.configuration).bulk(code, testCasebulk, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Attach the external issues to the test cases
+     * @param {string} code Code of project, where to search entities.
+     * @param {TestCaseexternalIssues} testCaseexternalIssues 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CasesApi
+     */
+    public caseAttachExternalIssue(code: string, testCaseexternalIssues: TestCaseexternalIssues, options?: AxiosRequestConfig) {
+        return CasesApiFp(this.configuration).caseAttachExternalIssue(code, testCaseexternalIssues, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Detach the external issues from the test cases
+     * @param {string} code Code of project, where to search entities.
+     * @param {TestCaseexternalIssues} testCaseexternalIssues 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CasesApi
+     */
+    public caseDetachExternalIssue(code: string, testCaseexternalIssues: TestCaseexternalIssues, options?: AxiosRequestConfig) {
+        return CasesApiFp(this.configuration).caseDetachExternalIssue(code, testCaseexternalIssues, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * This method allows to create a new test case in selected project. 
-     * @summary Create a new test case.
+     * @summary Create a new test case
      * @param {string} code Code of project, where to search entities.
      * @param {TestCaseCreate} testCaseCreate 
      * @param {*} [options] Override http request option.
@@ -565,7 +748,7 @@ export class CasesApi extends BaseAPI {
 
     /**
      * This method completely deletes a test case from repository. 
-     * @summary Delete test case.
+     * @summary Delete test case
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {*} [options] Override http request option.
@@ -578,7 +761,7 @@ export class CasesApi extends BaseAPI {
 
     /**
      * This method allows to retrieve a specific test case. 
-     * @summary Get a specific test case.
+     * @summary Get a specific test case
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {*} [options] Override http request option.
@@ -591,7 +774,7 @@ export class CasesApi extends BaseAPI {
 
     /**
      * This method allows to retrieve all test cases stored in selected project. 
-     * @summary Get all test cases.
+     * @summary Get all test cases
      * @param {string} code Code of project, where to search entities.
      * @param {string} [search] Provide a string that will be used to search by name.
      * @param {number} [milestoneId] ID of milestone.
@@ -602,19 +785,22 @@ export class CasesApi extends BaseAPI {
      * @param {string} [behavior] A list of behavior values separated by comma. Possible values: undefined, positive negative, destructive 
      * @param {string} [automation] A list of values separated by comma. Possible values: is-not-automated, automated to-be-automated 
      * @param {string} [status] A list of values separated by comma. Possible values: actual, draft deprecated 
+     * @param {'asana' | 'azure-devops' | 'clickup-app' | 'github-app' | 'gitlab-app' | 'jira-cloud' | 'jira-server' | 'linear' | 'monday' | 'redmine-app' | 'trello-app' | 'youtrack-app'} [externalIssuesType] An integration type. 
+     * @param {Array<string>} [externalIssuesIds] A list of issue IDs.
+     * @param {string} [include] A list of entities to include in response separated by comma. Possible values: external_issues. 
      * @param {number} [limit] A number of entities in result set.
      * @param {number} [offset] How many entities should be skipped.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CasesApi
      */
-    public getCases(code: string, search?: string, milestoneId?: number, suiteId?: number, severity?: string, priority?: string, type?: string, behavior?: string, automation?: string, status?: string, limit?: number, offset?: number, options?: AxiosRequestConfig) {
-        return CasesApiFp(this.configuration).getCases(code, search, milestoneId, suiteId, severity, priority, type, behavior, automation, status, limit, offset, options).then((request) => request(this.axios, this.basePath));
+    public getCases(code: string, search?: string, milestoneId?: number, suiteId?: number, severity?: string, priority?: string, type?: string, behavior?: string, automation?: string, status?: string, externalIssuesType?: 'asana' | 'azure-devops' | 'clickup-app' | 'github-app' | 'gitlab-app' | 'jira-cloud' | 'jira-server' | 'linear' | 'monday' | 'redmine-app' | 'trello-app' | 'youtrack-app', externalIssuesIds?: Array<string>, include?: string, limit?: number, offset?: number, options?: AxiosRequestConfig) {
+        return CasesApiFp(this.configuration).getCases(code, search, milestoneId, suiteId, severity, priority, type, behavior, automation, status, externalIssuesType, externalIssuesIds, include, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * This method updates a test case. 
-     * @summary Update test case.
+     * @summary Update test case
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {TestCaseUpdate} testCaseUpdate 

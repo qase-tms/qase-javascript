@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -13,19 +13,18 @@
  */
 
 
-import { BulkRequestCasesInner } from './bulk-request-cases-inner';
 
 /**
  * 
  * @export
- * @interface BulkRequest
+ * @interface TestCasebulkCasesInnerAllOf
  */
-export interface BulkRequest {
+export interface TestCasebulkCasesInnerAllOf {
     /**
      * 
-     * @type {Array<BulkRequestCasesInner>}
-     * @memberof BulkRequest
+     * @type {number}
+     * @memberof TestCasebulkCasesInnerAllOf
      */
-    'cases': Array<BulkRequestCasesInner>;
+    'id'?: number | null;
 }
 

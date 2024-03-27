@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -21,6 +21,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
+import { BaseResponse } from '../model';
+// @ts-ignore
 import { ProjectAccess } from '../model';
 // @ts-ignore
 import { ProjectCodeResponse } from '../model';
@@ -30,8 +32,6 @@ import { ProjectCreate } from '../model';
 import { ProjectListResponse } from '../model';
 // @ts-ignore
 import { ProjectResponse } from '../model';
-// @ts-ignore
-import { Response } from '../model';
 /**
  * ProjectsApi - axios parameter creator
  * @export
@@ -40,7 +40,7 @@ export const ProjectsApiAxiosParamCreator = function (configuration?: Configurat
     return {
         /**
          * This method is used to create a new project through API. 
-         * @summary Create new project.
+         * @summary Create new project
          * @param {ProjectCreate} projectCreate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -79,7 +79,7 @@ export const ProjectsApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * This method allows to delete a specific project. 
-         * @summary Delete Project by code.
+         * @summary Delete Project by code
          * @param {string} code Code of project, where to search entities.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -116,7 +116,7 @@ export const ProjectsApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * This method allows to retrieve a specific project. 
-         * @summary Get Project by code.
+         * @summary Get Project by code
          * @param {string} code Code of project, where to search entities.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -153,7 +153,7 @@ export const ProjectsApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * This method allows to retrieve all projects available for your account. You can limit and offset params to paginate. 
-         * @summary Get All Projects.
+         * @summary Get All Projects
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
@@ -196,7 +196,7 @@ export const ProjectsApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * This method allows to grant access to a specific project. 
-         * @summary Grant access to project by code.
+         * @summary Grant access to project by code
          * @param {string} code Code of project, where to search entities.
          * @param {ProjectAccess} projectAccess 
          * @param {*} [options] Override http request option.
@@ -239,7 +239,7 @@ export const ProjectsApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * This method allows to revoke access to a specific project. 
-         * @summary Revoke access to project by code.
+         * @summary Revoke access to project by code
          * @param {string} code Code of project, where to search entities.
          * @param {ProjectAccess} projectAccess 
          * @param {*} [options] Override http request option.
@@ -292,7 +292,7 @@ export const ProjectsApiFp = function(configuration?: Configuration) {
     return {
         /**
          * This method is used to create a new project through API. 
-         * @summary Create new project.
+         * @summary Create new project
          * @param {ProjectCreate} projectCreate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -303,18 +303,18 @@ export const ProjectsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to delete a specific project. 
-         * @summary Delete Project by code.
+         * @summary Delete Project by code
          * @param {string} code Code of project, where to search entities.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteProject(code: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Response>> {
+        async deleteProject(code: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteProject(code, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * This method allows to retrieve a specific project. 
-         * @summary Get Project by code.
+         * @summary Get Project by code
          * @param {string} code Code of project, where to search entities.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -325,7 +325,7 @@ export const ProjectsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to retrieve all projects available for your account. You can limit and offset params to paginate. 
-         * @summary Get All Projects.
+         * @summary Get All Projects
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
@@ -337,25 +337,25 @@ export const ProjectsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to grant access to a specific project. 
-         * @summary Grant access to project by code.
+         * @summary Grant access to project by code
          * @param {string} code Code of project, where to search entities.
          * @param {ProjectAccess} projectAccess 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async grantAccessToProject(code: string, projectAccess: ProjectAccess, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Response>> {
+        async grantAccessToProject(code: string, projectAccess: ProjectAccess, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.grantAccessToProject(code, projectAccess, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * This method allows to revoke access to a specific project. 
-         * @summary Revoke access to project by code.
+         * @summary Revoke access to project by code
          * @param {string} code Code of project, where to search entities.
          * @param {ProjectAccess} projectAccess 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async revokeAccessToProject(code: string, projectAccess: ProjectAccess, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Response>> {
+        async revokeAccessToProject(code: string, projectAccess: ProjectAccess, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.revokeAccessToProject(code, projectAccess, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -371,7 +371,7 @@ export const ProjectsApiFactory = function (configuration?: Configuration, baseP
     return {
         /**
          * This method is used to create a new project through API. 
-         * @summary Create new project.
+         * @summary Create new project
          * @param {ProjectCreate} projectCreate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -381,17 +381,17 @@ export const ProjectsApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * This method allows to delete a specific project. 
-         * @summary Delete Project by code.
+         * @summary Delete Project by code
          * @param {string} code Code of project, where to search entities.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteProject(code: string, options?: any): AxiosPromise<Response> {
+        deleteProject(code: string, options?: any): AxiosPromise<BaseResponse> {
             return localVarFp.deleteProject(code, options).then((request) => request(axios, basePath));
         },
         /**
          * This method allows to retrieve a specific project. 
-         * @summary Get Project by code.
+         * @summary Get Project by code
          * @param {string} code Code of project, where to search entities.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -401,7 +401,7 @@ export const ProjectsApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * This method allows to retrieve all projects available for your account. You can limit and offset params to paginate. 
-         * @summary Get All Projects.
+         * @summary Get All Projects
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
@@ -412,24 +412,24 @@ export const ProjectsApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * This method allows to grant access to a specific project. 
-         * @summary Grant access to project by code.
+         * @summary Grant access to project by code
          * @param {string} code Code of project, where to search entities.
          * @param {ProjectAccess} projectAccess 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        grantAccessToProject(code: string, projectAccess: ProjectAccess, options?: any): AxiosPromise<Response> {
+        grantAccessToProject(code: string, projectAccess: ProjectAccess, options?: any): AxiosPromise<BaseResponse> {
             return localVarFp.grantAccessToProject(code, projectAccess, options).then((request) => request(axios, basePath));
         },
         /**
          * This method allows to revoke access to a specific project. 
-         * @summary Revoke access to project by code.
+         * @summary Revoke access to project by code
          * @param {string} code Code of project, where to search entities.
          * @param {ProjectAccess} projectAccess 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        revokeAccessToProject(code: string, projectAccess: ProjectAccess, options?: any): AxiosPromise<Response> {
+        revokeAccessToProject(code: string, projectAccess: ProjectAccess, options?: any): AxiosPromise<BaseResponse> {
             return localVarFp.revokeAccessToProject(code, projectAccess, options).then((request) => request(axios, basePath));
         },
     };
@@ -444,7 +444,7 @@ export const ProjectsApiFactory = function (configuration?: Configuration, baseP
 export class ProjectsApi extends BaseAPI {
     /**
      * This method is used to create a new project through API. 
-     * @summary Create new project.
+     * @summary Create new project
      * @param {ProjectCreate} projectCreate 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -456,7 +456,7 @@ export class ProjectsApi extends BaseAPI {
 
     /**
      * This method allows to delete a specific project. 
-     * @summary Delete Project by code.
+     * @summary Delete Project by code
      * @param {string} code Code of project, where to search entities.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -468,7 +468,7 @@ export class ProjectsApi extends BaseAPI {
 
     /**
      * This method allows to retrieve a specific project. 
-     * @summary Get Project by code.
+     * @summary Get Project by code
      * @param {string} code Code of project, where to search entities.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -480,7 +480,7 @@ export class ProjectsApi extends BaseAPI {
 
     /**
      * This method allows to retrieve all projects available for your account. You can limit and offset params to paginate. 
-     * @summary Get All Projects.
+     * @summary Get All Projects
      * @param {number} [limit] A number of entities in result set.
      * @param {number} [offset] How many entities should be skipped.
      * @param {*} [options] Override http request option.
@@ -493,7 +493,7 @@ export class ProjectsApi extends BaseAPI {
 
     /**
      * This method allows to grant access to a specific project. 
-     * @summary Grant access to project by code.
+     * @summary Grant access to project by code
      * @param {string} code Code of project, where to search entities.
      * @param {ProjectAccess} projectAccess 
      * @param {*} [options] Override http request option.
@@ -506,7 +506,7 @@ export class ProjectsApi extends BaseAPI {
 
     /**
      * This method allows to revoke access to a specific project. 
-     * @summary Revoke access to project by code.
+     * @summary Revoke access to project by code
      * @param {string} code Code of project, where to search entities.
      * @param {ProjectAccess} projectAccess 
      * @param {*} [options] Override http request option.

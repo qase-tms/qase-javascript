@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -38,7 +38,7 @@ export const SharedStepsApiAxiosParamCreator = function (configuration?: Configu
     return {
         /**
          * This method allows to create a shared step in selected project. 
-         * @summary Create a new shared step.
+         * @summary Create a new shared step
          * @param {string} code Code of project, where to search entities.
          * @param {SharedStepCreate} sharedStepCreate 
          * @param {*} [options] Override http request option.
@@ -81,7 +81,7 @@ export const SharedStepsApiAxiosParamCreator = function (configuration?: Configu
         },
         /**
          * This method completely deletes a shared step from repository. 
-         * @summary Delete shared step.
+         * @summary Delete shared step
          * @param {string} code Code of project, where to search entities.
          * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
@@ -122,7 +122,7 @@ export const SharedStepsApiAxiosParamCreator = function (configuration?: Configu
         },
         /**
          * This method allows to retrieve a specific shared step. 
-         * @summary Get a specific shared step.
+         * @summary Get a specific shared step
          * @param {string} code Code of project, where to search entities.
          * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
@@ -163,7 +163,7 @@ export const SharedStepsApiAxiosParamCreator = function (configuration?: Configu
         },
         /**
          * This method allows to retrieve all shared steps stored in selected project. 
-         * @summary Get all shared steps.
+         * @summary Get all shared steps
          * @param {string} code Code of project, where to search entities.
          * @param {string} [search] Provide a string that will be used to search by name.
          * @param {number} [limit] A number of entities in result set.
@@ -215,7 +215,7 @@ export const SharedStepsApiAxiosParamCreator = function (configuration?: Configu
         },
         /**
          * This method updates a shared step. 
-         * @summary Update shared step.
+         * @summary Update shared step
          * @param {string} code Code of project, where to search entities.
          * @param {string} hash Hash.
          * @param {SharedStepUpdate} sharedStepUpdate 
@@ -272,7 +272,7 @@ export const SharedStepsApiFp = function(configuration?: Configuration) {
     return {
         /**
          * This method allows to create a shared step in selected project. 
-         * @summary Create a new shared step.
+         * @summary Create a new shared step
          * @param {string} code Code of project, where to search entities.
          * @param {SharedStepCreate} sharedStepCreate 
          * @param {*} [options] Override http request option.
@@ -284,7 +284,7 @@ export const SharedStepsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method completely deletes a shared step from repository. 
-         * @summary Delete shared step.
+         * @summary Delete shared step
          * @param {string} code Code of project, where to search entities.
          * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
@@ -296,7 +296,7 @@ export const SharedStepsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to retrieve a specific shared step. 
-         * @summary Get a specific shared step.
+         * @summary Get a specific shared step
          * @param {string} code Code of project, where to search entities.
          * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
@@ -308,7 +308,7 @@ export const SharedStepsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to retrieve all shared steps stored in selected project. 
-         * @summary Get all shared steps.
+         * @summary Get all shared steps
          * @param {string} code Code of project, where to search entities.
          * @param {string} [search] Provide a string that will be used to search by name.
          * @param {number} [limit] A number of entities in result set.
@@ -322,7 +322,7 @@ export const SharedStepsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method updates a shared step. 
-         * @summary Update shared step.
+         * @summary Update shared step
          * @param {string} code Code of project, where to search entities.
          * @param {string} hash Hash.
          * @param {SharedStepUpdate} sharedStepUpdate 
@@ -345,7 +345,7 @@ export const SharedStepsApiFactory = function (configuration?: Configuration, ba
     return {
         /**
          * This method allows to create a shared step in selected project. 
-         * @summary Create a new shared step.
+         * @summary Create a new shared step
          * @param {string} code Code of project, where to search entities.
          * @param {SharedStepCreate} sharedStepCreate 
          * @param {*} [options] Override http request option.
@@ -356,7 +356,7 @@ export const SharedStepsApiFactory = function (configuration?: Configuration, ba
         },
         /**
          * This method completely deletes a shared step from repository. 
-         * @summary Delete shared step.
+         * @summary Delete shared step
          * @param {string} code Code of project, where to search entities.
          * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
@@ -367,7 +367,7 @@ export const SharedStepsApiFactory = function (configuration?: Configuration, ba
         },
         /**
          * This method allows to retrieve a specific shared step. 
-         * @summary Get a specific shared step.
+         * @summary Get a specific shared step
          * @param {string} code Code of project, where to search entities.
          * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
@@ -378,7 +378,7 @@ export const SharedStepsApiFactory = function (configuration?: Configuration, ba
         },
         /**
          * This method allows to retrieve all shared steps stored in selected project. 
-         * @summary Get all shared steps.
+         * @summary Get all shared steps
          * @param {string} code Code of project, where to search entities.
          * @param {string} [search] Provide a string that will be used to search by name.
          * @param {number} [limit] A number of entities in result set.
@@ -391,7 +391,7 @@ export const SharedStepsApiFactory = function (configuration?: Configuration, ba
         },
         /**
          * This method updates a shared step. 
-         * @summary Update shared step.
+         * @summary Update shared step
          * @param {string} code Code of project, where to search entities.
          * @param {string} hash Hash.
          * @param {SharedStepUpdate} sharedStepUpdate 
@@ -413,7 +413,7 @@ export const SharedStepsApiFactory = function (configuration?: Configuration, ba
 export class SharedStepsApi extends BaseAPI {
     /**
      * This method allows to create a shared step in selected project. 
-     * @summary Create a new shared step.
+     * @summary Create a new shared step
      * @param {string} code Code of project, where to search entities.
      * @param {SharedStepCreate} sharedStepCreate 
      * @param {*} [options] Override http request option.
@@ -426,7 +426,7 @@ export class SharedStepsApi extends BaseAPI {
 
     /**
      * This method completely deletes a shared step from repository. 
-     * @summary Delete shared step.
+     * @summary Delete shared step
      * @param {string} code Code of project, where to search entities.
      * @param {string} hash Hash.
      * @param {*} [options] Override http request option.
@@ -439,7 +439,7 @@ export class SharedStepsApi extends BaseAPI {
 
     /**
      * This method allows to retrieve a specific shared step. 
-     * @summary Get a specific shared step.
+     * @summary Get a specific shared step
      * @param {string} code Code of project, where to search entities.
      * @param {string} hash Hash.
      * @param {*} [options] Override http request option.
@@ -452,7 +452,7 @@ export class SharedStepsApi extends BaseAPI {
 
     /**
      * This method allows to retrieve all shared steps stored in selected project. 
-     * @summary Get all shared steps.
+     * @summary Get all shared steps
      * @param {string} code Code of project, where to search entities.
      * @param {string} [search] Provide a string that will be used to search by name.
      * @param {number} [limit] A number of entities in result set.
@@ -467,7 +467,7 @@ export class SharedStepsApi extends BaseAPI {
 
     /**
      * This method updates a shared step. 
-     * @summary Update shared step.
+     * @summary Update shared step
      * @param {string} code Code of project, where to search entities.
      * @param {string} hash Hash.
      * @param {SharedStepUpdate} sharedStepUpdate 

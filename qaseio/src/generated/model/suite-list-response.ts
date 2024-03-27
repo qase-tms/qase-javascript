@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -13,7 +13,7 @@
  */
 
 
-import { Response } from './response';
+import { BaseResponse } from './base-response';
 import { SuiteListResponseAllOf } from './suite-list-response-all-of';
 import { SuiteListResponseAllOfResult } from './suite-list-response-all-of-result';
 
@@ -21,6 +21,6 @@ import { SuiteListResponseAllOfResult } from './suite-list-response-all-of-resul
  * @type SuiteListResponse
  * @export
  */
-export type SuiteListResponse = Response & SuiteListResponseAllOf;
+export type SuiteListResponse = BaseResponse & SuiteListResponseAllOf;
 
 

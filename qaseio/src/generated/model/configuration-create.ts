@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -17,26 +17,20 @@
 /**
  * 
  * @export
- * @interface Filters2
+ * @interface ConfigurationCreate
  */
-export interface Filters2 {
+export interface ConfigurationCreate {
     /**
      * 
      * @type {string}
-     * @memberof Filters2
+     * @memberof ConfigurationCreate
      */
-    'status'?: Filters2StatusEnum;
+    'title': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof ConfigurationCreate
+     */
+    'group_id': number;
 }
-
-/**
-    * @export
-    * @enum {string}
-    */
-export enum Filters2StatusEnum {
-    OPEN = 'open',
-    RESOLVED = 'resolved',
-    IN_PROGRESS = 'in_progress',
-    INVALID = 'invalid'
-}
-
 

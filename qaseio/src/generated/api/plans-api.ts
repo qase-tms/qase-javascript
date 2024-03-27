@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -38,7 +38,7 @@ export const PlansApiAxiosParamCreator = function (configuration?: Configuration
     return {
         /**
          * This method allows to create a plan in selected project. 
-         * @summary Create a new plan.
+         * @summary Create a new plan
          * @param {string} code Code of project, where to search entities.
          * @param {PlanCreate} planCreate 
          * @param {*} [options] Override http request option.
@@ -81,7 +81,7 @@ export const PlansApiAxiosParamCreator = function (configuration?: Configuration
         },
         /**
          * This method completely deletes a plan from repository. 
-         * @summary Delete plan.
+         * @summary Delete plan
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -122,7 +122,7 @@ export const PlansApiAxiosParamCreator = function (configuration?: Configuration
         },
         /**
          * This method allows to retrieve a specific plan. 
-         * @summary Get a specific plan.
+         * @summary Get a specific plan
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -163,7 +163,7 @@ export const PlansApiAxiosParamCreator = function (configuration?: Configuration
         },
         /**
          * This method allows to retrieve all plans stored in selected project. 
-         * @summary Get all plans.
+         * @summary Get all plans
          * @param {string} code Code of project, where to search entities.
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
@@ -210,7 +210,7 @@ export const PlansApiAxiosParamCreator = function (configuration?: Configuration
         },
         /**
          * This method updates a plan. 
-         * @summary Update plan.
+         * @summary Update plan
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {PlanUpdate} planUpdate 
@@ -267,7 +267,7 @@ export const PlansApiFp = function(configuration?: Configuration) {
     return {
         /**
          * This method allows to create a plan in selected project. 
-         * @summary Create a new plan.
+         * @summary Create a new plan
          * @param {string} code Code of project, where to search entities.
          * @param {PlanCreate} planCreate 
          * @param {*} [options] Override http request option.
@@ -279,7 +279,7 @@ export const PlansApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method completely deletes a plan from repository. 
-         * @summary Delete plan.
+         * @summary Delete plan
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -291,7 +291,7 @@ export const PlansApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to retrieve a specific plan. 
-         * @summary Get a specific plan.
+         * @summary Get a specific plan
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -303,7 +303,7 @@ export const PlansApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to retrieve all plans stored in selected project. 
-         * @summary Get all plans.
+         * @summary Get all plans
          * @param {string} code Code of project, where to search entities.
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
@@ -316,7 +316,7 @@ export const PlansApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method updates a plan. 
-         * @summary Update plan.
+         * @summary Update plan
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {PlanUpdate} planUpdate 
@@ -339,7 +339,7 @@ export const PlansApiFactory = function (configuration?: Configuration, basePath
     return {
         /**
          * This method allows to create a plan in selected project. 
-         * @summary Create a new plan.
+         * @summary Create a new plan
          * @param {string} code Code of project, where to search entities.
          * @param {PlanCreate} planCreate 
          * @param {*} [options] Override http request option.
@@ -350,7 +350,7 @@ export const PlansApiFactory = function (configuration?: Configuration, basePath
         },
         /**
          * This method completely deletes a plan from repository. 
-         * @summary Delete plan.
+         * @summary Delete plan
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -361,7 +361,7 @@ export const PlansApiFactory = function (configuration?: Configuration, basePath
         },
         /**
          * This method allows to retrieve a specific plan. 
-         * @summary Get a specific plan.
+         * @summary Get a specific plan
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -372,7 +372,7 @@ export const PlansApiFactory = function (configuration?: Configuration, basePath
         },
         /**
          * This method allows to retrieve all plans stored in selected project. 
-         * @summary Get all plans.
+         * @summary Get all plans
          * @param {string} code Code of project, where to search entities.
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
@@ -384,7 +384,7 @@ export const PlansApiFactory = function (configuration?: Configuration, basePath
         },
         /**
          * This method updates a plan. 
-         * @summary Update plan.
+         * @summary Update plan
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {PlanUpdate} planUpdate 
@@ -406,7 +406,7 @@ export const PlansApiFactory = function (configuration?: Configuration, basePath
 export class PlansApi extends BaseAPI {
     /**
      * This method allows to create a plan in selected project. 
-     * @summary Create a new plan.
+     * @summary Create a new plan
      * @param {string} code Code of project, where to search entities.
      * @param {PlanCreate} planCreate 
      * @param {*} [options] Override http request option.
@@ -419,7 +419,7 @@ export class PlansApi extends BaseAPI {
 
     /**
      * This method completely deletes a plan from repository. 
-     * @summary Delete plan.
+     * @summary Delete plan
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {*} [options] Override http request option.
@@ -432,7 +432,7 @@ export class PlansApi extends BaseAPI {
 
     /**
      * This method allows to retrieve a specific plan. 
-     * @summary Get a specific plan.
+     * @summary Get a specific plan
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {*} [options] Override http request option.
@@ -445,7 +445,7 @@ export class PlansApi extends BaseAPI {
 
     /**
      * This method allows to retrieve all plans stored in selected project. 
-     * @summary Get all plans.
+     * @summary Get all plans
      * @param {string} code Code of project, where to search entities.
      * @param {number} [limit] A number of entities in result set.
      * @param {number} [offset] How many entities should be skipped.
@@ -459,7 +459,7 @@ export class PlansApi extends BaseAPI {
 
     /**
      * This method updates a plan. 
-     * @summary Update plan.
+     * @summary Update plan
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {PlanUpdate} planUpdate 

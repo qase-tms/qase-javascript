@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -17,6 +17,7 @@
 export * from './api/attachments-api';
 export * from './api/authors-api';
 export * from './api/cases-api';
+export * from './api/configurations-api';
 export * from './api/custom-fields-api';
 export * from './api/defects-api';
 export * from './api/environments-api';
@@ -29,4 +30,5 @@ export * from './api/runs-api';
 export * from './api/search-api';
 export * from './api/shared-steps-api';
 export * from './api/suites-api';
+export * from './api/system-fields-api';
 

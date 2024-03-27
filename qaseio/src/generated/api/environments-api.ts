@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -38,7 +38,7 @@ export const EnvironmentsApiAxiosParamCreator = function (configuration?: Config
     return {
         /**
          * This method allows to create an environment in selected project. 
-         * @summary Create a new environment.
+         * @summary Create a new environment
          * @param {string} code Code of project, where to search entities.
          * @param {EnvironmentCreate} environmentCreate 
          * @param {*} [options] Override http request option.
@@ -81,7 +81,7 @@ export const EnvironmentsApiAxiosParamCreator = function (configuration?: Config
         },
         /**
          * This method completely deletes an environment from repository. 
-         * @summary Delete environment.
+         * @summary Delete environment
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -122,7 +122,7 @@ export const EnvironmentsApiAxiosParamCreator = function (configuration?: Config
         },
         /**
          * This method allows to retrieve a specific environment. 
-         * @summary Get a specific environment.
+         * @summary Get a specific environment
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -163,7 +163,7 @@ export const EnvironmentsApiAxiosParamCreator = function (configuration?: Config
         },
         /**
          * This method allows to retrieve all environments stored in selected project. 
-         * @summary Get all environments.
+         * @summary Get all environments
          * @param {string} code Code of project, where to search entities.
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
@@ -210,7 +210,7 @@ export const EnvironmentsApiAxiosParamCreator = function (configuration?: Config
         },
         /**
          * This method updates an environment. 
-         * @summary Update environment.
+         * @summary Update environment
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {EnvironmentUpdate} environmentUpdate 
@@ -267,7 +267,7 @@ export const EnvironmentsApiFp = function(configuration?: Configuration) {
     return {
         /**
          * This method allows to create an environment in selected project. 
-         * @summary Create a new environment.
+         * @summary Create a new environment
          * @param {string} code Code of project, where to search entities.
          * @param {EnvironmentCreate} environmentCreate 
          * @param {*} [options] Override http request option.
@@ -279,7 +279,7 @@ export const EnvironmentsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method completely deletes an environment from repository. 
-         * @summary Delete environment.
+         * @summary Delete environment
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -291,7 +291,7 @@ export const EnvironmentsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to retrieve a specific environment. 
-         * @summary Get a specific environment.
+         * @summary Get a specific environment
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -303,7 +303,7 @@ export const EnvironmentsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to retrieve all environments stored in selected project. 
-         * @summary Get all environments.
+         * @summary Get all environments
          * @param {string} code Code of project, where to search entities.
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
@@ -316,7 +316,7 @@ export const EnvironmentsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method updates an environment. 
-         * @summary Update environment.
+         * @summary Update environment
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {EnvironmentUpdate} environmentUpdate 
@@ -339,7 +339,7 @@ export const EnvironmentsApiFactory = function (configuration?: Configuration, b
     return {
         /**
          * This method allows to create an environment in selected project. 
-         * @summary Create a new environment.
+         * @summary Create a new environment
          * @param {string} code Code of project, where to search entities.
          * @param {EnvironmentCreate} environmentCreate 
          * @param {*} [options] Override http request option.
@@ -350,7 +350,7 @@ export const EnvironmentsApiFactory = function (configuration?: Configuration, b
         },
         /**
          * This method completely deletes an environment from repository. 
-         * @summary Delete environment.
+         * @summary Delete environment
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -361,7 +361,7 @@ export const EnvironmentsApiFactory = function (configuration?: Configuration, b
         },
         /**
          * This method allows to retrieve a specific environment. 
-         * @summary Get a specific environment.
+         * @summary Get a specific environment
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -372,7 +372,7 @@ export const EnvironmentsApiFactory = function (configuration?: Configuration, b
         },
         /**
          * This method allows to retrieve all environments stored in selected project. 
-         * @summary Get all environments.
+         * @summary Get all environments
          * @param {string} code Code of project, where to search entities.
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
@@ -384,7 +384,7 @@ export const EnvironmentsApiFactory = function (configuration?: Configuration, b
         },
         /**
          * This method updates an environment. 
-         * @summary Update environment.
+         * @summary Update environment
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {EnvironmentUpdate} environmentUpdate 
@@ -406,7 +406,7 @@ export const EnvironmentsApiFactory = function (configuration?: Configuration, b
 export class EnvironmentsApi extends BaseAPI {
     /**
      * This method allows to create an environment in selected project. 
-     * @summary Create a new environment.
+     * @summary Create a new environment
      * @param {string} code Code of project, where to search entities.
      * @param {EnvironmentCreate} environmentCreate 
      * @param {*} [options] Override http request option.
@@ -419,7 +419,7 @@ export class EnvironmentsApi extends BaseAPI {
 
     /**
      * This method completely deletes an environment from repository. 
-     * @summary Delete environment.
+     * @summary Delete environment
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {*} [options] Override http request option.
@@ -432,7 +432,7 @@ export class EnvironmentsApi extends BaseAPI {
 
     /**
      * This method allows to retrieve a specific environment. 
-     * @summary Get a specific environment.
+     * @summary Get a specific environment
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {*} [options] Override http request option.
@@ -445,7 +445,7 @@ export class EnvironmentsApi extends BaseAPI {
 
     /**
      * This method allows to retrieve all environments stored in selected project. 
-     * @summary Get all environments.
+     * @summary Get all environments
      * @param {string} code Code of project, where to search entities.
      * @param {number} [limit] A number of entities in result set.
      * @param {number} [offset] How many entities should be skipped.
@@ -459,7 +459,7 @@ export class EnvironmentsApi extends BaseAPI {
 
     /**
      * This method updates an environment. 
-     * @summary Update environment.
+     * @summary Update environment
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {EnvironmentUpdate} environmentUpdate 

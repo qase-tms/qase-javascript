@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -17,20 +17,14 @@
 /**
  * 
  * @export
- * @interface CustomFieldCreateValue
+ * @interface BaseResponse
  */
-export interface CustomFieldCreateValue {
+export interface BaseResponse {
     /**
      * 
-     * @type {number}
-     * @memberof CustomFieldCreateValue
+     * @type {boolean}
+     * @memberof BaseResponse
      */
-    'id'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof CustomFieldCreateValue
-     */
-    'title'?: string;
+    'status'?: boolean;
 }
 

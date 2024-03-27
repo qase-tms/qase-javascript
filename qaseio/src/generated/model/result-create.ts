@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -23,11 +23,11 @@ import { TestStepResultCreate } from './test-step-result-create';
  */
 export interface ResultCreate {
     /**
-     * 
+     * Can have the following values `passed`, `failed`, `blocked`, `skipped`, `invalid` + custom statuses
      * @type {string}
      * @memberof ResultCreate
      */
-    'status': ResultCreateStatusEnum;
+    'status': string;
     /**
      * 
      * @type {number}
@@ -101,18 +101,4 @@ export interface ResultCreate {
      */
     'author_id'?: number | null;
 }
-
-/**
-    * @export
-    * @enum {string}
-    */
-export enum ResultCreateStatusEnum {
-    IN_PROGRESS = 'in_progress',
-    PASSED = 'passed',
-    FAILED = 'failed',
-    BLOCKED = 'blocked',
-    SKIPPED = 'skipped',
-    INVALID = 'invalid'
-}
-
 

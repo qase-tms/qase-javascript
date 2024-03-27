@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -13,14 +13,14 @@
  */
 
 
+import { BaseResponse } from './base-response';
 import { ProjectListResponseAllOf } from './project-list-response-all-of';
 import { ProjectListResponseAllOfResult } from './project-list-response-all-of-result';
-import { Response } from './response';
 
 /**
  * @type ProjectListResponse
  * @export
  */
-export type ProjectListResponse = ProjectListResponseAllOf & Response;
+export type ProjectListResponse = BaseResponse & ProjectListResponseAllOf;
 
 

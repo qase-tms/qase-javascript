@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -70,10 +70,22 @@ export interface RunCreate {
     'plan_id'?: number;
     /**
      * 
+     * @type {number}
+     * @memberof RunCreate
+     */
+    'author_id'?: number;
+    /**
+     * 
      * @type {Array<string>}
      * @memberof RunCreate
      */
     'tags'?: Array<string>;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof RunCreate
+     */
+    'configurations'?: Array<number>;
     /**
      * A map of custom fields values (id => value)
      * @type {{ [key: string]: string; }}

@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -13,24 +13,25 @@
  */
 
 
-import { QqlDefect } from './qql-defect';
-import { QqlPlan } from './qql-plan';
-import { QqlTestCase } from './qql-test-case';
-import { Requirement } from './requirement';
-import { Result } from './result';
-import { Run } from './run';
+import { SearchResponseAllOfResultEntities } from './search-response-all-of-result-entities';
 
 /**
- *
+ * 
  * @export
  * @interface SearchResponseAllOfResult
  */
 export interface SearchResponseAllOfResult {
     /**
-     *
-     * @type {Array<Run | Result | Requirement | QqlTestCase | QqlDefect | QqlPlan>}
+     * 
+     * @type {Array<SearchResponseAllOfResultEntities>}
      * @memberof SearchResponseAllOfResult
      */
-    'entities'?: Array<Run | Result | Requirement | QqlTestCase | QqlDefect | QqlPlan>;
+    'entities': Array<SearchResponseAllOfResultEntities>;
+    /**
+     * 
+     * @type {number}
+     * @memberof SearchResponseAllOfResult
+     */
+    'total': number;
 }
 

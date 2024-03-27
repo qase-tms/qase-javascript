@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -13,14 +13,14 @@
  */
 
 
+import { BaseResponse } from './base-response';
 import { CustomFieldsResponseAllOf } from './custom-fields-response-all-of';
 import { CustomFieldsResponseAllOfResult } from './custom-fields-response-all-of-result';
-import { Response } from './response';
 
 /**
  * @type CustomFieldsResponse
  * @export
  */
-export type CustomFieldsResponse = CustomFieldsResponseAllOf & Response;
+export type CustomFieldsResponse = BaseResponse & CustomFieldsResponseAllOf;
 
 
