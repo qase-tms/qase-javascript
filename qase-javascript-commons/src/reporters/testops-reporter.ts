@@ -4,12 +4,10 @@ import chalk from 'chalk';
 import stripAnsi from 'strip-ansi';
 import {
   QaseApiInterface,
-  CreateResultsRequestV2ResultsInner,
-  ResultExecutionStatusEnum,
+  ResultCreateV2,
   RunCreate,
-  TestStepResultCreateStatusEnum,
+  ResultStepStatus,
   AttachmentGet,
-  ResultAttachment,
   ResultExecution,
   ResultStep,
   RelationSuiteItem,
@@ -58,24 +56,24 @@ export type TestOpsOptionsType = {
  */
 export class TestOpsReporter extends AbstractReporter {
   /**
-   * @type {Record<TestStatusEnum, ResultExecutionStatusEnum>}
+   * @type {Record<TestStatusEnum, string>}
    */
-  static statusMap: Record<TestStatusEnum, ResultExecutionStatusEnum> = {
-    [TestStatusEnum.passed]: ResultExecutionStatusEnum.PASSED,
-    [TestStatusEnum.failed]: ResultExecutionStatusEnum.FAILED,
-    [TestStatusEnum.skipped]: ResultExecutionStatusEnum.SKIPPED,
-    [TestStatusEnum.disabled]: ResultExecutionStatusEnum.SKIPPED,
-    [TestStatusEnum.blocked]: ResultExecutionStatusEnum.BLOCKED,
-    [TestStatusEnum.invalid]: ResultExecutionStatusEnum.INVALID,
+  static statusMap: Record<TestStatusEnum, string> = {
+    [TestStatusEnum.passed]: "passed",
+    [TestStatusEnum.failed]: "failed",
+    [TestStatusEnum.skipped]: "skipped",
+    [TestStatusEnum.disabled]: "disabled",
+    [TestStatusEnum.blocked]: "blocked",
+    [TestStatusEnum.invalid]: "invalid",
   };
 
   /**
-   * @type {Record<StepStatusEnum, TestStepResultCreateStatusEnum>}
+   * @type {Record<StepStatusEnum, ResultStepStatus>}
    */
-  static stepStatusMap: Record<StepStatusEnum, TestStepResultCreateStatusEnum> = {
-    [StepStatusEnum.passed]: TestStepResultCreateStatusEnum.PASSED,
-    [StepStatusEnum.failed]: TestStepResultCreateStatusEnum.FAILED,
-    [StepStatusEnum.blocked]: TestStepResultCreateStatusEnum.BLOCKED,
+  static stepStatusMap: Record<StepStatusEnum, ResultStepStatus> = {
+    [StepStatusEnum.passed]: ResultStepStatus.PASSED,
+    [StepStatusEnum.failed]: ResultStepStatus.FAILED,
+    [StepStatusEnum.blocked]: ResultStepStatus.BLOCKED,
   }
 
   /**
@@ -234,37 +232,25 @@ export class TestOpsReporter extends AbstractReporter {
 
   /**
    * @param {TestResultType} result
-   * @returns {ResultCreate}
+   * @returns {ResultCreateV2}
    * @private
    */
-  private transformTestResult(
-    result: TestResultType,
-  ): CreateResultsRequestV2ResultsInner {
-    const resultObject: CreateResultsRequestV2ResultsInner = {
+  private transformTestResult(result: TestResultType): ResultCreateV2 {
+
+    const resultObject: ResultCreateV2 = {
       title: result.title,
-      attachments: this.getAttachmentsFor(result.id),
       execution: this.getExecution(result),
-    };
-
-    if (result.suiteTitle) {
-      resultObject.relations = {
+      testops_id: result.testOpsId[0] || null,
+      attachments: this.getAttachmentsFor(result.id),
+      steps: this.transformSteps(result.steps ?? []),
+      params: {},
+      relations: {
         suite: {
-          data: this.getSuites(result.suiteTitle),
+          data: result.suiteTitle ? this.getSuites(result.suiteTitle) : [],
         },
-      };
-    }
-
-    if (result.testOpsId[0]) {
-      resultObject.testops_id = result.testOpsId[0];
-    }
-
-    if (result.error) {
-      resultObject.message = stripAnsi(result.error.message);
-    }
-
-    if (result.steps) {
-      resultObject.steps = this.transformSteps(result.steps);
-    }
+      },
+      message: result.error ? stripAnsi(result.error.message) : null,
+    };
 
     return resultObject;
   }
@@ -288,6 +274,9 @@ export class TestOpsReporter extends AbstractReporter {
   private getExecution(result: TestResultType): ResultExecution {
     const execution: ResultExecution = {
       status: TestOpsReporter.statusMap[result.status],
+      start_time: result.startTime ? result.startTime : null,
+      end_time: result.endTime ? result.endTime : null,
+      duration: result.duration ? result.duration : null,
     };
 
     if (result.startTime) {
@@ -311,19 +300,19 @@ export class TestOpsReporter extends AbstractReporter {
 
   /**
    * @param {string} id
-   * @returns {ResultAttachment[]}
+   * @returns {string[]}
    * @private
    */
-  private getAttachmentsFor(id: string): ResultAttachment[] {
+  private getAttachmentsFor(id: string): string[] {
     const attachments = this.attachmentsMap[id];
 
     if (!attachments) {
       return [];
     }
 
-    return attachments.reduce((acc: ResultAttachment[], attachment: AttachmentGet) => {
+    return attachments.reduce((acc: string[], attachment: AttachmentGet) => {
       if (attachment.hash) {
-        acc.push({ id: attachment.hash });
+        acc.push(attachment.hash);
       }
 
       return acc;
@@ -337,23 +326,20 @@ export class TestOpsReporter extends AbstractReporter {
    */
   private transformSteps(steps: TestStepType[]): ResultStep[] {
     return steps.map(({
-      id,
       title,
       status,
       steps,
+      attachments,
     }) => {
       const step: ResultStep = {
-        step_type: 'text',
-
         data: {
           action: title,
+          attachments: attachments ? this.getAttachmentsFor(title) : [],
         },
 
         execution: {
           status: TestOpsReporter.stepStatusMap[status],
         },
-
-        attachments: this.getAttachmentsFor(id),
       };
 
       if (steps) {

@@ -31,7 +31,7 @@
     "lodash.get": "^4.4.2",
     "lodash.merge": "^4.6.2",
     "lodash.mergewith": "^4.6.2",
-    "qaseio": "^2.0.3-beta.1",
+    "qaseio": "^2.0.4-beta.1",
     "strip-ansi": "^6.0.1",
     "uuid": "^9.0.0"
   },
