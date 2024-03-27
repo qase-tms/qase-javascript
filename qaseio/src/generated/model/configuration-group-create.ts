@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -17,20 +17,14 @@
 /**
  * 
  * @export
- * @interface CreateResult200ResponseAllOfResult
+ * @interface ConfigurationGroupCreate
  */
-export interface CreateResult200ResponseAllOfResult {
-    /**
-     * 
-     * @type {number}
-     * @memberof CreateResult200ResponseAllOfResult
-     */
-    'case_id'?: number;
+export interface ConfigurationGroupCreate {
     /**
      * 
      * @type {string}
-     * @memberof CreateResult200ResponseAllOfResult
+     * @memberof ConfigurationGroupCreate
      */
-    'hash'?: string;
+    'title': string;
 }
 

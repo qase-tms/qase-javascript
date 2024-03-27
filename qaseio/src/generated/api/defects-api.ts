@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -21,6 +21,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
+import { BaseResponse } from '../model';
+// @ts-ignore
 import { DefectCreate } from '../model';
 // @ts-ignore
 import { DefectListResponse } from '../model';
@@ -32,8 +34,6 @@ import { DefectStatus } from '../model';
 import { DefectUpdate } from '../model';
 // @ts-ignore
 import { IdResponse } from '../model';
-// @ts-ignore
-import { Response } from '../model';
 /**
  * DefectsApi - axios parameter creator
  * @export
@@ -42,7 +42,7 @@ export const DefectsApiAxiosParamCreator = function (configuration?: Configurati
     return {
         /**
          * This method allows to create a defect in selected project. 
-         * @summary Create a new defect.
+         * @summary Create a new defect
          * @param {string} code Code of project, where to search entities.
          * @param {DefectCreate} defectCreate 
          * @param {*} [options] Override http request option.
@@ -85,7 +85,7 @@ export const DefectsApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * This method completely deletes a defect from repository. 
-         * @summary Delete defect.
+         * @summary Delete defect
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -126,7 +126,7 @@ export const DefectsApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * This method allows to retrieve a specific defect. 
-         * @summary Get a specific defect.
+         * @summary Get a specific defect
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -167,7 +167,7 @@ export const DefectsApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * This method allows to retrieve all defects stored in selected project. 
-         * @summary Get all defects.
+         * @summary Get all defects
          * @param {string} code Code of project, where to search entities.
          * @param {'open' | 'resolved' | 'in_progress' | 'invalid'} [status] 
          * @param {number} [limit] A number of entities in result set.
@@ -219,7 +219,7 @@ export const DefectsApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * This method allows to resolve a specific defect. 
-         * @summary Resolve a specific defect.
+         * @summary Resolve a specific defect
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -260,7 +260,7 @@ export const DefectsApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * This method updates a defect. 
-         * @summary Update defect.
+         * @summary Update defect
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {DefectUpdate} defectUpdate 
@@ -307,7 +307,7 @@ export const DefectsApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * This method allows to update a specific defect status. 
-         * @summary Update a specific defect status.
+         * @summary Update a specific defect status
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {DefectStatus} defectStatus 
@@ -364,7 +364,7 @@ export const DefectsApiFp = function(configuration?: Configuration) {
     return {
         /**
          * This method allows to create a defect in selected project. 
-         * @summary Create a new defect.
+         * @summary Create a new defect
          * @param {string} code Code of project, where to search entities.
          * @param {DefectCreate} defectCreate 
          * @param {*} [options] Override http request option.
@@ -376,7 +376,7 @@ export const DefectsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method completely deletes a defect from repository. 
-         * @summary Delete defect.
+         * @summary Delete defect
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -388,7 +388,7 @@ export const DefectsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to retrieve a specific defect. 
-         * @summary Get a specific defect.
+         * @summary Get a specific defect
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -400,7 +400,7 @@ export const DefectsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to retrieve all defects stored in selected project. 
-         * @summary Get all defects.
+         * @summary Get all defects
          * @param {string} code Code of project, where to search entities.
          * @param {'open' | 'resolved' | 'in_progress' | 'invalid'} [status] 
          * @param {number} [limit] A number of entities in result set.
@@ -414,7 +414,7 @@ export const DefectsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to resolve a specific defect. 
-         * @summary Resolve a specific defect.
+         * @summary Resolve a specific defect
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -426,7 +426,7 @@ export const DefectsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method updates a defect. 
-         * @summary Update defect.
+         * @summary Update defect
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {DefectUpdate} defectUpdate 
@@ -439,14 +439,14 @@ export const DefectsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to update a specific defect status. 
-         * @summary Update a specific defect status.
+         * @summary Update a specific defect status
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {DefectStatus} defectStatus 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateDefectStatus(code: string, id: number, defectStatus: DefectStatus, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Response>> {
+        async updateDefectStatus(code: string, id: number, defectStatus: DefectStatus, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateDefectStatus(code, id, defectStatus, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -462,7 +462,7 @@ export const DefectsApiFactory = function (configuration?: Configuration, basePa
     return {
         /**
          * This method allows to create a defect in selected project. 
-         * @summary Create a new defect.
+         * @summary Create a new defect
          * @param {string} code Code of project, where to search entities.
          * @param {DefectCreate} defectCreate 
          * @param {*} [options] Override http request option.
@@ -473,7 +473,7 @@ export const DefectsApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * This method completely deletes a defect from repository. 
-         * @summary Delete defect.
+         * @summary Delete defect
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -484,7 +484,7 @@ export const DefectsApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * This method allows to retrieve a specific defect. 
-         * @summary Get a specific defect.
+         * @summary Get a specific defect
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -495,7 +495,7 @@ export const DefectsApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * This method allows to retrieve all defects stored in selected project. 
-         * @summary Get all defects.
+         * @summary Get all defects
          * @param {string} code Code of project, where to search entities.
          * @param {'open' | 'resolved' | 'in_progress' | 'invalid'} [status] 
          * @param {number} [limit] A number of entities in result set.
@@ -508,7 +508,7 @@ export const DefectsApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * This method allows to resolve a specific defect. 
-         * @summary Resolve a specific defect.
+         * @summary Resolve a specific defect
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -519,7 +519,7 @@ export const DefectsApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * This method updates a defect. 
-         * @summary Update defect.
+         * @summary Update defect
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {DefectUpdate} defectUpdate 
@@ -531,14 +531,14 @@ export const DefectsApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * This method allows to update a specific defect status. 
-         * @summary Update a specific defect status.
+         * @summary Update a specific defect status
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {DefectStatus} defectStatus 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateDefectStatus(code: string, id: number, defectStatus: DefectStatus, options?: any): AxiosPromise<Response> {
+        updateDefectStatus(code: string, id: number, defectStatus: DefectStatus, options?: any): AxiosPromise<BaseResponse> {
             return localVarFp.updateDefectStatus(code, id, defectStatus, options).then((request) => request(axios, basePath));
         },
     };
@@ -553,7 +553,7 @@ export const DefectsApiFactory = function (configuration?: Configuration, basePa
 export class DefectsApi extends BaseAPI {
     /**
      * This method allows to create a defect in selected project. 
-     * @summary Create a new defect.
+     * @summary Create a new defect
      * @param {string} code Code of project, where to search entities.
      * @param {DefectCreate} defectCreate 
      * @param {*} [options] Override http request option.
@@ -566,7 +566,7 @@ export class DefectsApi extends BaseAPI {
 
     /**
      * This method completely deletes a defect from repository. 
-     * @summary Delete defect.
+     * @summary Delete defect
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {*} [options] Override http request option.
@@ -579,7 +579,7 @@ export class DefectsApi extends BaseAPI {
 
     /**
      * This method allows to retrieve a specific defect. 
-     * @summary Get a specific defect.
+     * @summary Get a specific defect
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {*} [options] Override http request option.
@@ -592,7 +592,7 @@ export class DefectsApi extends BaseAPI {
 
     /**
      * This method allows to retrieve all defects stored in selected project. 
-     * @summary Get all defects.
+     * @summary Get all defects
      * @param {string} code Code of project, where to search entities.
      * @param {'open' | 'resolved' | 'in_progress' | 'invalid'} [status] 
      * @param {number} [limit] A number of entities in result set.
@@ -607,7 +607,7 @@ export class DefectsApi extends BaseAPI {
 
     /**
      * This method allows to resolve a specific defect. 
-     * @summary Resolve a specific defect.
+     * @summary Resolve a specific defect
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {*} [options] Override http request option.
@@ -620,7 +620,7 @@ export class DefectsApi extends BaseAPI {
 
     /**
      * This method updates a defect. 
-     * @summary Update defect.
+     * @summary Update defect
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {DefectUpdate} defectUpdate 
@@ -634,7 +634,7 @@ export class DefectsApi extends BaseAPI {
 
     /**
      * This method allows to update a specific defect status. 
-     * @summary Update a specific defect status.
+     * @summary Update a specific defect status
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {DefectStatus} defectStatus 

@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -13,14 +13,14 @@
  */
 
 
+import { BaseResponse } from './base-response';
 import { Defect } from './defect';
 import { DefectResponseAllOf } from './defect-response-all-of';
-import { Response } from './response';
 
 /**
  * @type DefectResponse
  * @export
  */
-export type DefectResponse = DefectResponseAllOf & Response;
+export type DefectResponse = BaseResponse & DefectResponseAllOf;
 
 

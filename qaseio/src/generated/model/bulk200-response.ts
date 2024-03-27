@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -13,14 +13,14 @@
  */
 
 
+import { BaseResponse } from './base-response';
 import { Bulk200ResponseAllOf } from './bulk200-response-all-of';
 import { Bulk200ResponseAllOfResult } from './bulk200-response-all-of-result';
-import { Response } from './response';
 
 /**
  * @type Bulk200Response
  * @export
  */
-export type Bulk200Response = Bulk200ResponseAllOf & Response;
+export type Bulk200Response = BaseResponse & Bulk200ResponseAllOf;
 
 

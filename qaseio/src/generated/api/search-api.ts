@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -30,7 +30,7 @@ export const SearchApiAxiosParamCreator = function (configuration?: Configuratio
     return {
         /**
          * This method allows to retrieve data sets for various entities using expressions with conditions. 
-         * @summary Search entities by Qase Query Language (QQL).
+         * @summary Search entities by Qase Query Language (QQL)
          * @param {string} query Expression in Qase Query Language.
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
@@ -90,7 +90,7 @@ export const SearchApiFp = function(configuration?: Configuration) {
     return {
         /**
          * This method allows to retrieve data sets for various entities using expressions with conditions. 
-         * @summary Search entities by Qase Query Language (QQL).
+         * @summary Search entities by Qase Query Language (QQL)
          * @param {string} query Expression in Qase Query Language.
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
@@ -113,7 +113,7 @@ export const SearchApiFactory = function (configuration?: Configuration, basePat
     return {
         /**
          * This method allows to retrieve data sets for various entities using expressions with conditions. 
-         * @summary Search entities by Qase Query Language (QQL).
+         * @summary Search entities by Qase Query Language (QQL)
          * @param {string} query Expression in Qase Query Language.
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
@@ -135,7 +135,7 @@ export const SearchApiFactory = function (configuration?: Configuration, basePat
 export class SearchApi extends BaseAPI {
     /**
      * This method allows to retrieve data sets for various entities using expressions with conditions. 
-     * @summary Search entities by Qase Query Language (QQL).
+     * @summary Search entities by Qase Query Language (QQL)
      * @param {string} query Expression in Qase Query Language.
      * @param {number} [limit] A number of entities in result set.
      * @param {number} [offset] How many entities should be skipped.

@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -21,21 +21,21 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
-import { CreateResult200Response } from '../model';
+import { BaseResponse } from '../model';
 // @ts-ignore
 import { HashResponse } from '../model';
 // @ts-ignore
-import { Response } from '../model';
-// @ts-ignore
 import { ResultCreate } from '../model';
 // @ts-ignore
-import { ResultCreateBulk } from '../model';
+import { ResultCreateResponse } from '../model';
 // @ts-ignore
 import { ResultListResponse } from '../model';
 // @ts-ignore
 import { ResultResponse } from '../model';
 // @ts-ignore
 import { ResultUpdate } from '../model';
+// @ts-ignore
+import { ResultcreateBulk } from '../model';
 /**
  * ResultsApi - axios parameter creator
  * @export
@@ -44,7 +44,7 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
     return {
         /**
          * This method allows to create test run result by Run Id. 
-         * @summary Create test run result.
+         * @summary Create test run result
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {ResultCreate} resultCreate 
@@ -91,20 +91,20 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * This method allows to create a lot of test run result at once.  If you try to send more than 2,000 results in a single bulk request, you will receive an error with code 413 - Payload Too Large.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
-         * @summary Bulk create test run result.
+         * @summary Bulk create test run result
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
-         * @param {ResultCreateBulk} resultCreateBulk 
+         * @param {ResultcreateBulk} resultcreateBulk 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createResultBulk: async (code: string, id: number, resultCreateBulk: ResultCreateBulk, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createResultBulk: async (code: string, id: number, resultcreateBulk: ResultcreateBulk, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('createResultBulk', 'code', code)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('createResultBulk', 'id', id)
-            // verify required parameter 'resultCreateBulk' is not null or undefined
-            assertParamExists('createResultBulk', 'resultCreateBulk', resultCreateBulk)
+            // verify required parameter 'resultcreateBulk' is not null or undefined
+            assertParamExists('createResultBulk', 'resultcreateBulk', resultcreateBulk)
             const localVarPath = `/v1/result/{code}/{id}/bulk`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
@@ -129,7 +129,7 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(resultCreateBulk, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(resultcreateBulk, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -138,7 +138,7 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * This method allows to delete test run result. 
-         * @summary Delete test run result.
+         * @summary Delete test run result
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {string} hash Hash.
@@ -183,7 +183,7 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * This method allows to retrieve a specific test run result by Hash. 
-         * @summary Get test run result by code.
+         * @summary Get test run result by code
          * @param {string} code Code of project, where to search entities.
          * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
@@ -224,7 +224,7 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * This method allows to retrieve all test run results stored in selected project. 
-         * @summary Get all test run results.
+         * @summary Get all test run results
          * @param {string} code Code of project, where to search entities.
          * @param {string} [status] A single test run result status. Possible values: in_progress, passed, failed, blocked, skipped, invalid. 
          * @param {string} [run] A list of run IDs separated by comma.
@@ -306,7 +306,7 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * This method allows to update test run result. 
-         * @summary Update test run result.
+         * @summary Update test run result
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {string} hash Hash.
@@ -367,33 +367,33 @@ export const ResultsApiFp = function(configuration?: Configuration) {
     return {
         /**
          * This method allows to create test run result by Run Id. 
-         * @summary Create test run result.
+         * @summary Create test run result
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {ResultCreate} resultCreate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createResult(code: string, id: number, resultCreate: ResultCreate, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateResult200Response>> {
+        async createResult(code: string, id: number, resultCreate: ResultCreate, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ResultCreateResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createResult(code, id, resultCreate, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * This method allows to create a lot of test run result at once.  If you try to send more than 2,000 results in a single bulk request, you will receive an error with code 413 - Payload Too Large.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
-         * @summary Bulk create test run result.
+         * @summary Bulk create test run result
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
-         * @param {ResultCreateBulk} resultCreateBulk 
+         * @param {ResultcreateBulk} resultcreateBulk 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createResultBulk(code: string, id: number, resultCreateBulk: ResultCreateBulk, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createResultBulk(code, id, resultCreateBulk, options);
+        async createResultBulk(code: string, id: number, resultcreateBulk: ResultcreateBulk, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createResultBulk(code, id, resultcreateBulk, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * This method allows to delete test run result. 
-         * @summary Delete test run result.
+         * @summary Delete test run result
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {string} hash Hash.
@@ -406,7 +406,7 @@ export const ResultsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to retrieve a specific test run result by Hash. 
-         * @summary Get test run result by code.
+         * @summary Get test run result by code
          * @param {string} code Code of project, where to search entities.
          * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
@@ -418,7 +418,7 @@ export const ResultsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to retrieve all test run results stored in selected project. 
-         * @summary Get all test run results.
+         * @summary Get all test run results
          * @param {string} code Code of project, where to search entities.
          * @param {string} [status] A single test run result status. Possible values: in_progress, passed, failed, blocked, skipped, invalid. 
          * @param {string} [run] A list of run IDs separated by comma.
@@ -438,7 +438,7 @@ export const ResultsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to update test run result. 
-         * @summary Update test run result.
+         * @summary Update test run result
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {string} hash Hash.
@@ -462,31 +462,31 @@ export const ResultsApiFactory = function (configuration?: Configuration, basePa
     return {
         /**
          * This method allows to create test run result by Run Id. 
-         * @summary Create test run result.
+         * @summary Create test run result
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {ResultCreate} resultCreate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createResult(code: string, id: number, resultCreate: ResultCreate, options?: any): AxiosPromise<CreateResult200Response> {
+        createResult(code: string, id: number, resultCreate: ResultCreate, options?: any): AxiosPromise<ResultCreateResponse> {
             return localVarFp.createResult(code, id, resultCreate, options).then((request) => request(axios, basePath));
         },
         /**
          * This method allows to create a lot of test run result at once.  If you try to send more than 2,000 results in a single bulk request, you will receive an error with code 413 - Payload Too Large.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
-         * @summary Bulk create test run result.
+         * @summary Bulk create test run result
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
-         * @param {ResultCreateBulk} resultCreateBulk 
+         * @param {ResultcreateBulk} resultcreateBulk 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createResultBulk(code: string, id: number, resultCreateBulk: ResultCreateBulk, options?: any): AxiosPromise<Response> {
-            return localVarFp.createResultBulk(code, id, resultCreateBulk, options).then((request) => request(axios, basePath));
+        createResultBulk(code: string, id: number, resultcreateBulk: ResultcreateBulk, options?: any): AxiosPromise<BaseResponse> {
+            return localVarFp.createResultBulk(code, id, resultcreateBulk, options).then((request) => request(axios, basePath));
         },
         /**
          * This method allows to delete test run result. 
-         * @summary Delete test run result.
+         * @summary Delete test run result
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {string} hash Hash.
@@ -498,7 +498,7 @@ export const ResultsApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * This method allows to retrieve a specific test run result by Hash. 
-         * @summary Get test run result by code.
+         * @summary Get test run result by code
          * @param {string} code Code of project, where to search entities.
          * @param {string} hash Hash.
          * @param {*} [options] Override http request option.
@@ -509,7 +509,7 @@ export const ResultsApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * This method allows to retrieve all test run results stored in selected project. 
-         * @summary Get all test run results.
+         * @summary Get all test run results
          * @param {string} code Code of project, where to search entities.
          * @param {string} [status] A single test run result status. Possible values: in_progress, passed, failed, blocked, skipped, invalid. 
          * @param {string} [run] A list of run IDs separated by comma.
@@ -528,7 +528,7 @@ export const ResultsApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * This method allows to update test run result. 
-         * @summary Update test run result.
+         * @summary Update test run result
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {string} hash Hash.
@@ -551,7 +551,7 @@ export const ResultsApiFactory = function (configuration?: Configuration, basePa
 export class ResultsApi extends BaseAPI {
     /**
      * This method allows to create test run result by Run Id. 
-     * @summary Create test run result.
+     * @summary Create test run result
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {ResultCreate} resultCreate 
@@ -565,21 +565,21 @@ export class ResultsApi extends BaseAPI {
 
     /**
      * This method allows to create a lot of test run result at once.  If you try to send more than 2,000 results in a single bulk request, you will receive an error with code 413 - Payload Too Large.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
-     * @summary Bulk create test run result.
+     * @summary Bulk create test run result
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
-     * @param {ResultCreateBulk} resultCreateBulk 
+     * @param {ResultcreateBulk} resultcreateBulk 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ResultsApi
      */
-    public createResultBulk(code: string, id: number, resultCreateBulk: ResultCreateBulk, options?: AxiosRequestConfig) {
-        return ResultsApiFp(this.configuration).createResultBulk(code, id, resultCreateBulk, options).then((request) => request(this.axios, this.basePath));
+    public createResultBulk(code: string, id: number, resultcreateBulk: ResultcreateBulk, options?: AxiosRequestConfig) {
+        return ResultsApiFp(this.configuration).createResultBulk(code, id, resultcreateBulk, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * This method allows to delete test run result. 
-     * @summary Delete test run result.
+     * @summary Delete test run result
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {string} hash Hash.
@@ -593,7 +593,7 @@ export class ResultsApi extends BaseAPI {
 
     /**
      * This method allows to retrieve a specific test run result by Hash. 
-     * @summary Get test run result by code.
+     * @summary Get test run result by code
      * @param {string} code Code of project, where to search entities.
      * @param {string} hash Hash.
      * @param {*} [options] Override http request option.
@@ -606,7 +606,7 @@ export class ResultsApi extends BaseAPI {
 
     /**
      * This method allows to retrieve all test run results stored in selected project. 
-     * @summary Get all test run results.
+     * @summary Get all test run results
      * @param {string} code Code of project, where to search entities.
      * @param {string} [status] A single test run result status. Possible values: in_progress, passed, failed, blocked, skipped, invalid. 
      * @param {string} [run] A list of run IDs separated by comma.
@@ -627,7 +627,7 @@ export class ResultsApi extends BaseAPI {
 
     /**
      * This method allows to update test run result. 
-     * @summary Update test run result.
+     * @summary Update test run result
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {string} hash Hash.

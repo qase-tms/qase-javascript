@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -13,18 +13,19 @@
  */
 
 
+import { SystemField } from './system-field';
 
 /**
  * 
  * @export
- * @interface BulkRequestCasesInnerAllOf
+ * @interface SystemFieldListResponseAllOf
  */
-export interface BulkRequestCasesInnerAllOf {
+export interface SystemFieldListResponseAllOf {
     /**
      * 
-     * @type {number}
-     * @memberof BulkRequestCasesInnerAllOf
+     * @type {Array<SystemField>}
+     * @memberof SystemFieldListResponseAllOf
      */
-    'id'?: number | null;
+    'result'?: Array<SystemField>;
 }
 

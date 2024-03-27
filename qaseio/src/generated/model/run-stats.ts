@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -28,50 +28,64 @@ export interface RunStats {
     'total'?: number;
     /**
      * 
+     * @type {{ [key: string]: number; }}
+     * @memberof RunStats
+     */
+    'statuses'?: { [key: string]: number; };
+    /**
+     * 
      * @type {number}
      * @memberof RunStats
+     * @deprecated
      */
     'untested'?: number;
     /**
      * 
      * @type {number}
      * @memberof RunStats
+     * @deprecated
      */
     'passed'?: number;
     /**
      * 
      * @type {number}
      * @memberof RunStats
+     * @deprecated
      */
     'failed'?: number;
     /**
      * 
      * @type {number}
      * @memberof RunStats
+     * @deprecated
      */
     'blocked'?: number;
     /**
      * 
      * @type {number}
      * @memberof RunStats
+     * @deprecated
      */
     'skipped'?: number;
     /**
      * 
      * @type {number}
      * @memberof RunStats
+     * @deprecated
      */
     'retest'?: number;
     /**
      * 
      * @type {number}
      * @memberof RunStats
+     * @deprecated
      */
     'in_progress'?: number;
     /**
      * 
      * @type {number}
      * @memberof RunStats
+     * @deprecated
      */
     'invalid'?: number;
 }

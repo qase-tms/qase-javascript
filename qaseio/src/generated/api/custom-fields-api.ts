@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -21,17 +21,17 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
+import { BaseResponse } from '../model';
+// @ts-ignore
 import { CustomFieldCreate } from '../model';
+// @ts-ignore
+import { CustomFieldListResponse } from '../model';
 // @ts-ignore
 import { CustomFieldResponse } from '../model';
 // @ts-ignore
 import { CustomFieldUpdate } from '../model';
 // @ts-ignore
-import { CustomFieldsResponse } from '../model';
-// @ts-ignore
 import { IdResponse } from '../model';
-// @ts-ignore
-import { Response } from '../model';
 /**
  * CustomFieldsApi - axios parameter creator
  * @export
@@ -40,7 +40,7 @@ export const CustomFieldsApiAxiosParamCreator = function (configuration?: Config
     return {
         /**
          * This method allows to create custom field. 
-         * @summary Create new Custom Field.
+         * @summary Create new Custom Field
          * @param {CustomFieldCreate} customFieldCreate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -79,7 +79,7 @@ export const CustomFieldsApiAxiosParamCreator = function (configuration?: Config
         },
         /**
          * This method allows to delete custom field. 
-         * @summary Delete Custom Field by id.
+         * @summary Delete Custom Field by id
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -116,7 +116,7 @@ export const CustomFieldsApiAxiosParamCreator = function (configuration?: Config
         },
         /**
          * This method allows to retrieve custom field. 
-         * @summary Get Custom Field by id.
+         * @summary Get Custom Field by id
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -153,7 +153,7 @@ export const CustomFieldsApiAxiosParamCreator = function (configuration?: Config
         },
         /**
          * This method allows to retrieve and filter custom fields. 
-         * @summary Get all Custom Fields.
+         * @summary Get all Custom Fields
          * @param {'case' | 'run' | 'defect'} [entity] 
          * @param {'string' | 'text' | 'number' | 'checkbox' | 'selectbox' | 'radio' | 'multiselect' | 'url' | 'user' | 'datetime'} [type] 
          * @param {number} [limit] A number of entities in result set.
@@ -206,7 +206,7 @@ export const CustomFieldsApiAxiosParamCreator = function (configuration?: Config
         },
         /**
          * This method allows to update custom field. 
-         * @summary Update Custom Field by id.
+         * @summary Update Custom Field by id
          * @param {number} id Identifier.
          * @param {CustomFieldUpdate} customFieldUpdate 
          * @param {*} [options] Override http request option.
@@ -259,7 +259,7 @@ export const CustomFieldsApiFp = function(configuration?: Configuration) {
     return {
         /**
          * This method allows to create custom field. 
-         * @summary Create new Custom Field.
+         * @summary Create new Custom Field
          * @param {CustomFieldCreate} customFieldCreate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -270,18 +270,18 @@ export const CustomFieldsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to delete custom field. 
-         * @summary Delete Custom Field by id.
+         * @summary Delete Custom Field by id
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteCustomField(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Response>> {
+        async deleteCustomField(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteCustomField(id, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * This method allows to retrieve custom field. 
-         * @summary Get Custom Field by id.
+         * @summary Get Custom Field by id
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -292,7 +292,7 @@ export const CustomFieldsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to retrieve and filter custom fields. 
-         * @summary Get all Custom Fields.
+         * @summary Get all Custom Fields
          * @param {'case' | 'run' | 'defect'} [entity] 
          * @param {'string' | 'text' | 'number' | 'checkbox' | 'selectbox' | 'radio' | 'multiselect' | 'url' | 'user' | 'datetime'} [type] 
          * @param {number} [limit] A number of entities in result set.
@@ -300,19 +300,19 @@ export const CustomFieldsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getCustomFields(entity?: 'case' | 'run' | 'defect', type?: 'string' | 'text' | 'number' | 'checkbox' | 'selectbox' | 'radio' | 'multiselect' | 'url' | 'user' | 'datetime', limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CustomFieldsResponse>> {
+        async getCustomFields(entity?: 'case' | 'run' | 'defect', type?: 'string' | 'text' | 'number' | 'checkbox' | 'selectbox' | 'radio' | 'multiselect' | 'url' | 'user' | 'datetime', limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CustomFieldListResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getCustomFields(entity, type, limit, offset, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * This method allows to update custom field. 
-         * @summary Update Custom Field by id.
+         * @summary Update Custom Field by id
          * @param {number} id Identifier.
          * @param {CustomFieldUpdate} customFieldUpdate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateCustomField(id: number, customFieldUpdate: CustomFieldUpdate, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Response>> {
+        async updateCustomField(id: number, customFieldUpdate: CustomFieldUpdate, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateCustomField(id, customFieldUpdate, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -328,7 +328,7 @@ export const CustomFieldsApiFactory = function (configuration?: Configuration, b
     return {
         /**
          * This method allows to create custom field. 
-         * @summary Create new Custom Field.
+         * @summary Create new Custom Field
          * @param {CustomFieldCreate} customFieldCreate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -338,17 +338,17 @@ export const CustomFieldsApiFactory = function (configuration?: Configuration, b
         },
         /**
          * This method allows to delete custom field. 
-         * @summary Delete Custom Field by id.
+         * @summary Delete Custom Field by id
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteCustomField(id: number, options?: any): AxiosPromise<Response> {
+        deleteCustomField(id: number, options?: any): AxiosPromise<BaseResponse> {
             return localVarFp.deleteCustomField(id, options).then((request) => request(axios, basePath));
         },
         /**
          * This method allows to retrieve custom field. 
-         * @summary Get Custom Field by id.
+         * @summary Get Custom Field by id
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -358,7 +358,7 @@ export const CustomFieldsApiFactory = function (configuration?: Configuration, b
         },
         /**
          * This method allows to retrieve and filter custom fields. 
-         * @summary Get all Custom Fields.
+         * @summary Get all Custom Fields
          * @param {'case' | 'run' | 'defect'} [entity] 
          * @param {'string' | 'text' | 'number' | 'checkbox' | 'selectbox' | 'radio' | 'multiselect' | 'url' | 'user' | 'datetime'} [type] 
          * @param {number} [limit] A number of entities in result set.
@@ -366,18 +366,18 @@ export const CustomFieldsApiFactory = function (configuration?: Configuration, b
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCustomFields(entity?: 'case' | 'run' | 'defect', type?: 'string' | 'text' | 'number' | 'checkbox' | 'selectbox' | 'radio' | 'multiselect' | 'url' | 'user' | 'datetime', limit?: number, offset?: number, options?: any): AxiosPromise<CustomFieldsResponse> {
+        getCustomFields(entity?: 'case' | 'run' | 'defect', type?: 'string' | 'text' | 'number' | 'checkbox' | 'selectbox' | 'radio' | 'multiselect' | 'url' | 'user' | 'datetime', limit?: number, offset?: number, options?: any): AxiosPromise<CustomFieldListResponse> {
             return localVarFp.getCustomFields(entity, type, limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
          * This method allows to update custom field. 
-         * @summary Update Custom Field by id.
+         * @summary Update Custom Field by id
          * @param {number} id Identifier.
          * @param {CustomFieldUpdate} customFieldUpdate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateCustomField(id: number, customFieldUpdate: CustomFieldUpdate, options?: any): AxiosPromise<Response> {
+        updateCustomField(id: number, customFieldUpdate: CustomFieldUpdate, options?: any): AxiosPromise<BaseResponse> {
             return localVarFp.updateCustomField(id, customFieldUpdate, options).then((request) => request(axios, basePath));
         },
     };
@@ -392,7 +392,7 @@ export const CustomFieldsApiFactory = function (configuration?: Configuration, b
 export class CustomFieldsApi extends BaseAPI {
     /**
      * This method allows to create custom field. 
-     * @summary Create new Custom Field.
+     * @summary Create new Custom Field
      * @param {CustomFieldCreate} customFieldCreate 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -404,7 +404,7 @@ export class CustomFieldsApi extends BaseAPI {
 
     /**
      * This method allows to delete custom field. 
-     * @summary Delete Custom Field by id.
+     * @summary Delete Custom Field by id
      * @param {number} id Identifier.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -416,7 +416,7 @@ export class CustomFieldsApi extends BaseAPI {
 
     /**
      * This method allows to retrieve custom field. 
-     * @summary Get Custom Field by id.
+     * @summary Get Custom Field by id
      * @param {number} id Identifier.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -428,7 +428,7 @@ export class CustomFieldsApi extends BaseAPI {
 
     /**
      * This method allows to retrieve and filter custom fields. 
-     * @summary Get all Custom Fields.
+     * @summary Get all Custom Fields
      * @param {'case' | 'run' | 'defect'} [entity] 
      * @param {'string' | 'text' | 'number' | 'checkbox' | 'selectbox' | 'radio' | 'multiselect' | 'url' | 'user' | 'datetime'} [type] 
      * @param {number} [limit] A number of entities in result set.
@@ -443,7 +443,7 @@ export class CustomFieldsApi extends BaseAPI {
 
     /**
      * This method allows to update custom field. 
-     * @summary Update Custom Field by id.
+     * @summary Update Custom Field by id
      * @param {number} id Identifier.
      * @param {CustomFieldUpdate} customFieldUpdate 
      * @param {*} [options] Override http request option.

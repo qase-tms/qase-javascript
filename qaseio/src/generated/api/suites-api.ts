@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -40,7 +40,7 @@ export const SuitesApiAxiosParamCreator = function (configuration?: Configuratio
     return {
         /**
          * This method is used to create a new test suite through API. 
-         * @summary Create a new test suite.
+         * @summary Create a new test suite
          * @param {string} code Code of project, where to search entities.
          * @param {SuiteCreate} suiteCreate 
          * @param {*} [options] Override http request option.
@@ -83,7 +83,7 @@ export const SuitesApiAxiosParamCreator = function (configuration?: Configuratio
         },
         /**
          * This method completely deletes a test suite with test cases from repository. 
-         * @summary Delete test suite.
+         * @summary Delete test suite
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {SuiteDelete} [suiteDelete] 
@@ -128,7 +128,7 @@ export const SuitesApiAxiosParamCreator = function (configuration?: Configuratio
         },
         /**
          * This method allows to retrieve a specific test suite. 
-         * @summary Get a specific test suite.
+         * @summary Get a specific test suite
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -169,7 +169,7 @@ export const SuitesApiAxiosParamCreator = function (configuration?: Configuratio
         },
         /**
          * This method allows to retrieve all test suites stored in selected project. 
-         * @summary Get all test suites.
+         * @summary Get all test suites
          * @param {string} code Code of project, where to search entities.
          * @param {string} [search] Provide a string that will be used to search by name.
          * @param {number} [limit] A number of entities in result set.
@@ -221,7 +221,7 @@ export const SuitesApiAxiosParamCreator = function (configuration?: Configuratio
         },
         /**
          * This method is used to update a test suite through API. 
-         * @summary Update test suite.
+         * @summary Update test suite
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {SuiteUpdate} suiteUpdate 
@@ -278,7 +278,7 @@ export const SuitesApiFp = function(configuration?: Configuration) {
     return {
         /**
          * This method is used to create a new test suite through API. 
-         * @summary Create a new test suite.
+         * @summary Create a new test suite
          * @param {string} code Code of project, where to search entities.
          * @param {SuiteCreate} suiteCreate 
          * @param {*} [options] Override http request option.
@@ -290,7 +290,7 @@ export const SuitesApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method completely deletes a test suite with test cases from repository. 
-         * @summary Delete test suite.
+         * @summary Delete test suite
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {SuiteDelete} [suiteDelete] 
@@ -303,7 +303,7 @@ export const SuitesApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to retrieve a specific test suite. 
-         * @summary Get a specific test suite.
+         * @summary Get a specific test suite
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -315,7 +315,7 @@ export const SuitesApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to retrieve all test suites stored in selected project. 
-         * @summary Get all test suites.
+         * @summary Get all test suites
          * @param {string} code Code of project, where to search entities.
          * @param {string} [search] Provide a string that will be used to search by name.
          * @param {number} [limit] A number of entities in result set.
@@ -329,7 +329,7 @@ export const SuitesApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method is used to update a test suite through API. 
-         * @summary Update test suite.
+         * @summary Update test suite
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {SuiteUpdate} suiteUpdate 
@@ -352,7 +352,7 @@ export const SuitesApiFactory = function (configuration?: Configuration, basePat
     return {
         /**
          * This method is used to create a new test suite through API. 
-         * @summary Create a new test suite.
+         * @summary Create a new test suite
          * @param {string} code Code of project, where to search entities.
          * @param {SuiteCreate} suiteCreate 
          * @param {*} [options] Override http request option.
@@ -363,7 +363,7 @@ export const SuitesApiFactory = function (configuration?: Configuration, basePat
         },
         /**
          * This method completely deletes a test suite with test cases from repository. 
-         * @summary Delete test suite.
+         * @summary Delete test suite
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {SuiteDelete} [suiteDelete] 
@@ -375,7 +375,7 @@ export const SuitesApiFactory = function (configuration?: Configuration, basePat
         },
         /**
          * This method allows to retrieve a specific test suite. 
-         * @summary Get a specific test suite.
+         * @summary Get a specific test suite
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -386,7 +386,7 @@ export const SuitesApiFactory = function (configuration?: Configuration, basePat
         },
         /**
          * This method allows to retrieve all test suites stored in selected project. 
-         * @summary Get all test suites.
+         * @summary Get all test suites
          * @param {string} code Code of project, where to search entities.
          * @param {string} [search] Provide a string that will be used to search by name.
          * @param {number} [limit] A number of entities in result set.
@@ -399,7 +399,7 @@ export const SuitesApiFactory = function (configuration?: Configuration, basePat
         },
         /**
          * This method is used to update a test suite through API. 
-         * @summary Update test suite.
+         * @summary Update test suite
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {SuiteUpdate} suiteUpdate 
@@ -421,7 +421,7 @@ export const SuitesApiFactory = function (configuration?: Configuration, basePat
 export class SuitesApi extends BaseAPI {
     /**
      * This method is used to create a new test suite through API. 
-     * @summary Create a new test suite.
+     * @summary Create a new test suite
      * @param {string} code Code of project, where to search entities.
      * @param {SuiteCreate} suiteCreate 
      * @param {*} [options] Override http request option.
@@ -434,7 +434,7 @@ export class SuitesApi extends BaseAPI {
 
     /**
      * This method completely deletes a test suite with test cases from repository. 
-     * @summary Delete test suite.
+     * @summary Delete test suite
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {SuiteDelete} [suiteDelete] 
@@ -448,7 +448,7 @@ export class SuitesApi extends BaseAPI {
 
     /**
      * This method allows to retrieve a specific test suite. 
-     * @summary Get a specific test suite.
+     * @summary Get a specific test suite
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {*} [options] Override http request option.
@@ -461,7 +461,7 @@ export class SuitesApi extends BaseAPI {
 
     /**
      * This method allows to retrieve all test suites stored in selected project. 
-     * @summary Get all test suites.
+     * @summary Get all test suites
      * @param {string} code Code of project, where to search entities.
      * @param {string} [search] Provide a string that will be used to search by name.
      * @param {number} [limit] A number of entities in result set.
@@ -476,7 +476,7 @@ export class SuitesApi extends BaseAPI {
 
     /**
      * This method is used to update a test suite through API. 
-     * @summary Update test suite.
+     * @summary Update test suite
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {SuiteUpdate} suiteUpdate 

@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -17,44 +17,44 @@
 /**
  * 
  * @export
- * @interface ResultAttachment
+ * @interface Attachmentupload
  */
-export interface ResultAttachment {
+export interface Attachmentupload {
     /**
      * 
      * @type {string}
-     * @memberof ResultAttachment
+     * @memberof Attachmentupload
      */
-    'id'?: string;
+    'hash'?: string;
     /**
      * 
      * @type {string}
-     * @memberof ResultAttachment
+     * @memberof Attachmentupload
      */
-    'file_name'?: string;
+    'filename'?: string;
     /**
      * 
      * @type {string}
-     * @memberof ResultAttachment
+     * @memberof Attachmentupload
      */
-    'mime_type'?: string;
+    'mime'?: string;
     /**
      * 
      * @type {string}
-     * @memberof ResultAttachment
+     * @memberof Attachmentupload
      */
-    'file_path'?: string;
+    'extension'?: string;
     /**
      * 
      * @type {string}
-     * @memberof ResultAttachment
+     * @memberof Attachmentupload
      */
-    'content'?: string;
+    'url'?: string;
     /**
      * 
-     * @type {number}
-     * @memberof ResultAttachment
+     * @type {string}
+     * @memberof Attachmentupload
      */
-    'size'?: number;
+    'team'?: string;
 }
 

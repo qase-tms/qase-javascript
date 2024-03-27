@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Qase.io API
- * Qase API Specification.
+ * Qase.io TestOps API v1
+ * Qase TestOps API v1 Specification.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: support@qase.io
@@ -38,7 +38,7 @@ export const MilestonesApiAxiosParamCreator = function (configuration?: Configur
     return {
         /**
          * This method allows to create a milestone in selected project. 
-         * @summary Create a new milestone.
+         * @summary Create a new milestone
          * @param {string} code Code of project, where to search entities.
          * @param {MilestoneCreate} milestoneCreate 
          * @param {*} [options] Override http request option.
@@ -81,7 +81,7 @@ export const MilestonesApiAxiosParamCreator = function (configuration?: Configur
         },
         /**
          * This method completely deletes a milestone from repository. 
-         * @summary Delete milestone.
+         * @summary Delete milestone
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -122,7 +122,7 @@ export const MilestonesApiAxiosParamCreator = function (configuration?: Configur
         },
         /**
          * This method allows to retrieve a specific milestone. 
-         * @summary Get a specific milestone.
+         * @summary Get a specific milestone
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -163,7 +163,7 @@ export const MilestonesApiAxiosParamCreator = function (configuration?: Configur
         },
         /**
          * This method allows to retrieve all milestones stored in selected project. 
-         * @summary Get all milestones.
+         * @summary Get all milestones
          * @param {string} code Code of project, where to search entities.
          * @param {string} [search] Provide a string that will be used to search by name.
          * @param {number} [limit] A number of entities in result set.
@@ -215,7 +215,7 @@ export const MilestonesApiAxiosParamCreator = function (configuration?: Configur
         },
         /**
          * This method updates a milestone. 
-         * @summary Update milestone.
+         * @summary Update milestone
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {MilestoneUpdate} milestoneUpdate 
@@ -272,7 +272,7 @@ export const MilestonesApiFp = function(configuration?: Configuration) {
     return {
         /**
          * This method allows to create a milestone in selected project. 
-         * @summary Create a new milestone.
+         * @summary Create a new milestone
          * @param {string} code Code of project, where to search entities.
          * @param {MilestoneCreate} milestoneCreate 
          * @param {*} [options] Override http request option.
@@ -284,7 +284,7 @@ export const MilestonesApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method completely deletes a milestone from repository. 
-         * @summary Delete milestone.
+         * @summary Delete milestone
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -296,7 +296,7 @@ export const MilestonesApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to retrieve a specific milestone. 
-         * @summary Get a specific milestone.
+         * @summary Get a specific milestone
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -308,7 +308,7 @@ export const MilestonesApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to retrieve all milestones stored in selected project. 
-         * @summary Get all milestones.
+         * @summary Get all milestones
          * @param {string} code Code of project, where to search entities.
          * @param {string} [search] Provide a string that will be used to search by name.
          * @param {number} [limit] A number of entities in result set.
@@ -322,7 +322,7 @@ export const MilestonesApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method updates a milestone. 
-         * @summary Update milestone.
+         * @summary Update milestone
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {MilestoneUpdate} milestoneUpdate 
@@ -345,7 +345,7 @@ export const MilestonesApiFactory = function (configuration?: Configuration, bas
     return {
         /**
          * This method allows to create a milestone in selected project. 
-         * @summary Create a new milestone.
+         * @summary Create a new milestone
          * @param {string} code Code of project, where to search entities.
          * @param {MilestoneCreate} milestoneCreate 
          * @param {*} [options] Override http request option.
@@ -356,7 +356,7 @@ export const MilestonesApiFactory = function (configuration?: Configuration, bas
         },
         /**
          * This method completely deletes a milestone from repository. 
-         * @summary Delete milestone.
+         * @summary Delete milestone
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -367,7 +367,7 @@ export const MilestonesApiFactory = function (configuration?: Configuration, bas
         },
         /**
          * This method allows to retrieve a specific milestone. 
-         * @summary Get a specific milestone.
+         * @summary Get a specific milestone
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
@@ -378,7 +378,7 @@ export const MilestonesApiFactory = function (configuration?: Configuration, bas
         },
         /**
          * This method allows to retrieve all milestones stored in selected project. 
-         * @summary Get all milestones.
+         * @summary Get all milestones
          * @param {string} code Code of project, where to search entities.
          * @param {string} [search] Provide a string that will be used to search by name.
          * @param {number} [limit] A number of entities in result set.
@@ -391,7 +391,7 @@ export const MilestonesApiFactory = function (configuration?: Configuration, bas
         },
         /**
          * This method updates a milestone. 
-         * @summary Update milestone.
+         * @summary Update milestone
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
          * @param {MilestoneUpdate} milestoneUpdate 
@@ -413,7 +413,7 @@ export const MilestonesApiFactory = function (configuration?: Configuration, bas
 export class MilestonesApi extends BaseAPI {
     /**
      * This method allows to create a milestone in selected project. 
-     * @summary Create a new milestone.
+     * @summary Create a new milestone
      * @param {string} code Code of project, where to search entities.
      * @param {MilestoneCreate} milestoneCreate 
      * @param {*} [options] Override http request option.
@@ -426,7 +426,7 @@ export class MilestonesApi extends BaseAPI {
 
     /**
      * This method completely deletes a milestone from repository. 
-     * @summary Delete milestone.
+     * @summary Delete milestone
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {*} [options] Override http request option.
@@ -439,7 +439,7 @@ export class MilestonesApi extends BaseAPI {
 
     /**
      * This method allows to retrieve a specific milestone. 
-     * @summary Get a specific milestone.
+     * @summary Get a specific milestone
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {*} [options] Override http request option.
@@ -452,7 +452,7 @@ export class MilestonesApi extends BaseAPI {
 
     /**
      * This method allows to retrieve all milestones stored in selected project. 
-     * @summary Get all milestones.
+     * @summary Get all milestones
      * @param {string} code Code of project, where to search entities.
      * @param {string} [search] Provide a string that will be used to search by name.
      * @param {number} [limit] A number of entities in result set.
@@ -467,7 +467,7 @@ export class MilestonesApi extends BaseAPI {
 
     /**
      * This method updates a milestone. 
-     * @summary Update milestone.
+     * @summary Update milestone
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
      * @param {MilestoneUpdate} milestoneUpdate 
