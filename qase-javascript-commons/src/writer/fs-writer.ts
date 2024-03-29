@@ -4,7 +4,7 @@ import * as path from 'path';
 import { WriterInterface } from './writer-interface';
 
 import { TestResultType, Attachment, Report } from '../models';
-import { FormatterInterface } from '../formatter';
+import { FormatterInterface, JsonFormatter, JsonpFormatter } from '../formatter';
 import { FormatEnum } from './driver-enum';
 
 export type FsWriterOptionsType = {
@@ -19,22 +19,27 @@ export type FsWriterOptionsType = {
 export class FsWriter implements WriterInterface {
   private readonly path: string;
   private readonly format: string;
+  private formatter: FormatterInterface;
 
   /**
    * @param {FsWriterOptionsType | undefined} options
-   * @param {FormatterInterface} formatter
    */
   constructor(
     options: FsWriterOptionsType | undefined,
-    private formatter: FormatterInterface,
   ) {
     const {
       path: pathOptions = path.join('build', 'qase-report'),
-      format = FormatEnum.json,
+      format = options?.format ?? FormatEnum.json,
     } = options ?? {};
 
     this.path = pathOptions;
     this.format = format;
+
+    if (this.format === FormatEnum.json) {
+      this.formatter = new JsonFormatter();
+    } else {
+      this.formatter = new JsonpFormatter();
+    }
   }
 
   /**
