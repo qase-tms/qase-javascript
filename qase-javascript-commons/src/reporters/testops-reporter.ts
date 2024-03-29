@@ -1,30 +1,19 @@
 import { createReadStream } from 'fs';
 
 import chalk from 'chalk';
-import stripAnsi from 'strip-ansi';
 import {
+  IdResponse,
   QaseApiInterface,
   ResultCreateV2,
-  RunCreate,
-  ResultStepStatus,
-  AttachmentGet,
   ResultExecution,
   ResultStep,
-  RelationSuiteItem,
+  ResultStepStatus,
+  RunCreate,
 } from 'qaseio';
 
-import {
-  AbstractReporter,
-  LoggerInterface,
-  ReporterOptionsType,
-} from './abstract-reporter';
+import { AbstractReporter, LoggerInterface, ReporterOptionsType } from './abstract-reporter';
 
-import {
-  StepStatusEnum,
-  TestResultType,
-  TestStatusEnum,
-  TestStepType,
-} from '../models';
+import { StepStatusEnum, TestResultType, TestStatusEnum, TestStepType, Attachment, TestExecution } from '../models';
 
 import { QaseError } from '../utils/qase-error';
 
@@ -59,12 +48,12 @@ export class TestOpsReporter extends AbstractReporter {
    * @type {Record<TestStatusEnum, string>}
    */
   static statusMap: Record<TestStatusEnum, string> = {
-    [TestStatusEnum.passed]: "passed",
-    [TestStatusEnum.failed]: "failed",
-    [TestStatusEnum.skipped]: "skipped",
-    [TestStatusEnum.disabled]: "disabled",
-    [TestStatusEnum.blocked]: "blocked",
-    [TestStatusEnum.invalid]: "invalid",
+    [TestStatusEnum.passed]: 'passed',
+    [TestStatusEnum.failed]: 'failed',
+    [TestStatusEnum.skipped]: 'skipped',
+    [TestStatusEnum.disabled]: 'disabled',
+    [TestStatusEnum.blocked]: 'blocked',
+    [TestStatusEnum.invalid]: 'invalid',
   };
 
   /**
@@ -74,23 +63,23 @@ export class TestOpsReporter extends AbstractReporter {
     [StepStatusEnum.passed]: ResultStepStatus.PASSED,
     [StepStatusEnum.failed]: ResultStepStatus.FAILED,
     [StepStatusEnum.blocked]: ResultStepStatus.BLOCKED,
-  }
+  };
 
   /**
    * @type {string}
    * @private
    */
-  private baseUrl: string;
+  private readonly baseUrl: string;
   /**
    * @type {string}
    * @private
    */
-  private projectCode: string;
+  private readonly projectCode: string;
   /**
    * @type {boolean | undefined}
    * @private
    */
-  private uploadAttachments: boolean | undefined;
+  private readonly isUploadAttachments: boolean | undefined;
   /**
    * @type {TestOpsRunType}
    * @private
@@ -100,27 +89,18 @@ export class TestOpsReporter extends AbstractReporter {
    * @type { number | undefined}
    * @private
    */
-  private environment: number | undefined;
+  private readonly environment: number | undefined;
   /**
    * @type {TestResultType[]}
    * @private
    */
-  private chunk: number;
-  /**
-   * @type {Record<string, string[]>}
-   * @private
-   */
-  private attachments: Record<string, string[]> = {};
-  /**
-   * @type {Record<string, string[]>}
-   * @private
-   */
-  private attachmentsMap: Record<string, AttachmentGet[]> = {};
+  private readonly chunk: number;
 
   /**
    * @param {ReporterOptionsType & TestOpsOptionsType} options
    * @param {QaseApiInterface} api
    * @param {LoggerInterface} logger
+   * @param {number} environment
    */
   constructor(
     options: ReporterOptionsType & TestOpsOptionsType,
@@ -142,10 +122,10 @@ export class TestOpsReporter extends AbstractReporter {
 
     this.baseUrl = baseUrl.replace(/\/$/, '');
     this.projectCode = project;
-    this.uploadAttachments = uploadAttachments;
+    this.isUploadAttachments = uploadAttachments;
     this.run = { complete: true, ...run };
     this.environment = environment;
-    this.chunk = options.chunk || defaultChunkSize;
+    this.chunk = options.chunk ?? defaultChunkSize;
   }
 
   /**
@@ -153,25 +133,12 @@ export class TestOpsReporter extends AbstractReporter {
    */
   public addTestResult(result: TestResultType) {
     this.results.push(result);
-    this.addAttachments(result);
-  }
-
-  private addAttachments(resultOrStep: TestResultType | TestStepType) {
-    if (resultOrStep.attachments) {
-      this.attachments[resultOrStep.id] = resultOrStep.attachments;
-    }
-
-    if (resultOrStep.steps) {
-      for (const step of resultOrStep.steps) {
-        this.addAttachments(step);
-      }
-    }
   }
 
   /**
    * @returns {Promise<void>}
    */
-  public async publish() {
+  public async publish(): Promise<void> {
     let runId: number;
 
     if (this.run.id !== undefined) {
@@ -200,11 +167,12 @@ export class TestOpsReporter extends AbstractReporter {
       return;
     }
 
-    if (this.uploadAttachments && Object.keys(this.attachments).length) {
-      await this.prepareAttachments();
-    }
+    const results: ResultCreateV2[] = [];
 
-    const results = this.results.map((result) => this.transformTestResult(result));
+    for (const result of this.results) {
+      const resultCreateV2 = await this.transformTestResult(result);
+      results.push(resultCreateV2);
+    }
 
     for (let i = 0; i < results.length; i += this.chunk) {
       await this.api.result.createResultsV2(this.projectCode, runId, {
@@ -232,122 +200,74 @@ export class TestOpsReporter extends AbstractReporter {
 
   /**
    * @param {TestResultType} result
-   * @returns {ResultCreateV2}
+   * @returns Promise<ResultCreateV2>
    * @private
    */
-  private transformTestResult(result: TestResultType): ResultCreateV2 {
+  private async transformTestResult(result: TestResultType): Promise<ResultCreateV2> {
+    const attachments = await this.uploadAttachments(result.attachments);
+    const steps = await this.transformSteps(result.steps);
 
-    const resultObject: ResultCreateV2 = {
+    return {
       title: result.title,
-      execution: this.getExecution(result),
-      testops_id: result.testOpsId[0] || null,
-      attachments: this.getAttachmentsFor(result.id),
-      steps: this.transformSteps(result.steps ?? []),
+      execution: this.getExecution(result.execution),
+      testops_id: result.testops_id,
+      attachments: attachments,
+      steps: steps,
       params: {},
       relations: {
-        suite: {
-          data: result.suiteTitle ? this.getSuites(result.suiteTitle) : [],
-        },
+        // suite: {
+        //   data: result.suiteTitle ? this.getSuites(result.suiteTitle) : [],
+        // },
       },
-      message: result.error ? stripAnsi(result.error.message) : null,
+      message: result.message,
     };
-
-    return resultObject;
   }
 
   /**
-   * @param {string | string[]} suiteTitle
-   * @returns {RelationSuiteItem[]}
-   * @private
-   */
-  private getSuites(suiteTitle: string | string[]): RelationSuiteItem[] {
-    const suiteTitles = Array.isArray(suiteTitle) ? suiteTitle : suiteTitle.split('\t');
-
-    return suiteTitles.map((title) => ({ title }));
-  }
-
-  /**
-   * @param {TestResultType} result
    * @returns {ResultExecution}
    * @private
+   * @param {TestExecution} exec
    */
-  private getExecution(result: TestResultType): ResultExecution {
-    const execution: ResultExecution = {
-      status: TestOpsReporter.statusMap[result.status],
-      start_time: result.startTime ? result.startTime : null,
-      end_time: result.endTime ? result.endTime : null,
-      duration: result.duration ? result.duration : null,
+  private getExecution(exec: TestExecution): ResultExecution {
+    return {
+      status: TestOpsReporter.statusMap[exec.status],
+      start_time: exec.start_time,
+      end_time: exec.end_time,
+      duration: exec.duration,
+      stacktrace: exec.stacktrace,
+      thread: exec.thread,
     };
-
-    if (result.startTime) {
-      execution.start_time = result.startTime;
-    }
-
-    if (result.duration) {
-      execution.duration = result.duration;
-    }
-
-    if (result.endTime) {
-      execution.end_time = result.endTime;
-    }
-
-    if (result.error) {
-      execution.stacktrace = stripAnsi(String(result.error.stack));
-    }
-
-    return execution;
-  }
-
-  /**
-   * @param {string} id
-   * @returns {string[]}
-   * @private
-   */
-  private getAttachmentsFor(id: string): string[] {
-    const attachments = this.attachmentsMap[id];
-
-    if (!attachments) {
-      return [];
-    }
-
-    return attachments.reduce((acc: string[], attachment: AttachmentGet) => {
-      if (attachment.hash) {
-        acc.push(attachment.hash);
-      }
-
-      return acc;
-    }, []);
   }
 
   /**
    * @param {TestStepType[]} steps
-   * @returns {ResultStep[]}
+   * @returns Promise<ResultStep[]>
    * @private
    */
-  private transformSteps(steps: TestStepType[]): ResultStep[] {
-    return steps.map(({
-      title,
-      status,
-      steps,
-      attachments,
-    }) => {
-      const step: ResultStep = {
-        data: {
-          action: title,
-          attachments: attachments ? this.getAttachmentsFor(title) : [],
-        },
+  private async transformSteps(steps: TestStepType[]): Promise<ResultStep[]> {
+    const resultsSteps: ResultStep[] = [];
 
+    for (const step of steps) {
+      const attachmentHashes: string[] = await this.uploadAttachments(step.attachments);
+
+      const resultStep: ResultStep = {
+        data: {
+          action: step.data.action,
+          attachments: attachmentHashes,
+        },
         execution: {
-          status: TestOpsReporter.stepStatusMap[status],
+          status: TestOpsReporter.stepStatusMap[step.execution.status],
         },
       };
 
-      if (steps) {
-        step.steps = this.transformSteps(steps);
+      if (step.steps.length > 0) {
+        resultStep.steps = await this.transformSteps(step.steps);
       }
 
-      return step;
-    });
+      resultsSteps.push(resultStep);
+    }
+
+    return resultsSteps;
   }
 
   /**
@@ -355,7 +275,7 @@ export class TestOpsReporter extends AbstractReporter {
    * @returns {Promise<void>}
    * @private
    */
-  private async checkRun(runId: number) {
+  private async checkRun(runId: number): Promise<void> {
     try {
       const resp = await this.api.runs.getRun(this.projectCode, runId);
 
@@ -371,14 +291,14 @@ export class TestOpsReporter extends AbstractReporter {
    * @param {string} title
    * @param {string} description
    * @param {number | undefined} environment
-   * @returns {Promise<any>}
+   * @returns {Promise<IdResponse>}
    * @private
    */
   private async createRun(
     title: string,
     description: string,
     environment: number | undefined,
-  ) {
+  ): Promise<IdResponse> {
     try {
       const runObject: RunCreate = {
         title,
@@ -406,51 +326,34 @@ export class TestOpsReporter extends AbstractReporter {
    * @returns {Promise<void>}
    * @private
    */
-  private async prepareAttachments() {
-    this.log(chalk`{yellow Uploading attachments to Qase}`);
+  private async uploadAttachments(attachments: Attachment[]): Promise<string[]> {
+    if (!this.isUploadAttachments) {
+      return [];
+    }
 
-    const uploads = Object.keys(this.attachments).reduce<
-      [string, Promise<AttachmentGet[]>][]
-    >((acc, id) => {
-      const attachment = this.attachments[id];
-
-      if (attachment) {
-        acc.push([id, this.doUploadAttachments(attachment)]);
-      }
-
-      return acc;
-    }, []);
-
-    this.attachmentsMap = Object.fromEntries(await Promise.all(
-      uploads.map(async ([id, request]) => {
-        return [id, await request] satisfies [string, AttachmentGet[]];
-      }),
-    ));
-  }
-
-  /**
-   * @param {string[]} attachments
-   * @returns {Promise<AttachmentGet[]>}
-   * @private
-   */
-  private async doUploadAttachments(attachments: string[]) {
-    return (await Promise.all(
-      attachments.map(async (attachment) => {
-        try {
-          const data = createReadStream(attachment);
-
-          const response = await this.api.attachments.uploadAttachment(
-            this.projectCode,
-            [data],
-          );
-
-          return response.data.result?.[0];
-        } catch (error) {
-          this.logError('Cannot upload attachment:', error);
-
-          return undefined;
+    const acc: string[] = [];
+    for (const attachment of attachments) {
+      try {
+        let data: unknown;
+        if (attachment.file_path) {
+          data = createReadStream(attachment.file_path);
+        } else {
+          data = attachment.content;
         }
-      }),
-    )).filter((attachments): attachments is AttachmentGet => Boolean(attachments));
+
+        const response = await this.api.attachments.uploadAttachment(
+          this.projectCode,
+          [data],
+        );
+
+        if (response.data.result?.[0]?.hash != undefined) {
+          acc.push(response.data.result[0].hash);
+        }
+
+      } catch (error) {
+        this.logError('Cannot upload attachment:', error);
+      }
+    }
+    return acc;
   }
 }
