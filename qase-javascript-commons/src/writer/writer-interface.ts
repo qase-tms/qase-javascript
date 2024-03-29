@@ -1,5 +1,7 @@
-import { TestResultType } from '../models';
+import { TestResultType, Attachment, Report } from '../models';
 
 export interface WriterInterface {
-  write(results: TestResultType[]): Promise<string>;
+  writeReport(results: Report): Promise<string>;
+  writeTestResult(result: TestResultType): Promise<void>;
+  writeAttachment(attachments: Attachment[]): Attachment[];
 }

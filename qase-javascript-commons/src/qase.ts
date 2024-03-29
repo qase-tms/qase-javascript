@@ -11,7 +11,7 @@ import {
   ReportReporter,
   LoggerInterface,
 } from './reporters';
-import { composeOptions, ModeEnum, OptionsType } from './options'
+import { composeOptions, ModeEnum, OptionsType } from './options';
 import {
   EnvApiEnum,
   EnvTestOpsEnum,
@@ -30,12 +30,12 @@ import { DisabledException } from './utils/disabled-exception';
  * @type {Record<TestStatusEnum, (test: TestResultType) => string>}
  */
 const resultLogMap: Record<TestStatusEnum, (test: TestResultType) => string> = {
-  [TestStatusEnum.failed]: (test) => chalk`{red Test ${test.title} ${test.status}}`,
-  [TestStatusEnum.passed]: (test) => chalk`{green Test ${test.title} ${test.status}}`,
-  [TestStatusEnum.skipped]: (test) => chalk`{blueBright Test ${test.title} ${test.status}}`,
-  [TestStatusEnum.blocked]: (test) => chalk`{blueBright Test ${test.title} ${test.status}}`,
-  [TestStatusEnum.disabled]: (test) => chalk`{grey Test ${test.title} ${test.status}}`,
-  [TestStatusEnum.invalid]: (test) => chalk`{yellowBright Test ${test.title} ${test.status}}`,
+  [TestStatusEnum.failed]: (test) => chalk`{red Test ${test.title} ${test.execution.status}}`,
+  [TestStatusEnum.passed]: (test) => chalk`{green Test ${test.title} ${test.execution.status}}`,
+  [TestStatusEnum.skipped]: (test) => chalk`{blueBright Test ${test.title} ${test.execution.status}}`,
+  [TestStatusEnum.blocked]: (test) => chalk`{blueBright Test ${test.title} ${test.execution.status}}`,
+  [TestStatusEnum.disabled]: (test) => chalk`{grey Test ${test.title} ${test.execution.status}}`,
+  [TestStatusEnum.invalid]: (test) => chalk`{yellowBright Test ${test.title} ${test.execution.status}}`,
 };
 
 /**
@@ -180,8 +180,7 @@ export class QaseReporter extends AbstractReporter {
 
       try {
         this.upstreamReporter?.addTestResult(result);
-      }
-      catch (error) {
+      } catch (error) {
         this.logError('Unable to add the result to the upstream reporter:', error);
 
         if (this.fallbackReporter == undefined) {
@@ -206,8 +205,7 @@ export class QaseReporter extends AbstractReporter {
   private addTestResultToFallback(result: TestResultType): void {
     try {
       this.fallbackReporter?.addTestResult(result);
-    }
-    catch (error) {
+    } catch (error) {
       this.logError('Unable to add the result to the fallback reporter:', error);
       this.disabled = true;
     }
@@ -248,8 +246,7 @@ export class QaseReporter extends AbstractReporter {
   private async publishFallback(): Promise<void> {
     try {
       await this.fallbackReporter?.publish();
-    }
-    catch (error) {
+    } catch (error) {
       this.logError('Unable to publish the run results to the fallback reporter:', error);
       this.disabled = true;
     }
@@ -318,7 +315,7 @@ export class QaseReporter extends AbstractReporter {
               reporterName,
             ),
           },
-          ...api
+          ...api,
         }, CustomBoundaryFormData);
 
         return new TestOpsReporter(
@@ -336,7 +333,7 @@ export class QaseReporter extends AbstractReporter {
           },
           apiClient,
           logger,
-          typeof environment === 'number' ? environment : undefined
+          typeof environment === 'number' ? environment : undefined,
         );
       }
 
@@ -360,6 +357,6 @@ export class QaseReporter extends AbstractReporter {
    * @private
    */
   private logTestItem(test: TestResultType) {
-    this.log(resultLogMap[test.status](test));
+    this.log(resultLogMap[test.execution.status](test));
   }
 }
