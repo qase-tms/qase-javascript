@@ -1,5 +1,6 @@
-export {
-  type TestResultType,
-  TestStatusEnum as TestStatusEnum,
-} from './test-result';
-export { type TestStepType, StepStatusEnum } from './test-step';
+export { type TestResultType } from './test-result';
+export { TestExecution, TestStatusEnum } from './test-execution';
+export { type TestStepType } from './test-step';
+export { StepStatusEnum } from './step-execution';
+export { Attachment } from './attachment';
+export { Report } from './report';
