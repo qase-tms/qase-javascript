@@ -20,7 +20,6 @@ import {
 } from './env';
 import { TestStatusEnum, TestResultType } from './models';
 import { DriverEnum, FsWriter } from './writer';
-import { JsonFormatter } from './formatter';
 
 import { getPackageVersion } from './utils/get-package-version';
 import { CustomBoundaryFormData } from './utils/custom-boundary';
@@ -339,7 +338,7 @@ export class QaseReporter extends AbstractReporter {
 
       case ModeEnum.report: {
         const localOptions = report.connections?.[DriverEnum.local];
-        const writer = new FsWriter(localOptions, new JsonFormatter());
+        const writer = new FsWriter(localOptions);
 
         return new ReportReporter(commonOptions, writer, logger);
       }
