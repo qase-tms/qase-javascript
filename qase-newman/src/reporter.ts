@@ -4,8 +4,6 @@ import semver from 'semver';
 import { NewmanRunExecution } from 'newman';
 import {
   EventList,
-  PropertyBase,
-  PropertyBaseDefinition,
 } from 'postman-collection';
 
 import {
@@ -53,28 +51,28 @@ export class NewmanQaseReporter {
     return ids;
   }
 
-  /**
-   * @param {PropertyBase<PropertyBaseDefinition>} item
-   * @param {string[]} titles
-   * @returns {string[]}
-   * @private
-   */
-  private static getParentTitles(
-    item: PropertyBase<PropertyBaseDefinition>,
-    titles: string[] = [],
-  ) {
-    const parent = item.parent();
-
-    if (parent) {
-      NewmanQaseReporter.getParentTitles(parent, titles);
-    }
-
-    if ('name' in item) {
-      titles.push(String(item.name));
-    }
-
-    return titles;
-  }
+  // /**
+  //  * @param {PropertyBase<PropertyBaseDefinition>} item
+  //  * @param {string[]} titles
+  //  * @returns {string[]}
+  //  * @private
+  //  */
+  // private static getParentTitles(
+  //   item: PropertyBase<PropertyBaseDefinition>,
+  //   titles: string[] = [],
+  // ) {
+  //   const parent = item.parent();
+  //
+  //   if (parent) {
+  //     NewmanQaseReporter.getParentTitles(parent, titles);
+  //   }
+  //
+  //   if ('name' in item) {
+  //     titles.push(String(item.name));
+  //   }
+  //
+  //   return titles;
+  // }
 
   /**
    * @type {ReporterInterface}
@@ -125,15 +123,31 @@ export class NewmanQaseReporter {
       'beforeItem',
       (_err: Error | undefined, exec: NewmanRunExecution) => {
         const { item } = exec;
-        const parent = item.parent();
+        // const parent = item.parent();
 
         this.pendingResultMap.set(item.id, {
+          attachments: [],
+          author: null,
+          execution: {
+            status: TestStatusEnum.passed,
+            start_time: 0,
+            end_time: 0,
+            duration: 0,
+            stacktrace: null,
+            thread: null,
+          },
+          fields: new Map<string, string>(),
+          message: null,
+          muted: false,
+          params: new Map<string, string>(),
+          relations: [],
+          run_id: null,
+          signature: '',
+          steps: [],
+          testops_id: NewmanQaseReporter.getCaseIds(item.events)[0] ?? null,
           id: item.id,
-          testOpsId: NewmanQaseReporter.getCaseIds(item.events),
           title: item.name,
-          suiteTitle: parent ? NewmanQaseReporter.getParentTitles(parent) : [],
-          status: TestStatusEnum.passed,
-          duration: 0,
+          // suiteTitle: parent ? NewmanQaseReporter.getParentTitles(parent) : [],
         });
 
         this.timerMap.set(item.id, Date.now());
@@ -147,8 +161,10 @@ export class NewmanQaseReporter {
         const pendingResult = this.pendingResultMap.get(item.id);
 
         if (pendingResult && err) {
-          pendingResult.status = TestStatusEnum.failed;
-          pendingResult.error = err;
+
+          pendingResult.execution.status = TestStatusEnum.failed;
+          pendingResult.execution.stacktrace = err.stack ?? null;
+          pendingResult.message = err.message;
         }
       },
     );
@@ -162,10 +178,9 @@ export class NewmanQaseReporter {
 
         if (timer) {
           const now = Date.now();
-
-          pendingResult.startTime = timer;
-          pendingResult.duration = now - timer;
-          pendingResult.endTime = now;
+          pendingResult.execution.start_time = timer;
+          pendingResult.execution.end_time = now;
+          pendingResult.execution.duration = now - timer;
         }
 
         this.reporter.addTestResult(pendingResult);

@@ -233,20 +233,32 @@ export class CucumberQaseReporter extends Formatter {
         }
 
         this.reporter.addTestResult({
-          id: tcs.id,
-          testOpsId: info.caseIds,
-          title: info.name,
-          suiteTitle: info.lastAstNodeId && this.scenarios[info.lastAstNodeId],
-          status:
-            this.testCaseStartedResult[
+          attachments: [],
+          author: null,
+          execution: {
+            status: this.testCaseStartedResult[
               envelope.testCaseFinished.testCaseStartedId
-            ] ?? TestStatusEnum.passed,
-          startTime: tcs.timestamp.seconds,
-          endTime: envelope.testCaseFinished.timestamp.seconds,
-          duration: Math.abs(
-            envelope.testCaseFinished.timestamp.seconds - tcs.timestamp.seconds,
-          ),
-          error,
+              ] ?? TestStatusEnum.passed,
+            start_time: tcs.timestamp.seconds,
+            end_time: envelope.testCaseFinished.timestamp.seconds,
+            duration: Math.abs(
+              envelope.testCaseFinished.timestamp.seconds - tcs.timestamp.seconds,
+            ),
+            stacktrace: error?.stack ?? null,
+            thread: null,
+          },
+          fields: new Map<string, string>(),
+          message: null,
+          muted: false,
+          params: new Map<string, string>(),
+          relations: [],
+          run_id: null,
+          signature: '',
+          steps: [],
+          testops_id: info.caseIds[0] ?? null,
+          id: tcs.id,
+          title: info.name,
+          // suiteTitle: info.lastAstNodeId && this.scenarios[info.lastAstNodeId],
         });
       }
     });
