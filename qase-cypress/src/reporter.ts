@@ -1,4 +1,5 @@
 import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
 
 import { MochaOptions, reporters, Runner, Test } from 'mocha';
 
@@ -7,11 +8,11 @@ import {
   QaseReporter,
   ReporterInterface,
   TestStatusEnum,
-  composeOptions,
+  composeOptions, TestResultType, Attachment,
 } from 'qase-javascript-commons';
 
 import { traverseDir } from './utils/traverse-dir';
-import { configSchema } from './configSchema'
+import { configSchema } from './configSchema';
 import { ReporterOptionsType } from './options';
 
 const {
@@ -60,12 +61,12 @@ export class CypressQaseReporter extends reporters.Base {
   /**
    * @param {number[]} ids
    * @param {string} dir
-   * @returns {string[]}
+   * @returns {Attachment[]}
    * @private
    */
-  private static findAttachments(ids: number[], dir: string) {
+  private static findAttachments(ids: number[], dir: string): Attachment[] {
     const idSet = new Set(ids);
-    const attachments: string[] = [];
+    const attachments: Attachment[] = [];
 
     try {
       traverseDir(path.join(process.cwd(), dir), (filePath) => {
@@ -74,10 +75,17 @@ export class CypressQaseReporter extends reporters.Base {
             idSet.has(item),
           )
         ) {
-          attachments.push(filePath);
+          attachments.push({
+            content: undefined,
+            id: uuidv4(),
+            mime_type: '', size: 0,
+            file_name: path.basename(filePath),
+            file_path: filePath,
+          });
         }
       });
-    } catch (error) {/* ignore */}
+    } catch (error) {/* ignore */
+    }
 
     return attachments;
   }
@@ -102,13 +110,13 @@ export class CypressQaseReporter extends reporters.Base {
   public constructor(
     runner: Runner,
     options: CypressQaseOptionsType,
-    configLoader = new ConfigLoader(configSchema)
+    configLoader = new ConfigLoader(configSchema),
   ) {
     super(runner, options);
 
     const { reporterOptions } = options;
     const config = configLoader.load();
-    const { framework, ...composedOptions } = composeOptions(reporterOptions, config)
+    const { framework, ...composedOptions } = composeOptions(reporterOptions, config);
 
     this.screenshotsFolder = framework?.cypress?.screenshotsFolder;
 
@@ -153,17 +161,31 @@ export class CypressQaseReporter extends reporters.Base {
       ? CypressQaseReporter.findAttachments(ids, this.screenshotsFolder)
       : undefined;
 
-    const result = {
+    const result: TestResultType = {
+      attachments: attachments ?? [],
+      author: null,
+      fields: new Map<string, string>(),
+      message: test.err?.message ?? null,
+      muted: false,
+      params: new Map<string, string>(),
+      relations: [],
+      run_id: null,
+      signature: '',
+      steps: [],
       id: test.id,
-      testOpsId: ids,
+      execution: {
+        status: test.state
+          ? CypressQaseReporter.statusMap[test.state]
+          : TestStatusEnum.invalid,
+        start_time: null,
+        end_time: null,
+        duration: test.duration ?? 0,
+        stacktrace: test.err?.stack ?? null,
+        thread: null,
+      },
+      testops_id: ids[0] ?? null,
       title: test.title,
-      suiteTitle: test.parent?.titlePath(),
-      status: test.state
-        ? CypressQaseReporter.statusMap[test.state]
-        : TestStatusEnum.invalid,
-      duration: test.duration ?? 0,
-      error: test.err,
-      attachments,
+      // suiteTitle: test.parent?.titlePath(),
     };
 
     this.reporter.addTestResult(result);

@@ -80,7 +80,8 @@ export class JestQaseReporter implements Reporter {
   /**
    * @see {Reporter.onRunStart}
    */
-  public onRunStart() {/* empty */}
+  public onRunStart() {/* empty */
+  }
 
   /**
    * @param {Test} _
@@ -89,13 +90,12 @@ export class JestQaseReporter implements Reporter {
   public onTestResult(_: Test, result: TestResult) {
     result.testResults.forEach(
       ({
-        ancestorTitles,
-        title,
-        status,
-        duration,
-        failureMessages,
-        failureDetails,
-      }) => {
+         title,
+         status,
+         duration,
+         failureMessages,
+         failureDetails,
+       }) => {
         let error;
 
         if (status === 'failed') {
@@ -111,13 +111,28 @@ export class JestQaseReporter implements Reporter {
         }
 
         this.reporter.addTestResult({
+          attachments: [],
+          author: null,
+          execution: {
+            status: JestQaseReporter.statusMap[status],
+            start_time: null,
+            end_time: null,
+            duration: duration ?? 0,
+            stacktrace: error?.stack ?? null,
+            thread: null,
+          },
+          fields: new Map<string, string>(),
+          message: error?.message ?? null,
+          muted: false,
+          params: new Map<string, string>(),
+          relations: [],
+          run_id: null,
+          signature: '',
+          steps: [],
+          testops_id: JestQaseReporter.getCaseId(title)[0] ?? null,
           id: uuidv4(),
-          testOpsId: JestQaseReporter.getCaseId(title),
           title: title,
-          suiteTitle: ancestorTitles,
-          status: JestQaseReporter.statusMap[status],
-          duration: duration ?? 0,
-          error,
+          // suiteTitle: ancestorTitles,
         });
       },
     );
@@ -126,7 +141,8 @@ export class JestQaseReporter implements Reporter {
   /**
    * @see {Reporter.getLastError}
    */
-  public getLastError() {/* empty */}
+  public getLastError() {/* empty */
+  }
 
   /**
    * @see {Reporter.onRunComplete}

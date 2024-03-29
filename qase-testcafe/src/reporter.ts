@@ -6,7 +6,8 @@ import {
   QaseReporter,
   ReporterInterface,
   TestStatusEnum,
-  composeOptions
+  composeOptions,
+  Attachment,
 } from 'qase-javascript-commons';
 
 type CallsiteRecordType = {
@@ -100,7 +101,7 @@ export class TestcafeQaseReporter {
    * @returns {Error}
    * @private
    */
-  private static transformErrors(errors: TestRunErrorFormattableAdapterType[]) {
+  private static transformErrors(errors: TestRunErrorFormattableAdapterType[]): Error {
     const [errorMessages, errorStacks] = errors.reduce<[string[], string[]]>(
       ([messages, stacks], error) => {
         const stack =
@@ -122,12 +123,25 @@ export class TestcafeQaseReporter {
   }
 
   /**
-   * @param {ScreenshotType[]} attachments
-   * @returns {string[]}
+   * @param {ScreenshotType[]} screenshots
+   * @returns {Attachment[]}
    * @private
    */
-  private static transformAttachments(attachments: ScreenshotType[]) {
-    return attachments.map(({ screenshotPath }) => screenshotPath);
+  private static transformAttachments(screenshots: ScreenshotType[]): Attachment[] {
+    const attachs: Attachment[] = [];
+
+    for (const screenshot of screenshots) {
+      attachs.push({
+        file_name: screenshot.screenshotPath,
+        file_path: screenshot.screenshotPath,
+        mime_type: '',
+        content: undefined,
+        size: 0,
+        id: uuidv4(),
+      });
+    }
+
+    return attachs;
   }
 
   /**
@@ -164,14 +178,29 @@ export class TestcafeQaseReporter {
     testRunInfo: TestRunInfoType,
     meta: Record<string, string>,
   ) => {
+    const error = TestcafeQaseReporter.transformErrors(testRunInfo.errs);
     this.reporter.addTestResult({
+      author: null,
+      execution: {
+        status: TestcafeQaseReporter.getStatus(testRunInfo),
+        start_time: null,
+        end_time: null,
+        duration: testRunInfo.durationMs,
+        stacktrace: error.stack ?? null,
+        thread: null,
+      },
+      fields: new Map<string, string>(),
+      message: error.message,
+      muted: false,
+      params: new Map<string, string>(),
+      relations: [],
+      run_id: null,
+      signature: '',
+      steps: [],
       id: uuidv4(),
-      testOpsId: TestcafeQaseReporter.getCaseId(meta),
+      testops_id: TestcafeQaseReporter.getCaseId(meta)[0] ?? null,
       title: title,
-      suiteTitle: testRunInfo.fixture.name,
-      status: TestcafeQaseReporter.getStatus(testRunInfo),
-      error: TestcafeQaseReporter.transformErrors(testRunInfo.errs),
-      duration: testRunInfo.durationMs,
+      // suiteTitle: testRunInfo.fixture.name,
       attachments: TestcafeQaseReporter.transformAttachments(
         testRunInfo.screenshots,
       ),
