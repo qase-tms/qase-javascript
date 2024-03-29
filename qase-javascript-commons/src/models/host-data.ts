@@ -6,4 +6,6 @@ export type HostData = {
   machine: string
   python: string
   pip: string
+  node_version: string
+  npm: string
 }

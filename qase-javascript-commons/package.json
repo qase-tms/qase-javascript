@@ -33,7 +33,8 @@
     "lodash.mergewith": "^4.6.2",
     "qaseio": "^2.0.4-beta.1",
     "strip-ansi": "^6.0.1",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "child-process-ext": "^3.0.2"
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",
