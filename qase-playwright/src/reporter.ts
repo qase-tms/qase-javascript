@@ -10,10 +10,20 @@ import {
   StepStatusEnum,
   TestStatusEnum,
   TestStepType,
-  Attachment
+  Attachment, TestResultType,
 } from 'qase-javascript-commons';
+import { MetadataMessage, ReporterContentType } from './playwright';
 
 type ArrayItemType<T> = T extends (infer R)[] ? R : never;
+
+const stepAttachRegexp = /^step_attach_(\w{8}-\w{4}-\w{4}-\w{4}-\w{12})_/i;
+
+interface TestCaseMetadata {
+  ids: number[];
+  title: string;
+  fields: Map<string, string>;
+  attachments: Attachment[];
+}
 
 export type PlaywrightQaseOptionsType = ConfigType;
 
@@ -34,48 +44,104 @@ export class PlaywrightQaseReporter implements Reporter {
   };
 
   /**
-   * @type {RegExp}
-   */
-  static qaseIdRegExp = /\(Qase ID: ([\d,]+)\)/;
-
-  /**
-   * @param {string} title
-   * @returns {number[]}
+   * @type {Map<string, number[]>}
    * @private
    */
-  private static getCaseIds(title: string): number[] {
-    const [, ids] = title.match(PlaywrightQaseReporter.qaseIdRegExp) ?? [];
-
-    return ids ? ids.split(',').map((id) => Number(id)) : [];
-  }
+  private static qaseIds: Map<string, number[]> = new Map<string, number[]>();
 
   // private static transformSuiteTitle(test: TestCase) {
   //   return test.titlePath().filter(Boolean);
   // }
 
   /**
-   * @param {ArrayItemType<TestResult['attachments']>[]} testAttachments
-   * @returns {string[]}
+   * @type {Map<TestStep, TestCase>}
    * @private
    */
-  private static transformAttachments(
+  private stepCache: Map<TestStep, TestCase> = new Map<TestStep, TestCase>();
+
+  /**
+   * @type {Map<string, TestStep>}
+   * @private
+   */
+  private stepAttachments: Map<TestStep, Attachment[]> = new Map<TestStep, Attachment[]>();
+
+  /**
+   * @param {ArrayItemType<TestResult['attachments']>[]} testAttachments
+   * @returns {TestCaseMetadata}
+   * @private
+   */
+  private transformAttachments(
     testAttachments: ArrayItemType<TestResult['attachments']>[],
-  ): Attachment[] {
+  ): TestCaseMetadata {
+    const metadata: TestCaseMetadata = {
+      ids: [],
+      title: '',
+      fields: new Map<string, string>(),
+      attachments: [],
+    };
     const attachments: Attachment[] = [];
 
     for (const attachment of testAttachments) {
 
-      attachments.push({
-        content: attachment.body,
-        file_name: attachment.name,
-        file_path: attachment.path == undefined ? null : attachment.path,
-        mime_type: attachment.contentType,
-        size: 0,
-        id: uuidv4(),
-      });
+      if (attachment.contentType === ReporterContentType) {
+        if (attachment.body == undefined) {
+          continue;
+        }
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const message: MetadataMessage = JSON.parse(attachment.body.toString());
+
+        if (message.title) {
+          metadata.title = message.title;
+        }
+
+        if (message.ids) {
+          metadata.ids = message.ids;
+        }
+
+        if (message.fields) {
+          metadata.fields = message.fields;
+        }
+
+        continue;
+      }
+
+      if (attachment.name.match(stepAttachRegexp)) {
+        const step = [...this.stepCache.keys()].find((step: TestStep) => step.title === attachment.name);
+
+        if (step) {
+          this.stepCache.delete(step);
+        }
+
+        const attachmentModel: Attachment = {
+          content: attachment.body,
+          file_name: attachment.name,
+          file_path: attachment.path == undefined ? null : attachment.path,
+          mime_type: attachment.contentType,
+          size: 0,
+          id: uuidv4(),
+        };
+
+        if (step?.parent) {
+          if (!this.stepAttachments.has(step.parent)) {
+            this.stepAttachments.set(step.parent, [attachmentModel]);
+            continue;
+          }
+
+          const stepAttachs = this.stepAttachments.get(step.parent);
+          if (stepAttachs) {
+            stepAttachs.push(attachmentModel);
+            this.stepAttachments.set(step.parent, stepAttachs);
+          }
+          continue;
+        }
+
+        attachments.push(attachmentModel);
+      }
     }
-    return attachments;
+    metadata.attachments = attachments;
+
+    return metadata;
   }
 
   /**
@@ -97,10 +163,17 @@ export class PlaywrightQaseReporter implements Reporter {
    * @returns {TestStepType[]}
    * @private
    */
-  private static transformSteps(testSteps: TestStep[], parentId: string | null): TestStepType[] {
+  private transformSteps(testSteps: TestStep[], parentId: string | null): TestStepType[] {
     const steps: TestStepType[] = [];
 
     for (const testStep of testSteps) {
+      if ((testStep.category !== 'test.step' && testStep.category !== 'hook')
+        || testStep.title.match(stepAttachRegexp)) {
+        continue;
+      }
+
+      const attachments = this.stepAttachments.get(testStep);
+
       const id = uuidv4();
       const step: TestStepType = {
         id: id,
@@ -116,8 +189,8 @@ export class PlaywrightQaseReporter implements Reporter {
           duration: testStep.duration,
           end_time: null,
         },
-        attachments: [],
-        steps: PlaywrightQaseReporter.transformSteps(testStep.steps, id),
+        attachments: attachments ? attachments : [],
+        steps: this.transformSteps(testStep.steps, id),
       };
 
       steps.push(step);
@@ -152,15 +225,29 @@ export class PlaywrightQaseReporter implements Reporter {
 
   /**
    * @param {TestCase} test
+   * @param _result
+   * @param step
+   */
+  onStepBegin(test: TestCase, _result: TestResult, step: TestStep): void {
+    if (step.category !== 'test.step') {
+      return;
+    }
+    if (this.stepCache.get(step)) {
+      return;
+    }
+    this.stepCache.set(step, test);
+  }
+
+  /**
+   * @param {TestCase} test
    * @param {TestResult} result
    */
   public onTestEnd(test: TestCase, result: TestResult) {
+    const testCaseMetadata = this.transformAttachments(result.attachments);
     const error = result.error ? PlaywrightQaseReporter.transformError(result.error) : null;
-    const ids = PlaywrightQaseReporter.getCaseIds(test.title);
-    this.reporter.addTestResult({
-      attachments: PlaywrightQaseReporter.transformAttachments(
-        result.attachments,
-      ),
+
+    const testResult: TestResultType = {
+      attachments: testCaseMetadata.attachments,
       author: null,
       execution: {
         status: PlaywrightQaseReporter.statusMap[result.status],
@@ -170,10 +257,10 @@ export class PlaywrightQaseReporter implements Reporter {
         stacktrace: error
           ? error.stack ? error.stack : null
           : null,
-        thread: null,
+        thread: result.parallelIndex.toString(),
       },
-      fields: new Map(),
-      id: test.id,
+      fields: testCaseMetadata.fields,
+      id: uuidv4(),
       message: error
         ? error.message ? error.message : null
         : null,
@@ -182,17 +269,49 @@ export class PlaywrightQaseReporter implements Reporter {
       relations: [],
       run_id: null,
       signature: '',
-      steps: PlaywrightQaseReporter.transformSteps(result.steps, null),
+      steps: this.transformSteps(result.steps, null),
       // suiteTitle: PlaywrightQaseReporter.transformSuiteTitle(test),
-      testops_id: ids[0] ?? null,
-      title: test.title,
-    });
+      testops_id: null,
+      title: testCaseMetadata.title === '' ? test.title : testCaseMetadata.title,
+    };
+
+    let ids: number[];
+    if (testCaseMetadata.ids.length > 0) {
+      ids = testCaseMetadata.ids;
+    } else {
+      ids = PlaywrightQaseReporter.qaseIds.get(test.title) ?? [];
+    }
+
+    if (ids.length == 0) {
+      this.reporter.addTestResult(testResult);
+      return;
+    }
+
+    // if we have multiple ids, we need to create multiple test results and set duration to 0 for all but the first one
+    let firstCase = true;
+    for (const id of ids) {
+      const testResultCopy = { ...testResult };
+      testResultCopy.testops_id = id;
+      testResultCopy.id = uuidv4();
+
+      if (!firstCase) {
+        testResultCopy.execution.duration = 0;
+      }
+      firstCase = false;
+
+      this.reporter.addTestResult(testResultCopy);
+    }
   }
 
   /**
    * @returns {Promise<void>}
    */
-  public async onEnd() {
+  public async onEnd(): Promise<void> {
     await this.reporter.publish();
+  }
+
+  // add this method for supporting old version of qase
+  public static addIds(ids: number[], title: string): void {
+    this.qaseIds.set(title, ids);
   }
 }
