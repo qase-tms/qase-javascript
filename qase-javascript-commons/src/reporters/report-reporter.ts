@@ -11,18 +11,27 @@ import * as process from 'process';
  * @extends AbstractReporter
  */
 export class ReportReporter extends AbstractReporter {
+  private readonly environment: string | undefined;
+  private readonly runId: number | undefined;
+  private readonly startTime: number = Date.now();
 
   /**
    * @param {ReporterOptionsType} options
    * @param {WriterInterface} writer
    * @param {LoggerInterface} logger
+   * @param {string | undefined} environment
+   * @param {number | undefined} runId
    */
   constructor(
     options: ReporterOptionsType | undefined,
     private writer: WriterInterface,
     logger?: LoggerInterface,
+    environment?: string,
+    runId?: number,
   ) {
     super(options, logger);
+    this.environment = environment;
+    this.runId = runId;
   }
 
   /**
@@ -41,9 +50,9 @@ export class ReportReporter extends AbstractReporter {
     const report: Report = {
       title: 'Test report',
       execution: {
-        start_time: 0,
-        end_time: 0,
-        duration: 0,
+        start_time: this.startTime,
+        end_time: Date.now(),
+        duration: Date.now() - this.startTime,
         cumulative_duration: 0,
       },
       stats: {
@@ -57,7 +66,7 @@ export class ReportReporter extends AbstractReporter {
       results: [],
       threads: [],
       suites: [],
-      environment: '',
+      environment: this.environment ?? '',
       host_data: this.getHostInfo(),
     };
 
@@ -100,7 +109,7 @@ export class ReportReporter extends AbstractReporter {
       }
 
       result.steps = this.copyStepAttachments(result.steps);
-
+      result.run_id = this.runId ?? null;
       await this.writer.writeTestResult(result);
     }
 

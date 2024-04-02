@@ -79,7 +79,7 @@ export class QaseReporter extends AbstractReporter {
     }
 
     if (qaseApiVersion) {
-      client.push(`qaseapi=${String(qaseApiVersion)}`);
+      client.push(`qaseio=${String(qaseApiVersion)}`);
     }
 
     return {
@@ -92,13 +92,13 @@ export class QaseReporter extends AbstractReporter {
    * @type {ReporterInterface}
    * @private
    */
-  private upstreamReporter?: ReporterInterface;
+  private readonly upstreamReporter?: ReporterInterface;
 
   /**
    * @type {ReporterInterface}
    * @private
    */
-  private fallbackReporter?: ReporterInterface;
+  private readonly fallbackReporter?: ReporterInterface;
 
 
   /**
@@ -125,6 +125,7 @@ export class QaseReporter extends AbstractReporter {
 
     try {
       this.upstreamReporter = this.createReporter(
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         composedOptions.mode as ModeEnum || ModeEnum.off,
         composedOptions,
         logger,
@@ -146,6 +147,7 @@ export class QaseReporter extends AbstractReporter {
 
     try {
       this.fallbackReporter = this.createReporter(
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         composedOptions.fallback as ModeEnum || ModeEnum.off,
         composedOptions,
         logger,
@@ -188,7 +190,7 @@ export class QaseReporter extends AbstractReporter {
         }
 
         if (!this.useFallback) {
-          this.fallbackReporter?.setTestResults(this.upstreamReporter?.getTestResults() ?? []);
+          this.fallbackReporter.setTestResults(this.upstreamReporter?.getTestResults() ?? []);
           this.useFallback = true;
         }
 
@@ -230,7 +232,7 @@ export class QaseReporter extends AbstractReporter {
         }
 
         if (!this.useFallback) {
-          this.fallbackReporter?.setTestResults(this.upstreamReporter?.getTestResults() ?? []);
+          this.fallbackReporter.setTestResults(this.upstreamReporter?.getTestResults() ?? []);
           this.useFallback = true;
         }
 
@@ -253,6 +255,7 @@ export class QaseReporter extends AbstractReporter {
 
   /**
    * @todo implement mode registry
+   * @param {ModeEnum} mode
    * @param {OptionsType} options
    * @param {LoggerInterface} logger
    * @returns {ReporterInterface}
@@ -340,7 +343,8 @@ export class QaseReporter extends AbstractReporter {
         const localOptions = report.connections?.[DriverEnum.local];
         const writer = new FsWriter(localOptions);
 
-        return new ReportReporter(commonOptions, writer, logger);
+        return new ReportReporter(commonOptions, writer, logger,
+          typeof environment === 'number' ? environment.toString() : environment, testops.run?.id);
       }
 
       case ModeEnum.off:
