@@ -179,6 +179,7 @@ export class TestcafeQaseReporter {
     meta: Record<string, string>,
   ) => {
     const error = TestcafeQaseReporter.transformErrors(testRunInfo.errs);
+    const ids = TestcafeQaseReporter.getCaseId(meta);
     this.reporter.addTestResult({
       author: null,
       execution: {
@@ -198,7 +199,7 @@ export class TestcafeQaseReporter {
       signature: '',
       steps: [],
       id: uuidv4(),
-      testops_id: TestcafeQaseReporter.getCaseId(meta)[0] ?? null,
+      testops_id: ids.length > 0 ? ids : null,
       title: title,
       // suiteTitle: testRunInfo.fixture.name,
       attachments: TestcafeQaseReporter.transformAttachments(
