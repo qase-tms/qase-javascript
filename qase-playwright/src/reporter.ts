@@ -275,32 +275,13 @@ export class PlaywrightQaseReporter implements Reporter {
       title: testCaseMetadata.title === '' ? test.title : testCaseMetadata.title,
     };
 
-    let ids: number[];
     if (testCaseMetadata.ids.length > 0) {
-      ids = testCaseMetadata.ids;
+      testResult.testops_id = testCaseMetadata.ids;
     } else {
-      ids = PlaywrightQaseReporter.qaseIds.get(test.title) ?? [];
+      testResult.testops_id = PlaywrightQaseReporter.qaseIds.get(test.title) ?? null;
     }
 
-    if (ids.length == 0) {
-      this.reporter.addTestResult(testResult);
-      return;
-    }
-
-    // if we have multiple ids, we need to create multiple test results and set duration to 0 for all but the first one
-    let firstCase = true;
-    for (const id of ids) {
-      const testResultCopy = { ...testResult };
-      testResultCopy.testops_id = id;
-      testResultCopy.id = uuidv4();
-
-      if (!firstCase) {
-        testResultCopy.execution.duration = 0;
-      }
-      firstCase = false;
-
-      this.reporter.addTestResult(testResultCopy);
-    }
+    this.reporter.addTestResult(testResult);
   }
 
   /**

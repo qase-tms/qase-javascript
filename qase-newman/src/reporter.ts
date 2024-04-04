@@ -124,7 +124,7 @@ export class NewmanQaseReporter {
       (_err: Error | undefined, exec: NewmanRunExecution) => {
         const { item } = exec;
         // const parent = item.parent();
-
+        const ids = NewmanQaseReporter.getCaseIds(item.events);
         this.pendingResultMap.set(item.id, {
           attachments: [],
           author: null,
@@ -144,7 +144,7 @@ export class NewmanQaseReporter {
           run_id: null,
           signature: '',
           steps: [],
-          testops_id: NewmanQaseReporter.getCaseIds(item.events)[0] ?? null,
+          testops_id: ids.length > 0 ? ids : null,
           id: item.id,
           title: item.name,
           // suiteTitle: parent ? NewmanQaseReporter.getParentTitles(parent) : [],

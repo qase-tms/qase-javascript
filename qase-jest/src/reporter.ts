@@ -110,6 +110,7 @@ export class JestQaseReporter implements Reporter {
           error.stack = failureMessages.join('\n\n');
         }
 
+        const ids = JestQaseReporter.getCaseId(title);
         this.reporter.addTestResult({
           attachments: [],
           author: null,
@@ -129,7 +130,7 @@ export class JestQaseReporter implements Reporter {
           run_id: null,
           signature: '',
           steps: [],
-          testops_id: JestQaseReporter.getCaseId(title)[0] ?? null,
+          testops_id: ids.length > 0 ? ids : null,
           id: uuidv4(),
           title: title,
           // suiteTitle: ancestorTitles,

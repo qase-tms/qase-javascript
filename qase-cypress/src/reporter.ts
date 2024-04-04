@@ -183,7 +183,7 @@ export class CypressQaseReporter extends reporters.Base {
         stacktrace: test.err?.stack ?? null,
         thread: null,
       },
-      testops_id: ids[0] ?? null,
+      testops_id: ids.length > 0 ? ids : null,
       title: test.title,
       // suiteTitle: test.parent?.titlePath(),
     };

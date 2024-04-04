@@ -255,7 +255,7 @@ export class CucumberQaseReporter extends Formatter {
           run_id: null,
           signature: '',
           steps: [],
-          testops_id: info.caseIds[0] ?? null,
+          testops_id: info.caseIds.length > 0 ? info.caseIds : null,
           id: tcs.id,
           title: info.name,
           // suiteTitle: info.lastAstNodeId && this.scenarios[info.lastAstNodeId],
