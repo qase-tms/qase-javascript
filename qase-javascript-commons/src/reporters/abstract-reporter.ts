@@ -1,10 +1,9 @@
 import { AxiosError } from 'axios';
 import get from 'lodash.get';
-
 import { TestResultType } from '../models';
-
 import { QaseError } from '../utils/qase-error';
 import { isAxiosError } from '../utils/is-axios-error';
+import { v4 as uuidv4 } from 'uuid';
 
 export interface LoggerInterface {
   log(message: string): void;
@@ -12,9 +11,9 @@ export interface LoggerInterface {
   groupEnd(): void;
 }
 
-export type ReporterOptionsType = {
+export interface ReporterOptionsType {
   debug?: boolean | undefined;
-};
+}
 
 export interface ReporterInterface {
   addTestResult(result: TestResultType): void;
@@ -33,14 +32,9 @@ export abstract class AbstractReporter implements ReporterInterface {
    * @type {boolean | undefined}
    * @private
    */
-  private debug: boolean | undefined;
+  private readonly debug: boolean | undefined;
 
   protected results: TestResultType[] = [];
-
-  /**
-   * @param {TestResultType} result
-   */
-  abstract addTestResult(result: TestResultType): void;
 
   /**
    * @returns {Promise<void>}
@@ -66,6 +60,32 @@ export abstract class AbstractReporter implements ReporterInterface {
    */
   public getTestResults(): TestResultType[] {
     return this.results;
+  }
+
+  /**
+   * @param {TestResultType} result
+   */
+  public addTestResult(result: TestResultType) {
+    if (result.testops_id === null || !Array.isArray(result.testops_id)) {
+      this.results.push(result);
+      return;
+    }
+
+    // if we have multiple ids, we need to create multiple test results and set duration to 0 for all but the first one
+    let firstCase = true;
+
+    for (const id of result.testops_id) {
+      const testResultCopy = { ...result };
+      testResultCopy.testops_id = id;
+      testResultCopy.id = uuidv4();
+
+      if (!firstCase) {
+        testResultCopy.execution.duration = 0;
+      }
+
+      firstCase = false;
+      this.results.push(testResultCopy);
+    }
   }
 
   /**

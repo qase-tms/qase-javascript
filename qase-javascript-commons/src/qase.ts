@@ -170,7 +170,7 @@ export class QaseReporter extends AbstractReporter {
   /**
    * @param {TestResultType} result
    */
-  public addTestResult(result: TestResultType) {
+  public override addTestResult(result: TestResultType) {
     if (!this.disabled) {
       this.logTestItem(result);
 

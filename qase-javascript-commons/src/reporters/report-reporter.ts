@@ -1,5 +1,5 @@
 import { AbstractReporter, LoggerInterface, ReporterOptionsType } from './abstract-reporter';
-import { Report, TestResultType, TestStatusEnum, TestStepType } from '../models';
+import { Report, TestStatusEnum, TestStepType } from '../models';
 import { WriterInterface } from '../writer';
 import { HostData } from '../models/host-data';
 import * as os from 'os';
@@ -32,13 +32,6 @@ export class ReportReporter extends AbstractReporter {
     super(options, logger);
     this.environment = environment;
     this.runId = runId;
-  }
-
-  /**
-   * @param {TestResultType} result
-   */
-  public addTestResult(result: TestResultType) {
-    this.results.push(result);
   }
 
   /**
