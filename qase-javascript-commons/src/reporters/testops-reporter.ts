@@ -129,13 +129,6 @@ export class TestOpsReporter extends AbstractReporter {
   }
 
   /**
-   * @param {TestResultType} result
-   */
-  public addTestResult(result: TestResultType) {
-    this.results.push(result);
-  }
-
-  /**
    * @returns {Promise<void>}
    */
   public async publish(): Promise<void> {
@@ -210,7 +203,7 @@ export class TestOpsReporter extends AbstractReporter {
     return {
       title: result.title,
       execution: this.getExecution(result.execution),
-      testops_id: result.testops_id,
+      testops_id: Array.isArray(result.testops_id) ? null : result.testops_id,
       attachments: attachments,
       steps: steps,
       params: {},

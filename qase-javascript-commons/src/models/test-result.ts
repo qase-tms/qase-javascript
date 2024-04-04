@@ -3,7 +3,6 @@ import { Attachment } from './attachment';
 import { TestExecution } from './test-execution';
 
 
-
 // export type TestResultType = {
 //   id: string;
 //   testOpsId: number[];
@@ -23,7 +22,7 @@ export type TestResultType = {
   title: string
   signature: string
   run_id: number | null
-  testops_id: number | null
+  testops_id: number | number[] | null
   execution: TestExecution
   fields: Map<string, string>
   attachments: Attachment[]
