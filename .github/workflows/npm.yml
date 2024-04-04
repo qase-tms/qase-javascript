@@ -16,7 +16,7 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm install
+    - run: npm ci
     - run: npm run build -ws --if-present
     - run: npm run lint -w ${{ matrix.prefix }}
     - run: npm run test -w ${{ matrix.prefix }}
@@ -37,7 +37,7 @@ jobs:
         node-version: '16'
         registry-url: 'https://registry.npmjs.org'
     - if: contains(github.event.ref, matrix.prefix)
-      run: npm install
+      run: npm ci
     - if: contains(github.event.ref, matrix.prefix)
       run: npm run build -ws --if-present
     - if: contains(github.event.ref, matrix.prefix)
