@@ -1,11 +1,11 @@
-> # Qase TMS Playwright reporter
->
-> Publish results simple and easy.
+# Qase TMS Playwright reporter
 
-## How to integrate
+Publish results simple and easy.
+
+## How to install
 
 ```
-npm install playwright-qase-reporter
+npm install playwright-qase-reporter@beta
 ```
 
 ## Example of usage
@@ -17,23 +17,23 @@ But if necessary, you can independently register the ID of already
 existing test cases from TMS before the executing tests. For example:
 
 ```typescript
-import { qase } from 'playwright-qase-reporter/playwright';
+import { qase } from 'playwright-qase-reporter';
 
 describe('Test suite', () => {
-  test(qase([1, 2], 'Several ids'), () => {
+  test('Simple test', () => {
+    qase.id(1);
+    qase.title('Example of simple test')
     expect(true).toBe(true);
   });
 
-  test(qase(3, 'Correct test'), () => {
+  test('Test with annotated fields', () => {
+    qase.id(2);
+    qase.fields({ 'severity': 'high', 'priority': 'medium' })
     expect(true).toBe(true);
   });
-
-  test.skip(qase('4', 'Skipped test'), () => {
+  
+  test(qase(3, 'This syntax is supported, but deprecated'), () => {
     expect(true).toBe(true);
-  });
-
-  test(qase(['5', '6'], 'Failed test'), () => {
-    expect(true).toBe(false);
   });
 });
 ```
