@@ -1,14 +1,12 @@
-# [Qase TMS](https://qase.io) JavaScript
+# [Qase TestOps](https://qase.io) reporters for JavaScript
 
-This is a monorepo for all JavaScript-related projects
+Monorepo with [Qase TestOps](https://qase.io) reporters for JavaScript testing frameworks.
 
-## Projects
-
-- [qaseio](/qaseio) - JavaScript API
-- [qase-core-reporter](/qase-core-reporter) - Core reporter
 - [qase-cypress](/qase-cypress) - Cypress reporter
 - [qase-cucumberjs](/qase-cucumberjs) - CucumberJS reporter
 - [qase-newman](/qase-newman) - Newman reporter
 - [qase-testcafe](/qase-testcafe) - TestCafe reporter
 - [qase-jest](/qase-jest) - Jest reporter
 - [qase-playwright](/qase-playwright) - Playwright reporter
+- [qaseio](/qaseio) - JavaScript API client
+- [qase-javascript-commons](/qase-javascript-commons) - Common functions library
