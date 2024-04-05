@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { qase } from 'playwright-qase-reporter/playwright';
+import { qase } from 'playwright-qase-reporter';
 
 import { add, mul, sub, div } from './arith';
 
