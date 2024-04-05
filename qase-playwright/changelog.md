@@ -1,3 +1,23 @@
+# playwright-qase-reporter@2.0.0-beta.3
+
+## What's new
+
+*   Change module exports for simpler importing.
+
+    New syntax:
+    
+    ```js
+    import { qase } from 'playwright-qase-reporter';
+    ```
+    
+    instead of:
+    ```js
+    import { qase } from 'playwright-qase-reporter/playwright';
+    ```
+    
+* Update the readme with examples of new imports and annotations.
+
+
 # playwright-qase-reporter@2.0.0-beta.2
 
 ## Overview
