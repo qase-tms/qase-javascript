@@ -6,6 +6,6 @@
   },
   "devDependencies": {
     "newman": "^5.3.2",
-    "newman-reporter-qase": "^2.0.0-beta.1"
+    "newman-reporter-qase": "^2.0.0-beta.2"
   }
 }

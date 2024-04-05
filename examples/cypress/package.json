@@ -8,7 +8,7 @@
     "cypress": "^12.13.0",
     "cypress-mochawesome-reporter": "^3.5.0",
     "cypress-multi-reporters": "^1.6.3",
-    "cypress-qase-reporter": "^2.0.0-beta.1",
+    "cypress-qase-reporter": "^2.0.0-beta.2",
     "eslint-plugin-cypress": "^2.13.3"
   }
 }
