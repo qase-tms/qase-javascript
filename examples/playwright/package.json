@@ -2,10 +2,10 @@
   "name": "examples-playwright",
   "private": true,
   "scripts": {
-    "test": "QASE_MODE=testops npx playwright test"
+    "test": "rm -r ./build/qase-report/results && QASE_MODE=testops npx playwright test"
   },
   "devDependencies": {
     "@playwright/test": "^1.34.3",
-    "playwright-qase-reporter": "^2.0.0-beta.2"
+    "playwright-qase-reporter": "^2.0.0-beta.3"
   }
 }
