@@ -179,13 +179,15 @@ export const AttachmentsApiAxiosParamCreator = function (configuration?: Configu
             // authentication TokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Token", configuration)
 
-            if (file) {
-                file.forEach((element) => {
-                    localVarFormParams.append('file', element as any);
-                })
-            }
-
-
+      if (file) {
+        file.forEach((element) => {
+          if (element?.name !== undefined && element?.value !== undefined) {
+            localVarFormParams.append('file', element.value, element.name);
+          } else {
+            localVarFormParams.append('file', element as any);
+          }
+        });
+      }
 
             localVarHeaderParameter['Content-Type'] = 'multipart/form-data; boundary=' + localVarFormParams.getBoundary();
 
