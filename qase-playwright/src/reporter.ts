@@ -112,7 +112,8 @@ export class PlaywrightQaseReporter implements Reporter {
         continue;
       }
 
-      if (attachment.name.match(stepAttachRegexp)) {
+      const matches = attachment.name.match(stepAttachRegexp);
+      if (matches) {
         const step = [...this.stepCache.keys()].find((step: TestStep) => step.title === attachment.name);
 
         if (step) {
@@ -120,8 +121,8 @@ export class PlaywrightQaseReporter implements Reporter {
         }
 
         const attachmentModel: Attachment = {
-          content: attachment.body,
-          file_name: attachment.name,
+          content: attachment.body == undefined ? '' : attachment.body,
+          file_name: decodeURIComponent(attachment.name.substring(matches[0].length)),
           file_path: attachment.path == undefined ? null : attachment.path,
           mime_type: attachment.contentType,
           size: 0,
