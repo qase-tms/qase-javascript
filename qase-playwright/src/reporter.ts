@@ -21,7 +21,8 @@ const stepAttachRegexp = /^step_attach_(\w{8}-\w{4}-\w{4}-\w{4}-\w{12})_/i;
 interface TestCaseMetadata {
   ids: number[];
   title: string;
-  fields: Map<string, string>;
+  fields: Record<string, string>;
+  parameters: Record<string, string>;
   attachments: Attachment[];
 }
 
@@ -76,7 +77,8 @@ export class PlaywrightQaseReporter implements Reporter {
     const metadata: TestCaseMetadata = {
       ids: [],
       title: '',
-      fields: new Map<string, string>(),
+      fields: {},
+      parameters: {},
       attachments: [],
     };
     const attachments: Attachment[] = [];
@@ -101,6 +103,10 @@ export class PlaywrightQaseReporter implements Reporter {
 
         if (message.fields) {
           metadata.fields = message.fields;
+        }
+
+        if (message.parameters) {
+          metadata.parameters = message.parameters;
         }
 
         continue;
@@ -265,7 +271,7 @@ export class PlaywrightQaseReporter implements Reporter {
         ? error.message ? error.message : null
         : null,
       muted: false,
-      params: new Map(),
+      params: testCaseMetadata.parameters,
       relations: [],
       run_id: null,
       signature: '',

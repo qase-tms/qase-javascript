@@ -9,7 +9,8 @@ const defaultContentType = 'application/octet-stream';
 export interface MetadataMessage {
   ids?: number[];
   title?: string;
-  fields?: Map<string, string>;
+  fields?: Record<string, string>;
+  parameters?: Record<string, string>;
 }
 
 /**
@@ -88,16 +89,33 @@ qase.title = function(value: string) {
 
 /**
  * Set fields for the test case
- * @param {Map<string, string>[]} value
+ * @param {Record<string, string>[]} value
  * @example
  * test('test', async ({ page }) => {
  *    qase.fields({ 'severity': 'high', 'priority': 'medium' });
  *    await page.goto('https://example.com');
  * });
  */
-qase.fields = function(value: Map<string, string>) {
+qase.fields = function(value: Record<string, string>) {
   addMetadata({
     fields: value,
+  });
+};
+
+/**
+ * Set parameters for the test case
+ * @param {Record<string, string>[]} value
+ * @example
+ * for (const value of values) {
+ *    test('test', async ({ page }) => {
+ *      qase.parameters({ 'parameter': value });
+ *      await page.goto('https://example.com');
+ *    });
+ * )
+ */
+qase.parameters = function(value: Record<string, string>) {
+  addMetadata({
+    parameters: value,
   });
 };
 
