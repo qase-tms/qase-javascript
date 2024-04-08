@@ -1,3 +1,10 @@
+# qase-javascript-commons@2.0.0-beta.3
+
+## What's new
+
+* Changed data type of `fields` and `parameters` in the test result data
+  from `Map<string, string>` to `Record<string, string>`.
+
 # qase-javascript-commons@2.0.0-beta.2
 
 ## Overview
