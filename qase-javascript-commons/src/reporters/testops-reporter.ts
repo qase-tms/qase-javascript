@@ -206,7 +206,7 @@ export class TestOpsReporter extends AbstractReporter {
       testops_id: Array.isArray(result.testops_id) ? null : result.testops_id,
       attachments: attachments,
       steps: steps,
-      params: {},
+      params: result.params,
       relations: {
         // suite: {
         //   data: result.suiteTitle ? this.getSuites(result.suiteTitle) : [],

@@ -24,10 +24,10 @@ export type TestResultType = {
   run_id: number | null
   testops_id: number | number[] | null
   execution: TestExecution
-  fields: Map<string, string>
+  fields: Record<string, string>
   attachments: Attachment[]
   steps: TestStepType[]
-  params: Map<string, string>
+  params: Record<string, string>
   author: string | null
   relations: any[]
   muted: boolean
