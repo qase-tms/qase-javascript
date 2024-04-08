@@ -329,9 +329,13 @@ export class TestOpsReporter extends AbstractReporter {
       try {
         let data: unknown;
         if (attachment.file_path) {
-          data = createReadStream(attachment.file_path);
+          data = { name: attachment.file_name, value: createReadStream(attachment.file_path) };
         } else {
-          data = attachment.content;
+          if (typeof attachment.content === 'string') {
+            data = { name: attachment.file_name, value: Buffer.from(attachment.content) };
+          } else {
+            data = { name: attachment.file_name, value: attachment.content };
+          }
         }
 
         const response = await this.api.attachments.uploadAttachment(
