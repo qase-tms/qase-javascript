@@ -164,10 +164,10 @@ export class CypressQaseReporter extends reporters.Base {
     const result: TestResultType = {
       attachments: attachments ?? [],
       author: null,
-      fields: new Map<string, string>(),
+      fields: {},
       message: test.err?.message ?? null,
       muted: false,
-      params: new Map<string, string>(),
+      params: {},
       relations: [],
       run_id: null,
       signature: '',
