@@ -1,3 +1,21 @@
+# playwright-qase-reporter@2.0.0-beta.4
+
+## What's new
+
+Annotate parameterized tests to see the complete data in the Qase.io test report:
+
+```js
+const people = ['Alice', 'Bob'];
+for (const name of people) {
+    test(`testing with ${name}`, async () => {
+        qase.id(1)
+        qase.parameters({ 'name': name });
+        // ...
+    });
+}
+
+```
+
 # playwright-qase-reporter@2.0.0-beta.3
 
 ## What's new
