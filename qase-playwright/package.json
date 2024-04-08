@@ -1,6 +1,6 @@
 {
   "name": "playwright-qase-reporter",
-  "version": "2.0.0-beta.4",
+  "version": "2.0.0-beta.5",
   "description": "Qase TMS Playwright Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -43,7 +43,7 @@
   "author": "Aleksei Galagan <alexneo2003@gmail.com> (https://github.com/alexneo2003/)",
   "license": "Apache-2.0",
   "dependencies": {
-    "qase-javascript-commons": "^2.0.0-beta.3",
+    "qase-javascript-commons": "^2.0.0-beta.4",
     "uuid": "^9.0.0"
   },
   "peerDependencies": {

@@ -45,7 +45,7 @@
   "dependencies": {
     "lodash.get": "^4.4.2",
     "lodash.has": "^4.5.2",
-    "qase-javascript-commons": "^2.0.0-beta.3",
+    "qase-javascript-commons": "^2.0.0-beta.4",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
