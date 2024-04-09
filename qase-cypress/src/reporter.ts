@@ -76,7 +76,7 @@ export class CypressQaseReporter extends reporters.Base {
           )
         ) {
           attachments.push({
-            content: undefined,
+            content: '',
             id: uuidv4(),
             mime_type: '', size: 0,
             file_name: path.basename(filePath),
