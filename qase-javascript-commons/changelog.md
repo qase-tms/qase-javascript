@@ -1,3 +1,10 @@
+# qase-javascript-commons@2.0.0-beta.4
+
+## What's new
+
+* Added support for uploading attachments from strings and buffers in the testops reporter.
+* Changed data type of `content` in the attachment data from `any` to `string | Buffer`.
+
 # qase-javascript-commons@2.0.0-beta.3
 
 ## What's new

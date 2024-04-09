@@ -1,3 +1,9 @@
+# qaseio@2.1.0-beta.1
+
+## What's new
+
+* Added support for uploading attachments from strings and buffers. 
+
 # qaseio@2.1.0-beta.0
 
 ## Overview

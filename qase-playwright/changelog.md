@@ -1,3 +1,9 @@
+# playwright-qase-reporter@2.0.0-beta.5
+
+## What's new
+
+Added support for the version of qase-javascript-commons@2.0.0-beta.4.
+
 # playwright-qase-reporter@2.0.0-beta.4
 
 ## What's new
