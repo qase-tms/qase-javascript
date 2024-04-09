@@ -1,8 +1,38 @@
+# playwright-qase-reporter@2.0.0-beta.6
+
+## What's new
+
+Capture `stdout` and `stderr` logs as attachments.
+To enable this feature, set environment variable `QASE_CAPTURE_LOGS=true` or
+add `captureLogs: true` to the reporter configuration:
+
+```diff
+[
+  'playwright-qase-reporter',
+  {
+    mode: 'testops', 
++   captureLogs: true,
+    ...
+  },
+];
+```
+
 # playwright-qase-reporter@2.0.0-beta.5
 
 ## What's new
 
-Added support for the version of qase-javascript-commons@2.0.0-beta.4.
+Upload test attachments to Qase:
+```js
+test('test', async ({ page }) => {
+  // upload files by path
+  qase.attach({ paths: '/path/to/file'});
+  // list multiple files at once
+  qase.attach({ paths: ['/path/to/file', '/path/to/another/file']});
+  // upload contents directly from your code
+  qase.attach({ name: 'attachment.txt', content: 'Hello, world!', contentType: 'text/plain' });
+  await page.goto('https://example.com');
+});
+```
 
 # playwright-qase-reporter@2.0.0-beta.4
 

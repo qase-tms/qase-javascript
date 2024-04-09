@@ -17,6 +17,7 @@ import { MetadataMessage, ReporterContentType } from './playwright';
 type ArrayItemType<T> = T extends (infer R)[] ? R : never;
 
 const stepAttachRegexp = /^step_attach_(\w{8}-\w{4}-\w{4}-\w{4}-\w{12})_/i;
+const logMimeType = 'text/plain';
 
 interface TestCaseMetadata {
   ids: number[];
@@ -50,9 +51,14 @@ export class PlaywrightQaseReporter implements Reporter {
    */
   private static qaseIds: Map<string, number[]> = new Map<string, number[]>();
 
-  // private static transformSuiteTitle(test: TestCase) {
-  //   return test.titlePath().filter(Boolean);
-  // }
+  /**
+   * @param {TestCase} test
+   * @returns {string[]}
+   * @private
+   */
+  private static transformSuiteTitle(test: TestCase): string[] {
+    return test.titlePath().filter(Boolean);
+  }
 
   /**
    * @type {Map<TestStep, TestCase>}
@@ -252,7 +258,7 @@ export class PlaywrightQaseReporter implements Reporter {
   public onTestEnd(test: TestCase, result: TestResult) {
     const testCaseMetadata = this.transformAttachments(result.attachments);
     const error = result.error ? PlaywrightQaseReporter.transformError(result.error) : null;
-
+    const suites = PlaywrightQaseReporter.transformSuiteTitle(test);
     const testResult: TestResultType = {
       attachments: testCaseMetadata.attachments,
       author: null,
@@ -275,12 +281,22 @@ export class PlaywrightQaseReporter implements Reporter {
       params: testCaseMetadata.parameters,
       relations: [],
       run_id: null,
-      signature: '',
+      signature: suites.join(':'),
       steps: this.transformSteps(result.steps, null),
       // suiteTitle: PlaywrightQaseReporter.transformSuiteTitle(test),
       testops_id: null,
       title: testCaseMetadata.title === '' ? test.title : testCaseMetadata.title,
     };
+
+    if (this.reporter.isCaptureLogs()) {
+      if (result.stdout.length > 0) {
+        testResult.attachments.push(this.convertLogsToAttachments(result.stdout, 'stdout.log'));
+      }
+
+      if (result.stderr.length > 0) {
+        testResult.attachments.push(this.convertLogsToAttachments(result.stderr, 'stderr.log'));
+      }
+    }
 
     if (testCaseMetadata.ids.length > 0) {
       testResult.testops_id = testCaseMetadata.ids;
@@ -301,5 +317,24 @@ export class PlaywrightQaseReporter implements Reporter {
   // add this method for supporting old version of qase
   public static addIds(ids: number[], title: string): void {
     this.qaseIds.set(title, ids);
+  }
+
+  /**
+   * @param {(string | Buffer)[]} logs
+   * @param {string} name
+   * @returns {Attachment}
+   * @private
+   */
+  private convertLogsToAttachments(logs: (string | Buffer)[], name: string): Attachment {
+    let content = '';
+    for (const line of logs) {
+      content = content + line.toString();
+    }
+
+    return {
+      file_name: name,
+      mime_type: logMimeType,
+      content: content,
+    } as Attachment;
   }
 }
