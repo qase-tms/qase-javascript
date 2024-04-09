@@ -2,6 +2,7 @@ import test from '@playwright/test';
 import { v4 as uuidv4 } from 'uuid';
 import { PlaywrightQaseReporter } from './reporter';
 import * as path from 'path';
+import { getMimeTypes } from 'qase-javascript-commons';
 
 export const ReporterContentType = 'application/qase.metadata+json';
 const defaultContentType = 'application/octet-stream';
@@ -141,7 +142,7 @@ qase.attach = function(attach: {
 
     for (const file of files) {
       const attachmentName = path.basename(file);
-      const contentType = getContentType(path.extname(file));
+      const contentType: string = getMimeTypes(file);
       addAttachment(attachmentName, contentType, file);
     }
 
@@ -159,28 +160,6 @@ const addMetadata = (metadata: MetadataMessage): void => {
     body: Buffer.from(JSON.stringify(metadata), 'utf8'),
   }).catch(() => {/**/
   });
-};
-
-const getContentType = (extension: string): string => {
-  const types: Record<string, string> = {
-    '.html': 'text/html',
-    '.css': 'text/css',
-    '.js': 'application/javascript',
-    '.json': 'application/json',
-    '.png': 'image/png',
-    '.jpg': 'image/jpeg',
-    '.gif': 'image/gif',
-    '.svg': 'image/svg+xml',
-    '.wav': 'audio/wav',
-    '.mp4': 'video/mp4',
-    '.woff': 'application/font-woff',
-    '.ttf': 'application/font-ttf',
-    '.eot': 'application/vnd.ms-fontobject',
-    '.otf': 'application/font-otf',
-    '.wasm': 'application/wasm',
-  };
-
-  return types[extension] ?? defaultContentType;
 };
 
 const addAttachment = (name: string, contentType: string, filePath?: string, body?: string | Buffer): void => {
