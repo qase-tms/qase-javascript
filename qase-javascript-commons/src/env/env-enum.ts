@@ -6,6 +6,7 @@ export enum EnvEnum {
   fallback = 'QASE_FALLBACK',
   debug = 'QASE_DEBUG',
   environment = 'QASE_ENVIRONMENT',
+  captureLogs = 'QASE_CAPTURE_LOGS',
 }
 
 /**

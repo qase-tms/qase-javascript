@@ -1,3 +1,10 @@
+# qase-javascript-commons@2.0.0-beta.5
+
+## What's new
+
+* Update the config of reporters. Added `framework.captureLogs` field. If it is set to `true`, the reporter will capture logs from the test framework.
+* Added `getMimeType` function to the commons package. It returns the MIME type of the file by its extension.
+
 # qase-javascript-commons@2.0.0-beta.4
 
 ## What's new

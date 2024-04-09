@@ -28,6 +28,7 @@ export type OptionsType = {
   reporterName: string;
   mode?: `${ModeEnum}` | undefined;
   fallback?: `${ModeEnum}` | undefined;
+  captureLogs?: boolean | undefined;
   debug?: boolean | undefined;
   environment?: string | number | undefined;
   testops?:

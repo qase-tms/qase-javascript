@@ -19,6 +19,7 @@ export const envToConfig = (env: EnvType): ConfigType => ({
   mode: env[EnvEnum.mode],
   debug: env[EnvEnum.debug],
   environment: env[EnvEnum.environment],
+  captureLogs: env[EnvEnum.captureLogs],
 
   testops: {
     project: env[EnvTestOpsEnum.project],
