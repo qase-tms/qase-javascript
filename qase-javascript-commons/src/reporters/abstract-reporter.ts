@@ -7,19 +7,27 @@ import { v4 as uuidv4 } from 'uuid';
 
 export interface LoggerInterface {
   log(message: string): void;
+
   group(): void;
+
   groupEnd(): void;
 }
 
 export interface ReporterOptionsType {
   debug?: boolean | undefined;
+  captureLogs?: boolean | undefined;
 }
 
 export interface ReporterInterface {
   addTestResult(result: TestResultType): void;
+
   publish(): Promise<void>;
+
   getTestResults(): TestResultType[];
+
   setTestResults(results: TestResultType[]): void;
+
+  isCaptureLogs(): boolean;
 }
 
 /**
@@ -34,6 +42,16 @@ export abstract class AbstractReporter implements ReporterInterface {
    */
   private readonly debug: boolean | undefined;
 
+  /**
+   * @type {boolean | undefined}
+   * @private
+   */
+  private readonly captureLogs: boolean | undefined;
+
+  /**
+   * @type {TestResultType[]}
+   * @protected
+   */
   protected results: TestResultType[] = [];
 
   /**
@@ -50,9 +68,10 @@ export abstract class AbstractReporter implements ReporterInterface {
     options: ReporterOptionsType | undefined,
     private logger: LoggerInterface = console,
   ) {
-    const { debug } = options ?? {};
+    const { debug, captureLogs } = options ?? {};
 
     this.debug = debug;
+    this.captureLogs = captureLogs;
   }
 
   /**
@@ -60,6 +79,13 @@ export abstract class AbstractReporter implements ReporterInterface {
    */
   public getTestResults(): TestResultType[] {
     return this.results;
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  public isCaptureLogs(): boolean {
+    return this.captureLogs ?? false;
   }
 
   /**

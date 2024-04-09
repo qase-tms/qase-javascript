@@ -121,7 +121,7 @@ export class QaseReporter extends AbstractReporter {
     const env = envToConfig(envSchema({ schema: envValidationSchema }));
     const composedOptions = composeOptions(options, env);
 
-    super({ debug: composedOptions.debug }, logger);
+    super({ debug: composedOptions.debug, captureLogs: composedOptions.captureLogs }, logger);
 
     try {
       this.upstreamReporter = this.createReporter(
@@ -331,7 +331,8 @@ export class QaseReporter extends AbstractReporter {
             },
             plan,
             chunk,
-            ...commonOptions,
+            debug: commonOptions.debug,
+            captureLogs: commonOptions.captureLogs,
           },
           apiClient,
           logger,
@@ -343,7 +344,10 @@ export class QaseReporter extends AbstractReporter {
         const localOptions = report.connections?.[DriverEnum.local];
         const writer = new FsWriter(localOptions);
 
-        return new ReportReporter(commonOptions, writer, logger,
+        return new ReportReporter({
+            debug: commonOptions.debug,
+            captureLogs: commonOptions.captureLogs,
+          }, writer, logger,
           typeof environment === 'number' ? environment.toString() : environment, testops.run?.id);
       }
 

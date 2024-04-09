@@ -15,6 +15,7 @@ export type EnvType = {
   [EnvEnum.fallback]?: `${ModeEnum}`;
   [EnvEnum.debug]?: boolean;
   [EnvEnum.environment]?: string | number;
+  [EnvEnum.captureLogs]?: boolean;
 
   [EnvTestOpsEnum.project]?: string;
   [EnvTestOpsEnum.uploadAttachments]?: boolean;
