@@ -135,7 +135,7 @@ export class TestcafeQaseReporter {
         file_name: screenshot.screenshotPath,
         file_path: screenshot.screenshotPath,
         mime_type: '',
-        content: undefined,
+        content: '',
         size: 0,
         id: uuidv4(),
       });
