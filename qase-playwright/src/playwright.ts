@@ -29,8 +29,6 @@ export const qase = (
   caseId: number | string | number[] | string[],
   name: string,
 ): string => {
-  console.log(`qase: qase(${caseId as string}) is deprecated. Use qase.id() and qase.title() inside the test body`);
-
   const caseIds = Array.isArray(caseId) ? caseId : [caseId];
   const ids: number[] = [];
 

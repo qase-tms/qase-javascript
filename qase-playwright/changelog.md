@@ -1,3 +1,19 @@
+# playwright-qase-reporter@2.0.0-beta.7
+
+## What's new
+
+Previously, we logged a message about the use of an outdated annotation immediately when running the test. 
+Now we will log the message after all tests are completed. Like this:
+
+```log
+qase: qase(caseId) is deprecated. Use qase.id() and qase.title() inside the test body
+The following tests are using the old annotation:
+at /Users/gda/Documents/github/qase-javascript/examples/playwright/test/arith.test.js:12:8
+at /Users/gda/Documents/github/qase-javascript/examples/playwright/test/arith.test.js:16:7
+at /Users/gda/Documents/github/qase-javascript/examples/playwright/test/arith.test.js:7:7
+
+```
+
 # playwright-qase-reporter@2.0.0-beta.6
 
 ## What's new
