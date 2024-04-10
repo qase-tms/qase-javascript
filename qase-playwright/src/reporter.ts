@@ -1,5 +1,6 @@
 import { Reporter, TestCase, TestError, TestResult, TestStatus, TestStep } from '@playwright/test/reporter';
 import { v4 as uuidv4 } from 'uuid';
+import chalk from 'chalk';
 
 import {
   composeOptions,
@@ -50,6 +51,12 @@ export class PlaywrightQaseReporter implements Reporter {
    * @private
    */
   private static qaseIds: Map<string, number[]> = new Map<string, number[]>();
+
+  /**
+   * @type {Map<string, number[]>}
+   * @private
+   */
+  private qaseTestWithOldAnnotation: Map<string, number[]> = new Map<string, number[]>();
 
   /**
    * @param {TestCase} test
@@ -301,7 +308,12 @@ export class PlaywrightQaseReporter implements Reporter {
     if (testCaseMetadata.ids.length > 0) {
       testResult.testops_id = testCaseMetadata.ids;
     } else {
-      testResult.testops_id = PlaywrightQaseReporter.qaseIds.get(test.title) ?? null;
+      const ids = PlaywrightQaseReporter.qaseIds.get(test.title) ?? null;
+      testResult.testops_id = ids;
+      if (ids) {
+        const path = `${test.location.file}:${test.location.line}:${test.location.column}`;
+        this.qaseTestWithOldAnnotation.set(path, ids);
+      }
     }
 
     this.reporter.addTestResult(testResult);
@@ -312,6 +324,14 @@ export class PlaywrightQaseReporter implements Reporter {
    */
   public async onEnd(): Promise<void> {
     await this.reporter.publish();
+
+    if (this.qaseTestWithOldAnnotation.size > 0) {
+      console.log(chalk`{yellow qase: qase(caseId) is deprecated. Use qase.id() and qase.title() inside the test body}`);
+      console.log(chalk`{yellow The following tests are using the old annotation:}`);
+      for (const [key] of this.qaseTestWithOldAnnotation) {
+        console.log(`at ${key}`);
+      }
+    }
   }
 
   // add this method for supporting old version of qase
