@@ -21,6 +21,7 @@ export type EnvType = {
   [EnvTestOpsEnum.uploadAttachments]?: boolean;
   [EnvTestOpsEnum.chunk]?: number;
   [EnvTestOpsEnum.defect]?: boolean;
+  [EnvTestOpsEnum.useV2]?: boolean;
 
   [EnvApiEnum.token]?: string;
   [EnvApiEnum.baseUrl]?: string;

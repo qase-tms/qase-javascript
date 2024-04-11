@@ -47,6 +47,7 @@ export type TestOpsOptionsType = {
   plan: TestOpsPlanType;
   chunk?: number | undefined;
   defect?: boolean | undefined;
+  useV2?: boolean | undefined;
 };
 
 /**
@@ -107,6 +108,12 @@ export class TestOpsReporter extends AbstractReporter {
   private readonly chunk: number;
 
   /**
+   * @type {boolean | undefined}
+   * @private
+   */
+  private readonly useV2: boolean;
+
+  /**
    * @param {ReporterOptionsType & TestOpsOptionsType} options
    * @param {QaseApiInterface} api
    * @param {LoggerInterface} logger
@@ -136,6 +143,7 @@ export class TestOpsReporter extends AbstractReporter {
     this.run = { complete: true, ...run };
     this.environment = environment;
     this.chunk = options.chunk ?? defaultChunkSize;
+    this.useV2 = options.useV2 ?? false;
   }
 
   /**
@@ -168,6 +176,10 @@ export class TestOpsReporter extends AbstractReporter {
       );
 
       return;
+    }
+
+    if (this.useV2){
+      //
     }
 
     const results: ResultCreateV2[] = [];

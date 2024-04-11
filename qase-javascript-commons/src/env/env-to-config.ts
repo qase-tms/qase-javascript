@@ -43,6 +43,7 @@ export const envToConfig = (env: EnvType): ConfigType => ({
 
     chunk: env[EnvTestOpsEnum.chunk],
     defect: env[EnvTestOpsEnum.defect],
+    useV2: env[EnvTestOpsEnum.useV2],
   },
 
   report: {
