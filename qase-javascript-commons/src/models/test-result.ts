@@ -14,8 +14,20 @@ export type TestResultType = {
   steps: TestStepType[]
   params: Record<string, string>
   author: string | null
-  relations: any[]
+  relations: Relation | null
   muted: boolean
   message: string | null
 }
 
+export type Relation = {
+  suite?: Suite
+}
+
+export type Suite = {
+  data: SuiteData[]
+}
+
+export type SuiteData = {
+  title: string
+  public_id: number | null
+}

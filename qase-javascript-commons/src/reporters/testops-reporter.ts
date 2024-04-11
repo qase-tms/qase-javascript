@@ -6,6 +6,7 @@ import {
   QaseApiInterface,
   ResultCreateV2,
   ResultExecution,
+  ResultRelations,
   ResultStep,
   ResultStepStatus,
   RunCreate,
@@ -13,7 +14,16 @@ import {
 
 import { AbstractReporter, LoggerInterface, ReporterOptionsType } from './abstract-reporter';
 
-import { StepStatusEnum, TestResultType, TestStatusEnum, TestStepType, Attachment, TestExecution } from '../models';
+import {
+  StepStatusEnum,
+  TestResultType,
+  TestStatusEnum,
+  TestStepType,
+  Attachment,
+  TestExecution,
+  Relation,
+  SuiteData,
+} from '../models';
 
 import { QaseError } from '../utils/qase-error';
 
@@ -207,11 +217,7 @@ export class TestOpsReporter extends AbstractReporter {
       attachments: attachments,
       steps: steps,
       params: result.params,
-      relations: {
-        // suite: {
-        //   data: result.suiteTitle ? this.getSuites(result.suiteTitle) : [],
-        // },
-      },
+      relations: this.getRelation(result.relations),
       message: result.message,
     };
   }
@@ -229,6 +235,31 @@ export class TestOpsReporter extends AbstractReporter {
       duration: exec.duration,
       stacktrace: exec.stacktrace,
       thread: exec.thread,
+    };
+  }
+
+  /**
+   * @param {Relation | null} relation
+   * @returns {ResultRelations}
+   * @private
+   */
+  private getRelation(relation: Relation | null): ResultRelations {
+    if (!relation || !relation.suite) {
+      return {};
+    }
+
+    const suiteData: SuiteData[] = [];
+    for (const data of relation.suite.data) {
+      suiteData.push({
+        public_id: null,
+        title: data.title,
+      });
+    }
+
+    return {
+      suite: {
+        data: suiteData,
+      },
     };
   }
 

@@ -1,3 +1,18 @@
+# qase-javascript-commons@2.0.0-beta.6
+
+## What's new
+### Support adding test suite description to a test report.
+
+Test reporters can now test suite description to test results.
+Such description can be collected from test's location and attributes
+or explicitly declared in the test.
+
+Add new data models:
+- Relation
+- Suite
+- SuiteData
+
+
 # qase-javascript-commons@2.0.0-beta.5
 
 ## What's new
