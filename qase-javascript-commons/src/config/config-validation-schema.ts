@@ -132,6 +132,11 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
           type: 'boolean',
           nullable: true,
         },
+
+        useV2: {
+          type: 'boolean',
+          nullable: true,
+        },
       },
     },
 

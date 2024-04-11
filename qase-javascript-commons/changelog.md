@@ -1,6 +1,30 @@
 # qase-javascript-commons@2.0.0-beta.6
 
 ## What's new
+
+### Select the API version to use for reporting
+
+Qase TestOps API has two endpoints for reporting test results:
+
+- Version 1, stable and used my most test reporters.
+  https://developers.qase.io/reference/create-result-bulk
+- Version 2, currently in beta access, and currently supported only
+  in the `playwright-qase-reporter`.
+  https://developers.qase.io/v2.0/reference/create-results-v2
+
+This commit introduces a way to select the API version to use.
+It enables using all new features of v2 JS reporters with the stable v1 API,
+and elso experimenting with the new v2 API.
+
+**Warning**: v2 API is still in beta. 
+If you want to try the v2 JS reporters, you don't have to enable the new API.
+
+To enable using API v2, set an environment variable before running the tests:
+
+```bash
+QASE_TESTOPS_API_V2=true
+```
+
 ### Support adding test suite description to a test report.
 
 Test reporters can now test suite description to test results.

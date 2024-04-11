@@ -17,6 +17,7 @@ export enum EnvTestOpsEnum {
   uploadAttachments = 'QASE_TESTOPS_UPLOAD_ATTACHMENTS',
   chunk = 'QASE_TESTOPS_CHUNK',
   defect = 'QASE_TESTOPS_DEFECT',
+  useV2 = 'QASE_TESTOPS_API_V2',
 }
 
 /**
