@@ -1,8 +1,25 @@
+# playwright-qase-reporter@2.0.0-beta.9
+
+## What's new
+
+### Collect test suite information
+
+Collect the following information as the test's suite:
+
+- path to the file which contains the test;
+- value of the `test.describe()` declaration, if it exists.
+
+The resulting test suite will be added to the test metadata.
+If Qase workspace is configured to update test cases from reported
+tests results, the newly created cases will be structured by their
+suites, derived from file path and `test.describe()`.
+
+
 # playwright-qase-reporter@2.0.0-beta.8
 
 ## What's new
 
-Fix problem with dependencies.
+Fix the problem with dependencies, introduced in `2.0.0-beta.7`
 
 
 # playwright-qase-reporter@2.0.0-beta.7
