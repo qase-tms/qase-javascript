@@ -1,3 +1,10 @@
+# playwright-qase-reporter@2.0.0-beta.8
+
+## What's new
+
+Fix problem with dependencies.
+
+
 # playwright-qase-reporter@2.0.0-beta.7
 
 ## What's new
