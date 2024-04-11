@@ -126,7 +126,7 @@ export class JestQaseReporter implements Reporter {
           message: error?.message ?? null,
           muted: false,
           params: {},
-          relations: [],
+          relations: {},
           run_id: null,
           signature: '',
           steps: [],
