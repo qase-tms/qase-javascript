@@ -286,11 +286,21 @@ export class PlaywrightQaseReporter implements Reporter {
         : null,
       muted: false,
       params: testCaseMetadata.parameters,
-      relations: [],
+      relations: {
+        suite: {
+          data: suites.filter((suite) => {
+            return suite != test.title;
+          }).map((suite) => {
+            return {
+              title: suite,
+              public_id: null,
+            };
+          }),
+        },
+      },
       run_id: null,
       signature: suites.join(':'),
       steps: this.transformSteps(result.steps, null),
-      // suiteTitle: PlaywrightQaseReporter.transformSuiteTitle(test),
       testops_id: null,
       title: testCaseMetadata.title === '' ? test.title : testCaseMetadata.title,
     };
