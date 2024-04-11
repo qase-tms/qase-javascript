@@ -3,13 +3,13 @@ import { createReadStream } from 'fs';
 import chalk from 'chalk';
 import {
   IdResponse,
-  QaseApiInterface,
+  QaseApiInterface, ResultCreate,
   ResultCreateV2,
   ResultExecution,
   ResultRelations,
   ResultStep,
   ResultStepStatus,
-  RunCreate,
+  RunCreate, TestStepResultCreate, TestStepResultCreateStatusEnum,
 } from 'qaseio';
 
 import { AbstractReporter, LoggerInterface, ReporterOptionsType } from './abstract-reporter';
@@ -77,6 +77,15 @@ export class TestOpsReporter extends AbstractReporter {
   };
 
   /**
+   * @type {Record<StepStatusEnum, ResultStepStatus>}
+   */
+  static stepStatusMapV1: Record<StepStatusEnum, TestStepResultCreateStatusEnum> = {
+    [StepStatusEnum.passed]: TestStepResultCreateStatusEnum.PASSED,
+    [StepStatusEnum.failed]: TestStepResultCreateStatusEnum.FAILED,
+    [StepStatusEnum.blocked]: TestStepResultCreateStatusEnum.BLOCKED,
+  };
+
+  /**
    * @type {string}
    * @private
    */
@@ -114,6 +123,12 @@ export class TestOpsReporter extends AbstractReporter {
   private readonly useV2: boolean;
 
   /**
+   * @type {boolean | undefined}
+   * @private
+   */
+  private readonly defect: boolean;
+
+  /**
    * @param {ReporterOptionsType & TestOpsOptionsType} options
    * @param {QaseApiInterface} api
    * @param {LoggerInterface} logger
@@ -144,6 +159,7 @@ export class TestOpsReporter extends AbstractReporter {
     this.environment = environment;
     this.chunk = options.chunk ?? defaultChunkSize;
     this.useV2 = options.useV2 ?? false;
+    this.defect = options.defect ?? false;
   }
 
   /**
@@ -178,21 +194,32 @@ export class TestOpsReporter extends AbstractReporter {
       return;
     }
 
-    if (this.useV2){
-      //
-    }
+    if (this.useV2) {
+      const results: ResultCreateV2[] = [];
 
-    const results: ResultCreateV2[] = [];
+      for (const result of this.results) {
+        const resultCreateV2 = await this.transformTestResult(result);
+        results.push(resultCreateV2);
+      }
 
-    for (const result of this.results) {
-      const resultCreateV2 = await this.transformTestResult(result);
-      results.push(resultCreateV2);
-    }
+      for (let i = 0; i < results.length; i += this.chunk) {
+        await this.api.result.createResultsV2(this.projectCode, runId, {
+          results: results.slice(i, i + this.chunk),
+        });
+      }
+    } else {
+      const results: ResultCreate[] = [];
 
-    for (let i = 0; i < results.length; i += this.chunk) {
-      await this.api.result.createResultsV2(this.projectCode, runId, {
-        results: results.slice(i, i + this.chunk),
-      });
+      for (const result of this.results) {
+        const resultCreate = await this.transformTestResultV1(result);
+        results.push(resultCreate);
+      }
+
+      for (let i = 0; i < results.length; i += this.chunk) {
+        await this.api.results.createResultBulk(this.projectCode, runId, {
+          results: results.slice(i, i + this.chunk),
+        });
+      }
     }
 
     this.log(chalk`{green ${this.results.length} result(s) sent to Qase}`);
@@ -232,6 +259,42 @@ export class TestOpsReporter extends AbstractReporter {
       relations: this.getRelation(result.relations),
       message: result.message,
     };
+  }
+
+  /**
+   * @param {TestResultType} result
+   * @returns Promise<ResultCreate>
+   * @private
+   */
+  private async transformTestResultV1(result: TestResultType): Promise<ResultCreate> {
+    const attachments = await this.uploadAttachments(result.attachments);
+    const steps = await this.transformStepsV1(result.steps);
+
+    const resultCreate: ResultCreate = {
+      attachments: attachments,
+      comment: result.message,
+      defect: this.defect,
+      param: result.params,
+      stacktrace: result.execution.stacktrace,
+      start_time: result.execution.start_time ? result.execution.start_time | 0 : null,
+      status: result.execution.status,
+      steps: steps,
+      time: result.execution.end_time,
+      time_ms: result.execution.duration,
+    };
+
+    const id = Array.isArray(result.testops_id) ? null : result.testops_id;
+    if (id) {
+      resultCreate.case_id = id;
+      return resultCreate;
+    }
+
+    resultCreate.case = {
+      title: result.title,
+      suite_title: result.relations?.suite ? result.relations?.suite?.data.map((suite) => suite.title).join('\t') : null,
+    };
+
+    return resultCreate;
   }
 
   /**
@@ -298,6 +361,33 @@ export class TestOpsReporter extends AbstractReporter {
 
       if (step.steps.length > 0) {
         resultStep.steps = await this.transformSteps(step.steps);
+      }
+
+      resultsSteps.push(resultStep);
+    }
+
+    return resultsSteps;
+  }
+
+  /**
+   * @param {TestStepType[]} steps
+   * @returns Promise<TestStepResultCreate[]>
+   * @private
+   */
+  private async transformStepsV1(steps: TestStepType[]): Promise<TestStepResultCreate[]> {
+    const resultsSteps: TestStepResultCreate[] = [];
+
+    for (const step of steps) {
+      const attachmentHashes: string[] = await this.uploadAttachments(step.attachments);
+
+      const resultStep: TestStepResultCreate = {
+        status: TestOpsReporter.stepStatusMapV1[step.execution.status],
+        action: step.data.action,
+        attachments: attachmentHashes,
+      };
+
+      if (step.steps.length > 0) {
+        resultStep.steps = await this.transformStepsV1(step.steps);
       }
 
       resultsSteps.push(resultStep);
