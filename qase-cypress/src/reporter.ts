@@ -168,7 +168,7 @@ export class CypressQaseReporter extends reporters.Base {
       message: test.err?.message ?? null,
       muted: false,
       params: {},
-      relations: [],
+      relations: {},
       run_id: null,
       signature: '',
       steps: [],

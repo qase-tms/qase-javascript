@@ -194,7 +194,7 @@ export class TestcafeQaseReporter {
       message: error.message,
       muted: false,
       params: {},
-      relations: [],
+      relations: {},
       run_id: null,
       signature: '',
       steps: [],

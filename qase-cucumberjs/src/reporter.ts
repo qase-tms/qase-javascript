@@ -251,7 +251,7 @@ export class CucumberQaseReporter extends Formatter {
           message: null,
           muted: false,
           params: {},
-          relations: [],
+          relations: {},
           run_id: null,
           signature: '',
           steps: [],
