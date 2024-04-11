@@ -1,4 +1,4 @@
-export { type TestResultType } from './test-result';
+export { type TestResultType, Relation, Suite, SuiteData } from './test-result';
 export { TestExecution, TestStatusEnum } from './test-execution';
 export { type TestStepType } from './test-step';
 export { StepStatusEnum } from './step-execution';

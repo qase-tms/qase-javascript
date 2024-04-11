@@ -1,6 +1,6 @@
 {
   "name": "qase-javascript-commons",
-  "version": "2.0.0-beta.5",
+  "version": "2.0.0-beta.6",
   "description": "Qase JS Reporters",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
