@@ -19,9 +19,11 @@ export interface ReporterOptionsType {
 }
 
 export interface ReporterInterface {
-  addTestResult(result: TestResultType): void;
+  addTestResult(result: TestResultType): Promise<void>;
 
   publish(): Promise<void>;
+
+  startTestRun(): Promise<void>;
 
   getTestResults(): TestResultType[];
 
@@ -60,6 +62,11 @@ export abstract class AbstractReporter implements ReporterInterface {
   abstract publish(): Promise<void>;
 
   /**
+   * @returns {Promise<void>}
+   */
+  abstract startTestRun(): Promise<void>;
+
+  /**
    * @param {ReporterOptionsType} options
    * @param {LoggerInterface} logger
    * @protected
@@ -91,7 +98,8 @@ export abstract class AbstractReporter implements ReporterInterface {
   /**
    * @param {TestResultType} result
    */
-  public addTestResult(result: TestResultType) {
+  // eslint-disable-next-line @typescript-eslint/require-await
+  public async addTestResult(result: TestResultType) {
     if (result.testops_id === null || !Array.isArray(result.testops_id)) {
       this.results.push(result);
       return;

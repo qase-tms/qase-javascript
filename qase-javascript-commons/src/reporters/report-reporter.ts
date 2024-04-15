@@ -13,7 +13,7 @@ import * as process from 'process';
 export class ReportReporter extends AbstractReporter {
   private readonly environment: string | undefined;
   private readonly runId: number | undefined;
-  private readonly startTime: number = Date.now();
+  private startTime: number = Date.now();
 
   /**
    * @param {ReporterOptionsType} options
@@ -36,8 +36,15 @@ export class ReportReporter extends AbstractReporter {
 
   /**
    * @returns {Promise<void>}
+   */
+  // eslint-disable-next-line @typescript-eslint/require-await
+  public async startTestRun(): Promise<void> {
+    this.startTime = Date.now();
+  }
+
+  /**
+   * @returns {Promise<void>}
    *
-   * eslint-disable-next-line @typescript-eslint/require-await
    */
   public async publish(): Promise<void> {
     const report: Report = {
