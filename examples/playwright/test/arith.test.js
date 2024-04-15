@@ -18,9 +18,9 @@ test.describe.parallel('Test suite. Level 1', () => {
     expect(mul(3, 4)).toBe(12);
   });
 
-  test('3 * 4 = 12', async () => {
+  test('3 * 5 = 15', async () => {
     await new Promise((r) => setTimeout(r, 2000));
-    expect(mul(3, 4)).toBe(12);
+    expect(mul(3, 5)).toBe(15);
   });
 
   test('5 - 6 = -1', () => {
