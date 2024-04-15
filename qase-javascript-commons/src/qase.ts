@@ -168,19 +168,45 @@ export class QaseReporter extends AbstractReporter {
   }
 
   /**
+   * @returns {Promise<void>}
+   */
+  public override async startTestRun(): Promise<void> {
+    if (!this.disabled) {
+
+      try {
+        await this.upstreamReporter?.startTestRun();
+      } catch (error) {
+        this.logError('Unable to start test run in the upstream reporter: ', error);
+
+        if (this.fallbackReporter == undefined) {
+          this.disabled = true;
+          return;
+        }
+
+        try {
+          await this.fallbackReporter?.startTestRun();
+        } catch (error) {
+          this.logError('Unable to start test run in the fallback reporter: ', error);
+          this.disabled = true;
+        }
+      }
+    }
+  }
+
+  /**
    * @param {TestResultType} result
    */
-  public override addTestResult(result: TestResultType) {
+  public override async addTestResult(result: TestResultType) {
     if (!this.disabled) {
       this.logTestItem(result);
 
       if (this.useFallback) {
-        this.addTestResultToFallback(result);
+        await this.addTestResultToFallback(result);
         return;
       }
 
       try {
-        this.upstreamReporter?.addTestResult(result);
+        await this.upstreamReporter?.addTestResult(result);
       } catch (error) {
         this.logError('Unable to add the result to the upstream reporter:', error);
 
@@ -194,7 +220,7 @@ export class QaseReporter extends AbstractReporter {
           this.useFallback = true;
         }
 
-        this.addTestResultToFallback(result);
+        await this.addTestResultToFallback(result);
       }
     }
   }
@@ -203,9 +229,9 @@ export class QaseReporter extends AbstractReporter {
    * @param {TestResultType} result
    * @private
    */
-  private addTestResultToFallback(result: TestResultType): void {
+  private async addTestResultToFallback(result: TestResultType): Promise<void> {
     try {
-      this.fallbackReporter?.addTestResult(result);
+      await this.fallbackReporter?.addTestResult(result);
     } catch (error) {
       this.logError('Unable to add the result to the fallback reporter:', error);
       this.disabled = true;

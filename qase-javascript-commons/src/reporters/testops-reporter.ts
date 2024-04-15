@@ -129,6 +129,18 @@ export class TestOpsReporter extends AbstractReporter {
   private readonly defect: boolean;
 
   /**
+   * @type {number}
+   * @private
+   */
+  private firstIndex = 0;
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  private isTestRunReady = false;
+
+  /**
    * @param {ReporterOptionsType & TestOpsOptionsType} options
    * @param {QaseApiInterface} api
    * @param {LoggerInterface} logger
@@ -165,61 +177,97 @@ export class TestOpsReporter extends AbstractReporter {
   /**
    * @returns {Promise<void>}
    */
-  public async publish(): Promise<void> {
-    let runId: number;
+  public async startTestRun(): Promise<void> {
+    await this.checkOrCreateTestRun();
+  }
 
-    if (this.run.id !== undefined) {
-      await this.checkRun(this.run.id);
+  /**
+   * @param {TestResultType} result
+   * @returns {Promise<void>}
+   */
+  public override async addTestResult(result: TestResultType): Promise<void> {
+    await super.addTestResult(result);
 
-      runId = this.run.id;
-    } else {
-      const { result } = await this.createRun(
-        this.run.title,
-        this.run.description,
-        this.environment,
-      );
-
-      if (!result?.id) {
-        throw new Error('Cannot create run.');
-      }
-
-      runId = result.id;
-    }
-
-    if (!this.results.length) {
-      this.log(
-        'No test cases were matched. Ensure that your tests are declared correctly.',
-      );
-
+    if (!this.isTestRunReady) {
       return;
     }
 
+    const countOfResults = this.chunk + this.firstIndex;
+
+    if (this.results.length >= countOfResults) {
+      await this.publishResults(this.results.slice(this.firstIndex, countOfResults));
+      this.firstIndex = countOfResults;
+    }
+  }
+
+  /**
+   * @returns {Promise<void>}
+   */
+  private async checkOrCreateTestRun(): Promise<void> {
+    if (this.run.id !== undefined) {
+      await this.checkRun(this.run.id);
+
+      this.isTestRunReady = true;
+      return;
+    }
+
+    const { result } = await this.createRun(
+      this.run.title,
+      this.run.description,
+      this.environment,
+    );
+
+    if (!result?.id) {
+      throw new Error('Cannot create run.');
+    }
+
+    this.run.id = result.id;
+    this.isTestRunReady = true;
+  }
+
+  /**
+   * @returns {Promise<void>}
+   * @param testResults
+   * @private
+   */
+  private async publishResults(testResults: TestResultType[]): Promise<void> {
     if (this.useV2) {
       const results: ResultCreateV2[] = [];
 
-      for (const result of this.results) {
+      for (const result of testResults) {
         const resultCreateV2 = await this.transformTestResult(result);
         results.push(resultCreateV2);
       }
 
-      for (let i = 0; i < results.length; i += this.chunk) {
-        await this.api.result.createResultsV2(this.projectCode, runId, {
-          results: results.slice(i, i + this.chunk),
-        });
-      }
+      await this.api.result.createResultsV2(this.projectCode, this.run.id!, {
+        results: results,
+      });
+
     } else {
       const results: ResultCreate[] = [];
 
-      for (const result of this.results) {
+      for (const result of testResults) {
         const resultCreate = await this.transformTestResultV1(result);
         results.push(resultCreate);
       }
 
-      for (let i = 0; i < results.length; i += this.chunk) {
-        await this.api.results.createResultBulk(this.projectCode, runId, {
-          results: results.slice(i, i + this.chunk),
-        });
-      }
+      await this.api.results.createResultBulk(this.projectCode, this.run.id!, {
+        results: results,
+      });
+    }
+  }
+
+  /**
+   * @returns {Promise<void>}
+   */
+  public async publish(): Promise<void> {
+    if (this.results.length === 0) {
+      this.log(chalk`{yellow No results to send to Qase}`);
+      return;
+    }
+
+    if (this.firstIndex < this.results.length) {
+      await this.publishResults(this.results.slice(this.firstIndex));
     }
 
     this.log(chalk`{green ${this.results.length} result(s) sent to Qase}`);
@@ -229,13 +277,13 @@ export class TestOpsReporter extends AbstractReporter {
     }
 
     try {
-      await this.api.runs.completeRun(this.projectCode, runId);
-      this.log(chalk`{green Run ${runId} completed}`);
+      await this.api.runs.completeRun(this.projectCode, this.run.id!);
+      this.log(chalk`{green Run ${this.run.id!} completed}`);
     } catch (error) {
       throw new QaseError('Error on completing run', { cause: error });
     }
 
-    const runUrl = `${this.baseUrl}/run/${this.projectCode}/dashboard/${runId}`;
+    const runUrl = `${this.baseUrl}/run/${this.projectCode}/dashboard/${this.run.id!}`;
 
     this.log(chalk`{blue Test run link: ${runUrl}}`);
   }

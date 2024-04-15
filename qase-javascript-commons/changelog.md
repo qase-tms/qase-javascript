@@ -1,3 +1,30 @@
+# qase-javascript-commons@2.0.0-beta.7
+
+## What's new
+
+TestOps reporter supports uploading test result in real-time.
+It can be useful for long-running tests, where you want to see the results as soon as they are available.
+You can use chunk size to control the size of the data sent to the Qase.
+
+To enable real-time reporting, set an environment variable before running the tests or use the reporter's configuration:
+
+```bash
+QASE_TESTOPS_CHUNK=10
+```
+
+```diff
+{
+  ...
+  "testops": {
++   "chunk": 10
+    ...
+  },
+  ...
+}
+```
+
+where `10` is the size of the chunk in test result's count.
+
 # qase-javascript-commons@2.0.0-beta.6
 
 ## What's new
