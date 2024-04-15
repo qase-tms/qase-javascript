@@ -39,7 +39,7 @@
   "author": "Parviz Khavari <havaripa@gmail.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "qase-javascript-commons": "^2.0.0-beta.6",
+    "qase-javascript-commons": "^2.0.0-beta.7",
     "semver": "^7.5.1"
   },
   "devDependencies": {

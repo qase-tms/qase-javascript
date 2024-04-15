@@ -5,7 +5,6 @@ import { NewmanRunExecution } from 'newman';
 import {
   EventList,
 } from 'postman-collection';
-
 import {
   ConfigType,
   QaseReporter,
@@ -119,6 +118,10 @@ export class NewmanQaseReporter {
    * @private
    */
   private addRunnerListeners(runner: EventEmitter) {
+    runner.on('start', () => {
+      void this.reporter.startTestRun();
+    });
+
     runner.on(
       'beforeItem',
       (_err: Error | undefined, exec: NewmanRunExecution) => {
@@ -183,7 +186,7 @@ export class NewmanQaseReporter {
           pendingResult.execution.duration = now - timer;
         }
 
-        this.reporter.addTestResult(pendingResult);
+        void this.reporter.addTestResult(pendingResult);
       }
     });
 

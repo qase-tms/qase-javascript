@@ -169,18 +169,25 @@ export class TestcafeQaseReporter {
   }
 
   /**
+   * @returns {Promise<void>}
+   */
+  public startTestRun = async (): Promise<void> => {
+    await this.reporter.startTestRun();
+  };
+
+  /**
    * @param {string} title
    * @param {TestRunInfoType} testRunInfo
    * @param {Record<string, string>} meta
    */
-  public reportTestDone = (
+  public reportTestDone = async (
     title: string,
     testRunInfo: TestRunInfoType,
     meta: Record<string, string>,
   ) => {
     const error = TestcafeQaseReporter.transformErrors(testRunInfo.errs);
     const ids = TestcafeQaseReporter.getCaseId(meta);
-    this.reporter.addTestResult({
+    await this.reporter.addTestResult({
       author: null,
       execution: {
         status: TestcafeQaseReporter.getStatus(testRunInfo),
@@ -211,7 +218,7 @@ export class TestcafeQaseReporter {
   /**
    * @returns {Promise<void>}
    */
-  public reportTaskDone = async () => {
+  public reportTaskDone = async (): Promise<void> => {
     await this.reporter.publish();
   };
 }

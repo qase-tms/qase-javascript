@@ -258,11 +258,15 @@ export class PlaywrightQaseReporter implements Reporter {
     this.stepCache.set(step, test);
   }
 
+  public onBegin(): void {
+    void this.reporter.startTestRun();
+  }
+
   /**
    * @param {TestCase} test
    * @param {TestResult} result
    */
-  public onTestEnd(test: TestCase, result: TestResult) {
+  public async onTestEnd(test: TestCase, result: TestResult) {
     const testCaseMetadata = this.transformAttachments(result.attachments);
     const error = result.error ? PlaywrightQaseReporter.transformError(result.error) : null;
     const suites = PlaywrightQaseReporter.transformSuiteTitle(test);
@@ -326,7 +330,7 @@ export class PlaywrightQaseReporter implements Reporter {
       }
     }
 
-    this.reporter.addTestResult(testResult);
+    await this.reporter.addTestResult(testResult);
   }
 
   /**
