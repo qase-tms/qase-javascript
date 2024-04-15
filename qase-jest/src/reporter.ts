@@ -80,7 +80,8 @@ export class JestQaseReporter implements Reporter {
   /**
    * @see {Reporter.onRunStart}
    */
-  public onRunStart() {/* empty */
+  public onRunStart() {
+    void this.reporter.startTestRun();
   }
 
   /**
@@ -111,7 +112,7 @@ export class JestQaseReporter implements Reporter {
         }
 
         const ids = JestQaseReporter.getCaseId(title);
-        this.reporter.addTestResult({
+        void this.reporter.addTestResult({
           attachments: [],
           author: null,
           execution: {

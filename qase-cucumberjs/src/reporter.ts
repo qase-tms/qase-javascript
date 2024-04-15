@@ -166,6 +166,8 @@ export class CucumberQaseReporter extends Formatter {
           this.attachments[envelope.attachment.testCaseStartedId] =
             envelope.attachment.fileName;
         }
+      } else if (envelope.testRunStarted) {
+        void this.startTestRun();
       } else if (envelope.testRunFinished) {
         void this.publishResults();
       } else if (envelope.testCase) {
@@ -232,7 +234,7 @@ export class CucumberQaseReporter extends Formatter {
           error = new Error(this.testCaseStartedErrors[tcs.id]?.join('\n\n'));
         }
 
-        this.reporter.addTestResult({
+        void this.reporter.addTestResult({
           attachments: [],
           author: null,
           execution: {
@@ -268,7 +270,15 @@ export class CucumberQaseReporter extends Formatter {
    * @returns {Promise<void>}
    * @private
    */
-  private async publishResults() {
+  private async publishResults(): Promise<void> {
     await this.reporter.publish();
+  }
+
+  /**
+   * @returns {Promise<void>}
+   * @private
+   */
+  private async startTestRun(): Promise<void> {
+    await this.reporter.startTestRun();
   }
 }

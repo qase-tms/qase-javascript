@@ -20,6 +20,7 @@ const {
   EVENT_TEST_PASS,
   EVENT_TEST_PENDING,
   EVENT_RUN_END,
+  EVENT_RUN_BEGIN,
 } = Runner.constants;
 
 type CypressState = 'failed' | 'passed' | 'pending';
@@ -140,6 +141,9 @@ export class CypressQaseReporter extends reporters.Base {
     runner.on(EVENT_TEST_FAIL, (test: Test) => this.addTestResult(test));
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    runner.on(EVENT_RUN_BEGIN,  () => this.reporter.startTestRun());
+
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     runner.once(EVENT_RUN_END, async () => {
       this.preventExit();
       await this.reporter.publish();
@@ -188,7 +192,7 @@ export class CypressQaseReporter extends reporters.Base {
       // suiteTitle: test.parent?.titlePath(),
     };
 
-    this.reporter.addTestResult(result);
+    void this.reporter.addTestResult(result);
   }
 
   /**
