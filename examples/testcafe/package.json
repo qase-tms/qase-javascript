@@ -2,7 +2,7 @@
   "name": "examples-testcafe",
   "private": true,
   "scripts": {
-    "test": "QASE_MODE=testops npx testcafe \"chromium:headless\" test.js test2.js -r spec,qase -s path=screenshots,takeOnFails=true"
+    "test": "QASE_MODE=testops npx testcafe \"chrome\" test.js test2.js -r spec,qase -s path=screenshots,takeOnFails=true"
   },
   "devDependencies": {
     "eslint-plugin-testcafe": "^0.2.1",
