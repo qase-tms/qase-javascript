@@ -278,16 +278,14 @@ export class PlaywrightQaseReporter implements Reporter {
         start_time: result.startTime.valueOf() / 1000,
         end_time: null,
         duration: result.duration,
-        stacktrace: error
-          ? error.stack ? error.stack : null
-          : null,
+        stacktrace: error === null ?
+          null : error.stack === undefined ?
+            null : error.stack,
         thread: result.parallelIndex.toString(),
       },
       fields: testCaseMetadata.fields,
       id: uuidv4(),
-      message: error
-        ? error.message ? error.message : null
-        : null,
+      message: error === null ? null : error.message,
       muted: false,
       params: testCaseMetadata.parameters,
       relations: {
