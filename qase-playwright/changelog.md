@@ -1,3 +1,10 @@
+# playwright-qase-reporter@2.0.0-beta.10
+
+## What's new
+
+- Reporting no longer fails when a test has failed but no stacktrace was collected.
+  ("TypeError: Cannot read properties of undefined (reading 'toString')").
+
 # playwright-qase-reporter@2.0.0-beta.9
 
 ## What's new
