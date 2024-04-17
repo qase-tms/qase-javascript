@@ -1,102 +1,79 @@
-## Install
+# Qase JavaScript Commons
 
-```
-$ npm install --save qase-core-reporter
-```
+This package contains common classes and functions for working with Qase TMS API.
 
-## Usage
+## Installation
 
-> Create a new Qase JS reporter in minutes by leveraging this core reporter.
-> Use Qase core reporter with test framework custom reporter hooks
-
-```js
-import {
-  QaseCoreReporter,
-  QaseOptions,
-  QaseCoreReporterOptions,
-  TestResult
-} from "qase-core-reporter";
-
-const reporterOptions: QaseOptions = {
-  // expected options, provided by reporter user
-  apiToken: 'lknkldnfknobek'
-  projectCode: 'DH'
-};
-
-const qaseCoreReporterOptions: QaseCoreReporterOptions = {
-  // expected core options, provider by reporter developer
-  frameworkName: 'vitest',
-  reporterName: 'vitest-qase-reporter'
-};
-
-// Initialize Core reporter with expected params
-const reporter = new QaseCoreReporter(reporterOptions, qaseCoreReporterOptions);
-
-// On start hook
-reporter.start();
-
-// On test results
-reporter.addTestResult(test: TestResult, status, attachments);
-
-// On end/complete hook
-reporter.end({ spawn: false }); // spawn true will finish reporting in a child process
+```bash
+npm install qase-javascript-commons@beta
 ```
 
-## Reporter Options
+## Configuration
 
-<a name="qase-core-reporter"></a>
+Qase JS Reporters can be configured in multiple ways:
 
-## reporter(qaseOptions, qaseCoreReporterOptions) ⇒ <code>QaseCoreReporter</code>
+- using a config file `qase.config.json`
+- using environment variables
 
-| Param                                       | Type      | Required | Description                                                                       |
-| ------------------------------------------- | --------- | -------- | --------------------------------------------------------------------------------- |
-| qaseOptions                                 | `object`  | yes      |                                                                                   |
-| qaseOptions.`report`                        | `boolean` | no       | Whether or not to enable reporter                                                 |
-| qaseOptions.`apiToken`                      | `string`  | yes      | Qase api key                                                                      |
-| qaseOptions.`projectCode`                   | `string`  | yes      | Qase project ID                                                                   |
-| qaseOptions.`basePath`                      | `string`  | no       | Qase API base url                                                                 |
-| qaseOptions.`rootSuiteTitle`                | `string`  | no       | The root suite that unknown test cases will be added to                           |
-| qaseOptions.`runId`                         | `string`  | no       | Qase run ID, if you want results to be posted to a specific run                   |
-| qaseOptions.`logging`                       | `boolean` | no       | Whether or not to output Qase logs while testing and reporting                    |
-| qaseOptions.`runComplete`                   | `boolean` | no       | Whether or not to complete a test run when results are posted                     |
-| qaseOptions.`environmentId`                 | `string`  | no       | Qase environment ID                                                               |
-| qaseOptions.`runDescription`                | `string`  | no       | Qase run custom description                                                       |
-| qaseOptions.`runName`                       | `string`  | no       | Qase run custom name                                                              |
-| qaseCoreReporterOptions                     | `object`  | yes      |                                                                                   |
-| qaseCoreReporterOptions.`frameworkName`     | `string`  | yes      | Test automation framework/package name                                            |
-| qaseCoreReporterOptions.`reporterName`      | `string`  | yes      | Current qase reporter package name                                                |
-| qaseCoreReporterOptions.`uploadAttachments` | `boolean` | no       | Wether or not to upload attachments                                               |
-| qaseCoreReporterOptions.`screenshotFolder`  | `string`  | no       | Folder to find screenshots with Qase ID in file name                              |
-| qaseCoreReporterOptions.`videoFolder`       | `string`  | no       | Folder to find videos with Qase ID in file name                                   |
-| qaseCoreReporterOptions.`loadConfig`        | `boolean` | no       | Whether or not to also load reporter options from `qase.config.json` or `.qaserc` |
+All configuration options are listed in the table below:
 
-## API (public methods)
+| Description                                                                                                                | Config file                | Environment variable            | Default value                           | Required | Possible values            |
+|----------------------------------------------------------------------------------------------------------------------------|----------------------------|---------------------------------|-----------------------------------------|----------|----------------------------|
+| **Common**                                                                                                                 |                            |                                 |                                         |          |                            |
+| Mode of reporter                                                                                                           | `mode`                     | `QASE_MODE`                     | `testops`                               | No       | `testops`, `report`, `off` |
+| Fallback mode of reporter                                                                                                  | `fallback`                 | `QASE_FALLBACK`                 | `off`                                   | No       | `testops`, `report`, `off` |
+| Environment                                                                                                                | `environment`              | `QASE_ENVIRONMENT`              | `local`                                 | No       | Any string                 |
+| Enable debug logs                                                                                                          | `debug`                    | `QASE_DEBUG`                    | `False`                                 | No       | `True`, `False`            |
+| Enable capture logs from `stdout` and `stderr`                                                                             | `testops.defect`           | `QASE_CAPTURE_LOGS`             | `False`                                 | No       | `True`, `False`            |
+| **Qase Report configuration**                                                                                              |                            |                                 |                                         |          |                            |
+| Driver used for report mode                                                                                                | `report.driver`            | `QASE_REPORT_DRIVER`            | `local`                                 | No       | `local`                    |
+| Path to save the report                                                                                                    | `report.connection.path`   | `QASE_REPORT_CONNECTION_PATH`   | `./build/qase-report`                   |          |                            |
+| Local report format                                                                                                        | `report.connection.format` | `QASE_REPORT_CONNECTION_FORMAT` | `json`                                  |          | `json`, `jsonp`            |
+| **Qase TestOps configuration**                                                                                             |                            |                                 |                                         |          |                            |
+| Token for [API access](https://developers.qase.io/#authentication)                                                         | `testops.api.token`        | `QASE_TESTOPS_API_TOKEN`        |                                         | Yes      | Any string                 |
+| Qase API host                                                                                                              | `testops.api.host`         | `QASE_TESTOPS_API_HOST`         | `qase.io`                               | No       | Any string                 |
+| Code of your project, which you can take from the URL: `https://app.qase.io/project/DEMOTR` - `DEMOTR` is the project code | `testops.project`          | `QASE_TESTOPS_PROJECT`          |                                         | Yes      | Any string                 |
+| Qase test run ID                                                                                                           | `testops.run.id`           | `QASE_TESTOPS_RUN_ID`           |                                         | No       | Any integer                |
+| Qase test run title                                                                                                        | `testops.run.title`        | `QASE_TESTOPS_RUN_TITLE`        | `Automated run <Current date and time>` | No       | Any string                 |
+| Qase test run description                                                                                                  | `testops.run.description`  | `QASE_TESTOPS_RUN_DESCRIPTION`  | `<Framework name> automated run`        | No       | Any string                 |
+| Qase test run complete                                                                                                     | `testops.run.complete`     | `QASE_TESTOPS_RUN_COMPLETE`     | `True`                                  |          | `True`, `False`            |
+| Qase test plan ID                                                                                                          | `testops.plan.id`          | `QASE_TESTOPS_PLAN_ID`          |                                         | No       | Any integer                |
+| Size of batch for sending test results                                                                                     | `testops.batch.size`       | `QASE_TESTOPS_BATCH_SIZE`       | `200`                                   | No       | Any integer                |
+| Enable defects for failed test cases                                                                                       | `testops.defect`           | `QASE_TESTOPS_DEFECT`           | `False`                                 | No       | `True`, `False`            |
 
-<a name="qase-core-reporter-public-methods"></a>
+### Example `qase.config.json` config:
 
-| Method                                   | Description                                                                                                     |
-| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| start()                                  | Check if reporting is enabled, check project and create run if needed                                           |
-| addTestResult(test, status, attachments) | Parse and save test results for publishing                                                                      |
-| end({spawn: true/false})                 | Upload attachments if needed and map to existing results, send results as BulkCreate, complete run if specified |
-| uploadAttachments(attachments)           | Upload attachments based on file path and return attachment hashes for test results                             |
-
-## Qase Reporter Environmental Variables
-
-> Qase environmental variables are first class options, which means the user can change all default/static reporter options by using these variables.
-
-<a name="qase-core-reporter-envs"></a>
-| Variable | Type | Description |
-| ------------------------- | --------- | -------------------------------------------------------------- |
-| `QASE_REPORT` | boolean | Whether or not to enable reporter |
-| `QASE_API_TOKEN` | string | Qase api key |
-| `QASE_API_BASE_URL` | string | Qase API base url |
-| `QASE_PROJECT_CODE` | string | Qase project ID |
-| `QASE_RUN_ID` | string | Qase run ID, if you want results to be posted to a specific run |
-| `QASE_RUN_NAME` | string | Qase run custom name |
-| `QASE_RUN_DESCRIPTION` | string | Qase run custom description |
-| `QASE_RUN_COMPLETE` | string | Whether or not to complete a test run when results are posted |
-| `QASE_ENVIRONMENT_ID` | string | Qase environment ID |
-| `QASE_ROOT_SUITE_TITLE` | string | The root suite that unknown test cases will be added to |
-| `QASE_UPLOAD_ATTACHMENTS` | string | Whether or not to upload attachments
-| `QASE_LOGGING` | boolean | Whether or not to output Qase logs while testing and reporting |
+```json
+{
+  "mode": "testops",
+  "fallback": "report",
+  "debug": false,
+  "environment": "local",
+  "captureLogs": false,
+  "report": {
+    "driver": "local",
+    "connection": {
+      "local": {
+        "path": "./build/qase-report",
+        "format": "json"
+      }
+    }
+  },
+  "testops": {
+    "api": {
+      "token": "<token>",
+      "host": "qase.io"
+    },
+    "run": {
+      "title": "Regress run",
+      "description": "Regress run description",
+      "complete": true
+    },
+    "defect": false,
+    "project": "<project_code>",
+    "batch": {
+      "size": 100
+    }
+  }
+}
+```
