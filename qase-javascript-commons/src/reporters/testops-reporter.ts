@@ -259,6 +259,8 @@ export class TestOpsReporter extends AbstractReporter {
         results: results,
       });
     }
+
+    this.log(chalk`{green ${testResults.length} result(s) sent to Qase}`);
   }
 
   /**
@@ -273,8 +275,6 @@ export class TestOpsReporter extends AbstractReporter {
     if (this.firstIndex < this.results.length) {
       await this.publishResults(this.results.slice(this.firstIndex));
     }
-
-    this.log(chalk`{green ${this.results.length} result(s) sent to Qase}`);
 
     if (!this.run.complete) {
       return;
