@@ -5,7 +5,7 @@ import {
   EnvApiEnum,
   EnvRunEnum,
   EnvLocalEnum,
-  EnvPlanEnum,
+  EnvPlanEnum, EnvBatchEnum,
 } from './env-enum';
 
 import { DriverEnum } from '../writer';
@@ -41,7 +41,9 @@ export const envToConfig = (env: EnvType): ConfigType => ({
       id: env[EnvPlanEnum.id],
     },
 
-    chunk: env[EnvTestOpsEnum.chunk],
+    batch: {
+      size: env[EnvBatchEnum.size],
+    },
     defect: env[EnvTestOpsEnum.defect],
     useV2: env[EnvTestOpsEnum.useV2],
   },

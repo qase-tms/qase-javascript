@@ -2,7 +2,7 @@ import { JSONSchemaType } from 'env-schema';
 
 import { EnvType } from './env-type';
 import {
-  EnvApiEnum,
+  EnvApiEnum, EnvBatchEnum,
   EnvEnum,
   EnvLocalEnum,
   EnvPlanEnum,
@@ -51,10 +51,6 @@ export const envValidationSchema: JSONSchemaType<EnvType> = {
       type: 'boolean',
       nullable: true,
     },
-    [EnvTestOpsEnum.chunk]: {
-      type: 'number',
-      nullable: true,
-    },
     [EnvTestOpsEnum.defect]: {
       type: 'boolean',
       nullable: true,
@@ -91,6 +87,11 @@ export const envValidationSchema: JSONSchemaType<EnvType> = {
     },
 
     [EnvPlanEnum.id]: {
+      type: 'number',
+      nullable: true,
+    },
+
+    [EnvBatchEnum.size]: {
       type: 'number',
       nullable: true,
     },

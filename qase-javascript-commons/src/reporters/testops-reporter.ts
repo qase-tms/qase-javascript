@@ -40,12 +40,16 @@ export type TestOpsPlanType = {
   id?: number | undefined;
 };
 
+export type TestOpsBatchType = {
+  size?: number | undefined;
+}
+
 export type TestOpsOptionsType = {
   project: string;
   uploadAttachments?: boolean | undefined;
   run: TestOpsRunType;
   plan: TestOpsPlanType;
-  chunk?: number | undefined;
+  batch?: TestOpsBatchType;
   defect?: boolean | undefined;
   useV2?: boolean | undefined;
 };
@@ -114,7 +118,7 @@ export class TestOpsReporter extends AbstractReporter {
    * @type {TestResultType[]}
    * @private
    */
-  private readonly chunk: number;
+  private readonly batchSize: number;
 
   /**
    * @type {boolean | undefined}
@@ -169,7 +173,7 @@ export class TestOpsReporter extends AbstractReporter {
     this.isUploadAttachments = uploadAttachments;
     this.run = { complete: true, ...run };
     this.environment = environment;
-    this.chunk = options.chunk ?? defaultChunkSize;
+    this.batchSize = options.batch?.size ?? defaultChunkSize;
     this.useV2 = options.useV2 ?? false;
     this.defect = options.defect ?? false;
   }
@@ -192,7 +196,7 @@ export class TestOpsReporter extends AbstractReporter {
       return;
     }
 
-    const countOfResults = this.chunk + this.firstIndex;
+    const countOfResults = this.batchSize + this.firstIndex;
 
     if (this.results.length >= countOfResults) {
       await this.publishResults(this.results.slice(this.firstIndex, countOfResults));

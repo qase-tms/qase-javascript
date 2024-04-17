@@ -4,7 +4,7 @@ import {
   EnvApiEnum,
   EnvRunEnum,
   EnvLocalEnum,
-  EnvPlanEnum,
+  EnvPlanEnum, EnvBatchEnum,
 } from './env-enum';
 
 import { ModeEnum } from '../options';
@@ -19,7 +19,6 @@ export type EnvType = {
 
   [EnvTestOpsEnum.project]?: string;
   [EnvTestOpsEnum.uploadAttachments]?: boolean;
-  [EnvTestOpsEnum.chunk]?: number;
   [EnvTestOpsEnum.defect]?: boolean;
   [EnvTestOpsEnum.useV2]?: boolean;
 
@@ -32,6 +31,8 @@ export type EnvType = {
   [EnvRunEnum.complete]?: boolean;
 
   [EnvPlanEnum.id]?: number;
+
+  [EnvBatchEnum.size]?: number;
 
   [EnvLocalEnum.path]?: string;
   [EnvLocalEnum.format]?: `${FormatEnum}`;

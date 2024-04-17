@@ -15,7 +15,6 @@ export enum EnvEnum {
 export enum EnvTestOpsEnum {
   project = 'QASE_TESTOPS_PROJECT',
   uploadAttachments = 'QASE_TESTOPS_UPLOAD_ATTACHMENTS',
-  chunk = 'QASE_TESTOPS_CHUNK',
   defect = 'QASE_TESTOPS_DEFECT',
   useV2 = 'QASE_TESTOPS_API_V2',
 }
@@ -43,6 +42,13 @@ export enum EnvRunEnum {
  */
 export enum EnvPlanEnum {
   id = 'QASE_TESTOPS_PLAN_ID',
+}
+
+/**
+ * @enum {string}
+ */
+export enum EnvBatchEnum {
+  size = 'QASE_TESTOPS_BATCH_SIZE',
 }
 
 /**
