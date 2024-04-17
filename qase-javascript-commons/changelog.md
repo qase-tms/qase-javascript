@@ -1,3 +1,24 @@
+# qase-javascript-commons@2.0.0-beta.8
+
+## What's new
+
+Renamed the `QASE_TESTOPS_CHUNK` environment variable to `QASE_TESTOPS_BATCH_SIZE`.
+Renamed the `chunk` field in the reporter's configuration to `batch.size`.
+
+```diff
+{
+  ...
+  "testops": {
+-   "chunk": 10
++   "batch": {
++      "size": 10
++    }
+    ...
+  },
+  ...
+}
+```
+
 # qase-javascript-commons@2.0.0-beta.7
 
 ## What's new
