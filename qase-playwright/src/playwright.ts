@@ -69,6 +69,7 @@ qase.id = function(value: number | number[]) {
   addMetadata({
     ids: Array.isArray(value) ? value : [value],
   });
+  return this;
 };
 
 /**
@@ -84,6 +85,7 @@ qase.title = function(value: string) {
   addMetadata({
     title: value,
   });
+  return this;
 };
 
 /**
@@ -99,6 +101,7 @@ qase.fields = function(value: Record<string, string>) {
   addMetadata({
     fields: value,
   });
+  return this;
 };
 
 /**
@@ -116,6 +119,7 @@ qase.parameters = function(value: Record<string, string>) {
   addMetadata({
     parameters: value,
   });
+  return this;
 };
 
 /**
@@ -144,12 +148,13 @@ qase.attach = function(attach: {
       addAttachment(attachmentName, contentType, file);
     }
 
-    return;
+    return this;
   }
   const attachmentName = attach.name ?? 'attachment';
   const contentType = attach.contentType ?? defaultContentType;
   addAttachment(attachmentName, contentType, undefined, attach.content);
 
+  return this;
 };
 
 const addMetadata = (metadata: MetadataMessage): void => {

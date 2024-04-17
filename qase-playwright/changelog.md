@@ -1,3 +1,19 @@
+# playwright-qase-reporter@2.0.0-beta.11
+
+## What's new
+
+- Using the `qase` annotation in a chain
+
+```js
+test('Ultimate Question of Life, The Universe, and Everything', async ({ page }) => {
+    qase.id(42)
+      .title('Ultimate Question of Life, The Universe, and Everything')
+      .fields({ severity: high, priority: medium })
+      .attach({ paths: '/path/to/file'});
+    ...
+})
+```
+
 # playwright-qase-reporter@2.0.0-beta.10
 
 ## What's new
