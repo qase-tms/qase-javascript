@@ -8,24 +8,31 @@ Publish results simple and easy.
 npm install -D cypress-qase-reporter@beta
 ```
 
-## Example of usage
+## Getting started
 
-The Cypress reporter has the ability to auto-generate test cases
+The Cypress reporter can auto-generate test cases
 and suites from your test data.
+Test results of subsequent test runs will match the same test cases
+as long as their names and file paths don't change.
 
-But if necessary, you can independently register the ID of already
-existing test cases from TMS before the executing tests. For example:
+You can also annotate the tests with the IDs of existing test cases
+from Qase.io before executing tests. It's a more reliable way to bind
+autotests to test cases, that persists when you rename, move, or
+parameterize your tests.
+
+For example:
 
 ```typescript
 import { qase } from 'cypress-qase-reporter/mocha';
 
 describe('My First Test', () => {
-  qase([1, 2],
+  qase(1,
           it('Several ids', () => {
             expect(true).to.equal(true);
           })
   );
-  qase(3,
+  // a test can check multiple test cases
+  qase([2, 3],
           it('Correct test', () => {
             expect(true).to.equal(true);
           })
@@ -36,10 +43,9 @@ describe('My First Test', () => {
           })
   );
 });
-
 ```
 
-To run tests and create a test run, execute the command (for example from folder examples):
+To execute Cypress tests and report them to Qase.io, run the command:
 
 ```bash
 QASE_MODE=testops npx cypress run
@@ -50,6 +56,8 @@ or
 ```bash
 npm test
 ```
+
+You can try it with the example project at [`examples/cypress`](../examples/cypress/).
 
 <p align="center">
   <img width="65%" src="./screenshots/screenshot.png">
@@ -64,8 +72,9 @@ https://app.qase.io/run/QASE_PROJECT_CODE
 ## Configuration
 
 Qase Cypress reporter can be configured in multiple ways:
-- using a config file `qase.config.json`
-- using environment variables
+- by adding configuration block in `cypress.config.js`,
+- using a separate config file `qase.config.json`,
+- using environment variables (they override the values from the configuration files).
 
 For a full list of configuration options, see the [Configuration reference](../qase-javascript-commons/README.md#configuration).
 
@@ -115,7 +124,8 @@ module.exports = cypress.defineConfig({
 });
 ```
 
-### You can check example configuration with multiple reporters in [demo project](../examples/cypress/cypress.config.js).
+Check out the example of configuration for multiple reporters in the
+[demo project](../examples/cypress/cypress.config.js).
 
 ## Requirements
 
