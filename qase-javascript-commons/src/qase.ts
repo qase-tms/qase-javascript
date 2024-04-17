@@ -317,7 +317,7 @@ export class QaseReporter extends AbstractReporter {
             ...run
           } = {},
           plan = {},
-          chunk,
+          batch= {},
           uploadAttachments,
         } = testops;
 
@@ -356,7 +356,7 @@ export class QaseReporter extends AbstractReporter {
               ...run,
             },
             plan,
-            chunk,
+            batch,
             debug: commonOptions.debug,
             captureLogs: commonOptions.captureLogs,
           },

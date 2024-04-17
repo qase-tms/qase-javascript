@@ -123,9 +123,16 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
           },
         },
 
-        chunk: {
-          type: 'number',
+        batch: {
+          type: 'object',
           nullable: true,
+
+          properties: {
+            size: {
+              type: 'number',
+              nullable: true,
+            },
+          },
         },
 
         defect: {
