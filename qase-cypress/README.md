@@ -1,65 +1,56 @@
-> # Qase TMS Cypress reporter
->
-> Publish results simple and easy.
+# Qase TMS Cypress reporter
 
-## How to integrate
+Publish results simple and easy.
+
+## How to install
 
 ```
-npm install cypress-qase-reporter
+npm install -D cypress-qase-reporter@beta
 ```
 
 ## Example of usage
 
-If you want to decorate come test with Qase Case ID you could use qase function:
+The Cypress reporter has the ability to auto-generate test cases
+and suites from your test data.
+
+But if necessary, you can independently register the ID of already
+existing test cases from TMS before the executing tests. For example:
 
 ```typescript
-import { qase } from 'cypress-qase-reporter';
+import { qase } from 'cypress-qase-reporter/mocha';
 
 describe('My First Test', () => {
-    qase([1,2],
-        it('Several ids', () => {
+  qase([1, 2],
+          it('Several ids', () => {
             expect(true).to.equal(true);
-        })
-    );
-    qase(3,
-        it('Correct test', () => {
+          })
+  );
+  qase(3,
+          it('Correct test', () => {
             expect(true).to.equal(true);
-        })
-    );
-    qase(4,
-        it.skip('Skipped test', () => {
+          })
+  );
+  qase(4,
+          it.skip('Skipped test', () => {
             expect(true).to.equal(true);
-        })
-    );
-    qase(5,
-        it('Failed test', () => {
-            expect(true).to.equal(false);
-        })
-    );
+          })
+  );
 });
 
 ```
-If you are going to use several specifications for execution and you have in config 
-```json
-"testops": {
-  "run": {
-    "complete": true
-  }
-}
-```
-then it is necessary to additionally set in the project settings
-```
-Allow to add results for cases in closed runs.
-```
 
 To run tests and create a test run, execute the command (for example from folder examples):
+
 ```bash
 QASE_MODE=testops npx cypress run
 ```
+
 or
+
 ```bash
 npm test
 ```
+
 <p align="center">
   <img width="65%" src="./screenshots/screenshot.png">
 </p>
@@ -72,39 +63,63 @@ https://app.qase.io/run/QASE_PROJECT_CODE
 
 ## Configuration
 
-Reporter options (* - required):
+Qase Cypress reporter can be configured in multiple ways:
+- using a config file `qase.config.json`
+- using environment variables
 
-- `mode` - `testops`/`off` Enables reporter, default - `off`
-- `debug` - Enables debug logging, defaule - `false`
-- `environment` - To execute with the sending of the envinroment information
-- *`testops.api.token` - Token for API access, you can find more information
-  [here](https://developers.qase.io/#authentication)
-- *`testops.project` - Code of your project (can be extracted from main
-  page of your project: `https://app.qase.io/project/DEMOTR` -
-  `DEMOTR` is project code here)
-- `testops.uploadAttachments` - Permission to send screenshots to Qase TMS
-- `testops.run.id` - Pass Run ID
-- `testops.run.title` - Set custom Run name, when new run is created
-- `testops.run.description` - Set custom Run description, when new run is created
-- `testops.run.complete` - Whether the run should be completed
-- `framework.cypress.screenshotFolder` - Folder for save screenshot cypress
+For a full list of configuration options, see the [Configuration reference](../qase-javascript-commons/README.md#configuration).
 
-#### You can check example configuration with multiple reporters in [demo project](../examples/cypress/cypress.config.js).
+Example `cypress.config.js` config:
 
-Supported ENV variables:
+```js
+import cypress from 'cypress';
 
-- `QASE_MODE` - Same as `mode`
-- `QASE_DEBUG` - Same as `debug`
-- `QASE_ENVIRONMENT` - Same as `environment`
-- `QASE_TESTOPS_API_TOKEN` - Same as `testops.api.token`
-- `QASE_TESTOPS_PROJECT` - Same as `testops.project`
-- `QASE_TESTOPS_RUN_ID` - Pass Run ID from ENV and override reporter option `testops.run.id`
-- `QASE_TESTOPS_RUN_TITLE` - Same as `testops.run.title`
-- `QASE_TESTOPS_RUN_DESCRIPTION` - Same as `testops.run.description`
+import plugins from './cypress/plugins/index.js';
+
+module.exports = cypress.defineConfig({
+  reporter: 'cypress-multi-reporters',
+  reporterOptions: {
+    reporterEnabled: 'cypress-mochawesome-reporter, cypress-qase-reporter',
+    cypressMochawesomeReporterReporterOptions: {
+      charts: true,
+    },
+    cypressQaseReporterReporterOptions: {
+      debug: true,
+
+      testops: {
+        api: {
+          token: 'api_key',
+        },
+
+        project: 'project_code',
+        uploadAttachments: true,
+
+        run: {
+          complete: true,
+        },
+      },
+
+      framework: {
+        cypress: {
+          screenshotsFolder: 'cypress/screenshots',
+        }
+      }
+    },
+  },
+  video: false,
+  e2e: {
+    setupNodeEvents(on, config) {
+      return plugins(on, config);
+    },
+  },
+});
+```
+
+### You can check example configuration with multiple reporters in [demo project](../examples/cypress/cypress.config.js).
 
 ## Requirements
 
-We maintain the reporter on LTS versions of Node. You can find the current versions by following the [link](https://nodejs.org/en/about/releases/)
+We maintain the reporter on [LTS versions of Node](https://nodejs.org/en/about/releases/).
 
 `cypress >= 8.0.0`
 
