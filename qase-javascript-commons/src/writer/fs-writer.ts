@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync, copyFileSync } from 'fs';
+import { mkdirSync, writeFileSync, copyFileSync, existsSync, readdirSync, lstatSync, unlinkSync, rmdirSync } from 'fs';
 import * as path from 'path';
 
 import { WriterInterface } from './writer-interface';
@@ -40,6 +40,13 @@ export class FsWriter implements WriterInterface {
     } else {
       this.formatter = new JsonpFormatter();
     }
+  }
+
+  /**
+   * @returns {void}
+   */
+  clearPreviousResults(): void {
+    this.deleteFolderRecursive(this.path);
   }
 
   /**
@@ -108,5 +115,19 @@ export class FsWriter implements WriterInterface {
 
     writeFileSync(filePath, await this.formatter.format(result));
 
+  }
+
+  private deleteFolderRecursive(directoryPath: string) {
+    if (existsSync(directoryPath)) {
+      readdirSync(directoryPath).forEach((file) => {
+        const curPath = path.join(directoryPath, file);
+        if (lstatSync(curPath).isDirectory()) { // recurse
+          this.deleteFolderRecursive(curPath);
+        } else { // delete file
+          unlinkSync(curPath);
+        }
+      });
+      rmdirSync(directoryPath);
+    }
   }
 }
