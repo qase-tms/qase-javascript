@@ -4,9 +4,26 @@ Publish results simple and easy.
 
 ## How to install
 
-```
+Qase Cypress reporter is currently in open beta stage for the version 2 series.
+To install the latest beta version, run:
+
+```sh
 npm install -D cypress-qase-reporter@beta
 ```
+
+## Updating from v1
+
+You can update a test project from using version 1 to version 2 in several steps:
+
+1.  Change import paths:
+
+    ```diff
+    - import { qase } from 'cypress-qase-reporter/dist/mocha'
+    + import { qase } from 'cypress-qase-reporter/mocha'
+    ```
+
+2.  Update reporter configuration in `cypress.config.js` and/or environment variables —
+    see the [configuration reference](#configuration) below.
 
 ## Getting started
 
