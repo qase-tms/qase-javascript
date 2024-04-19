@@ -23,6 +23,7 @@ import {
   TestExecution,
   Relation,
   SuiteData,
+  StepType,
 } from '../models';
 
 import { QaseError } from '../utils/qase-error';
@@ -403,13 +404,25 @@ export class TestOpsReporter extends AbstractReporter {
 
       const resultStep: ResultStep = {
         data: {
-          action: step.data.action,
+          action: '',
           attachments: attachmentHashes,
         },
         execution: {
           status: TestOpsReporter.stepStatusMap[step.execution.status],
         },
       };
+
+      if (step.step_type === StepType.TEXT) {
+        if ('action' in step.data && resultStep.data != undefined) {
+          resultStep.data.action = step.data.action;
+        }
+      }
+
+      if (step.step_type === StepType.GHERKIN) {
+        if ('keyword' in step.data && resultStep.data != undefined) {
+          resultStep.data.action = step.data.keyword;
+        }
+      }
 
       if (step.steps.length > 0) {
         resultStep.steps = await this.transformSteps(step.steps);
@@ -434,9 +447,20 @@ export class TestOpsReporter extends AbstractReporter {
 
       const resultStep: TestStepResultCreate = {
         status: TestOpsReporter.stepStatusMapV1[step.execution.status],
-        action: step.data.action,
         attachments: attachmentHashes,
       };
+
+      if (step.step_type === StepType.TEXT) {
+        if ('action' in step.data) {
+          resultStep.action = step.data.action;
+        }
+      }
+
+      if (step.step_type === StepType.GHERKIN) {
+        if ('keyword' in step.data) {
+          resultStep.action = step.data.keyword;
+        }
+      }
 
       if (step.steps.length > 0) {
         resultStep.steps = await this.transformStepsV1(step.steps);
