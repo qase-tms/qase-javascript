@@ -3,15 +3,17 @@ import { v4 as uuidv4 } from 'uuid';
 import chalk from 'chalk';
 
 import {
+  Attachment,
   composeOptions,
   ConfigLoader,
   ConfigType,
   QaseReporter,
   ReporterInterface,
   StepStatusEnum,
+  StepType,
+  TestResultType,
   TestStatusEnum,
   TestStepType,
-  Attachment, TestResultType,
 } from 'qase-javascript-commons';
 import { MetadataMessage, ReporterContentType } from './playwright';
 
@@ -197,7 +199,7 @@ export class PlaywrightQaseReporter implements Reporter {
       const id = uuidv4();
       const step: TestStepType = {
         id: id,
-        step_type: 'text',
+        step_type: StepType.TEXT,
         data: {
           action: testStep.title,
           expected_result: null,

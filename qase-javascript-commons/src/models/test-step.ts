@@ -1,26 +1,18 @@
-import { StepData } from './step-data';
+import { StepGherkinData, StepTextData } from './step-data';
 import { StepExecution } from './step-execution';
 
 import { Attachment } from './attachment';
 
 
-
-// export type TestStepType = {
-//   id: string;
-//   title: string;
-//   status: `${StepStatusEnum}`;
-//   duration?: number | undefined;
-//   error?: Error | undefined;
-//   steps?: TestStepType[] | undefined;
-//   attachments?: string[] | undefined;
-// };
-
-
+export enum StepType {
+  TEXT = 'text',
+  GHERKIN = 'gherkin',
+}
 
 export type TestStepType = {
   id: string;
-  step_type: string;
-  data: StepData;
+  step_type: StepType;
+  data: StepTextData | StepGherkinData;
   parent_id: string | null;
   execution: StepExecution;
   attachments: Attachment[];
