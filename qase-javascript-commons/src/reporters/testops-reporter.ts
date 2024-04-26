@@ -227,6 +227,7 @@ export class TestOpsReporter extends AbstractReporter {
     }
 
     this.run.id = result.id;
+    process.env['QASE_TESTOPS_RUN_ID'] = String(result.id);
     this.isTestRunReady = true;
   }
 

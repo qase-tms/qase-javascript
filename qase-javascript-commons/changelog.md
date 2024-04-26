@@ -1,3 +1,10 @@
+# qase-javascript-commons@2.0.0-beta.9
+
+## What's new
+
+Fixed an issue with duplicate test runs if the testing framework (such as Cypress) uses more than one instance of the Qase reporter.
+The Qase reporter stores the test run ID in the ENV variable `QASE_TESTOPS_RUN_ID` after creating the first test run.
+
 # qase-javascript-commons@2.0.0-beta.8
 
 ## What's new
