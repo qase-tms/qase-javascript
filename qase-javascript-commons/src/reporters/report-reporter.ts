@@ -1,4 +1,4 @@
-import { AbstractReporter, LoggerInterface, ReporterOptionsType } from './abstract-reporter';
+import { AbstractReporter, ReporterOptionsType } from './abstract-reporter';
 import { Report, TestStatusEnum, TestStepType } from '../models';
 import { WriterInterface } from '../writer';
 import { HostData } from '../models/host-data';
@@ -18,18 +18,16 @@ export class ReportReporter extends AbstractReporter {
   /**
    * @param {ReporterOptionsType} options
    * @param {WriterInterface} writer
-   * @param {LoggerInterface} logger
    * @param {string | undefined} environment
    * @param {number | undefined} runId
    */
   constructor(
     options: ReporterOptionsType | undefined,
     private writer: WriterInterface,
-    logger?: LoggerInterface,
     environment?: string,
     runId?: number,
   ) {
-    super(options, logger);
+    super(options);
     this.environment = environment;
     this.runId = runId;
   }
@@ -117,7 +115,7 @@ export class ReportReporter extends AbstractReporter {
 
     const path = await this.writer.writeReport(report);
 
-    this.log(`Report saved to ${path}`);
+    this.logger.log(`Report saved to ${path}`)
   }
 
   /**
