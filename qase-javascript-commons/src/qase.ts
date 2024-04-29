@@ -9,7 +9,6 @@ import {
   ReporterInterface,
   TestOpsReporter,
   ReportReporter,
-  LoggerInterface,
 } from './reporters';
 import { composeOptions, ModeEnum, OptionsType } from './options';
 import {
@@ -115,26 +114,26 @@ export class QaseReporter extends AbstractReporter {
 
   /**
    * @param {OptionsType} options
-   * @param {LoggerInterface} logger
    */
-  constructor(options: OptionsType, logger?: LoggerInterface) {
+  constructor(options: OptionsType) {
     const env = envToConfig(envSchema({ schema: envValidationSchema }));
     const composedOptions = composeOptions(options, env);
 
-    super({ debug: composedOptions.debug, captureLogs: composedOptions.captureLogs }, logger);
+    super({ debug: composedOptions.debug, captureLogs: composedOptions.captureLogs });
+
+    this.logger.logDebug(`Config: ${JSON.stringify(composedOptions)}`);
 
     try {
       this.upstreamReporter = this.createReporter(
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         composedOptions.mode as ModeEnum || ModeEnum.off,
         composedOptions,
-        logger,
       );
     } catch (error) {
       if (error instanceof DisabledException) {
         this.disabled = true;
       } else {
-        this.logError('Unable to create upstream reporter:', error);
+        this.logger.logError('Unable to create upstream reporter:', error);
 
         if (composedOptions.fallback != undefined) {
           this.disabled = true;
@@ -150,7 +149,6 @@ export class QaseReporter extends AbstractReporter {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         composedOptions.fallback as ModeEnum || ModeEnum.off,
         composedOptions,
-        logger,
       );
     } catch (error) {
       if (error instanceof DisabledException) {
@@ -158,7 +156,7 @@ export class QaseReporter extends AbstractReporter {
           this.disabled = true;
         }
       } else {
-        this.logError('Unable to create fallback reporter:', error);
+        this.logger.logError('Unable to create fallback reporter:', error);
 
         if (this.useFallback && this.upstreamReporter === undefined) {
           this.disabled = true;
@@ -173,10 +171,12 @@ export class QaseReporter extends AbstractReporter {
   public override async startTestRun(): Promise<void> {
     if (!this.disabled) {
 
+      this.logger.logDebug('Starting test run');
+
       try {
         await this.upstreamReporter?.startTestRun();
       } catch (error) {
-        this.logError('Unable to start test run in the upstream reporter: ', error);
+        this.logger.logError('Unable to start test run in the upstream reporter: ', error);
 
         if (this.fallbackReporter == undefined) {
           this.disabled = true;
@@ -186,7 +186,7 @@ export class QaseReporter extends AbstractReporter {
         try {
           await this.fallbackReporter?.startTestRun();
         } catch (error) {
-          this.logError('Unable to start test run in the fallback reporter: ', error);
+          this.logger.logError('Unable to start test run in the fallback reporter: ', error);
           this.disabled = true;
         }
       }
@@ -208,7 +208,7 @@ export class QaseReporter extends AbstractReporter {
       try {
         await this.upstreamReporter?.addTestResult(result);
       } catch (error) {
-        this.logError('Unable to add the result to the upstream reporter:', error);
+        this.logger.logError('Unable to add the result to the upstream reporter:', error);
 
         if (this.fallbackReporter == undefined) {
           this.disabled = true;
@@ -233,7 +233,7 @@ export class QaseReporter extends AbstractReporter {
     try {
       await this.fallbackReporter?.addTestResult(result);
     } catch (error) {
-      this.logError('Unable to add the result to the fallback reporter:', error);
+      this.logger.logError('Unable to add the result to the fallback reporter:', error);
       this.disabled = true;
     }
   }
@@ -243,6 +243,9 @@ export class QaseReporter extends AbstractReporter {
    */
   public async publish(): Promise<void> {
     if (!this.disabled) {
+
+      this.logger.logDebug('Publishing test run results');
+
       if (this.useFallback) {
         await this.publishFallback();
       }
@@ -250,7 +253,7 @@ export class QaseReporter extends AbstractReporter {
       try {
         await this.upstreamReporter?.publish();
       } catch (error) {
-        this.logError('Unable to publish the run results to the upstream reporter:', error);
+        this.logger.logError('Unable to publish the run results to the upstream reporter:', error);
 
         if (this.fallbackReporter == undefined) {
           this.disabled = true;
@@ -274,7 +277,7 @@ export class QaseReporter extends AbstractReporter {
     try {
       await this.fallbackReporter?.publish();
     } catch (error) {
-      this.logError('Unable to publish the run results to the fallback reporter:', error);
+      this.logger.logError('Unable to publish the run results to the fallback reporter:', error);
       this.disabled = true;
     }
   }
@@ -283,14 +286,12 @@ export class QaseReporter extends AbstractReporter {
    * @todo implement mode registry
    * @param {ModeEnum} mode
    * @param {OptionsType} options
-   * @param {LoggerInterface} logger
    * @returns {ReporterInterface}
    * @private
    */
   private createReporter(
     mode: ModeEnum,
     options: OptionsType,
-    logger?: LoggerInterface,
   ): ReporterInterface {
     const {
       frameworkPackage,
@@ -317,7 +318,7 @@ export class QaseReporter extends AbstractReporter {
             ...run
           } = {},
           plan = {},
-          batch= {},
+          batch = {},
           uploadAttachments,
         } = testops;
 
@@ -361,7 +362,6 @@ export class QaseReporter extends AbstractReporter {
             captureLogs: commonOptions.captureLogs,
           },
           apiClient,
-          logger,
           typeof environment === 'number' ? environment : undefined,
         );
       }
@@ -373,7 +373,7 @@ export class QaseReporter extends AbstractReporter {
         return new ReportReporter({
             debug: commonOptions.debug,
             captureLogs: commonOptions.captureLogs,
-          }, writer, logger,
+          }, writer,
           typeof environment === 'number' ? environment.toString() : environment, testops.run?.id);
       }
 
@@ -390,6 +390,6 @@ export class QaseReporter extends AbstractReporter {
    * @private
    */
   private logTestItem(test: TestResultType) {
-    this.log(resultLogMap[test.execution.status](test));
+    this.logger.log(resultLogMap[test.execution.status](test));
   }
 }

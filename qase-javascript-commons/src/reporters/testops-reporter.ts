@@ -12,7 +12,7 @@ import {
   RunCreate, TestStepResultCreate, TestStepResultCreateStatusEnum,
 } from 'qaseio';
 
-import { AbstractReporter, LoggerInterface, ReporterOptionsType } from './abstract-reporter';
+import { AbstractReporter, ReporterOptionsType } from './abstract-reporter';
 
 import {
   StepStatusEnum,
@@ -148,13 +148,11 @@ export class TestOpsReporter extends AbstractReporter {
   /**
    * @param {ReporterOptionsType & TestOpsOptionsType} options
    * @param {QaseApiInterface} api
-   * @param {LoggerInterface} logger
    * @param {number} environment
    */
   constructor(
     options: ReporterOptionsType & TestOpsOptionsType,
     private api: QaseApiInterface,
-    logger?: LoggerInterface,
     environment?: number,
   ) {
     const {
@@ -165,7 +163,7 @@ export class TestOpsReporter extends AbstractReporter {
       ...restOptions
     } = options;
 
-    super(restOptions, logger);
+    super(restOptions);
 
     const baseUrl = 'https://app.qase.io';
 
@@ -210,11 +208,16 @@ export class TestOpsReporter extends AbstractReporter {
    */
   private async checkOrCreateTestRun(): Promise<void> {
     if (this.run.id !== undefined) {
+
+      this.logger.logDebug('Check test run');
+
       await this.checkRun(this.run.id);
 
       this.isTestRunReady = true;
       return;
     }
+
+    this.logger.logDebug('Create test run');
 
     const { result } = await this.createRun(
       this.run.title,
@@ -225,6 +228,8 @@ export class TestOpsReporter extends AbstractReporter {
     if (!result?.id) {
       throw new Error('Cannot create run.');
     }
+
+    this.logger.logDebug(`Test run created: ${result.id}`);
 
     this.run.id = result.id;
     process.env['QASE_TESTOPS_RUN_ID'] = String(result.id);
@@ -262,7 +267,7 @@ export class TestOpsReporter extends AbstractReporter {
       });
     }
 
-    this.log(chalk`{green ${testResults.length} result(s) sent to Qase}`);
+    this.logger.logDebug(`Results sent to Qase: ${testResults.length}`);
   }
 
   /**
@@ -270,7 +275,7 @@ export class TestOpsReporter extends AbstractReporter {
    */
   public async publish(): Promise<void> {
     if (this.results.length === 0) {
-      this.log(chalk`{yellow No results to send to Qase}`);
+      this.logger.log(chalk`{yellow No results to send to Qase}`);
       return;
     }
 
@@ -284,14 +289,14 @@ export class TestOpsReporter extends AbstractReporter {
 
     try {
       await this.api.runs.completeRun(this.projectCode, this.run.id!);
-      this.log(chalk`{green Run ${this.run.id!} completed}`);
+      this.logger.log(chalk`{green Run ${this.run.id!} completed}`);
     } catch (error) {
       throw new QaseError('Error on completing run', { cause: error });
     }
 
     const runUrl = `${this.baseUrl}/run/${this.projectCode}/dashboard/${this.run.id!}`;
 
-    this.log(chalk`{blue Test run link: ${runUrl}}`);
+    this.logger.log(chalk`{blue Test run link: ${runUrl}}`);
   }
 
   /**
@@ -303,7 +308,7 @@ export class TestOpsReporter extends AbstractReporter {
     const attachments = await this.uploadAttachments(result.attachments);
     const steps = await this.transformSteps(result.steps);
 
-    return {
+    const model = {
       title: result.title,
       execution: this.getExecution(result.execution),
       testops_id: Array.isArray(result.testops_id) ? null : result.testops_id,
@@ -313,6 +318,10 @@ export class TestOpsReporter extends AbstractReporter {
       relations: this.getRelation(result.relations),
       message: result.message,
     };
+
+    this.logger.logDebug(`Transformed result: ${JSON.stringify(model)}`);
+
+    return model;
   }
 
   /**
@@ -347,6 +356,8 @@ export class TestOpsReporter extends AbstractReporter {
       title: result.title,
       suite_title: result.relations?.suite ? result.relations?.suite?.data.map((suite) => suite.title).join('\t') : null,
     };
+
+    this.logger.logDebug(`Transformed result: ${JSON.stringify(resultCreate)}`);
 
     return resultCreate;
   }
@@ -482,7 +493,7 @@ export class TestOpsReporter extends AbstractReporter {
     try {
       const resp = await this.api.runs.getRun(this.projectCode, runId);
 
-      this.log(
+      this.logger.log(
         `Get run result on checking run "${String(resp.data.result?.id)}"`,
       );
     } catch (error) {
@@ -558,7 +569,7 @@ export class TestOpsReporter extends AbstractReporter {
         }
 
       } catch (error) {
-        this.logError('Cannot upload attachment:', error);
+        this.logger.logError('Cannot upload attachment:', error);
       }
     }
     return acc;
