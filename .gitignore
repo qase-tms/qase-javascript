@@ -74,3 +74,7 @@ jspm_packages/
 # IDE files
 .idea
 .vscode
+
+# Temporary files and playground
+tmp
+*.tmp
