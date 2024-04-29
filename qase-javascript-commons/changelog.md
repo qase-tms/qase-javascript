@@ -2,8 +2,23 @@
 
 ## What's new
 
-Fixed an issue with duplicate test runs if the testing framework (such as Cypress) uses more than one instance of the Qase reporter.
-The Qase reporter stores the test run ID in the ENV variable `QASE_TESTOPS_RUN_ID` after creating the first test run.
+Improved debug logging for better testing and reporting errors.
+
+-   Separate `logger` class for use in reporters, supporting logging to console and files.
+-   Extra debug logs in both reporter modes: TestOps and Local.
+
+Fixed an issue with duplicate test runs created when the testing framework
+(such as Cypress) uses more than one instance of the Qase reporter.
+Now reporter handles Qase test runs in the following way:
+
+1.  The first instance of the reporter creates a Qase test run and stores the run ID 
+    in the ENV variable `QASE_TESTOPS_RUN_ID`.
+2.  Other instances of the reporter read this variable and report test results 
+    to the existing test run.
+
+Nothing has changed in cases when there is a single instance of a reporter or
+when it is using a test run, created with other tools, such as with an API request
+or manually in the Qase app.
 
 # qase-javascript-commons@2.0.0-beta.8
 
