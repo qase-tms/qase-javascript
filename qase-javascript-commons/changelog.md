@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.0.0-beta.10
+
+## What's new
+
+Fixed an issue when the results published before the test run creation.
+
 # qase-javascript-commons@2.0.0-beta.9
 
 ## What's new
