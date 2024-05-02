@@ -5,8 +5,7 @@ import chalk from 'chalk';
 import { QaseApi } from 'qaseio';
 
 import {
-  AbstractReporter,
-  ReporterInterface,
+  InternalReporterInterface,
   TestOpsReporter,
   ReportReporter,
 } from './reporters';
@@ -23,6 +22,7 @@ import { DriverEnum, FsWriter } from './writer';
 import { getPackageVersion } from './utils/get-package-version';
 import { CustomBoundaryFormData } from './utils/custom-boundary';
 import { DisabledException } from './utils/disabled-exception';
+import { Logger, LoggerInterface } from './utils/logger';
 
 /**
  * @type {Record<TestStatusEnum, (test: TestResultType) => string>}
@@ -36,11 +36,21 @@ const resultLogMap: Record<TestStatusEnum, (test: TestResultType) => string> = {
   [TestStatusEnum.invalid]: (test) => chalk`{yellowBright Test ${test.title} ${test.execution.status}}`,
 };
 
+export interface ReporterInterface {
+  addTestResult(result: TestResultType): Promise<void>;
+
+  publish(): Promise<void>;
+
+  startTestRun(): void;
+
+  isCaptureLogs(): boolean;
+}
+
 /**
  * @class QaseReporter
  * @implements AbstractReporter
  */
-export class QaseReporter extends AbstractReporter {
+export class QaseReporter implements ReporterInterface {
   /**
    * @param {string} frameworkPackage
    * @param {string} frameworkName
@@ -88,17 +98,22 @@ export class QaseReporter extends AbstractReporter {
   }
 
   /**
-   * @type {ReporterInterface}
+   * @type {InternalReporterInterface}
    * @private
    */
-  private readonly upstreamReporter?: ReporterInterface;
+  private readonly upstreamReporter?: InternalReporterInterface;
 
   /**
-   * @type {ReporterInterface}
+   * @type {InternalReporterInterface}
    * @private
    */
-  private readonly fallbackReporter?: ReporterInterface;
+  private readonly fallbackReporter?: InternalReporterInterface;
 
+  /**
+   * @type {boolean | undefined}
+   * @private
+   */
+  private readonly captureLogs: boolean | undefined;
 
   /**
    * @type {boolean}
@@ -112,6 +127,10 @@ export class QaseReporter extends AbstractReporter {
    */
   private useFallback = false;
 
+  private readonly logger: LoggerInterface;
+
+  private startTestRunOperation?: Promise<void> | undefined;
+
   /**
    * @param {OptionsType} options
    */
@@ -119,9 +138,10 @@ export class QaseReporter extends AbstractReporter {
     const env = envToConfig(envSchema({ schema: envValidationSchema }));
     const composedOptions = composeOptions(options, env);
 
-    super({ debug: composedOptions.debug, captureLogs: composedOptions.captureLogs });
-
+    this.logger = new Logger({ debug: composedOptions.debug });
     this.logger.logDebug(`Config: ${JSON.stringify(composedOptions)}`);
+
+    this.captureLogs = composedOptions.captureLogs;
 
     try {
       this.upstreamReporter = this.createReporter(
@@ -166,15 +186,15 @@ export class QaseReporter extends AbstractReporter {
   }
 
   /**
-   * @returns {Promise<void>}
+   * @returns {void}
    */
-  public override async startTestRun(): Promise<void> {
+  public startTestRun(): void {
     if (!this.disabled) {
 
       this.logger.logDebug('Starting test run');
 
       try {
-        await this.upstreamReporter?.startTestRun();
+        this.startTestRunOperation = this.upstreamReporter?.startTestRun();
       } catch (error) {
         this.logger.logError('Unable to start test run in the upstream reporter: ', error);
 
@@ -184,7 +204,7 @@ export class QaseReporter extends AbstractReporter {
         }
 
         try {
-          await this.fallbackReporter?.startTestRun();
+          this.startTestRunOperation = this.fallbackReporter?.startTestRun();
         } catch (error) {
           this.logger.logError('Unable to start test run in the fallback reporter: ', error);
           this.disabled = true;
@@ -196,7 +216,7 @@ export class QaseReporter extends AbstractReporter {
   /**
    * @param {TestResultType} result
    */
-  public override async addTestResult(result: TestResultType) {
+  public async addTestResult(result: TestResultType) {
     if (!this.disabled) {
       this.logTestItem(result);
 
@@ -239,10 +259,19 @@ export class QaseReporter extends AbstractReporter {
   }
 
   /**
+   * @returns {boolean}
+   */
+  public isCaptureLogs(): boolean {
+    return this.captureLogs ?? false;
+  }
+
+  /**
    * @returns {Promise<void>}
    */
   public async publish(): Promise<void> {
     if (!this.disabled) {
+
+      await this.startTestRunOperation;
 
       this.logger.logDebug('Publishing test run results');
 
@@ -286,13 +315,13 @@ export class QaseReporter extends AbstractReporter {
    * @todo implement mode registry
    * @param {ModeEnum} mode
    * @param {OptionsType} options
-   * @returns {ReporterInterface}
+   * @returns {InternalReporterInterface}
    * @private
    */
   private createReporter(
     mode: ModeEnum,
     options: OptionsType,
-  ): ReporterInterface {
+  ): InternalReporterInterface {
     const {
       frameworkPackage,
       frameworkName,
@@ -300,7 +329,6 @@ export class QaseReporter extends AbstractReporter {
       environment,
       report = {},
       testops = {},
-      ...commonOptions
     } = options;
 
     switch (mode) {
@@ -348,6 +376,7 @@ export class QaseReporter extends AbstractReporter {
         }, CustomBoundaryFormData);
 
         return new TestOpsReporter(
+          this.logger,
           {
             project,
             uploadAttachments,
@@ -358,8 +387,6 @@ export class QaseReporter extends AbstractReporter {
             },
             plan,
             batch,
-            debug: commonOptions.debug,
-            captureLogs: commonOptions.captureLogs,
           },
           apiClient,
           typeof environment === 'number' ? environment : undefined,
@@ -370,10 +397,9 @@ export class QaseReporter extends AbstractReporter {
         const localOptions = report.connections?.[DriverEnum.local];
         const writer = new FsWriter(localOptions);
 
-        return new ReportReporter({
-            debug: commonOptions.debug,
-            captureLogs: commonOptions.captureLogs,
-          }, writer,
+        return new ReportReporter(
+          this.logger,
+          writer,
           typeof environment === 'number' ? environment.toString() : environment, testops.run?.id);
       }
 

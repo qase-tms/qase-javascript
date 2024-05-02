@@ -261,7 +261,7 @@ export class PlaywrightQaseReporter implements Reporter {
   }
 
   public onBegin(): void {
-    void this.reporter.startTestRun();
+    this.reporter.startTestRun();
   }
 
   /**

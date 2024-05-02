@@ -1,21 +1,8 @@
 import { TestResultType } from '../models';
 import { v4 as uuidv4 } from 'uuid';
-import { Logger } from '../utils/logger';
+import { LoggerInterface } from '../utils/logger';
 
-export interface LoggerInterface {
-  log(message: string): void;
-
-  logError(message: string, error?: unknown): void;
-
-  logDebug(message: string): void;
-}
-
-export interface ReporterOptionsType {
-  debug?: boolean | undefined;
-  captureLogs?: boolean | undefined;
-}
-
-export interface ReporterInterface {
+export interface InternalReporterInterface {
   addTestResult(result: TestResultType): Promise<void>;
 
   publish(): Promise<void>;
@@ -25,22 +12,14 @@ export interface ReporterInterface {
   getTestResults(): TestResultType[];
 
   setTestResults(results: TestResultType[]): void;
-
-  isCaptureLogs(): boolean;
 }
 
 /**
  * @abstract
  * @class AbstractReporter
- * @implements ReporterInterface
+ * @implements InternalReporterInterface
  */
-export abstract class AbstractReporter implements ReporterInterface {
-  /**
-   * @type {boolean | undefined}
-   * @private
-   */
-  private readonly captureLogs: boolean | undefined;
-
+export abstract class AbstractReporter implements InternalReporterInterface {
   /**
    * @type {LoggerInterface}
    * @private
@@ -64,16 +43,11 @@ export abstract class AbstractReporter implements ReporterInterface {
   abstract startTestRun(): Promise<void>;
 
   /**
-   * @param {ReporterOptionsType} options
    * @protected
+   * @param {LoggerInterface} logger
    */
-  protected constructor(
-    options: ReporterOptionsType | undefined,
-  ) {
-    const { debug, captureLogs } = options ?? {};
-
-    this.captureLogs = captureLogs;
-    this.logger = new Logger({ debug });
+  protected constructor(logger: LoggerInterface) {
+    this.logger = logger;
   }
 
   /**
@@ -81,13 +55,6 @@ export abstract class AbstractReporter implements ReporterInterface {
    */
   public getTestResults(): TestResultType[] {
     return this.results;
-  }
-
-  /**
-   * @returns {boolean}
-   */
-  public isCaptureLogs(): boolean {
-    return this.captureLogs ?? false;
   }
 
   /**

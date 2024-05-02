@@ -12,7 +12,7 @@ import {
   RunCreate, TestStepResultCreate, TestStepResultCreateStatusEnum,
 } from 'qaseio';
 
-import { AbstractReporter, ReporterOptionsType } from './abstract-reporter';
+import { AbstractReporter } from './abstract-reporter';
 
 import {
   StepStatusEnum,
@@ -27,6 +27,7 @@ import {
 } from '../models';
 
 import { QaseError } from '../utils/qase-error';
+import { LoggerInterface } from '../utils/logger';
 
 const defaultChunkSize = 200;
 
@@ -146,12 +147,14 @@ export class TestOpsReporter extends AbstractReporter {
   private isTestRunReady = false;
 
   /**
+   * @param {LoggerInterface} logger
    * @param {ReporterOptionsType & TestOpsOptionsType} options
    * @param {QaseApiInterface} api
    * @param {number} environment
    */
   constructor(
-    options: ReporterOptionsType & TestOpsOptionsType,
+    logger: LoggerInterface,
+    options: TestOpsOptionsType,
     private api: QaseApiInterface,
     environment?: number,
   ) {
@@ -159,11 +162,9 @@ export class TestOpsReporter extends AbstractReporter {
       project,
       uploadAttachments,
       run,
-
-      ...restOptions
     } = options;
 
-    super(restOptions);
+    super(logger);
 
     const baseUrl = 'https://app.qase.io';
 

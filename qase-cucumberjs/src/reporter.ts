@@ -167,7 +167,7 @@ export class CucumberQaseReporter extends Formatter {
             envelope.attachment.fileName;
         }
       } else if (envelope.testRunStarted) {
-        void this.startTestRun();
+        this.startTestRun();
       } else if (envelope.testRunFinished) {
         void this.publishResults();
       } else if (envelope.testCase) {
@@ -278,7 +278,7 @@ export class CucumberQaseReporter extends Formatter {
    * @returns {Promise<void>}
    * @private
    */
-  private async startTestRun(): Promise<void> {
-    await this.reporter.startTestRun();
+  private startTestRun(): void {
+    void this.reporter.startTestRun();
   }
 }
