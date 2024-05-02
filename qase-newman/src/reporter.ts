@@ -103,7 +103,7 @@ export class NewmanQaseReporter {
   ) {
     const config = configLoader.load();
 
-    this.reporter = new QaseReporter({
+    this.reporter = QaseReporter.getInstance({
       ...composeOptions(options, config),
       frameworkPackage: 'newman',
       frameworkName: 'newman',

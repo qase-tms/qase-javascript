@@ -121,7 +121,7 @@ export class CypressQaseReporter extends reporters.Base {
 
     this.screenshotsFolder = framework?.cypress?.screenshotsFolder;
 
-    this.reporter = new QaseReporter({
+    this.reporter = QaseReporter.getInstance({
       ...composedOptions,
       frameworkPackage: 'cypress',
       frameworkName: 'cypress',

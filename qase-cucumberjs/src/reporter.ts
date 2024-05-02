@@ -124,7 +124,7 @@ export class CucumberQaseReporter extends Formatter {
 
     super(formatterOptions);
 
-    this.reporter = new QaseReporter({
+    this.reporter = QaseReporter.getInstance({
       ...composeOptions(qase, config),
       frameworkPackage: '@cucumber/cucumber',
       frameworkName: 'cucumberjs',

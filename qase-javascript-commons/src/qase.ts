@@ -51,6 +51,8 @@ export interface ReporterInterface {
  * @implements AbstractReporter
  */
 export class QaseReporter implements ReporterInterface {
+  private static instance: QaseReporter;
+
   /**
    * @param {string} frameworkPackage
    * @param {string} frameworkName
@@ -134,7 +136,7 @@ export class QaseReporter implements ReporterInterface {
   /**
    * @param {OptionsType} options
    */
-  constructor(options: OptionsType) {
+  private constructor(options: OptionsType) {
     const env = envToConfig(envSchema({ schema: envValidationSchema }));
     const composedOptions = composeOptions(options, env);
 
@@ -211,6 +213,18 @@ export class QaseReporter implements ReporterInterface {
         }
       }
     }
+  }
+
+  /**
+   * @param {OptionsType} options
+   * @returns {QaseReporter}
+   */
+  public static getInstance(options: OptionsType): QaseReporter {
+    if (!QaseReporter.instance) {
+      QaseReporter.instance = new QaseReporter(options);
+    }
+
+    return QaseReporter.instance;
   }
 
   /**

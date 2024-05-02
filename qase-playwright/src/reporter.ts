@@ -237,7 +237,7 @@ export class PlaywrightQaseReporter implements Reporter {
   ) {
     const config = configLoader.load();
 
-    this.reporter = new QaseReporter({
+    this.reporter = QaseReporter.getInstance({
       ...composeOptions(options, config),
       frameworkPackage: '@playwright/test',
       frameworkName: 'playwright',
