@@ -160,7 +160,7 @@ export class TestcafeQaseReporter {
   ) {
     const config = configLoader.load();
 
-    this.reporter = new QaseReporter({
+    this.reporter = QaseReporter.getInstance({
       ...composeOptions(options, config),
       frameworkPackage: 'testcafe',
       frameworkName: 'testcafe',

@@ -69,7 +69,7 @@ export class JestQaseReporter implements Reporter {
   ) {
     const config = configLoader.load();
 
-    this.reporter = new QaseReporter({
+    this.reporter = QaseReporter.getInstance({
       ...composeOptions(options, config),
       frameworkPackage: 'jest',
       frameworkName: 'jest',
