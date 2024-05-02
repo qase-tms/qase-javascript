@@ -5,7 +5,15 @@ import { QaseError } from './qase-error';
 import { AxiosError } from 'axios';
 import get from 'lodash.get';
 
-export class Logger {
+export interface LoggerInterface {
+  log(message: string): void;
+
+  logError(message: string, error?: unknown): void;
+
+  logDebug(message: string): void;
+}
+
+export class Logger implements LoggerInterface {
   private readonly debug: boolean | undefined;
   private readonly filePath: string;
 

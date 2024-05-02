@@ -171,8 +171,8 @@ export class TestcafeQaseReporter {
   /**
    * @returns {Promise<void>}
    */
-  public startTestRun = async (): Promise<void> => {
-    await this.reporter.startTestRun();
+  public startTestRun = (): void => {
+    void this.reporter.startTestRun();
   };
 
   /**

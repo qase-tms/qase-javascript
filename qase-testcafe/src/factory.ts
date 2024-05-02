@@ -9,8 +9,8 @@ export const factory = (options: TestcafeQaseOptionsType) => {
 
   return {
     noColors: false,
-    reportTaskStart: async () => {
-      await reporter.startTestRun();
+    reportTaskStart: () => {
+      reporter.startTestRun();
     },
     reportFixtureStart: () => {
       /* empty */
