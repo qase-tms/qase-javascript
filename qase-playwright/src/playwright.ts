@@ -90,23 +90,28 @@ qase.title = function(value: string) {
 
 /**
  * Set fields for the test case
- * @param {Record<string, string>[]} value
+ * @param {Record<string, string>[]} values
  * @example
  * test('test', async ({ page }) => {
  *    qase.fields({ 'severity': 'high', 'priority': 'medium' });
  *    await page.goto('https://example.com');
  * });
  */
-qase.fields = function(value: Record<string, string>) {
+qase.fields = function(values: Record<string, string>) {
+  const stringRecord: Record<string, string> = {};
+  for (const [key, value] of Object.entries(values)) {
+    stringRecord[String(key)] = String(value);
+  }
+
   addMetadata({
-    fields: value,
+    fields: stringRecord,
   });
   return this;
 };
 
 /**
  * Set parameters for the test case
- * @param {Record<string, string>[]} value
+ * @param {Record<string, string>[]} values
  * @example
  * for (const value of values) {
  *    test('test', async ({ page }) => {
@@ -115,9 +120,13 @@ qase.fields = function(value: Record<string, string>) {
  *    });
  * )
  */
-qase.parameters = function(value: Record<string, string>) {
+qase.parameters = function(values: Record<string, string>) {
+  const stringRecord: Record<string, string> = {};
+  for (const [key, value] of Object.entries(values)) {
+    stringRecord[String(key)] = String(value);
+  }
   addMetadata({
-    parameters: value,
+    parameters: stringRecord,
   });
   return this;
 };
