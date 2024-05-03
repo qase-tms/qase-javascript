@@ -1,3 +1,19 @@
+# playwright-qase-reporter@2.0.0-beta.13
+
+## What's new
+
+Fixed the issue with the `qase.parameters` annotation if you use not string values for parameters.
+
+```log
+[ERROR] qase: Unable to add the result to the upstream reporter:
+Message: Data is invalid.
+ results.0.param.test_case: The param.test_case must be a string.
+
+Error: Request failed with status code 400
+```
+
+Right now, the reporter will convert all parameters to strings before sending them to the Qase API.
+
 # playwright-qase-reporter@2.0.0-beta.11
 
 ## What's new
