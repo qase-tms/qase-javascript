@@ -1,3 +1,13 @@
+# qase-javascript-commons@2.0.0-beta.11
+
+## What's new
+
+* The `useV2` option in the reporter's configuration will now enable using the experimental v2 API.
+  Before this fix, v1 API was used despite the configuration.
+
+* Attachments from test steps will now be uploaded to Qase.
+  Before this fix, the reporter uploaded only the attachments made outside of any step scope.
+
 # qase-javascript-commons@2.0.0-beta.10
 
 ## What's new
