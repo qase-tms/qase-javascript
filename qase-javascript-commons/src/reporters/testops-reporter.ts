@@ -418,10 +418,10 @@ export class TestOpsReporter extends AbstractReporter {
       const resultStep: ResultStep = {
         data: {
           action: '',
-          attachments: attachmentHashes,
         },
         execution: {
           status: TestOpsReporter.stepStatusMap[step.execution.status],
+          attachments: attachmentHashes,
         },
       };
 
