@@ -1,12 +1,92 @@
 # Qase TMS Playwright reporter
 
-Publish results simple and easy.
+Qase Playwright reporter sends test results and metadata to Qase.io.
+It can work in different test automation scenarios:
 
-## How to install
+* Create new test cases in Qase from existing autotests.
+* Report Cypress test results to existing test cases in Qase.
+* Update existing cases with metadata, such as parameters and fields.
 
+Qase Playwright reporter is currently in open beta stage for the version 2 series.
+To install the latest beta version, run:
+
+```sh
+npm install -D playwright-qase-reporter@beta
 ```
-npm install playwright-qase-reporter@beta
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+# Contents
+
+- [Getting started](#getting-started)
+- [Updating from v1](#updating-from-v1)
+- [Example of usage](#example-of-usage)
+- [Configuration](#configuration)
+- [Requirements](#requirements)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Getting started
+
+To report your tests results to Qase, install `playwright-qase-reporter`,
+and add a reporter config in the `playwright.config.ts` file.
+A minimal configuration needs just two things:
+
+* Qase project code, for example, in https://app.qase.io/project/DEMO the code is `DEMO`.
+* Qase API token, created on the [Apps page](https://app.qase.io/apps?app=playwright-reporter).
+
+```js
+const config: PlaywrightTestConfig = {
+  // ...  
+  reporter: [
+    [
+      'playwright-qase-reporter',
+      {
+        testops: {
+          api: {
+            token: 'api_key',
+          },
+          project: 'project_code',
+        },
+      },
+    ],
+  ],
+  // ...  
+};
+module.exports = config;
 ```
+
+Now run the tests as usual.
+Test results will be reported to a new test run in Qase:
+
+```console
+$ npx playwright test
+Running 5 tests using 1 worker
+...
+...
+...
+qase: 5 results sent to Qase
+qase: run 1 completed
+qase: Test run link: https://app.qase.io/run/DEMO/dashboard/1
+```
+
+## Updating from v1
+
+To update a test project using qase-playwright-reporter@v1 to version 2:
+
+1.  Change the import paths:
+
+    ```diff
+    - import { qase } from 'playwright-qase-reporter/dist/playwright'
+    + import { qase } from 'playwright-qase-reporter'
+    ```
+
+2.  Update reporter configuration in `playwright.config.js` and/or environment variables —
+    see the [configuration reference](#configuration) below.
+
+The previous test annotation syntax is still supported, so there is no need to rewrite the tests.
+However, check out the docs for the new, more flexible and powerful syntax.
 
 ## Example of usage
 
@@ -31,8 +111,8 @@ describe('Test suite', () => {
     qase.fields({ 'severity': 'high', 'priority': 'medium' })
     expect(true).toBe(true);
   });
-  
-  test(qase(3, 'This syntax is supported, but deprecated'), () => {
+
+  test(qase(2, 'This syntax is still supported'), () => {
     expect(true).toBe(true);
   });
 });
@@ -130,7 +210,7 @@ Supported ENV variables:
 
 ## Requirements
 
-We maintain the reporter on LTS versions of Node. You can find the current versions by following the [link](https://nodejs.org/en/about/releases/)
+We maintain the reporter on [LTS versions of Node.js](https://nodejs.org/en/about/releases/).
 
 `@playwright/test >= 1.16.3`
 
