@@ -1,6 +1,7 @@
 import { Reporter, TestCase, TestError, TestResult, TestStatus, TestStep } from '@playwright/test/reporter';
 import { v4 as uuidv4 } from 'uuid';
 import chalk from 'chalk';
+import * as path from 'path';
 
 import {
   Attachment,
@@ -159,7 +160,19 @@ export class PlaywrightQaseReporter implements Reporter {
         }
 
         attachments.push(attachmentModel);
+        continue;
       }
+
+      const attachmentModel: Attachment = {
+        content: attachment.body == undefined ? '' : attachment.body,
+        file_name: attachment.path == undefined ? attachment.name : path.basename(attachment.path),
+        file_path: attachment.path == undefined ? null : attachment.path,
+        mime_type: attachment.contentType,
+        size: 0,
+        id: uuidv4(),
+      };
+
+      attachments.push(attachmentModel);
     }
     metadata.attachments = attachments;
 
