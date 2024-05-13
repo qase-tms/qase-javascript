@@ -1,3 +1,10 @@
+# playwright-qase-reporter@2.0.0-beta.14
+
+## What's new
+
+Fixed the issue with attachments that the Playwright would create if the test failed.
+We have not uploaded these attachments before. This problem has now been fixed.
+
 # playwright-qase-reporter@2.0.0-beta.13
 
 ## What's new
