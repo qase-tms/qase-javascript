@@ -4,24 +4,24 @@ Monorepo with [Qase TestOps](https://qase.io) reporters for JavaScript testing f
 
 For all of our reporters, there are two versions:
 
-* The latest v2 series, either already released or in beta stage.
+* The latest v2 series, either already released or in the beta stage.
 * The v1 series, stable and receiving only bugfixes.
 
 If you're just starting, pick v2.
 If your project is using a v1 reporter, check out the reporter's readme for the migration guide.
 
-| Name                          | Package name               | v1 series                                                                                  | v2 series                                                                                            |
-|:------------------------------|:---------------------------|:-------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------|
+| Name                          | Package name               | v2 series                                                                                          | v1 series                                                                                      |
+|:------------------------------|:---------------------------|:---------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------|
 | **Qase JavaScript Reporters** |
-| CucumberJS                    | `cucumberjs-qase-reporter` | [🗿stable](https://github.com/qase-tms/qase-javascript/tree/master/qase-cucumberjs#readme) | [🧰 closed beta](https://github.com/qase-tms/qase-javascript/tree/main/qase-cucumberjs#readme)       |
-| Cypress                       | `cypress-qase-reporter`    | [🗿stable](https://github.com/qase-tms/qase-javascript/tree/master/qase-cypress#readme)    | [🧪 open beta](https://github.com/qase-tms/qase-javascript/tree/main/qase-cypress#readme)            |
-| Jest                          | `jest-qase-reporter`       | [🗿stable](https://github.com/qase-tms/qase-javascript/tree/master/qase-jest#readme)       | [🧰 closed beta](https://github.com/qase-tms/qase-javascript/tree/main/qase-jest#readme)             |
-| Newman                        | `newman-reporter-qase`     | [🗿stable](https://github.com/qase-tms/qase-javascript/tree/master/qase-newman#readme)     | [🧰 closed beta](https://github.com/qase-tms/qase-javascript/tree/main/qase-newman#readme)           |
-| Playwright                    | `playwright-qase-reporter` | [🗿stable](https://github.com/qase-tms/qase-javascript/tree/master/qase-playwright#readme) | [🧪 open beta](https://github.com/qase-tms/qase-javascript/tree/main/qase-playwright#readme)         |
-| Testcafe                      | `testcafe-reporter-qase`   | [🗿stable](https://github.com/qase-tms/qase-javascript/tree/master/qase-testcafe#readme)   | [🧰 closed beta](https://github.com/qase-tms/qase-javascript/tree/main/qase-testcafe#readme)         |
+| CucumberJS                    | `cucumberjs-qase-reporter` | [🧰 closed beta](https://github.com/qase-tms/qase-javascript/tree/main/qase-cucumberjs#readme)     | [🗿stable](https://github.com/qase-tms/qase-javascript/tree/master/qase-cucumberjs#readme)     |
+| Cypress                       | `cypress-qase-reporter`    | [🧪 open beta](https://github.com/qase-tms/qase-javascript/tree/main/qase-cypress#readme)          | [🗿stable](https://github.com/qase-tms/qase-javascript/tree/master/qase-cypress#readme)        |
+| Jest                          | `jest-qase-reporter`       | [🧰 closed beta](https://github.com/qase-tms/qase-javascript/tree/main/qase-jest#readme)           | [🗿stable](https://github.com/qase-tms/qase-javascript/tree/master/qase-jest#readme)           |
+| Newman                        | `newman-reporter-qase`     | [🧰 closed beta](https://github.com/qase-tms/qase-javascript/tree/main/qase-newman#readme)         | [🗿stable](https://github.com/qase-tms/qase-javascript/tree/master/qase-newman#readme)         |
+| Playwright                    | `playwright-qase-reporter` | [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qase-playwright#readme)         | [🗿deprecated](https://github.com/qase-tms/qase-javascript/tree/master/qase-playwright#readme) |
+| Testcafe                      | `testcafe-reporter-qase`   | [🧰 closed beta](https://github.com/qase-tms/qase-javascript/tree/main/qase-testcafe#readme)       | [🗿stable](https://github.com/qase-tms/qase-javascript/tree/master/qase-testcafe#readme)       |
 | **Qase JavaScript SDK**       |
-| Common functions library      | `qase-javascript-commons`  | not available                                                                              | [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qase-javascript-commons#readme)   |
-| JavaScript API client         | `qaseio`                   | [🗿deprecated](https://github.com/qase-tms/qase-javascript/tree/master/qaseio#readme)      | [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qaseio#readme)                    |
+| Common functions library      | `qase-javascript-commons`  | [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qase-javascript-commons#readme) | not available                                                                                  |
+| JavaScript API client         | `qaseio`                   | [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qaseio#readme)                  | [🗿deprecated](https://github.com/qase-tms/qase-javascript/tree/master/qaseio#readme)          |
 
 What each status means:
 
