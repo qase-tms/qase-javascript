@@ -1,3 +1,10 @@
+# qase-javascript-commons@2.0.0-beta.12
+
+## What's new
+
+Fixed an issue when the result has empty step action. Now the reporter will mark such steps as "Unnamed step" and will
+log a warning message.
+
 # qase-javascript-commons@2.0.0-beta.11
 
 ## What's new
