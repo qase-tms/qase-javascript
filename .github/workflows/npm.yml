@@ -48,12 +48,12 @@ jobs:
 
     - name: Publish a release version
       if: contains(github.event.ref, matrix.prefix) && !contains(github.event.ref, 'beta')
-      run: echo 'release' # && npm publish -w ${{ matrix.prefix }}
+      run: npm publish -w ${{ matrix.prefix }}
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
     - name: Publish a beta version
       if: contains(github.event.ref, matrix.prefix) && contains(github.event.ref, 'beta')
-      run: echo 'beta' # && npm publish -w ${{ matrix.prefix }} --tag beta
+      run: npm publish -w ${{ matrix.prefix }} --tag beta
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
