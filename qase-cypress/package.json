@@ -1,6 +1,6 @@
 {
   "name": "cypress-qase-reporter",
-  "version": "2.0.0-beta.4",
+  "version": "2.0.0",
   "description": "Qase Cypress Reporter",
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "sideEffects": false,
@@ -41,10 +41,10 @@
     "test": "jest --passWithNoTests",
     "clean": "rm -rf dist"
   },
-  "author": "Nikita Fedorov <nik333r@gmail.com>",
+  "author": "Qase Team <support@qase.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "qase-javascript-commons": "^2.0.0-beta.10",
+    "qase-javascript-commons": "^2.0.0",
     "uuid": "^9.0.1"
   },
   "peerDependencies": {

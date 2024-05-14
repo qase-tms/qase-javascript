@@ -4,11 +4,10 @@ Publish results simple and easy.
 
 ## How to install
 
-Qase Cypress reporter is currently in open beta stage for the version 2 series.
-To install the latest beta version, run:
+To install the latest version, run:
 
 ```sh
-npm install -D cypress-qase-reporter@beta
+npm install -D cypress-qase-reporter
 ```
 
 ## Updating from v1
