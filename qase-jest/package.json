@@ -1,6 +1,6 @@
 {
   "name": "jest-qase-reporter",
-  "version": "2.0.0-beta.2",
+  "version": "2.0.0",
   "description": "Qase TMS Jest Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -40,12 +40,12 @@
     "test": "jest --passWithNoTests",
     "clean": "rm -rf dist"
   },
-  "author": "Parviz Khavari <csctclan@gmail.com>",
+  "author": "Qase Team <support@qase.io>",
   "license": "Apache-2.0",
   "dependencies": {
     "lodash.get": "^4.4.2",
     "lodash.has": "^4.5.2",
-    "qase-javascript-commons": "^2.0.0-beta.12",
+    "qase-javascript-commons": "^2.0.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
