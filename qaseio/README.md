@@ -1,6 +1,44 @@
-# [Qase TMS](https://qase.io) JavaScript Api Client
+# [Qase TMS](https://qase.io) API JavaScript Client
 
 [![License](https://lxgaming.github.io/badges/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+
+The `qaseio` package implements a JavaScript client for Qase API.
+It should be used for building integrations with [Qase API](https://developers.qase.io/reference/introduction-to-the-qase-api)
+or writing test reporters for special-purpose frameworks.
+
+To report results from tests using a popular framework or test runner,
+use the corresponding package instead:
+
+* [CucumberJS](https://github.com/qase-tms/qase-javascript/tree/main/qase-cucumberjs#readme)
+* [Cypress](https://github.com/qase-tms/qase-javascript/tree/main/qase-cypress#readme)
+* [Jest](https://github.com/qase-tms/qase-javascript/tree/main/qase-jest#readme)
+* [Newman](https://github.com/qase-tms/qase-javascript/tree/main/qase-newman#readme)
+* [Playwright](https://github.com/qase-tms/qase-javascript/tree/main/qase-playwright#readme)
+* [TestCafe](https://github.com/qase-tms/qase-javascript/tree/main/qase-testcafe#readme)
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+# Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Projects](#projects)
+  - [Test cases](#test-cases)
+  - [Test Suites](#test-suites)
+  - [Milestones](#milestones)
+  - [Shared steps](#shared-steps)
+  - [Test plans](#test-plans)
+  - [Test runs](#test-runs)
+  - [Test run results](#test-run-results)
+  - [Defects](#defects)
+  - [Custom fields](#custom-fields)
+  - [Attachments](#attachments)
+  - [Team](#team)
+- [Requirements](#requirements)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 
 ## Installation
 
@@ -10,16 +48,18 @@ npm install qaseio
 
 ## Usage
 
-Qase.io uses API tokens to authenticate requests. You can view an manage your API keys in [API tokens pages](https://app.qase.io/user/api/token).
-
-You must replace api_token with your personal API key.
+Qase.io uses API tokens to authenticate requests.
+API keys can be issued on the [personal API tokens page](https://app.qase.io/user/api/token)
+or on the [app integrations page](https://app.qase.io/apps).
 
 Pure JavaScript:
 
 ```javascript
 var qaseio = require('qaseio');
 
-var qase = new qaseio.QaseApi('api_token');
+const qase = new QaseApi({
+    token: 'api_token',
+});
 ```
 
 ES5:
@@ -27,7 +67,9 @@ ES5:
 ```typescript
 import { QaseApi } from 'qaseio';
 
-const qase = new QaseApi('api_token');
+const qase = new QaseApi({
+    token: 'api_token',
+});
 ```
 
 ### Projects
@@ -702,4 +744,4 @@ qase.users.exists(123).then((exists) => {
 
 ## Requirements
 
-We maintain the reporter on LTS versions of Node. You can find the current versions by following the [link](https://nodejs.org/en/about/releases/)
+The reporter is maintained on the [LTS versions of Node.js](https://nodejs.org/en/about/releases/).

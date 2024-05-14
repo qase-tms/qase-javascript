@@ -1,7 +1,7 @@
 {
   "name": "qaseio",
-  "version": "2.1.0-beta.1",
-  "description": "Qase TMS Javascript Api Client",
+  "version": "2.1.0",
+  "description": "Qase TMS Javascript API Client",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "homepage": "https://github.com/qase-tms/qase-javascript",
@@ -21,7 +21,7 @@
     "test": "jest",
     "clean": "rm -rf dist"
   },
-  "author": "Parviz Khavari <csctclan@gmail.com>",
+  "author": "Qase Team <support@qase.io>",
   "license": "Apache-2.0",
   "dependencies": {
     "axios": "^0.21.4",

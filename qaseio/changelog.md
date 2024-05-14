@@ -1,3 +1,14 @@
+# qaseio@2.1.0
+
+## What's new
+
+The new release of Qase API client brings a number of new features:
+
+* Full support of the latest state of the [Qase API](https://developers.qase.io/reference);
+* Full support of the experimental v2 API for working with test results.
+* Uploading test attachments from strings and buffers.
+* New API endpoints: `v1/system-fields/` and `v1/configurations/`.
+
 # qaseio@2.1.0-beta.1
 
 ## What's new
