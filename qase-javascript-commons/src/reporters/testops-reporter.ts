@@ -307,7 +307,7 @@ export class TestOpsReporter extends AbstractReporter {
    */
   private async transformTestResult(result: TestResultType): Promise<ResultCreateV2> {
     const attachments = await this.uploadAttachments(result.attachments);
-    const steps = await this.transformSteps(result.steps);
+    const steps = await this.transformSteps(result.steps, result.title);
 
     const model = {
       title: result.title,
@@ -332,7 +332,7 @@ export class TestOpsReporter extends AbstractReporter {
    */
   private async transformTestResultV1(result: TestResultType): Promise<ResultCreate> {
     const attachments = await this.uploadAttachments(result.attachments);
-    const steps = await this.transformStepsV1(result.steps);
+    const steps = await this.transformStepsV1(result.steps, result.title);
 
     const resultCreate: ResultCreate = {
       attachments: attachments,
@@ -406,10 +406,11 @@ export class TestOpsReporter extends AbstractReporter {
 
   /**
    * @param {TestStepType[]} steps
+   * @param testTitle
    * @returns Promise<ResultStep[]>
    * @private
    */
-  private async transformSteps(steps: TestStepType[]): Promise<ResultStep[]> {
+  private async transformSteps(steps: TestStepType[], testTitle: string): Promise<ResultStep[]> {
     const resultsSteps: ResultStep[] = [];
 
     for (const step of steps) {
@@ -427,7 +428,12 @@ export class TestOpsReporter extends AbstractReporter {
 
       if (step.step_type === StepType.TEXT) {
         if ('action' in step.data && resultStep.data != undefined) {
-          resultStep.data.action = step.data.action;
+          if (step.data.action === '') {
+            this.logEmptyStep(testTitle);
+            resultStep.data.action = 'Unnamed step';
+          } else {
+            resultStep.data.action = step.data.action;
+          }
         }
       }
 
@@ -438,7 +444,7 @@ export class TestOpsReporter extends AbstractReporter {
       }
 
       if (step.steps.length > 0) {
-        resultStep.steps = await this.transformSteps(step.steps);
+        resultStep.steps = await this.transformSteps(step.steps, testTitle);
       }
 
       resultsSteps.push(resultStep);
@@ -449,10 +455,11 @@ export class TestOpsReporter extends AbstractReporter {
 
   /**
    * @param {TestStepType[]} steps
+   * @param testTitle
    * @returns Promise<TestStepResultCreate[]>
    * @private
    */
-  private async transformStepsV1(steps: TestStepType[]): Promise<TestStepResultCreate[]> {
+  private async transformStepsV1(steps: TestStepType[], testTitle: string): Promise<TestStepResultCreate[]> {
     const resultsSteps: TestStepResultCreate[] = [];
 
     for (const step of steps) {
@@ -465,7 +472,12 @@ export class TestOpsReporter extends AbstractReporter {
 
       if (step.step_type === StepType.TEXT) {
         if ('action' in step.data) {
-          resultStep.action = step.data.action;
+          if (step.data.action === '') {
+            this.logEmptyStep(testTitle);
+            resultStep.action = 'Unnamed step';
+          } else {
+            resultStep.action = step.data.action;
+          }
         }
       }
 
@@ -476,13 +488,17 @@ export class TestOpsReporter extends AbstractReporter {
       }
 
       if (step.steps.length > 0) {
-        resultStep.steps = await this.transformStepsV1(step.steps);
+        resultStep.steps = await this.transformStepsV1(step.steps, testTitle);
       }
 
       resultsSteps.push(resultStep);
     }
 
     return resultsSteps;
+  }
+
+  private logEmptyStep(testTitle: string): void {
+    this.logger.log(chalk`{magenta Test '${testTitle}' has empty action in step. The reporter will mark this step as unnamed step.}`);
   }
 
   /**
