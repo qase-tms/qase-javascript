@@ -4,7 +4,7 @@ Qase Playwright reporter sends test results and metadata to Qase.io.
 It can work in different test automation scenarios:
 
 * Create new test cases in Qase from existing autotests.
-* Report Cypress test results to existing test cases in Qase.
+* Report Playwright test results to existing test cases in Qase.
 * Update existing cases with metadata, such as parameters and fields.
 
 Qase Playwright reporter is currently in open beta stage for the version 2 series.
@@ -45,7 +45,7 @@ const config: PlaywrightTestConfig = {
       {
         testops: {
           api: {
-            token: 'api_key',
+            token: 'api_token',
           },
           project: 'project_code',
         },
