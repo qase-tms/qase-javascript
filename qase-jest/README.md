@@ -1,11 +1,75 @@
-> # Qase TMS Jest reporter
->
-> Publish results simple and easy.
+# Qase TestOps Jest reporter
 
-## How to integrate
+Qase Jest reporter sends test results and metadata to Qase.io.
+It can work in different test automation scenarios:
 
+* Create new test cases in Qase from existing autotests.
+* Report Jest test results to existing test cases in Qase.
+
+Testing frameworks that use Jest as a test runner, such as Puppetteer, Appium, and Detox,
+can also be used with Jest reporter.
+
+Qase Jest reporter is currently in open beta stage for the version 2 series.
+To install the latest beta version, run:ы
+
+```shell
+npm install --save-dev jest-qase-reporter@beta
 ```
-npm install jest-qase-reporter
+
+# Contents
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+- [Getting started](#getting-started)
+- [Using Reporter](#using-reporter)
+- [Configuration](#configuration)
+- [Requirements](#requirements)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Getting started
+
+To report your tests results to Qase, install `jest-qase-reporter`,
+and add a reporter config in the `jest.config.ts` file.
+A minimal configuration needs just two things:
+
+* Qase project code, for example, in https://app.qase.io/project/DEMO the code is `DEMO`.
+* Qase API token, created on the [Apps page](https://app.qase.io/apps?app=jest-reporter).
+
+```js
+module.exports = {
+  reporters: [
+    'default',
+    [
+      'jest-qase-reporter',
+      {
+        mode: 'testops',
+        testops: {
+          api: {
+            token: 'api_token'
+          },
+          project: 'project_code',
+        },
+      },
+    ],
+  ],
+};
+```
+
+Now, run the Jest tests as usual.
+Test results will be reported to a new test run in Qase.
+
+
+```console
+$ npx jest
+Determining test suites to run...
+...
+qase: Project DEMO exists
+qase: Using run 42 to publish test results
+...
+
+Ran all test suites.
 ```
 
 ## Using Reporter
@@ -17,7 +81,7 @@ But if necessary, you can independently register the ID of already
 existing test cases from TMS before the executing tests. For example:
 
 ```typescript
-import { qase } from 'jest-qase-reporter/jest';
+const { qase } = require("jest-qase-reporter/jest");
 
 describe('My First Test', () => {
     test(qase([1,2], 'Several ids'), () => {
@@ -61,14 +125,12 @@ https://app.qase.io/run/QASE_PROJECT_CODE
 Reporter options (* - required):
 
 - `mode` - `testops`/`off` Enables reporter, default - `off`
-- `debug` - Enables debug logging, defaule - `false`
+- `debug` - Enables debug logging, default - `false`
 - `environment` - To execute with the sending of the envinroment information 
 - *`testops.api.token` - Token for API access, you can find more information
   [here](https://developers.qase.io/#authentication)
-- *`testops.project` - Code of your project (can be extracted from main
-  page of your project: `https://app.qase.io/project/DEMOTR` -
-  `DEMOTR` is project code here)
-- `testops.run.id` - Pass Run ID
+- *`testops.project` - Qase project code, for example, in https://app.qase.io/project/DEMO the code is `DEMO`
+- `testops.run.id` - Qase test run ID, used when the test run was created earlier using CLI or API call.
 - `testops.run.title` - Set custom Run name, when new run is created
 - `testops.run.description` - Set custom Run description, when new run is created
 - `testops.run.complete` - Whether the run should be completed
@@ -82,18 +144,17 @@ module.exports = {
     [
       'jest-qase-reporter',
       {
-        debug: true,
-        environment: 1,
+        mode: 'testops',
         testops: {
           api: {
             token: 'api_key'
           },
           project: 'project_code',
           run: {
-            id: 45,
             complete: true,
           },
         },
+        debug: true,
       },
     ],
   ],
