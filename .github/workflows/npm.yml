@@ -20,6 +20,7 @@ jobs:
     - run: npm run build -ws --if-present
     - run: npm run lint -w ${{ matrix.prefix }}
     - run: npm run test -w ${{ matrix.prefix }}
+
   build-n-publish:
     runs-on: ubuntu-latest
     needs: test
@@ -36,11 +37,23 @@ jobs:
       with:
         node-version: '16'
         registry-url: 'https://registry.npmjs.org'
-    - if: contains(github.event.ref, matrix.prefix)
+
+    - name: Install dependencies
+      if: contains(github.event.ref, matrix.prefix)
       run: npm ci
-    - if: contains(github.event.ref, matrix.prefix)
+
+    - name: Build a Node package
+      if: contains(github.event.ref, matrix.prefix)
       run: npm run build -ws --if-present
-    - if: contains(github.event.ref, matrix.prefix)
-      run: npm publish -w ${{ matrix.prefix }} --tag beta
+
+    - name: Publish a release version
+      if: contains(github.event.ref, matrix.prefix) && !contains(github.event.ref, 'beta')
+      run: echo 'release' # && npm publish -w ${{ matrix.prefix }}
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    - name: Publish a beta version
+      if: contains(github.event.ref, matrix.prefix) && contains(github.event.ref, 'beta')
+      run: echo 'beta' # && npm publish -w ${{ matrix.prefix }} --tag beta
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
