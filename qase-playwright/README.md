@@ -7,11 +7,10 @@ It can work in different test automation scenarios:
 * Report Playwright test results to existing test cases in Qase.
 * Update existing cases with metadata, such as parameters and fields.
 
-Qase Playwright reporter is currently in open beta stage for the version 2 series.
-To install the latest beta version, run:
+To install the latest version, run:
 
 ```sh
-npm install -D playwright-qase-reporter@beta
+npm install -D playwright-qase-reporter
 ```
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
