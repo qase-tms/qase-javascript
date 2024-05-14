@@ -1,11 +1,25 @@
 # Qase JavaScript Commons
 
-This package contains common classes and functions for working with Qase TMS API.
+This module is an SDK for developing test reporters for Qase TMS.
+It's using `qaseio` as an API client, and all Qase reporters are, in turn,
+using this package.
+You should use it if you're developing your own test reporter for a special-purpose framework.
+
+To report results from tests using a popular framework or test runner,
+don't install this module directly and
+use the corresponding reporter module instead:
+
+* [CucumberJS](https://github.com/qase-tms/qase-javascript/tree/main/qase-cucumberjs#readme)
+* [Cypress](https://github.com/qase-tms/qase-javascript/tree/main/qase-cypress#readme)
+* [Jest](https://github.com/qase-tms/qase-javascript/tree/main/qase-jest#readme)
+* [Newman](https://github.com/qase-tms/qase-javascript/tree/main/qase-newman#readme)
+* [Playwright](https://github.com/qase-tms/qase-javascript/tree/main/qase-playwright#readme)
+* [TestCafe](https://github.com/qase-tms/qase-javascript/tree/main/qase-testcafe#readme)
 
 ## Installation
 
 ```bash
-npm install qase-javascript-commons@beta
+npm install qase-javascript-commons
 ```
 
 ## Configuration
