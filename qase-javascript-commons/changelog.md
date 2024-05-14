@@ -1,3 +1,56 @@
+# qase-javascript-commons@2.0.0
+
+## What's new
+
+This is the first release version of the Qase JavaScript SDK.
+It is numbered `2.0.0` (and not `1.0.0`) to match the release series of 
+test reporters for Playwright, Cypress, Jest and other frameworks.
+
+### Annotating test with field data
+
+Tests can now be annotated with data for system and custom fields in Qase.
+This feature is already implemented in the Playwright reporter:
+
+```js
+test('Test with annotated fields', () => {
+    qase.id(1);
+    qase.fields({ 'severity': 'high', 'priority': 'medium' })
+    // ...
+});
+```
+
+### Parametrized tests
+
+Qase JavaScript SDK enables annotating tests with parameters, and passing parameter values to Qase.
+Parameterized tests can report to a single test case, but each parameter variation is registered as
+a standalone result, with its own run history.
+
+### Attachments from files and variables
+
+Reporters can now upload attachments of various data types to Qase,
+both from files and from variables.
+It enables flexible and meticulous logging, such as collecting full HTTP request data,
+including URL, headers, and payload.
+
+### Uploading results in flexible batches, asynchronously
+
+Test reporters can now upload results in batches, while tests are still running.
+It helps bring test results faster and enables acting on them long before the test run is complete.
+
+### Uniform configuration
+
+Qase JavaScript SDK brings configuration with config files and environment variables
+to a common standard, used with Qase reporters in all languages and frameworks.
+
+For details, see the Configuration section in the README.
+
+### Latest API
+
+Qase JavaScript SDK is using the latest Qase API client,
+employing the full power of the stable v1 API version,
+and enabling the use of experimental v2 API, tailored for uploading
+huge amounts of test results.
+
 # qase-javascript-commons@2.0.0-beta.12
 
 ## What's new
