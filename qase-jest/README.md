@@ -6,14 +6,13 @@ It can work in different test automation scenarios:
 * Create new test cases in Qase from existing autotests.
 * Report Jest test results to existing test cases in Qase.
 
-Testing frameworks that use Jest as a test runner, such as Puppetteer, Appium, and Detox,
+Testing frameworks that use Jest as a test runner, such as Puppeteer, Appium, and Detox,
 can also be used with Jest reporter.
 
-Qase Jest reporter is currently in open beta stage for the version 2 series.
-To install the latest beta version, run:ы
+To install the latest beta version, run:
 
 ```shell
-npm install --save-dev jest-qase-reporter@beta
+npm install --save-dev jest-qase-reporter
 ```
 
 # Contents
