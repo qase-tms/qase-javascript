@@ -28,7 +28,7 @@ export class JestQaseReporter implements Reporter {
     failed: TestStatusEnum.failed,
     skipped: TestStatusEnum.skipped,
     disabled: TestStatusEnum.disabled,
-    pending: TestStatusEnum.blocked,
+    pending: TestStatusEnum.skipped,
     todo: TestStatusEnum.disabled,
     focused: TestStatusEnum.passed,
   };
