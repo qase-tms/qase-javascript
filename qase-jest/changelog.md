@@ -1,3 +1,11 @@
+# jest-qase-reporter@2.0.1
+
+## What's new
+
+Fixed a bug when a test was marked as skipped.
+This reporter has uploaded this test as blocked. 
+Right now the reporter will upload this test as skipped.
+
 # jest-qase-reporter@2.0.0
 
 ## What's new
