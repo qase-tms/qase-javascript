@@ -64,6 +64,14 @@ export abstract class AbstractReporter implements InternalReporterInterface {
   public async addTestResult(result: TestResultType) {
     this.logger.logDebug(`Adding test result: ${JSON.stringify(result)}`);
 
+    if (result.execution.stacktrace) {
+      result.execution.stacktrace = this.removeAnsiEscapeCodes(result.execution.stacktrace);
+    }
+
+    if (result.message) {
+      result.message = this.removeAnsiEscapeCodes(result.message);
+    }
+
     if (result.testops_id === null || !Array.isArray(result.testops_id)) {
       this.results.push(result);
       return;
@@ -91,5 +99,13 @@ export abstract class AbstractReporter implements InternalReporterInterface {
    */
   public setTestResults(results: TestResultType[]): void {
     this.results = results;
+  }
+
+  private removeAnsiEscapeCodes(str: string): string {
+    const ansiEscapeSequences = new RegExp([
+      '\x1B[[(?);]{0,2}(;?\\d)*.',
+    ].join('|'), 'g');
+
+    return str.replace(ansiEscapeSequences, '');
   }
 }

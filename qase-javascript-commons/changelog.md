@@ -1,3 +1,15 @@
+# qase-javascript-commons@2.0.1
+
+## What's new
+
+Remove ANSI escape codes from the message and stack trace.
+Before this fix, the reporter added ANSI escape codes to the message and stack trace.
+
+```diff
+- Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
++ Error: expect(received).toBe(expected) // Object.is equality
+```
+
 # qase-javascript-commons@2.0.0
 
 ## What's new
