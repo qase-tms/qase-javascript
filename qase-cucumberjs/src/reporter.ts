@@ -1,22 +1,34 @@
 import { EventEmitter } from 'events';
 
 import { Formatter, IFormatterOptions, Status } from '@cucumber/cucumber';
-import { Envelope, PickleTag, TestCaseStarted } from '@cucumber/messages';
+import {
+  Envelope,
+  PickleStep,
+  PickleTag,
+  TestCaseStarted,
+  TestStepFinished,
+} from '@cucumber/messages';
 
 import {
-  ConfigType,
-  ConfigLoader,
-  QaseReporter,
-  ReporterInterface,
-  TestStatusEnum,
   composeOptions,
+  ConfigLoader,
+  ConfigType,
+  QaseReporter,
+  Relation,
+  ReporterInterface,
+  StepStatusEnum,
+  StepType,
+  TestStatusEnum,
+  TestStepType,
 } from 'qase-javascript-commons';
+import { TestCase } from '@cucumber/messages/dist/esm/src/messages';
 
-type PickleInfoType = {
+interface PickleInfoType {
   caseIds: number[];
   name: string;
   lastAstNodeId: string | undefined;
-};
+  steps: readonly PickleStep[];
+}
 
 type TestStepResultStatus = (typeof Status)[keyof typeof Status];
 
@@ -43,6 +55,19 @@ export class CucumberQaseReporter extends Formatter {
   };
 
   /**
+   * @type {Record<TestStepResultStatus, StepStatusEnum>}
+   */
+  static stepStatusMap: Record<TestStepResultStatus, StepStatusEnum> = {
+    [Status.PASSED]: StepStatusEnum.passed,
+    [Status.FAILED]: StepStatusEnum.failed,
+    [Status.SKIPPED]: StepStatusEnum.blocked,
+    [Status.AMBIGUOUS]: StepStatusEnum.blocked,
+    [Status.PENDING]: StepStatusEnum.blocked,
+    [Status.UNDEFINED]: StepStatusEnum.blocked,
+    [Status.UNKNOWN]: StepStatusEnum.blocked,
+  };
+
+  /**
    * @type {RegExp}
    */
   static qaseIdRegExp = /^@[Qq]-?(\d+)$/g;
@@ -52,7 +77,7 @@ export class CucumberQaseReporter extends Formatter {
    * @returns {number[]}
    * @private
    */
-  private static getCaseIds(tagsList: readonly PickleTag[]) {
+  private static getCaseIds(tagsList: readonly PickleTag[]): number[] {
     return tagsList.reduce<number[]>((acc, tagInfo) => {
       const ids = Array.from(tagInfo.name.matchAll(CucumberQaseReporter.qaseIdRegExp))
         .map(([, id]) => Number(id))
@@ -78,6 +103,13 @@ export class CucumberQaseReporter extends Formatter {
    * @type {Record<string, >}
    * @private
    */
+
+  /**
+   * @type {Record<string, TestStepFinished>}
+   * @private
+   */
+  private testCaseStepsFinished: Record<string, TestStepFinished> = {};
+
   private testCaseStartedResult: Record<string, TestStatusEnum> = {};
   /**
    * @type {Record<string, string[]>}
@@ -88,7 +120,7 @@ export class CucumberQaseReporter extends Formatter {
    * @type {Record<string, string>}
    * @private
    */
-  private testCaseScenarioId: Record<string, string> = {};
+  private testCaseScenarioId: Record<string, TestCase> = {};
   /**
    * @type {Record<string, string>}
    * @private
@@ -157,6 +189,7 @@ export class CucumberQaseReporter extends Formatter {
           name: envelope.pickle.name,
           lastAstNodeId:
             envelope.pickle.astNodeIds[envelope.pickle.astNodeIds.length - 1],
+          steps: envelope.pickle.steps,
         };
       } else if (envelope.attachment) {
         if (
@@ -172,7 +205,7 @@ export class CucumberQaseReporter extends Formatter {
         void this.publishResults();
       } else if (envelope.testCase) {
         this.testCaseScenarioId[envelope.testCase.id] =
-          envelope.testCase.pickleId;
+          envelope.testCase;
       } else if (envelope.testCaseStarted) {
         this.testCaseStarts[envelope.testCaseStarted.id] =
           envelope.testCaseStarted;
@@ -187,6 +220,8 @@ export class CucumberQaseReporter extends Formatter {
         if (newStatus === null) {
           return;
         }
+
+        this.testCaseStepsFinished[stepFin.testStepId] = stepFin;
 
         if (newStatus !== TestStatusEnum.passed) {
           if (stepFin.testStepResult.message) {
@@ -216,13 +251,13 @@ export class CucumberQaseReporter extends Formatter {
           return;
         }
 
-        const pickleId = this.testCaseScenarioId[tcs.testCaseId];
+        const testCase = this.testCaseScenarioId[tcs.testCaseId];
 
-        if (!pickleId) {
+        if (!testCase) {
           return;
         }
 
-        const info = this.pickleInfo[pickleId];
+        const info = this.pickleInfo[testCase.pickleId];
 
         if (!info) {
           return;
@@ -233,6 +268,19 @@ export class CucumberQaseReporter extends Formatter {
         if (this.testCaseStartedErrors[tcs.id]?.length) {
           error = new Error(this.testCaseStartedErrors[tcs.id]?.join('\n\n'));
         }
+        let relations: Relation | null = null;
+        if (info.lastAstNodeId != undefined && this.scenarios[info.lastAstNodeId] != undefined) {
+          relations = {
+            suite: {
+              data: [
+                {
+                  title: this.scenarios[info.lastAstNodeId] ?? '',
+                  public_id: null,
+                },
+              ],
+            },
+          };
+        }
 
         void this.reporter.addTestResult({
           attachments: [],
@@ -241,8 +289,8 @@ export class CucumberQaseReporter extends Formatter {
             status: this.testCaseStartedResult[
               envelope.testCaseFinished.testCaseStartedId
               ] ?? TestStatusEnum.passed,
-            start_time: tcs.timestamp.seconds,
-            end_time: envelope.testCaseFinished.timestamp.seconds,
+            start_time: null,
+            end_time: null,
             duration: Math.abs(
               envelope.testCaseFinished.timestamp.seconds - tcs.timestamp.seconds,
             ),
@@ -253,10 +301,10 @@ export class CucumberQaseReporter extends Formatter {
           message: null,
           muted: false,
           params: {},
-          relations: {},
+          relations: relations,
           run_id: null,
           signature: '',
-          steps: [],
+          steps: this.convertSteps(info.steps, testCase),
           testops_id: info.caseIds.length > 0 ? info.caseIds : null,
           id: tcs.id,
           title: info.name,
@@ -264,6 +312,47 @@ export class CucumberQaseReporter extends Formatter {
         });
       }
     });
+  }
+
+  private convertSteps(steps: readonly PickleStep[], testCase: TestCase): TestStepType[] {
+    const results: TestStepType[] = [];
+
+    for (const s of testCase.testSteps) {
+      const finished = this.testCaseStepsFinished[s.id];
+      if (!finished) {
+        continue;
+      }
+
+      const step = steps.find((step) => step.id === s.pickleStepId);
+
+      if (!step) {
+        continue;
+      }
+
+      const result: TestStepType = {
+          id: s.id,
+          step_type: StepType.GHERKIN,
+          data: {
+            keyword: step.text,
+            name: step.text,
+            line: 0,
+          },
+          execution: {
+            status: CucumberQaseReporter.stepStatusMap[finished.testStepResult.status],
+            start_time: null,
+            end_time: null,
+            duration: finished.testStepResult.duration.seconds,
+          },
+          attachments: [],
+          steps: [],
+          parent_id: null,
+        }
+      ;
+
+      results.push(result);
+    }
+
+    return results;
   }
 
   /**
@@ -279,6 +368,6 @@ export class CucumberQaseReporter extends Formatter {
    * @private
    */
   private startTestRun(): void {
-    void this.reporter.startTestRun();
+    this.reporter.startTestRun();
   }
 }
