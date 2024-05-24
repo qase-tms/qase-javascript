@@ -2,11 +2,10 @@
   "name": "examples-cucumberjs",
   "private": true,
   "scripts": {
-    "test": "QASE_MODE=testops cucumber-js -f cucumberjs-qase-reporter:/dev/null features -r zombie/support -r zombie/steps --publish-quiet"
+    "test": "QASE_MODE=testops cucumber-js -f cucumberjs-qase-reporter features -r step_definitions --publish-quiet"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^7.3.2",
-    "cucumberjs-qase-reporter": "^2.0.0-beta.2",
-    "zombie": "^6.1.4"
+    "cucumberjs-qase-reporter": "^2.0.0-beta.3"
   }
 }
