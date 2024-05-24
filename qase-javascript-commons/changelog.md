@@ -1,3 +1,13 @@
+# qase-javascript-commons@2.0.2
+
+## What's new
+
+Add new step status `skipped` to the test result data.
+Before this fix, the reporter didn't support the `skipped` status for test steps.
+
+For ApiV1 the `skipped` status will be converted to `blocked` status.
+For ApiV2 the `skipped` status will be converted to `skipped` status.
+
 # qase-javascript-commons@2.0.1
 
 ## What's new

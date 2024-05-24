@@ -2,6 +2,7 @@ export enum StepStatusEnum {
   passed = 'passed',
   failed = 'failed',
   blocked = 'blocked',
+  skipped = 'skipped',
 }
 
 export interface StepExecution {
