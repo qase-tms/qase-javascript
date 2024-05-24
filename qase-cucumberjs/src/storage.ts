@@ -23,6 +23,9 @@ import { Status } from '@cucumber/cucumber';
 type TestStepResultStatus = (typeof Status)[keyof typeof Status];
 
 const qaseIdRegExp = /^@[Qq]-?(\d+)$/g;
+const newQaseIdRegExp = /^@[Qq]ase[Ii][Dd]=(\d+)$/g;
+const qaseTitleRegExp = /^@[Qq]ase[Tt]itle=(.+)$/g;
+const qaseFieldsRegExp = /^@[Qq]ase[Ff]ields:(.+?)=(.+)$/g;
 
 export class Storage {
   /**
@@ -142,35 +145,27 @@ export class Storage {
    * @param {TestStepFinished} testCaseStep
    */
   public addTestCaseStep(testCaseStep: TestStepFinished): void {
-    const stepFin = testCaseStep;
-    const oldStatus = this.testCaseStartedResult[stepFin.testCaseStartedId];
-    const newStatus =
-      Storage.statusMap[stepFin.testStepResult.status];
+    const oldStatus = this.testCaseStartedResult[testCaseStep.testCaseStartedId];
+    const newStatus = Storage.statusMap[testCaseStep.testStepResult.status];
 
-    if (newStatus === null) {
-      return;
-    }
-
-    this.testCaseSteps[stepFin.testStepId] = stepFin;
+    this.testCaseSteps[testCaseStep.testStepId] = testCaseStep;
 
     if (newStatus !== TestStatusEnum.passed) {
-      if (stepFin.testStepResult.message) {
-        const errors =
-          this.testCaseStartedErrors[stepFin.testCaseStartedId] ?? [];
+      if (testCaseStep.testStepResult.message) {
 
-        if (!this.testCaseStartedErrors[stepFin.testCaseStartedId]) {
-          this.testCaseStartedErrors[stepFin.testCaseStartedId] = errors;
+        if (!this.testCaseStartedErrors[testCaseStep.testCaseStartedId]) {
+          this.testCaseStartedErrors[testCaseStep.testCaseStartedId] = [];
         }
 
-        errors.push(stepFin.testStepResult.message);
+        this.testCaseStartedErrors[testCaseStep.testCaseStartedId]?.push(testCaseStep.testStepResult.message);
       }
 
       if (oldStatus) {
         if (oldStatus !== TestStatusEnum.failed) {
-          this.testCaseStartedResult[stepFin.testCaseStartedId] = newStatus;
+          this.testCaseStartedResult[testCaseStep.testCaseStartedId] = newStatus;
         }
       } else {
-        this.testCaseStartedResult[stepFin.testCaseStartedId] = newStatus;
+        this.testCaseStartedResult[testCaseStep.testCaseStartedId] = newStatus;
       }
     }
   }
@@ -220,7 +215,7 @@ export class Storage {
       };
     }
 
-    const testOpsId = this.getCaseIds(pickle.tags);
+    const metadata = this.parseTags(pickle.tags);
 
     return {
       attachments: [],
@@ -233,7 +228,7 @@ export class Storage {
         stacktrace: error?.stack ?? null,
         thread: null,
       },
-      fields: {},
+      fields: metadata.fields,
       message: null,
       muted: false,
       params: {},
@@ -241,9 +236,9 @@ export class Storage {
       run_id: null,
       signature: '',
       steps: this.convertSteps(pickle.steps, tc),
-      testops_id: testOpsId.length > 0 ? testOpsId : null,
+      testops_id: metadata.ids.length > 0 ? metadata.ids : null,
       id: tcs.id,
-      title: pickle.name,
+      title: metadata.title ?? pickle.name,
     };
   }
 
@@ -295,35 +290,17 @@ export class Storage {
     return results;
   }
 
-
   /**
-   * @param {readonly PickleTag[]} tagsList
-   * @returns {number[]}
-   * @private
+   * @type {Record<TestStepResultStatus, TestStatusEnum>}
    */
-  private getCaseIds(tagsList: readonly PickleTag[]): number[] {
-    return tagsList.reduce<number[]>((acc, tagInfo) => {
-      const ids = Array.from(tagInfo.name.matchAll(qaseIdRegExp))
-        .map(([, id]) => Number(id))
-        .filter((id): id is number => id !== undefined);
-
-      acc.push(...ids);
-
-      return acc;
-    }, []);
-  }
-
-  /**
-   * @type {Record<TestStepResultStatus, TestStatusEnum | null>}
-   */
-  static statusMap: Record<TestStepResultStatus, TestStatusEnum | null> = {
+  static statusMap: Record<TestStepResultStatus, TestStatusEnum> = {
     [Status.PASSED]: TestStatusEnum.passed,
     [Status.FAILED]: TestStatusEnum.failed,
     [Status.SKIPPED]: TestStatusEnum.skipped,
-    [Status.AMBIGUOUS]: TestStatusEnum.blocked,
-    [Status.PENDING]: TestStatusEnum.blocked,
-    [Status.UNDEFINED]: TestStatusEnum.blocked,
-    [Status.UNKNOWN]: TestStatusEnum.blocked,
+    [Status.AMBIGUOUS]: TestStatusEnum.failed,
+    [Status.PENDING]: TestStatusEnum.skipped,
+    [Status.UNDEFINED]: TestStatusEnum.skipped,
+    [Status.UNKNOWN]: TestStatusEnum.skipped,
   };
 
   /**
@@ -332,10 +309,48 @@ export class Storage {
   static stepStatusMap: Record<TestStepResultStatus, StepStatusEnum> = {
     [Status.PASSED]: StepStatusEnum.passed,
     [Status.FAILED]: StepStatusEnum.failed,
-    [Status.SKIPPED]: StepStatusEnum.blocked,
-    [Status.AMBIGUOUS]: StepStatusEnum.blocked,
-    [Status.PENDING]: StepStatusEnum.blocked,
-    [Status.UNDEFINED]: StepStatusEnum.blocked,
-    [Status.UNKNOWN]: StepStatusEnum.blocked,
+    [Status.SKIPPED]: StepStatusEnum.skipped,
+    [Status.AMBIGUOUS]: StepStatusEnum.failed,
+    [Status.PENDING]: StepStatusEnum.skipped,
+    [Status.UNDEFINED]: StepStatusEnum.skipped,
+    [Status.UNKNOWN]: StepStatusEnum.skipped,
   };
+
+  private parseTags(tags: readonly PickleTag[]): TestMetadata {
+    const metadata: TestMetadata = {
+      ids: [],
+      fields: {},
+      title: null,
+    };
+
+    for (const tag of tags) {
+      if (qaseIdRegExp.test(tag.name)) {
+        metadata.ids.push(Number(tag.name.replace(/^@[Qq]-?/, '')));
+        continue;
+      }
+
+      if (newQaseIdRegExp.test(tag.name)) {
+        metadata.ids.push(Number(tag.name.replace(/^@[Qq]ase[Ii][Dd]=/, '')));
+        continue;
+      }
+
+      if (qaseTitleRegExp.test(tag.name)) {
+        metadata.title = tag.name.replace(/^@[Qq]ase[Tt]itle=/, '');
+        continue;
+      }
+
+      if (qaseFieldsRegExp.test(tag.name)) {
+        const value = tag.name.replace(/^@[Qq]ase[Ff]ields:/, '');
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const record: Record<string, string> = JSON.parse(value);
+          metadata.fields = { ...metadata.fields, ...record };
+        } catch (e) {
+          // do nothing
+        }
+      }
+    }
+
+    return metadata;
+  }
 }
