@@ -80,6 +80,7 @@ export class TestOpsReporter extends AbstractReporter {
     [StepStatusEnum.passed]: ResultStepStatus.PASSED,
     [StepStatusEnum.failed]: ResultStepStatus.FAILED,
     [StepStatusEnum.blocked]: ResultStepStatus.BLOCKED,
+    [StepStatusEnum.skipped]: ResultStepStatus.SKIPPED,
   };
 
   /**
@@ -89,6 +90,7 @@ export class TestOpsReporter extends AbstractReporter {
     [StepStatusEnum.passed]: TestStepResultCreateStatusEnum.PASSED,
     [StepStatusEnum.failed]: TestStepResultCreateStatusEnum.FAILED,
     [StepStatusEnum.blocked]: TestStepResultCreateStatusEnum.BLOCKED,
+    [StepStatusEnum.skipped]: TestStepResultCreateStatusEnum.BLOCKED,
   };
 
   /**
