@@ -1,3 +1,10 @@
+# cypress-qase-reporter@2.0.1
+
+## What's new
+
+The reporter would mark the test as blocked if the test was skipped in Cypress.
+Now, the reporter will mark the test as skipped.
+
 # cypress-qase-reporter@2.0.0
 
 ## What's new

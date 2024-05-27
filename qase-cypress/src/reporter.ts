@@ -45,7 +45,7 @@ export class CypressQaseReporter extends reporters.Base {
   static statusMap: Record<CypressState, TestStatusEnum> = {
     failed: TestStatusEnum.failed,
     passed: TestStatusEnum.passed,
-    pending: TestStatusEnum.blocked,
+    pending: TestStatusEnum.skipped,
   };
 
   /**
