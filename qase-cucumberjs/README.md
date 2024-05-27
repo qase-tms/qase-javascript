@@ -1,50 +1,69 @@
-> # Qase TMS Cucumber JS reporter
->
-> Publish results simple and easy.
+# Qase TMS Cucumber JS reporter
 
-## How to integrate
+Publish results simple and easy.
 
+## How to install
+
+```sh
+npm install -D cucumberjs-qase-reporter@beta
 ```
-npm install cucumberjs-qase-reporter
-```
 
-## Example of usage
+## Updating from v1
 
-The Cucumber JS reporter has the ability to auto-generate test cases
+To update a test project using cucumberjs-qase-reporter@v1 to version 2:
+
+1. Update reporter configuration in `qase.config.json` and/or environment variables —
+   see the [configuration reference](#configuration) below.
+
+## Getting started
+
+The Cucumber JS reporter can auto-generate test cases
 and suites from your test data.
+Test results of subsequent test runs will match the same test cases
+as long as their names and file paths don't change.
 
-But if necessary, you can independently register the ID of already
-existing test cases from TMS before the executing tests. You can decorate your scenarios with Qase TMS case IDs in format `Q-<case id>` or `Q123`, also `q` can be in any case:
+You can also annotate the tests with the IDs of existing test cases
+from Qase.io before executing tests. It's a more reliable way to bind
+autotests to test cases, that persists when you rename, move, or
+parameterize your tests.
+
+For example:
 
 ```gherkin
 Feature: Cucumber documentation
-    As a user of cucumber.js
-    I want to have documentation on cucumber
-    So I can write better applications
+  As a user of cucumber.js
+  I want to have documentation on cucumber
+  So I can write better applications
 
-    @sections @Q-2
-    Scenario: Usage documentation
-        Given I am on the cucumber.js GitHub repository
-        When I go to the README file
-        Then I should see a "Cool" section
-        When I go to the README file
+  @QaseID=1
+  Scenario: Usage documentation
+    Given I am on the cucumber.js GitHub repository
+    When I go to the README file
+    Then I should see a "Cool" section
 
-    @ignore @q4
-    Scenario: Status badges 2
-        Given I am on the cucumber.js GitHub repository
-        When I go to the README file
-        Then I should see a "Build Status" badge
-        And I should see a "Dependencies" badge
+  @QaseID=2
+  @QaseFields={'severity':'high'}
+  Scenario: Status badges 2
+    Given I am on the cucumber.js GitHub repository
+    When I go to the README file
+    Then I should see a "Build Status" badge
+    And I should see a "Dependencies" badge
 ```
----
-To run tests and create a test run, execute the command (for example from folder examples/cucumberjs):
+
+To execute Cucumber JS tests and report them to Qase.io, run the command:
+
 ```bash
-QASE_MODE=testops cucumber-js -f cucumberjs-qase-reporter:/dev/null features -r zombie/support -r zombie/steps --publish-quiet
+QASE_MODE=testops cucumber-js -f cucumberjs-qase-reporter features -r step_definitions --publish-quiet
 ```
+
 or
+
 ```bash
 npm test
 ```
+
+You can try it with the example project at [`examples/cucumberjs`](../examples/cucumberjs/).
+
 <p align="center">
   <img width="65%" src="./screenshots/screenshot.png">
 </p>
@@ -61,34 +80,28 @@ https://app.qase.io/run/QASE_PROJECT_CODE
 
 ## Configuration
 
-Qase reporter supports passing parameters using two ways:
-using `.qaserc`/`qase.config.json` file and using ENV variables.
+Qase Cucumber JS reporter can be configured in multiple ways:
 
-`.qaserc` parameters, (* - required):
-- `mode` - `testops`/`off` Enables reporter, default - `off`
-- `debug` - Enables debug logging, defaule - `false`
-- `environment` - To execute with the sending of the envinroment information
-- *`testops.api.token` - Token for API access, you can find more information
-  [here](https://developers.qase.io/#authentication)
-- *`testops.project` - Code of your project (can be extracted from main
-  page of your project: `https://app.qase.io/project/DEMOTR` -
-  `DEMOTR` is project code here)
-- `testops.run.id` - Pass Run ID
-- `testops.run.title` - Set custom Run name, when new run is created
-- `testops.run.description` - Set custom Run description, when new run is created
-- `testops.run.complete` - Whether the run should be completed
+- using a separate config file `qase.config.json`,
+- using environment variables (they override the values from the configuration files).
 
-Example configuration file:
+For a full list of configuration options, see
+the [Configuration reference](../qase-javascript-commons/README.md#configuration).
+
+Example `qase.config.json` file:
 
 ```json
 {
+  "mode": "testops",
   "debug": true,
-  "environment": 1,
   "testops": {
     "api": {
       "token": "api_key"
     },
-    "project": "project_code"
+    "project": "project_code",
+    "run": {
+      "complete": true
+    }
   }
 }
 ```
@@ -105,41 +118,17 @@ Supported ENV variables:
 - `QASE_TESTOPS_RUN_DESCRIPTION` - Same as `testops.run.description`
 
 To run using ENV you have to execute:
+
 ```bash
-cucumber-js -f cucumberjs-qase-reporter features
+cucumber-js -f cucumberjs-qase-reporter features -r step_definitions --publish-quiet
 ```
-
-## Setup with Protractor
-
-Due to different configurations of protractor and cucumber itself you should install a bit more libraries:
-```bash
-npm install cucumberjs-qase-reporter @cucumber/cucumber @cucumber/messages
-```
-
-After that you will be able to use reporter like this (`protractor.conf.js`):
-```js
-exports.config = {
-  ...
-  cucumberOpts: {
-    require: [
-      './tests/e2e/specs/*.js',
-    ],  // require step definition files before executing features
-    tags: [],
-    'dry-run': false,
-    compiler: [],  
-    format: ["node_modules/cucumberjs-qase-reporter"],
-  },
-  ...
-}
-```
-
-**Do not forget to add `.qaserc`/`qase.config.json` file!**
 
 ## Requirements
 
-We maintain the reporter on LTS versions of Node. You can find the current versions by following the [link](https://nodejs.org/en/about/releases/)
-<!-- references -->
+We maintain the reporter on [LTS versions of Node](https://nodejs.org/en/about/releases/).
 
 `@cucumber/cucumber >= 7.0.0`
+
+<!-- references -->
 
 [auth]: https://developers.qase.io/#authentication
