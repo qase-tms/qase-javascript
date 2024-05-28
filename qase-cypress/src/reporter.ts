@@ -144,7 +144,7 @@ export class CypressQaseReporter extends reporters.Base {
     runner.on(EVENT_TEST_FAIL, (test: Test) => this.addTestResult(test));
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    runner.on(EVENT_RUN_BEGIN,  () => this.reporter.startTestRun());
+    runner.on(EVENT_RUN_BEGIN, () => this.reporter.startTestRun());
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     runner.once(EVENT_RUN_END, async () => {
@@ -168,6 +168,23 @@ export class CypressQaseReporter extends reporters.Base {
       ? CypressQaseReporter.findAttachments(ids, this.screenshotsFolder)
       : undefined;
 
+    let relations = {};
+    if (test.parent !== undefined) {
+      const data = [];
+      for (const suite of test.parent.titlePath()) {
+        data.push({
+          title: suite,
+          public_id: null,
+        });
+      }
+
+      relations = {
+        suite: {
+          data: data,
+        },
+      };
+    }
+
     const result: TestResultType = {
       attachments: attachments ?? [],
       author: null,
@@ -175,7 +192,7 @@ export class CypressQaseReporter extends reporters.Base {
       message: test.err?.message ?? null,
       muted: false,
       params: {},
-      relations: {},
+      relations: relations,
       run_id: null,
       signature: '',
       steps: [],
@@ -192,7 +209,6 @@ export class CypressQaseReporter extends reporters.Base {
       },
       testops_id: ids.length > 0 ? ids : null,
       title: test.title,
-      // suiteTitle: test.parent?.titlePath(),
     };
 
     void this.reporter.addTestResult(result);
