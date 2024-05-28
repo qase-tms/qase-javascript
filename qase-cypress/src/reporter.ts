@@ -25,6 +25,9 @@ const {
 
 type CypressState = 'failed' | 'passed' | 'pending';
 
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const _exit = process.exit;
+
 export type CypressQaseOptionsType = Omit<MochaOptions, 'reporterOptions'> & {
   reporterOptions: ReporterOptionsType;
 };
@@ -199,9 +202,6 @@ export class CypressQaseReporter extends reporters.Base {
    * @private
    */
   private preventExit() {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const _exit = process.exit;
-
     const mutableProcess: Record<'exit', (code: number) => void> = process;
 
     mutableProcess.exit = (code: number) => {
