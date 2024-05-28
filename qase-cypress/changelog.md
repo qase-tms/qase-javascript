@@ -1,3 +1,12 @@
+# cypress-qase-reporter@2.0.2
+
+## What's new
+
+1. Cypress kills the process after the last tests. 
+The reporter will wait for all results to be sent to Qase and will not block the process after sending.
+
+2. The reporter will collect suites and add them to results.
+
 # cypress-qase-reporter@2.0.1
 
 ## What's new
