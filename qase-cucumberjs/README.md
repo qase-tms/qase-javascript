@@ -5,7 +5,7 @@ Publish results simple and easy.
 ## How to install
 
 ```sh
-npm install -D cucumberjs-qase-reporter@beta
+npm install -D cucumberjs-qase-reporter
 ```
 
 ## Updating from v1
