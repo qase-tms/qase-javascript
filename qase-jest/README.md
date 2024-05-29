@@ -9,7 +9,7 @@ It can work in different test automation scenarios:
 Testing frameworks that use Jest as a test runner, such as Puppeteer, Appium, and Detox,
 can also be used with Jest reporter.
 
-To install the latest beta version, run:
+To install the latest version, run:
 
 ```shell
 npm install --save-dev jest-qase-reporter

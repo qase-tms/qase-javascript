@@ -2,8 +2,6 @@
 
 Publish results simple and easy.
 
-## How to install
-
 To install the latest version, run:
 
 ```sh

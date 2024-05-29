@@ -1,11 +1,12 @@
-> # Qase TMS Newman reporter
->
-> Publish results simple and easy.
+# Qase TMS Newman reporter
 
-## How to integrate
+Publish results simple and easy.
+
+The Newman reporter is currently in the closed beta stage.
+To install the latest beta version, run:
 
 ```bash
-npm install newman-reporter-qase
+npm install newman-reporter-qase@beta
 ```
 
 ## Example of usage
