@@ -1,3 +1,10 @@
+# qase-javascript-commons@2.0.3
+
+## What's new
+
+Fixed an issue when the reporter would run tests before creating a test run.
+Now the reporter will create a test run before running tests.
+
 # qase-javascript-commons@2.0.2
 
 ## What's new
