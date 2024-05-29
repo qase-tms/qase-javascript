@@ -1,13 +1,16 @@
-> # Qase TMS Playwright reporter
->
-> Publish results simple and easy.
+# Qase TMS Playwright reporter
 
-## How to integrate
+Publish results simple and easy.
 
+> 🗿This readme is for the Playwright reporter v1, which is no longer supported.
+> [Check out the newer version 2](https://github.com/qase-tms/qase-javascript/tree/main/qase-playwright#readme),
+> supporting parametrized tests, custom test case fields, and more.
+
+To install the Playwright reporter v1, run:
+
+```sh
+npm install -D playwright-qase-reporter@1.2.2
 ```
-npm install playwright-qase-reporter
-```
-
 
 ## Example of usage
 
