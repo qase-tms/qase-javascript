@@ -1,11 +1,14 @@
-> # Qase TMS Cypress reporter
->
-> Publish results simple and easy.
+# Qase TMS Cypress reporter
 
-## How to integrate
+Publish results simple and easy.
 
-```
-npm install cypress-qase-reporter
+> 🗿This readme is for the Cypress reporter v1, which is no longer supported.
+> [Check out the newer version 2](https://github.com/qase-tms/qase-javascript/tree/main/qase-cypress#readme).
+
+To install the Cypress reporter v1, run:
+
+```sh
+npm install -D cypress-qase-reporter@1.4.3
 ```
 
 ## Example of usage
