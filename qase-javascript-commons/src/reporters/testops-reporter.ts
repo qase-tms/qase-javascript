@@ -538,6 +538,7 @@ export class TestOpsReporter extends AbstractReporter {
         description,
         is_autotest: true,
         cases: [],
+        start_time: this.getDate(),
       };
 
       if (environment !== undefined) {
@@ -553,6 +554,23 @@ export class TestOpsReporter extends AbstractReporter {
     } catch (error) {
       throw new QaseError('Cannot create run', { cause: error });
     }
+  }
+
+  /**
+   * @returns {string}
+   * @private
+   */
+  private getDate(): string {
+    const date = new Date();
+    date.setSeconds(-10);
+    const year = date.getUTCFullYear();
+    const month = ('0' + (date.getUTCMonth() + 1).toString()).slice(-2); // Months are zero indexed, so we add 1
+    const day = ('0' + date.getUTCDate().toString()).slice(-2);
+    const hours = date.getUTCHours().toString();
+    const minutes = date.getUTCMinutes().toString();
+    const seconds = date.getUTCSeconds().toString();
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
 
   /**
