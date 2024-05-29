@@ -10,15 +10,15 @@ import {
   Attachment,
 } from 'qase-javascript-commons';
 
-type CallsiteRecordType = {
+interface CallsiteRecordType {
   filename?: string;
   lineNum?: number;
   callsiteFrameIdx?: number;
-  stackFrames?: Array<unknown>;
+  stackFrames?: unknown[];
   isV8Frames?: boolean;
-};
+}
 
-type TestRunErrorFormattableAdapterType = {
+interface TestRunErrorFormattableAdapterType {
   userAgent: string;
   screenshotPath: string;
   testRunId: string;
@@ -29,22 +29,22 @@ type TestRunErrorFormattableAdapterType = {
   errMsg?: string;
   diff?: boolean;
   id?: string;
-};
+}
 
-type ScreenshotType = {
+interface ScreenshotType {
   screenshotPath: string;
   thumbnailPath: string;
   userAgent: string;
   quarantineAttempt: number;
   takenOnFail: boolean;
-};
+}
 
-type FixtureType = {
+interface FixtureType {
   id: string;
   name: string;
   path?: string;
   meta: Record<string, unknown>;
-};
+}
 
 enum metadataEnum {
   id = 'QaseID',
@@ -61,7 +61,7 @@ interface MetadataType {
   [metadataEnum.parameters]: Record<string, string>;
 }
 
-export type TestRunInfoType = {
+export interface TestRunInfoType {
   errs: TestRunErrorFormattableAdapterType[];
   warnings: string[];
   durationMs: number;
@@ -71,7 +71,7 @@ export type TestRunInfoType = {
   quarantine: Record<string, Record<'passed', boolean>>;
   skipped: boolean;
   fixture: FixtureType;
-};
+}
 
 export type TestcafeQaseOptionsType = ConfigType;
 
@@ -170,7 +170,7 @@ export class TestcafeQaseReporter {
    * @returns {Promise<void>}
    */
   public startTestRun = (): void => {
-    void this.reporter.startTestRun();
+      this.reporter.startTestRun();
   };
 
   /**

@@ -2,7 +2,7 @@ import { TestcafeQaseOptionsType, TestcafeQaseReporter, TestRunInfoType } from '
 
 /**
  * @param {TestcafeQaseOptionsType} options
- * @returns {object}
+ * @returns
  */
 export const factory = (options: TestcafeQaseOptionsType) => {
   const reporter = new TestcafeQaseReporter(options);
