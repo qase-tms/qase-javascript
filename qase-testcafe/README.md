@@ -9,6 +9,13 @@ To install the latest beta version, run:
 npm install -D testcafe-reporter-qase@beta
 ```
 
+## Updating from v1
+
+To update a test project using testcafe-reporter-qaser@v1 to version 2:
+
+1. Update reporter configuration in `qase.config.json` and/or environment variables —
+   see the [configuration reference](#configuration) below.
+
 ## Example of usage
 
 The TestCafe reporter has the ability to auto-generate test cases
@@ -23,7 +30,12 @@ test.meta('CID', [1])('Text typing basics', async (t) => {
   await t;
 });
 
-test.meta({ CID: [2, 3] })(
+const q = qase.id(1)
+  .title('Text typing basics')
+  .field({ 'severity': 'high' })
+  .parameters({ 'browser': 'chrome' })
+  .create();
+test.meta({ ...q })(
   'Click check boxes and then verify their state',
   async (t) => {
     await t;
@@ -61,36 +73,28 @@ https://app.qase.io/run/QASE_PROJECT_CODE
 
 ## Configuration
 
-Qase reporter supports passing parameters using two ways:
-using `.qaserc`/`qase.config.json` file and using ENV variables.
+Qase Testcafe reporter can be configured in multiple ways:
 
-`.qaserc` parameters, (* - required):
+- using a separate config file `qase.config.json`,
+- using environment variables (they override the values from the configuration files).
 
-- `mode` - `testops`/`off` Enables reporter, default - `off`
-- `debug` - Enables debug logging, defaule - `false`
-- `environment` - To execute with the sending of the envinroment information 
-- *`testops.api.token` - Token for API access, you can find more information
-  [here](https://developers.qase.io/#authentication)
-- *`testops.project` - Code of your project (can be extracted from main
-  page of your project: `https://app.qase.io/project/DEMOTR` -
-  `DEMOTR` is project code here)
-- `testops.uploadAttachments` - Permission to send screenshots to Qase TMS
-- `testops.run.id` - Pass Run ID
-- `testops.run.title` - Set custom Run name, when new run is created
-- `testops.run.description` - Set custom Run description, when new run is created
-- `testops.run.complete` - Whether the run should be completed
+For a full list of configuration options, see
+the [Configuration reference](../qase-javascript-commons/README.md#configuration).
 
-Example configuration file:
+Example `qase.config.json` file:
 
 ```json
 {
+  "mode": "testops",
   "debug": true,
-  "environment": 1,
   "testops": {
     "api": {
       "token": "api_key"
     },
-    "project": "project_code"
+    "project": "project_code",
+    "run": {
+      "complete": true
+    }
   }
 }
 ```
@@ -99,7 +103,7 @@ Supported ENV variables:
 
 - `QASE_MODE` - Same as `mode`
 - `QASE_DEBUG` - Same as `debug`
-- `QASE_ENVIRONMENT` - Same as `environment` 
+- `QASE_ENVIRONMENT` - Same as `environment`
 - `QASE_TESTOPS_API_TOKEN` - Same as `testops.api.token`
 - `QASE_TESTOPS_PROJECT` - Same as `testops.project`
 - `QASE_TESTOPS_RUN_ID` - Pass Run ID from ENV and override reporter option `testops.run.id`
@@ -108,7 +112,7 @@ Supported ENV variables:
 
 ## Requirements
 
-We maintain the reporter on LTS versions of Node. You can find the current versions by following the [link](https://nodejs.org/en/about/releases/)
+We maintain the reporter on [LTS versions of Node](https://nodejs.org/en/about/releases/).
 
 `testcafe >= 2.0.0`
 
