@@ -46,6 +46,21 @@ type FixtureType = {
   meta: Record<string, unknown>;
 };
 
+enum metadataEnum {
+  id = 'QaseID',
+  title = 'QaseTitle',
+  fields = 'QaseFields',
+  parameters = 'QaseParameters',
+  oldID = 'CID',
+}
+
+interface MetadataType {
+  [metadataEnum.id]: number[];
+  [metadataEnum.title]: string | undefined;
+  [metadataEnum.fields]: Record<string, string>;
+  [metadataEnum.parameters]: Record<string, string>;
+}
+
 export type TestRunInfoType = {
   errs: TestRunErrorFormattableAdapterType[];
   warnings: string[];
@@ -65,28 +80,11 @@ export type TestcafeQaseOptionsType = ConfigType;
  */
 export class TestcafeQaseReporter {
   /**
-   * @param {Record<string, string>} meta
-   * @returns {number[]}
-   * @private
-   */
-  private static getCaseId(meta: Record<string, string>) {
-    if (!meta['CID']) {
-      return [];
-    }
-
-    const ids: string[] = Array.isArray(meta['CID'])
-      ? meta['CID']
-      : meta['CID'].split(',');
-
-    return ids.map((id) => Number(id));
-  }
-
-  /**
    * @param {TestRunInfoType} testRunInfo
    * @returns {TestStatusEnum}
    * @private
    */
-  private static getStatus(testRunInfo: TestRunInfoType) {
+  private static getStatus(testRunInfo: TestRunInfoType): TestStatusEnum {
     if (testRunInfo.skipped) {
       return TestStatusEnum.skipped;
     } else if (testRunInfo.errs.length > 0) {
@@ -128,10 +126,10 @@ export class TestcafeQaseReporter {
    * @private
    */
   private static transformAttachments(screenshots: ScreenshotType[]): Attachment[] {
-    const attachs: Attachment[] = [];
+    const attachments: Attachment[] = [];
 
     for (const screenshot of screenshots) {
-      attachs.push({
+      attachments.push({
         file_name: screenshot.screenshotPath,
         file_path: screenshot.screenshotPath,
         mime_type: '',
@@ -141,7 +139,7 @@ export class TestcafeQaseReporter {
       });
     }
 
-    return attachs;
+    return attachments;
   }
 
   /**
@@ -186,7 +184,7 @@ export class TestcafeQaseReporter {
     meta: Record<string, string>,
   ) => {
     const error = TestcafeQaseReporter.transformErrors(testRunInfo.errs);
-    const ids = TestcafeQaseReporter.getCaseId(meta);
+    const metadata = this.getMeta(meta);
     await this.reporter.addTestResult({
       author: null,
       execution: {
@@ -197,18 +195,26 @@ export class TestcafeQaseReporter {
         stacktrace: error.stack ?? null,
         thread: null,
       },
-      fields: {},
+      fields: metadata[metadataEnum.fields],
       message: error.message,
       muted: false,
-      params: {},
-      relations: {},
+      params: metadata[metadataEnum.parameters],
+      relations: {
+        suite: {
+          data: [
+            {
+              title: testRunInfo.fixture.name,
+              public_id: null,
+            },
+          ],
+        },
+      },
       run_id: null,
-      signature: '',
+      signature: `${testRunInfo.fixture.name}::${title}`,
       steps: [],
       id: uuidv4(),
-      testops_id: ids.length > 0 ? ids : null,
-      title: title,
-      // suiteTitle: testRunInfo.fixture.name,
+      testops_id: metadata[metadataEnum.id].length > 0 ? metadata[metadataEnum.id] : null,
+      title: metadata[metadataEnum.title] != undefined ? metadata[metadataEnum.title] : title,
       attachments: TestcafeQaseReporter.transformAttachments(
         testRunInfo.screenshots,
       ),
@@ -221,4 +227,37 @@ export class TestcafeQaseReporter {
   public reportTaskDone = async (): Promise<void> => {
     await this.reporter.publish();
   };
+
+  private getMeta(meta: Record<string, string>) {
+    const metadata: MetadataType = {
+      QaseID: [],
+      QaseTitle: undefined,
+      QaseFields: {},
+      QaseParameters: {},
+    };
+
+    if (meta[metadataEnum.oldID] !== undefined && meta[metadataEnum.oldID] !== '') {
+      const v = meta[metadataEnum.oldID].split(',');
+      metadata.QaseID = Array.isArray(v) ? v.map(Number) : [Number(v)];
+    }
+
+    if (meta[metadataEnum.id] !== undefined && meta[metadataEnum.id] !== '') {
+      const v = meta[metadataEnum.id].split(',');
+      metadata.QaseID = Array.isArray(v) ? v.map(Number) : [Number(v)];
+    }
+
+    if (meta[metadataEnum.title] !== undefined && meta[metadataEnum.title] !== '') {
+      metadata.QaseTitle = meta[metadataEnum.title];
+    }
+
+    if (meta[metadataEnum.fields] !== undefined && meta[metadataEnum.fields] !== '') {
+      metadata.QaseFields = JSON.parse(meta[metadataEnum.fields]) as Record<string, string>;
+    }
+
+    if (meta[metadataEnum.parameters] !== undefined && meta[metadataEnum.parameters] !== '') {
+      metadata.QaseParameters = JSON.parse(meta[metadataEnum.parameters]) as Record<string, string>;
+    }
+
+    return metadata;
+  }
 }
