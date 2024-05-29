@@ -1,11 +1,12 @@
-> # Qase TMS TestCafe reporter
->
-> Publish results simple and easy.
+# Qase TMS TestCafe reporter
 
-## How to integrate
+Publish results simple and easy.
 
-```
-npm install testcafe testcafe-reporter-qase
+The TestCafe reporter is currently in the closed beta stage.
+To install the latest beta version, run:
+
+```sh
+npm install -D testcafe-reporter-qase@beta
 ```
 
 ## Example of usage
