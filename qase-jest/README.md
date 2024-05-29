@@ -1,11 +1,14 @@
-> # Qase TMS Jest reporter
->
-> Publish results simple and easy.
+# Qase TMS Jest reporter
 
-## How to integrate
+Publish results simple and easy.
 
-```
-npm install jest-qase-reporter
+> 🗿This readme is for the Jest reporter v1, which is no longer supported.
+> [Check out the newer version 2](https://github.com/qase-tms/qase-javascript/tree/main/qase-jest#readme).
+
+To install the Jest reporter v1, run:
+
+```sh
+npm install -D playwright-qase-reporter@1.2.1
 ```
 
 ## Using Reporter
