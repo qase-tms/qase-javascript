@@ -1,11 +1,14 @@
-> # Qase TMS Cucumber JS reporter
->
-> Publish results simple and easy.
+# Qase TMS Cucumber JS reporter
 
-## How to integrate
+Publish results simple and easy.
 
-```
-npm install cucumberjs-qase-reporter
+> 🗿This readme is for the Cucumber reporter v0.x, which is no longer supported and should not be used.
+> [Check out the newer version 2](https://github.com/qase-tms/qase-javascript/tree/main/qase-cucumber#readme).
+
+To install the Cucumber reporter, run:
+
+```sh
+npm install -D cucumberjs-qase-reporter
 ```
 
 ## Example of usage
