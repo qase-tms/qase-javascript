@@ -566,9 +566,9 @@ export class TestOpsReporter extends AbstractReporter {
     const year = date.getUTCFullYear();
     const month = ('0' + (date.getUTCMonth() + 1).toString()).slice(-2); // Months are zero indexed, so we add 1
     const day = ('0' + date.getUTCDate().toString()).slice(-2);
-    const hours = date.getUTCHours().toString();
-    const minutes = date.getUTCMinutes().toString();
-    const seconds = date.getUTCSeconds().toString();
+    const hours = ('0' + date.getUTCHours().toString()).slice(-2);
+    const minutes = ('0' +date.getUTCMinutes().toString()).slice(-2);
+    const seconds = ('0' +date.getUTCSeconds().toString()).slice(-2);
 
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
