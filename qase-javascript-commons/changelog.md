@@ -1,3 +1,10 @@
+# qase-javascript-commons@2.0.4
+
+## What's new
+
+Fixed an issue when the reporter created a test run:
+`The start time does not match the format Y-m-d H:i:s.`
+
 # qase-javascript-commons@2.0.3
 
 ## What's new
