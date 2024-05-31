@@ -174,16 +174,15 @@ const addMetadata = (metadata: MetadataMessage): void => {
   });
 };
 
-const addAttachment = (name: string, contentType: string, filePath?: string, body?: string | Buffer): void => {
-  const stepName = `step_attach_${uuidv4()}_${name}`;
+const addAttachment = (name: string, contentType: string, filePath?: string, body?: string | Buffer) => {
+  const stepName = filePath != undefined ? `step_attach_file_${uuidv4()}_${name}` : `step_attach_body_${uuidv4()}_${name}`;
 
   test.step(stepName, async () => {
     if (filePath) {
       await test.info().attach(stepName, {
         contentType: contentType,
-        path: filePath,
+        body: filePath,
       });
-      return;
     }
 
     if (body) {
@@ -191,7 +190,6 @@ const addAttachment = (name: string, contentType: string, filePath?: string, bod
         contentType: contentType,
         body: body,
       });
-      return;
     }
   }).catch(() => {/**/
   });

@@ -20,7 +20,7 @@ import { MetadataMessage, ReporterContentType } from './playwright';
 
 type ArrayItemType<T> = T extends (infer R)[] ? R : never;
 
-const stepAttachRegexp = /^step_attach_(\w{8}-\w{4}-\w{4}-\w{4}-\w{12})_/i;
+const stepAttachRegexp = /^step_attach_(body|file)_(\w{8}-\w{4}-\w{4}-\w{4}-\w{12})_/i;
 const logMimeType = 'text/plain';
 
 interface TestCaseMetadata {
@@ -136,14 +136,26 @@ export class PlaywrightQaseReporter implements Reporter {
           this.stepCache.delete(step);
         }
 
-        const attachmentModel: Attachment = {
-          content: attachment.body == undefined ? '' : attachment.body,
-          file_name: decodeURIComponent(attachment.name.substring(matches[0].length)),
-          file_path: attachment.path == undefined ? null : attachment.path,
-          mime_type: attachment.contentType,
-          size: 0,
-          id: uuidv4(),
-        };
+        let attachmentModel: Attachment;
+        if (attachment.name.match(/^step_attach_body_/i)) {
+          attachmentModel = {
+            content: attachment.body == undefined ? '' : attachment.body,
+            file_name: decodeURIComponent(attachment.name.substring(matches[0].length)),
+            file_path: null,
+            mime_type: attachment.contentType,
+            size: attachment.body == undefined ? 0 : Buffer.byteLength(attachment.body),
+            id: uuidv4(),
+          };
+        } else {
+          attachmentModel = {
+            content: '',
+            file_name: decodeURIComponent(attachment.name.substring(matches[0].length)),
+            file_path: attachment.body != undefined ? attachment.body.toString() : null,
+            mime_type: attachment.contentType,
+            size: 0,
+            id: uuidv4(),
+          };
+        }
 
         if (step?.parent) {
           if (!this.stepAttachments.has(step.parent)) {
