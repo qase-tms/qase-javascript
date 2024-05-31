@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.0.6
+
+## What's new
+
+Fixed an issue with a race condition when the reporter added test results to the test run.
+
 # qase-javascript-commons@2.0.5
 
 ## What's new
