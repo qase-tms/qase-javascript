@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.0.5
+
+## What's new
+
+Improved logging for better debugging and error reporting.
+
 # qase-javascript-commons@2.0.4
 
 ## What's new

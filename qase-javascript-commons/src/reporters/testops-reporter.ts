@@ -567,8 +567,8 @@ export class TestOpsReporter extends AbstractReporter {
     const month = ('0' + (date.getUTCMonth() + 1).toString()).slice(-2); // Months are zero indexed, so we add 1
     const day = ('0' + date.getUTCDate().toString()).slice(-2);
     const hours = ('0' + date.getUTCHours().toString()).slice(-2);
-    const minutes = ('0' +date.getUTCMinutes().toString()).slice(-2);
-    const seconds = ('0' +date.getUTCSeconds().toString()).slice(-2);
+    const minutes = ('0' + date.getUTCMinutes().toString()).slice(-2);
+    const seconds = ('0' + date.getUTCSeconds().toString()).slice(-2);
 
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
@@ -584,9 +584,12 @@ export class TestOpsReporter extends AbstractReporter {
 
     const acc: string[] = [];
     for (const attachment of attachments) {
+      this.logger.logDebug(`Uploading attachment: ${attachment.file_path ?? attachment.file_name}`);
+
       try {
         let data: unknown;
         if (attachment.file_path) {
+
           data = { name: attachment.file_name, value: createReadStream(attachment.file_path) };
         } else {
           if (typeof attachment.content === 'string') {
