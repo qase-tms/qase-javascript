@@ -201,8 +201,9 @@ export class TestOpsReporter extends AbstractReporter {
     const countOfResults = this.batchSize + this.firstIndex;
 
     if (this.results.length >= countOfResults) {
-      await this.publishResults(this.results.slice(this.firstIndex, countOfResults));
+      const firstIndex = this.firstIndex;
       this.firstIndex = countOfResults;
+      await this.publishResults(this.results.slice(firstIndex, countOfResults));
     }
   }
 
