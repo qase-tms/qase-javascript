@@ -1,3 +1,10 @@
+# playwright-qase-reporter@2.0.1
+
+## What's new
+
+Fixed an issue with using the `qase.attach()` method to add attachments with a file path. 
+The reporter didn't add such attachments to the test.
+
 # playwright-qase-reporter@2.0.0
 
 ## What's new
