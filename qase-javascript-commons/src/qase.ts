@@ -362,6 +362,7 @@ export class QaseReporter implements ReporterInterface {
           plan = {},
           batch = {},
           useV2,
+          defect,
           uploadAttachments,
         } = testops;
 
@@ -403,6 +404,7 @@ export class QaseReporter implements ReporterInterface {
             plan,
             batch,
             useV2,
+            defect,
           },
           apiClient,
           typeof environment === 'number' ? environment : undefined,

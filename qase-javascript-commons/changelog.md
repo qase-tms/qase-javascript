@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.0.7
+
+## What's new
+
+Fixed an issue with creating a defect for failed tests when the report generator ignored the `defect` parameter in the configuration.
+
 # qase-javascript-commons@2.0.6
 
 ## What's new
