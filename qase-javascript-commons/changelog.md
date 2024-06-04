@@ -1,8 +1,14 @@
+# qase-javascript-commons@2.0.8
+
+## What's new
+
+Fixed an issue with creating a test run with environment when the reporter ignored the `environment` parameter in the configuration.
+
 # qase-javascript-commons@2.0.7
 
 ## What's new
 
-Fixed an issue with creating a defect for failed tests when the report generator ignored the `defect` parameter in the configuration.
+Fixed an issue with creating a defect for failed tests when the reporter ignored the `defect` parameter in the configuration.
 
 # qase-javascript-commons@2.0.6
 

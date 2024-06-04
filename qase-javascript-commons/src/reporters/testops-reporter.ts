@@ -3,13 +3,16 @@ import { createReadStream } from 'fs';
 import chalk from 'chalk';
 import {
   IdResponse,
-  QaseApiInterface, ResultCreate,
+  QaseApiInterface,
+  ResultCreate,
   ResultCreateV2,
   ResultExecution,
   ResultRelations,
   ResultStep,
   ResultStepStatus,
-  RunCreate, TestStepResultCreate, TestStepResultCreateStatusEnum,
+  RunCreate,
+  TestStepResultCreate,
+  TestStepResultCreateStatusEnum,
 } from 'qaseio';
 
 import { AbstractReporter } from './abstract-reporter';
@@ -117,7 +120,7 @@ export class TestOpsReporter extends AbstractReporter {
    * @type { number | undefined}
    * @private
    */
-  private readonly environment: number | undefined;
+  private readonly environment: string | undefined;
   /**
    * @type {TestResultType[]}
    * @private
@@ -158,7 +161,7 @@ export class TestOpsReporter extends AbstractReporter {
     logger: LoggerInterface,
     options: TestOpsOptionsType,
     private api: QaseApiInterface,
-    environment?: number,
+    environment?: string,
   ) {
     const {
       project,
@@ -222,11 +225,22 @@ export class TestOpsReporter extends AbstractReporter {
     }
 
     this.logger.logDebug('Create test run');
-
+    let environmentId: number | undefined;
+    if (this.environment != undefined) {
+      try {
+        const { data } = await this.api.environment.getEnvironments(this.projectCode, 100);
+        const env = data.result?.entities?.find((env) => env.slug === this.environment);
+        if (env) {
+          environmentId = env.id;
+        }
+      } catch (error) {
+        throw new QaseError('Cannot get environments', { cause: error });
+      }
+    }
     const { result } = await this.createRun(
       this.run.title,
       this.run.description,
-      this.environment,
+      environmentId,
     );
 
     if (!result?.id) {
