@@ -407,7 +407,7 @@ export class QaseReporter implements ReporterInterface {
             defect,
           },
           apiClient,
-          typeof environment === 'number' ? environment : undefined,
+          environment,
         );
       }
 
@@ -418,7 +418,8 @@ export class QaseReporter implements ReporterInterface {
         return new ReportReporter(
           this.logger,
           writer,
-          typeof environment === 'number' ? environment.toString() : environment, testops.run?.id);
+          environment,
+          testops.run?.id);
       }
 
       case ModeEnum.off:

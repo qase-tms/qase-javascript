@@ -30,7 +30,7 @@ export type OptionsType = {
   fallback?: `${ModeEnum}` | undefined;
   captureLogs?: boolean | undefined;
   debug?: boolean | undefined;
-  environment?: string | number | undefined;
+  environment?: string | undefined;
   testops?:
     | (RecursivePartial<TestOpsOptionsType> & AdditionalTestOpsOptionsType)
     | undefined;

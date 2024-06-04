@@ -26,7 +26,7 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
       nullable: true,
     },
     environment: {
-      type: ['string', 'number'],
+      type: 'string',
       nullable: true,
     },
     captureLogs: {

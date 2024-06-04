@@ -35,7 +35,7 @@ export const envValidationSchema: JSONSchemaType<EnvType> = {
       nullable: true,
     },
     [EnvEnum.environment]: {
-      type: ['string', 'number'],
+      type: 'string',
       nullable: true,
     },
     [EnvEnum.captureLogs]: {

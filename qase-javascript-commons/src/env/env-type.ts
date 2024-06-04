@@ -14,7 +14,7 @@ export type EnvType = {
   [EnvEnum.mode]?: `${ModeEnum}`;
   [EnvEnum.fallback]?: `${ModeEnum}`;
   [EnvEnum.debug]?: boolean;
-  [EnvEnum.environment]?: string | number;
+  [EnvEnum.environment]?: string;
   [EnvEnum.captureLogs]?: boolean;
 
   [EnvTestOpsEnum.project]?: string;
