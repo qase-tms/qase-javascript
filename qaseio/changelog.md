@@ -1,3 +1,9 @@
+# qaseio@2.1.1
+
+## What's new
+
+Add environment API support. Now you can create, update, delete and list environments for your projects.
+
 # qaseio@2.1.0
 
 ## What's new

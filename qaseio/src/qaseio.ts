@@ -15,7 +15,7 @@ import {
   DefectsApi,
   CustomFieldsApi,
   AuthorsApi,
-  Configuration,
+  Configuration, EnvironmentsApi,
 } from './generated';
 
 export type QaseApiOptionsType = {
@@ -40,6 +40,7 @@ export interface QaseApiInterface {
   defects: DefectsApi;
   customFields: CustomFieldsApi;
   authors: AuthorsApi;
+  environment: EnvironmentsApi;
 }
 
 /**
@@ -60,6 +61,7 @@ export class QaseApi implements QaseApiInterface {
   public defects: DefectsApi;
   public customFields: CustomFieldsApi;
   public authors: AuthorsApi;
+  public environment: EnvironmentsApi;
 
   /**
    * @param {QaseApiOptionsType} options
@@ -108,5 +110,6 @@ export class QaseApi implements QaseApiInterface {
     this.defects = new DefectsApi(configuration, baseUrl, transport);
     this.customFields = new CustomFieldsApi(configuration, baseUrl, transport);
     this.authors = new AuthorsApi(configuration, baseUrl, transport);
+    this.environment = new EnvironmentsApi(configuration, baseUrl, transport);
   }
 }
