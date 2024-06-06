@@ -29,6 +29,7 @@ interface TestCaseMetadata {
   fields: Record<string, string>;
   parameters: Record<string, string>;
   attachments: Attachment[];
+  ignore: boolean;
 }
 
 export type PlaywrightQaseOptionsType = ConfigType;
@@ -96,6 +97,7 @@ export class PlaywrightQaseReporter implements Reporter {
       fields: {},
       parameters: {},
       attachments: [],
+      ignore: false,
     };
     const attachments: Attachment[] = [];
 
@@ -123,6 +125,10 @@ export class PlaywrightQaseReporter implements Reporter {
 
         if (message.parameters) {
           metadata.parameters = message.parameters;
+        }
+
+        if (message.ignore) {
+          metadata.ignore = message.ignore;
         }
 
         continue;
@@ -295,6 +301,11 @@ export class PlaywrightQaseReporter implements Reporter {
    */
   public async onTestEnd(test: TestCase, result: TestResult) {
     const testCaseMetadata = this.transformAttachments(result.attachments);
+
+    if (testCaseMetadata.ignore) {
+      return;
+    }
+
     const error = result.error ? PlaywrightQaseReporter.transformError(result.error) : null;
     const suites = PlaywrightQaseReporter.transformSuiteTitle(test);
     const testResult: TestResultType = {

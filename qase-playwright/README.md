@@ -114,6 +114,11 @@ describe('Test suite', () => {
   test(qase(2, 'This syntax is still supported'), () => {
     expect(true).toBe(true);
   });
+  
+  test('Running, but not reported to Qase', () => {
+    qase.ignore();
+    expect(true).toBe(true);
+  });
 });
 ```
 
