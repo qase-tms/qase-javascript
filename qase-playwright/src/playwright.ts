@@ -12,6 +12,7 @@ export interface MetadataMessage {
   title?: string;
   fields?: Record<string, string>;
   parameters?: Record<string, string>;
+  ignore?: boolean;
 }
 
 /**
@@ -163,6 +164,21 @@ qase.attach = function(attach: {
   const contentType = attach.contentType ?? defaultContentType;
   addAttachment(attachmentName, contentType, undefined, attach.content);
 
+  return this;
+};
+
+/**
+ * Ignore the test case result in Qase
+ * @example
+ * test('test', async ({ page }) => {
+ *   qase.ignore();
+ *   await page.goto('https://example.com');
+ * });
+ */
+qase.ignore = function() {
+  addMetadata({
+    ignore: true,
+  });
   return this;
 };
 

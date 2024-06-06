@@ -1,3 +1,17 @@
+# playwright-qase-reporter@2.0.2
+
+## What's new
+
+Added new annotation `qase.ignore()`.
+Tests marked with it will run as usual but won't appear in the Qase report.
+
+```js
+test('test', async ({ page }) => {
+  qase.ignore();
+  await page.goto('https://example.com');
+});
+```
+
 # playwright-qase-reporter@2.0.1
 
 ## What's new
