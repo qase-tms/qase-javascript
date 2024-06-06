@@ -24,7 +24,7 @@
   "author": "Qase Team <support@qase.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "axios": "^0.21.4",
+    "axios": "^0.28.0",
     "axios-retry": "^3.5.0"
   },
   "devDependencies": {
