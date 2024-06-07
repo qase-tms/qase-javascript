@@ -1,3 +1,9 @@
+# qaseio@2.1.2
+
+## What's new
+
+Update `axios` dependency to `^0.28.0` for fixes vulnerabilities [CVE-2023-45857](https://github.com/advisories/GHSA-wf5p-g6vw-rhxx)
+
 # qaseio@2.1.1
 
 ## What's new

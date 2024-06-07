@@ -1,6 +1,6 @@
 {
   "name": "qaseio",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Qase TMS Javascript API Client",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -24,7 +24,7 @@
   "author": "Qase Team <support@qase.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "axios": "^0.21.4",
+    "axios": "^0.28.0",
     "axios-retry": "^3.5.0"
   },
   "devDependencies": {
@@ -33,7 +33,7 @@
     "@types/node": "^12.11.5",
     "axios-mock-adapter": "^1.21.4",
     "jest": "^27.5.1",
-    "ts-jest": "^27.1.5",
-    "typescript": "^3.6.4"
+    "ts-jest": "^29.1.4",
+    "typescript": "^5.4.5"
   }
 }
