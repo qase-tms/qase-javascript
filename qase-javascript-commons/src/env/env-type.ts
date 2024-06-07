@@ -23,7 +23,7 @@ export type EnvType = {
   [EnvTestOpsEnum.useV2]?: boolean;
 
   [EnvApiEnum.token]?: string;
-  [EnvApiEnum.baseUrl]?: string;
+  [EnvApiEnum.host]?: string;
 
   [EnvRunEnum.id]?: number;
   [EnvRunEnum.title]?: string;

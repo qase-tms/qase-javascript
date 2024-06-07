@@ -24,7 +24,7 @@ export enum EnvTestOpsEnum {
  */
 export enum EnvApiEnum {
   token = 'QASE_TESTOPS_API_TOKEN',
-  baseUrl = 'QASE_TESTOPS_API_HOST',
+  host = 'QASE_TESTOPS_API_HOST',
 }
 
 /**

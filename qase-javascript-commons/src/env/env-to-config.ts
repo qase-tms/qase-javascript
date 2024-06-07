@@ -27,7 +27,7 @@ export const envToConfig = (env: EnvType): ConfigType => ({
 
     api: {
       token: env[EnvApiEnum.token],
-      baseUrl: env[EnvApiEnum.baseUrl],
+      host: env[EnvApiEnum.host],
     },
 
     run: {
