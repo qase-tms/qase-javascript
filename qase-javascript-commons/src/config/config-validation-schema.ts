@@ -49,7 +49,7 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
               nullable: true,
             },
 
-            baseUrl: {
+            host: {
               type: 'string',
               nullable: true,
             },

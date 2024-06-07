@@ -1,3 +1,25 @@
+# qase-javascript-commons@2.0.9
+
+## What's new
+
+Added new configuration options `enterprise` for the Qase TestOps reporter in the `qase.config.json` file and environment variables.
+Support enterprise API URL. Now the reporters will upload test results to your own Qase instance.
+
+```diff
+{
+  ...
+  "testops": {
+   "api": {
+      "token": "token",
+	  "host": "qase.io",
++	  "enterprise": true
+   }
+    ...
+  },
+  ...
+}
+```
+
 # qase-javascript-commons@2.0.8
 
 ## What's new

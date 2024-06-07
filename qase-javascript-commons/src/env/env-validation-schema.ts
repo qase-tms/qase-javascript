@@ -64,7 +64,7 @@ export const envValidationSchema: JSONSchemaType<EnvType> = {
       type: 'string',
       nullable: true,
     },
-    [EnvApiEnum.baseUrl]: {
+    [EnvApiEnum.host]: {
       type: 'string',
       nullable: true,
     },
