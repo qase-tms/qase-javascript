@@ -20,7 +20,7 @@ import {
 
 export type QaseApiOptionsType = {
   token: string;
-  baseUrl?: string | undefined;
+  host?: string | undefined;
   headers?: Record<string, string | undefined> | undefined;
   retries?: number | undefined;
   retryDelay?: number | undefined;
@@ -73,7 +73,7 @@ export class QaseApi implements QaseApiInterface {
   ) {
     const {
       token,
-      baseUrl,
+      host,
       headers,
       retries = 3,
       retryDelay = 0,
@@ -97,19 +97,27 @@ export class QaseApi implements QaseApiInterface {
       formDataCtor,
     });
 
-    this.projects = new ProjectsApi(configuration, baseUrl, transport);
-    this.cases = new CasesApi(configuration, baseUrl, transport);
-    this.result = new ResultApi(configuration, baseUrl, transport);
-    this.results = new ResultsApi(configuration, baseUrl, transport);
-    this.runs = new RunsApi(configuration, baseUrl, transport);
-    this.attachments = new AttachmentsApi(configuration, baseUrl, transport);
-    this.plans = new PlansApi(configuration, baseUrl, transport);
-    this.suites = new SuitesApi(configuration, baseUrl, transport);
-    this.milestones = new MilestonesApi(configuration, baseUrl, transport);
-    this.sharedSteps = new SharedStepsApi(configuration, baseUrl, transport);
-    this.defects = new DefectsApi(configuration, baseUrl, transport);
-    this.customFields = new CustomFieldsApi(configuration, baseUrl, transport);
-    this.authors = new AuthorsApi(configuration, baseUrl, transport);
-    this.environment = new EnvironmentsApi(configuration, baseUrl, transport);
+    if (host != undefined) {
+      if (host == 'qase.io') {
+        configuration.basePath = `https://api.${host}`;
+      } else {
+        configuration.basePath = host;
+      }
+    }
+
+    this.projects = new ProjectsApi(configuration, host, transport);
+    this.cases = new CasesApi(configuration, host, transport);
+    this.result = new ResultApi(configuration, host, transport);
+    this.results = new ResultsApi(configuration, host, transport);
+    this.runs = new RunsApi(configuration, host, transport);
+    this.attachments = new AttachmentsApi(configuration, host, transport);
+    this.plans = new PlansApi(configuration, host, transport);
+    this.suites = new SuitesApi(configuration, host, transport);
+    this.milestones = new MilestonesApi(configuration, host, transport);
+    this.sharedSteps = new SharedStepsApi(configuration, host, transport);
+    this.defects = new DefectsApi(configuration, host, transport);
+    this.customFields = new CustomFieldsApi(configuration, host, transport);
+    this.authors = new AuthorsApi(configuration, host, transport);
+    this.environment = new EnvironmentsApi(configuration, host, transport);
   }
 }
