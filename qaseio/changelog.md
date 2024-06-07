@@ -1,3 +1,10 @@
+# qaseio@2.1.3
+
+## What's new
+
+Configure custom Qase API URLs, such as for Enterprise on-premises installations
+or for using proxies.
+
 # qaseio@2.1.2
 
 ## What's new
