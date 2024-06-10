@@ -42,6 +42,10 @@ export const envValidationSchema: JSONSchemaType<EnvType> = {
       type: 'boolean',
       nullable: true,
     },
+    [EnvEnum.rootSuite]: {
+      type: 'string',
+      nullable: true,
+    },
 
     [EnvTestOpsEnum.project]: {
       type: 'string',

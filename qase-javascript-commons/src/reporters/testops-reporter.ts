@@ -140,6 +140,12 @@ export class TestOpsReporter extends AbstractReporter {
   private readonly defect: boolean;
 
   /**
+   * @type {string | undefined}
+   * @private
+   */
+  private readonly rootSuite: string | undefined;
+
+  /**
    * @type {number}
    * @private
    */
@@ -155,13 +161,15 @@ export class TestOpsReporter extends AbstractReporter {
    * @param {LoggerInterface} logger
    * @param {ReporterOptionsType & TestOpsOptionsType} options
    * @param {QaseApiInterface} api
-   * @param {number} environment
+   * @param {string | undefined} environment
+   * @param {string | undefined} rootSuite
    */
   constructor(
     logger: LoggerInterface,
     options: TestOpsOptionsType,
     private api: QaseApiInterface,
     environment?: string,
+    rootSuite?: string,
   ) {
     const {
       project,
@@ -181,6 +189,7 @@ export class TestOpsReporter extends AbstractReporter {
     this.batchSize = options.batch?.size ?? defaultChunkSize;
     this.useV2 = options.useV2 ?? false;
     this.defect = options.defect ?? false;
+    this.rootSuite = rootSuite;
   }
 
   /**
@@ -370,9 +379,10 @@ export class TestOpsReporter extends AbstractReporter {
       return resultCreate;
     }
 
+    const rootSuite = this.rootSuite ? `${this.rootSuite}\t` : '';
     resultCreate.case = {
       title: result.title,
-      suite_title: result.relations?.suite ? result.relations?.suite?.data.map((suite) => suite.title).join('\t') : null,
+      suite_title: result.relations?.suite ? `${rootSuite}${result.relations?.suite?.data.map((suite) => suite.title).join('\t')}` : rootSuite,
     };
 
     this.logger.logDebug(`Transformed result: ${JSON.stringify(resultCreate)}`);
@@ -402,11 +412,31 @@ export class TestOpsReporter extends AbstractReporter {
    * @private
    */
   private getRelation(relation: Relation | null): ResultRelations {
-    if (!relation || !relation.suite) {
-      return {};
+    if (!relation?.suite) {
+      if (this.rootSuite == undefined) {
+        return {};
+      }
+
+      return {
+        suite: {
+          data: [
+            {
+              public_id: null,
+              title: this.rootSuite,
+            },
+          ],
+        },
+      };
     }
 
     const suiteData: SuiteData[] = [];
+    if (this.rootSuite != undefined) {
+      suiteData.push({
+        public_id: null,
+        title: this.rootSuite,
+      });
+    }
+
     for (const data of relation.suite.data) {
       suiteData.push({
         public_id: null,

@@ -7,6 +7,7 @@ export enum EnvEnum {
   debug = 'QASE_DEBUG',
   environment = 'QASE_ENVIRONMENT',
   captureLogs = 'QASE_CAPTURE_LOGS',
+  rootSuite = 'QASE_ROOT_SUITE',
 }
 
 /**

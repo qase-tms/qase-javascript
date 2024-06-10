@@ -341,6 +341,7 @@ export class QaseReporter implements ReporterInterface {
       frameworkName,
       reporterName,
       environment,
+      rootSuite,
       report = {},
       testops = {},
     } = options;
@@ -408,6 +409,7 @@ export class QaseReporter implements ReporterInterface {
           },
           apiClient,
           environment,
+          rootSuite,
         );
       }
 
@@ -419,6 +421,7 @@ export class QaseReporter implements ReporterInterface {
           this.logger,
           writer,
           environment,
+          rootSuite,
           testops.run?.id);
       }
 

@@ -14,23 +14,27 @@ import { LoggerInterface } from '../utils/logger';
 export class ReportReporter extends AbstractReporter {
   private readonly environment: string | undefined;
   private readonly runId: number | undefined;
+  private readonly rootSuite: string | undefined;
   private startTime: number = Date.now();
 
   /**
    * @param {LoggerInterface} logger
    * @param {WriterInterface} writer
    * @param {string | undefined} environment
+   * @param {string | undefined} rootSuite
    * @param {number | undefined} runId
    */
   constructor(
     logger: LoggerInterface,
     private writer: WriterInterface,
     environment?: string,
+    rootSuite?: string,
     runId?: number,
   ) {
     super(logger);
     this.environment = environment;
     this.runId = runId;
+    this.rootSuite = rootSuite;
   }
 
   /**
@@ -111,6 +115,26 @@ export class ReportReporter extends AbstractReporter {
 
       result.steps = this.copyStepAttachments(result.steps);
       result.run_id = this.runId ?? null;
+      if (result.relations != null && this.rootSuite != null) {
+        const data = {
+          title: this.rootSuite,
+          public_id: null,
+        };
+
+        result.relations.suite?.data.unshift(data);
+      } else if (this.rootSuite != null) {
+        result.relations = {
+          suite: {
+            data: [
+              {
+                title: this.rootSuite,
+                public_id: null,
+              },
+            ],
+          },
+        };
+      }
+
       await this.writer.writeTestResult(result);
     }
 
