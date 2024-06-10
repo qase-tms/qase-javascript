@@ -33,6 +33,10 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
       type: 'boolean',
       nullable: true,
     },
+    rootSuite: {
+      type: 'string',
+      nullable: true,
+    },
 
     testops: {
       type: 'object',

@@ -16,6 +16,7 @@ export type EnvType = {
   [EnvEnum.debug]?: boolean;
   [EnvEnum.environment]?: string;
   [EnvEnum.captureLogs]?: boolean;
+  [EnvEnum.rootSuite]?: string;
 
   [EnvTestOpsEnum.project]?: string;
   [EnvTestOpsEnum.uploadAttachments]?: boolean;

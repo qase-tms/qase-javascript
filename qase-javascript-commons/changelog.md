@@ -2,20 +2,15 @@
 
 ## What's new
 
-Added new configuration options `enterprise` for the Qase TestOps reporter in the `qase.config.json` file and environment variables.
-Support enterprise API URL. Now the reporters will upload test results to your own Qase instance.
+Added new configuration option `rootSuite` to specify a root suite.
+This option is available in the config file and the `QASE_ROOT_SUITE` env variable
 
 ```diff
 {
-  ...
-  "testops": {
-   "api": {
-      "token": "token",
-	  "host": "qase.io",
-+	  "enterprise": true
-   }
-    ...
-  },
+  "mode": "testops",
+  "fallback": "report",
+  "environment": "local",
++ "rootSuite": "Root Suite",
   ...
 }
 ```

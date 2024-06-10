@@ -31,6 +31,7 @@ export type OptionsType = {
   captureLogs?: boolean | undefined;
   debug?: boolean | undefined;
   environment?: string | undefined;
+  rootSuite?: string | undefined;
   testops?:
     | (RecursivePartial<TestOpsOptionsType> & AdditionalTestOpsOptionsType)
     | undefined;
