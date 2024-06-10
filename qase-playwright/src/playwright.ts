@@ -13,6 +13,7 @@ export interface MetadataMessage {
   fields?: Record<string, string>;
   parameters?: Record<string, string>;
   ignore?: boolean;
+  suite?: string;
 }
 
 /**
@@ -178,6 +179,22 @@ qase.attach = function(attach: {
 qase.ignore = function() {
   addMetadata({
     ignore: true,
+  });
+  return this;
+};
+
+/**
+ * Set a suite for the test case
+ * @param {string} value
+ * @example
+ * test('test', async ({ page }) => {
+ *    qase.suite("Suite");
+ *    await page.goto('https://example.com');
+ * });
+ */
+qase.suite = function(value: string) {
+  addMetadata({
+    suite: value,
   });
   return this;
 };

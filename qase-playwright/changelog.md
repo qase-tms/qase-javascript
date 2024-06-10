@@ -1,3 +1,20 @@
+# playwright-qase-reporter@2.0.3
+
+## What's new
+
+Added new annotation `qase.suite()`.
+Tests marked with it will be reported to the specified suite in the Qase.
+
+If you don't specify the suite name, the reporter will take a suites from the test file path.
+If you use the root suite, the reporter will take the root suite as the first level of the suite and your value of the `qase.suite()` as the second level.
+
+```js
+test('test', async ({ page }) => {
+  qase.suite("Custom suite");
+  await page.goto('https://example.com');
+});
+```
+
 # playwright-qase-reporter@2.0.2
 
 ## What's new
