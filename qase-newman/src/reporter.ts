@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 import semver from 'semver';
 import { NewmanRunExecution } from 'newman';
 import {
-  EventList,
+  EventList, PropertyBase, PropertyBaseDefinition,
 } from 'postman-collection';
 import {
   ConfigType,
@@ -13,7 +13,7 @@ import {
   TestResultType,
   getPackageVersion,
   ConfigLoader,
-  composeOptions,
+  composeOptions, Relation, SuiteData,
 } from 'qase-javascript-commons';
 
 export type NewmanQaseOptionsType = ConfigType;
@@ -50,28 +50,28 @@ export class NewmanQaseReporter {
     return ids;
   }
 
-  // /**
-  //  * @param {PropertyBase<PropertyBaseDefinition>} item
-  //  * @param {string[]} titles
-  //  * @returns {string[]}
-  //  * @private
-  //  */
-  // private static getParentTitles(
-  //   item: PropertyBase<PropertyBaseDefinition>,
-  //   titles: string[] = [],
-  // ) {
-  //   const parent = item.parent();
-  //
-  //   if (parent) {
-  //     NewmanQaseReporter.getParentTitles(parent, titles);
-  //   }
-  //
-  //   if ('name' in item) {
-  //     titles.push(String(item.name));
-  //   }
-  //
-  //   return titles;
-  // }
+  /**
+   * @param {PropertyBase<PropertyBaseDefinition>} item
+   * @param {string[]} titles
+   * @returns {string[]}
+   * @private
+   */
+  private static getParentTitles(
+    item: PropertyBase<PropertyBaseDefinition>,
+  ) {
+    const titles: string[] = [];
+
+    if ('name' in item) {
+      titles.push(String(item.name));
+    }
+
+    const parent = item.parent();
+    if (parent) {
+      titles.concat(NewmanQaseReporter.getParentTitles(parent));
+    }
+
+    return titles;
+  }
 
   /**
    * @type {ReporterInterface}
@@ -119,14 +119,29 @@ export class NewmanQaseReporter {
    */
   private addRunnerListeners(runner: EventEmitter) {
     runner.on('start', () => {
-      void this.reporter.startTestRun();
+      this.reporter.startTestRun();
     });
 
     runner.on(
       'beforeItem',
       (_err: Error | undefined, exec: NewmanRunExecution) => {
         const { item } = exec;
-        // const parent = item.parent();
+        const parent = item.parent();
+        const suites = parent ? NewmanQaseReporter.getParentTitles(parent) : [];
+        let relation: Relation | null = null;
+        if (suites.length > 0) {
+          const data: SuiteData[] = suites.map(title => {
+            return {
+              title: title,
+              public_id: null,
+            };
+          });
+          relation = {
+            suite: {
+              data: data,
+            },
+          };
+        }
         const ids = NewmanQaseReporter.getCaseIds(item.events);
         this.pendingResultMap.set(item.id, {
           attachments: [],
@@ -143,14 +158,13 @@ export class NewmanQaseReporter {
           message: null,
           muted: false,
           params: {},
-          relations: {},
+          relations: relation,
           run_id: null,
           signature: '',
           steps: [],
           testops_id: ids.length > 0 ? ids : null,
           id: item.id,
           title: item.name,
-          // suiteTitle: parent ? NewmanQaseReporter.getParentTitles(parent) : [],
         });
 
         this.timerMap.set(item.id, Date.now());
@@ -181,8 +195,6 @@ export class NewmanQaseReporter {
 
         if (timer) {
           const now = Date.now();
-          pendingResult.execution.start_time = timer;
-          pendingResult.execution.end_time = now;
           pendingResult.execution.duration = now - timer;
         }
 
