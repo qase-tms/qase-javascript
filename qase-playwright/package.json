@@ -1,6 +1,6 @@
 {
   "name": "playwright-qase-reporter",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Qase TMS Playwright Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

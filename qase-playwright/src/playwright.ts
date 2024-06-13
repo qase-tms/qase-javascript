@@ -14,6 +14,7 @@ export interface MetadataMessage {
   parameters?: Record<string, string>;
   ignore?: boolean;
   suite?: string;
+  comment?: string;
 }
 
 /**
@@ -195,6 +196,22 @@ qase.ignore = function() {
 qase.suite = function(value: string) {
   addMetadata({
     suite: value,
+  });
+  return this;
+};
+
+/**
+ * Set a comment for the test case
+ * @param {string} value
+ * @example
+ * test('test', async ({ page }) => {
+ *    qase.comment("Comment");
+ *    await page.goto('https://example.com');
+ * });
+ */
+qase.comment = function(value: string) {
+  addMetadata({
+    comment: value,
   });
   return this;
 };

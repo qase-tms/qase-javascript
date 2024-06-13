@@ -1,3 +1,17 @@
+# playwright-qase-reporter@2.0.4
+
+## What's new
+
+Added new annotation `qase.comment()`.
+Tests marked with it will be reported with the specified comment in the Qase.
+
+```js
+test('test', async ({ page }) => {
+  qase.comment("Custom comment");
+  await page.goto('https://example.com');
+});
+```
+
 # playwright-qase-reporter@2.0.3
 
 ## What's new
