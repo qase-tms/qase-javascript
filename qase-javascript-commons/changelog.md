@@ -1,3 +1,14 @@
+# qase-javascript-commons@2.0.10
+
+## What's new
+
+Fixed an issue with sending test results duplicates when we use the `qase-cypress` reporter.
+Now the reporter will send the test results only once.
+
+The Cypress calls the `publish` method multiple times for the same test results because of the Cypress architecture.
+It calls the `publish` method for each test file.
+
+
 # qase-javascript-commons@2.0.9
 
 ## What's new
