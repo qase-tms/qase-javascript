@@ -310,6 +310,9 @@ export class TestOpsReporter extends AbstractReporter {
       await this.publishResults(this.results.slice(this.firstIndex));
     }
 
+    // Clear results because we don't need to send them again then we use Cypress reporter
+    this.results.length = 0;
+
     if (!this.run.complete) {
       return;
     }
