@@ -2,11 +2,10 @@
 
 Publish results simple and easy.
 
-The TestCafe reporter is currently in the closed beta stage.
-To install the latest beta version, run:
+To install the latest version, run:
 
 ```sh
-npm install -D testcafe-reporter-qase@beta
+npm install -D testcafe-reporter-qase
 ```
 
 ## Updating from v1
