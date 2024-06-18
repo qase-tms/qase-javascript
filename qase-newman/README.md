@@ -2,11 +2,10 @@
 
 Publish results simple and easy.
 
-The Newman reporter is currently in the closed beta stage.
-To install the latest beta version, run:
+To install the latest version, run:
 
 ```bash
-npm install newman-reporter-qase@beta
+npm install newman-reporter-qase
 ```
 
 ## Example of usage
