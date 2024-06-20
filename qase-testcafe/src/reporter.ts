@@ -170,7 +170,7 @@ export class TestcafeQaseReporter {
    * @returns {Promise<void>}
    */
   public startTestRun = (): void => {
-      this.reporter.startTestRun();
+    this.reporter.startTestRun();
   };
 
   /**
@@ -210,7 +210,7 @@ export class TestcafeQaseReporter {
         },
       },
       run_id: null,
-      signature: `${testRunInfo.fixture.name}::${title}`,
+      signature: this.getSignature(testRunInfo.fixture, title, metadata[metadataEnum.id], metadata[metadataEnum.parameters]),
       steps: [],
       id: uuidv4(),
       testops_id: metadata[metadataEnum.id].length > 0 ? metadata[metadataEnum.id] : null,
@@ -259,5 +259,42 @@ export class TestcafeQaseReporter {
     }
 
     return metadata;
+  }
+
+  /**
+   * @param {FixtureType} fixture
+   * @param {string} title
+   * @param {number[]} ids
+   * @param {Record<string, string>} parameters
+   * @private
+   */
+  private getSignature(fixture: FixtureType, title: string, ids: number[], parameters: Record<string, string>) {
+    const executionPath = process.cwd() + '/';
+    const path = fixture.path?.replace(executionPath, '') ?? '';
+    let signature = '';
+
+    if (path != '') {
+      signature += path.split('/').join('::') + '::';
+    }
+
+    signature += fixture.name.toLowerCase()
+        .replace(/\s/g, '_')
+      + '::'
+      + title.toLowerCase()
+        .replace(/\s/g, '_');
+
+    if (ids.length > 0) {
+      signature += `::${ids.join('::')}`;
+    }
+
+    if (Object.keys(parameters).length > 0) {
+      signature += '::';
+    }
+
+    signature += Object.entries(parameters)
+      .map(([key, value]) => `{${key}:${value}}`)
+      .join('::');
+
+    return signature;
   }
 }

@@ -367,7 +367,7 @@ export class PlaywrightQaseReporter implements Reporter {
         },
       },
       run_id: null,
-      signature: suites.join(':'),
+      signature: '',
       steps: this.transformSteps(result.steps, null),
       testops_id: null,
       title: testCaseMetadata.title === '' ? test.title : testCaseMetadata.title,
@@ -393,6 +393,8 @@ export class PlaywrightQaseReporter implements Reporter {
         this.qaseTestWithOldAnnotation.set(path, ids);
       }
     }
+
+    testResult.signature = this.getSignature(suites, testCaseMetadata.parameters, testResult.testops_id ?? []);
 
     await this.reporter.addTestResult(testResult);
   }
@@ -434,5 +436,33 @@ export class PlaywrightQaseReporter implements Reporter {
       mime_type: logMimeType,
       content: content,
     } as Attachment;
+  }
+
+  /**
+   * @param {string[]} suites
+   * @param {Record<string, string>} parameters
+   * @param {number[]} ids
+   * @private
+   */
+  private getSignature(suites: string[], parameters: Record<string, string>, ids: number[]): string {
+    let signature = suites.map(suite =>
+      suite.toLowerCase()
+        .replace('/', '::')
+        .replace(/\s/g, '_'),
+    ).join('::');
+
+    if (ids.length > 0) {
+      signature += '::' + ids.join('::');
+    }
+
+    if (Object.keys(parameters).length !== 0) {
+      signature += '::';
+    }
+
+    signature += Object.entries(parameters)
+      .map(([key, value]) => `{${key}:${value}}`)
+      .join('::');
+
+    return signature;
   }
 }
