@@ -1,16 +1,18 @@
 import has from 'lodash.has';
 import get from 'lodash.get';
 import { v4 as uuidv4 } from 'uuid';
-import { Reporter, Test, TestResult, Config } from '@jest/reporters';
+import { Config, Reporter, Test, TestResult } from '@jest/reporters';
 import { Status } from '@jest/test-result';
 
 import {
-  QaseReporter,
-  ConfigType,
-  ReporterInterface,
-  TestStatusEnum,
-  ConfigLoader,
   composeOptions,
+  ConfigLoader,
+  ConfigType,
+  QaseReporter,
+  Relation,
+  ReporterInterface,
+  Suite,
+  TestStatusEnum,
 } from 'qase-javascript-commons';
 
 export type JestQaseOptionsType = ConfigType;
@@ -89,16 +91,18 @@ export class JestQaseReporter implements Reporter {
    * @param {TestResult} result
    */
   public onTestResult(_: Test, result: TestResult) {
+    console.log(result);
     result.testResults.forEach(
       ({
          title,
+         fullName,
+         ancestorTitles,
          status,
          duration,
          failureMessages,
          failureDetails,
        }) => {
         let error;
-
         if (status === 'failed') {
           error = new Error(failureDetails.map((item) => {
             if (has(item, 'matcherResult.message')) {
@@ -112,6 +116,8 @@ export class JestQaseReporter implements Reporter {
         }
 
         const ids = JestQaseReporter.getCaseId(title);
+        const filePath = this.getCurrentTestPath(result.testFilePath);
+
         void this.reporter.addTestResult({
           attachments: [],
           author: null,
@@ -127,14 +133,13 @@ export class JestQaseReporter implements Reporter {
           message: error?.message ?? null,
           muted: false,
           params: {},
-          relations: {},
+          relations: this.getRelations(filePath, ancestorTitles),
           run_id: null,
-          signature: '',
+          signature: this.getSignature(filePath, fullName, ids),
           steps: [],
           testops_id: ids.length > 0 ? ids : null,
           id: uuidv4(),
           title: title,
-          // suiteTitle: ancestorTitles,
         });
       },
     );
@@ -151,5 +156,62 @@ export class JestQaseReporter implements Reporter {
    */
   public onRunComplete() {
     void this.reporter.publish();
+  }
+
+  /**
+   * @param {string} filePath
+   * @param {string} fullName
+   * @param {number[]} ids
+   * @private
+   */
+  private getSignature(filePath: string, fullName: string, ids: number[]) {
+    let signature = filePath.split('/').join('::');
+
+    signature += '::' + fullName.toLowerCase().replace(/\s/g, '_');
+
+    if (ids.length > 0) {
+      signature += '::' + ids.join('::');
+    }
+
+    return signature;
+  }
+
+  /**
+   * @param {string} filePath
+   * @param {string[]} suites
+   * @private
+   */
+  private getRelations(filePath: string, suites: string[]): Relation {
+    const suite: Suite = {
+      data: [],
+    };
+
+    for (const part of filePath.split('/')) {
+      suite.data.push({
+        title: part,
+        public_id: null,
+      });
+    }
+
+    for (const part of suites) {
+      suite.data.push({
+        title: part,
+        public_id: null,
+      });
+    }
+
+    return {
+      suite: suite,
+    };
+  }
+
+  /**
+   * @param {string} fullPath
+   * @private
+   */
+  private getCurrentTestPath(fullPath: string) {
+    const executionPath = process.cwd() + '/';
+
+    return fullPath.replace(executionPath, '');
   }
 }

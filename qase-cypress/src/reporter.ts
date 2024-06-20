@@ -1,7 +1,7 @@
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
-import { MochaOptions, reporters, Runner, Test } from 'mocha';
+import { MochaOptions, reporters, Runner, Suite, Test } from 'mocha';
 
 import {
   ConfigLoader,
@@ -194,7 +194,7 @@ export class CypressQaseReporter extends reporters.Base {
       params: {},
       relations: relations,
       run_id: null,
-      signature: '',
+      signature: this.getSignature(test, ids),
       steps: [],
       id: test.id,
       execution: {
@@ -211,6 +211,7 @@ export class CypressQaseReporter extends reporters.Base {
       title: test.title,
     };
 
+    console.log(result.signature);
     void this.reporter.addTestResult(result);
   }
 
@@ -224,5 +225,49 @@ export class CypressQaseReporter extends reporters.Base {
       process.exitCode = code || 0;
       process.exit = _exit;
     };
+  }
+
+  /**
+   * @param {Test} test
+   * @param {number[]} ids
+   * @private
+   */
+  private getSignature(test: Test, ids: number[]) {
+    let signature = '';
+    const file = test.parent ? this.getFile(test.parent) : undefined;
+
+    if (file) {
+      signature = file.split('/').join('::');
+    }
+
+    if (test.parent) {
+      for (const suite of test.parent.titlePath()) {
+        signature += '::' + suite.toLowerCase().replace(/\s/g, '_');
+      }
+    }
+
+    signature += '::' + test.title.toLowerCase().replace(/\s/g, '_');
+
+    if (ids.length > 0) {
+      signature += '::' + ids.join('::');
+    }
+
+    return signature;
+  }
+
+  /**
+   * @param {Suite} suite
+   * @private
+   */
+  private getFile(suite: Suite): string | undefined {
+    if (suite.file) {
+      return suite.file;
+    }
+
+    if (suite.parent) {
+      return this.getFile(suite.parent);
+    }
+
+    return undefined;
   }
 }

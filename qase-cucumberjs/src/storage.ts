@@ -234,7 +234,7 @@ export class Storage {
       params: {},
       relations: relations,
       run_id: null,
-      signature: '',
+      signature: this.getSignature(pickle, metadata.ids),
       steps: this.convertSteps(pickle.steps, tc),
       testops_id: metadata.ids.length > 0 ? metadata.ids : null,
       id: tcs.id,
@@ -352,5 +352,22 @@ export class Storage {
     }
 
     return metadata;
+  }
+
+  /**
+   * @param {Pickle} pickle
+   * @param {number[]} ids
+   * @private
+   */
+  private getSignature(pickle: Pickle, ids: number[]): string {
+    let signature = pickle.uri.split('/').join('::')
+      + '::'
+      + pickle.name.toLowerCase().replace(/\s/g, '_');
+
+    if (ids.length > 0) {
+      signature += '::' + ids.join('::');
+    }
+
+    return signature;
   }
 }

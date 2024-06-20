@@ -160,7 +160,7 @@ export class NewmanQaseReporter {
           params: {},
           relations: relation,
           run_id: null,
-          signature: '',
+          signature: this.getSignature(suites, item.name, ids),
           steps: [],
           testops_id: ids.length > 0 ? ids : null,
           id: item.id,
@@ -228,5 +228,27 @@ export class NewmanQaseReporter {
         process.exit = _exit;
       };
     }
+  }
+
+  /**
+   * @param {string[]} suites
+   * @param {string} title
+   * @param {number[]} ids
+   * @private
+   */
+  private getSignature(suites: string[], title: string, ids: number[]) {
+    let signature = '';
+
+    for (const suite of suites) {
+      signature += suite.toLowerCase().replace(/\s/g, '_') + '::';
+    }
+
+    signature += title.toLowerCase().replace(/\s/g, '_');
+
+    if (ids.length > 0) {
+      signature += '::' + ids.join('::');
+    }
+
+    return signature;
   }
 }
