@@ -101,7 +101,7 @@ export class QaseApi implements QaseApiInterface {
       if (host == 'qase.io') {
         configuration.basePath = `https://api.${host}`;
       } else {
-        configuration.basePath = host;
+        configuration.basePath = `https://${host}`;
       }
     }
 

@@ -1,3 +1,9 @@
+# qaseio@2.1.4
+
+## What's new
+
+Fix an issue with base url for enterprise customers.   
+
 # qaseio@2.1.3
 
 ## What's new
