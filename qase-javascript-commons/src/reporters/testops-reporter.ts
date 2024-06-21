@@ -31,6 +31,7 @@ import {
 
 import { QaseError } from '../utils/qase-error';
 import { LoggerInterface } from '../utils/logger';
+import axios from 'axios';
 
 const defaultChunkSize = 200;
 
@@ -233,7 +234,8 @@ export class TestOpsReporter extends AbstractReporter {
       return;
     }
 
-    this.logger.logDebug('Create test run');
+    this.logger.logDebug('Creating test run');
+
     let environmentId: number | undefined;
     if (this.environment != undefined) {
       try {
@@ -243,7 +245,7 @@ export class TestOpsReporter extends AbstractReporter {
           environmentId = env.id;
         }
       } catch (error) {
-        throw new QaseError('Cannot get environments', { cause: error });
+        throw this.processError(error, 'Error on getting environments');
       }
     }
     const { result } = await this.createRun(
@@ -276,10 +278,13 @@ export class TestOpsReporter extends AbstractReporter {
         const resultCreateV2 = await this.transformTestResult(result);
         results.push(resultCreateV2);
       }
-
-      await this.api.result.createResultsV2(this.projectCode, this.run.id!, {
-        results: results,
-      });
+      try {
+        await this.api.result.createResultsV2(this.projectCode, this.run.id!, {
+          results: results,
+        });
+      } catch (error) {
+        throw this.processError(error, 'Error on uploading results', results);
+      }
 
     } else {
       const results: ResultCreate[] = [];
@@ -289,9 +294,13 @@ export class TestOpsReporter extends AbstractReporter {
         results.push(resultCreate);
       }
 
-      await this.api.results.createResultBulk(this.projectCode, this.run.id!, {
-        results: results,
-      });
+      try {
+        await this.api.results.createResultBulk(this.projectCode, this.run.id!, {
+          results: results,
+        });
+      } catch (error) {
+        throw this.processError(error, 'Error on uploading results', results);
+      }
     }
 
     this.logger.logDebug(`Results sent to Qase: ${testResults.length}`);
@@ -321,7 +330,7 @@ export class TestOpsReporter extends AbstractReporter {
       await this.api.runs.completeRun(this.projectCode, this.run.id!);
       this.logger.log(chalk`{green Run ${this.run.id!} completed}`);
     } catch (error) {
-      throw new QaseError('Error on completing run', { cause: error });
+      throw this.processError(error, 'Error on completing run');
     }
 
     const runUrl = `${this.baseUrl}/run/${this.projectCode}/dashboard/${this.run.id!}`;
@@ -564,7 +573,7 @@ export class TestOpsReporter extends AbstractReporter {
         `Get run result on checking run "${String(resp.data.result?.id)}"`,
       );
     } catch (error) {
-      throw new QaseError('Error on checking run', { cause: error });
+      throw this.processError(error, 'Error on checking run');
     }
   }
 
@@ -600,7 +609,7 @@ export class TestOpsReporter extends AbstractReporter {
 
       return data;
     } catch (error) {
-      throw new QaseError('Cannot create run', { cause: error });
+      throw this.processError(error, 'Error on creating run');
     }
   }
 
@@ -661,5 +670,32 @@ export class TestOpsReporter extends AbstractReporter {
       }
     }
     return acc;
+  }
+
+  /**
+   * Process error and throw QaseError
+   * @param {Error | AxiosError} error
+   * @param {string} message
+   * @param {object} model
+   * @private
+   */
+  private processError(error: unknown, message: string, model?: object): QaseError {
+    if (!axios.isAxiosError(error)) {
+      return new QaseError(message, { cause: error });
+    }
+
+    if (error.response?.status === 401) {
+      return new QaseError(message + ': \n Unauthorized. Please check your API token. Maybe it is expired or invalid.');
+    }
+
+    if (error.response?.status === 404) {
+      return new QaseError(message + ': Not found.');
+    }
+
+    if (error.response?.status === 400) {
+      return new QaseError(message + ': Bad request. Body: \n ' + JSON.stringify(model));
+    }
+
+    return new QaseError(message, { cause: error });
   }
 }
