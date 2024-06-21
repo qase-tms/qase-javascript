@@ -1,3 +1,15 @@
+# qase-javascript-commons@2.0.11
+
+## What's new
+
+- Improved logging for better debugging and error reporting.
+
+- Show the link to the test run in the console output when the test is failed.
+
+```text
+[INFO] qase: See why this test failed: https://app.qase.io/run/DEMO/dashboard/123?status=%5B2%5D&search=5%20-%206%20=%20-2
+```
+
 # qase-javascript-commons@2.0.10
 
 ## What's new
