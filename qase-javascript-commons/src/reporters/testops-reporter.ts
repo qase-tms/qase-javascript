@@ -164,6 +164,7 @@ export class TestOpsReporter extends AbstractReporter {
    * @param {QaseApiInterface} api
    * @param {string | undefined} environment
    * @param {string | undefined} rootSuite
+   * @param {string | undefined} baseUrl
    */
   constructor(
     logger: LoggerInterface,
@@ -171,6 +172,7 @@ export class TestOpsReporter extends AbstractReporter {
     private api: QaseApiInterface,
     environment?: string,
     rootSuite?: string,
+    baseUrl?: string,
   ) {
     const {
       project,
@@ -180,9 +182,7 @@ export class TestOpsReporter extends AbstractReporter {
 
     super(logger);
 
-    const baseUrl = 'https://app.qase.io';
-
-    this.baseUrl = baseUrl.replace(/\/$/, '');
+    this.baseUrl = this.getBaseUrl(baseUrl);
     this.projectCode = project;
     this.isUploadAttachments = uploadAttachments;
     this.run = { complete: true, ...run };
@@ -205,6 +205,17 @@ export class TestOpsReporter extends AbstractReporter {
    * @returns {Promise<void>}
    */
   public override async addTestResult(result: TestResultType): Promise<void> {
+    if (result.execution.status === TestStatusEnum.failed) {
+
+      if (Array.isArray(result.testops_id)) {
+        for (const id of result.testops_id) {
+          this.showLink(id, result.title);
+        }
+      } else {
+        this.showLink(result.testops_id, result.title);
+      }
+    }
+
     await super.addTestResult(result);
 
     if (!this.isTestRunReady) {
@@ -697,5 +708,44 @@ export class TestOpsReporter extends AbstractReporter {
     }
 
     return new QaseError(message, { cause: error });
+  }
+
+  /**
+   * @param {string | undefined} url
+   * @return string
+   * @private
+   */
+  private getBaseUrl(url: string | undefined): string {
+    if (!url || url === 'qase.io') {
+      return 'https://app.qase.io';
+    }
+
+    return `https://${url.replace('api', 'app')}`;
+  }
+
+  /**
+   * @param {number | null} id
+   * @param {string} title
+   * @return string
+   * @private
+   */
+  private prepareFailedTestLink(id: number | null, title: string): string {
+    const baseLink = `${this.baseUrl}/run/${this.projectCode}/dashboard/${this.run.id!}?source=logs&status=%5B2%5D&search=`;
+    if (id) {
+      return `${baseLink}${id}`;
+    }
+
+    return `${baseLink}${encodeURI(title)}`;
+  }
+
+  /**
+   * Show link to failed test
+   * @param {number | null} id
+   * @param {string} title
+   * @private
+   */
+  private showLink(id: number | null, title: string): void {
+    const link = this.prepareFailedTestLink(id, title);
+    this.logger.log(chalk`{blue See why this test failed: ${link}}`);
   }
 }

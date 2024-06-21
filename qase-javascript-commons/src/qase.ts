@@ -232,6 +232,8 @@ export class QaseReporter implements ReporterInterface {
    */
   public async addTestResult(result: TestResultType) {
     if (!this.disabled) {
+      await this.startTestRunOperation;
+
       this.logTestItem(result);
 
       if (this.useFallback) {
@@ -410,6 +412,7 @@ export class QaseReporter implements ReporterInterface {
           apiClient,
           environment,
           rootSuite,
+          api.host,
         );
       }
 
