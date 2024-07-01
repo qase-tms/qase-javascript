@@ -1,3 +1,19 @@
+# playwright-qase-reporter@2.0.5
+
+## What's new
+
+The log message about the `qase(id, 'title')` annotation syntax got improved.
+Earlier it was saying that this syntax is deprecated, which could be understood as that it's not working anymore,
+or will be removed any time.
+In fact, it's still working and will be supported further on.
+However, there's a more powerful and flexible syntax which we propose to try in new tests.
+
+The updated log message will, hopefully, explain it better:
+
+> Some tests are using qase(id, 'Title') syntax.
+> Consider using the new syntax: qase.id().title() in the test body. See the docs for reference:
+> https://github.com/qase-tms/qase-javascript/tree/main/qase-playwright#readme
+
 # playwright-qase-reporter@2.0.4
 
 ## What's new

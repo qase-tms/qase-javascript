@@ -406,11 +406,9 @@ export class PlaywrightQaseReporter implements Reporter {
     await this.reporter.publish();
 
     if (this.qaseTestWithOldAnnotation.size > 0) {
-      console.log(chalk`{yellow qase: qase(caseId) is deprecated. Use qase.id() and qase.title() inside the test body}`);
-      console.log(chalk`{yellow The following tests are using the old annotation:}`);
-      for (const [key] of this.qaseTestWithOldAnnotation) {
-        console.log(`at ${key}`);
-      }
+      console.log(chalk`{yellow qase: Some tests are using qase(id, 'Title') syntax.}`);
+      console.log(chalk`{yellow qase: Consider using the new syntax: qase.id().title() in the test body. See the docs for reference:}`);
+      console.log(chalk`{yellow qase: https://github.com/qase-tms/qase-javascript/tree/main/qase-playwright#readme}`);
     }
   }
 
