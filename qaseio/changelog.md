@@ -1,3 +1,9 @@
+# qaseio@2.1.5
+
+## What's new
+
+Enable using 'http://api.qase.lo' as API host for Qase development.
+
 # qaseio@2.1.4
 
 ## What's new

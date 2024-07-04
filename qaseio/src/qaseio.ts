@@ -97,10 +97,16 @@ export class QaseApi implements QaseApiInterface {
       formDataCtor,
     });
 
+    // default path is https://api.qase.io, defined in
+    // qaseio/src/generated/base.ts
     if (host != undefined) {
-      if (host == 'qase.io') {
-        configuration.basePath = `https://api.${host}`;
+      if (host == 'qase.io' || host == 'api.qase.io' || host == 'https://api.qase.io') {
+        configuration.basePath = `https://api.qase.io`;
+      } else if (host == 'http://api.qase.lo') {
+        // Qase on local machine, development mode
+        configuration.basePath = host
       } else {
+        // Custom Qase host
         configuration.basePath = `https://${host}`;
       }
     }
