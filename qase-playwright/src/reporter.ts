@@ -211,28 +211,19 @@ export class PlaywrightQaseReporter implements Reporter {
 
   /**
    * @param {TestError[]} testErrors
-   * @returns {Error}
+   * @returns {string}
    * @private
    */
-  private static transformError(testErrors: TestError[]): Error {
-
+  private static transformError(testErrors: TestError[]): string {
     let message = '';
-    for (const error of testErrors) {
-      if (error.message == undefined) {
-        continue;
-      }
-      message += error.message + '\n\n';
-    }
-
-    const error = new Error(message);
     for (const error of testErrors) {
       if (error.stack == undefined) {
         continue;
       }
-      error.stack += error.stack + '\n\n';
+      message += error.stack + '\n\n';
     }
 
-    return error;
+    return message;
   }
 
   /**
@@ -339,16 +330,6 @@ export class PlaywrightQaseReporter implements Reporter {
       message = testCaseMetadata.comment;
     }
 
-    if (error) {
-      if (message) {
-        message += '\n\n';
-      } else {
-        message = '';
-      }
-
-      message += error.message;
-    }
-
     const testResult: TestResultType = {
       attachments: testCaseMetadata.attachments,
       author: null,
@@ -357,9 +338,7 @@ export class PlaywrightQaseReporter implements Reporter {
         start_time: result.startTime.valueOf() / 1000,
         end_time: null,
         duration: result.duration,
-        stacktrace: error === null ?
-          null : error.stack === undefined ?
-            null : error.stack,
+        stacktrace: error,
         thread: result.parallelIndex.toString(),
       },
       fields: testCaseMetadata.fields,

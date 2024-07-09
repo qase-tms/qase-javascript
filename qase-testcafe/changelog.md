@@ -1,3 +1,10 @@
+# qase-testcafe@2.0.1
+
+## What's new
+
+Improve the collecting information about failed tests.
+Now, the reporter will collect the stack trace and the error message from all errors for failed tests.
+
 # qase-testcafe@2.0.0
 
 ## What's new

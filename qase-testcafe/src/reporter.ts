@@ -96,10 +96,10 @@ export class TestcafeQaseReporter {
 
   /**
    * @param {TestRunErrorFormattableAdapterType[]} errors
-   * @returns {Error}
+   * @returns {string}
    * @private
    */
-  private static transformErrors(errors: TestRunErrorFormattableAdapterType[]): Error {
+  private static transformErrors(errors: TestRunErrorFormattableAdapterType[]): string {
     const [errorMessages, errorStacks] = errors.reduce<[string[], string[]]>(
       ([messages, stacks], error) => {
         const stack =
@@ -113,11 +113,7 @@ export class TestcafeQaseReporter {
       [[], []],
     );
 
-    const error = new Error(errorMessages.join('\n\n'));
-
-    error.stack = errorStacks.join('\n\n');
-
-    return error;
+    return errorMessages.join('\n\n') + '\n\n' + errorStacks.join('\n\n');
   }
 
   /**
@@ -192,11 +188,11 @@ export class TestcafeQaseReporter {
         start_time: null,
         end_time: null,
         duration: testRunInfo.durationMs,
-        stacktrace: error.stack ?? null,
+        stacktrace: error,
         thread: null,
       },
       fields: metadata[metadataEnum.fields],
-      message: error.message,
+      message: null,
       muted: false,
       params: metadata[metadataEnum.parameters],
       relations: {

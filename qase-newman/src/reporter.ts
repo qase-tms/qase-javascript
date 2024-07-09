@@ -181,7 +181,6 @@ export class NewmanQaseReporter {
 
           pendingResult.execution.status = TestStatusEnum.failed;
           pendingResult.execution.stacktrace = err.stack ?? null;
-          pendingResult.message = err.message;
         }
       },
     );

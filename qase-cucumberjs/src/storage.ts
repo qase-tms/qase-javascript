@@ -225,7 +225,7 @@ export class Storage {
         start_time: null,
         end_time: null,
         duration: Math.abs(testCase.timestamp.seconds - tcs.timestamp.seconds),
-        stacktrace: error?.stack ?? null,
+        stacktrace: error?.message ?? null,
         thread: null,
       },
       fields: metadata.fields,

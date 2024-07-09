@@ -189,7 +189,7 @@ export class CypressQaseReporter extends reporters.Base {
       attachments: attachments ?? [],
       author: null,
       fields: {},
-      message: test.err?.message ?? null,
+      message: null,
       muted: false,
       params: {},
       relations: relations,

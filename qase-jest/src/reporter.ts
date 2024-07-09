@@ -130,7 +130,7 @@ export class JestQaseReporter implements Reporter {
             thread: null,
           },
           fields: {},
-          message: error?.message ?? null,
+          message: null,
           muted: false,
           params: {},
           relations: this.getRelations(filePath, ancestorTitles),
