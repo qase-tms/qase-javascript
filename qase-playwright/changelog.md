@@ -1,3 +1,10 @@
+# playwright-qase-reporter@2.0.6
+
+## What's new
+
+Improve the collecting information about failed tests. 
+Now, the reporter will collect the stack trace and the error message from all errors for failed tests.
+
 # playwright-qase-reporter@2.0.5
 
 ## What's new

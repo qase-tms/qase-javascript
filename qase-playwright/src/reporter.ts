@@ -210,14 +210,27 @@ export class PlaywrightQaseReporter implements Reporter {
   }
 
   /**
-   * @param {TestError} testError
+   * @param {TestError[]} testErrors
    * @returns {Error}
    * @private
    */
-  private static transformError(testError: TestError): Error {
-    const error = new Error(testError.message);
+  private static transformError(testErrors: TestError[]): Error {
 
-    error.stack = testError.stack ?? '';
+    let message = '';
+    for (const error of testErrors) {
+      if (error.message == undefined) {
+        continue;
+      }
+      message += error.message + '\n\n';
+    }
+
+    const error = new Error(message);
+    for (const error of testErrors) {
+      if (error.stack == undefined) {
+        continue;
+      }
+      error.stack += error.stack + '\n\n';
+    }
 
     return error;
   }
@@ -318,7 +331,7 @@ export class PlaywrightQaseReporter implements Reporter {
       return;
     }
 
-    const error = result.error ? PlaywrightQaseReporter.transformError(result.error) : null;
+    const error = result.error ? PlaywrightQaseReporter.transformError(result.errors) : null;
     const suites = testCaseMetadata.suite != '' ? [testCaseMetadata.suite] : PlaywrightQaseReporter.transformSuiteTitle(test);
 
     let message: string | null = null;
