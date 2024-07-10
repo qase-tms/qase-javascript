@@ -25,6 +25,7 @@
     "qase-newman",
     "qase-playwright",
     "qase-testcafe",
+    "qase-mocha",
     "./examples/*"
   ],
   "devDependencies": {
@@ -38,6 +39,7 @@
     "jest": "^29.5.0",
     "prettier": "^2.8.8",
     "ts-jest": "^29.1.0",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "mocha": "^10.6.0"
   }
 }
