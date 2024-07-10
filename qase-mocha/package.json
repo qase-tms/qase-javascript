@@ -1,0 +1,58 @@
+{
+  "name": "mocha-qase-reporter",
+  "version": "1.0.0-beta.1",
+  "description": "Mocha Cypress Reporter",
+  "homepage": "https://github.com/qase-tms/qase-javascript",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./reporter": "./dist/reporter.js",
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      ".": [
+        "./dist/index.d.ts"
+      ],
+      "reporter": [
+        "./dist/reporter.d.ts"
+      ]
+    }
+  },
+  "bugs": {
+    "url": "https://github.com/qase-tms/qase-javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qase-tms/qase-javascript.git"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "scripts": {
+    "build": "npm run clean && tsc --project tsconfig.build.json",
+    "lint": "eslint .",
+    "test": "jest --passWithNoTests",
+    "clean": "rm -rf dist"
+  },
+  "author": "Qase Team <support@qase.io>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "mocha": "^10.2.0",
+    "deasync-promise": "^1.0.1",
+    "qase-javascript-commons": "^2.0.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/deasync-promise": "^1.0.2",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^20.2.4",
+    "@types/request": "^2.48.8",
+    "@typescript-eslint/eslint-plugin": "^5.59.7",
+    "@typescript-eslint/parser": "^5.59.7",
+    "eslint": "^8.41.0",
+    "prettier": "^2.8.8"
+  }
+}
