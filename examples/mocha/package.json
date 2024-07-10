@@ -1,0 +1,11 @@
+{
+  "name": "examples-mocha",
+  "private": true,
+  "scripts": {
+    "test": "QASE_MODE=testops mocha"
+  },
+  "devDependencies": {
+    "mocha": "^10.2.0",
+    "mocha-qase-reporter": "^1.0.0-beta.1"
+  }
+}
