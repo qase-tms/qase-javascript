@@ -13,6 +13,7 @@ import {
   TestStepType,
 } from 'qase-javascript-commons';
 import deasyncPromise from 'deasync-promise';
+import { extname, join } from 'node:path';
 
 const Events = Runner.constants;
 
@@ -23,6 +24,9 @@ class currentTest {
   status: MochaState = 'passed';
   attachments: Attachment[] = [];
 }
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-return,@typescript-eslint/restrict-template-expressions
+const resolveParallelModeSetupFile = () => join(__dirname, `parallel${extname(__filename)}`);
 
 export class MochaQaseReporter extends reporters.Base {
 
@@ -65,8 +69,11 @@ export class MochaQaseReporter extends reporters.Base {
       reporterName: 'mocha-qase-reporter',
     });
 
-
-    this.applyListeners();
+    if (options.parallel) {
+      options.require = [...(options.require ?? []), resolveParallelModeSetupFile()];
+    } else {
+      this.applyListeners();
+    }
   }
 
   private applyListeners = () => {
