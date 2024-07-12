@@ -65,6 +65,33 @@ A test run will be performed and available at:
 https://app.qase.io/run/QASE_PROJECT_CODE
 ```
 
+### Parallel execution
+
+The reporter supports parallel execution of tests.
+
+First, you need to create a new run in Qase.io. You can use
+the [Qase CLI](https://github.com/qase-tms/qasectl):
+
+```bash
+# Create a new test run
+qli testops run create --project DEMO --token token --title 'Mocha test run'
+
+# Save the run ID to the environment variable
+export QASE_TESTOPS_RUN_ID=$(< qase.env grep QASE_TESTOPS_RUN_ID | cut -d'=' -f2)
+```
+
+Then, you can run tests in parallel:
+
+```bash
+QASE_MODE=testops mocha --parallel
+```
+
+After the tests are finished, you can complete the run:
+
+```bash
+qli testops run complete --project DEMO --token token --run $(echo $QASE_TESTOPS_RUN_ID)
+```
+
 ## Configuration
 
 Qase Mocha reporter can be configured in multiple ways:
