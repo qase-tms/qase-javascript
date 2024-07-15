@@ -250,7 +250,7 @@ export class TestOpsReporter extends AbstractReporter {
     let environmentId: number | undefined;
     if (this.environment != undefined) {
       try {
-        const { data } = await this.api.environment.getEnvironments(this.projectCode, 100);
+        const { data } = await this.api.environment.getEnvironments(this.projectCode, undefined, this.environment, 100);
         const env = data.result?.entities?.find((env) => env.slug === this.environment);
         if (env) {
           environmentId = env.id;
