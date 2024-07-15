@@ -1,3 +1,10 @@
+# qase-javascript-commons@2.0.12
+
+## What's new
+
+Support qaseio package version 2.2.0
+
+
 # qase-javascript-commons@2.0.11
 
 ## What's new
