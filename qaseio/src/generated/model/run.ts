@@ -115,5 +115,11 @@ export interface Run {
      * @memberof Run
      */
     'cases'?: Array<number>;
+    /**
+     *
+     * @type {number}
+     * @memberof Run
+     */
+    'plan_id'?: number | null;
 }
 

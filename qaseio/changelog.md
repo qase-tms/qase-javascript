@@ -1,3 +1,9 @@
+# qaseio@2.2.0
+
+## What's new
+
+Added search for environments and creation of test runs with the addition of an environment slug.
+
 # qaseio@2.1.5
 
 ## What's new
