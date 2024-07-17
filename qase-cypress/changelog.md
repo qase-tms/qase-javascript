@@ -1,3 +1,10 @@
+# cypress-qase-reporter@2.0.3
+
+## What's new
+
+Cypress doesn't finish the process after the last test.
+The reporter will wait for all results to be sent to Qase and will not block the process after sending.
+
 # cypress-qase-reporter@2.0.2
 
 ## What's new
