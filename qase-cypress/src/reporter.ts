@@ -1,5 +1,6 @@
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import { spawnSync } from 'child_process';
 
 import { MochaOptions, reporters, Runner, Suite, Test } from 'mocha';
 
@@ -24,9 +25,6 @@ const {
 } = Runner.constants;
 
 type CypressState = 'failed' | 'passed' | 'pending';
-
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const _exit = process.exit;
 
 export type CypressQaseOptionsType = Omit<MochaOptions, 'reporterOptions'> & {
   reporterOptions: ReporterOptionsType;
@@ -148,12 +146,9 @@ export class CypressQaseReporter extends reporters.Base {
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     runner.once(EVENT_RUN_END, async () => {
-      this.preventExit();
       await this.reporter.publish();
 
-      if (process.exitCode !== undefined) {
-        process.exit(process.exitCode);
-      }
+      spawnSync('node', [`${__dirname}/child.js`], { stdio: 'inherit' });
     });
   }
 
@@ -211,20 +206,7 @@ export class CypressQaseReporter extends reporters.Base {
       title: test.title,
     };
 
-    console.log(result.signature);
     void this.reporter.addTestResult(result);
-  }
-
-  /**
-   * @private
-   */
-  private preventExit() {
-    const mutableProcess: Record<'exit', (code: number) => void> = process;
-
-    mutableProcess.exit = (code: number) => {
-      process.exitCode = code || 0;
-      process.exit = _exit;
-    };
   }
 
   /**
