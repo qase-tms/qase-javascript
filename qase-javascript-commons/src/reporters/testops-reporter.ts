@@ -118,10 +118,15 @@ export class TestOpsReporter extends AbstractReporter {
    */
   private run: TestOpsRunType;
   /**
-   * @type { number | undefined}
+   * @type { string | undefined}
    * @private
    */
   private readonly environment: string | undefined;
+  /**
+   * @type { number | undefined}
+   * @private
+   */
+  private readonly planId: number | undefined;
   /**
    * @type {TestResultType[]}
    * @private
@@ -178,6 +183,7 @@ export class TestOpsReporter extends AbstractReporter {
       project,
       uploadAttachments,
       run,
+      plan
     } = options;
 
     super(logger);
@@ -187,6 +193,7 @@ export class TestOpsReporter extends AbstractReporter {
     this.isUploadAttachments = uploadAttachments;
     this.run = { complete: true, ...run };
     this.environment = environment;
+    this.planId = plan.id;
     this.batchSize = options.batch?.size ?? defaultChunkSize;
     this.useV2 = options.useV2 ?? false;
     this.defect = options.defect ?? false;
@@ -611,6 +618,10 @@ export class TestOpsReporter extends AbstractReporter {
 
       if (environment !== undefined) {
         runObject.environment_id = environment;
+      }
+
+      if (this.planId){
+        runObject.plan_id = this.planId;
       }
 
       const { data } = await this.api.runs.createRun(
