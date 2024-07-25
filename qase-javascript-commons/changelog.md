@@ -1,3 +1,10 @@
+# qase-javascript-commons@2.0.13
+
+## What's new
+
+- If a plan ID is specified then when creating a test run it also specifies the plan ID.
+- If a test run ID is specified then the reporter won't check for the existence of a test run.
+
 # qase-javascript-commons@2.0.12
 
 ## What's new
