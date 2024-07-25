@@ -243,12 +243,8 @@ export class TestOpsReporter extends AbstractReporter {
    */
   private async checkOrCreateTestRun(): Promise<void> {
     if (this.run.id !== undefined) {
-
-      this.logger.logDebug('Check test run');
-
-      await this.checkRun(this.run.id);
-
       this.isTestRunReady = true;
+
       return;
     }
 
@@ -576,23 +572,6 @@ export class TestOpsReporter extends AbstractReporter {
 
   private logEmptyStep(testTitle: string): void {
     this.logger.log(chalk`{magenta Test '${testTitle}' has empty action in step. The reporter will mark this step as unnamed step.}`);
-  }
-
-  /**
-   * @param {number} runId
-   * @returns {Promise<void>}
-   * @private
-   */
-  private async checkRun(runId: number): Promise<void> {
-    try {
-      const resp = await this.api.runs.getRun(this.projectCode, runId);
-
-      this.logger.log(
-        `Get run result on checking run "${String(resp.data.result?.id)}"`,
-      );
-    } catch (error) {
-      throw this.processError(error, 'Error on checking run');
-    }
   }
 
   /**
