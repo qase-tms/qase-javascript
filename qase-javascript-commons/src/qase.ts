@@ -12,6 +12,8 @@ import {
 import { composeOptions, ModeEnum, OptionsType } from './options';
 import {
   EnvApiEnum,
+  EnvEnum,
+  EnvRunEnum,
   EnvTestOpsEnum,
   envToConfig,
   envValidationSchema,
@@ -23,6 +25,8 @@ import { getPackageVersion } from './utils/get-package-version';
 import { CustomBoundaryFormData } from './utils/custom-boundary';
 import { DisabledException } from './utils/disabled-exception';
 import { Logger, LoggerInterface } from './utils/logger';
+import { StateManager, StateModel } from './state/state';
+import { ConfigType } from './config';
 
 /**
  * @type {Record<TestStatusEnum, (test: TestResultType) => string>}
@@ -44,6 +48,12 @@ export interface ReporterInterface {
   startTestRun(): void;
 
   isCaptureLogs(): boolean;
+
+  getResults(): TestResultType[];
+
+  sendResults(): Promise<void>;
+
+  complete(): Promise<void>;
 }
 
 /**
@@ -133,12 +143,26 @@ export class QaseReporter implements ReporterInterface {
 
   private startTestRunOperation?: Promise<void> | undefined;
 
+  private options: ConfigType & OptionsType;
+
   /**
    * @param {OptionsType} options
    */
   private constructor(options: OptionsType) {
+    if (StateManager.isStateExists()) {
+      const state = StateManager.getState();
+      if (state.IsModeChanged && state.Mode) {
+        process.env[EnvEnum.mode] = state.Mode.toString();
+      }
+
+      if (state.RunId) {
+        process.env[EnvRunEnum.id] = state.RunId.toString();
+      }
+    }
+
     const env = envToConfig(envSchema({ schema: envValidationSchema }));
     const composedOptions = composeOptions(options, env);
+    this.options = composedOptions;
 
     this.logger = new Logger({ debug: composedOptions.debug });
     this.logger.logDebug(`Config: ${JSON.stringify(composedOptions)}`);
@@ -185,6 +209,102 @@ export class QaseReporter implements ReporterInterface {
         }
       }
     }
+
+    if (!StateManager.isStateExists()) {
+      const state: StateModel = {
+        RunId: undefined,
+        Mode: this.useFallback ? composedOptions.fallback as ModeEnum : composedOptions.mode as ModeEnum,
+        IsModeChanged: undefined,
+      };
+
+      if (this.disabled) {
+        state.Mode = ModeEnum.off;
+      }
+
+      StateManager.setState(state);
+    }
+  }
+
+  getResults(): TestResultType[] {
+    if (this.disabled) {
+      return [];
+    }
+
+    if (this.useFallback) {
+      return this.fallbackReporter?.getTestResults() ?? [];
+    }
+
+    return this.upstreamReporter?.getTestResults() ?? [];
+  }
+
+  setTestResults(results: TestResultType[]): void {
+    if (this.disabled) {
+      return;
+    }
+
+    if (this.useFallback) {
+      this.fallbackReporter?.setTestResults(results);
+    } else {
+      this.upstreamReporter?.setTestResults(results);
+    }
+  }
+
+  async sendResults(): Promise<void> {
+    if (this.disabled) {
+      return;
+    }
+
+    try {
+      await this.upstreamReporter?.sendResults();
+    } catch (error) {
+      this.logger.logError('Unable to send the results to the upstream reporter:', error);
+
+      if (this.fallbackReporter == undefined) {
+        StateManager.setMode(ModeEnum.off);
+        return;
+      }
+
+      if (!this.useFallback) {
+        this.fallbackReporter.setTestResults(this.upstreamReporter?.getTestResults() ?? []);
+        this.useFallback = true;
+      }
+
+      try {
+        await this.fallbackReporter?.sendResults();
+        StateManager.setMode(this.options.fallback as ModeEnum);
+      } catch (error) {
+        this.logger.logError('Unable to send the results to the fallback reporter:', error);
+        StateManager.setMode(ModeEnum.off);
+      }
+    }
+  }
+
+  async complete(): Promise<void> {
+    StateManager.clearState();
+    if (this.disabled) {
+      return;
+    }
+
+    try {
+      await this.upstreamReporter?.complete();
+    } catch (error) {
+      this.logger.logError('Unable to complete the run in the upstream reporter:', error);
+
+      if (this.fallbackReporter == undefined) {
+        return;
+      }
+
+      if (!this.useFallback) {
+        this.fallbackReporter.setTestResults(this.upstreamReporter?.getTestResults() ?? []);
+        this.useFallback = true;
+      }
+
+      try {
+        await this.fallbackReporter?.complete();
+      } catch (error) {
+        this.logger.logError('Unable to complete the run in the fallback reporter:', error);
+      }
+    }
   }
 
   /**
@@ -202,17 +322,25 @@ export class QaseReporter implements ReporterInterface {
 
         if (this.fallbackReporter == undefined) {
           this.disabled = true;
+          StateManager.setMode(ModeEnum.off);
           return;
         }
 
         try {
           this.startTestRunOperation = this.fallbackReporter?.startTestRun();
+          StateManager.setMode(this.options.fallback as ModeEnum);
         } catch (error) {
           this.logger.logError('Unable to start test run in the fallback reporter: ', error);
           this.disabled = true;
+          StateManager.setMode(ModeEnum.off);
         }
       }
     }
+  }
+
+  public async startTestRunAsync(): Promise<void> {
+    this.startTestRun();
+    await this.startTestRunOperation;
   }
 
   /**
@@ -248,6 +376,7 @@ export class QaseReporter implements ReporterInterface {
 
         if (this.fallbackReporter == undefined) {
           this.disabled = true;
+          StateManager.setMode(ModeEnum.off);
           return;
         }
 
@@ -268,9 +397,11 @@ export class QaseReporter implements ReporterInterface {
   private async addTestResultToFallback(result: TestResultType): Promise<void> {
     try {
       await this.fallbackReporter?.addTestResult(result);
+      StateManager.setMode(this.options.fallback as ModeEnum);
     } catch (error) {
       this.logger.logError('Unable to add the result to the fallback reporter:', error);
       this.disabled = true;
+      StateManager.setMode(ModeEnum.off);
     }
   }
 
@@ -302,6 +433,7 @@ export class QaseReporter implements ReporterInterface {
 
         if (this.fallbackReporter == undefined) {
           this.disabled = true;
+          StateManager.setMode(ModeEnum.off);
           return;
         }
 
@@ -321,7 +453,9 @@ export class QaseReporter implements ReporterInterface {
   private async publishFallback(): Promise<void> {
     try {
       await this.fallbackReporter?.publish();
+      StateManager.setMode(this.options.fallback as ModeEnum);
     } catch (error) {
+      StateManager.setMode(ModeEnum.off);
       this.logger.logError('Unable to publish the run results to the fallback reporter:', error);
       this.disabled = true;
     }

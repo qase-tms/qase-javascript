@@ -50,6 +50,45 @@ export class ReportReporter extends AbstractReporter {
    *
    */
   public async publish(): Promise<void> {
+    await this.sendResults();
+    await this.complete();
+  }
+
+  public async sendResults(): Promise<void> {
+    this.writer.clearPreviousResults();
+
+    for (const result of this.results) {
+      if (result.attachments.length > 0) {
+        result.attachments = this.writer.writeAttachment(result.attachments);
+      }
+
+      result.steps = this.copyStepAttachments(result.steps);
+      result.run_id = this.runId ?? null;
+      if (result.relations != null && this.rootSuite != null) {
+        const data = {
+          title: this.rootSuite,
+          public_id: null,
+        };
+
+        result.relations.suite?.data.unshift(data);
+      } else if (this.rootSuite != null) {
+        result.relations = {
+          suite: {
+            data: [
+              {
+                title: this.rootSuite,
+                public_id: null,
+              },
+            ],
+          },
+        };
+      }
+
+      await this.writer.writeTestResult(result);
+    }
+  }
+
+  public async complete(): Promise<void> {
     this.writer.clearPreviousResults();
 
     const report: Report = {
@@ -95,10 +134,6 @@ export class ReportReporter extends AbstractReporter {
           break;
       }
 
-      if (result.execution.thread && !report.threads.includes(result.execution.thread)) {
-        report.threads.push(result.execution.thread);
-      }
-
       report.execution.cumulative_duration += result.execution.duration ?? 0;
 
       report.results.push({
@@ -108,34 +143,6 @@ export class ReportReporter extends AbstractReporter {
         thread: result.execution.thread,
         title: result.title,
       });
-
-      if (result.attachments.length > 0) {
-        result.attachments = this.writer.writeAttachment(result.attachments);
-      }
-
-      result.steps = this.copyStepAttachments(result.steps);
-      result.run_id = this.runId ?? null;
-      if (result.relations != null && this.rootSuite != null) {
-        const data = {
-          title: this.rootSuite,
-          public_id: null,
-        };
-
-        result.relations.suite?.data.unshift(data);
-      } else if (this.rootSuite != null) {
-        result.relations = {
-          suite: {
-            data: [
-              {
-                title: this.rootSuite,
-                public_id: null,
-              },
-            ],
-          },
-        };
-      }
-
-      await this.writer.writeTestResult(result);
     }
 
     const path = await this.writer.writeReport(report);
