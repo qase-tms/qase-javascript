@@ -8,19 +8,52 @@ To install the latest version, run:
 npm install -D cypress-qase-reporter
 ```
 
-## Updating from v1
+## Updating from v1 to v2.1
 
-You can update a test project from using version 1 to version 2 in several steps:
+You can update a test project from using version 1 to version 2.1 in several steps:
 
-1.  Change import paths:
+1. Change import paths:
 
-    ```diff
-    - import { qase } from 'cypress-qase-reporter/dist/mocha'
-    + import { qase } from 'cypress-qase-reporter/mocha'
-    ```
+   ```diff
+   - import { qase } from 'cypress-qase-reporter/dist/mocha'
+   + import { qase } from 'cypress-qase-reporter/mocha'
+   ```
+2. Update reporter configuration in `cypress.config.js` and/or environment variables —
+   see the [configuration reference](#configuration) below.
 
-2.  Update reporter configuration in `cypress.config.js` and/or environment variables —
-    see the [configuration reference](#configuration) below.
+3. Set the hooks in the `e2e` section in `cypress.config.js`:
+
+   ```diff
+   ...
+   e2e: {
+        setupNodeEvents(on, config) { 
+          + require('cypress-qase-reporter/plugin')(on, config);
+        }
+   }
+   ...
+   ```
+
+   If you are override before:run or after:run hooks, use this:
+
+   ```diff  
+   const { beforeRunHook, afterRunHook } = require('cypress-qase-reporter/hooks');
+    
+   ...
+   e2e: {
+       setupNodeEvents(on, config) {
+           + on('before:run', async () => {
+               + console.log('override before:run');
+               + await beforeRunHook(config);
+           + });
+
+           + on('after:run', async () => {
+               + console.log('override after:run');
+               + await afterRunHook(config);
+           + });
+       },
+   },
+   ...
+   ```
 
 ## Getting started
 
@@ -41,20 +74,20 @@ import { qase } from 'cypress-qase-reporter/mocha';
 
 describe('My First Test', () => {
   qase(1,
-          it('Several ids', () => {
-            expect(true).to.equal(true);
-          })
+    it('Several ids', () => {
+      expect(true).to.equal(true);
+    })
   );
   // a test can check multiple test cases
   qase([2, 3],
-          it('Correct test', () => {
-            expect(true).to.equal(true);
-          })
+    it('Correct test', () => {
+      expect(true).to.equal(true);
+    })
   );
   qase(4,
-          it.skip('Skipped test', () => {
-            expect(true).to.equal(true);
-          })
+    it.skip('Skipped test', () => {
+      expect(true).to.equal(true);
+    })
   );
 });
 ```
@@ -86,11 +119,13 @@ https://app.qase.io/run/QASE_PROJECT_CODE
 ## Configuration
 
 Qase Cypress reporter can be configured in multiple ways:
+
 - by adding configuration block in `cypress.config.js`,
 - using a separate config file `qase.config.json`,
 - using environment variables (they override the values from the configuration files).
 
-For a full list of configuration options, see the [Configuration reference](../qase-javascript-commons/README.md#configuration).
+For a full list of configuration options, see
+the [Configuration reference](../qase-javascript-commons/README.md#configuration).
 
 Example `cypress.config.js` config:
 
