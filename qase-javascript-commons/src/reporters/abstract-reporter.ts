@@ -12,6 +12,10 @@ export interface InternalReporterInterface {
   getTestResults(): TestResultType[];
 
   setTestResults(results: TestResultType[]): void;
+
+  sendResults(): Promise<void>;
+
+  complete(): Promise<void>;
 }
 
 /**
@@ -43,6 +47,16 @@ export abstract class AbstractReporter implements InternalReporterInterface {
   abstract startTestRun(): Promise<void>;
 
   /**
+   * @returns {Promise<void>}
+   */
+  abstract complete(): Promise<void>;
+
+  /**
+   * @returns {Promise<void>}
+   */
+  abstract sendResults(): Promise<void>;
+
+  /**
    * @protected
    * @param {LoggerInterface} logger
    */
@@ -54,7 +68,11 @@ export abstract class AbstractReporter implements InternalReporterInterface {
    * @returns {TestResultType[]}
    */
   public getTestResults(): TestResultType[] {
-    return this.results;
+    const results = this.results;
+
+    this.results = [];
+
+    return results;
   }
 
   /**

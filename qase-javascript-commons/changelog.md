@@ -1,3 +1,10 @@
+# qase-javascript-commons@2.1.0-beta.1
+
+## What's new
+
+- update a `InternalReporterInterface`. Added a new methods `sendResults` and `complete` to send the results and complete the test run.
+- add `StateManager` class to manage and share the state of the reporter between the different instances of the reporter.
+
 # qase-javascript-commons@2.0.13
 
 ## What's new
