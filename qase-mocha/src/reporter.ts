@@ -14,6 +14,7 @@ import {
 } from 'qase-javascript-commons';
 import deasyncPromise from 'deasync-promise';
 import { extname, join } from 'node:path';
+import { v4 as uuidv4 } from 'uuid';
 
 const Events = Runner.constants;
 
@@ -70,6 +71,7 @@ export class MochaQaseReporter extends reporters.Base {
     });
 
     if (options.parallel) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       options.require = [...(options.require ?? []), resolveParallelModeSetupFile()];
     } else {
       this.applyListeners();
@@ -153,7 +155,7 @@ export class MochaQaseReporter extends reporters.Base {
       run_id: null,
       signature: this.getSignature(test, ids),
       steps: this.currentTest.steps,
-      id: test.id,
+      id: uuidv4(),
       execution: {
         status: test.state
           ? MochaQaseReporter.statusMap[test.state]
