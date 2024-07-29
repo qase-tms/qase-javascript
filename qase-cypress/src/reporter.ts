@@ -9,7 +9,11 @@ import {
   QaseReporter,
   ReporterInterface,
   TestStatusEnum,
-  composeOptions, TestResultType, Attachment,
+  composeOptions,
+  TestResultType,
+  Attachment,
+  FrameworkOptionsType,
+  ConfigType,
 } from 'qase-javascript-commons';
 
 import { traverseDir } from './utils/traverse-dir';
@@ -21,7 +25,6 @@ const {
   EVENT_TEST_PASS,
   EVENT_TEST_PENDING,
   EVENT_RUN_END,
-  EVENT_RUN_BEGIN,
 } = Runner.constants;
 
 type CypressState = 'failed' | 'passed' | 'pending';
@@ -104,6 +107,8 @@ export class CypressQaseReporter extends reporters.Base {
    */
   private reporter: ReporterInterface;
 
+  private options: Omit<(FrameworkOptionsType<'cypress', ReporterOptionsType> & ConfigType & ReporterOptionsType & NonNullable<unknown>) | (null & ReporterOptionsType & NonNullable<unknown>), 'framework'>;
+
   /**
    * @param {Runner} runner
    * @param {CypressQaseOptionsType} options
@@ -121,6 +126,7 @@ export class CypressQaseReporter extends reporters.Base {
     const { framework, ...composedOptions } = composeOptions(reporterOptions, config);
 
     this.screenshotsFolder = framework?.cypress?.screenshotsFolder;
+    this.options = composedOptions;
 
     this.reporter = QaseReporter.getInstance({
       ...composedOptions,
@@ -142,13 +148,16 @@ export class CypressQaseReporter extends reporters.Base {
     runner.on(EVENT_TEST_FAIL, (test: Test) => this.addTestResult(test));
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    runner.on(EVENT_RUN_BEGIN, () => this.reporter.startTestRun());
+    runner.once(EVENT_RUN_END, () => {
+      const results = this.reporter.getResults();
 
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    runner.once(EVENT_RUN_END, async () => {
-      await this.reporter.publish();
-
-      spawnSync('node', [`${__dirname}/child.js`], { stdio: 'inherit' });
+      spawnSync('node', [`${__dirname}/child.js`], {
+        stdio: 'inherit',
+        env: Object.assign(process.env, {
+          reporterConfig: JSON.stringify(this.options),
+          results: JSON.stringify(results),
+        }),
+      });
     });
   }
 
@@ -191,7 +200,7 @@ export class CypressQaseReporter extends reporters.Base {
       run_id: null,
       signature: this.getSignature(test, ids),
       steps: [],
-      id: test.id,
+      id: uuidv4(),
       execution: {
         status: test.state
           ? CypressQaseReporter.statusMap[test.state]
