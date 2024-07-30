@@ -383,7 +383,7 @@ export class PlaywrightQaseReporter implements Reporter {
       signature: '',
       steps: this.transformSteps(result.steps, null),
       testops_id: null,
-      title: testCaseMetadata.title === '' ? test.title : testCaseMetadata.title,
+      title: testCaseMetadata.title === '' ? this.removeQaseIdsFromTitle(test.title) : testCaseMetadata.title,
     };
 
     if (this.reporter.isCaptureLogs()) {
@@ -475,5 +475,13 @@ export class PlaywrightQaseReporter implements Reporter {
       .join('::');
 
     return signature;
+  }
+
+  private removeQaseIdsFromTitle(title: string): string {
+    const matches = title.match(/\(Qase ID: ([0-9,]+)\)$/i);
+    if (matches) {
+      return title.replace(matches[0], '');
+    }
+    return title;
   }
 }
