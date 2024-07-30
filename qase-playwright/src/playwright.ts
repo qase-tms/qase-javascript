@@ -53,7 +53,7 @@ export const qase = (
 
   PlaywrightQaseReporter.addIds(ids, name);
 
-  return `${name}`;
+  return `${name} (Qase ID: ${caseIds.join(',')})`;
 };
 
 /**
