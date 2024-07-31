@@ -349,6 +349,8 @@ export class PlaywrightQaseReporter implements Reporter {
       message += error.message;
     }
 
+    const testTitle = this.removeQaseIdsFromTitle(test.title);
+
     const testResult: TestResultType = {
       attachments: testCaseMetadata.attachments,
       author: null,
@@ -383,7 +385,7 @@ export class PlaywrightQaseReporter implements Reporter {
       signature: '',
       steps: this.transformSteps(result.steps, null),
       testops_id: null,
-      title: testCaseMetadata.title === '' ? this.removeQaseIdsFromTitle(test.title) : testCaseMetadata.title,
+      title: testCaseMetadata.title === '' ? testTitle : testCaseMetadata.title,
     };
 
     if (this.reporter.isCaptureLogs()) {
@@ -399,7 +401,7 @@ export class PlaywrightQaseReporter implements Reporter {
     if (testCaseMetadata.ids.length > 0) {
       testResult.testops_id = testCaseMetadata.ids;
     } else {
-      const ids = PlaywrightQaseReporter.qaseIds.get(test.title) ?? null;
+      const ids = PlaywrightQaseReporter.qaseIds.get(testTitle) ?? null;
       testResult.testops_id = ids;
       if (ids) {
         const path = `${test.location.file}:${test.location.line}:${test.location.column}`;
@@ -477,10 +479,15 @@ export class PlaywrightQaseReporter implements Reporter {
     return signature;
   }
 
+  /**
+   * @param {string} title
+   * @returns {string}
+   * @private
+   */
   private removeQaseIdsFromTitle(title: string): string {
     const matches = title.match(/\(Qase ID: ([0-9,]+)\)$/i);
     if (matches) {
-      return title.replace(matches[0], '');
+      return title.replace(matches[0], '').trimEnd();
     }
     return title;
   }
