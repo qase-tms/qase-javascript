@@ -401,7 +401,7 @@ export class PlaywrightQaseReporter implements Reporter {
     if (testCaseMetadata.ids.length > 0) {
       testResult.testops_id = testCaseMetadata.ids;
     } else {
-      const ids = PlaywrightQaseReporter.qaseIds.get(testTitle) ?? null;
+      const ids = PlaywrightQaseReporter.qaseIds.get(test.title) ?? null;
       testResult.testops_id = ids;
       if (ids) {
         const path = `${test.location.file}:${test.location.line}:${test.location.column}`;

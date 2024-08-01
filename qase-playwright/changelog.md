@@ -1,3 +1,10 @@
+# playwright-qase-reporter@2.0.9
+
+## What's new
+
+Fixed the problem when tests have the same name and different QaseIDs.
+They were uploaded into the Qase with an incorrect QaseID.
+
 # playwright-qase-reporter@2.0.7
 
 ## What's new
