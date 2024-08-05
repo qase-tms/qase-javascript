@@ -1,3 +1,9 @@
+# cypress-qase-reporter@2.1.0-beta.3
+
+## What's new
+
+Fixed an issue with the reporter completing the test run after each file with tests.
+
 # cypress-qase-reporter@2.1.0-beta.1
 
 ## What's new

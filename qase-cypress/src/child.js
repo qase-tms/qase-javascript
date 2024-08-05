@@ -9,7 +9,7 @@ const runChild = async () => {
   const reporter = QaseReporter.getInstance(options);
   reporter.setTestResults(results);
 
-  await reporter.publish();
+  await reporter.sendResults();
 };
 
 runChild();
