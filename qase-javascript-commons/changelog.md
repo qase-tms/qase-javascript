@@ -1,3 +1,10 @@
+# qase-javascript-commons@2.1.3
+
+## What's new
+
+Reporters will send all data on the results of the autotests. Including the data of the title, the description, etc.
+
+
 # qase-javascript-commons@2.1.1
 
 ## What's new
