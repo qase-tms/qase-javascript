@@ -183,7 +183,7 @@ export class TestOpsReporter extends AbstractReporter {
       project,
       uploadAttachments,
       run,
-      plan
+      plan,
     } = options;
 
     super(logger);
@@ -402,14 +402,28 @@ export class TestOpsReporter extends AbstractReporter {
     const id = Array.isArray(result.testops_id) ? null : result.testops_id;
     if (id) {
       resultCreate.case_id = id;
-      return resultCreate;
     }
 
     const rootSuite = this.rootSuite ? `${this.rootSuite}\t` : '';
     resultCreate.case = {
       title: result.title,
       suite_title: result.relations?.suite ? `${rootSuite}${result.relations?.suite?.data.map((suite) => suite.title).join('\t')}` : rootSuite,
+      description: result.fields['description'] ?? null,
+      postconditions: result.fields['postconditions'] ?? null,
+      preconditions: result.fields['preconditions'] ?? null,
     };
+
+    if (result.fields['severity']) {
+      resultCreate.case.severity = result.fields['severity'];
+    }
+
+    if (result.fields['priority']) {
+      resultCreate.case.priority = result.fields['priority'];
+    }
+
+    if (result.fields['layer']) {
+      resultCreate.case.layer = result.fields['layer'];
+    }
 
     this.logger.logDebug(`Transformed result: ${JSON.stringify(resultCreate)}`);
 
@@ -599,7 +613,7 @@ export class TestOpsReporter extends AbstractReporter {
         runObject.environment_id = environment;
       }
 
-      if (this.planId){
+      if (this.planId) {
         runObject.plan_id = this.planId;
       }
 
