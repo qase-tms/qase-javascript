@@ -51,9 +51,11 @@ export const qase = (
     console.log(`qase: qase ID ${id} should be a number`);
   }
 
-  PlaywrightQaseReporter.addIds(ids, name);
+  const newName = `${name} (Qase ID: ${caseIds.join(',')})`;
 
-  return `${name}`;
+  PlaywrightQaseReporter.addIds(ids, newName);
+
+  return newName;
 };
 
 /**

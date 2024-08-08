@@ -349,6 +349,8 @@ export class PlaywrightQaseReporter implements Reporter {
       message += error.message;
     }
 
+    const testTitle = this.removeQaseIdsFromTitle(test.title);
+
     const testResult: TestResultType = {
       attachments: testCaseMetadata.attachments,
       author: null,
@@ -383,7 +385,7 @@ export class PlaywrightQaseReporter implements Reporter {
       signature: '',
       steps: this.transformSteps(result.steps, null),
       testops_id: null,
-      title: testCaseMetadata.title === '' ? test.title : testCaseMetadata.title,
+      title: testCaseMetadata.title === '' ? testTitle : testCaseMetadata.title,
     };
 
     if (this.reporter.isCaptureLogs()) {
@@ -475,5 +477,18 @@ export class PlaywrightQaseReporter implements Reporter {
       .join('::');
 
     return signature;
+  }
+
+  /**
+   * @param {string} title
+   * @returns {string}
+   * @private
+   */
+  private removeQaseIdsFromTitle(title: string): string {
+    const matches = title.match(/\(Qase ID: ([0-9,]+)\)$/i);
+    if (matches) {
+      return title.replace(matches[0], '').trimEnd();
+    }
+    return title;
   }
 }

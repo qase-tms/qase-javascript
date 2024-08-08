@@ -1,3 +1,17 @@
+# playwright-qase-reporter@2.0.9
+
+## What's new
+
+Fixed the problem when tests have the same name and different QaseIDs.
+They were uploaded into the Qase with an incorrect QaseID.
+
+# playwright-qase-reporter@2.0.7
+
+## What's new
+
+Returned the ability to add the QaseID to the test name. 
+This allows using the standard playwright mechanism to filter the tests being run.
+
 # playwright-qase-reporter@2.0.6
 
 ## What's new
