@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.1.0
+
+## What's new
+
+Minor release of the commons package
+
 # qase-javascript-commons@2.1.0-beta.1
 
 ## What's new
