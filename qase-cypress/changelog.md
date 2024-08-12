@@ -1,3 +1,34 @@
+# cypress-qase-reporter@2.1.0
+
+## What's new
+
+Minor release of the Cypress reporter package
+
+# cypress-qase-reporter@2.1.0-beta.3
+
+## What's new
+
+Fixed an issue with the reporter completing the test run after each file with tests.
+
+# cypress-qase-reporter@2.1.0-beta.1
+
+## What's new
+
+- fixed an issue with the reporter completing the test run before all results are sent to Qase
+- fixed an issue with the reporter not sending all results to Qase
+
+Need to add the following to the `cypress.config.js` file:
+
+```diff
+...
+  e2e: {
+    setupNodeEvents(on, config) {
++      require('cypress-qase-reporter/plugin')(on, config);
+    }
+  }
+...
+```
+
 # cypress-qase-reporter@2.0.3
 
 ## What's new

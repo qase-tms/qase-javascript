@@ -32,6 +32,7 @@ import {
 import { QaseError } from '../utils/qase-error';
 import { LoggerInterface } from '../utils/logger';
 import axios from 'axios';
+import { StateManager } from '../state/state';
 
 const defaultChunkSize = 200;
 
@@ -183,7 +184,7 @@ export class TestOpsReporter extends AbstractReporter {
       project,
       uploadAttachments,
       run,
-      plan
+      plan,
     } = options;
 
     super(logger);
@@ -276,6 +277,7 @@ export class TestOpsReporter extends AbstractReporter {
 
     this.run.id = result.id;
     process.env['QASE_TESTOPS_RUN_ID'] = String(result.id);
+    StateManager.setRunId(result.id);
     this.isTestRunReady = true;
   }
 
@@ -324,6 +326,14 @@ export class TestOpsReporter extends AbstractReporter {
    * @returns {Promise<void>}
    */
   public async publish(): Promise<void> {
+    await this.sendResults();
+    await this.complete();
+  }
+
+  /**
+   * @returns {Promise<void>}
+   */
+  public async sendResults(): Promise<void> {
     if (this.results.length === 0) {
       this.logger.log(chalk`{yellow No results to send to Qase}`);
       return;
@@ -335,7 +345,12 @@ export class TestOpsReporter extends AbstractReporter {
 
     // Clear results because we don't need to send them again then we use Cypress reporter
     this.results.length = 0;
+  }
 
+  /**
+   * @returns {Promise<void>}
+   */
+  public async complete(): Promise<void> {
     if (!this.run.complete) {
       return;
     }
@@ -599,7 +614,7 @@ export class TestOpsReporter extends AbstractReporter {
         runObject.environment_id = environment;
       }
 
-      if (this.planId){
+      if (this.planId) {
         runObject.plan_id = this.planId;
       }
 
