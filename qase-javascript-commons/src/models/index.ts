@@ -4,3 +4,4 @@ export { type TestStepType, StepType } from './test-step';
 export { StepStatusEnum } from './step-execution';
 export { Attachment } from './attachment';
 export { Report } from './report';
+export { CompoundError } from './error';
