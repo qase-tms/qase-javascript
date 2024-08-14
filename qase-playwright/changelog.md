@@ -1,3 +1,10 @@
+# playwright-qase-reporter@2.0.10
+
+## What's new
+
+Improved stack trace handling when an error occurs.
+Now, records related to the reporter are not added to the stack trace.
+
 # playwright-qase-reporter@2.0.9
 
 ## What's new
