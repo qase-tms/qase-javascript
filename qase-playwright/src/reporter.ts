@@ -6,6 +6,7 @@ import * as path from 'path';
 import {
   Attachment,
   composeOptions,
+  CompoundError,
   ConfigLoader,
   ConfigType,
   QaseReporter,
@@ -214,25 +215,24 @@ export class PlaywrightQaseReporter implements Reporter {
    * @returns {Error}
    * @private
    */
-  private static transformError(testErrors: TestError[]): Error {
+  private static transformError(testErrors: TestError[]): CompoundError {
+    const compoundError = new CompoundError();
 
-    let message = '';
     for (const error of testErrors) {
       if (error.message == undefined) {
         continue;
       }
-      message += error.message + '\n\n';
+      compoundError.addMessage(error.message);
     }
 
-    const error = new Error(message);
     for (const error of testErrors) {
       if (error.stack == undefined) {
         continue;
       }
-      error.stack += error.stack + '\n\n';
+      compoundError.addStacktrace(error.stack);
     }
 
-    return error;
+    return compoundError;
   }
 
   /**
@@ -360,8 +360,8 @@ export class PlaywrightQaseReporter implements Reporter {
         end_time: null,
         duration: result.duration,
         stacktrace: error === null ?
-          null : error.stack === undefined ?
-            null : error.stack,
+          null : error.stacktrace === undefined ?
+            null : error.stacktrace,
         thread: result.parallelIndex.toString(),
       },
       fields: testCaseMetadata.fields,
