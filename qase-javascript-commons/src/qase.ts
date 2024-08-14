@@ -445,6 +445,7 @@ export class QaseReporter implements ReporterInterface {
         await this.publishFallback();
       }
     }
+    StateManager.clearState();
   }
 
   /**

@@ -36,6 +36,7 @@ export class StateManager {
   static setMode(mode: ModeEnum): void {
     const state = this.getState();
     state.Mode = mode;
+    state.IsModeChanged = true;
     this.setState(state);
   }
 

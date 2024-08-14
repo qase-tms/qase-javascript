@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.1.1
+
+## What's new
+
+Fixed an issue where the state file was not deleted. This resulted in results being uploaded into the same test run.
+
 # qase-javascript-commons@2.1.0
 
 ## What's new
