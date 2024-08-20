@@ -26,6 +26,7 @@
     "qase-playwright",
     "qase-testcafe",
     "qase-mocha",
+    "qase-wdio",
     "./examples/*"
   ],
   "devDependencies": {
