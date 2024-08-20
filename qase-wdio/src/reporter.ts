@@ -71,6 +71,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
     const configLoader = new ConfigLoader();
     const config = configLoader.load();
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     this.reporter = QaseReporter.getInstance({
       ...composeOptions(options, config),
       frameworkPackage: 'wdio',
