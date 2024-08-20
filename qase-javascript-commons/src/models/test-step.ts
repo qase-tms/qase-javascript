@@ -9,7 +9,7 @@ export enum StepType {
   GHERKIN = 'gherkin',
 }
 
-export type TestStepType = {
+export class TestStepType {
   id: string;
   step_type: StepType;
   data: StepTextData | StepGherkinData;
@@ -17,4 +17,25 @@ export type TestStepType = {
   execution: StepExecution;
   attachments: Attachment[];
   steps: TestStepType[];
+
+  constructor(type: StepType = StepType.TEXT) {
+    this.id = '';
+    this.step_type = type;
+    this.parent_id = null;
+    this.execution = new StepExecution();
+    this.attachments = [];
+    this.steps = [];
+    if (type === StepType.TEXT) {
+      this.data = {
+        action: '',
+        expected_result: null,
+      };
+    } else {
+      this.data = {
+        keyword: '',
+        name: '',
+        line: 0,
+      };
+    }
+  }
 }
