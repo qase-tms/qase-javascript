@@ -1,3 +1,10 @@
+# qaseio@2.3.0
+
+## What's new
+
+Added a new `param_groups` field to the `ResultCreate` model. 
+This field allows you to group parameters in the test results.
+
 # qaseio@2.2.0
 
 ## What's new
