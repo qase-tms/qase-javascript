@@ -36,22 +36,22 @@ import { StateManager } from '../state/state';
 
 const defaultChunkSize = 200;
 
-export type TestOpsRunType = {
+export interface TestOpsRunType {
   id?: number | undefined;
   title: string;
   description: string;
   complete?: boolean | undefined;
-};
+}
 
-export type TestOpsPlanType = {
+export interface TestOpsPlanType {
   id?: number | undefined;
-};
+}
 
-export type TestOpsBatchType = {
+export interface TestOpsBatchType {
   size?: number | undefined;
 }
 
-export type TestOpsOptionsType = {
+export interface TestOpsOptionsType {
   project: string;
   uploadAttachments?: boolean | undefined;
   run: TestOpsRunType;
@@ -59,7 +59,7 @@ export type TestOpsOptionsType = {
   batch?: TestOpsBatchType;
   defect?: boolean | undefined;
   useV2?: boolean | undefined;
-};
+}
 
 /**
  * @class TestOpsReporter
@@ -401,11 +401,38 @@ export class TestOpsReporter extends AbstractReporter {
     const attachments = await this.uploadAttachments(result.attachments);
     const steps = await this.transformStepsV1(result.steps, result.title);
 
+    const param: Record<string, string> = {};
+
+    for (const key in result.params) {
+      const value = result.params[key];
+      if (!value) {
+        continue;
+      }
+      param[key] = value;
+    }
+
+    const group_params: string[][] = [];
+
+    const keys = Object.keys(result.group_params);
+    if (keys.length > 0) {
+      group_params.push(keys);
+    }
+
+    for (const key in result.group_params) {
+      const value = result.group_params[key];
+      if (!value) {
+        continue;
+      }
+      param[key] = value;
+    }
+
+
     const resultCreate: ResultCreate = {
       attachments: attachments,
       comment: result.message,
       defect: this.defect,
-      param: result.params,
+      param: param,
+      param_groups: group_params,
       stacktrace: result.execution.stacktrace,
       start_time: result.execution.start_time ? result.execution.start_time | 0 : null,
       status: result.execution.status,
@@ -422,7 +449,7 @@ export class TestOpsReporter extends AbstractReporter {
     const rootSuite = this.rootSuite ? `${this.rootSuite}\t` : '';
     resultCreate.case = {
       title: result.title,
-      suite_title: result.relations?.suite ? `${rootSuite}${result.relations?.suite?.data.map((suite) => suite.title).join('\t')}` : rootSuite,
+      suite_title: result.relations?.suite ? `${rootSuite}${result.relations.suite.data.map((suite) => suite.title).join('\t')}` : rootSuite,
       description: result.fields['description'] ?? null,
       postconditions: result.fields['postconditions'] ?? null,
       preconditions: result.fields['preconditions'] ?? null,

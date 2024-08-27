@@ -12,6 +12,7 @@ export interface MetadataMessage {
   title?: string;
   fields?: Record<string, string>;
   parameters?: Record<string, string>;
+  groupParams?: Record<string, string>;
   ignore?: boolean;
   suite?: string;
   comment?: string;
@@ -130,8 +131,33 @@ qase.parameters = function(values: Record<string, string>) {
   for (const [key, value] of Object.entries(values)) {
     stringRecord[String(key)] = String(value);
   }
+
   addMetadata({
     parameters: stringRecord,
+  });
+  return this;
+};
+
+/**
+ * Set group parameters for the test case.
+ * All parameters will be grouped as a single entity.
+ * @param {Record<string, string>[]} values
+ * @example
+ * for (const value of values) {
+ *    test('test', async ({ page }) => {
+ *      qase.groupParameters({ 'parameter': value });
+ *      await page.goto('https://example.com');
+ *    });
+ * )
+ */
+qase.groupParameters = function(values: Record<string, string>) {
+  const stringRecord: Record<string, string> = {};
+  for (const [key, value] of Object.entries(values)) {
+    stringRecord[String(key)] = String(value);
+  }
+
+  addMetadata({
+    groupParams: stringRecord,
   });
   return this;
 };

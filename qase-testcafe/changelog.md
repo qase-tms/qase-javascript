@@ -1,3 +1,19 @@
+# qase-testcafe@2.0.1
+
+## What's new
+
+Support group parameters for test cases. You can specify the group parameters in the test case using the following format:
+
+```ts
+const q = qase.groupParameters({ 'param01': 'value01', 'param02': 'value02' }).create();
+test.meta({ ...q })(
+  'test',
+  async (t) => {
+    await t;
+  },
+);
+```
+
 # qase-testcafe@2.0.0
 
 ## What's new

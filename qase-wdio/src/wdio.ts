@@ -45,6 +45,17 @@ export class qase {
   }
 
   /**
+   * Assign group parameters to test
+   * @name groupParameters
+   * @param {Record<string, string>} values
+   */
+  public static groupParameters(values: Record<string, string>) {
+    sendEvent(events.addGroupParameters, { records: values });
+
+    return this;
+  }
+
+  /**
    * Assign fields to test
    * @name fields
    * @param {Record<string, string>} values

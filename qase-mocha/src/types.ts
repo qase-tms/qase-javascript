@@ -24,6 +24,8 @@ export interface Methods {
 
   parameters(values: Record<string, string>): void;
 
+  groupParameters(values: Record<string, string>): void;
+
   fields(values: Record<string, string>): void;
 
   suite(name: string): void;
@@ -42,6 +44,7 @@ export class Metadata {
   title?: string;
   fields?: Record<string, string>;
   parameters?: Record<string, string>;
+  groupParameters?: Record<string, string>;
   ignore?: boolean;
   suite?: string;
   comment?: string;
@@ -93,6 +96,7 @@ export class Metadata {
     this.title = '';
     this.fields = {};
     this.parameters = {};
+    this.groupParameters = {};
     this.ignore = false;
     this.suite = '';
     this.comment = '';

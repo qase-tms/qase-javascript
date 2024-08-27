@@ -232,6 +232,7 @@ export class Storage {
       message: null,
       muted: false,
       params: {},
+      group_params: {},
       relations: relations,
       run_id: null,
       signature: this.getSignature(pickle, metadata.ids),

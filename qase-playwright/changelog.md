@@ -1,3 +1,16 @@
+# playwright-qase-reporter@2.0.11
+
+## What's new
+
+Support group parameters for test cases. You can specify the group parameters in the test case using the following format:
+
+```ts
+  test('test', () => {
+    qase.groupParameters({ 'param01': 'value01', 'param02': 'value02' });
+    expect(true).toBe(true);
+  });
+```
+
 # playwright-qase-reporter@2.0.10
 
 ## What's new

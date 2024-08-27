@@ -4,6 +4,7 @@ export class qase {
   private static _qaseTitle = '';
   private static _qaseFields = '';
   private static _qaseParameters = '';
+  private static _qaseGroupParameters = '';
 
   /**
    * Set a Qase ID for the test case
@@ -66,6 +67,21 @@ export class qase {
   };
 
   /**
+   * Set a group parameters for the test case
+   * Don't forget to call `create` method after setting all the necessary parameters
+   * @param {Record<string, string>} values
+   * @example
+   * const q = qase.group_parameters({ 'severity': 'high', 'priority': 'medium' }).create();
+   * test.meta(q)('Test case title', async t => { ... });
+   * or
+   * test.meta({userField: 123, ...q})('Test case title', async t => { ... });
+   */
+  public static group_parameters = (values: Record<string, string>) => {
+    this._qaseGroupParameters = this.toNormalizeRecord(values);
+    return this;
+  };
+
+  /**
    * Create a Qase metadata
    * Call this method after setting all the necessary parameters
    * @example
@@ -80,12 +96,14 @@ export class qase {
       QaseTitle: this._qaseTitle,
       QaseFields: this._qaseFields,
       QaseParameters: this._qaseParameters,
+      QaseGroupParameters: this._qaseGroupParameters,
     };
 
     this._qaseID = '';
     this._qaseTitle = '';
     this._qaseFields = '';
     this._qaseParameters = '';
+    this._qaseGroupParameters = '';
 
     return meta;
   };
