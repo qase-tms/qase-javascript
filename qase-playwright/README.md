@@ -165,7 +165,7 @@ https://app.qase.io/run/QASE_PROJECT_CODE
 Reporter options (\* - required):
 
 - `mode` - `testops`/`off` Enables reporter, default - `off`
-- `debug` - Enables debug logging, defaule - `false`
+- `debug` - Enables debug logging, default - `false`
 - `environment` - To execute with the sending of the envinroment information 
 - *`testops.api.token` - Token for API access, you can find more information
   [here](https://developers.qase.io/#authentication)
