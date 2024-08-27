@@ -166,7 +166,7 @@ Reporter options (\* - required):
 
 - `mode` - `testops`/`off` Enables reporter, default - `off`
 - `debug` - Enables debug logging, default - `false`
-- `environment` - To execute with the sending of the envinroment information 
+- `environment` - To execute with the sending of the environment information 
 - *`testops.api.token` - Token for API access, you can find more information
   [here](https://developers.qase.io/#authentication)
 - *`testops.project` - Code of your project (can be extracted from main
