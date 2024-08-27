@@ -13,6 +13,7 @@ export class TestResultType {
   attachments: Attachment[];
   steps: TestStepType[];
   params: Record<string, string>;
+  group_params: Record<string, string>;
   author: string | null;
   relations: Relation | null;
   muted: boolean;
@@ -29,6 +30,7 @@ export class TestResultType {
     this.attachments = [];
     this.steps = [];
     this.params = {};
+    this.group_params = {};
     this.author = null;
     this.relations = null;
     this.muted = false;

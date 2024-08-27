@@ -51,6 +51,7 @@ enum metadataEnum {
   title = 'QaseTitle',
   fields = 'QaseFields',
   parameters = 'QaseParameters',
+  groupParameters = 'QaseGroupParameters',
   oldID = 'CID',
 }
 
@@ -59,6 +60,7 @@ interface MetadataType {
   [metadataEnum.title]: string | undefined;
   [metadataEnum.fields]: Record<string, string>;
   [metadataEnum.parameters]: Record<string, string>;
+  [metadataEnum.groupParameters]: Record<string, string>;
 }
 
 export interface TestRunInfoType {
@@ -199,6 +201,7 @@ export class TestcafeQaseReporter {
       message: error.message,
       muted: false,
       params: metadata[metadataEnum.parameters],
+      group_params: metadata[metadataEnum.groupParameters],
       relations: {
         suite: {
           data: [
@@ -234,6 +237,7 @@ export class TestcafeQaseReporter {
       QaseTitle: undefined,
       QaseFields: {},
       QaseParameters: {},
+      QaseGroupParameters: {},
     };
 
     if (meta[metadataEnum.oldID] !== undefined && meta[metadataEnum.oldID] !== '') {

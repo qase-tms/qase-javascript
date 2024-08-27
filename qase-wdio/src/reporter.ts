@@ -336,6 +336,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
     process.on(events.addFields, this.addFields.bind(this));
     process.on(events.addSuite, this.addSuite.bind(this));
     process.on(events.addParameters, this.addParameters.bind(this));
+    process.on(events.addGroupParameters, this.addGroupParameters.bind(this));
     process.on(events.addAttachment, this.addAttachment.bind(this));
     process.on(events.addIgnore, this.ignore.bind(this));
     process.on(events.addStep, this.addStep.bind(this));
@@ -389,6 +390,20 @@ export default class WDIOQaseReporter extends WDIOReporter {
     }
 
     curTest.params = stringRecord;
+  }
+
+  addGroupParameters({ records }: AddRecordsEventArgs) {
+    const curTest = this.storage.getCurrentTest();
+    if (!curTest) {
+      return;
+    }
+
+    const stringRecord: Record<string, string> = {};
+    for (const [key, value] of Object.entries(records)) {
+      stringRecord[String(key)] = String(value);
+    }
+
+    curTest.group_params = stringRecord;
   }
 
   addFields({ records }: AddRecordsEventArgs) {

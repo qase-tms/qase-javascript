@@ -158,6 +158,7 @@ export class NewmanQaseReporter {
           message: null,
           muted: false,
           params: {},
+          group_params: {},
           relations: relation,
           run_id: null,
           signature: this.getSignature(suites, item.name, ids),

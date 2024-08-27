@@ -103,6 +103,7 @@ export class MochaQaseReporter extends reporters.Base {
     ctx.qaseId = this.qaseId;
     ctx.title = this.title;
     ctx.parameters = this.parameters;
+    ctx.groupParameters = this.groupParameters;
     ctx.fields = this.fields;
     ctx.suite = this.suite;
     ctx.ignore = this.ignore;
@@ -151,6 +152,7 @@ export class MochaQaseReporter extends reporters.Base {
       message: message ?? null,
       muted: false,
       params: this.metadata.parameters ?? {},
+      group_params: this.metadata.groupParameters ?? {},
       relations: relations,
       run_id: null,
       signature: this.getSignature(test, ids),
@@ -265,6 +267,14 @@ export class MochaQaseReporter extends reporters.Base {
       stringRecord[String(key)] = String(value);
     }
     this.metadata.parameters = stringRecord;
+  };
+
+  groupParameters = (values: Record<string, string>) => {
+    const stringRecord: Record<string, string> = {};
+    for (const [key, value] of Object.entries(values)) {
+      stringRecord[String(key)] = String(value);
+    }
+    this.metadata.groupParameters = stringRecord;
   };
 
   fields = (values: Record<string, string>) => {

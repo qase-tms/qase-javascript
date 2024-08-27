@@ -29,6 +29,7 @@ interface TestCaseMetadata {
   title: string;
   fields: Record<string, string>;
   parameters: Record<string, string>;
+  groupParams: Record<string, string>;
   attachments: Attachment[];
   ignore: boolean;
   suite: string;
@@ -99,6 +100,7 @@ export class PlaywrightQaseReporter implements Reporter {
       title: '',
       fields: {},
       parameters: {},
+      groupParams: {},
       attachments: [],
       ignore: false,
       suite: '',
@@ -142,6 +144,10 @@ export class PlaywrightQaseReporter implements Reporter {
 
         if (message.comment) {
           metadata.comment = message.comment;
+        }
+
+        if (message.groupParams) {
+          metadata.groupParams = message.groupParams;
         }
 
         continue;
@@ -369,6 +375,7 @@ export class PlaywrightQaseReporter implements Reporter {
       message: message,
       muted: false,
       params: testCaseMetadata.parameters,
+      group_params: testCaseMetadata.groupParams,
       relations: {
         suite: {
           data: suites.filter((suite) => {

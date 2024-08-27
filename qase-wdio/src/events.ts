@@ -5,6 +5,7 @@ export const events = {
   addSuite: 'qase:suite',
   addIgnore: 'qase:ignore',
   addParameters: 'qase:parameters',
+  addGroupParameters: 'qase:groupParameters',
   addAttachment: 'qase:attachment',
   startStep: 'qase:startStep',
   endStep: 'qase:endStep',
