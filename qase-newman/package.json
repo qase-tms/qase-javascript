@@ -40,7 +40,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "qase-javascript-commons": "~2.2.0",
-    "semver": "^7.5.1"
+    "semver": "^7.6.3"
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",
