@@ -256,6 +256,10 @@ export class PlaywrightQaseReporter implements Reporter {
         continue;
       }
 
+      if ((testStep.title === 'Before Hooks' || testStep.title === 'After Hooks') && testStep.steps.length === 0) {
+        continue;
+      }
+
       const attachments = this.stepAttachments.get(testStep);
 
       const id = uuidv4();
