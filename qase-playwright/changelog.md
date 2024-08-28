@@ -1,3 +1,9 @@
+# playwright-qase-reporter@2.0.12
+
+## What's new
+
+Exclude `Before Hook` and `After Hook` if they don't have children steps. 
+
 # playwright-qase-reporter@2.0.11
 
 ## What's new
