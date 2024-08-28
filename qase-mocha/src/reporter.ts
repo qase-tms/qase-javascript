@@ -86,7 +86,8 @@ export class MochaQaseReporter extends reporters.Base {
     this.runner.on(Events.EVENT_HOOK_BEGIN, (hook: Hook) => this.addMethods(hook.ctx));
 
     this.runner.on(Events.EVENT_TEST_BEGIN, () => this.onStartTest());
-    this.runner.on(Events.EVENT_TEST_END, (test) => this.onEndTest(test));
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    this.runner.on(Events.EVENT_TEST_END, async (test) => await this.onEndTest(test));
   };
 
   private onStartRun() {
@@ -116,7 +117,7 @@ export class MochaQaseReporter extends reporters.Base {
     this.currentType = 'test';
   }
 
-  private onEndTest(test: Mocha.Test) {
+  private async onEndTest(test: Mocha.Test) {
     if (this.metadata.ignore) {
       return;
     }
@@ -172,7 +173,8 @@ export class MochaQaseReporter extends reporters.Base {
       title: this.metadata.title && this.metadata.title != '' ? this.metadata.title : test.title,
     };
 
-    deasyncPromise(this.reporter.addTestResult(result));
+    await this.reporter.addTestResult(result);
+
     this.metadata.clear();
     this.currentTest = new currentTest();
   }
