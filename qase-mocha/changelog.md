@@ -1,3 +1,9 @@
+# qase-mocha@1.0.0-beta.4
+
+## What's new
+
+Fixed the issue with async tests not being reported correctly.
+
 # qase-mocha@1.0.0-beta.3
 
 ## What's new
