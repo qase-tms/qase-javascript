@@ -23,10 +23,11 @@ interface TestRunErrorFormattableAdapterType {
   screenshotPath: string;
   testRunId: string;
   testRunPhase: string;
+  type: string;
   code?: string;
   isTestCafeError?: boolean;
   callsite?: CallsiteRecordType;
-  errMsg?: string;
+  errMsg: string;
   diff?: boolean;
   id?: string;
 }
@@ -97,32 +98,6 @@ export class TestcafeQaseReporter {
   }
 
   /**
-   * @param {TestRunErrorFormattableAdapterType[]} errors
-   * @returns {Error}
-   * @private
-   */
-  private static transformErrors(errors: TestRunErrorFormattableAdapterType[]): Error {
-    const [errorMessages, errorStacks] = errors.reduce<[string[], string[]]>(
-      ([messages, stacks], error) => {
-        const stack =
-          error.callsite?.stackFrames?.map((line) => String(line)) ?? [];
-
-        messages.push(error.errMsg ?? 'Error');
-        stacks.push(stack.join('\n'));
-
-        return [messages, stacks];
-      },
-      [[], []],
-    );
-
-    const error = new Error(errorMessages.join('\n\n'));
-
-    error.stack = errorStacks.join('\n\n');
-
-    return error;
-  }
-
-  /**
    * @param {ScreenshotType[]} screenshots
    * @returns {Attachment[]}
    * @private
@@ -179,13 +154,22 @@ export class TestcafeQaseReporter {
    * @param {string} title
    * @param {TestRunInfoType} testRunInfo
    * @param {Record<string, string>} meta
+   * @param formatError
    */
   public reportTestDone = async (
     title: string,
     testRunInfo: TestRunInfoType,
     meta: Record<string, string>,
+    formatError: (error: any, prefix: string) => string,
   ) => {
-    const error = TestcafeQaseReporter.transformErrors(testRunInfo.errs);
+    const errorLog = testRunInfo.errs
+      .map((error, index) => formatError(error, `${index + 1} `).replace(
+        // eslint-disable-next-line no-control-regex
+        /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
+        '',
+      ))
+      .join('\n');
+
     const metadata = this.getMeta(meta);
     await this.reporter.addTestResult({
       author: null,
@@ -194,11 +178,11 @@ export class TestcafeQaseReporter {
         start_time: null,
         end_time: null,
         duration: testRunInfo.durationMs,
-        stacktrace: error.stack ?? null,
+        stacktrace: errorLog,
         thread: null,
       },
       fields: metadata[metadataEnum.fields],
-      message: error.message,
+      message: errorLog ? errorLog.split('\n')[0] ?? '' : '',
       muted: false,
       params: metadata[metadataEnum.parameters],
       group_params: metadata[metadataEnum.groupParameters],

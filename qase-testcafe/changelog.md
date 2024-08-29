@@ -1,3 +1,9 @@
+# qase-testcafe@2.0.2
+
+## What's new
+
+Improved error collection. The error stack trace contains more useful debugging information: browser, code, etc.
+
 # qase-testcafe@2.0.1
 
 ## What's new
