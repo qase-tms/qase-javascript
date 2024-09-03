@@ -117,6 +117,7 @@ Also, you need to configure the reporter using the `wdio.conf.ts` file:
 // wdio.conf.ts
 import WDIOQaseReporter from 'wdio-qase-reporter';
 import type { Options } from '@wdio/types';
+import { afterRunHook, beforeRunHook } from 'wdio-qase-reporter';
 
 export const config: Options.Testrunner = {
   reporters: [[WDIOQaseReporter, {
@@ -124,6 +125,17 @@ export const config: Options.Testrunner = {
     disableWebdriverScreenshotsReporting: true,
     useCucumber: false,
   }]],
+
+  // ...
+  // =====
+  // Hooks
+  // =====
+  onPrepare: async function() {
+    await beforeRunHook();
+  },
+  onComplete: async function() {
+    await afterRunHook();
+  },
   // ... other options
 };
 ```
