@@ -135,20 +135,6 @@ export default class WDIOQaseReporter extends WDIOReporter {
           case '@suite':
             this.addSuite({ suite: tagData.value });
             break;
-          // case 'parameters':
-          //   const params = tagData.value.split(',').map((param) => {
-          //     const [key, value] = param.split(':');
-          //     return { key, value };
-          //   });
-          //   process.emit(events.addParameters, { records: params });
-          //   break;
-          // case 'fields':
-          //   const fields = tagData.value.split(',').map((field) => {
-          //     const [key, value] = field.split(':');
-          //     return { key, value };
-          //   });
-          //   process.emit(events.addFields, { records: fields });
-          //   break;
         }
       }
 
@@ -238,12 +224,49 @@ export default class WDIOQaseReporter extends WDIOReporter {
     return err;
   }
 
-  override async onTestEnd(test: TestStats) {
+  override async onTestPass() {
+    if (this._options.useCucumber) {
+      this._endStep();
+      return;
+    }
+
+    await this._endTest(TestStatusEnum.passed, null);
+  }
+
+  override async onTestRetry(test: TestStats) {
     const error = test.errors ? WDIOQaseReporter.transformError(test.errors) : null;
+
+    if (this._options.useCucumber) {
+      this._endStep(error ? TestStatusEnum.failed : TestStatusEnum.passed);
+      return;
+    }
 
     await this._endTest(WDIOQaseReporter.statusMap[test.state] ?? TestStatusEnum.skipped,
       error,
       test.end ? test.end.valueOf() / 1000 : Date.now().valueOf() / 1000);
+  }
+
+  override async onTestFail(test: TestStats) {
+    const error = test.errors ? WDIOQaseReporter.transformError(test.errors) : null;
+
+    if (this._options.useCucumber) {
+      this._endStep(TestStatusEnum.failed);
+      return;
+    }
+
+    await this._endTest(WDIOQaseReporter.statusMap[test.state] ?? TestStatusEnum.skipped,
+      error,
+      test.end ? test.end.valueOf() / 1000 : Date.now().valueOf() / 1000);
+  }
+
+  override async onTestSkip(test: TestStats) {
+    if (this._options.useCucumber) {
+      this._endStep(TestStatusEnum.skipped);
+      return;
+    }
+
+    await this._endTest(WDIOQaseReporter.statusMap[test.state] ?? TestStatusEnum.skipped,
+      null);
   }
 
   private async _endTest(status: TestStatusEnum, err: CompoundError | null, end_time: number = Date.now().valueOf() / 1000) {
@@ -275,16 +298,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
       null : err.message === undefined ?
         null : err.message;
 
-    console.log(testResult);
     await this.reporter.addTestResult(testResult);
-  }
-
-  override onHookStart() {
-    console.log('Hook started');
-  }
-
-  override onHookEnd() {
-    console.log('Hook ended');
   }
 
   override onBeforeCommand(command: BeforeCommandArgs) {
