@@ -97,7 +97,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
 
   override onRunnerStart(runner: RunnerStats) {
     this._isMultiremote = runner.isMultiremote;
-    this.reporter.startTestRun();
+    // this.reporter.startTestRun();
     this.isSync = false;
   }
 
@@ -186,7 +186,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
   }
 
   override async onRunnerEnd(_: RunnerStats) {
-    await this.reporter.publish();
+    await this.reporter.sendResults();
     this.isSync = true;
   }
 
