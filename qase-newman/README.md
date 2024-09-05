@@ -76,7 +76,7 @@ Example configuration file:
     "api": {
       "token": "api_key"
     },
-    "projectCode": "project_code"
+    "project": "project_code"
   }
 }
 ```
