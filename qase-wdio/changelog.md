@@ -1,3 +1,14 @@
+# qase-wdio@1.0.0-beta.4
+
+## What's new
+
+Fix an issue with attaching the screenshot to the test case. Now, the reporter will correctly handle the screenshots and
+will attach them to the test case in the Qase TMS.
+
+```log
+The first argument must be of type string or an instance of Buffer, ArrayBuffer, or Array or an Array-like Object. Received an instance of Object
+```
+
 # qase-wdio@1.0.0-beta.3
 
 ## What's new
