@@ -89,7 +89,7 @@ QASE_MODE=testops mocha --parallel
 After the tests are finished, you can complete the run:
 
 ```bash
-qli testops run complete --project DEMO --token token --run $(echo $QASE_TESTOPS_RUN_ID)
+qli testops run complete --project DEMO --token token --id $(echo $QASE_TESTOPS_RUN_ID)
 ```
 
 ## Configuration
