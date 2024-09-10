@@ -329,11 +329,11 @@ export default class WDIOQaseReporter extends WDIOReporter {
   override onAfterCommand(command: AfterCommandArgs) {
     const { disableWebdriverStepsReporting, disableWebdriverScreenshotsReporting } = this._options;
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const commandResult: string | undefined = command.result || undefined;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
+    const commandResult: string | undefined = command.result.value || undefined;
     const isScreenshot = isScreenshotCommand(command);
     if (!disableWebdriverScreenshotsReporting && isScreenshot && commandResult) {
-      this.attachFile('Screenshot', Buffer.from(commandResult, 'base64'), 'image/png');
+      this.attachFile('Screenshot.png', Buffer.from(commandResult, 'base64'), 'image/png');
     }
 
     if (disableWebdriverStepsReporting || this._isMultiremote || !this.storage.getCurrentStep()) {
@@ -549,7 +549,6 @@ export default class WDIOQaseReporter extends WDIOReporter {
       content: content,
     };
 
-    console.log('attachFile:', attach);
     this.storage.getLastItem()?.attachments.push(attach);
   }
 
