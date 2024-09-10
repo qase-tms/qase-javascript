@@ -32,7 +32,7 @@ interface TestCaseMetadata {
   groupParams: Record<string, string>;
   attachments: Attachment[];
   ignore: boolean;
-  suite: string;
+  suites: string[];
   comment: string;
 }
 
@@ -103,7 +103,7 @@ export class PlaywrightQaseReporter implements Reporter {
       groupParams: {},
       attachments: [],
       ignore: false,
-      suite: '',
+      suites: [],
       comment: '',
     };
     const attachments: Attachment[] = [];
@@ -138,8 +138,8 @@ export class PlaywrightQaseReporter implements Reporter {
           metadata.ignore = message.ignore;
         }
 
-        if (message.suite) {
-          metadata.suite = message.suite;
+        if (message.suites) {
+          metadata.suites = message.suites;
         }
 
         if (message.comment) {
@@ -342,7 +342,7 @@ export class PlaywrightQaseReporter implements Reporter {
     }
 
     const error = result.error ? PlaywrightQaseReporter.transformError(result.errors) : null;
-    const suites = testCaseMetadata.suite != '' ? [testCaseMetadata.suite] : PlaywrightQaseReporter.transformSuiteTitle(test);
+    const suites = testCaseMetadata.suites.length > 0 ? testCaseMetadata.suites : PlaywrightQaseReporter.transformSuiteTitle(test);
 
     let message: string | null = null;
     if (testCaseMetadata.comment !== '') {
