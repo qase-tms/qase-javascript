@@ -144,6 +144,11 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
           nullable: true,
         },
 
+        skipReportsForEmptyIds: {
+          type: 'boolean',
+          nullable: true,
+        },
+
         useV2: {
           type: 'boolean',
           nullable: true,

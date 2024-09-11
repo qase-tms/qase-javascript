@@ -46,6 +46,7 @@ export const envToConfig = (env: EnvType): ConfigType => ({
       size: env[EnvBatchEnum.size],
     },
     defect: env[EnvTestOpsEnum.defect],
+    skipReportsForEmptyIds: env[EnvTestOpsEnum.skipReportsForEmptyIds],
     useV2: env[EnvTestOpsEnum.useV2],
   },
 

@@ -167,6 +167,9 @@ export class CypressQaseReporter extends reporters.Base {
    */
   private addTestResult(test: Test) {
     const ids = CypressQaseReporter.getCaseId(test.title);
+    if (this.options.testops?.skipReportsForEmptyIds && ids.length === 0) {
+      return;
+    }
 
     const attachments = this.screenshotsFolder
       ? CypressQaseReporter.findAttachments(ids, this.screenshotsFolder)

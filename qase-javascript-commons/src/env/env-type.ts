@@ -21,6 +21,7 @@ export type EnvType = {
   [EnvTestOpsEnum.project]?: string;
   [EnvTestOpsEnum.uploadAttachments]?: boolean;
   [EnvTestOpsEnum.defect]?: boolean;
+  [EnvTestOpsEnum.skipReportsForEmptyIds]?: boolean;
   [EnvTestOpsEnum.useV2]?: boolean;
 
   [EnvApiEnum.token]?: string;

@@ -18,6 +18,7 @@ export enum EnvTestOpsEnum {
   uploadAttachments = 'QASE_TESTOPS_UPLOAD_ATTACHMENTS',
   defect = 'QASE_TESTOPS_DEFECT',
   useV2 = 'QASE_TESTOPS_API_V2',
+  skipReportsForEmptyIds = 'QASE_TESTOPS_SKIP_EMPTY_ID_REPORT',
 }
 
 /**

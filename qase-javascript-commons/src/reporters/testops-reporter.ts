@@ -58,6 +58,7 @@ export interface TestOpsOptionsType {
   plan: TestOpsPlanType;
   batch?: TestOpsBatchType;
   defect?: boolean | undefined;
+  skipReportsForEmptyIds?: boolean | undefined;
   useV2?: boolean | undefined;
 }
 
