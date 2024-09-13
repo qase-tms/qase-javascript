@@ -1,20 +1,37 @@
+# playwright-qase-reporter@2.0.13
+
+## What's new
+
+Revert the `qase.id()` syntax to `qase()` for the Qase ID.
+The `qase.id()` syntax is still supported, but the `qase()` syntax is more concise and easier to use.
+
+```ts
+test(qase(42, 'test'), async ({ page }) => {
+  await page.goto('https://example.com');
+});
+```
+
+We decided to return the old syntax because in some situations the new syntax does not work, since the test does not
+run.
+
 # playwright-qase-reporter@2.0.12
 
 ## What's new
 
-Exclude `Before Hook` and `After Hook` if they don't have children steps. 
+Exclude `Before Hook` and `After Hook` if they don't have children steps.
 
 # playwright-qase-reporter@2.0.11
 
 ## What's new
 
-Support group parameters for test cases. You can specify the group parameters in the test case using the following format:
+Support group parameters for test cases. You can specify the group parameters in the test case using the following
+format:
 
 ```ts
   test('test', () => {
-    qase.groupParameters({ 'param01': 'value01', 'param02': 'value02' });
-    expect(true).toBe(true);
-  });
+  qase.groupParameters({ 'param01': 'value01', 'param02': 'value02' });
+  expect(true).toBe(true);
+});
 ```
 
 # playwright-qase-reporter@2.0.10
@@ -35,14 +52,14 @@ They were uploaded into the Qase with an incorrect QaseID.
 
 ## What's new
 
-Returned the ability to add the QaseID to the test name. 
+Returned the ability to add the QaseID to the test name.
 This allows using the standard playwright mechanism to filter the tests being run.
 
 # playwright-qase-reporter@2.0.6
 
 ## What's new
 
-Improve the collecting information about failed tests. 
+Improve the collecting information about failed tests.
 Now, the reporter will collect the stack trace and the error message from all errors for failed tests.
 
 # playwright-qase-reporter@2.0.5
@@ -83,7 +100,8 @@ Added new annotation `qase.suite()`.
 Tests marked with it will be reported to the specified suite in the Qase.
 
 If you don't specify the suite name, the reporter will take a suites from the test file path.
-If you use the root suite, the reporter will take the root suite as the first level of the suite and your value of the `qase.suite()` as the second level.
+If you use the root suite, the reporter will take the root suite as the first level of the suite and your value of the
+`qase.suite()` as the second level.
 
 ```js
 test('test', async ({ page }) => {
@@ -110,7 +128,7 @@ test('test', async ({ page }) => {
 
 ## What's new
 
-Fixed an issue with using the `qase.attach()` method to add attachments with a file path. 
+Fixed an issue with using the `qase.attach()` method to add attachments with a file path.
 The reporter didn't add such attachments to the test.
 
 # playwright-qase-reporter@2.0.0
@@ -157,11 +175,11 @@ Right now, the reporter will convert all parameters to strings before sending th
 
 ```js
 test('Ultimate Question of Life, The Universe, and Everything', async ({ page }) => {
-    qase.id(42)
-      .title('Ultimate Question of Life, The Universe, and Everything')
-      .fields({ severity: high, priority: medium })
-      .attach({ paths: '/path/to/file'});
-    ...
+  qase.id(42)
+    .title('Ultimate Question of Life, The Universe, and Everything')
+    .fields({ severity: high, priority: medium })
+    .attach({ paths: '/path/to/file' });
+...
 })
 ```
 
@@ -188,19 +206,17 @@ If Qase workspace is configured to update test cases from reported
 tests results, the newly created cases will be structured by their
 suites, derived from file path and `test.describe()`.
 
-
 # playwright-qase-reporter@2.0.0-beta.8
 
 ## What's new
 
 Fix the problem with dependencies, introduced in `2.0.0-beta.7`
 
-
 # playwright-qase-reporter@2.0.0-beta.7
 
 ## What's new
 
-Previously, we logged a message about the use of an outdated annotation immediately when running the test. 
+Previously, we logged a message about the use of an outdated annotation immediately when running the test.
 Now we will log the message after all tests are completed. Like this:
 
 ```log
@@ -236,12 +252,13 @@ add `captureLogs: true` to the reporter configuration:
 ## What's new
 
 Upload test attachments to Qase:
+
 ```js
 test('test', async ({ page }) => {
   // upload files by path
-  qase.attach({ paths: '/path/to/file'});
+  qase.attach({ paths: '/path/to/file' });
   // list multiple files at once
-  qase.attach({ paths: ['/path/to/file', '/path/to/another/file']});
+  qase.attach({ paths: ['/path/to/file', '/path/to/another/file'] });
   // upload contents directly from your code
   qase.attach({ name: 'attachment.txt', content: 'Hello, world!', contentType: 'text/plain' });
   await page.goto('https://example.com');
@@ -257,11 +274,11 @@ Annotate parameterized tests to see the complete data in the Qase.io test report
 ```js
 const people = ['Alice', 'Bob'];
 for (const name of people) {
-    test(`testing with ${name}`, async () => {
-        qase.id(1)
-        qase.parameters({ 'name': name });
-        // ...
-    });
+  test(`testing with ${name}`, async () => {
+    qase.id(1)
+    qase.parameters({ 'name': name });
+    // ...
+  });
 }
 
 ```
@@ -270,25 +287,25 @@ for (const name of people) {
 
 ## What's new
 
-*   Change module exports for simpler importing.
+* Change module exports for simpler importing.
 
-    New syntax:
-    
-    ```js
-    import { qase } from 'playwright-qase-reporter';
-    ```
-    
-    instead of:
-    ```js
-    import { qase } from 'playwright-qase-reporter/playwright';
-    ```
-    
+  New syntax:
+
+  ```js
+  import { qase } from 'playwright-qase-reporter';
+  ```
+
+  instead of:
+  ```js
+  import { qase } from 'playwright-qase-reporter/playwright';
+  ```
+
 * Update the readme with examples of new imports and annotations.
-
 
 # playwright-qase-reporter@2.0.0-beta.2
 
 ## Overview
+
 Qase reporter for the Playwright test framework.
 
 This is a beta channel release.
@@ -305,6 +322,7 @@ npm install playwright-qase-reporter@latest
 ```
 
 ## What's new
+
 ### New syntax for annotating tests
 
 This release brings a major syntax change for specifying more test parameters.
@@ -313,7 +331,7 @@ Old syntax allowed only test ID and title, and wasn't improving code readability
 
 ```js
 test(qase(42, 'Ultimate Question of Life, The Universe, and Everything'), async ({ page }) => {
-    ...  
+...
 })
 ```
 
@@ -321,9 +339,9 @@ New syntax allows for adding information on separate lines, keeping the code rea
 
 ```js
 test('Ultimate Question of Life, The Universe, and Everything', async ({ page }) => {
-    qase.id(42);
-    qase.fields({ severity: high, priority: medium });
-    qase.attach({ paths: '/path/to/file'});
-    ...
+  qase.id(42);
+  qase.fields({ severity: high, priority: medium });
+  qase.attach({ paths: '/path/to/file' });
+...
 })
 ```

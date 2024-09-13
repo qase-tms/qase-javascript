@@ -99,22 +99,20 @@ existing test cases from TMS before the executing tests. For example:
 import { qase } from 'playwright-qase-reporter';
 
 describe('Test suite', () => {
+  test(qase(2, 'Test with Qase ID'), () => {
+    expect(true).toBe(true);
+  });
+  
   test('Simple test', () => {
-    qase.id(1);
     qase.title('Example of simple test');
     expect(true).toBe(true);
   });
 
   test('Test with annotated fields', () => {
-    qase.id(2);
     qase.fields({ 'severity': 'high', 'priority': 'medium' });
     expect(true).toBe(true);
   });
-
-  test(qase(2, 'This syntax is still supported'), () => {
-    expect(true).toBe(true);
-  });
-
+  
   test('Running, but not reported to Qase', () => {
     qase.ignore();
     expect(true).toBe(true);
