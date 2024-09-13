@@ -1,6 +1,5 @@
 import { Reporter, TestCase, TestError, TestResult, TestStatus, TestStep } from '@playwright/test/reporter';
 import { v4 as uuidv4 } from 'uuid';
-import chalk from 'chalk';
 import * as path from 'path';
 
 import {
@@ -430,12 +429,6 @@ export class PlaywrightQaseReporter implements Reporter {
    */
   public async onEnd(): Promise<void> {
     await this.reporter.publish();
-
-    if (this.qaseTestWithOldAnnotation.size > 0) {
-      console.log(chalk`{yellow qase: Some tests are using qase(id, 'Title') syntax.}`);
-      console.log(chalk`{yellow qase: Consider using the new syntax: qase.id().title() in the test body. See the docs for reference:}`);
-      console.log(chalk`{yellow qase: https://github.com/qase-tms/qase-javascript/tree/main/qase-playwright#readme}`);
-    }
   }
 
   // add this method for supporting old version of qase

@@ -19,7 +19,7 @@ export interface MetadataMessage {
 }
 
 /**
- * Use `qase.id()` instead. This method is deprecated and kept for reverse compatibility.
+ * Set IDs for the test case
  *
  * @param caseId
  * @param name
@@ -61,6 +61,7 @@ export const qase = (
 
 /**
  * Set IDs for the test case
+ * Use `qase()` instead. This method is deprecated and kept for reverse compatibility.
  *
  * @param {number | number[]} value
  *
