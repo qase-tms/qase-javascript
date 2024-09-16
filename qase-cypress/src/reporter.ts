@@ -19,6 +19,7 @@ import {
 import { traverseDir } from './utils/traverse-dir';
 import { configSchema } from './configSchema';
 import { ReporterOptionsType } from './options';
+import { MetadataManager } from './metadata/manager';
 
 const {
   EVENT_TEST_FAIL,
@@ -166,6 +167,13 @@ export class CypressQaseReporter extends reporters.Base {
    * @private
    */
   private addTestResult(test: Test) {
+    const metadata = MetadataManager.getMetadata();
+
+    if (metadata?.ignore) {
+      MetadataManager.clear();
+      return;
+    }
+
     const ids = CypressQaseReporter.getCaseId(test.title);
 
     const attachments = this.screenshotsFolder
@@ -189,14 +197,38 @@ export class CypressQaseReporter extends reporters.Base {
       };
     }
 
+    if (metadata?.suite) {
+      relations = {
+        suite: {
+          data: [
+            {
+              title: metadata.suite,
+              public_id: null,
+            },
+          ],
+        },
+      };
+    }
+
+    let message: string | null = null;
+    if (metadata?.comment) {
+      message = metadata.comment;
+    }
+    if (test.err?.message) {
+      if (message) {
+        message += '\n\n';
+      }
+      message += test.err.message;
+    }
+
     const result: TestResultType = {
       attachments: attachments ?? [],
       author: null,
-      fields: {},
-      message: test.err?.message ?? null,
+      fields: metadata?.fields ?? {},
+      message: message,
       muted: false,
-      params: {},
-      group_params: {},
+      params: metadata?.parameters ?? {},
+      group_params: metadata?.groupParams ?? {},
       relations: relations,
       run_id: null,
       signature: this.getSignature(test, ids),
@@ -213,10 +245,12 @@ export class CypressQaseReporter extends reporters.Base {
         thread: null,
       },
       testops_id: ids.length > 0 ? ids : null,
-      title: test.title,
+      title: metadata?.title ?? test.title,
     };
 
     void this.reporter.addTestResult(result);
+
+    MetadataManager.clear();
   }
 
   /**
