@@ -1,5 +1,6 @@
-import { Metadata } from './models';
+import { Metadata, StepStart } from './models';
 import { readFileSync, existsSync, unlinkSync, writeFileSync } from 'fs';
+import { v4 as uuidv4 } from 'uuid';
 
 const metadataPath = 'qaseMetadata';
 
@@ -18,6 +19,9 @@ export class MetadataManager {
       ignore: false,
       suite: undefined,
       comment: undefined,
+      steps: [],
+      currentStepId: undefined,
+      firstStepName: undefined,
     };
 
     try {
@@ -35,6 +39,39 @@ export class MetadataManager {
   public static setIgnore(): void {
     const metadata = this.getMetadata() ?? {};
     metadata.ignore = true;
+    this.setMetadata(metadata);
+  }
+
+  public static addStepStart(name: string): void {
+    const metadata = this.getMetadata() ?? {};
+
+    if (metadata.firstStepName === name) {
+      return;
+    }
+
+    if (!metadata.steps) {
+      metadata.steps = [];
+    }
+    const id = uuidv4();
+    const parentId = metadata.currentStepId ?? undefined;
+    metadata.steps.push({ timestamp: Date.now(), name, id: id, parentId: parentId });
+    metadata.currentStepId = id;
+
+    if (!metadata.firstStepName) {
+      metadata.firstStepName = name;
+    }
+
+    this.setMetadata(metadata);
+  }
+
+  public static addStepEnd(status: string): void {
+    const metadata = this.getMetadata() ?? {};
+    if (!metadata.steps || !metadata.currentStepId) {
+      return;
+    }
+    const parentId = metadata.steps.reverse().find((step): step is StepStart => step.id === metadata.currentStepId)?.parentId;
+    metadata.steps.push({ timestamp: Date.now(), status, id: metadata.currentStepId });
+    metadata.currentStepId = parentId;
     this.setMetadata(metadata);
   }
 
