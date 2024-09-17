@@ -49,4 +49,18 @@ module.exports = function(on) {
       return null;
     },
   });
+
+  on('task', {
+    qaseStepStart(value) {
+      MetadataManager.addStepStart(value);
+      return null;
+    },
+  });
+
+  on('task', {
+    qaseStepEnd(value) {
+      MetadataManager.addStepEnd(value);
+      return null;
+    },
+  });
 };
