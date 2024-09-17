@@ -1,3 +1,19 @@
+# cypress-qase-reporter@2.2.0-beta.2
+
+## What's new
+
+Added the ability to add steps in tests:
+
+- `qase.step` - add a step to the test
+
+```ts
+it('test', () => {
+  qase.step('Step 1', () => {
+    cy.visit('https://example.com');
+  });
+});
+```
+
 # cypress-qase-reporter@2.2.0-beta.1
 
 ## What's new

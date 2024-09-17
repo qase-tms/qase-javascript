@@ -127,3 +127,25 @@ qase.comment = (
     //
   });
 };
+
+/**
+ * Add a step to  the test case
+ * @param {string} name
+ * @param {() => T | PromiseLike<T>} body
+ * @example
+ * it('test', () => {
+ *    qase.step("Some step", () => {
+ *      // some actions
+ *    });
+ *    cy.visit('https://example.com');
+ * });
+ */
+qase.step = <T = void>(name: string, body: () => T | PromiseLike<T>) => {
+  return cy.task('qaseStepStart', name).then(() => {
+    return Cypress.Promise.resolve(body());
+  }).then(() => {
+    cy.task('qaseStepEnd', 'passed').then(() => {
+      //
+    });
+  });
+};

@@ -106,6 +106,7 @@ parameterize your tests.
 - `qase.parameters` - set the parameters of the test case
 - `qase.groupParameters` - set the group parameters of the test case
 - `qase.ignore` - ignore the test case in Qase. The test will be executed, but the results will not be sent to Qase.
+- `qase.step` - create a step in the test case
 
 For example:
 
@@ -206,8 +207,8 @@ module.exports = cypress.defineConfig({
   video: false,
   e2e: {
     setupNodeEvents(on, config) {
-       require('cypress-qase-reporter/plugin')(on, config)
-       require('cypress-qase-reporter/metadata')(on)
+      require('cypress-qase-reporter/plugin')(on, config)
+      require('cypress-qase-reporter/metadata')(on)
     },
   },
 });
