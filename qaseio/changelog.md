@@ -1,3 +1,9 @@
+# qaseio@2.3.1
+
+## What's new
+
+Added a new `author_id` and `entity_id` fields to the `Author` model.
+
 # qaseio@2.3.0
 
 ## What's new
