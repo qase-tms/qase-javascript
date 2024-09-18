@@ -467,6 +467,14 @@ export class TestOpsReporter extends AbstractReporter {
       resultCreate.case.layer = result.fields['layer'];
     }
 
+    if (result.fields['author']) {
+      const resp = await this.api.authors.getAuthors(result.fields['author']);
+      if (resp.data.result?.entities && resp.data.result.entities.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        resultCreate.author_id = resp.data.result.entities[0]?.author_id ?? null;
+      }
+    }
+
     this.logger.logDebug(`Transformed result: ${JSON.stringify(resultCreate)}`);
 
     return resultCreate;
