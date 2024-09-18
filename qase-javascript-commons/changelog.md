@@ -1,9 +1,15 @@
+# qase-javascript-commons@2.2.1
+
+## What's new
+
+Support `author` field in the test result data.
+You can specify author name or email in fields.
+
 # qase-javascript-commons@2.1.3
 
 ## What's new
 
 Reporters will send all data on the results of the autotests. Including the data of the title, the description, etc.
-
 
 # qase-javascript-commons@2.1.1
 
@@ -21,8 +27,10 @@ Minor release of the commons package
 
 ## What's new
 
-- update a `InternalReporterInterface`. Added a new methods `sendResults` and `complete` to send the results and complete the test run.
-- add `StateManager` class to manage and share the state of the reporter between the different instances of the reporter.
+- update a `InternalReporterInterface`. Added a new methods `sendResults` and `complete` to send the results and
+  complete the test run.
+- add `StateManager` class to manage and share the state of the reporter between the different instances of the
+  reporter.
 
 # qase-javascript-commons@2.0.13
 
@@ -36,7 +44,6 @@ Minor release of the commons package
 ## What's new
 
 Support qaseio package version 2.2.0
-
 
 # qase-javascript-commons@2.0.11
 
@@ -60,7 +67,6 @@ Now the reporter will send the test results only once.
 The Cypress calls the `publish` method multiple times for the same test results because of the Cypress architecture.
 It calls the `publish` method for each test file.
 
-
 # qase-javascript-commons@2.0.9
 
 ## What's new
@@ -82,13 +88,15 @@ This option is available in the config file and the `QASE_ROOT_SUITE` env variab
 
 ## What's new
 
-Fixed an issue with creating a test run with environment when the reporter ignored the `environment` parameter in the configuration.
+Fixed an issue with creating a test run with environment when the reporter ignored the `environment` parameter in the
+configuration.
 
 # qase-javascript-commons@2.0.7
 
 ## What's new
 
-Fixed an issue with creating a defect for failed tests when the reporter ignored the `defect` parameter in the configuration.
+Fixed an issue with creating a defect for failed tests when the reporter ignored the `defect` parameter in the
+configuration.
 
 # qase-javascript-commons@2.0.6
 
@@ -143,7 +151,7 @@ Before this fix, the reporter added ANSI escape codes to the message and stack t
 ## What's new
 
 This is the first release version of the Qase JavaScript SDK.
-It is numbered `2.0.0` (and not `1.0.0`) to match the release series of 
+It is numbered `2.0.0` (and not `1.0.0`) to match the release series of
 test reporters for Playwright, Cypress, Jest, and other frameworks.
 
 ### Annotating test with field data
@@ -153,9 +161,9 @@ This feature is already implemented in the Playwright reporter:
 
 ```js
 test('Test with annotated fields', () => {
-    qase.id(1);
-    qase.fields({ 'severity': 'high', 'priority': 'medium' })
-    // ...
+  qase.id(1);
+  qase.fields({ 'severity': 'high', 'priority': 'medium' })
+  // ...
 });
 ```
 
@@ -182,7 +190,8 @@ It helps bring test results faster and enables acting on them long before the te
 Qase JavaScript SDK brings configuration with config files and environment variables
 to a common standard, used with Qase reporters in all languages and frameworks.
 
-For details, see the [Configuration](https://github.com/qase-tms/qase-javascript/tree/main/qase-javascript-commons#configuration)
+For details, see
+the [Configuration](https://github.com/qase-tms/qase-javascript/tree/main/qase-javascript-commons#configuration)
 section in the README.
 
 ### Latest API
@@ -221,17 +230,17 @@ Fixed an issue when the results published before the test run creation.
 
 Improved debug logging for better testing and reporting errors.
 
--   Separate `logger` class for use in reporters, supporting logging to console and files.
--   Extra debug logs in both reporter modes: TestOps and Local.
+- Separate `logger` class for use in reporters, supporting logging to console and files.
+- Extra debug logs in both reporter modes: TestOps and Local.
 
 Fixed an issue with duplicate test runs created when the testing framework
 (such as Cypress) uses more than one instance of the Qase reporter.
 Now reporter handles Qase test runs in the following way:
 
-1.  The first instance of the reporter creates a Qase test run and stores the run ID 
-    in the ENV variable `QASE_TESTOPS_RUN_ID`.
-2.  Other instances of the reporter read this variable and report test results 
-    to the existing test run.
+1. The first instance of the reporter creates a Qase test run and stores the run ID
+   in the ENV variable `QASE_TESTOPS_RUN_ID`.
+2. Other instances of the reporter read this variable and report test results
+   to the existing test run.
 
 Nothing has changed in cases when there is a single instance of a reporter or
 when it is using a test run, created with other tools, such as with an API request
@@ -303,7 +312,7 @@ This commit introduces a way to select the API version to use.
 It enables using all new features of v2 JS reporters with the stable v1 API,
 and elso experimenting with the new v2 API.
 
-**Warning**: v2 API is still in beta. 
+**Warning**: v2 API is still in beta.
 If you want to try the v2 JS reporters, you don't have to enable the new API.
 
 To enable using API v2, set an environment variable before running the tests:
@@ -319,16 +328,17 @@ Such description can be collected from test's location and attributes
 or explicitly declared in the test.
 
 Add new data models:
+
 - Relation
 - Suite
 - SuiteData
-
 
 # qase-javascript-commons@2.0.0-beta.5
 
 ## What's new
 
-* Update the config of reporters. Added `captureLogs` field. If it is set to `true`, the reporter will capture logs from the test framework.
+* Update the config of reporters. Added `captureLogs` field. If it is set to `true`, the reporter will capture logs from
+  the test framework.
 * Added `getMimeType` function to the commons package. It returns the MIME type of the file by its extension.
 
 # qase-javascript-commons@2.0.0-beta.4
