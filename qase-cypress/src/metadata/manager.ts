@@ -1,6 +1,8 @@
-import { Metadata, StepStart } from './models';
+import { Attach, Metadata, StepStart } from './models';
 import { readFileSync, existsSync, unlinkSync, writeFileSync } from 'fs';
 import { v4 as uuidv4 } from 'uuid';
+import path from 'path';
+import { Attachment, getMimeTypes } from 'qase-javascript-commons';
 
 const metadataPath = 'qaseMetadata';
 
@@ -22,6 +24,8 @@ export class MetadataManager {
       steps: [],
       currentStepId: undefined,
       firstStepName: undefined,
+      attachments: [],
+      stepAttachments: {},
     };
 
     try {
@@ -72,6 +76,31 @@ export class MetadataManager {
     const parentId = metadata.steps.reverse().find((step): step is StepStart => step.id === metadata.currentStepId)?.parentId;
     metadata.steps.push({ timestamp: Date.now(), status, id: metadata.currentStepId });
     metadata.currentStepId = parentId;
+    this.setMetadata(metadata);
+  }
+
+  public static addAttach(attach: Attach) {
+    const metadata = this.getMetadata() ?? {};
+
+    if (!metadata.attachments) {
+      metadata.attachments = [];
+    }
+    if (!metadata.stepAttachments) {
+      metadata.stepAttachments = {};
+    }
+
+    const attachments = this.prepareAttach(attach);
+
+    if (metadata.currentStepId) {
+      if (metadata.stepAttachments[metadata.currentStepId] === undefined) {
+        metadata.stepAttachments[metadata.currentStepId] = attachments;
+      } else {
+        metadata.stepAttachments[metadata.currentStepId]?.push(...attachments);
+      }
+    } else {
+      metadata.attachments.push(...attachments);
+    }
+
     this.setMetadata(metadata);
   }
 
@@ -134,5 +163,47 @@ export class MetadataManager {
 
   static isExists(): boolean {
     return existsSync(metadataPath);
+  }
+
+  static prepareAttach(attach: Attach): Attachment[] {
+    const attachments: Attachment[] = [];
+    if (attach.paths) {
+      if (Array.isArray(attach.paths)) {
+        attach.paths.forEach((file) => {
+          const attachmentName = path.basename(file);
+          const contentType: string = getMimeTypes(file);
+          attachments.push({
+            file_name: attachmentName,
+            mime_type: contentType,
+            file_path: file,
+            content: '',
+            size: 0,
+            id: uuidv4(),
+          });
+        });
+      } else {
+        const attachmentName = path.basename(attach.paths);
+        const contentType: string = getMimeTypes(attach.paths);
+        attachments.push({
+          file_name: attachmentName,
+          mime_type: contentType,
+          file_path: attach.paths,
+          content: '',
+          size: 0,
+          id: uuidv4(),
+        });
+      }
+    } else if (attach.content) {
+      attachments.push({
+        file_name: attach.name ?? 'attachment',
+        mime_type: attach.contentType ?? 'application/octet-stream',
+        file_path: null,
+        content: attach.content,
+        size: 0,
+        id: uuidv4(),
+      });
+    }
+
+    return attachments;
   }
 }

@@ -63,4 +63,11 @@ module.exports = function(on) {
       return null;
     },
   });
+
+  on('task', {
+    qaseAttach(value) {
+      MetadataManager.addAttach(value);
+      return null;
+    },
+  });
 };
