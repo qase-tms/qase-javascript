@@ -183,6 +183,8 @@ export class CypressQaseReporter extends reporters.Base {
       ? CypressQaseReporter.findAttachments(ids, this.screenshotsFolder)
       : undefined;
 
+    attachments?.push(...(metadata?.attachments ?? []));
+
     let relations = {};
     if (test.parent !== undefined) {
       const data = [];
@@ -235,7 +237,7 @@ export class CypressQaseReporter extends reporters.Base {
       relations: relations,
       run_id: null,
       signature: this.getSignature(test, ids),
-      steps: metadata?.steps ? this.getSteps(metadata.steps) : [],
+      steps: metadata?.steps ? this.getSteps(metadata.steps, metadata.stepAttachments ?? {}) : [],
       id: uuidv4(),
       execution: {
         status: test.state
@@ -300,7 +302,7 @@ export class CypressQaseReporter extends reporters.Base {
     return undefined;
   }
 
-  private getSteps(steps: (StepStart | StepEnd)[]): TestStepType[] {
+  private getSteps(steps: (StepStart | StepEnd)[], attachments: Record<string, Attachment[]>): TestStepType[] {
     const result: TestStepType[] = [];
     const stepMap = new Map<string, TestStepType>();
 
@@ -315,6 +317,10 @@ export class CypressQaseReporter extends reporters.Base {
           action: step.name,
           expected_result: null,
         };
+
+        if (attachments[step.id]) {
+          newStep.attachments = attachments[step.id] ?? [];
+        }
 
         const parentId = step.parentId;
         if (parentId) {

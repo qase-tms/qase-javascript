@@ -23,7 +23,7 @@ export const qase = (
 qase.title = (
   value: string,
 ) => {
-  cy.task('qaseTitle', value).then(() => {
+  return cy.task('qaseTitle', value).then(() => {
     //
   });
 };
@@ -41,7 +41,7 @@ qase.title = (
 qase.fields = (
   values: Record<string, string>,
 ) => {
-  cy.task('qaseFields', values).then(() => {
+  return cy.task('qaseFields', values).then(() => {
     //
   });
 };
@@ -55,7 +55,7 @@ qase.fields = (
  * });
  */
 qase.ignore = () => {
-  cy.task('qaseIgnore').then(() => {
+  return cy.task('qaseIgnore').then(() => {
     //
   });
 };
@@ -72,7 +72,7 @@ qase.ignore = () => {
 qase.parameters = (
   values: Record<string, string>,
 ) => {
-  cy.task('qaseParameters', values).then(() => {
+  return cy.task('qaseParameters', values).then(() => {
     //
   });
 };
@@ -89,7 +89,7 @@ qase.parameters = (
 qase.groupParameters = (
   values: Record<string, string>,
 ) => {
-  cy.task('qaseGroupParameters', values).then(() => {
+  return cy.task('qaseGroupParameters', values).then(() => {
     //
   });
 };
@@ -106,7 +106,7 @@ qase.groupParameters = (
 qase.suite = (
   value: string,
 ) => {
-  cy.task('qaseSuite', value).then(() => {
+  return cy.task('qaseSuite', value).then(() => {
     //
   });
 };
@@ -123,7 +123,7 @@ qase.suite = (
 qase.comment = (
   value: string,
 ) => {
-  cy.task('qaseComment', value).then(() => {
+  return cy.task('qaseComment', value).then(() => {
     //
   });
 };
@@ -147,5 +147,27 @@ qase.step = <T = void>(name: string, body: () => T | PromiseLike<T>) => {
     cy.task('qaseStepEnd', 'passed').then(() => {
       //
     });
+  });
+};
+
+/**
+ * Attach a file to the test case or the step
+ * @param attach
+ * @example
+ * it('test', () => {
+ *   qase.attach({ name: 'attachment.txt', content: 'Hello, world!', contentType: 'text/plain' });
+ *   qase.attach({ paths: '/path/to/file'});
+ *   qase.attach({ paths: ['/path/to/file', '/path/to/another/file']});
+ *   cy.visit('https://example.com');
+ *  });
+ */
+qase.attach = (attach: {
+  name?: string,
+  paths?: string | string[],
+  content?: Buffer | string,
+  contentType?: string,
+}) => {
+  return cy.task('qaseAttach', attach).then(() => {
+    //
   });
 };

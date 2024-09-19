@@ -1,3 +1,21 @@
+# cypress-qase-reporter@2.2.0-beta.3
+
+## What's new
+
+Added the ability to add attachments to tests or steps:
+
+- `qase.attach` - add an attachment to test or step
+
+```ts
+it('test', () => {
+  qase.attach({ paths: '/path/to/file' });
+  qase.step('Step 1', () => {
+    cy.visit('https://example.com');
+    qase.attach({ name: 'attachment.txt', content: 'Hello, world!', contentType: 'text/plain' });
+  });
+});
+```
+
 # cypress-qase-reporter@2.2.0-beta.2
 
 ## What's new
