@@ -1,3 +1,17 @@
+# qase-cucumberjs@2.0.2
+
+## What's new
+
+- Support `QaseIgnore` tag. If the test case has the `QaseIgnore` tag, the reporter will not send the result to the Qase
+  TMS.
+
+    ```cucumber
+    @QaseIgnore
+    Scenario: simple test
+    ```
+
+- Improved error handling.
+
 # qase-cucumberjs@2.0.0
 
 ## What's new
