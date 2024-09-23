@@ -23,11 +23,13 @@ Example:
 //qase: 10
 // Qase: 1, 2, 3
 // qase: 4 5 6 14
-pm.test('expect response be 200', function () {
-    pm.response.to.be.info
+pm.test('expect response be 200', function() {
+  pm.response.to.be.info
 })
 ```
+
 ### Execute rom CLI:
+
 ```
 QASE_MODE=testops newman run ./sample-collection.json -r qase
 ```
@@ -48,53 +50,36 @@ https://app.qase.io/run/QASE_PROJECT_CODE
 
 ## Configuration
 
-Qase reporter supports passing parameters using two ways:
-using `.qaserc`/`qase.config.json` file and using ENV variables.
+Qase Newman reporter can be configured in multiple ways:
 
-`.qaserc` parameters, (* - required):
-- `mode` - `testops`/`off` Enables reporter, default - `off`
-- `debug` - Enables debug logging, defaule - `false`
-- `environment` - To execute with the sending of the envinroment information 
-- *`testops.api.token` - Token for API access, you can find more information
-  [here](https://developers.qase.io/#authentication)
-- *`testops.project` - Code of your project (can be extracted from main
-  page of your project: `https://app.qase.io/project/DEMOTR` -
-  `DEMOTR` is project code here)
-- `testops.run.id` - Pass Run ID
-- `testops.run.title` - Set custom Run name, when new run is created
-- `testops.run.description` - Set custom Run description, when new run is created
-- `testops.run.complete` - Whether the run should be completed
+- using a separate config file `qase.config.json`,
+- using environment variables (they override the values from the configuration files).
 
-Example configuration file:
+For a full list of configuration options, see
+the [Configuration reference](../qase-javascript-commons/README.md#configuration).
+
+Example `qase.config.json` config:
 
 ```json
 {
   "mode": "testops",
   "debug": true,
-  "environment": 1,
   "testops": {
     "api": {
       "token": "api_key"
     },
-    "project": "project_code"
+    "project": "project_code",
+    "run": {
+      "complete": true
+    }
   }
 }
 ```
 
-Supported ENV variables:
-
-- `QASE_MODE` - Same as `mode`
-- `QASE_DEBUG` - Same as `debug`
-- `QASE_ENVIRONMENT` - Same as `environment` 
-- `QASE_TESTOPS_API_TOKEN` - Same as `testops.api.token`
-- `QASE_TESTOPS_PROJECT` - Same as `testops.project`
-- `QASE_TESTOPS_RUN_ID` - Pass Run ID from ENV and override reporter option `testops.run.id`
-- `QASE_TESTOPS_RUN_TITLE` - Same as `testops.run.title`
-- `QASE_TESTOPS_RUN_DESCRIPTION` - Same as `testops.run.description`
-
 ## Requirements
 
-We maintain the reporter on LTS versions of Node. You can find the current versions by following the [link](https://nodejs.org/en/about/releases/)
+We maintain the reporter on LTS versions of Node. You can find the current versions by following
+the [link](https://nodejs.org/en/about/releases/)
 
 `newman >= 5.3.0`
 
