@@ -1,3 +1,20 @@
+# qase-testcafe@2.0.3
+
+## What's new
+
+Support `ignore` metadata for test cases. If the test case has the `ignore` tag, the reporter will not send the result to the Qase
+TMS.
+
+```ts
+const q = qase.ignore().create();
+test.meta({ ...q })(
+  'test',
+  async (t) => {
+    await t;
+  },
+);
+```
+
 # qase-testcafe@2.0.2
 
 ## What's new
@@ -8,7 +25,8 @@ Improved error collection. The error stack trace contains more useful debugging 
 
 ## What's new
 
-Support group parameters for test cases. You can specify the group parameters in the test case using the following format:
+Support group parameters for test cases. You can specify the group parameters in the test case using the following
+format:
 
 ```ts
 const q = qase.groupParameters({ 'param01': 'value01', 'param02': 'value02' }).create();
