@@ -9,7 +9,7 @@ import {
   TestStepFinished,
 } from '@cucumber/messages';
 import {
-  Attachment,
+  Attachment, CompoundError,
   Relation,
   StepStatusEnum,
   StepType,
@@ -26,6 +26,7 @@ const qaseIdRegExp = /^@[Qq]-?(\d+)$/g;
 const newQaseIdRegExp = /^@[Qq]ase[Ii][Dd]=(\d+)$/g;
 const qaseTitleRegExp = /^@[Qq]ase[Tt]itle=(.+)$/g;
 const qaseFieldsRegExp = /^@[Qq]ase[Ff]ields:(.+?)=(.+)$/g;
+const qaseIgnoreRegExp = /^@[Qq]ase[Ii][Gg][Nn][Oo][Rr][Ee]$/g;
 
 export class Storage {
   /**
@@ -195,11 +196,14 @@ export class Storage {
       return undefined;
     }
 
-    let error: Error | undefined;
+    const metadata = this.parseTags(pickle.tags);
 
-    if (this.testCaseStartedErrors[tcs.id]?.length) {
-      error = new Error(this.testCaseStartedErrors[tcs.id]?.join('\n\n'));
+    if (metadata.isIgnore) {
+      return undefined;
     }
+
+    const error = this.getError(tcs.id);
+
     let relations: Relation | null = null;
     const nodeId = pickle.astNodeIds[pickle.astNodeIds.length - 1];
     if (nodeId != undefined && this.scenarios[nodeId] != undefined) {
@@ -215,8 +219,6 @@ export class Storage {
       };
     }
 
-    const metadata = this.parseTags(pickle.tags);
-
     return {
       attachments: [],
       author: null,
@@ -225,11 +227,11 @@ export class Storage {
         start_time: null,
         end_time: null,
         duration: Math.abs(testCase.timestamp.seconds - tcs.timestamp.seconds),
-        stacktrace: error?.stack ?? null,
+        stacktrace: error?.stacktrace ?? null,
         thread: null,
       },
       fields: metadata.fields,
-      message: null,
+      message: error?.message ?? null,
       muted: false,
       params: {},
       group_params: {},
@@ -322,6 +324,7 @@ export class Storage {
       ids: [],
       fields: {},
       title: null,
+      isIgnore: false,
     };
 
     for (const tag of tags) {
@@ -350,6 +353,10 @@ export class Storage {
           // do nothing
         }
       }
+
+      if (qaseIgnoreRegExp.test(tag.name)) {
+        metadata.isIgnore = true;
+      }
     }
 
     return metadata;
@@ -370,5 +377,21 @@ export class Storage {
     }
 
     return signature;
+  }
+
+  private getError(testCaseId: string): CompoundError | undefined {
+    const testErrors = this.testCaseStartedErrors[testCaseId];
+
+    if (!testErrors) {
+      return undefined;
+    }
+
+    const error = new CompoundError();
+    testErrors.forEach((message) => {
+      error.addMessage(message);
+      error.addStacktrace(message);
+    });
+
+    return error;
   }
 }
