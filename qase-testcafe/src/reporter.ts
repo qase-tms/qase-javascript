@@ -54,6 +54,7 @@ enum metadataEnum {
   parameters = 'QaseParameters',
   groupParameters = 'QaseGroupParameters',
   oldID = 'CID',
+  ignore = 'QaseIgnore',
 }
 
 interface MetadataType {
@@ -62,6 +63,7 @@ interface MetadataType {
   [metadataEnum.fields]: Record<string, string>;
   [metadataEnum.parameters]: Record<string, string>;
   [metadataEnum.groupParameters]: Record<string, string>;
+  [metadataEnum.ignore]: boolean;
 }
 
 export interface TestRunInfoType {
@@ -162,6 +164,12 @@ export class TestcafeQaseReporter {
     meta: Record<string, string>,
     formatError: (error: any, prefix: string) => string,
   ) => {
+    const metadata = this.getMeta(meta);
+
+    if (metadata[metadataEnum.ignore]) {
+      return;
+    }
+
     const errorLog = testRunInfo.errs
       .map((error, index) => formatError(error, `${index + 1} `).replace(
         // eslint-disable-next-line no-control-regex
@@ -170,7 +178,6 @@ export class TestcafeQaseReporter {
       ))
       .join('\n');
 
-    const metadata = this.getMeta(meta);
     await this.reporter.addTestResult({
       author: null,
       execution: {
@@ -222,6 +229,7 @@ export class TestcafeQaseReporter {
       QaseFields: {},
       QaseParameters: {},
       QaseGroupParameters: {},
+      QaseIgnore: false,
     };
 
     if (meta[metadataEnum.oldID] !== undefined && meta[metadataEnum.oldID] !== '') {
@@ -244,6 +252,14 @@ export class TestcafeQaseReporter {
 
     if (meta[metadataEnum.parameters] !== undefined && meta[metadataEnum.parameters] !== '') {
       metadata.QaseParameters = JSON.parse(meta[metadataEnum.parameters]) as Record<string, string>;
+    }
+
+    if (meta[metadataEnum.groupParameters] !== undefined && meta[metadataEnum.groupParameters] !== '') {
+      metadata.QaseGroupParameters = JSON.parse(meta[metadataEnum.groupParameters]) as Record<string, string>;
+    }
+
+    if (meta[metadataEnum.ignore] !== undefined && meta[metadataEnum.ignore] !== '') {
+      metadata.QaseIgnore = meta[metadataEnum.ignore] === 'true';
     }
 
     return metadata;
