@@ -408,7 +408,10 @@ export class PlaywrightQaseReporter implements Reporter {
       }
     }
 
-    if (testCaseMetadata.ids.length > 0) {
+    const ids = this.extractQaseIdsFromAnnotation(test.annotations);
+    if (ids.length > 0) {
+      testResult.testops_id = ids;
+    } else if (testCaseMetadata.ids.length > 0) {
       testResult.testops_id = testCaseMetadata.ids;
     } else {
       const ids = PlaywrightQaseReporter.qaseIds.get(test.title) ?? null;
@@ -494,5 +497,26 @@ export class PlaywrightQaseReporter implements Reporter {
       return title.replace(matches[0], '').trimEnd();
     }
     return title;
+  }
+
+  /**
+   * @param annotation
+   * @returns {number[]}
+   * @private
+   */
+  private extractQaseIdsFromAnnotation(annotation: { type: string, description?: string }[]): number[] {
+    const ids: number[] = [];
+    for (const item of annotation) {
+      if (item.type.toLowerCase() === 'qaseid' && item.description) {
+        if (item.description.includes(',')) {
+          ids.push(...item.description.split(',').map((id) => parseInt(id)));
+          continue;
+        }
+
+        ids.push(parseInt(item.description));
+      }
+    }
+
+    return ids;
   }
 }

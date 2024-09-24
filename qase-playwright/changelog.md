@@ -1,3 +1,19 @@
+# playwright-qase-reporter@2.0.14
+
+## What's new
+
+Support specifying the test case ID in the `annotation`.
+
+```ts
+test('test',
+  {
+    annotation: { type: 'QaseID', description: '1' },
+  },
+  async ({ page }) => {
+    await page.goto('https://example.com');
+  });
+```
+
 # playwright-qase-reporter@2.0.13
 
 ## What's new
