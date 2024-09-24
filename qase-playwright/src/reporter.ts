@@ -60,12 +60,6 @@ export class PlaywrightQaseReporter implements Reporter {
   private static qaseIds: Map<string, number[]> = new Map<string, number[]>();
 
   /**
-   * @type {Map<string, number[]>}
-   * @private
-   */
-  private qaseTestWithOldAnnotation: Map<string, number[]> = new Map<string, number[]>();
-
-  /**
    * @param {TestCase} test
    * @returns {string[]}
    * @private
@@ -414,12 +408,7 @@ export class PlaywrightQaseReporter implements Reporter {
     } else if (testCaseMetadata.ids.length > 0) {
       testResult.testops_id = testCaseMetadata.ids;
     } else {
-      const ids = PlaywrightQaseReporter.qaseIds.get(test.title) ?? null;
-      testResult.testops_id = ids;
-      if (ids) {
-        const path = `${test.location.file}:${test.location.line}:${test.location.column}`;
-        this.qaseTestWithOldAnnotation.set(path, ids);
-      }
+      testResult.testops_id = PlaywrightQaseReporter.qaseIds.get(test.title) ?? null;
     }
 
     testResult.signature = this.getSignature(suites, testCaseMetadata.parameters, testResult.testops_id ?? []);
