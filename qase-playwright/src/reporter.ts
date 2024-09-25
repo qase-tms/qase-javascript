@@ -35,6 +35,8 @@ interface TestCaseMetadata {
   comment: string;
 }
 
+const defaultSteps: string[] = ['Before Hooks', 'After Hooks', 'Worker Cleanup'];
+
 export type PlaywrightQaseOptionsType = ConfigType;
 
 /**
@@ -249,7 +251,7 @@ export class PlaywrightQaseReporter implements Reporter {
         continue;
       }
 
-      if ((testStep.title === 'Before Hooks' || testStep.title === 'After Hooks') && testStep.steps.length === 0) {
+      if (defaultSteps.includes(testStep.title) && testStep.steps.length === 0) {
         continue;
       }
 

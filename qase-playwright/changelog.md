@@ -1,3 +1,9 @@
+# playwright-qase-reporter@2.0.15
+
+## What's new
+
+Exclude `Worker Cleanup` step if it doesn't have children steps.
+
 # playwright-qase-reporter@2.0.14
 
 ## What's new
