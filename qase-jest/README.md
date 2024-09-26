@@ -59,7 +59,6 @@ module.exports = {
 Now, run the Jest tests as usual.
 Test results will be reported to a new test run in Qase.
 
-
 ```console
 $ npx jest
 Determining test suites to run...
@@ -79,32 +78,49 @@ and suites from your test data.
 But if necessary, you can independently register the ID of already
 existing test cases from TMS before the executing tests. For example:
 
+### Metadata
+
+- `qase.title` - set the title of the test case
+- `qase.fields` - set the fields of the test case
+- `qase.suite` - set the suite of the test case
+- `qase.comment` - set the comment of the test case
+- `qase.parameters` - set the parameters of the test case
+- `qase.groupParameters` - set the group parameters of the test case
+- `qase.ignore` - ignore the test case in Qase. The test will be executed, but the results will not be sent to Qase.
+- `qase.step` - create a step in the test case
+- `qase.attach` - attach a file to the test case
+
 ```typescript
-const { qase } = require("jest-qase-reporter/jest");
+const { qase } = require('jest-qase-reporter/jest');
 
 describe('My First Test', () => {
-    test(qase([1,2], 'Several ids'), () => {
-        expect(true).toBe(true);
-    })
+  test(qase([1, 2], 'Several ids'), () => {
+    expect(true).toBe(true);
+  });
 
-    test(qase(3, 'Correct test'), () => {
-        expect(true).toBe(true);
-    })
+  test(qase(3, 'Correct test'), () => {
+    qase.title('Title');
+    expect(true).toBe(true);
+  });
 
-    test.skip(qase("4", 'Skipped test'), () => {
-        expect(true).toBe(true);
-    })
+  test.skip(qase('4', 'Skipped test'), () => {
+    expect(true).toBe(true);
+  });
 
-    test(qase(["5", "6"], 'Failed test'), () => {
-        expect(true).toBe(false);
-    })
+  test(qase(['5', '6'], 'Failed test'), () => {
+    expect(true).toBe(false);
+  });
 });
 ```
+
 To run tests and create a test run, execute the command (for example from folder examples):
+
 ```bash
 QASE_MODE=testops npx jest
 ```
+
 or
+
 ```bash
 npm test
 ```
@@ -125,7 +141,7 @@ Reporter options (* - required):
 
 - `mode` - `testops`/`off` Enables reporter, default - `off`
 - `debug` - Enables debug logging, default - `false`
-- `environment` - To execute with the sending of the envinroment information 
+- `environment` - To execute with the sending of the envinroment information
 - *`testops.api.token` - Token for API access, you can find more information
   [here](https://developers.qase.io/#authentication)
 - *`testops.project` - Qase project code, for example, in https://app.qase.io/project/DEMO the code is `DEMO`
@@ -167,7 +183,7 @@ Supported ENV variables:
 
 - `QASE_MODE` - Same as `mode`
 - `QASE_DEBUG` - Same as `debug`
-- `QASE_ENVIRONMENT` - Same as `environment` 
+- `QASE_ENVIRONMENT` - Same as `environment`
 - `QASE_TESTOPS_API_TOKEN` - Same as `testops.api.token`
 - `QASE_TESTOPS_PROJECT` - Same as `testops.project`
 - `QASE_TESTOPS_RUN_ID` - Pass Run ID from ENV and override reporter option `testops.run.id`
@@ -176,7 +192,8 @@ Supported ENV variables:
 
 ## Requirements
 
-We maintain the reporter on LTS versions of Node. You can find the current versions by following the [link](https://nodejs.org/en/about/releases/)
+We maintain the reporter on LTS versions of Node. You can find the current versions by following
+the [link](https://nodejs.org/en/about/releases/)
 
 `jest >= 28.0.0`
 

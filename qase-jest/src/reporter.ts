@@ -2,9 +2,10 @@ import has from 'lodash.has';
 import get from 'lodash.get';
 import { v4 as uuidv4 } from 'uuid';
 import { Config, Reporter, Test, TestResult } from '@jest/reporters';
-import { Status } from '@jest/test-result';
+import { AssertionResult, Status, TestCaseResult } from '@jest/test-result';
 
 import {
+  Attachment,
   composeOptions,
   ConfigLoader,
   ConfigType,
@@ -12,8 +13,12 @@ import {
   Relation,
   ReporterInterface,
   Suite,
+  TestResultType,
   TestStatusEnum,
+  TestStepType,
 } from 'qase-javascript-commons';
+import { Qase } from './global';
+import { Metadata } from './models';
 
 export type JestQaseOptionsType = ConfigType;
 
@@ -42,10 +47,10 @@ export class JestQaseReporter implements Reporter {
 
   /**
    * @param {string} title
-   * @returns {any}
+   * @returns {number[]}
    * @private
    */
-  private static getCaseId(title: string) {
+  private static getCaseId(title: string): number[] {
     const [, ids] = title.match(JestQaseReporter.qaseIdRegExp) ?? [];
 
     return ids ? ids.split(',').map((id) => Number(id)) : [];
@@ -56,6 +61,12 @@ export class JestQaseReporter implements Reporter {
    * @private
    */
   private reporter: ReporterInterface;
+
+  /**
+   * @type {Metadata}
+   * @private
+   */
+  private metadata: Metadata;
 
   /**
    * @param {Config.GlobalConfig} _
@@ -77,6 +88,9 @@ export class JestQaseReporter implements Reporter {
       frameworkName: 'jest',
       reporterName: 'jest-qase-reporter',
     });
+
+    global.Qase = new Qase(this);
+    this.metadata = this.createEmptyMetadata();
   }
 
   /**
@@ -86,62 +100,78 @@ export class JestQaseReporter implements Reporter {
     void this.reporter.startTestRun();
   }
 
+  public onTestCaseResult(
+    test: Test,
+    testCaseResult: TestCaseResult,
+  ) {
+
+    if (this.metadata.ignore) {
+      this.cleanMetadata();
+      return;
+    }
+
+    const result = this.convertToResult(testCaseResult, test.path);
+
+    if (this.metadata.title) {
+      result.title = this.metadata.title;
+    }
+
+    if (this.metadata.comment) {
+      result.message = this.metadata.comment;
+    }
+
+    if (this.metadata.suite) {
+      result.relations = {
+        suite: {
+          data: [
+            {
+              title: this.metadata.suite,
+              public_id: null,
+            },
+          ],
+        },
+      };
+    }
+
+    if (Object.keys(this.metadata.fields).length > 0) {
+      result.fields = this.metadata.fields;
+    }
+
+    if (Object.keys(this.metadata.parameters).length > 0) {
+      result.params = this.metadata.parameters;
+    }
+
+    if (Object.keys(this.metadata.groupParams).length > 0) {
+      result.group_params = this.metadata.groupParams;
+    }
+
+    if (this.metadata.steps.length > 0) {
+      result.steps = this.metadata.steps;
+    }
+
+    if (this.metadata.attachments.length > 0) {
+      result.attachments = this.metadata.attachments;
+    }
+
+    this.cleanMetadata();
+
+    void this.reporter.addTestResult(result);
+  }
+
   /**
    * @param {Test} _
    * @param {TestResult} result
    */
   public onTestResult(_: Test, result: TestResult) {
-    console.log(result);
     result.testResults.forEach(
-      ({
-         title,
-         fullName,
-         ancestorTitles,
-         status,
-         duration,
-         failureMessages,
-         failureDetails,
-       }) => {
-        let error;
-        if (status === 'failed') {
-          error = new Error(failureDetails.map((item) => {
-            if (has(item, 'matcherResult.message')) {
-              return String(get(item, 'matcherResult.message'));
-            }
+      (value) => {
 
-            return 'Runtime exception';
-          }).join('\n\n'));
-
-          error.stack = failureMessages.join('\n\n');
+        if (value.status !== 'pending') {
+          return;
         }
 
-        const ids = JestQaseReporter.getCaseId(title);
-        const filePath = this.getCurrentTestPath(result.testFilePath);
-
-        void this.reporter.addTestResult({
-          attachments: [],
-          author: null,
-          execution: {
-            status: JestQaseReporter.statusMap[status],
-            start_time: null,
-            end_time: null,
-            duration: duration ?? 0,
-            stacktrace: error?.stack ?? null,
-            thread: null,
-          },
-          fields: {},
-          message: error?.message ?? null,
-          muted: false,
-          params: {},
-          group_params: {},
-          relations: this.getRelations(filePath, ancestorTitles),
-          run_id: null,
-          signature: this.getSignature(filePath, fullName, ids),
-          steps: [],
-          testops_id: ids.length > 0 ? ids : null,
-          id: uuidv4(),
-          title: title,
-        });
+        const model = this.convertToResult(value, result.testFilePath);
+        void this.reporter.addTestResult(model);
       },
     );
   }
@@ -214,5 +244,112 @@ export class JestQaseReporter implements Reporter {
     const executionPath = process.cwd() + '/';
 
     return fullPath.replace(executionPath, '');
+  }
+
+  public addTitle(title: string) {
+    this.metadata.title = title;
+  }
+
+  public addComment(comment: string) {
+    this.metadata.comment = comment;
+  }
+
+  public addSuite(suite: string) {
+    this.metadata.suite = suite;
+  }
+
+  public addFields(fields: Record<string, string>) {
+    this.metadata.fields = fields;
+  }
+
+  public addParameters(parameters: Record<string, string>) {
+    this.metadata.parameters = parameters;
+  }
+
+  public addGroupParams(groupParams: Record<string, string>) {
+    this.metadata.groupParams = groupParams;
+  }
+
+  public addIgnore() {
+    this.metadata.ignore = true;
+  }
+
+  public addStep(step: TestStepType) {
+    this.metadata.steps.push(step);
+  }
+
+  public addAttachment(attachment: Attachment) {
+    this.metadata.attachments.push(attachment);
+  }
+
+  private cleanMetadata() {
+    this.metadata = this.createEmptyMetadata();
+  }
+
+  /**
+   * @param {AssertionResult} value
+   * @param {string} path
+   * @private
+   * @returns {TestResultType}
+   */
+  private convertToResult(value: AssertionResult, path: string): TestResultType {
+    let error;
+    if (value.status === 'failed') {
+      error = new Error(value.failureDetails.map((item) => {
+        if (has(item, 'matcherResult.message')) {
+          return String(get(item, 'matcherResult.message'));
+        }
+
+        return 'Runtime exception';
+      }).join('\n\n'));
+
+      error.stack = value.failureMessages.join('\n\n');
+    }
+
+    const ids = JestQaseReporter.getCaseId(value.title);
+    const filePath = this.getCurrentTestPath(path);
+
+    return {
+      attachments: [],
+      author: null,
+      execution: {
+        status: JestQaseReporter.statusMap[value.status],
+        start_time: null,
+        end_time: null,
+        duration: value.duration ?? 0,
+        stacktrace: error?.stack ?? null,
+        thread: null,
+      },
+      fields: {},
+      message: error?.message ?? null,
+      muted: false,
+      params: {},
+      group_params: {},
+      relations: this.getRelations(filePath, value.ancestorTitles),
+      run_id: null,
+      signature: this.getSignature(filePath, value.fullName, ids),
+      steps: [],
+      testops_id: ids.length > 0 ? ids : null,
+      id: uuidv4(),
+      title: value.title,
+    };
+  }
+
+  /**
+   * @returns {Metadata}
+   * @private
+   */
+  private createEmptyMetadata(): Metadata {
+    return {
+      title: undefined,
+      ignore: false,
+      comment: undefined,
+      suite: undefined,
+      fields: {},
+      parameters: {},
+      groupParams: {},
+      steps: [],
+      attachments: [],
+    };
   }
 }
