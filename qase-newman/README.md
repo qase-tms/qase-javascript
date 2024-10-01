@@ -48,6 +48,8 @@ https://app.qase.io/run/QASE_PROJECT_CODE
   <img src="./screenshots/demo.gif">
 </p>
 
+You can find more information about using the reporter [here](./docs/usage.md).
+
 ## Configuration
 
 Qase Newman reporter can be configured in multiple ways:
