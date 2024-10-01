@@ -1,10 +1,8 @@
 import { EventEmitter } from 'events';
 
 import semver from 'semver';
-import { NewmanRunExecution } from 'newman';
-import {
-  EventList, PropertyBase, PropertyBaseDefinition,
-} from 'postman-collection';
+import { NewmanRunExecution, NewmanRunOptions } from 'newman';
+import { EventList, PropertyBase, PropertyBaseDefinition } from 'postman-collection';
 import {
   ConfigType,
   QaseReporter,
@@ -13,7 +11,9 @@ import {
   TestResultType,
   getPackageVersion,
   ConfigLoader,
-  composeOptions, Relation, SuiteData,
+  composeOptions,
+  Relation,
+  SuiteData,
 } from 'qase-javascript-commons';
 
 export type NewmanQaseOptionsType = ConfigType;
@@ -26,6 +26,11 @@ export class NewmanQaseReporter {
    * @type {RegExp}
    */
   static qaseIdRegExp = /\/\/\s*?[qQ]ase:\s?((?:[\d]+[\s,]{0,})+)/;
+
+  /**
+   * @type {RegExp}
+   */
+  static qaseParamRegExp = /qase\.parameters:\s*([\w.]+(?:\s*,\s*[\w.]+)*)/i;
 
   /**
    * @param {EventList} eventList
@@ -51,8 +56,32 @@ export class NewmanQaseReporter {
   }
 
   /**
+   * @param {EventList} eventList
+   * @returns {string[]}
+   * @private
+   */
+  private static getParameters(eventList: EventList) {
+    const params: string[] = [];
+
+    eventList.each((event) => {
+      if (event.listen === 'test' && event.script.exec) {
+        event.script.exec.forEach((line) => {
+          const match = line.match(NewmanQaseReporter.qaseParamRegExp);
+
+          if (match) {
+            const parameters: string[] = match[1]?.split(/\s*,\s*/) ?? [];
+
+            params.push(...parameters);
+          }
+        });
+      }
+    });
+
+    return params;
+  }
+
+  /**
    * @param {PropertyBase<PropertyBaseDefinition>} item
-   * @param {string[]} titles
    * @returns {string[]}
    * @private
    */
@@ -88,17 +117,22 @@ export class NewmanQaseReporter {
    * @private
    */
   private timerMap = new Map<string, number>();
+  /**
+   * @type {Record<string, string>[]}
+   * @private
+   */
+  private parameters: Record<string, string>[] = [];
 
   /**
    * @param {EventEmitter} emitter
    * @param {NewmanQaseOptionsType} options
-   * @param {unknown} _
+   * @param {NewmanRunOptions} collectionOptions
    * @param {ConfigLoaderInterface} configLoader
    */
   public constructor(
     emitter: EventEmitter,
     options: NewmanQaseOptionsType,
-    _: unknown,
+    collectionOptions: NewmanRunOptions,
     configLoader = new ConfigLoader(),
   ) {
     const config = configLoader.load();
@@ -110,6 +144,7 @@ export class NewmanQaseReporter {
       reporterName: 'newman-reporter-qase',
     });
 
+    this.parameters = this.getParameters(collectionOptions.iterationData);
     this.addRunnerListeners(emitter);
   }
 
@@ -199,6 +234,8 @@ export class NewmanQaseReporter {
           pendingResult.execution.duration = now - timer;
         }
 
+        pendingResult.params = this.prepareParameters(item.events, exec.cursor.iteration);
+
         void this.reporter.addTestResult(pendingResult);
       }
     });
@@ -251,5 +288,84 @@ export class NewmanQaseReporter {
     }
 
     return signature;
+  }
+
+  /**
+   * @param {EventList} events
+   * @param {number} iteration
+   * @returns {Record<string, string>}
+   * @private
+   */
+  private prepareParameters(events: EventList, iteration: number): Record<string, string> {
+    if (this.parameters.length === 0) {
+      return {};
+    }
+
+    const availableParameters = this.parameters[iteration] ?? {};
+    const params = NewmanQaseReporter.getParameters(events);
+
+    if (params.length === 0) {
+      return availableParameters;
+    }
+
+    return params.reduce<Record<string, string>>((filteredParams, param) => {
+      const value = availableParameters[param];
+      if (value) {
+        filteredParams[param] = value;
+      }
+      return filteredParams;
+    }, {});
+  }
+
+
+  /**
+   * @param {any} iterationData
+   * @private
+   */
+  private getParameters(iterationData: any): Record<string, string>[] {
+    if (!iterationData) {
+      return [];
+    }
+
+    if (Array.isArray(iterationData) && iterationData.every(item => typeof item === 'object' && item !== null)) {
+      return iterationData.map((item: Record<string, any>) => this.convertToRecord(item));
+    }
+
+    return [];
+  }
+
+  /**
+   * @param {unknown} obj
+   * @param parentKey
+   * @returns {Record<string, string>}
+   * @private
+   */
+  private convertToRecord(obj: unknown, parentKey = ''): Record<string, string> {
+    const record: Record<string, string> = {};
+
+    if (this.isRecord(obj)) {
+      for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          const value = obj[key];
+          const newKey = parentKey ? `${parentKey}.${key}` : key;
+
+          if (this.isRecord(value)) {
+            Object.assign(record, this.convertToRecord(value, newKey));
+          } else {
+            record[newKey] = String(value);
+          }
+        }
+      }
+    }
+
+    return record;
+  }
+
+  /**
+   * @param {unknown} obj
+   * @private
+   */
+  private isRecord(obj: unknown): obj is Record<string, unknown> {
+    return typeof obj === 'object' && obj !== null;
   }
 }

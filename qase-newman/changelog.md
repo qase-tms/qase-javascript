@@ -1,3 +1,10 @@
+# qase-newman@2.1.0
+
+## What's new
+
+Added support parameters from data files in Newman.
+How to use parameters from data files in Newman, see [here](./docs/usage.md).
+
 # qase-newman@2.0.0
 
 ## What's new
