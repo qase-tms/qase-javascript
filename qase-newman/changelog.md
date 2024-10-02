@@ -1,4 +1,4 @@
-# qase-newman@2.1.0
+# qase-newman@2.0.2
 
 ## What's new
 

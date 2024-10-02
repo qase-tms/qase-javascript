@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events';
 
+import { configSchema } from './configSchema';
 import semver from 'semver';
 import { NewmanRunExecution, NewmanRunOptions } from 'newman';
 import { EventList, PropertyBase, PropertyBaseDefinition } from 'postman-collection';
@@ -107,21 +108,30 @@ export class NewmanQaseReporter {
    * @private
    */
   private reporter: ReporterInterface;
+
   /**
    * @type {Map<string, TestResultType>}
    * @private
    */
-  private pendingResultMap = new Map<string, TestResultType>();
+  private pendingResultMap: Map<string, TestResultType> = new Map<string, TestResultType>();
+
   /**
    * @type {Map<string, number>}
    * @private
    */
-  private timerMap = new Map<string, number>();
+  private timerMap: Map<string, number> = new Map<string, number>();
+
   /**
    * @type {Record<string, string>[]}
    * @private
    */
-  private parameters: Record<string, string>[] = [];
+  private readonly parameters: Record<string, string>[] = [];
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  private autoCollectParams: boolean;
 
   /**
    * @param {EventEmitter} emitter
@@ -133,7 +143,7 @@ export class NewmanQaseReporter {
     emitter: EventEmitter,
     options: NewmanQaseOptionsType,
     collectionOptions: NewmanRunOptions,
-    configLoader = new ConfigLoader(),
+    configLoader = new ConfigLoader(configSchema),
   ) {
     const config = configLoader.load();
 
@@ -143,6 +153,8 @@ export class NewmanQaseReporter {
       frameworkName: 'newman',
       reporterName: 'newman-reporter-qase',
     });
+
+    this.autoCollectParams = config?.framework?.newman?.autoCollectParams ?? false;
 
     this.parameters = this.getParameters(collectionOptions.iterationData);
     this.addRunnerListeners(emitter);
@@ -305,7 +317,11 @@ export class NewmanQaseReporter {
     const params = NewmanQaseReporter.getParameters(events);
 
     if (params.length === 0) {
-      return availableParameters;
+      if (this.autoCollectParams) {
+        return availableParameters;
+      }
+
+      return {};
     }
 
     return params.reduce<Record<string, string>>((filteredParams, param) => {
