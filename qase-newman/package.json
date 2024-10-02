@@ -1,6 +1,6 @@
 {
   "name": "newman-reporter-qase",
-  "version": "2.1.0",
+  "version": "2.0.2",
   "description": "Qase TMS Newman Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -47,6 +47,7 @@
     "@types/jest": "^29.5.2",
     "@types/newman": "^5.3.6",
     "@types/postman-collection": "^3.5.7",
+    "ajv": "^8.17.1",
     "jest": "^29.5.0",
     "postman-collection": "^4.1.7",
     "ts-jest": "^29.1.0"

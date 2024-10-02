@@ -55,5 +55,26 @@ When you run the tests, the following behavior is expected:
 
 - In the **`Status code is 201`** test, both `userId` and `user.name` will be passed as parameters.
 - In the **`Response has correct userId`** test, only the `userId` parameter will be passed.
-- In the **`Response has correct name`** test, all relevant parameters from the data file will be passed, including
-  `userId`, `user.name`, and `user.age`.
+- In the **`Response has correct name`** test, by default, test will not have any parameters passed. But you can enable
+  specific option in config file to pass all parameters from data file if test have not commented `qase.parameters`
+  line.
+
+  ```json
+  {
+    "debug": true,
+    "testops": {
+      "api": {
+        "token": "api_key"
+      },
+      "project": "project_code",
+      "run": {
+        "complete": true
+      }
+    },
+    "framework": {
+      "newman": {
+        "autoCollectParams": true
+      }   
+    }
+  }
+  ```
