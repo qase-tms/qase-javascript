@@ -1,3 +1,9 @@
+# qase-newman@2.0.3
+
+## What's new
+
+Added support parameters from data files in Newman on collection and folder levels.
+
 # qase-newman@2.0.2
 
 ## What's new

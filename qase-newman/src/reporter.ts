@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 import { configSchema } from './configSchema';
 import semver from 'semver';
 import { NewmanRunExecution, NewmanRunOptions } from 'newman';
-import { EventList, PropertyBase, PropertyBaseDefinition } from 'postman-collection';
+import { EventList, Item, PropertyBase, PropertyBaseDefinition } from 'postman-collection';
 import {
   ConfigType,
   QaseReporter,
@@ -57,26 +57,30 @@ export class NewmanQaseReporter {
   }
 
   /**
-   * @param {EventList} eventList
+   * @param {Item} item
    * @returns {string[]}
    * @private
    */
-  private static getParameters(eventList: EventList) {
+  private static getParameters(item: Item): string[] {
     const params: string[] = [];
 
-    eventList.each((event) => {
+    item.events.each((event) => {
       if (event.listen === 'test' && event.script.exec) {
         event.script.exec.forEach((line) => {
           const match = line.match(NewmanQaseReporter.qaseParamRegExp);
 
           if (match) {
             const parameters: string[] = match[1]?.split(/\s*,\s*/) ?? [];
-
             params.push(...parameters);
           }
         });
       }
     });
+
+    const parent = item.parent();
+    if (parent && 'events' in parent) {
+      params.push(...NewmanQaseReporter.getParameters(parent as Item));
+    }
 
     return params;
   }
@@ -246,7 +250,7 @@ export class NewmanQaseReporter {
           pendingResult.execution.duration = now - timer;
         }
 
-        pendingResult.params = this.prepareParameters(item.events, exec.cursor.iteration);
+        pendingResult.params = this.prepareParameters(item, exec.cursor.iteration);
 
         void this.reporter.addTestResult(pendingResult);
       }
@@ -303,18 +307,18 @@ export class NewmanQaseReporter {
   }
 
   /**
-   * @param {EventList} events
+   * @param {Item} item
    * @param {number} iteration
    * @returns {Record<string, string>}
    * @private
    */
-  private prepareParameters(events: EventList, iteration: number): Record<string, string> {
+  private prepareParameters(item: Item, iteration: number): Record<string, string> {
     if (this.parameters.length === 0) {
       return {};
     }
 
     const availableParameters = this.parameters[iteration] ?? {};
-    const params = NewmanQaseReporter.getParameters(events);
+    const params = NewmanQaseReporter.getParameters(item);
 
     if (params.length === 0) {
       if (this.autoCollectParams) {
@@ -325,9 +329,9 @@ export class NewmanQaseReporter {
     }
 
     return params.reduce<Record<string, string>>((filteredParams, param) => {
-      const value = availableParameters[param];
+      const value = availableParameters[param.toLowerCase()];
       if (value) {
-        filteredParams[param] = value;
+        filteredParams[param.toLowerCase()] = value;
       }
       return filteredParams;
     }, {});
@@ -368,7 +372,7 @@ export class NewmanQaseReporter {
           if (this.isRecord(value)) {
             Object.assign(record, this.convertToRecord(value, newKey));
           } else {
-            record[newKey] = String(value);
+            record[newKey.toLowerCase()] = String(value);
           }
         }
       }
