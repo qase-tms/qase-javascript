@@ -49,6 +49,66 @@ pm.test("Response has correct name", function() {
 });
 ```
 
+You also can specify parameters on collection or folder level. In this case, all tests in collection or folder will have
+these parameters. If test has own parameters, they will be merged with collection or folder parameters.
+
+```json
+{
+  "info": {
+    "_postman_id": "collection_id",
+    "name": "Collection Name",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Folder Name",
+      "item": [
+        {
+          "name": "Test Name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://api.example.com",
+              "host": [
+                "api",
+                "example",
+                "com"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// qase.parameters: userId, user.name"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
 ### Expected Behavior
 
 When you run the tests, the following behavior is expected:
