@@ -251,7 +251,7 @@ export class PlaywrightQaseReporter implements Reporter {
         continue;
       }
 
-      if (defaultSteps.includes(testStep.title) && testStep.steps.length === 0) {
+      if (defaultSteps.includes(testStep.title) && this.checkChildrenSteps(testStep.steps)) {
         continue;
       }
 
@@ -510,4 +510,24 @@ export class PlaywrightQaseReporter implements Reporter {
 
     return ids;
   }
+
+  /**
+   * @param {TestStep[]} steps
+   * @returns {boolean}
+   * @private
+   */
+  private checkChildrenSteps(steps: TestStep[]): boolean {
+    if (steps.length === 0) {
+      return true;
+    }
+
+    for (const step of steps) {
+      if (step.category === 'test.step' || step.category === 'hook') {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
 }

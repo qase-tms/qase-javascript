@@ -1,3 +1,9 @@
+# playwright-qase-reporter@2.0.16
+
+## What's new
+
+Improve excluding default steps, like `Worker Cleanup`, `Before Hook`, and `After Hook`.
+
 # playwright-qase-reporter@2.0.15
 
 ## What's new
