@@ -1,6 +1,6 @@
 {
   "name": "cypress-qase-reporter",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "Qase Cypress Reporter",
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "sideEffects": false,
@@ -12,6 +12,7 @@
     "./reporter": "./dist/reporter.js",
     "./package.json": "./package.json",
     "./plugin": "./dist/plugin.js",
+    "./metadata": "./dist/metadata.js",
     "./hooks": "./dist/hooks.js"
   },
   "typesVersions": {

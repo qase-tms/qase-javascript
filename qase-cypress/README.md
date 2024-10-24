@@ -4,19 +4,10 @@ Publish results simple and easy.
 
 ## Installation
 
-To install the latest release version (2.0.x), run:
+To install the latest release version (2.2.x), run:
 
 ```sh
 npm install -D cypress-qase-reporter
-```
-
-<!-- if there's no current beta, comment the next block
--->
-
-To install the latest beta version (2.1.x), run:
-
-```sh
-npm install -D cypress-qase-reporter@beta
 ```
 
 ## Updating from v1 to v2.1
@@ -30,7 +21,7 @@ run the following steps:
    - import { qase } from 'cypress-qase-reporter/dist/mocha'
    + import { qase } from 'cypress-qase-reporter/mocha'
    ```                                        
-   
+
 2. Update reporter configuration in `cypress.config.js` and/or environment variables —
    see the [configuration reference](#configuration) below.
 
@@ -68,6 +59,23 @@ run the following steps:
      ...
    ```
 
+## Updating from v2.1 to v2.2
+
+To update an existing test project using Qase reporter from version 2.1 to version 2.2,
+run the following steps:
+
+1. Add a metadata in the `e2e` section of `cypress.config.js`
+
+   ```diff
+     ...
+     e2e: {
+      setupNodeEvents(on, config) { 
+        require('cypress-qase-reporter/plugin')(on, config)
+   +    require('cypress-qase-reporter/metadata')(on)
+       }
+     }
+     ...
+
 ## Getting started
 
 The Cypress reporter can auto-generate test cases
@@ -80,6 +88,17 @@ from Qase.io before executing tests. It's a more reliable way to bind
 autotests to test cases, that persists when you rename, move, or
 parameterize your tests.
 
+### Metadata
+
+- `qase.title` - set the title of the test case
+- `qase.fields` - set the fields of the test case
+- `qase.suite` - set the suite of the test case
+- `qase.comment` - set the comment of the test case
+- `qase.parameters` - set the parameters of the test case
+- `qase.groupParameters` - set the group parameters of the test case
+- `qase.ignore` - ignore the test case in Qase. The test will be executed, but the results will not be sent to Qase.
+- `qase.step` - create a step in the test case
+
 For example:
 
 ```typescript
@@ -88,6 +107,7 @@ import { qase } from 'cypress-qase-reporter/mocha';
 describe('My First Test', () => {
   qase(1,
     it('Several ids', () => {
+      qase.title('My title');
       expect(true).to.equal(true);
     })
   );
@@ -145,8 +165,6 @@ Example `cypress.config.js` config:
 ```js
 import cypress from 'cypress';
 
-import plugins from './cypress/plugins/index.js';
-
 module.exports = cypress.defineConfig({
   reporter: 'cypress-multi-reporters',
   reporterOptions: {
@@ -180,7 +198,8 @@ module.exports = cypress.defineConfig({
   video: false,
   e2e: {
     setupNodeEvents(on, config) {
-      return plugins(on, config);
+      require('cypress-qase-reporter/plugin')(on, config)
+      require('cypress-qase-reporter/metadata')(on)
     },
   },
 });

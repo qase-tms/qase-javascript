@@ -14,11 +14,15 @@ import {
   Attachment,
   FrameworkOptionsType,
   ConfigType,
+  TestStepType,
+  StepStatusEnum,
 } from 'qase-javascript-commons';
 
 import { traverseDir } from './utils/traverse-dir';
 import { configSchema } from './configSchema';
 import { ReporterOptionsType } from './options';
+import { MetadataManager } from './metadata/manager';
+import { StepEnd, StepStart } from './metadata/models';
 
 const {
   EVENT_TEST_FAIL,
@@ -166,11 +170,20 @@ export class CypressQaseReporter extends reporters.Base {
    * @private
    */
   private addTestResult(test: Test) {
+    const metadata = MetadataManager.getMetadata();
+
+    if (metadata?.ignore) {
+      MetadataManager.clear();
+      return;
+    }
+
     const ids = CypressQaseReporter.getCaseId(test.title);
 
     const attachments = this.screenshotsFolder
       ? CypressQaseReporter.findAttachments(ids, this.screenshotsFolder)
       : undefined;
+
+    attachments?.push(...(metadata?.attachments ?? []));
 
     let relations = {};
     if (test.parent !== undefined) {
@@ -189,18 +202,42 @@ export class CypressQaseReporter extends reporters.Base {
       };
     }
 
+    if (metadata?.suite) {
+      relations = {
+        suite: {
+          data: [
+            {
+              title: metadata.suite,
+              public_id: null,
+            },
+          ],
+        },
+      };
+    }
+
+    let message: string | null = null;
+    if (metadata?.comment) {
+      message = metadata.comment;
+    }
+    if (test.err?.message) {
+      if (message) {
+        message += '\n\n';
+      }
+      message += test.err.message;
+    }
+
     const result: TestResultType = {
       attachments: attachments ?? [],
       author: null,
-      fields: {},
-      message: test.err?.message ?? null,
+      fields: metadata?.fields ?? {},
+      message: message,
       muted: false,
-      params: {},
-      group_params: {},
+      params: metadata?.parameters ?? {},
+      group_params: metadata?.groupParams ?? {},
       relations: relations,
       run_id: null,
       signature: this.getSignature(test, ids),
-      steps: [],
+      steps: metadata?.steps ? this.getSteps(metadata.steps, metadata.stepAttachments ?? {}) : [],
       id: uuidv4(),
       execution: {
         status: test.state
@@ -213,10 +250,12 @@ export class CypressQaseReporter extends reporters.Base {
         thread: null,
       },
       testops_id: ids.length > 0 ? ids : null,
-      title: test.title,
+      title: metadata?.title ?? test.title,
     };
 
     void this.reporter.addTestResult(result);
+
+    MetadataManager.clear();
   }
 
   /**
@@ -261,5 +300,49 @@ export class CypressQaseReporter extends reporters.Base {
     }
 
     return undefined;
+  }
+
+  private getSteps(steps: (StepStart | StepEnd)[], attachments: Record<string, Attachment[]>): TestStepType[] {
+    const result: TestStepType[] = [];
+    const stepMap = new Map<string, TestStepType>();
+
+    for (const step of steps.sort((a, b) => a.timestamp - b.timestamp)) {
+      if (!('status' in step)) {
+        const newStep = new TestStepType();
+        newStep.id = step.id;
+        newStep.execution.status = StepStatusEnum.failed;
+        newStep.execution.start_time = step.timestamp;
+        newStep.execution.end_time = Date.now();
+        newStep.data = {
+          action: step.name,
+          expected_result: null,
+        };
+
+        if (attachments[step.id]) {
+          newStep.attachments = attachments[step.id] ?? [];
+        }
+
+        const parentId = step.parentId;
+        if (parentId) {
+          newStep.parent_id = parentId;
+          const parent = stepMap.get(parentId);
+          if (parent) {
+            parent.steps.push(newStep);
+          }
+        } else {
+          result.push(newStep);
+        }
+
+        stepMap.set(step.id, newStep);
+      } else {
+        const stepType = stepMap.get(step.id);
+        if (stepType) {
+          stepType.execution.status = step.status as StepStatusEnum;
+          stepType.execution.end_time = step.timestamp;
+        }
+      }
+    }
+
+    return result;
   }
 }

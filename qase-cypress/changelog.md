@@ -1,3 +1,71 @@
+# cypress-qase-reporter@2.2.0
+
+## What's new
+
+Minor release of the Cypress reporter package
+
+# cypress-qase-reporter@2.2.0-beta.3
+
+## What's new
+
+Added the ability to add attachments to tests or steps:
+
+- `qase.attach` - add an attachment to test or step
+
+```ts
+it('test', () => {
+  qase.attach({ paths: '/path/to/file' });
+  qase.step('Step 1', () => {
+    cy.visit('https://example.com');
+    qase.attach({ name: 'attachment.txt', content: 'Hello, world!', contentType: 'text/plain' });
+  });
+});
+```
+
+# cypress-qase-reporter@2.2.0-beta.2
+
+## What's new
+
+Added the ability to add steps in tests:
+
+- `qase.step` - add a step to the test
+
+```ts
+it('test', () => {
+  qase.step('Step 1', () => {
+    cy.visit('https://example.com');
+  });
+});
+```
+
+# cypress-qase-reporter@2.2.0-beta.1
+
+## What's new
+
+Added the ability to specify a test metadata in tests:
+
+- `qase.title` - set the test title
+- `qase.fields` - set the test fields
+- `qase.suite` - set the test suite
+- `qase.comment` - set the test comment
+- `qase.parameters` - set the test parameters
+- `qase.groupParameters` - set the test group parameters
+- `qase.ignore` - ignore the test in Qase
+
+```ts
+it('test', () => {
+  qase.title('Title');
+  qase.fields({ field: 'value' });
+  qase.suite('Suite');
+  qase.comment('Comment');
+  qase.parameters({ param: 'value' });
+  qase.groupParameters({ param: 'value' });
+  qase.ignore();
+
+  cy.visit('https://example.com');
+});
+```
+
 # cypress-qase-reporter@2.1.0
 
 ## What's new
@@ -40,8 +108,8 @@ The reporter will wait for all results to be sent to Qase and will not block the
 
 ## What's new
 
-1. Cypress kills the process after the last tests. 
-The reporter will wait for all results to be sent to Qase and will not block the process after sending.
+1. Cypress kills the process after the last tests.
+   The reporter will wait for all results to be sent to Qase and will not block the process after sending.
 
 2. The reporter will collect suites and add them to results.
 
@@ -66,7 +134,7 @@ For more information about the new features and a guide for migration from v1, r
 
 # cypress-qase-reporter@2.0.0-beta.3
 
-Fixed an issue with multiple test runs created when Cypress is running 
+Fixed an issue with multiple test runs created when Cypress is running
 multiple tests in parallel.
 
 # cypress-qase-reporter@2.0.0-beta.2
