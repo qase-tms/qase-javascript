@@ -1,3 +1,9 @@
+# cypress-qase-reporter@2.2.0
+
+## What's new
+
+Minor release of the Cypress reporter package
+
 # cypress-qase-reporter@2.2.0-beta.3
 
 ## What's new

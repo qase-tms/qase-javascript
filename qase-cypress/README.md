@@ -4,19 +4,10 @@ Publish results simple and easy.
 
 ## Installation
 
-To install the latest release version (2.1.x), run:
+To install the latest release version (2.2.x), run:
 
 ```sh
 npm install -D cypress-qase-reporter
-```
-
-<!-- if there's no current beta, comment the next block
--->
-
-To install the latest beta version (2.2.x), run:
-
-```sh
-npm install -D cypress-qase-reporter@beta
 ```
 
 ## Updating from v1 to v2.1
