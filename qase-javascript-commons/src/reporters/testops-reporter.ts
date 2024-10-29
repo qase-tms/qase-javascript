@@ -215,12 +215,10 @@ export class TestOpsReporter extends AbstractReporter {
   public override async addTestResult(result: TestResultType): Promise<void> {
     if (result.execution.status === TestStatusEnum.failed) {
 
-      if (Array.isArray(result.testops_id)) {
-        for (const id of result.testops_id) {
-          this.showLink(id, result.title);
-        }
-      } else {
-        this.showLink(result.testops_id, result.title);
+      const testOpsIds = Array.isArray(result.testops_id) ? result.testops_id : [result.testops_id];
+
+      for (const id of testOpsIds) {
+        this.showLink(id, result.title);
       }
     }
 
@@ -339,8 +337,17 @@ export class TestOpsReporter extends AbstractReporter {
       return;
     }
 
+    const remainingResults = this.results.slice(this.firstIndex);
+
     if (this.firstIndex < this.results.length) {
-      await this.publishResults(this.results.slice(this.firstIndex));
+      if (remainingResults.length <= defaultChunkSize) {
+        await this.publishResults(remainingResults);
+        return;
+      }
+
+      for (let i = 0; i < remainingResults.length; i += defaultChunkSize) {
+        await this.publishResults(remainingResults.slice(i, i + defaultChunkSize));
+      }
     }
 
     // Clear results because we don't need to send them again then we use Cypress reporter
@@ -376,15 +383,42 @@ export class TestOpsReporter extends AbstractReporter {
     const attachments = await this.uploadAttachments(result.attachments);
     const steps = await this.transformSteps(result.steps, result.title);
 
+    const param: Record<string, string> = {};
+
+    for (const key in result.params) {
+      const value = result.params[key];
+      if (!value) {
+        continue;
+      }
+      param[key] = value;
+    }
+
+    const group_params: string[][] = [];
+
+    const keys = Object.keys(result.group_params);
+    if (keys.length > 0) {
+      group_params.push(keys);
+    }
+
+    for (const key in result.group_params) {
+      const value = result.group_params[key];
+      if (!value) {
+        continue;
+      }
+      param[key] = value;
+    }
+
     const model = {
       title: result.title,
       execution: this.getExecution(result.execution),
       testops_id: Array.isArray(result.testops_id) ? null : result.testops_id,
       attachments: attachments,
       steps: steps,
-      params: result.params,
+      params: param,
+      param_groups: group_params,
       relations: this.getRelation(result.relations),
       message: result.message,
+      fields: result.fields,
     };
 
     this.logger.logDebug(`Transformed result: ${JSON.stringify(model)}`);
