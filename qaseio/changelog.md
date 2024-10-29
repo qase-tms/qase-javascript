@@ -1,3 +1,9 @@
+# qaseio@2.4.0
+
+## What's new
+
+Updated API v2 models to support the latest changes in the Qase API.
+
 # qaseio@2.3.1
 
 ## What's new

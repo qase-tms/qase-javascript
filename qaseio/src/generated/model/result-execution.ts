@@ -27,19 +27,19 @@ export interface ResultExecution {
      */
     'status': string;
     /**
-     * 
+     * Unix epoch time in seconds (whole part) and milliseconds (fractional part).
      * @type {number}
      * @memberof ResultExecution
      */
     'start_time'?: number | null;
     /**
-     * 
+     * Unix epoch time in seconds (whole part) and milliseconds (fractional part).
      * @type {number}
      * @memberof ResultExecution
      */
     'end_time'?: number | null;
     /**
-     * 
+     * Duration of the test execution in milliseconds.
      * @type {number}
      * @memberof ResultExecution
      */

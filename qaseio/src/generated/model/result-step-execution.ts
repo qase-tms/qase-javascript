@@ -28,19 +28,19 @@ export interface ResultStepExecution {
      */
     'status': ResultStepStatus;
     /**
-     * 
+     * Unix epoch time in seconds (whole part) and milliseconds (fractional part).
      * @type {number}
      * @memberof ResultStepExecution
      */
     'start_time'?: number | null;
     /**
-     * 
+     * Unix epoch time in seconds (whole part) and milliseconds (fractional part).
      * @type {number}
      * @memberof ResultStepExecution
      */
     'end_time'?: number | null;
     /**
-     * 
+     * Duration of the test step execution in milliseconds.
      * @type {number}
      * @memberof ResultStepExecution
      */
