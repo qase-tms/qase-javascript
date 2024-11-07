@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.2.3
+
+## What's new
+
+Fixed an issue when the reporter saves the state file in the wrong directory.
+
 # qase-javascript-commons@2.2.1
 
 ## What's new

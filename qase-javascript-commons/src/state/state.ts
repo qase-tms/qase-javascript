@@ -1,5 +1,6 @@
 import { ModeEnum } from '../options';
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
+import path from 'path';
 
 export interface StateModel {
   RunId: number | undefined;
@@ -7,9 +8,8 @@ export interface StateModel {
   IsModeChanged: boolean | undefined;
 }
 
-const statePath = 'reporterState.json';
-
 export class StateManager {
+  static statePath = path.resolve(__dirname, 'reporterState.json');
 
   static getState(): StateModel {
     let state: StateModel = {
@@ -19,7 +19,7 @@ export class StateManager {
     };
 
     try {
-      const data = readFileSync(statePath, 'utf8');
+      const data = readFileSync(this.statePath, 'utf8');
       state = JSON.parse(data) as StateModel;
     } catch (err) {
       console.error('Error reading state file:', err);
@@ -49,7 +49,7 @@ export class StateManager {
   static setState(state: StateModel): void {
     try {
       const data = JSON.stringify(state);
-      writeFileSync(statePath, data);
+      writeFileSync(this.statePath, data);
     } catch (err) {
       console.error('Error writing state file:', err);
     }
@@ -57,13 +57,13 @@ export class StateManager {
 
   static clearState(): void {
     try {
-      unlinkSync(statePath);
+      unlinkSync(this.statePath);
     } catch (err) {
       console.error('Error clearing state file:', err);
     }
   }
 
   static isStateExists(): boolean {
-    return existsSync(statePath);
+    return existsSync(this.statePath);
   }
 }
