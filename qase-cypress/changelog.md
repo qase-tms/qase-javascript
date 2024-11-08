@@ -1,3 +1,17 @@
+# cypress-qase-reporter@2.2.1
+
+## What's new
+
+When specifying test names, QaseIDs are now excluded from the final test name.
+
+```js
+// The test name will be 'Example', not 'Example (Qase ID: 1)'
+qase(1,it('Example', () => {
+    expect(true).to.equal(true);
+  })
+);
+```
+
 # cypress-qase-reporter@2.2.0
 
 ## What's new
