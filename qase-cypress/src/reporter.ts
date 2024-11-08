@@ -250,7 +250,7 @@ export class CypressQaseReporter extends reporters.Base {
         thread: null,
       },
       testops_id: ids.length > 0 ? ids : null,
-      title: metadata?.title ?? test.title,
+      title: metadata?.title ?? this.removeQaseIdsFromTitle(test.title),
     };
 
     void this.reporter.addTestResult(result);
@@ -300,6 +300,19 @@ export class CypressQaseReporter extends reporters.Base {
     }
 
     return undefined;
+  }
+
+  /**
+   * @param {string} title
+   * @returns {string}
+   * @private
+   */
+  private removeQaseIdsFromTitle(title: string): string {
+    const matches = title.match(/\(Qase ID: ([0-9,]+)\)$/i);
+    if (matches) {
+      return title.replace(matches[0], '').trimEnd();
+    }
+    return title;
   }
 
   private getSteps(steps: (StepStart | StepEnd)[], attachments: Record<string, Attachment[]>): TestStepType[] {
