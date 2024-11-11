@@ -1,3 +1,9 @@
+# cypress-qase-reporter@2.2.2
+
+## What's new
+
+Fixed an issue with metadata. When specifying the path to the Cypress config located outside the root directory, metadata was not added to the test case.
+
 # cypress-qase-reporter@2.2.1
 
 ## What's new
