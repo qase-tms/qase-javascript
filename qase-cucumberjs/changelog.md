@@ -1,3 +1,21 @@
+# qase-cucumberjs@2.0.3
+
+## What's new
+
+Support attachments in the test results.
+
+```js
+const { Given, Then } = require('cucumber');
+
+Given('I have a step with attachment', async function () {
+  await this.attach('Hello, world!', 'text/plain');
+});
+
+Then('I have a step with attachment', async function () {
+  await this.attach('Hello, world!', 'text/plain');
+});
+```
+
 # qase-cucumberjs@2.0.2
 
 ## What's new

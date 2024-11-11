@@ -9,7 +9,8 @@ import {
   TestStepFinished,
 } from '@cucumber/messages';
 import {
-  Attachment, CompoundError,
+  Attachment,
+  CompoundError,
   Relation,
   StepStatusEnum,
   StepType,
@@ -19,6 +20,7 @@ import {
 } from 'qase-javascript-commons';
 import { TestCase } from '@cucumber/messages/dist/esm/src/messages';
 import { Status } from '@cucumber/cucumber';
+import { v4 as uuidv4 } from 'uuid';
 
 type TestStepResultStatus = (typeof Status)[keyof typeof Status];
 
@@ -106,18 +108,18 @@ export class Storage {
    * @param {Attach} attachment
    */
   public addAttachment(attachment: Attach): void {
-    if (attachment.testCaseStartedId && attachment.fileName) {
-      if (!this.attachments[attachment.testCaseStartedId]) {
-        this.attachments[attachment.testCaseStartedId] = [];
+    if (attachment.testStepId) {
+      if (!this.attachments[attachment.testStepId]) {
+        this.attachments[attachment.testStepId] = [];
       }
 
-      this.attachments[attachment.testCaseStartedId]?.push({
-        file_name: attachment.fileName,
+      this.attachments[attachment.testStepId]?.push({
+        file_name: this.getFileNameFromMediaType(attachment.mediaType),
         mime_type: attachment.mediaType,
         file_path: null,
         content: attachment.body,
         size: 0,
-        id: attachment.fileName,
+        id: uuidv4(),
       });
     }
   }
@@ -281,7 +283,7 @@ export class Storage {
             end_time: null,
             duration: finished.testStepResult.duration.seconds,
           },
-          attachments: [],
+          attachments: this.attachments[s.id] ?? [],
           steps: [],
           parent_id: null,
         }
@@ -393,5 +395,31 @@ export class Storage {
     });
 
     return error;
+  }
+
+  private getFileNameFromMediaType(mediaType: string): string {
+    const extensions: Record<string, string> = {
+      'text/plain': 'txt',
+      'application/json': 'json',
+      'image/png': 'png',
+      'image/jpeg': 'jpg',
+      'image/gif': 'gif',
+      'text/html': 'html',
+      'application/pdf': 'pdf',
+      'application/xml': 'xml',
+      'application/zip': 'zip',
+      'application/msword': 'doc',
+      'application/vnd.ms-excel': 'xls',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
+    };
+
+    const extension = extensions[mediaType];
+
+    if (extension) {
+      return `file.${extension}`;
+    } else {
+      return 'file';
+    }
   }
 }
