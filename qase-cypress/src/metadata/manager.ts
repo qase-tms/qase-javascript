@@ -4,10 +4,10 @@ import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import { Attachment, getMimeTypes } from 'qase-javascript-commons';
 
-const metadataPath = 'qaseMetadata';
-
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class MetadataManager {
+  static metadataPath = path.resolve(__dirname, 'qaseMetadata');
+
   public static getMetadata(): Metadata | undefined {
     if (!this.isExists()) {
       return undefined;
@@ -29,7 +29,7 @@ export class MetadataManager {
     };
 
     try {
-      const data = readFileSync(metadataPath, 'utf8');
+      const data = readFileSync(this.metadataPath, 'utf8');
       metadata = JSON.parse(data) as Metadata;
 
       return metadata;
@@ -143,7 +143,7 @@ export class MetadataManager {
   private static setMetadata(metadata: Metadata): void {
     try {
       const data = JSON.stringify(metadata);
-      writeFileSync(metadataPath, data);
+      writeFileSync(this.metadataPath, data);
     } catch (err) {
       console.error('Error writing metadata file:', err);
     }
@@ -155,14 +155,14 @@ export class MetadataManager {
     }
 
     try {
-      unlinkSync(metadataPath);
+      unlinkSync(this.metadataPath);
     } catch (err) {
       console.error('Error clearing state file:', err);
     }
   }
 
   static isExists(): boolean {
-    return existsSync(metadataPath);
+    return existsSync(this.metadataPath);
   }
 
   static prepareAttach(attach: Attach): Attachment[] {
