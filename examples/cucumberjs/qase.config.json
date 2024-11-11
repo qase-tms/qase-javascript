@@ -5,9 +5,8 @@
     "api": {
       "token": "api_key"
     },
-
     "project": "project_code",
-
+    "uploadAttachments": true,
     "run": {
       "complete": true
     }
