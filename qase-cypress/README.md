@@ -98,6 +98,9 @@ parameterize your tests.
 - `qase.groupParameters` - set the group parameters of the test case
 - `qase.ignore` - ignore the test case in Qase. The test will be executed, but the results will not be sent to Qase.
 - `qase.step` - create a step in the test case
+- `qase.attach` - attach a file or content to the test case
+
+For detailed instructions on using annotations and methods, refer to [Usage](docs/usage.md).
 
 For example:
 

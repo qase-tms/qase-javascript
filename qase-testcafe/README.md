@@ -20,15 +20,28 @@ To update a test project using testcafe-reporter-qaser@v1 to version 2:
 The TestCafe reporter has the ability to auto-generate test cases
 and suites from your test data.
 
-But if necessary, you can independently register the ID of already
-existing test cases from TMS before the executing tests. Meta key should be `CID`.
-You should assign list of case IDs to it, e.g.:
+You can also annotate the tests with the IDs of existing test cases
+from Qase.io before executing tests. It's a more reliable way to bind
+autotests to test cases, that persists when you rename, move, or
+parameterize your tests.
+
+### Metadata
+
+- `qase.title` - set the title of the test case
+- `qase.fields` - set the fields of the test case
+- `qase.suite` - set the suite of the test case
+- `qase.comment` - set the comment of the test case
+- `qase.parameters` - set the parameters of the test case
+- `qase.groupParameters` - set the group parameters of the test case
+- `qase.ignore` - ignore the test case in Qase. The test will be executed, but the results will not be sent to Qase.
+- `qase.step` - create a step in the test case
+- `qase.attach` - attach a file or content to the test case
+
+For detailed instructions on using annotations and methods, refer to [Usage](docs/usage.md).
+
+For example:
 
 ```js
-test.meta('CID', [1])('Text typing basics', async (t) => {
-  await t;
-});
-
 const q = qase.id(1)
   .title('Text typing basics')
   .field({ 'severity': 'high' })
@@ -98,16 +111,8 @@ Example `qase.config.json` file:
 }
 ```
 
-Supported ENV variables:
-
-- `QASE_MODE` - Same as `mode`
-- `QASE_DEBUG` - Same as `debug`
-- `QASE_ENVIRONMENT` - Same as `environment`
-- `QASE_TESTOPS_API_TOKEN` - Same as `testops.api.token`
-- `QASE_TESTOPS_PROJECT` - Same as `testops.project`
-- `QASE_TESTOPS_RUN_ID` - Pass Run ID from ENV and override reporter option `testops.run.id`
-- `QASE_TESTOPS_RUN_TITLE` - Same as `testops.run.title`
-- `QASE_TESTOPS_RUN_DESCRIPTION` - Same as `testops.run.description`
+Check out the example of configuration for multiple reporters in the
+[demo project](../examples/testcafe/qase.config.json).
 
 ## Requirements
 
