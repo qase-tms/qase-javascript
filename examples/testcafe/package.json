@@ -2,11 +2,11 @@
   "name": "examples-testcafe",
   "private": true,
   "scripts": {
-    "test": "QASE_MODE=testops npx testcafe \"chrome\" test.js test2.js -r spec,qase -s path=screenshots,takeOnFails=true"
+    "test": "QASE_MODE=testops npx testcafe \"chrome\" simpleTests.js attachmentTests.js -r spec,qase -s path=screenshots,takeOnFails=true"
   },
   "devDependencies": {
     "eslint-plugin-testcafe": "^0.2.1",
     "testcafe": "^2.6.0",
-    "testcafe-reporter-qase": "^2.0.0-beta.2"
+    "testcafe-reporter-qase": "^2.0.3"
   }
 }

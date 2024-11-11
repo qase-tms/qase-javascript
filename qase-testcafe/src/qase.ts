@@ -1,4 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
+import path from 'path';
+import { QaseStep, StepFunction, getMimeTypes } from 'qase-javascript-commons';
+import { v4 as uuidv4 } from 'uuid';
+
 export class qase {
   private static _qaseID = '';
   private static _qaseTitle = '';
@@ -94,6 +98,70 @@ export class qase {
   public static ignore = () => {
     this._qaseIgnore = 'true';
     return this;
+  };
+
+  /**
+   * Add a step to the test case
+   * @param name
+   * @param body
+   * @example
+   * test.meta({userField: 123, ...q})('Test case title', async t => {
+   *    await qase.step("Step", () => {
+   *      expect(true).toBe(true);
+   *    });
+   *     expect(true).toBe(true);
+   * });
+   */
+  public static step = async (name: string, body: StepFunction) => {
+    const runningStep = new QaseStep(name);
+    // eslint-disable-next-line @typescript-eslint/require-await
+    await runningStep.run(body, async (step) => global.Qase.step(step));
+  };
+
+
+  /**
+   * Add an attachment to the test case
+   * @param attach
+   * @example
+   * test.meta({userField: 123, ...q})('Test case title', async t => {
+   *   qase.attach({ name: 'attachment.txt', content: 'Hello, world!', type: 'text/plain' });
+   *   qase.attach({ paths: ['/path/to/file', '/path/to/another/file']});
+   *     expect(true).toBe(true);
+   * });
+   */
+  public static attach = (attach: {
+    name?: string;
+    type?: string;
+    content?: string;
+    paths?: string[];
+  }) => {
+    if (attach.paths) {
+      for (const file of attach.paths) {
+        const attachmentName = path.basename(file);
+        const contentType: string = getMimeTypes(file);
+
+        global.Qase.attachment({
+          file_path: file,
+          size: 0,
+          id: uuidv4(),
+          file_name: attachmentName,
+          mime_type: contentType,
+          content: '',
+        });
+      }
+      return;
+    }
+
+    if (attach.content) {
+      global.Qase.attachment({
+        file_path: null,
+        size: attach.content.length,
+        id: uuidv4(),
+        file_name: attach.name ?? 'attachment',
+        mime_type: attach.type ?? 'application/octet-stream',
+        content: attach.content,
+      });
+    }
   };
 
   /**

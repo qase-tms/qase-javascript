@@ -1,3 +1,28 @@
+# qase-testcafe@2.0.4
+
+## What's new
+
+Support `step` and `attach` methods for test cases. 
+
+```javascript
+import { qase } from 'testcafe-qase-reporter/qase';
+
+test('test', async (t) => {
+  qase.attach({ name: 'attachment.txt', content: 'Hello, world!', contentType: 'text/plain' });
+  
+  await qase.step('Step 1', async (s1) => {
+    await s1.step('Step 1.1', async (s11) => {
+      await s11.step('Step 1.1.1', async (s111) => {
+        s11.attach({ name: 'attachment.txt', content: 'Hello, world!', contentType: 'text/plain' });
+        await s111.expect(true).ok();
+      });
+    });
+    await t.expect(true).ok();
+  });
+  await t.expect(true).ok();
+});
+```
+
 # qase-testcafe@2.0.3
 
 ## What's new

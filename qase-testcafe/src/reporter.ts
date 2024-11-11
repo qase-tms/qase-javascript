@@ -8,7 +8,9 @@ import {
   TestStatusEnum,
   composeOptions,
   Attachment,
+  TestStepType,
 } from 'qase-javascript-commons';
+import { Qase } from './global';
 
 interface CallsiteRecordType {
   filename?: string;
@@ -127,6 +129,9 @@ export class TestcafeQaseReporter {
    */
   private reporter: ReporterInterface;
 
+  private steps: TestStepType[] = [];
+  private attachments: Attachment[] = [];
+
   /**
    * @param {TestcafeQaseOptionsType} options
    * @param {ConfigLoaderInterface} configLoader
@@ -143,6 +148,16 @@ export class TestcafeQaseReporter {
       frameworkName: 'testcafe',
       reporterName: 'testcafe-reporter-qase',
     });
+
+    global.Qase = new Qase(this);
+  }
+
+  public addStep(step: TestStepType) {
+    this.steps.push(step);
+  }
+
+  public addAttachment(attachment: Attachment) {
+    this.attachments.push(attachment);
   }
 
   /**
@@ -150,6 +165,11 @@ export class TestcafeQaseReporter {
    */
   public startTestRun = (): void => {
     this.reporter.startTestRun();
+  };
+
+  public reportTestStart = () => {
+    this.steps = [];
+    this.attachments = [];
   };
 
   /**
@@ -178,6 +198,12 @@ export class TestcafeQaseReporter {
       ))
       .join('\n');
 
+    const attachments = TestcafeQaseReporter.transformAttachments(
+      testRunInfo.screenshots,
+    );
+
+    attachments.push(...this.attachments);
+
     await this.reporter.addTestResult({
       author: null,
       execution: {
@@ -205,13 +231,11 @@ export class TestcafeQaseReporter {
       },
       run_id: null,
       signature: this.getSignature(testRunInfo.fixture, title, metadata[metadataEnum.id], metadata[metadataEnum.parameters]),
-      steps: [],
+      steps: this.steps,
       id: uuidv4(),
       testops_id: metadata[metadataEnum.id].length > 0 ? metadata[metadataEnum.id] : null,
       title: metadata[metadataEnum.title] != undefined ? metadata[metadataEnum.title] : title,
-      attachments: TestcafeQaseReporter.transformAttachments(
-        testRunInfo.screenshots,
-      ),
+      attachments: attachments,
     });
   };
 
