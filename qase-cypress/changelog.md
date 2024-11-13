@@ -1,8 +1,20 @@
+# cypress-qase-reporter@2.2.3
+
+## What's new
+
+Fixed an issue with the `@cypress/grep` plugin. When the `grepOmitFiltered` option is set to `true`, the reporter
+encounters an error.
+
+```log
+Cannot set properties of undefined (setting 'title')
+```
+
 # cypress-qase-reporter@2.2.2
 
 ## What's new
 
-Fixed an issue with metadata. When specifying the path to the Cypress config located outside the root directory, metadata was not added to the test case.
+Fixed an issue with metadata. When specifying the path to the Cypress config located outside the root directory,
+metadata was not added to the test case.
 
 # cypress-qase-reporter@2.2.1
 
@@ -12,7 +24,7 @@ When specifying test names, QaseIDs are now excluded from the final test name.
 
 ```js
 // The test name will be 'Example', not 'Example (Qase ID: 1)'
-qase(1,it('Example', () => {
+qase(1, it('Example', () => {
     expect(true).to.equal(true);
   })
 );
