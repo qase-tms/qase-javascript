@@ -196,7 +196,7 @@ export class TestOpsReporter extends AbstractReporter {
     this.environment = environment;
     this.planId = plan.id;
     this.batchSize = options.batch?.size ?? defaultChunkSize;
-    this.useV2 = options.useV2 ?? false;
+    this.useV2 = options.useV2 ?? true;
     this.defect = options.defect ?? false;
     this.rootSuite = rootSuite;
   }
