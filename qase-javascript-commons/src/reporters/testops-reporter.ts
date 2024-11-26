@@ -791,7 +791,7 @@ export class TestOpsReporter extends AbstractReporter {
       return new QaseError(message + ': Not found.');
     }
 
-    if (error.response?.status === 400) {
+    if (error.response?.status === 400 || error.response?.status === 422) {
       return new QaseError(message + ': Bad request. Body: \n ' + JSON.stringify(model));
     }
 
