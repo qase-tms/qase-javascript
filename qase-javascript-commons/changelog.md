@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.2.6
+
+## What's new
+
+Added error handling for HTTP status 422 in API responses, returning a descriptive QaseError with relevant details.
+
 # qase-javascript-commons@2.2.5
 
 ## What's new
