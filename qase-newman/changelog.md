@@ -1,3 +1,14 @@
+# qase-newman@2.0.4
+
+## What's new
+
+Resolved error when uploading results due to bad request:
+
+```log
+ Error: Error on uploading results: Bad request. Body: 
+ {"message":"The execution.start time must be at least 1732623290. (and 1 more error)","errors":{"execution.start_time":["The execution.start time must be at least 1732623290."],"execution.end_time":["The execution.end time must be at least 1732623290."]}}
+```
+
 # qase-newman@2.0.3
 
 ## What's new
@@ -27,7 +38,7 @@ For more information about the new features and a guide for migration from v1, r
 
 ## What's new
 
-Add support for suites in test results. 
+Add support for suites in test results.
 
 # qase-newman@2.0.0-beta.1
 

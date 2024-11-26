@@ -199,8 +199,8 @@ export class NewmanQaseReporter {
           author: null,
           execution: {
             status: TestStatusEnum.passed,
-            start_time: 0,
-            end_time: 0,
+            start_time: null,
+            end_time: null,
             duration: 0,
             stacktrace: null,
             thread: null,
