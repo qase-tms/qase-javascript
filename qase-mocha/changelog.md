@@ -1,3 +1,11 @@
+# qase-mocha@1.0.0-beta.5
+
+## What's new
+
+- Added a `qase` function to allow specifying QaseID for tests.
+- Marked the old syntax for QaseID as deprecated.
+- Implemented functionality to capture console logs and include them as attachments in tests.
+
 # qase-mocha@1.0.0-beta.4
 
 ## What's new

@@ -1,5 +1,5 @@
-import { MochaOptions, reporters, Runner, Suite } from 'mocha';
-import { Context, Hook, Metadata, Test } from './types';
+import { Context, MochaOptions, reporters, Runner, Suite } from 'mocha';
+import { Hook, Metadata, Test } from './types';
 import {
   Attachment,
   composeOptions,
@@ -15,6 +15,8 @@ import {
 import deasyncPromise from 'deasync-promise';
 import { extname, join } from 'node:path';
 import { v4 as uuidv4 } from 'uuid';
+import { StreamInterceptor, TestOutput } from './interceptor';
+
 
 const Events = Runner.constants;
 
@@ -30,6 +32,10 @@ class currentTest {
 const resolveParallelModeSetupFile = () => join(__dirname, `parallel${extname(__filename)}`);
 
 export class MochaQaseReporter extends reporters.Base {
+
+  private originalStdoutWrite: typeof process.stdout.write;
+  private originalStderrWrite: typeof process.stderr.write;
+  private testOutputs: Map<string, TestOutput>;
 
   /**
    * @type {Record<CypressState, TestStatusEnum>}
@@ -76,18 +82,22 @@ export class MochaQaseReporter extends reporters.Base {
     } else {
       this.applyListeners();
     }
+
+    this.originalStdoutWrite = process.stdout.write.bind(process.stdout);
+    this.originalStderrWrite = process.stderr.write.bind(process.stderr);
+    this.testOutputs = new Map();
   }
 
   private applyListeners = () => {
     this.runner.on(Events.EVENT_RUN_BEGIN, () => this.onStartRun());
     this.runner.on(Events.EVENT_RUN_END, () => this.onEndRun());
 
-    this.runner.on(Events.EVENT_TEST_BEGIN, (test: Test) => this.addMethods(test.ctx));
-    this.runner.on(Events.EVENT_HOOK_BEGIN, (hook: Hook) => this.addMethods(hook.ctx));
+    this.runner.on(Events.EVENT_TEST_BEGIN, (test: Test) => this.addMethods(test));
+    this.runner.on(Events.EVENT_HOOK_BEGIN, (hook: Hook) => this.addMethodsToContext(hook.ctx));
 
     this.runner.on(Events.EVENT_TEST_BEGIN, () => this.onStartTest());
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    this.runner.on(Events.EVENT_TEST_END, async (test) => await this.onEndTest(test));
+    this.runner.on(Events.EVENT_TEST_END, (test) => this.onEndTest(test));
   };
 
   private onStartRun() {
@@ -98,7 +108,7 @@ export class MochaQaseReporter extends reporters.Base {
     deasyncPromise(this.reporter.publish());
   }
 
-  private addMethods(ctx?: Context) {
+  private addMethodsToContext(ctx?: Context) {
     if (!ctx) return;
 
     ctx.qaseId = this.qaseId;
@@ -113,16 +123,62 @@ export class MochaQaseReporter extends reporters.Base {
     ctx.step = this.step;
   }
 
+  private addMethods(test: Test) {
+    const stdoutInterceptor = new StreamInterceptor((data: string) => {
+      const output = this.testOutputs.get(test.title) ?? { stdout: '', stderr: '' };
+      output.stdout += data;
+      this.testOutputs.set(test.title, output);
+    });
+
+    const stderrInterceptor = new StreamInterceptor((data: string) => {
+      const output = this.testOutputs.get(test.title) ?? { stdout: '', stderr: '' };
+      output.stderr += data;
+      this.testOutputs.set(test.title, output);
+
+    });
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    process.stdout.write = stdoutInterceptor.write.bind(stdoutInterceptor);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    process.stderr.write = stderrInterceptor.write.bind(stderrInterceptor);
+
+    this.testOutputs.set(test.title, { stdout: '', stderr: '' });
+
+    this.addMethodsToContext(test.ctx);
+  }
+
   private onStartTest() {
     this.currentType = 'test';
   }
 
-  private async onEndTest(test: Mocha.Test) {
+  private onEndTest(test: Mocha.Test) {
+    process.stdout.write = this.originalStdoutWrite;
+    process.stderr.write = this.originalStderrWrite;
+
+    if (this.reporter.isCaptureLogs()) {
+      const output = this.testOutputs.get(test.title);
+
+      if (output?.stdout) {
+        this.attach({ name: 'stdout.txt', content: output.stdout, contentType: 'text/plain' });
+      }
+
+      if (output?.stderr) {
+        this.attach({ name: 'stderr.txt', content: output.stderr, contentType: 'text/plain' });
+      }
+    }
+
     if (this.metadata.ignore) {
+      this.metadata.clear();
+      this.currentTest = new currentTest();
       return;
     }
 
     const ids = this.getQaseId();
+    if (ids.length === 0) {
+      ids.push(...MochaQaseReporter.getCaseId(test.title));
+    }
     const suites = this.getSuites(test);
     let relations = {};
     if (suites.length > 0) {
@@ -170,10 +226,10 @@ export class MochaQaseReporter extends reporters.Base {
         thread: null,
       },
       testops_id: ids.length > 0 ? ids : null,
-      title: this.metadata.title && this.metadata.title != '' ? this.metadata.title : test.title,
+      title: this.metadata.title && this.metadata.title != '' ? this.metadata.title : this.removeQaseIdsFromTitle(test.title),
     };
 
-    await this.reporter.addTestResult(result);
+    deasyncPromise(this.reporter.addTestResult(result));
 
     this.metadata.clear();
     this.currentTest = new currentTest();
@@ -339,5 +395,34 @@ export class MochaQaseReporter extends reporters.Base {
     this.currentTest.steps.push(step);
     this.currentType = previousType;
   };
+
+  /**
+   * @param {string} title
+   * @returns {string}
+   * @private
+   */
+  private removeQaseIdsFromTitle(title: string): string {
+    const matches = title.match(MochaQaseReporter.qaseIdRegExp);
+    if (matches) {
+      return title.replace(matches[0], '').trimEnd();
+    }
+    return title;
+  }
+
+  /**
+   * @type {RegExp}
+   */
+  static qaseIdRegExp = /\(Qase ID: ([\d,]+)\)/;
+
+  /**
+   * @param {string} title
+   * @returns {number[]}
+   * @private
+   */
+  private static getCaseId(title: string): number[] {
+    const [, ids] = title.match(MochaQaseReporter.qaseIdRegExp) ?? [];
+
+    return ids ? ids.split(',').map((id) => Number(id)) : [];
+  }
 }
 

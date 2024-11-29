@@ -18,6 +18,10 @@ export interface Hook extends Mocha.Hook {
 }
 
 export interface Methods {
+  /**
+   * Set IDs for the test case
+   * Use `qase()` instead. This method is deprecated and kept for reverse compatibility.
+   */
   qaseId(id: number | number[]): void;
 
   title(title: string): void;
