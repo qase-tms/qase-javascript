@@ -1,99 +1,72 @@
 const assert = require('assert');
+const { qase } = require('mocha-qase-reporter/mocha');
 
 
-describe('test without qase metadata', function() {
-  it('successful test', function() {
+describe('Simple tests', function() {
+  it('test without qase metadata success', function() {
     assert.strictEqual(1, 1);
   });
 
-  it('failing test', function() {
+  it('test without qase metadata failed', function() {
     assert.strictEqual(1, 2);
   });
-});
 
-describe('test with qase id', function() {
-  it('successful test', function() {
-    this.qaseId(1);
+  it.skip(qase(1, 'test with qase id success'), function() {
     assert.strictEqual(1, 1);
   });
 
-  it('failing test', function() {
-    this.qaseId(2);
+  it(qase(2, 'test with qase id failed'), function() {
     assert.strictEqual(1, 2);
   });
-});
 
-describe('test with title', function() {
-  it('successful test', function() {
+  it('test with title success', function() {
     this.title('Successful test with title');
     assert.strictEqual(1, 1);
   });
 
-  it('failing test', function() {
+  it('test with title failed', function() {
     this.title('Failing test with title');
     assert.strictEqual(1, 2);
   });
-});
 
-describe('test with suite', function() {
-  it('successful test', function() {
+  it('test with suite success', function() {
     this.suite('Suite 1');
     assert.strictEqual(1, 1);
   });
 
-  it('failing test', function() {
+  it('test with suite failed', function() {
     this.suite('Suite 1');
     assert.strictEqual(1, 2);
   });
-});
 
-describe('test with comment', function() {
-  it('successful test', function() {
+  it('test with comment success', function() {
     this.comment('comment');
     assert.strictEqual(1, 1);
   });
 
-  it('failing test', function() {
+  it('test with comment failed', function() {
     this.comment('comment');
     assert.strictEqual(1, 2);
   });
-});
 
-describe('test with parameters', function() {
-  const params = [1, 2, 3, 4, 5];
-  params.forEach((param) => {
-    it(`successful test with parameter ${param}`, function() {
-      this.parameters({ number: param });
-      assert.strictEqual(param, param);
-    });
-    it(`failing test with parameter ${param}`, function() {
-      this.parameters({ number: param });
-      assert.strictEqual(param, param + 1);
-    });
-  });
-});
-
-
-describe('test with fields', function() {
-  it('successful test', function() {
+  it('test with fields success', function() {
     this.fields({ custom_field: 'value' });
     assert.strictEqual(1, 1);
   });
 
-  it('failing test', function() {
+  it('test with fields failed', function() {
     this.fields({ custom_field: 'value' });
     assert.strictEqual(1, 2);
   });
-});
 
-describe('ignored test', function() {
-  it('successful test', function() {
+  it('ignored test success', function() {
     this.ignore();
     assert.strictEqual(1, 1);
   });
 
-  it('failing test', function() {
+  it('ignored test failed', function() {
     this.ignore();
     assert.strictEqual(1, 2);
   });
 });
+
