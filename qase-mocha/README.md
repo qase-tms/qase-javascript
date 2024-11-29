@@ -23,15 +23,15 @@ parameterize your tests.
 For example:
 
 ```typescript
+import { qase } from 'mocha-qase-reporter/mocha';
+
 describe('My First Test', () => {
-  it('Several ids', () => {
-    this.qaseId(1);
+  it(qase(1,'Several ids'), () => {;
     expect(true).to.equal(true);
   });
 
   // a test can check multiple test cases
-  it('Correct test', () => {
-    this.qaseId([2, 3]);
+  it(qase([2,3],'Correct test'), () => {
     expect(true).to.equal(true);
   });
 
