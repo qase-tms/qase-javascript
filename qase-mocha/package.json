@@ -1,6 +1,6 @@
 {
   "name": "mocha-qase-reporter",
-  "version": "1.0.0-beta.4",
+  "version": "1.0.0-beta.5",
   "description": "Mocha Cypress Reporter",
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "sideEffects": false,
@@ -9,7 +9,8 @@
   "exports": {
     ".": "./dist/index.js",
     "./reporter": "./dist/reporter.js",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./mocha": "./dist/mocha.js"
   },
   "typesVersions": {
     "*": {
