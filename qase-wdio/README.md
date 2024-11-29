@@ -111,7 +111,7 @@ Example `qase.config.json` config:
 }
 ```
 
-Also, you need to configure the reporter using the `wdio.conf.ts` file:
+Also, you need to configure the reporter using the `wdio.conf.ts` or `wdio.conf.js` files:
 
 ```ts
 // wdio.conf.ts
@@ -140,7 +140,34 @@ export const config: Options.Testrunner = {
 };
 ```
 
-Additional options of the reporter in the `wdio.conf.ts` file:
+```javascript
+// wdio.conf.js
+const WDIOQaseReporter = require('wdio-qase-reporter').default;
+const {beforeRunHook, afterRunHook} = require('wdio-qase-reporter');
+
+
+exports.config = {
+  reporters: [[WDIOQaseReporter, {
+    disableWebdriverStepsReporting: true,
+    disableWebdriverScreenshotsReporting: true,
+    useCucumber: false,
+  }]],
+
+  // ...
+  // =====
+  // Hooks
+  // =====
+  onPrepare: async function() {
+    await beforeRunHook();
+  },
+  onComplete: async function() {
+    await afterRunHook();
+  },
+  // ... other options
+};
+```
+
+Additional options of the reporter in the `wdio.conf.ts` or `wdio.conf.js` files:
 
 - `disableWebdriverStepsReporting` - optional parameter(`false` by default), in order to log only custom steps to the reporter.
 - `disableWebdriverScreenshotsReporting` - optional parameter(`false` by default), in order to not attach screenshots to the reporter.
