@@ -419,6 +419,7 @@ export class TestOpsReporter extends AbstractReporter {
       relations: this.getRelation(result.relations),
       message: result.message,
       fields: result.fields,
+      defect: this.defect,
     };
 
     this.logger.logDebug(`Transformed result: ${JSON.stringify(model)}`);
