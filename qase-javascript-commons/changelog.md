@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.2.7
+
+## What's new
+
+Fixed an issue then the reporter didn't create defects for failed tests.
+
 # qase-javascript-commons@2.2.6
 
 ## What's new
