@@ -1,6 +1,6 @@
 {
   "name": "cypress-qase-reporter",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "Qase Cypress Reporter",
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "sideEffects": false,

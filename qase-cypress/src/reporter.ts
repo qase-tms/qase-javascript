@@ -18,17 +18,18 @@ import {
   StepStatusEnum,
 } from 'qase-javascript-commons';
 
-import { traverseDir } from './utils/traverse-dir';
 import { configSchema } from './configSchema';
 import { ReporterOptionsType } from './options';
 import { MetadataManager } from './metadata/manager';
 import { StepEnd, StepStart } from './metadata/models';
+import { FileSearcher } from './fileSearcher';
 
 const {
   EVENT_TEST_FAIL,
   EVENT_TEST_PASS,
   EVENT_TEST_PENDING,
   EVENT_RUN_END,
+  EVENT_TEST_BEGIN,
 } = Runner.constants;
 
 type CypressState = 'failed' | 'passed' | 'pending';
@@ -68,38 +69,6 @@ export class CypressQaseReporter extends reporters.Base {
   }
 
   /**
-   * @param {number[]} ids
-   * @param {string} dir
-   * @returns {Attachment[]}
-   * @private
-   */
-  private static findAttachments(ids: number[], dir: string): Attachment[] {
-    const idSet = new Set(ids);
-    const attachments: Attachment[] = [];
-
-    try {
-      traverseDir(path.join(process.cwd(), dir), (filePath) => {
-        if (
-          CypressQaseReporter.getCaseId(filePath).some((item) =>
-            idSet.has(item),
-          )
-        ) {
-          attachments.push({
-            content: '',
-            id: uuidv4(),
-            mime_type: '', size: 0,
-            file_name: path.basename(filePath),
-            file_path: filePath,
-          });
-        }
-      });
-    } catch (error) {/* ignore */
-    }
-
-    return attachments;
-  }
-
-  /**
    * @type {string | undefined}
    * @private
    */
@@ -110,6 +79,8 @@ export class CypressQaseReporter extends reporters.Base {
    * @private
    */
   private reporter: ReporterInterface;
+
+  private testBeginTime: number = Date.now();
 
   private options: Omit<(FrameworkOptionsType<'cypress', ReporterOptionsType> & ConfigType & ReporterOptionsType & NonNullable<unknown>) | (null & ReporterOptionsType & NonNullable<unknown>), 'framework'>;
 
@@ -150,6 +121,9 @@ export class CypressQaseReporter extends reporters.Base {
     runner.on(EVENT_TEST_PASS, (test: Test) => this.addTestResult(test));
     runner.on(EVENT_TEST_PENDING, (test: Test) => this.addTestResult(test));
     runner.on(EVENT_TEST_FAIL, (test: Test) => this.addTestResult(test));
+    runner.on(EVENT_TEST_BEGIN, () => {
+      this.testBeginTime = Date.now();
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     runner.once(EVENT_RUN_END, () => {
@@ -179,11 +153,21 @@ export class CypressQaseReporter extends reporters.Base {
 
     const ids = CypressQaseReporter.getCaseId(test.title);
 
-    const attachments = this.screenshotsFolder
-      ? CypressQaseReporter.findAttachments(ids, this.screenshotsFolder)
-      : undefined;
+    const testFile = this.getTestFileName(test);
+    const files = this.screenshotsFolder ?
+      FileSearcher.findFilesBeforeTime(path.join(this.screenshotsFolder, testFile), new Date(this.testBeginTime))
+      : [];
 
-    attachments?.push(...(metadata?.attachments ?? []));
+    const attachments = files.map((file) => ({
+      content: '',
+      id: uuidv4(),
+      mime_type: 'image/png',
+      size: 0,
+      file_name: path.basename(file),
+      file_path: file,
+    } as Attachment));
+
+    attachments.push(...(metadata?.attachments ?? []));
 
     let relations = {};
     if (test.parent !== undefined) {
@@ -284,6 +268,22 @@ export class CypressQaseReporter extends reporters.Base {
     }
 
     return signature;
+  }
+
+  private getTestFileName(test: Test): string {
+    if (!test.parent) {
+      return '';
+    }
+
+    const file = this.getFile(test.parent);
+    if (!file) {
+      return '';
+    }
+
+    const pathParts = file.split('/');
+    const fileName = pathParts[pathParts.length - 1];
+
+    return fileName ? fileName : '';
   }
 
   /**
