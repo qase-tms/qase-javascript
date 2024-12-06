@@ -1,3 +1,9 @@
+# cypress-qase-reporter@2.2.4
+
+## What's new
+
+Fixed an issue with screenshots not being uploaded to Qase for failed tests.
+
 # cypress-qase-reporter@2.2.3
 
 ## What's new
