@@ -29,6 +29,7 @@ module.exports = cypress.defineConfig({
     },
   },
   video: false,
+  screenshotOnRunFailure: true,
   e2e: {
     setupNodeEvents(on, config) {
       require('cypress-qase-reporter/plugin')(on, config);
