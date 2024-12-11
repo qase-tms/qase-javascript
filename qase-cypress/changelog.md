@@ -1,3 +1,9 @@
+# cypress-qase-reporter@2.2.5
+
+## What's new
+
+Support Cucumber tests in Cypress with the `cypress-cucumber-preprocessor` plugin.
+
 # cypress-qase-reporter@2.2.4
 
 ## What's new

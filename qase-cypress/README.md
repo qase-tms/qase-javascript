@@ -165,7 +165,7 @@ the [Configuration reference](../qase-javascript-commons/README.md#configuration
 
 Example `cypress.config.js` config:
 
-```js
+```javascript
 import cypress from 'cypress';
 
 module.exports = cypress.defineConfig({
@@ -210,6 +210,66 @@ module.exports = cypress.defineConfig({
 
 Check out the example of configuration for multiple reporters in the
 [demo project](../examples/cypress/cypress.config.js).
+
+If you use Cucumber, you need to add the following configuration in `cypress.config.js`:
+
+```javascript
+import cypress from 'cypress';
+
+const cucumber = require('cypress-cucumber-preprocessor').default;
+
+module.exports = cypress.defineConfig({
+  reporter: 'cypress-multi-reporters',
+  reporterOptions: {
+    reporterEnabled: 'cypress-mochawesome-reporter, cypress-qase-reporter',
+    cypressMochawesomeReporterReporterOptions: {
+      charts: true,
+    },
+    cypressQaseReporterReporterOptions: {
+      debug: true,
+
+      testops: {
+        api: {
+          token: 'api_key',
+        },
+
+        project: 'project_code',
+        uploadAttachments: true,
+
+        run: {
+          complete: true,
+        },
+      },
+
+      framework: {
+        cypress: {
+          screenshotsFolder: 'cypress/screenshots',
+        },
+      },
+    },
+  },
+  video: false,
+  e2e: {
+    setupNodeEvents(on, config) {
+      on('file:preprocessor', cucumber());
+      require('cypress-qase-reporter/plugin')(on, config);
+      require('cypress-qase-reporter/metadata')(on);
+    },
+    specPattern: 'cypress/e2e/*.feature',
+  },
+});
+``` 
+
+And add the following lines in `support/e2e.js` file:
+
+```javascript
+import { enableCucumberSupport } from "cypress-qase-reporter";
+
+enableCucumberSupport();
+```
+
+Check out the example of configuration for multiple reporters in the
+[demo project](../examples/cypressCucumber/cypress.config.js).
 
 ## Requirements
 

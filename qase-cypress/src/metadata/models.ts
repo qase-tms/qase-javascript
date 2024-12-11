@@ -9,6 +9,7 @@ export interface Metadata {
   suite?: string | undefined;
   comment?: string | undefined;
   steps?: (StepStart | StepEnd)[];
+  cucumberSteps?: StepStart[];
   currentStepId?: string | undefined;
   firstStepName?: string | undefined;
   attachments?: Attachment[];
