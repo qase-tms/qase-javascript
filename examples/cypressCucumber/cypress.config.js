@@ -10,10 +10,10 @@ module.exports = defineConfig({
 
             testops: {
                 api: {
-                    token: '45a0b4c1e0cc6c64580a82565d939779490097e0d7a7d8ccfe77393346b426fb',
+                    token: '<token>',
                 },
 
-                project: 'DEVX',
+                project: '<project_code>',
                 uploadAttachments: true,
 
                 run: {
