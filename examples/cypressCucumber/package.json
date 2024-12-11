@@ -1,0 +1,16 @@
+{
+  "name": "cypress-cucumber",
+  "private": true,
+  "scripts": {
+    "test": "QASE_MODE=testops cypress run"
+  },
+  "devDependencies": {
+    "cypress": "^13.16.0",
+    "cypress-cucumber-preprocessor": "^4.3.1",
+    "cypress-multi-reporters": "^1.6.3",
+    "cypress-qase-reporter": "2.2.5"
+  },
+  "cypress-cucumber-preprocessor": {
+    "step_definitions": "cypress/step_definitions/"
+  }
+}
