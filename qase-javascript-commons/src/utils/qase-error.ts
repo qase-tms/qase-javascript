@@ -15,7 +15,7 @@ export class QaseError extends Error implements QaseErrorInterface {
   /**
    * @type {unknown}
    */
-  public cause?: unknown;
+  public override cause?: unknown;
 
   constructor(message?: string, options?: ErrorOptionsType) {
     super(message);
