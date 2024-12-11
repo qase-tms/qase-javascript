@@ -22,6 +22,7 @@ export class MetadataManager {
       suite: undefined,
       comment: undefined,
       steps: [],
+      cucumberSteps: [],
       currentStepId: undefined,
       firstStepName: undefined,
       attachments: [],
@@ -76,6 +77,28 @@ export class MetadataManager {
     const parentId = metadata.steps.reverse().find((step): step is StepStart => step.id === metadata.currentStepId)?.parentId;
     metadata.steps.push({ timestamp: Date.now(), status, id: metadata.currentStepId });
     metadata.currentStepId = parentId;
+    this.setMetadata(metadata);
+  }
+
+  public static addCucumberStep(name: string): void {
+    const metadata = this.getMetadata() ?? {};
+
+    if (metadata.firstStepName === name) {
+      return;
+    }
+
+    if (!metadata.cucumberSteps) {
+      metadata.cucumberSteps = [];
+    }
+    const id = uuidv4();
+    const parentId = metadata.currentStepId ?? undefined;
+    metadata.cucumberSteps.push({ timestamp: Date.now(), name, id: id, parentId: parentId });
+    metadata.currentStepId = id;
+
+    if (!metadata.firstStepName) {
+      metadata.firstStepName = name;
+    }
+
     this.setMetadata(metadata);
   }
 

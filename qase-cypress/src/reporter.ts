@@ -5,17 +5,18 @@ import { spawnSync } from 'child_process';
 import { MochaOptions, reporters, Runner, Suite, Test } from 'mocha';
 
 import {
+  Attachment,
+  composeOptions,
   ConfigLoader,
+  ConfigType,
+  FrameworkOptionsType,
   QaseReporter,
   ReporterInterface,
-  TestStatusEnum,
-  composeOptions,
-  TestResultType,
-  Attachment,
-  FrameworkOptionsType,
-  ConfigType,
-  TestStepType,
   StepStatusEnum,
+  StepType,
+  TestResultType,
+  TestStatusEnum,
+  TestStepType,
 } from 'qase-javascript-commons';
 
 import { configSchema } from './configSchema';
@@ -23,6 +24,7 @@ import { ReporterOptionsType } from './options';
 import { MetadataManager } from './metadata/manager';
 import { StepEnd, StepStart } from './metadata/models';
 import { FileSearcher } from './fileSearcher';
+import { extractTags } from './utils/tagParser';
 
 const {
   EVENT_TEST_FAIL,
@@ -123,6 +125,7 @@ export class CypressQaseReporter extends reporters.Base {
     runner.on(EVENT_TEST_FAIL, (test: Test) => this.addTestResult(test));
     runner.on(EVENT_TEST_BEGIN, () => {
       this.testBeginTime = Date.now();
+      MetadataManager.clear();
     });
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -153,9 +156,9 @@ export class CypressQaseReporter extends reporters.Base {
 
     const ids = CypressQaseReporter.getCaseId(test.title);
 
-    const testFile = this.getTestFileName(test);
+    const testFileName = this.getTestFileName(test);
     const files = this.screenshotsFolder ?
-      FileSearcher.findFilesBeforeTime(path.join(this.screenshotsFolder, testFile), new Date(this.testBeginTime))
+      FileSearcher.findFilesBeforeTime(path.join(this.screenshotsFolder, testFileName), new Date(this.testBeginTime))
       : [];
 
     const attachments = files.map((file) => ({
@@ -199,15 +202,25 @@ export class CypressQaseReporter extends reporters.Base {
       };
     }
 
-    let message: string | null = null;
-    if (metadata?.comment) {
-      message = metadata.comment;
-    }
+    let message = metadata?.comment ?? '';
     if (test.err?.message) {
-      if (message) {
-        message += '\n\n';
+      message += message ? `\n\n${test.err.message}` : test.err.message;
+    }
+
+    const steps = metadata?.steps ? this.getSteps(metadata.steps, metadata.stepAttachments ?? {}) : [];
+
+    // support for cucumber steps and metadata
+    if (metadata?.cucumberSteps && metadata.cucumberSteps.length > 0) {
+      steps.push(...this.convertCypressMessages(metadata.cucumberSteps, test.state ?? 'failed'));
+
+      if (test.parent) {
+        const file = this.getFile(test.parent);
+
+        if (file) {
+          const tags = extractTags(file, test.title);
+          ids.push(...this.extractQaseIds(tags));
+        }
       }
-      message += test.err.message;
     }
 
     const result: TestResultType = {
@@ -221,7 +234,7 @@ export class CypressQaseReporter extends reporters.Base {
       relations: relations,
       run_id: null,
       signature: this.getSignature(test, ids),
-      steps: metadata?.steps ? this.getSteps(metadata.steps, metadata.stepAttachments ?? {}) : [],
+      steps: steps,
       id: uuidv4(),
       execution: {
         status: test.state
@@ -313,6 +326,52 @@ export class CypressQaseReporter extends reporters.Base {
       return title.replace(matches[0], '').trimEnd();
     }
     return title;
+  }
+
+  /**
+   * Extracts numbers from @qaseid tags, regardless of case.
+   * @param tags - An array of tags to process.
+   * @returns An array of numbers extracted from the tags.
+   */
+  private extractQaseIds(tags: string[]): number[] {
+    const qaseIdRegex = /@qaseid\((\d+(?:,\d+)*)\)/i;
+    const qaseIds: number[] = [];
+
+    for (const tag of tags) {
+      const match = qaseIdRegex.exec(tag);
+      if (match) {
+        const ids = match[1]?.split(',').map(id => parseInt(id, 10));
+        if (ids) {
+          qaseIds.push(...ids);
+        }
+      }
+    }
+
+    return qaseIds;
+  }
+
+  private convertCypressMessages(messages: StepStart[], testStatus: string): TestStepType[] {
+    const result: TestStepType[] = [];
+
+    const lastIndex = messages.length - 1;
+    for (const message of messages) {
+      const step = new TestStepType(StepType.TEXT);
+      step.id = message.id;
+      step.execution.status = StepStatusEnum.passed;
+      step.execution.start_time = message.timestamp;
+      step.data = {
+        action: message.name,
+        expected_result: null,
+      };
+
+      if (lastIndex === messages.indexOf(message) && testStatus !== 'passed') {
+        step.execution.status = StepStatusEnum.failed;
+      }
+
+      result.push(step);
+    }
+
+    return result;
   }
 
   private getSteps(steps: (StepStart | StepEnd)[], attachments: Record<string, Attachment[]>): TestStepType[] {

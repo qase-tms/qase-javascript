@@ -70,4 +70,11 @@ module.exports = function(on) {
       return null;
     },
   });
+
+  on('task', {
+    qaseCucumberStepStart(value) {
+      MetadataManager.addCucumberStep(value);
+      return null;
+    },
+  });
 };
