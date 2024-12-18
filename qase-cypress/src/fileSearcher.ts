@@ -51,6 +51,10 @@ export class FileSearcher {
     const result: string[] = [];
 
     function searchDirectory(currentPath: string): void {
+      if (!fs.existsSync(currentPath)) {
+        return;
+      }
+
       const items = fs.readdirSync(currentPath, { withFileTypes: true });
 
       for (const item of items) {
