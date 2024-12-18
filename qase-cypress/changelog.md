@@ -1,3 +1,9 @@
+# cypress-qase-reporter@2.2.6
+
+## What's new
+
+Fixed an issue where screenshots for failed tests were not attached if the tests were located in subdirectories.
+
 # cypress-qase-reporter@2.2.5
 
 ## What's new

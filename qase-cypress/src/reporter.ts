@@ -158,7 +158,7 @@ export class CypressQaseReporter extends reporters.Base {
 
     const testFileName = this.getTestFileName(test);
     const files = this.screenshotsFolder ?
-      FileSearcher.findFilesBeforeTime(path.join(this.screenshotsFolder, testFileName), new Date(this.testBeginTime))
+      FileSearcher.findFilesBeforeTime(this.screenshotsFolder, testFileName, new Date(this.testBeginTime))
       : [];
 
     const attachments = files.map((file) => ({
