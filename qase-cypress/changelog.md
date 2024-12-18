@@ -1,3 +1,9 @@
+# cypress-qase-reporter@2.2.7
+
+## What's new
+
+Fixed an issue where the reporter got error if screenshot folder was not exist.
+
 # cypress-qase-reporter@2.2.6
 
 ## What's new
