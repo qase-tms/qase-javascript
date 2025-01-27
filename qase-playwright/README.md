@@ -155,7 +155,7 @@ https://app.qase.io/run/QASE_PROJECT_CODE
 ```
 
 <p align="center">
-  <img src="./screenshots/demo.gif">
+  <img width="85%" src="./screenshots/test-run.gif">
 </p>
 
 ## Configuration
@@ -165,11 +165,8 @@ Reporter options (\* - required):
 - `mode` - `testops`/`off` Enables reporter, default - `off`
 - `debug` - Enables debug logging, default - `false`
 - `environment` - To execute with the sending of the environment information 
-- *`testops.api.token` - Token for API access, you can find more information
-  [here](https://developers.qase.io/#authentication)
-- *`testops.project` - Code of your project (can be extracted from main
-  page of your project: `https://app.qase.io/project/DEMOTR` -
-  `DEMOTR` is project code here)
+- *`testops.api.token` - Token for API access, you can generate it [here](https://developers.qase.io/#authentication).
+- *`testops.project` - [Your project's code](https://help.qase.io/en/articles/9787250-how-do-i-find-my-project-code)
 - `testops.uploadAttachments` - Permission to send screenshots to Qase TMS
 - `testops.run.id` - Pass Run ID
 - `testops.run.title` - Set custom Run name, when new run is created
