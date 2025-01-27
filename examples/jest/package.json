@@ -9,6 +9,6 @@
     "@jest/globals": "^29.5.0",
     "babel-jest": "^29.5.0",
     "jest": "^29.5.0",
-    "jest-qase-reporter": "^2.0.0"
+    "jest-qase-reporter": "^2.0.3"
   }
 }

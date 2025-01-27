@@ -142,9 +142,8 @@ Reporter options (* - required):
 - `mode` - `testops`/`off` Enables reporter, default - `off`
 - `debug` - Enables debug logging, default - `false`
 - `environment` - To execute with the sending of the envinroment information
-- *`testops.api.token` - Token for API access, you can find more information
-  [here](https://developers.qase.io/#authentication)
-- *`testops.project` - Qase project code, for example, in https://app.qase.io/project/DEMO the code is `DEMO`
+- *`testops.api.token` - Token for API access, you can generate it [here](https://developers.qase.io/#authentication).
+- *`testops.project` - [Your project's code](https://help.qase.io/en/articles/9787250-how-do-i-find-my-project-code)
 - `testops.run.id` - Qase test run ID, used when the test run was created earlier using CLI or API call.
 - `testops.run.title` - Set custom Run name, when new run is created
 - `testops.run.description` - Set custom Run description, when new run is created
