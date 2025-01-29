@@ -27,7 +27,7 @@ type TestStepResultStatus = (typeof Status)[keyof typeof Status];
 const qaseIdRegExp = /^@[Qq]-?(\d+)$/g;
 const newQaseIdRegExp = /^@[Qq]ase[Ii][Dd]=(\d+)$/g;
 const qaseTitleRegExp = /^@[Qq]ase[Tt]itle=(.+)$/g;
-const qaseFieldsRegExp = /^@[Qq]ase[Ff]ields:(.+?)=(.+)$/g;
+const qaseFieldsRegExp = /^@[Qq]ase[Ff]ields=(.+)$/g;
 const qaseIgnoreRegExp = /^@[Qq]ase[Ii][Gg][Nn][Oo][Rr][Ee]$/g;
 
 export class Storage {
@@ -346,7 +346,7 @@ export class Storage {
       }
 
       if (qaseFieldsRegExp.test(tag.name)) {
-        const value = tag.name.replace(/^@[Qq]ase[Ff]ields:/, '');
+        const value = tag.name.replace(/^@[Qq]ase[Ff]ields=/, '');
         try {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const record: Record<string, string> = JSON.parse(value);
