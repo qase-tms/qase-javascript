@@ -1,3 +1,9 @@
+# cypress-qase-reporter@2.2.8
+
+## What's new
+
+Fixed an issue where attachments were not properly linked to failed tests on Windows.
+
 # cypress-qase-reporter@2.2.7
 
 ## What's new

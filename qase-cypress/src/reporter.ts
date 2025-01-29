@@ -265,7 +265,7 @@ export class CypressQaseReporter extends reporters.Base {
     const file = test.parent ? this.getFile(test.parent) : undefined;
 
     if (file) {
-      signature = file.split('/').join('::');
+      signature = file.split(path.sep).join('::');
     }
 
     if (test.parent) {
@@ -293,7 +293,7 @@ export class CypressQaseReporter extends reporters.Base {
       return '';
     }
 
-    const pathParts = file.split('/');
+    const pathParts = file.split(path.sep);
     const fileName = pathParts[pathParts.length - 1];
 
     return fileName ? fileName : '';
