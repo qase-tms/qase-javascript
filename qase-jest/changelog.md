@@ -1,3 +1,9 @@
+# jest-qase-reporter@2.0.4
+
+## What's new
+
+Improved test name processing: Qase IDs are now automatically removed when uploading results
+
 # jest-qase-reporter@2.0.3
 
 ## What's new
