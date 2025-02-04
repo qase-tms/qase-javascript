@@ -331,7 +331,7 @@ export class JestQaseReporter implements Reporter {
       steps: [],
       testops_id: ids.length > 0 ? ids : null,
       id: uuidv4(),
-      title: value.title,
+      title: this.removeQaseIdsFromTitle(value.title),
     };
   }
 
@@ -351,5 +351,18 @@ export class JestQaseReporter implements Reporter {
       steps: [],
       attachments: [],
     };
+  }
+
+  /**
+   * @param {string} title
+   * @returns {string}
+   * @private
+   */
+  private removeQaseIdsFromTitle(title: string): string {
+    const matches = title.match(/\(Qase ID: ([0-9,]+)\)$/i);
+    if (matches) {
+      return title.replace(matches[0], '').trimEnd();
+    }
+    return title;
   }
 }
