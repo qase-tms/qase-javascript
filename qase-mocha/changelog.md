@@ -1,3 +1,9 @@
+# qase-mocha@1.0.0
+
+## What's new
+
+Major release of the Cypress reporter package
+
 # qase-mocha@1.0.0-beta.5
 
 ## What's new
