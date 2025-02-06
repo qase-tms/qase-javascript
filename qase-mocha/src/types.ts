@@ -81,8 +81,9 @@ export class Metadata {
           size: 0,
           id: '',
         });
-
       }
+
+      return
     }
 
     this.attachments?.push({
