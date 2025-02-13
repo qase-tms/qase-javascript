@@ -21,8 +21,6 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
-import { CreateResultV2422Response } from '../model';
-// @ts-ignore
 import { CreateResultsRequestV2 } from '../model';
 // @ts-ignore
 import { ResultCreateV2 } from '../model';
@@ -34,10 +32,10 @@ export const ResultApiAxiosParamCreator = function (configuration?: Configuratio
     return {
         /**
          * This method allows to create single test run result.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
-         * @summary (Beta) Create test run result
+         * @summary Create test run result
          * @param {string} projectCode 
          * @param {number} runId 
-         * @param {ResultCreate} resultCreate 
+         * @param {ResultCreateV2} resultCreate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -81,7 +79,7 @@ export const ResultApiAxiosParamCreator = function (configuration?: Configuratio
         },
         /**
          * This method allows to create several test run results at once.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
-         * @summary (Beta) Bulk create test run result
+         * @summary Bulk create test run result
          * @param {string} projectCode 
          * @param {number} runId 
          * @param {CreateResultsRequestV2} createResultsRequestV2 
@@ -138,10 +136,10 @@ export const ResultApiFp = function(configuration?: Configuration) {
     return {
         /**
          * This method allows to create single test run result.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
-         * @summary (Beta) Create test run result
+         * @summary Create test run result
          * @param {string} projectCode 
          * @param {number} runId 
-         * @param {ResultCreate} resultCreate 
+         * @param {ResultCreateV2} resultCreate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -151,7 +149,7 @@ export const ResultApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to create several test run results at once.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
-         * @summary (Beta) Bulk create test run result
+         * @summary Bulk create test run result
          * @param {string} projectCode 
          * @param {number} runId 
          * @param {CreateResultsRequestV2} createResultsRequestV2 
@@ -174,10 +172,10 @@ export const ResultApiFactory = function (configuration?: Configuration, basePat
     return {
         /**
          * This method allows to create single test run result.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
-         * @summary (Beta) Create test run result
+         * @summary Create test run result
          * @param {string} projectCode 
          * @param {number} runId 
-         * @param {ResultCreate} resultCreate 
+         * @param {ResultCreateV2} resultCreate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -186,7 +184,7 @@ export const ResultApiFactory = function (configuration?: Configuration, basePat
         },
         /**
          * This method allows to create several test run results at once.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
-         * @summary (Beta) Bulk create test run result
+         * @summary Bulk create test run result
          * @param {string} projectCode 
          * @param {number} runId 
          * @param {CreateResultsRequestV2} createResultsRequestV2 
@@ -208,10 +206,10 @@ export const ResultApiFactory = function (configuration?: Configuration, basePat
 export class ResultApi extends BaseAPI {
     /**
      * This method allows to create single test run result.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
-     * @summary (Beta) Create test run result
+     * @summary Create test run result
      * @param {string} projectCode 
      * @param {number} runId 
-     * @param {ResultCreate} resultCreate 
+     * @param {ResultCreateV2} resultCreate 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ResultApi
@@ -222,7 +220,7 @@ export class ResultApi extends BaseAPI {
 
     /**
      * This method allows to create several test run results at once.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
-     * @summary (Beta) Bulk create test run result
+     * @summary Bulk create test run result
      * @param {string} projectCode 
      * @param {number} runId 
      * @param {CreateResultsRequestV2} createResultsRequestV2 

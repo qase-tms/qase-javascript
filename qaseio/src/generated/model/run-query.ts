@@ -22,109 +22,109 @@ import { TagValue } from './tag-value';
 /**
  * 
  * @export
- * @interface Run
+ * @interface RunQuery
  */
-export interface Run {
+export interface RunQuery {
     /**
      * 
      * @type {number}
-     * @memberof Run
+     * @memberof RunQuery
+     */
+    'run_id': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof RunQuery
      */
     'id'?: number;
     /**
      * 
-     * @type {number}
-     * @memberof Run
-     */
-    'run_id'?: number;
-    /**
-     * 
      * @type {string}
-     * @memberof Run
+     * @memberof RunQuery
      */
     'title'?: string;
     /**
      * 
      * @type {string}
-     * @memberof Run
+     * @memberof RunQuery
      */
     'description'?: string | null;
     /**
      * 
      * @type {number}
-     * @memberof Run
+     * @memberof RunQuery
      */
     'status'?: number;
     /**
      * 
      * @type {string}
-     * @memberof Run
+     * @memberof RunQuery
      */
     'status_text'?: string;
     /**
      * 
      * @type {string}
-     * @memberof Run
+     * @memberof RunQuery
      */
     'start_time'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof Run
+     * @memberof RunQuery
      */
     'end_time'?: string | null;
     /**
      * 
      * @type {boolean}
-     * @memberof Run
+     * @memberof RunQuery
      */
     'public'?: boolean;
     /**
      * 
      * @type {RunStats}
-     * @memberof Run
+     * @memberof RunQuery
      */
     'stats'?: RunStats;
     /**
      * Time in ms.
      * @type {number}
-     * @memberof Run
+     * @memberof RunQuery
      */
     'time_spent'?: number;
     /**
      * 
      * @type {RunEnvironment}
-     * @memberof Run
+     * @memberof RunQuery
      */
     'environment'?: RunEnvironment | null;
     /**
      * 
      * @type {RunMilestone}
-     * @memberof Run
+     * @memberof RunQuery
      */
     'milestone'?: RunMilestone | null;
     /**
      * 
      * @type {Array<CustomFieldValue>}
-     * @memberof Run
+     * @memberof RunQuery
      */
     'custom_fields'?: Array<CustomFieldValue>;
     /**
      * 
      * @type {Array<TagValue>}
-     * @memberof Run
+     * @memberof RunQuery
      */
     'tags'?: Array<TagValue>;
     /**
      * 
      * @type {Array<number>}
-     * @memberof Run
+     * @memberof RunQuery
      */
     'cases'?: Array<number>;
     /**
      * 
      * @type {number}
-     * @memberof Run
+     * @memberof RunQuery
      */
     'plan_id'?: number | null;
 }

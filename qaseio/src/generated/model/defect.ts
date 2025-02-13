@@ -98,6 +98,18 @@ export interface Defect {
     'external_data'?: string;
     /**
      * 
+     * @type {Array<number>}
+     * @memberof Defect
+     */
+    'runs'?: Array<number>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof Defect
+     */
+    'results'?: Array<string>;
+    /**
+     * 
      * @type {Array<TagValue>}
      * @memberof Defect
      */
