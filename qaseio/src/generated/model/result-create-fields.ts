@@ -1,6 +1,5 @@
 /* tslint:disable */
 /* eslint-disable */
-
 /**
  * Qase.io TestOps API v2
  * Qase TestOps API v2 Specification.
@@ -14,79 +13,86 @@
  */
 
 
+
 /**
- *
+ * 
  * @export
  * @interface ResultCreateFields
  */
 export interface ResultCreateFields {
-  [key: string]: string | any;
+    [key: string]: string | any;
 
-  /**
-   *
-   * @type {string}
-   * @memberof ResultCreateFields
-   */
-  'author'?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof ResultCreateFields
-   */
-  'description'?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof ResultCreateFields
-   */
-  'preconditions'?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof ResultCreateFields
-   */
-  'postconditions'?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof ResultCreateFields
-   */
-  'layer'?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof ResultCreateFields
-   */
-  'severity'?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof ResultCreateFields
-   */
-  'priority'?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof ResultCreateFields
-   */
-  'behavior'?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof ResultCreateFields
-   */
-  'type'?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof ResultCreateFields
-   */
-  'muted'?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof ResultCreateFields
-   */
-  'is_flaky'?: string;
+    /**
+     * Author of the related test case (member id, name or email). If set and test case auto-creation is enabled, the author will be used to create the test case
+     * @type {string}
+     * @memberof ResultCreateFields
+     */
+    'author'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ResultCreateFields
+     */
+    'description'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ResultCreateFields
+     */
+    'preconditions'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ResultCreateFields
+     */
+    'postconditions'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ResultCreateFields
+     */
+    'layer'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ResultCreateFields
+     */
+    'severity'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ResultCreateFields
+     */
+    'priority'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ResultCreateFields
+     */
+    'behavior'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ResultCreateFields
+     */
+    'type'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ResultCreateFields
+     */
+    'muted'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ResultCreateFields
+     */
+    'is_flaky'?: string;
+    /**
+     * User who executed the test (member id, name or email)
+     * @type {string}
+     * @memberof ResultCreateFields
+     */
+    'executed_by'?: string;
 }
 

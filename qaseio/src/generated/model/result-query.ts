@@ -19,79 +19,79 @@ import { TestStepResult } from './test-step-result';
 /**
  * 
  * @export
- * @interface Result
+ * @interface ResultQuery
  */
-export interface Result {
+export interface ResultQuery {
     /**
      * 
      * @type {string}
-     * @memberof Result
+     * @memberof ResultQuery
+     */
+    'result_hash': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ResultQuery
      */
     'hash'?: string;
     /**
      * 
      * @type {string}
-     * @memberof Result
-     */
-    'result_hash'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Result
+     * @memberof ResultQuery
      */
     'comment'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof Result
+     * @memberof ResultQuery
      */
     'stacktrace'?: string | null;
     /**
      * 
      * @type {number}
-     * @memberof Result
+     * @memberof ResultQuery
      */
     'run_id'?: number;
     /**
      * 
      * @type {number}
-     * @memberof Result
+     * @memberof ResultQuery
      */
     'case_id'?: number;
     /**
      * 
      * @type {Array<TestStepResult>}
-     * @memberof Result
+     * @memberof ResultQuery
      */
     'steps'?: Array<TestStepResult> | null;
     /**
      * 
      * @type {string}
-     * @memberof Result
+     * @memberof ResultQuery
      */
     'status'?: string;
     /**
      * 
      * @type {boolean}
-     * @memberof Result
+     * @memberof ResultQuery
      */
     'is_api_result'?: boolean;
     /**
      * 
      * @type {number}
-     * @memberof Result
+     * @memberof ResultQuery
      */
     'time_spent_ms'?: number;
     /**
      * 
      * @type {string}
-     * @memberof Result
+     * @memberof ResultQuery
      */
     'end_time'?: string | null;
     /**
      * 
      * @type {Array<Attachment>}
-     * @memberof Result
+     * @memberof ResultQuery
      */
     'attachments'?: Array<Attachment>;
 }

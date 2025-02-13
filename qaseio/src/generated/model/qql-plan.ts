@@ -25,6 +25,12 @@ export interface QqlPlan {
      * @type {number}
      * @memberof QqlPlan
      */
+    'plan_id': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QqlPlan
+     */
     'id'?: number;
     /**
      * 

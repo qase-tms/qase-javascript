@@ -25,6 +25,12 @@ export interface PlanQuery {
      * @type {number}
      * @memberof PlanQuery
      */
+    'plan_id': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof PlanQuery
+     */
     'id'?: number;
     /**
      * 

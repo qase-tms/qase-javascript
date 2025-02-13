@@ -28,6 +28,12 @@ export interface QqlDefect {
      * @type {number}
      * @memberof QqlDefect
      */
+    'defect_id': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QqlDefect
+     */
     'id'?: number;
     /**
      * 

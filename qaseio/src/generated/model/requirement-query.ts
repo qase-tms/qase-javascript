@@ -17,67 +17,67 @@
 /**
  * 
  * @export
- * @interface Requirement
+ * @interface RequirementQuery
  */
-export interface Requirement {
+export interface RequirementQuery {
     /**
      * 
      * @type {number}
-     * @memberof Requirement
+     * @memberof RequirementQuery
+     */
+    'requirement_id': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof RequirementQuery
      */
     'id'?: number;
     /**
      * 
      * @type {number}
-     * @memberof Requirement
-     */
-    'requirement_id'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof Requirement
+     * @memberof RequirementQuery
      */
     'parent_id'?: number | null;
     /**
      * 
      * @type {number}
-     * @memberof Requirement
+     * @memberof RequirementQuery
      */
     'member_id'?: number;
     /**
      * 
      * @type {string}
-     * @memberof Requirement
+     * @memberof RequirementQuery
      */
     'title'?: string;
     /**
      * 
      * @type {string}
-     * @memberof Requirement
+     * @memberof RequirementQuery
      */
     'description'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof Requirement
+     * @memberof RequirementQuery
      */
-    'status'?: RequirementStatusEnum;
+    'status'?: RequirementQueryStatusEnum;
     /**
      * 
      * @type {string}
-     * @memberof Requirement
+     * @memberof RequirementQuery
      */
-    'type'?: RequirementTypeEnum;
+    'type'?: RequirementQueryTypeEnum;
     /**
      * 
      * @type {string}
-     * @memberof Requirement
+     * @memberof RequirementQuery
      */
     'created_at'?: string;
     /**
      * 
      * @type {string}
-     * @memberof Requirement
+     * @memberof RequirementQuery
      */
     'updated_at'?: string | null;
 }
@@ -86,7 +86,7 @@ export interface Requirement {
     * @export
     * @enum {string}
     */
-export enum RequirementStatusEnum {
+export enum RequirementQueryStatusEnum {
     VALID = 'valid',
     DRAFT = 'draft',
     REVIEW = 'review',
@@ -100,7 +100,7 @@ export enum RequirementStatusEnum {
     * @export
     * @enum {string}
     */
-export enum RequirementTypeEnum {
+export enum RequirementQueryTypeEnum {
     EPIC = 'epic',
     USER_STORY = 'user-story',
     FEATURE = 'feature'
