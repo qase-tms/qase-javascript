@@ -1,3 +1,10 @@
+# qase-javascript-commons@2.2.10
+
+## What's new
+
+Resolved an issue with parallel execution of multiple reporters using a shared sync file. Each reporter now uses its own
+dedicated file for state synchronization.
+
 # qase-javascript-commons@2.2.7
 
 ## What's new

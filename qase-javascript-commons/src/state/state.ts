@@ -9,7 +9,7 @@ export interface StateModel {
 }
 
 export class StateManager {
-  static statePath = path.resolve(__dirname, 'reporterState.json');
+  static statePath = path.resolve(process.cwd(), 'reporterState.json');
 
   static getState(): StateModel {
     let state: StateModel = {
