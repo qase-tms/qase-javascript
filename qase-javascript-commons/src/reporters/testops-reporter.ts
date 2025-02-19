@@ -168,6 +168,7 @@ export class TestOpsReporter extends AbstractReporter {
    * @param {LoggerInterface} logger
    * @param {ReporterOptionsType & TestOpsOptionsType} options
    * @param {QaseApiInterface} api
+   * @param {boolean} withState
    * @param {string | undefined} environment
    * @param {string | undefined} rootSuite
    * @param {string | undefined} baseUrl
@@ -176,6 +177,7 @@ export class TestOpsReporter extends AbstractReporter {
     logger: LoggerInterface,
     options: TestOpsOptionsType,
     private api: QaseApiInterface,
+    private withState: boolean,
     environment?: string,
     rootSuite?: string,
     baseUrl?: string,
@@ -275,7 +277,9 @@ export class TestOpsReporter extends AbstractReporter {
 
     this.run.id = result.id;
     process.env['QASE_TESTOPS_RUN_ID'] = String(result.id);
-    StateManager.setRunId(result.id);
+    if (this.withState) {
+      StateManager.setRunId(result.id);
+    }
     this.isTestRunReady = true;
   }
 

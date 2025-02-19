@@ -61,7 +61,7 @@ export interface ReporterInterface {
  * @implements AbstractReporter
  */
 export class QaseReporter implements ReporterInterface {
-  private static instance: QaseReporter;
+  private static instance: QaseReporter | null;
 
   /**
    * @param {string} frameworkPackage
@@ -145,18 +145,24 @@ export class QaseReporter implements ReporterInterface {
 
   private options: ConfigType & OptionsType;
 
+  private withState: boolean;
+
   /**
    * @param {OptionsType} options
    */
   private constructor(options: OptionsType) {
-    if (StateManager.isStateExists()) {
-      const state = StateManager.getState();
-      if (state.IsModeChanged && state.Mode) {
-        process.env[EnvEnum.mode] = state.Mode.toString();
-      }
+    this.withState = this.setWithState(options);
 
-      if (state.RunId) {
-        process.env[EnvRunEnum.id] = state.RunId.toString();
+    if (this.withState) {
+      if (StateManager.isStateExists()) {
+        const state = StateManager.getState();
+        if (state.IsModeChanged && state.Mode) {
+          process.env[EnvEnum.mode] = state.Mode.toString();
+        }
+
+        if (state.RunId) {
+          process.env[EnvRunEnum.id] = state.RunId.toString();
+        }
       }
     }
 
@@ -165,7 +171,7 @@ export class QaseReporter implements ReporterInterface {
     this.options = composedOptions;
 
     this.logger = new Logger({ debug: composedOptions.debug });
-    this.logger.logDebug(`Config: ${JSON.stringify(composedOptions)}`);
+    this.logger.logDebug(`Config: ${JSON.stringify(this.sanitizeOptions(composedOptions))}`);
 
     this.captureLogs = composedOptions.captureLogs;
 
@@ -210,18 +216,20 @@ export class QaseReporter implements ReporterInterface {
       }
     }
 
-    if (!StateManager.isStateExists()) {
-      const state: StateModel = {
-        RunId: undefined,
-        Mode: this.useFallback ? composedOptions.fallback as ModeEnum : composedOptions.mode as ModeEnum,
-        IsModeChanged: undefined,
-      };
+    if (this.withState) {
+      if (!StateManager.isStateExists()) {
+        const state: StateModel = {
+          RunId: undefined,
+          Mode: this.useFallback ? composedOptions.fallback as ModeEnum : composedOptions.mode as ModeEnum,
+          IsModeChanged: undefined,
+        };
 
-      if (this.disabled) {
-        state.Mode = ModeEnum.off;
+        if (this.disabled) {
+          state.Mode = ModeEnum.off;
+        }
+
+        StateManager.setState(state);
       }
-
-      StateManager.setState(state);
     }
   }
 
@@ -260,7 +268,9 @@ export class QaseReporter implements ReporterInterface {
       this.logger.logError('Unable to send the results to the upstream reporter:', error);
 
       if (this.fallbackReporter == undefined) {
-        StateManager.setMode(ModeEnum.off);
+        if (this.withState) {
+          StateManager.setMode(ModeEnum.off);
+        }
         return;
       }
 
@@ -271,16 +281,22 @@ export class QaseReporter implements ReporterInterface {
 
       try {
         await this.fallbackReporter?.sendResults();
-        StateManager.setMode(this.options.fallback as ModeEnum);
+        if (this.withState) {
+          StateManager.setMode(this.options.fallback as ModeEnum);
+        }
       } catch (error) {
         this.logger.logError('Unable to send the results to the fallback reporter:', error);
-        StateManager.setMode(ModeEnum.off);
+        if (this.withState) {
+          StateManager.setMode(ModeEnum.off);
+        }
       }
     }
   }
 
   async complete(): Promise<void> {
-    StateManager.clearState();
+    if (this.withState) {
+      StateManager.clearState();
+    }
     if (this.disabled) {
       return;
     }
@@ -311,6 +327,11 @@ export class QaseReporter implements ReporterInterface {
    * @returns {void}
    */
   public startTestRun(): void {
+    if (this.withState) {
+      console.log("Clean state");
+      StateManager.clearState();
+    }
+
     if (!this.disabled) {
 
       this.logger.logDebug('Starting test run');
@@ -322,17 +343,23 @@ export class QaseReporter implements ReporterInterface {
 
         if (this.fallbackReporter == undefined) {
           this.disabled = true;
-          StateManager.setMode(ModeEnum.off);
+          if (this.withState) {
+            StateManager.setMode(ModeEnum.off);
+          }
           return;
         }
 
         try {
           this.startTestRunOperation = this.fallbackReporter?.startTestRun();
-          StateManager.setMode(this.options.fallback as ModeEnum);
+          if (this.withState) {
+            StateManager.setMode(this.options.fallback as ModeEnum);
+          }
         } catch (error) {
           this.logger.logError('Unable to start test run in the fallback reporter: ', error);
           this.disabled = true;
-          StateManager.setMode(ModeEnum.off);
+          if (this.withState) {
+            StateManager.setMode(ModeEnum.off);
+          }
         }
       }
     }
@@ -376,7 +403,9 @@ export class QaseReporter implements ReporterInterface {
 
         if (this.fallbackReporter == undefined) {
           this.disabled = true;
-          StateManager.setMode(ModeEnum.off);
+          if (this.withState) {
+            StateManager.setMode(ModeEnum.off);
+          }
           return;
         }
 
@@ -397,7 +426,9 @@ export class QaseReporter implements ReporterInterface {
   private async addTestResultToFallback(result: TestResultType): Promise<void> {
     try {
       await this.fallbackReporter?.addTestResult(result);
-      StateManager.setMode(this.options.fallback as ModeEnum);
+      if (this.withState) {
+        StateManager.setMode(this.options.fallback as ModeEnum);
+      }
     } catch (error) {
       this.logger.logError('Unable to add the result to the fallback reporter:', error);
       this.disabled = true;
@@ -433,7 +464,9 @@ export class QaseReporter implements ReporterInterface {
 
         if (this.fallbackReporter == undefined) {
           this.disabled = true;
-          StateManager.setMode(ModeEnum.off);
+          if (this.withState) {
+            StateManager.setMode(ModeEnum.off);
+          }
           return;
         }
 
@@ -445,7 +478,9 @@ export class QaseReporter implements ReporterInterface {
         await this.publishFallback();
       }
     }
-    StateManager.clearState();
+    if (this.withState) {
+      StateManager.clearState();
+    }
   }
 
   /**
@@ -454,9 +489,13 @@ export class QaseReporter implements ReporterInterface {
   private async publishFallback(): Promise<void> {
     try {
       await this.fallbackReporter?.publish();
-      StateManager.setMode(this.options.fallback as ModeEnum);
+      if (this.withState) {
+        StateManager.setMode(this.options.fallback as ModeEnum);
+      }
     } catch (error) {
-      StateManager.setMode(ModeEnum.off);
+      if (this.withState) {
+        StateManager.setMode(ModeEnum.off);
+      }
       this.logger.logError('Unable to publish the run results to the fallback reporter:', error);
       this.disabled = true;
     }
@@ -545,6 +584,7 @@ export class QaseReporter implements ReporterInterface {
             defect,
           },
           apiClient,
+          this.withState,
           environment,
           rootSuite,
           api.host,
@@ -577,5 +617,43 @@ export class QaseReporter implements ReporterInterface {
    */
   private logTestItem(test: TestResultType) {
     this.logger.log(resultLogMap[test.execution.status](test));
+  }
+
+  private setWithState(options: OptionsType): boolean {
+    return options.frameworkName == 'cypress'
+      || options.frameworkName == ''
+      || options.frameworkName == null
+      || options.frameworkName == undefined;
+  }
+
+  private maskToken(token: string): string {
+    if (token.length <= 7) {
+      return '*'.repeat(token.length);
+    }
+    return `${token.slice(0, 3)}****${token.slice(-4)}`;
+  }
+
+  private sanitizeOptions<T extends Record<string, any>>(options: T): T {
+    if (typeof options !== 'object' || options === null) {
+      return options;
+    }
+
+    const sanitizedObject: Partial<T> = {};
+
+    for (const key in options) {
+      if (Object.prototype.hasOwnProperty.call(options, key)) {
+        const value = options[key];
+
+        if (key === 'token' && typeof value === 'string') {
+          sanitizedObject[key] = this.maskToken(value) as T[typeof key];
+        } else if (typeof value === 'object' && value !== null) {
+          sanitizedObject[key] = this.sanitizeOptions(value) as T[typeof key];
+        } else {
+          sanitizedObject[key] = value;
+        }
+      }
+    }
+
+    return sanitizedObject as T;
   }
 }
