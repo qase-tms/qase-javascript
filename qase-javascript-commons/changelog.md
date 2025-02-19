@@ -1,3 +1,10 @@
+# qase-javascript-commons@2.2.11
+
+## What's new
+
+- Improved state manager behavior to ensure correct handling.
+- Masked token in logs to enhance security.
+
 # qase-javascript-commons@2.2.10
 
 ## What's new

@@ -9,7 +9,7 @@ export interface StateModel {
 }
 
 export class StateManager {
-  static statePath = path.resolve(process.cwd(), 'reporterState.json');
+  static statePath = path.resolve(__dirname, 'reporterState.json');
 
   static getState(): StateModel {
     let state: StateModel = {
@@ -17,6 +17,10 @@ export class StateManager {
       Mode: undefined,
       IsModeChanged: undefined,
     };
+
+    if (!this.isStateExists()) {
+      return state;
+    }
 
     try {
       const data = readFileSync(this.statePath, 'utf8');
@@ -56,6 +60,10 @@ export class StateManager {
   }
 
   static clearState(): void {
+    if (!this.isStateExists()) {
+      return;
+    }
+
     try {
       unlinkSync(this.statePath);
     } catch (err) {
