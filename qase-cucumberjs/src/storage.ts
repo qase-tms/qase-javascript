@@ -25,7 +25,7 @@ import { v4 as uuidv4 } from 'uuid';
 type TestStepResultStatus = (typeof Status)[keyof typeof Status];
 
 const qaseIdRegExp = /^@[Qq]-?(\d+)$/g;
-const newQaseIdRegExp = /^@[Qq]ase[Ii][Dd]=(\d+)$/g;
+const newQaseIdRegExp = /^@[Qq]ase[Ii][Dd]=(\d+(?:,\s*\d+)*)$/g;
 const qaseTitleRegExp = /^@[Qq]ase[Tt]itle=(.+)$/g;
 const qaseFieldsRegExp = /^@[Qq]ase[Ff]ields=(.+)$/g;
 const qaseIgnoreRegExp = /^@[Qq]ase[Ii][Gg][Nn][Oo][Rr][Ee]$/g;
@@ -336,7 +336,7 @@ export class Storage {
       }
 
       if (newQaseIdRegExp.test(tag.name)) {
-        metadata.ids.push(Number(tag.name.replace(/^@[Qq]ase[Ii][Dd]=/, '')));
+        metadata.ids.push(...(tag.name.replace(/^@[Qq]ase[Ii][Dd]=/, '')).split(',').map(Number));
         continue;
       }
 
