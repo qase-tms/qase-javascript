@@ -1,3 +1,10 @@
+# qase-javascript-commons@2.2.12
+
+## What's new
+
+Added a mutex to ensure correct result submission when running tests in multiple threads, preventing potential
+duplication.
+
 # qase-javascript-commons@2.2.11
 
 ## What's new
