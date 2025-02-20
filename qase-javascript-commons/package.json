@@ -1,6 +1,6 @@
 {
   "name": "qase-javascript-commons",
-  "version": "2.2.11",
+  "version": "2.2.12",
   "description": "Qase JS Reporters",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -34,7 +34,8 @@
     "mime-types": "^2.1.33",
     "qaseio": "~2.4.0",
     "strip-ansi": "^6.0.1",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "async-mutex": "~0.5.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",

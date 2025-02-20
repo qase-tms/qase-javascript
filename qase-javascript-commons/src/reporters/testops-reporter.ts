@@ -33,6 +33,7 @@ import { QaseError } from '../utils/qase-error';
 import { LoggerInterface } from '../utils/logger';
 import axios from 'axios';
 import { StateManager } from '../state/state';
+import { Mutex } from 'async-mutex';
 
 const defaultChunkSize = 200;
 
@@ -164,6 +165,8 @@ export class TestOpsReporter extends AbstractReporter {
    */
   private isTestRunReady = false;
 
+  private mutex = new Mutex();
+
   /**
    * @param {LoggerInterface} logger
    * @param {ReporterOptionsType & TestOpsOptionsType} options
@@ -224,18 +227,24 @@ export class TestOpsReporter extends AbstractReporter {
       }
     }
 
-    await super.addTestResult(result);
+    const release = await this.mutex.acquire();
+    try {
 
-    if (!this.isTestRunReady) {
-      return;
-    }
+      await super.addTestResult(result);
 
-    const countOfResults = this.batchSize + this.firstIndex;
+      if (!this.isTestRunReady) {
+        return;
+      }
 
-    if (this.results.length >= countOfResults) {
-      const firstIndex = this.firstIndex;
-      this.firstIndex = countOfResults;
-      await this.publishResults(this.results.slice(firstIndex, countOfResults));
+      const countOfResults = this.batchSize + this.firstIndex;
+
+      if (this.results.length >= countOfResults) {
+        const firstIndex = this.firstIndex;
+        this.firstIndex = countOfResults;
+        await this.publishResults(this.results.slice(firstIndex, countOfResults));
+      }
+    } finally {
+      release();
     }
   }
 
@@ -328,7 +337,12 @@ export class TestOpsReporter extends AbstractReporter {
    * @returns {Promise<void>}
    */
   public async publish(): Promise<void> {
-    await this.sendResults();
+    const release = await this.mutex.acquire();
+    try {
+      await this.sendResults();
+    } finally {
+      release();
+    }
     await this.complete();
   }
 
