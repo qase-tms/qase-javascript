@@ -1,3 +1,15 @@
+# qase-cucumberjs@2.0.5
+
+## What's new
+
+Enabled support for multiple IDs in the `QaseID` tag, allowing tests to be linked to multiple cases.
+
+```gherkin
+@QaseID=1,2,3
+Scenario: Scenario with new Qase ID tag
+Given I have a step
+```
+
 # qase-cucumberjs@2.0.4
 
 ## What's new
