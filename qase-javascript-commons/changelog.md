@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.2.13
+
+## What's new
+
+Enhanced error messages for 403 status code responses to provide clearer and more informative feedback.
+
 # qase-javascript-commons@2.2.12
 
 ## What's new

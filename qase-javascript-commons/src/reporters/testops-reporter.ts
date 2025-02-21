@@ -810,6 +810,11 @@ export class TestOpsReporter extends AbstractReporter {
       return new QaseError(message + ': Not found.');
     }
 
+    if (error.response?.status === 403) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/restrict-template-expressions
+      return new QaseError(`${message}: ${error.response?.data?.errorMessage}`);
+    }
+
     if (error.response?.status === 400 || error.response?.status === 422) {
       return new QaseError(message + ': Bad request. Body: \n ' + JSON.stringify(model));
     }
