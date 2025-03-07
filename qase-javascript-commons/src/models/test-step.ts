@@ -29,6 +29,7 @@ export class TestStepType {
       this.data = {
         action: '',
         expected_result: null,
+        data: null,
       };
     } else {
       this.data = {

@@ -1,3 +1,9 @@
+# playwright-qase-reporter@2.0.17
+
+## What's new
+
+Introduced the ability to specify expected results and data for each step, improving step validation and customization.
+
 # playwright-qase-reporter@2.0.16
 
 ## What's new

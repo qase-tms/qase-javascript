@@ -245,6 +245,23 @@ qase.comment = function(value: string) {
   return this;
 };
 
+/**
+ * Set a expected result and data for the test step
+ * @param action
+ * @param expectedResult
+ * @param data
+ * @example
+ * test('test', async ({ page }) => {
+ *    await test.step(qase.step('action', 'expected result', 'data'), async () => {
+ *      await page.goto('https://example.com');
+ *    });
+ * });
+ */
+qase.step = function(action: string, expectedResult: string | undefined, data: string | undefined): string {
+  return `${action} QaseExpRes:${expectedResult ? `: ${expectedResult}` : ''} QaseData:${data ? `: ${data}` : ''}`;
+};
+
+
 const addMetadata = (metadata: MetadataMessage): void => {
   test.info().attach('qase-metadata.json', {
     contentType: ReporterContentType,
@@ -273,3 +290,4 @@ const addAttachment = (name: string, contentType: string, filePath?: string, bod
   }).catch(() => {/**/
   });
 };
+

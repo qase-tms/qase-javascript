@@ -370,6 +370,7 @@ export class MochaQaseReporter extends reporters.Base {
       data: {
         action: title,
         expected_result: null,
+        data: null,
       },
       execution: {
         start_time: Date.now(),

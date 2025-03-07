@@ -257,13 +257,16 @@ export class PlaywrightQaseReporter implements Reporter {
 
       const attachments = this.stepAttachments.get(testStep);
 
+      const stepData = this.extractAndCleanStep(testStep.title);
+
       const id = uuidv4();
       const step: TestStepType = {
         id: id,
         step_type: StepType.TEXT,
         data: {
-          action: testStep.title,
-          expected_result: null,
+          action: stepData.cleanedString,
+          expected_result: stepData.expectedResult,
+          data: stepData.data,
         },
         parent_id: parentId,
         execution: {
@@ -528,6 +531,32 @@ export class PlaywrightQaseReporter implements Reporter {
     }
 
     return true;
+  }
+
+  private extractAndCleanStep(input: string): { expectedResult: string | null; data: string | null; cleanedString: string } {
+    let expectedResult: string | null = null;
+    let data: string | null = null;
+    let cleanedString = input;
+
+    const hasExpectedResult = /QaseExpRes:/.test(input);
+    const hasData = /QaseData:/.test(input);
+
+    if (hasExpectedResult || hasData) {
+      const regex = /QaseExpRes:\s*:?\s*(.*?)\s*(?=QaseData:|$)QaseData:\s*:?\s*(.*)?/;
+      const match = input.match(regex);
+
+      if (match) {
+        expectedResult = match[1]?.trim() || null;
+        data = match[2]?.trim() || null;
+
+        cleanedString = input
+          .replace(/QaseExpRes:\s*:?\s*.*?(?=QaseData:|$)/, '')
+          .replace(/QaseData:\s*:?\s*.*/, '')
+          .trim();
+      }
+    }
+
+    return { expectedResult, data, cleanedString };
   }
 
 }

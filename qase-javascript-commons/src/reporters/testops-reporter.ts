@@ -625,6 +625,14 @@ export class TestOpsReporter extends AbstractReporter {
             resultStep.data.action = step.data.action;
           }
         }
+
+        if ('expected_result' in step.data && resultStep.data != undefined && step.data.expected_result != null) {
+          resultStep.data.expected_result = step.data.expected_result;
+        }
+
+        if ('data' in step.data && resultStep.data != undefined && step.data.data != null) {
+          resultStep.data.input_data = step.data.data;
+        }
       }
 
       if (step.step_type === StepType.GHERKIN) {
