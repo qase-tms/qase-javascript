@@ -512,6 +512,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
       data: {
         action: title,
         expected_result: null,
+        data: null,
       },
       parent_id: this.storage.getLastItem()?.id ?? null,
       execution: {

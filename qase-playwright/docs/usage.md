@@ -121,6 +121,24 @@ test('A Test case with steps, updated from code', async () => {
   });
 });
 ```
+
+You also can use the `qase.step()` method to set the expected result and data of the step, which will be used in the Qase report.
+
+```javascript
+test('A Test case with steps, updated from code', async () => {
+  await test.step(qase.step('Initialize the environment'), async () => {
+    // Set up test environment
+  });
+  await test.step(qase.step('Test Core Functionality of the app', 'expected result'), async () => {
+    // Exercise core functionality
+  });
+
+  await test.step(qase.step('Verify Expected Behavior of the app', 'expected result', 'data'), async () => {
+    // Assert expected behavior
+  });
+});
+```
+
 <br>
 
 ### Fields

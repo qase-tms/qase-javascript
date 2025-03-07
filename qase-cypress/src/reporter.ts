@@ -362,6 +362,7 @@ export class CypressQaseReporter extends reporters.Base {
       step.data = {
         action: message.name,
         expected_result: null,
+        data: null,
       };
 
       if (lastIndex === messages.indexOf(message) && testStatus !== 'passed') {
@@ -388,6 +389,7 @@ export class CypressQaseReporter extends reporters.Base {
         newStep.data = {
           action: step.name,
           expected_result: null,
+          data: null,
         };
 
         if (attachments[step.id]) {

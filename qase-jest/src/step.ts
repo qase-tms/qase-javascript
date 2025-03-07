@@ -71,6 +71,7 @@ export class QaseStep {
     step.data = {
       action: this.name,
       expected_result: null,
+      data: null,
     };
 
     try {
