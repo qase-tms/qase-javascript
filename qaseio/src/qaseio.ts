@@ -18,13 +18,13 @@ import {
   Configuration, EnvironmentsApi,
 } from './generated';
 
-export type QaseApiOptionsType = {
+export interface QaseApiOptionsType {
   token: string;
   host?: string | undefined;
   headers?: Record<string, string | undefined> | undefined;
   retries?: number | undefined;
   retryDelay?: number | undefined;
-};
+}
 
 export interface QaseApiInterface {
   projects: ProjectsApi;
