@@ -4,7 +4,11 @@ module.exports = {
   roots: ['<rootDir>/test'],
   transform: {
     '^.+\\.ts$': 'ts-jest',
+    '^.+\\.js$': 'babel-jest'
   },
+  transformIgnorePatterns: [
+    '/node_modules/(?!(axios)/)'
+  ],
   testMatch: ['**/*.test.ts'],
   moduleFileExtensions: ['js', 'ts'],
   collectCoverage: true,
