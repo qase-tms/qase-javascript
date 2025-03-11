@@ -1,3 +1,9 @@
+# qaseio@2.4.2
+
+## What's new
+
+Updated axios dependency to address identified security vulnerabilities.
+
 # qaseio@2.4.0
 
 ## What's new

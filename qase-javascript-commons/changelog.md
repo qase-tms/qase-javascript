@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.2.15
+
+## What's new
+
+Updated axios dependency to address identified security vulnerabilities.
+
 # qase-javascript-commons@2.2.13
 
 ## What's new
