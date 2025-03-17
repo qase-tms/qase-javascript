@@ -9,9 +9,14 @@ export class Storage {
 
   clear() {
     this.currentFile = undefined;
-    this.suites = [];
     this.items = [];
     this.ignore = false;
+
+    if (this.suites.length > 0) {
+      this.suites.pop();
+    } else {
+      this.suites = [];
+    }
   }
 
   push(item: TestResultType | TestStepType) {

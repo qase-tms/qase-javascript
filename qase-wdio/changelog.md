@@ -1,3 +1,15 @@
+# qase-wdio@1.0.1
+
+## What's new
+
+Resolved an issue with handling parent test suites, ensuring proper structure and reporting.
+
+# qase-wdio@1.0.0
+
+## What's new
+
+Major release of the WDIO reporter package.
+
 # qase-wdio@1.0.0-beta.4
 
 ## What's new

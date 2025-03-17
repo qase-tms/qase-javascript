@@ -2,7 +2,7 @@
 
 ## What's new
 
-Major release of the Cypress reporter package
+Major release of the Mocha reporter package
 
 # qase-mocha@1.0.0-beta.5
 
