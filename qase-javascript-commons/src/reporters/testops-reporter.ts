@@ -31,7 +31,7 @@ import {
 
 import { QaseError } from '../utils/qase-error';
 import { LoggerInterface } from '../utils/logger';
-import axios from 'axios';
+import { AxiosError, isAxiosError } from 'axios';
 import { StateManager } from '../state/state';
 import { Mutex } from 'async-mutex';
 
@@ -806,28 +806,31 @@ export class TestOpsReporter extends AbstractReporter {
    * @private
    */
   private processError(error: unknown, message: string, model?: object): QaseError {
-    if (!axios.isAxiosError(error)) {
+    if (!isAxiosError(error)) {
       return new QaseError(message, { cause: error });
     }
 
-    if (error.response?.status === 401) {
+    const err = error as AxiosError;
+
+    if (err.response?.status === 401) {
       return new QaseError(message + ': \n Unauthorized. Please check your API token. Maybe it is expired or invalid.');
     }
 
-    if (error.response?.status === 404) {
+    if (err.response?.status === 404) {
       return new QaseError(message + ': Not found.');
     }
 
-    if (error.response?.status === 403) {
+    if (err.response?.status === 403) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/restrict-template-expressions
       return new QaseError(`${message}: ${error.response?.data?.errorMessage}`);
     }
 
-    if (error.response?.status === 400 || error.response?.status === 422) {
-      return new QaseError(message + ': Bad request. Body: \n ' + JSON.stringify(model));
+    if (err.response?.status === 400 || err.response?.status === 422) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/restrict-template-expressions
+      return new QaseError(message + ': \n Bad request: \n' + `${JSON.stringify(err.response?.data)}` + '. \n Body: \n ' + JSON.stringify(model));
     }
 
-    return new QaseError(message, { cause: error });
+    return new QaseError(message, { cause: err });
   }
 
   /**

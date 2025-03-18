@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.2.16
+
+## What's new
+
+Improved logging and exception management to provide clearer diagnostics
+
 # qase-javascript-commons@2.2.15
 
 ## What's new
