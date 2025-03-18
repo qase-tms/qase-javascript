@@ -24,7 +24,7 @@ Feature: Simple feature
   Scenario: Scenario with Qase title tag
     Given I have a step
 
-  @QaseFields={"description":"Description","severity":"high"}
+  @QaseFields={"description":"Description","severity":"major"}
   Scenario: Scenario with Qase fields tag
     Given I have a step
 
