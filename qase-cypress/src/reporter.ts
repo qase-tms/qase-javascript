@@ -147,6 +147,9 @@ export class CypressQaseReporter extends reporters.Base {
    * @private
    */
   private addTestResult(test: Test) {
+    const end_time = Date.now();
+    const duration = end_time - this.testBeginTime;
+
     const metadata = MetadataManager.getMetadata();
 
     if (metadata?.ignore) {
@@ -240,9 +243,9 @@ export class CypressQaseReporter extends reporters.Base {
         status: test.state
           ? CypressQaseReporter.statusMap[test.state]
           : TestStatusEnum.invalid,
-        start_time: null,
-        end_time: null,
-        duration: test.duration ?? 0,
+        start_time: this.testBeginTime / 1000,
+        end_time: end_time / 1000,
+        duration: duration,
         stacktrace: test.err?.stack ?? null,
         thread: null,
       },

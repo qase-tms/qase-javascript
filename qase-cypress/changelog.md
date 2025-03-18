@@ -1,3 +1,9 @@
+# cypress-qase-reporter@2.2.10
+
+## What's new
+
+Enhanced handling of start and end times for tests and steps, ensuring greater accuracy in reporting.
+
 # cypress-qase-reporter@2.2.8
 
 ## What's new
