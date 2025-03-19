@@ -1,3 +1,9 @@
+# qase-newman@2.0.5
+
+## What's new
+
+Enhanced handling of start and end times for tests and steps, ensuring greater accuracy in reporting.
+
 # qase-newman@2.0.4
 
 ## What's new
