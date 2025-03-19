@@ -1,3 +1,9 @@
+# qase-mocha@1.0.2
+
+## What's new
+
+Enhanced handling of start and end times for tests and steps, ensuring greater accuracy in reporting.
+
 # qase-mocha@1.0.0
 
 ## What's new
