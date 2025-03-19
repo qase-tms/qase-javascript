@@ -248,6 +248,8 @@ export class NewmanQaseReporter {
         if (timer) {
           const now = Date.now();
           pendingResult.execution.duration = now - timer;
+          pendingResult.execution.start_time = timer / 1000;
+          pendingResult.execution.end_time = now / 1000;
         }
 
         pendingResult.params = this.prepareParameters(item, exec.cursor.iteration);
