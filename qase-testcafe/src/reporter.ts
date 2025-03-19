@@ -131,6 +131,7 @@ export class TestcafeQaseReporter {
 
   private steps: TestStepType[] = [];
   private attachments: Attachment[] = [];
+  private testBeginTime: number = Date.now();
 
   /**
    * @param {TestcafeQaseOptionsType} options
@@ -170,6 +171,7 @@ export class TestcafeQaseReporter {
   public reportTestStart = () => {
     this.steps = [];
     this.attachments = [];
+    this.testBeginTime = Date.now();
   };
 
   /**
@@ -208,8 +210,8 @@ export class TestcafeQaseReporter {
       author: null,
       execution: {
         status: TestcafeQaseReporter.getStatus(testRunInfo),
-        start_time: null,
-        end_time: null,
+        start_time: this.testBeginTime / 1000,
+        end_time: (this.testBeginTime + testRunInfo.durationMs) / 1000,
         duration: testRunInfo.durationMs,
         stacktrace: errorLog,
         thread: null,
