@@ -1,11 +1,8 @@
 import { AbstractReporter } from './abstract-reporter';
 import { Report, TestStatusEnum, TestStepType } from '../models';
 import { WriterInterface } from '../writer';
-import { HostData } from '../models/host-data';
-import * as os from 'os';
-import * as cp from 'child_process';
-import * as process from 'process';
 import { LoggerInterface } from '../utils/logger';
+import { getHostInfo } from '../utils/hostData';
 
 /**
  * @class ReportReporter
@@ -20,6 +17,8 @@ export class ReportReporter extends AbstractReporter {
   /**
    * @param {LoggerInterface} logger
    * @param {WriterInterface} writer
+   * @param {string} frameworkName
+   * @param {string} reporterName
    * @param {string | undefined} environment
    * @param {string | undefined} rootSuite
    * @param {number | undefined} runId
@@ -27,6 +26,8 @@ export class ReportReporter extends AbstractReporter {
   constructor(
     logger: LoggerInterface,
     private writer: WriterInterface,
+    private frameworkName: string,
+    private reporterName: string,
     environment?: string,
     rootSuite?: string,
     runId?: number,
@@ -111,7 +112,7 @@ export class ReportReporter extends AbstractReporter {
       threads: [],
       suites: [],
       environment: this.environment ?? '',
-      host_data: this.getHostInfo(),
+      host_data: getHostInfo(this.frameworkName, this.reporterName),
     };
 
     for (const result of this.results) {
@@ -166,51 +167,5 @@ export class ReportReporter extends AbstractReporter {
     }
 
     return steps;
-  }
-
-  /**
-   * @returns {HostData}
-   */
-  private getHostInfo(): HostData {
-    return {
-      system: process.platform,
-      node: this.getComputerName(),
-      release: os.release(),
-      version: this.getDetailedOSInfo(),
-      machine: os.arch(),
-      python: '',
-      pip: '',
-      node_version: cp.execSync('node --version').toString().trim(),
-      npm: cp.execSync('npm --version').toString().trim(),
-    };
-  }
-
-  /**
-   * @returns {string}
-   */
-  private getComputerName(): string {
-    switch (process.platform) {
-      case 'win32':
-        return process.env['COMPUTERNAME'] ?? '';
-      case 'darwin':
-        return cp.execSync('scutil --get ComputerName').toString().trim();
-      case 'linux': {
-        const prettyname = cp.execSync('hostnamectl --pretty').toString().trim();
-        return prettyname === '' ? os.hostname() : prettyname;
-      }
-      default:
-        return os.hostname();
-    }
-  }
-
-  /**
-   * @returns {string}
-   */
-  private getDetailedOSInfo(): string {
-    if (process.platform === 'darwin') {
-      return cp.execSync('uname -a').toString().trim();
-    } else {
-      return `${os.type()} ${os.release()} ${os.arch()}`;
-    }
   }
 }

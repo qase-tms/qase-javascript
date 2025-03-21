@@ -1,11 +1,13 @@
-export type HostData = {
-  system: string
-  node: string
-  release: string
-  version: string
-  machine: string
-  python: string
-  pip: string
-  node_version: string
-  npm: string
+export interface HostData {
+  system: string;
+  machineName: string;
+  release: string;
+  version: string;
+  arch: string;
+  node: string;
+  npm: string;
+  framework: string;
+  reporter: string;
+  commons: string;
+  apiClient: string;
 }
