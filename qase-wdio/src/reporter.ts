@@ -74,7 +74,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     this.reporter = QaseReporter.getInstance({
       ...composeOptions(options, config),
-      frameworkPackage: 'wdio',
+      frameworkPackage: '@wdio/cli',
       frameworkName: 'wdio',
       reporterName: 'wdio-qase-reporter',
     });

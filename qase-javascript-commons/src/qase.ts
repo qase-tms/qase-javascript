@@ -1,5 +1,3 @@
-import { execSync } from 'child_process';
-
 import envSchema from 'env-schema';
 import chalk from 'chalk';
 import { QaseApi } from 'qaseio';
@@ -21,12 +19,12 @@ import {
 import { TestStatusEnum, TestResultType } from './models';
 import { DriverEnum, FsWriter } from './writer';
 
-import { getPackageVersion } from './utils/get-package-version';
 import { CustomBoundaryFormData } from './utils/custom-boundary';
 import { DisabledException } from './utils/disabled-exception';
 import { Logger, LoggerInterface } from './utils/logger';
 import { StateManager, StateModel } from './state/state';
 import { ConfigType } from './config';
+import { getHostInfo } from './utils/hostData';
 
 /**
  * @type {Record<TestStatusEnum, (test: TestResultType) => string>}
@@ -62,52 +60,6 @@ export interface ReporterInterface {
  */
 export class QaseReporter implements ReporterInterface {
   private static instance: QaseReporter | null;
-
-  /**
-   * @param {string} frameworkPackage
-   * @param {string} frameworkName
-   * @param {string} reporterName
-   * @returns {Record<string, string>}
-   * @private
-   */
-  private static createHeaders(
-    frameworkPackage: string,
-    frameworkName: string,
-    reporterName: string,
-  ): Record<string, string> {
-    const { version: nodeVersion, platform: os, arch } = process;
-    const npmVersion = execSync('npm -v', { encoding: 'utf8' }).replace(
-      /['"\n]+/g,
-      '',
-    );
-    const qaseApiVersion = getPackageVersion('qaseio');
-    const qaseReporterVersion = getPackageVersion('qase-javascript-commons');
-    const frameworkVersion = getPackageVersion(frameworkPackage);
-    const reporterVersion = getPackageVersion(reporterName);
-
-    const client: string[] = [];
-
-    if (frameworkVersion) {
-      client.push(`${frameworkName}=${frameworkVersion}`);
-    }
-
-    if (reporterVersion) {
-      client.push(`qase-${frameworkName}=${reporterVersion}`);
-    }
-
-    if (qaseReporterVersion) {
-      client.push(`qase-core-reporter=${qaseReporterVersion}`);
-    }
-
-    if (qaseApiVersion) {
-      client.push(`qaseio=${String(qaseApiVersion)}`);
-    }
-
-    return {
-      'X-Client': client.join('; '),
-      'X-Platform': `node=${nodeVersion}; npm=${npmVersion}; os=${os}; arch=${arch}`,
-    };
-  }
 
   /**
    * @type {InternalReporterInterface}
@@ -172,6 +124,9 @@ export class QaseReporter implements ReporterInterface {
 
     this.logger = new Logger({ debug: composedOptions.debug });
     this.logger.logDebug(`Config: ${JSON.stringify(this.sanitizeOptions(composedOptions))}`);
+
+    const hostData = getHostInfo(options.frameworkPackage, options.reporterName);
+    this.logger.logDebug(`Host data: ${JSON.stringify(hostData)}`);
 
     this.captureLogs = composedOptions.captureLogs;
 
@@ -328,7 +283,6 @@ export class QaseReporter implements ReporterInterface {
    */
   public startTestRun(): void {
     if (this.withState) {
-      console.log("Clean state");
       StateManager.clearState();
     }
 
@@ -514,7 +468,6 @@ export class QaseReporter implements ReporterInterface {
   ): InternalReporterInterface {
     const {
       frameworkPackage,
-      frameworkName,
       reporterName,
       environment,
       rootSuite,
@@ -559,11 +512,6 @@ export class QaseReporter implements ReporterInterface {
           token,
           headers: {
             ...headers,
-            ...QaseReporter.createHeaders(
-              frameworkPackage,
-              frameworkName,
-              reporterName,
-            ),
           },
           ...api,
         }, CustomBoundaryFormData);
@@ -598,6 +546,8 @@ export class QaseReporter implements ReporterInterface {
         return new ReportReporter(
           this.logger,
           writer,
+          frameworkPackage,
+          reporterName,
           environment,
           rootSuite,
           testops.run?.id);

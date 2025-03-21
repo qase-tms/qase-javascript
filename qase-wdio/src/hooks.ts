@@ -7,7 +7,7 @@ export async function beforeRunHook() {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const reporter = QaseReporter.getInstance({
     ...config,
-    frameworkPackage: 'wdio',
+    frameworkPackage: '@wdio/cli',
     frameworkName: 'wdio',
     reporterName: 'wdio-qase-reporter',
   });
