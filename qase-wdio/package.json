@@ -1,6 +1,6 @@
 {
   "name": "wdio-qase-reporter",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Qase WebDriverIO Reporter",
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "sideEffects": false,

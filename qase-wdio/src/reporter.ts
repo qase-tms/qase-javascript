@@ -275,19 +275,22 @@ export default class WDIOQaseReporter extends WDIOReporter {
       return;
     }
 
-    const relations: Relation = {};
-    if (this.storage.suites.length > 0) {
-      relations.suite = {
-        data: this.storage.suites.map((suite) => {
-          return {
-            title: suite,
-            public_id: null,
-          };
-        }),
-      };
+    if (testResult.relations === null) {
+      const relations: Relation = {};
+      if (this.storage.suites.length > 0) {
+        relations.suite = {
+          data: this.storage.suites.map((suite) => {
+            return {
+              title: suite,
+              public_id: null,
+            };
+          }),
+        };
+      }
+
+      testResult.relations = relations;
     }
 
-    testResult.relations = relations;
     testResult.execution.duration = testResult.execution.start_time ? Math.round(end_time - testResult.execution.start_time) : 0;
     testResult.execution.status = status;
     testResult.execution.stacktrace = err === null ?

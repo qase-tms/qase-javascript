@@ -1,3 +1,9 @@
+# qase-wdio@1.0.2
+
+## What's new
+
+Resolved an issue where a custom suite set via `qase.suite` was not included in the test results.
+
 # qase-wdio@1.0.1
 
 ## What's new
