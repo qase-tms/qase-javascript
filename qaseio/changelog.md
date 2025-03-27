@@ -1,3 +1,10 @@
+# qaseio@2.4.3
+
+## What's new
+
+- New field in the search endpoint of the public API contract.
+- Extended API client functionality to accommodate the updated contract.
+
 # qaseio@2.4.2
 
 ## What's new
