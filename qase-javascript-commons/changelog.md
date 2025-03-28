@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.2.18
+
+## What's new
+
+Resolved an issue where retrieving installed package versions failed if some dependencies were missing.
+
 # qase-javascript-commons@2.2.17
 
 ## What's new
