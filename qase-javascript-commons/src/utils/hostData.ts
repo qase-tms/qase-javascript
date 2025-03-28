@@ -120,9 +120,15 @@ function getPackageVersion(packageName: string): string | null {
       return packageJson.version;
     }
 
+
     // Try using npm list as fallback with recursive search
-    const output = execCommand(`npm list --depth=10 --json`);
-    if (!output) return null;
+    let output = null;
+    try {
+      output = execCommand(`npm list --depth=10 --json`);
+      if (!output) return null;
+    } catch (error) {
+      return null;
+    }
 
     try {
       const npmList = JSON.parse(output) as NpmListResult;
