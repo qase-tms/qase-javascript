@@ -1,5 +1,6 @@
 const { qase } = require("jest-qase-reporter/jest");
 const { markdownContent } = require("./markdownContent");
+const {describe, test, expect} = require("@jest/globals");
 
 describe("Example: fields.test.js\tTest cases with field: Priority", () => {
   /*

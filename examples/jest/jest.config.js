@@ -9,14 +9,12 @@ module.exports = {
       'jest-qase-reporter',
       {
         debug: true,
-
         testops: {
+          uploadAttachments: true,
           api: {
             token: 'api_key',
           },
-
           project: 'project_code',
-
           run: {
             complete: true,
           },

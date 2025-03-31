@@ -2,13 +2,13 @@
   "name": "examples-jest",
   "private": true,
   "scripts": {
-    "test": "QASE_MODE=testops jest"
+    "test": "QASE_MODE=testops jest --runInBand"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.22.4",
     "@jest/globals": "^29.5.0",
     "babel-jest": "^29.5.0",
     "jest": "^29.5.0",
-    "jest-qase-reporter": "^2.0.3"
+    "jest-qase-reporter": "^2.0.5"
   }
 }

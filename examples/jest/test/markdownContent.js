@@ -1,4 +1,4 @@
-const markdownContent = `# Markdown Syntax Showcase
+export const markdownContent = `# Markdown Syntax Showcase
 
 ## Headers
 ### Different Header Levels
