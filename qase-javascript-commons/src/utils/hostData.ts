@@ -3,6 +3,7 @@ import * as cp from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import { HostData } from '../models/host-data';
+import { execSync } from "child_process";
 
 interface PackageJson {
   version: string;
@@ -124,7 +125,7 @@ function getPackageVersion(packageName: string): string | null {
     // Try using npm list as fallback with recursive search
     let output = null;
     try {
-      output = execCommand(`npm list --depth=10 --json`);
+      output = execSync(`npm list --depth=10 --json`, { stdio: "pipe" }).toString();
       if (!output) return null;
     } catch (error) {
       return null;
