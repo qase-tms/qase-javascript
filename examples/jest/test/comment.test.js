@@ -1,4 +1,5 @@
 const { qase } = require("jest-qase-reporter/jest");
+const {describe, test, expect} = require("@jest/globals");
 
 describe("Example: comment.test.js", () => {
   test("A test case with qase.comment()", () => {

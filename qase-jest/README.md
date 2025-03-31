@@ -116,7 +116,7 @@ describe('My First Test', () => {
 To run tests and create a test run, execute the command (for example from folder examples):
 
 ```bash
-QASE_MODE=testops npx jest
+QASE_MODE=testops npx jest --runInBand
 ```
 
 or
