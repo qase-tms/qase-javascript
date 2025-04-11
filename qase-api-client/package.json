@@ -1,0 +1,39 @@
+{
+  "name": "qase-api-client",
+  "version": "1.0.0",
+  "description": "Qase TMS Javascript API V1 Client",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "homepage": "https://github.com/qase-tms/qase-javascript",
+  "bugs": {
+    "url": "https://github.com/qase-tms/qase-javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qase-tms/qase-javascript.git"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "scripts": {
+    "build": "npm run clean && tsc --project tsconfig.build.json",
+    "lint": "eslint .",
+    "test": "jest",
+    "clean": "rm -rf dist"
+  },
+  "author": "Qase Team <support@qase.io>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "axios": "^1.8.2",
+    "axios-retry": "^3.5.0"
+  },
+  "devDependencies": {
+    "@jest/globals": "^27.5.1",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^12.11.5",
+    "axios-mock-adapter": "^1.21.4",
+    "jest": "^27.5.1",
+    "ts-jest": "^29.1.4",
+    "typescript": "^5.4.5"
+  }
+}

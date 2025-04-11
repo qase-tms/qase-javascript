@@ -20,10 +20,12 @@ If your project is using a v1 reporter, check out the reporter's readme for the 
 | Playwright                    | `playwright-qase-reporter` | [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qase-playwright#readme)         | [🗿deprecated](https://github.com/qase-tms/qase-javascript/tree/master/qase-playwright#readme) |
 | Testcafe                      | `testcafe-reporter-qase`   | [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qase-testcafe#readme)           | [🗿deprecated](https://github.com/qase-tms/qase-javascript/tree/master/qase-testcafe#readme)   |
 | Mocha                         | `mocha-qase-reporter`      | not available                                                                                      | [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qase-mocha#readme)          |
-| WebDriverIO                   | `wdio-qase-reporter`       | not available                                                                                      | [🧪 open beta](https://github.com/qase-tms/qase-javascript/tree/main/qase-wdio#readme)         |
+| WebDriverIO                   | `wdio-qase-reporter`       | not available                                                                                      | [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qase-wdio#readme)         |
 | **Qase JavaScript SDK**       |
 | Common functions library      | `qase-javascript-commons`  | [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qase-javascript-commons#readme) | not available                                                                                  |
-| JavaScript API client         | `qaseio`                   | [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qaseio#readme)                  | [🗿deprecated](https://github.com/qase-tms/qase-javascript/tree/master/qaseio#readme)          |
+| JavaScript API client v1      | `qase-api-client`          |  not available      |         [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qase-api-client#readme)                                                                             |
+| JavaScript API client v2      | `qase-api-v2-client`       |  not available    |       [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qase-api-v2-client#readme)                                                                         |
+| JavaScript API client         | `qaseio`                   | [🗿deprecated](https://github.com/qase-tms/qase-javascript/tree/main/qaseio#readme)                  | [🗿deprecated](https://github.com/qase-tms/qase-javascript/tree/master/qaseio#readme)          |
 
 What each status means:
 
