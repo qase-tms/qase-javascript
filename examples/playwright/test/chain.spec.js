@@ -13,7 +13,7 @@ test.describe("Example: chain.spec.js", () => {
                     Tech debt grows where shortcuts go,
                     Refactor later? Ha! We know.`,
       })
-      .attach({ paths: "./tests/examples/attachments/test-file.txt" })
+      .attach({ paths: "./test/attachments/test-file.txt" })
       .comment(
         "This comment will be displayed in the 'Actual Result' field of the test result in Qase.",
       );
