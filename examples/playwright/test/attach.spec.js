@@ -4,7 +4,7 @@ import { qase } from "playwright-qase-reporter";
 test.describe("Example: attach.spec.js", () => {
   test("Test result with attachment", async () => {
     // To attach a single file
-    qase.attach({ paths: "./tests/examples/attachments/test-file.txt" });
+    qase.attach({ paths: "./test/attachments/test-file.txt" });
 
     /* 
      // Add multiple attachments. 
