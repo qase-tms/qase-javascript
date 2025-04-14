@@ -1,6 +1,5 @@
 import envSchema from 'env-schema';
 import chalk from 'chalk';
-import { QaseApi } from 'qaseio';
 
 import {
   InternalReporterInterface,
@@ -19,12 +18,13 @@ import {
 import { TestStatusEnum, TestResultType } from './models';
 import { DriverEnum, FsWriter } from './writer';
 
-import { CustomBoundaryFormData } from './utils/custom-boundary';
 import { DisabledException } from './utils/disabled-exception';
 import { Logger, LoggerInterface } from './utils/logger';
 import { StateManager, StateModel } from './state/state';
 import { ConfigType } from './config';
 import { getHostInfo } from './utils/hostData';
+import { ClientV2 } from './client/clientV2';
+import { TestOpsOptionsType } from './models/config/TestOpsOptionsType';
 
 /**
  * @type {Record<TestStatusEnum, (test: TestResultType) => string>}
@@ -235,7 +235,7 @@ export class QaseReporter implements ReporterInterface {
       }
 
       try {
-        await this.fallbackReporter?.sendResults();
+        await this.fallbackReporter.sendResults();
         if (this.withState) {
           StateManager.setMode(this.options.fallback as ModeEnum);
         }
@@ -271,7 +271,7 @@ export class QaseReporter implements ReporterInterface {
       }
 
       try {
-        await this.fallbackReporter?.complete();
+        await this.fallbackReporter.complete();
       } catch (error) {
         this.logger.logError('Unable to complete the run in the fallback reporter:', error);
       }
@@ -304,7 +304,7 @@ export class QaseReporter implements ReporterInterface {
         }
 
         try {
-          this.startTestRunOperation = this.fallbackReporter?.startTestRun();
+          this.startTestRunOperation = this.fallbackReporter.startTestRun();
           if (this.withState) {
             StateManager.setMode(this.options.fallback as ModeEnum);
           }
@@ -466,91 +466,51 @@ export class QaseReporter implements ReporterInterface {
     mode: ModeEnum,
     options: OptionsType,
   ): InternalReporterInterface {
-    const {
-      frameworkPackage,
-      reporterName,
-      environment,
-      rootSuite,
-      report = {},
-      testops = {},
-    } = options;
 
     switch (mode) {
       case ModeEnum.testops: {
-        const {
-          api: {
-            token,
-            headers,
-            ...api
-          } = {},
-          project,
-          run: {
-            title,
-            description,
-            ...run
-          } = {},
-          plan = {},
-          batch = {},
-          useV2,
-          defect,
-          uploadAttachments,
-        } = testops;
-
-        if (!token) {
+        if (!options.testops?.api?.token) {
           throw new Error(
             `Either "testops.api.token" parameter or "${EnvApiEnum.token}" environment variable is required in "testops" mode`,
           );
         }
 
-        if (!project) {
+        if (!options.testops.project) {
           throw new Error(
             `Either "testops.project" parameter or "${EnvTestOpsEnum.project}" environment variable is required in "testops" mode`,
           );
         }
 
-        const apiClient = new QaseApi({
-          token,
-          headers: {
-            ...headers,
-          },
-          ...api,
-        }, CustomBoundaryFormData);
+        const apiClient = new ClientV2(
+          this.logger,
+          options.testops as TestOpsOptionsType,
+          options.environment,
+          options.rootSuite,
+        );
 
         return new TestOpsReporter(
           this.logger,
-          {
-            project,
-            uploadAttachments,
-            run: {
-              title: title ?? `Automated run ${new Date().toISOString()}`,
-              description: description ?? `${reporterName} automated run`,
-              ...run,
-            },
-            plan,
-            batch,
-            useV2,
-            defect,
-          },
           apiClient,
           this.withState,
-          environment,
-          rootSuite,
-          api.host,
+          options.testops.project,
+          options.testops.api.host,
+          options.testops.batch?.size,
+          options.testops.run?.id
         );
       }
 
       case ModeEnum.report: {
-        const localOptions = report.connections?.[DriverEnum.local];
+        const localOptions = options.report?.connections?.[DriverEnum.local];
         const writer = new FsWriter(localOptions);
 
         return new ReportReporter(
           this.logger,
           writer,
-          frameworkPackage,
-          reporterName,
-          environment,
-          rootSuite,
-          testops.run?.id);
+          options.frameworkPackage,
+          options.reporterName,
+          options.environment,
+          options.rootSuite,
+          options.testops?.run?.id);
       }
 
       case ModeEnum.off:

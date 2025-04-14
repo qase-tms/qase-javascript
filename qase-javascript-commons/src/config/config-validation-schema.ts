@@ -57,27 +57,6 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
               type: 'string',
               nullable: true,
             },
-
-            headers: {
-              type: 'object',
-              nullable: true,
-              additionalProperties: false,
-              patternProperties: {
-                '^.*$': {
-                  type: 'string',
-                },
-              },
-            },
-
-            retries: {
-              type: 'number',
-              nullable: true,
-            },
-
-            retryDelay: {
-              type: 'number',
-              nullable: true,
-            },
           },
         },
 
@@ -140,11 +119,6 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
         },
 
         defect: {
-          type: 'boolean',
-          nullable: true,
-        },
-
-        useV2: {
           type: 'boolean',
           nullable: true,
         },

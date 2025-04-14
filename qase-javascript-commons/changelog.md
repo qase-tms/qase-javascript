@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.3.0
+
+## What's new
+
+Migrated to the new API clients for v1 (`qase-api-client`) and v2 (`qase-api-v2-client`) from the `qaseio`.
+
 # qase-javascript-commons@2.2.18
 
 ## What's new
@@ -289,10 +295,10 @@ log a warning message.
 
 ## What's new
 
-* The `useV2` option in the reporter's configuration will now enable using the experimental v2 API.
+- The `useV2` option in the reporter's configuration will now enable using the experimental v2 API.
   Before this fix, v1 API was used despite the configuration.
 
-* Attachments from test steps will now be uploaded to Qase.
+- Attachments from test steps will now be uploaded to Qase.
   Before this fix, the reporter uploaded only the attachments made outside of any step scope.
 
 # qase-javascript-commons@2.0.0-beta.10
@@ -380,10 +386,10 @@ where `10` is the size of the chunk in test result's count.
 Qase TestOps API has two endpoints for reporting test results:
 
 - Version 1, stable and used my most test reporters.
-  https://developers.qase.io/reference/create-result-bulk
+  <https://developers.qase.io/reference/create-result-bulk>
 - Version 2, currently in beta access, and currently supported only
   in the `playwright-qase-reporter`.
-  https://developers.qase.io/v2.0/reference/create-results-v2
+  <https://developers.qase.io/v2.0/reference/create-results-v2>
 
 This commit introduces a way to select the API version to use.
 It enables using all new features of v2 JS reporters with the stable v1 API,
@@ -398,7 +404,7 @@ To enable using API v2, set an environment variable before running the tests:
 QASE_TESTOPS_API_V2=true
 ```
 
-### Support adding test suite description to a test report.
+### Support adding test suite description to a test report
 
 Test reporters can now test suite description to test results.
 Such description can be collected from test's location and attributes
@@ -414,22 +420,22 @@ Add new data models:
 
 ## What's new
 
-* Update the config of reporters. Added `captureLogs` field. If it is set to `true`, the reporter will capture logs from
+- Update the config of reporters. Added `captureLogs` field. If it is set to `true`, the reporter will capture logs from
   the test framework.
-* Added `getMimeType` function to the commons package. It returns the MIME type of the file by its extension.
+- Added `getMimeType` function to the commons package. It returns the MIME type of the file by its extension.
 
 # qase-javascript-commons@2.0.0-beta.4
 
 ## What's new
 
-* Added support for uploading attachments from strings and buffers in the testops reporter.
-* Changed data type of `content` in the attachment data from `any` to `string | Buffer`.
+- Added support for uploading attachments from strings and buffers in the testops reporter.
+- Changed data type of `content` in the attachment data from `any` to `string | Buffer`.
 
 # qase-javascript-commons@2.0.0-beta.3
 
 ## What's new
 
-* Changed data type of `fields` and `parameters` in the test result data
+- Changed data type of `fields` and `parameters` in the test result data
   from `Map<string, string>` to `Record<string, string>`.
 
 # qase-javascript-commons@2.0.0-beta.2
@@ -448,10 +454,10 @@ npm install playwright-qase-reporter@beta
 
 ## What's new
 
-* Set a fallback reporter when the primary reporter can't be used,
+- Set a fallback reporter when the primary reporter can't be used,
   such as when the `testops` reporter can't authenticate with the Qase API.
-* Rename some environment variables to keep naming consistent between reporters in all languages.
-* Add several environment variables for new config options.
-* Write outputs in JSONP format, which can be used with
+- Rename some environment variables to keep naming consistent between reporters in all languages.
+- Add several environment variables for new config options.
+- Write outputs in JSONP format, which can be used with
   [Qase Report](https://github.com/qase-tms/qase-report).
-* Logic for handling test with multiple case IDs moved to the commons package.
+- Logic for handling test with multiple case IDs moved to the commons package.

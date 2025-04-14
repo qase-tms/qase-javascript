@@ -38,15 +38,15 @@ export class TestResultType {
   }
 }
 
-export type Relation = {
+export interface Relation {
   suite?: Suite
 }
 
-export type Suite = {
+export interface Suite {
   data: SuiteData[]
 }
 
-export type SuiteData = {
+export interface SuiteData {
   title: string
   public_id: number | null
 }
