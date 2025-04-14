@@ -7,10 +7,10 @@ import { TestResultType, Attachment, Report } from '../models';
 import { FormatterInterface, JsonFormatter, JsonpFormatter } from '../formatter';
 import { FormatEnum } from './driver-enum';
 
-export type FsWriterOptionsType = {
+export interface FsWriterOptionsType {
   path?: string | undefined;
   format?: `${FormatEnum}` | undefined;
-};
+}
 
 /**
  * @class FsWriter

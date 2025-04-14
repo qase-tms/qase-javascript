@@ -3,7 +3,7 @@ import { ShortResult } from './short-result';
 import { Stats } from './stats';
 import { ExecutionSum } from './execution-sum';
 
-export type Report = {
+export interface Report {
     environment: string
     execution: ExecutionSum
     host_data: HostData

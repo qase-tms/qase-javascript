@@ -1,4 +1,4 @@
-export type Stats = {
+export interface Stats {
   passed: number
   failed: number
   skipped: number
