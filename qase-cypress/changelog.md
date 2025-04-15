@@ -1,3 +1,10 @@
+# cypress-qase-reporter@2.3.0
+
+## What's new
+
+- Updated to the latest minor version of the common package for improved compatibility and features.
+- Fixed all ESLint warnings across the project to ensure code quality and maintainability.
+
 # cypress-qase-reporter@2.2.10
 
 ## What's new

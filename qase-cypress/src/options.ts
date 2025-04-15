@@ -1,3 +1,3 @@
-export type ReporterOptionsType = {
+export interface ReporterOptionsType {
   screenshotsFolder?: string;
-};
+}
