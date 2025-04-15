@@ -139,10 +139,10 @@ export class MochaQaseReporter extends reporters.Base {
     });
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
+    // @ts-expect-error
     process.stdout.write = stdoutInterceptor.write.bind(stdoutInterceptor);
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
+    // @ts-expect-error
     process.stderr.write = stderrInterceptor.write.bind(stderrInterceptor);
 
     this.testOutputs.set(test.title, { stdout: '', stderr: '' });
@@ -251,7 +251,7 @@ export class MochaQaseReporter extends reporters.Base {
 
     if (file) {
       const executionPath = process.cwd() + '/';
-      const path = file.replace(executionPath, '') ?? '';
+      const path = file.replace(executionPath, '');
       signature = path.split('/').join('::');
     }
 
