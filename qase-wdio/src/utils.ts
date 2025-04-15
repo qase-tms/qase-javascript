@@ -5,6 +5,7 @@ import { CommandArgs } from '@wdio/reporter';
  * @param object {Object}
  * @private
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isEmpty = (object: any) =>
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   !object || Object.keys(object).length === 0;

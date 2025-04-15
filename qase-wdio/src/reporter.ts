@@ -65,6 +65,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
   private _options: QaseReporterOptions;
   private _isMultiremote?: boolean;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(options: any) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     super(options);
@@ -185,7 +186,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
     this.storage.clear();
   }
 
-  override async onRunnerEnd(_: RunnerStats) {
+  override async onRunnerEnd() {
     await this.reporter.sendResults();
     this.isSync = true;
   }
@@ -208,6 +209,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
   private static transformError(testErrors: Error[]): CompoundError {
     const err = new CompoundError();
     for (const error of testErrors) {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (error.message == undefined) {
         continue;
       }
@@ -438,8 +440,6 @@ export default class WDIOQaseReporter extends WDIOReporter {
   }
 
   addAttachment({ name, type, content, paths }: AddAttachmentEventArgs) {
-    console.log('addAttachment');
-    console.log(name, type, content, paths);
     const curTest = this.storage.getCurrentTest();
     if (!curTest) {
       return;
@@ -532,7 +532,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
     this.storage.push(step);
   }
 
-  private attachJSON(name: string, json: any) {
+  private attachJSON(name: string, json: unknown) {
     const isStr = typeof json === 'string';
     const content = isStr ? json : JSON.stringify(json, null, 2);
 

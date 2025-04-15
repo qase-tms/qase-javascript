@@ -48,7 +48,7 @@ export const findLast = <T>(
 
   for (let i = arr.length - 1; i >= 0; i--) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
+    // @ts-expect-error
     if (predicate(arr[i])) {
       result = arr[i];
       break;
