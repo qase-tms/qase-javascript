@@ -538,16 +538,16 @@ export class PlaywrightQaseReporter implements Reporter {
     let data: string | null = null;
     let cleanedString = input;
 
-    const hasExpectedResult = /QaseExpRes:/.test(input);
-    const hasData = /QaseData:/.test(input);
+    const hasExpectedResult = input.includes('QaseExpRes:');
+    const hasData = input.includes('QaseData:');
 
     if (hasExpectedResult || hasData) {
       const regex = /QaseExpRes:\s*:?\s*(.*?)\s*(?=QaseData:|$)QaseData:\s*:?\s*(.*)?/;
       const match = input.match(regex);
 
       if (match) {
-        expectedResult = match[1]?.trim() || null;
-        data = match[2]?.trim() || null;
+        expectedResult = match[1]?.trim() ?? null;
+        data = match[2]?.trim() ?? null;
 
         cleanedString = input
           .replace(/QaseExpRes:\s*:?\s*.*?(?=QaseData:|$)/, '')
