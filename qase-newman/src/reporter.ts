@@ -341,16 +341,16 @@ export class NewmanQaseReporter {
 
 
   /**
-   * @param {any} iterationData
+   * @param {unknown} iterationData
    * @private
    */
-  private getParameters(iterationData: any): Record<string, string>[] {
+  private getParameters(iterationData: unknown): Record<string, string>[] {
     if (!iterationData) {
       return [];
     }
 
     if (Array.isArray(iterationData) && iterationData.every(item => typeof item === 'object' && item !== null)) {
-      return iterationData.map((item: Record<string, any>) => this.convertToRecord(item));
+      return iterationData.map((item: Record<string, unknown>) => this.convertToRecord(item));
     }
 
     return [];
