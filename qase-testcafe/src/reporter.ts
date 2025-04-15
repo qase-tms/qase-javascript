@@ -184,7 +184,7 @@ export class TestcafeQaseReporter {
     title: string,
     testRunInfo: TestRunInfoType,
     meta: Record<string, string>,
-    formatError: (error: any, prefix: string) => string,
+    formatError: (error: unknown, prefix: string) => string,
   ) => {
     const metadata = this.getMeta(meta);
 
