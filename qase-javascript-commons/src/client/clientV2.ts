@@ -77,7 +77,7 @@ export class ClientV2 extends ClientV1 {
             title: result.title,
             execution: this.getExecution(result.execution),
             testops_ids: Array.isArray(result.testops_id) 
-                ? result.testops_id.filter((id): id is number => id !== null) 
+                ? result.testops_id
                 : result.testops_id !== null ? [result.testops_id] : null,
             attachments: attachments,
             steps: steps,
@@ -133,7 +133,7 @@ export class ClientV2 extends ClientV1 {
 
         if (step.step_type === StepType.TEXT) {
             this.processTextStep(step, resultStep, testTitle);
-        } else if (step.step_type === StepType.GHERKIN) {
+        } else {
             this.processGherkinStep(step, resultStep);
         }
 

@@ -10,6 +10,7 @@ import {
 
 import { DriverEnum } from '../writer';
 import { ConfigType } from '../config';
+import { FormatEnum } from '../writer/driver-enum';
 
 /**
  * @param {EnvType} env
@@ -52,7 +53,7 @@ export const envToConfig = (env: EnvType): ConfigType => ({
     connections: {
       [DriverEnum.local]: {
         path: env[EnvLocalEnum.path],
-        format: env[EnvLocalEnum.format],
+        format: env[EnvLocalEnum.format] as FormatEnum | undefined,
       },
     },
   },

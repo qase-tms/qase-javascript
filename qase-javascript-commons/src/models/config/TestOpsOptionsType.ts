@@ -11,8 +11,8 @@ export interface TestOpsOptionsType {
 
 export interface TestOpsRunType {
   id?: number | undefined;
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
   complete?: boolean | undefined;
 }
 

@@ -9,7 +9,7 @@ import { FormatEnum } from './driver-enum';
 
 export interface FsWriterOptionsType {
   path?: string | undefined;
-  format?: `${FormatEnum}` | undefined;
+  format?: FormatEnum | undefined;
 }
 
 /**
@@ -18,7 +18,7 @@ export interface FsWriterOptionsType {
  */
 export class FsWriter implements WriterInterface {
   private readonly path: string;
-  private readonly format: string;
+  private readonly format: FormatEnum;
   private formatter: FormatterInterface;
 
   /**

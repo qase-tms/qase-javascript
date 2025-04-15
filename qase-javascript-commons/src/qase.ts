@@ -363,6 +363,7 @@ export class QaseReporter implements ReporterInterface {
           return;
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (!this.useFallback) {
           this.fallbackReporter.setTestResults(this.upstreamReporter?.getTestResults() ?? []);
           this.useFallback = true;
@@ -530,10 +531,7 @@ export class QaseReporter implements ReporterInterface {
   }
 
   private setWithState(options: OptionsType): boolean {
-    return options.frameworkName == 'cypress'
-      || options.frameworkName == ''
-      || options.frameworkName == null
-      || options.frameworkName == undefined;
+    return options.frameworkName === 'cypress' || !options.frameworkName;
   }
 
   private maskToken(token: string): string {
@@ -543,27 +541,13 @@ export class QaseReporter implements ReporterInterface {
     return `${token.slice(0, 3)}****${token.slice(-4)}`;
   }
 
-  private sanitizeOptions<T extends Record<string, any>>(options: T): T {
-    if (typeof options !== 'object' || options === null) {
-      return options;
+  private sanitizeOptions(options: ConfigType & OptionsType): ConfigType & OptionsType {
+    const sanitized = JSON.parse(JSON.stringify(options)) as ConfigType & OptionsType;
+
+    if (sanitized.testops?.api?.token) {
+      sanitized.testops.api.token = this.maskToken(sanitized.testops.api.token);
     }
 
-    const sanitizedObject: Partial<T> = {};
-
-    for (const key in options) {
-      if (Object.prototype.hasOwnProperty.call(options, key)) {
-        const value = options[key];
-
-        if (key === 'token' && typeof value === 'string') {
-          sanitizedObject[key] = this.maskToken(value) as T[typeof key];
-        } else if (typeof value === 'object' && value !== null) {
-          sanitizedObject[key] = this.sanitizeOptions(value) as T[typeof key];
-        } else {
-          sanitizedObject[key] = value;
-        }
-      }
-    }
-
-    return sanitizedObject as T;
+    return sanitized;
   }
 }
