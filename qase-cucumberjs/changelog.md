@@ -1,3 +1,10 @@
+# qase-cucumberjs@2.1.0
+
+## What's new
+
+- Updated to the latest minor version of the common package for improved compatibility and features.
+- Fixed all ESLint warnings across the project to ensure code quality and maintainability.
+
 # qase-cucumberjs@2.0.7
 
 ## What's new

@@ -21,6 +21,7 @@ import {
 import { TestCase } from '@cucumber/messages/dist/esm/src/messages';
 import { Status } from '@cucumber/cucumber';
 import { v4 as uuidv4 } from 'uuid';
+import { TestMetadata } from './models';
 
 type TestStepResultStatus = (typeof Status)[keyof typeof Status];
 
