@@ -1,3 +1,10 @@
+# qase-wdio@1.1.0
+
+## What's new
+
+- Updated to the latest minor version of the common package for improved compatibility and features.
+- Fixed all ESLint warnings across the project to ensure code quality and maintainability.
+
 # qase-wdio@1.0.2
 
 ## What's new

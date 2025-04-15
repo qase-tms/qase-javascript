@@ -1,5 +1,5 @@
 import { events } from './events';
-import { QaseStep, StepFunction } from './step';
+import { QaseStep, StepFunction } from 'qase-javascript-commons';
 
 /**
  * Send event to reporter
@@ -7,11 +7,13 @@ import { QaseStep, StepFunction } from './step';
  * @param {object} msg - event payload
  * @private
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const sendEvent = (event: string, msg: any = {}) => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
   process.emit(event as any, msg);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class qase {
   /**
    * Assign QaseID to test
