@@ -129,7 +129,7 @@ export class ClientV2 extends ClientV1 {
 
     private async transformStep(step: TestStepType, testTitle: string): Promise<ResultStep> {
         const attachmentHashes = await this.uploadAttachments(step.attachments);
-        const resultStep = this.createBaseResultStep(attachmentHashes);
+        const resultStep = this.createBaseResultStep(attachmentHashes, step.execution.status);
 
         if (step.step_type === StepType.TEXT) {
             this.processTextStep(step, resultStep, testTitle);
@@ -144,13 +144,13 @@ export class ClientV2 extends ClientV1 {
         return resultStep;
     }
 
-    private createBaseResultStep(attachmentHashes: string[]): ResultStep {
+    private createBaseResultStep(attachmentHashes: string[], status: StepStatusEnum): ResultStep {
         return {
             data: {
                 action: '',
             },
             execution: {
-                status: ClientV2.stepStatusMap[StepStatusEnum.passed],
+                status: ClientV2.stepStatusMap[status],
                 attachments: attachmentHashes,
             },
         };

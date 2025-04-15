@@ -7,17 +7,19 @@ type RecursivePartial<T> = {
   [K in keyof T]?: RecursivePartial<T[K]> | undefined;
 };
 
-
-export interface ConnectionsType {
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export type ConnectionsType = {
   [DriverEnum.local]?: FsWriterOptionsType;
-}
+};
 
-export interface AdditionalReportOptionsType {
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export type AdditionalReportOptionsType = {
   driver?: `${DriverEnum}`;
   connections?: ConnectionsType;
-}
+};
 
-export interface OptionsType {
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export type OptionsType = {
   frameworkPackage: string;
   frameworkName: string;
   reporterName: string;
@@ -27,10 +29,13 @@ export interface OptionsType {
   debug?: boolean | undefined;
   environment?: string | undefined;
   rootSuite?: string | undefined;
-  testops?: RecursivePartial<TestOpsOptionsType>;
-  report?: RecursivePartial<AdditionalReportOptionsType>;
-}
+  testops?:
+    | RecursivePartial<TestOpsOptionsType>
+    | undefined;
+  report?: RecursivePartial<AdditionalReportOptionsType> | undefined;
+};
 
-export interface FrameworkOptionsType<F extends string, O> {
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export type FrameworkOptionsType<F extends string, O> = {
   framework?: Partial<Record<F, O>>
 }
