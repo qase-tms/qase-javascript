@@ -3,6 +3,7 @@ import path from 'path';
 import { QaseStep, StepFunction, getMimeTypes } from 'qase-javascript-commons';
 import { v4 as uuidv4 } from 'uuid';
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class qase {
   private static _qaseID = '';
   private static _qaseTitle = '';
