@@ -1,3 +1,10 @@
+# playwright-qase-reporter@2.1.0
+
+## What's new
+
+- Updated to the latest minor version of the common package for improved compatibility and features.
+- Fixed all ESLint warnings across the project to ensure code quality and maintainability.
+
 # playwright-qase-reporter@2.0.17
 
 ## What's new
@@ -110,7 +117,7 @@ The updated log message will, hopefully, explain it better:
 
 > Some tests are using qase(id, 'Title') syntax.
 > Consider using the new syntax: qase.id().title() in the test body. See the docs for reference:
-> https://github.com/qase-tms/qase-javascript/tree/main/qase-playwright#readme
+> <https://github.com/qase-tms/qase-javascript/tree/main/qase-playwright#readme>
 
 # playwright-qase-reporter@2.0.4
 
@@ -321,7 +328,7 @@ for (const name of people) {
 
 ## What's new
 
-* Change module exports for simpler importing.
+- Change module exports for simpler importing.
 
   New syntax:
 
@@ -330,11 +337,12 @@ for (const name of people) {
   ```
 
   instead of:
+
   ```js
   import { qase } from 'playwright-qase-reporter/playwright';
   ```
 
-* Update the readme with examples of new imports and annotations.
+- Update the readme with examples of new imports and annotations.
 
 # playwright-qase-reporter@2.0.0-beta.2
 
