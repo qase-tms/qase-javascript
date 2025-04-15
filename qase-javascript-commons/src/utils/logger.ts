@@ -88,13 +88,16 @@ export class Logger implements LoggerInterface {
    * @private
    */
   private logApiError(error: AxiosError): string {
-    const response = error.response?.data as ApiErrorResponse;
-    const statusText = error.response?.statusText;
+    if (!error.response?.data) {
+      return `\nMessage: ${error.message || 'Unknown error'}`;
+    }
+
+    const response = error.response.data as ApiErrorResponse;
+    const statusText = error.response.statusText;
     
     const errorMessage = response.errorMessage 
       ?? response.error 
-      ?? statusText 
-      ?? 'Unknown error';
+      ?? statusText;
 
     const errorFields = this.formatErrorFields(response.errorFields);
 

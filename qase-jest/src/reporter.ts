@@ -97,7 +97,7 @@ export class JestQaseReporter implements Reporter {
    * @see {Reporter.onRunStart}
    */
   public onRunStart() {
-    void this.reporter.startTestRun();
+    this.reporter.startTestRun();
   }
 
   public onTestCaseResult(
@@ -364,5 +364,9 @@ export class JestQaseReporter implements Reporter {
       return title.replace(matches[0], '').trimEnd();
     }
     return title;
+  }
+
+  async onRunnerEnd() {
+    await this.reporter.publish();
   }
 }
