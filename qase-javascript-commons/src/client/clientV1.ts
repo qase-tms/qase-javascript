@@ -9,7 +9,7 @@ import { LoggerInterface } from "../utils/logger";
 import chalk from "chalk";
 import { createReadStream } from "fs";
 import { Readable } from 'stream';
-import { DateUtils } from "./dateUtils";
+import { formatUTCDate } from "./dateUtils";
 import { CustomBoundaryFormData } from "../utils/custom-boundary";
 
 // Константы и типы
@@ -179,10 +179,10 @@ export class ClientV1 implements IClient {
     private prepareRunObject(environmentId?: number): RunCreate {
         const runObject: RunCreate = {
             title: this.config.run.title ?? `Automated run ${new Date().toISOString()}`,
-            description: this.config.run.description,
+            description: this.config.run.description ?? '',
             is_autotest: true,
             cases: [],
-            start_time: DateUtils.getStartTime()
+            start_time: formatUTCDate(new Date())
         };
 
         if (environmentId !== undefined) {
@@ -216,7 +216,7 @@ export class ClientV1 implements IClient {
             case ApiErrorCode.UNAUTHORIZED:
                 return new QaseError(`${message}: Unauthorized. Please check your API token.`);
             case ApiErrorCode.FORBIDDEN:
-                return new QaseError(`${message}: ${errorData?.errorMessage || 'Forbidden'}`);
+                return new QaseError(`${message}: ${errorData?.errorMessage ?? 'Forbidden'}`);
             case ApiErrorCode.NOT_FOUND:
                 return new QaseError(`${message}: Not found.`);
             case ApiErrorCode.BAD_REQUEST:

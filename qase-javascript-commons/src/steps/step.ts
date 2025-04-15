@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import { Attachment, StepStatusEnum, TestStepType } from '../models';
 
-export type StepFunction<T = any> = (
+export type StepFunction<T = unknown> = (
   this: QaseStep,
   step: QaseStep,
 ) => T | Promise<T>;
@@ -87,7 +87,7 @@ export class QaseStep {
       step.steps = this.steps;
 
       await messageEmitter(step);
-    } catch (e: any) {
+    } catch (error: unknown) {
       step.execution = {
         start_time: startDate,
         end_time: new Date().getTime(),
@@ -100,7 +100,7 @@ export class QaseStep {
 
       await messageEmitter(step);
 
-      throw e;
+      throw error;
     }
   }
 }

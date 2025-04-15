@@ -9,7 +9,7 @@ export interface Report {
     host_data: HostData
     results: ShortResult[]
     stats: Stats
-    suites: any[]
+    suites: string[]
     threads: string[]
     title: string
 }

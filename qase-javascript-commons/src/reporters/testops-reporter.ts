@@ -118,7 +118,10 @@ export class TestOpsReporter extends AbstractReporter {
    * @private
    */
   private async publishResults(testResults: TestResultType[]): Promise<void> {
-    await this.api.uploadResults(this.runId!, testResults);
+    if (!this.runId) {
+      throw new Error('Run ID is not set');
+    }
+    await this.api.uploadResults(this.runId, testResults);
 
     this.logger.logDebug(`Results sent to Qase: ${testResults.length}`);
   }
@@ -166,9 +169,12 @@ export class TestOpsReporter extends AbstractReporter {
    * @returns {Promise<void>}
    */
   public async complete(): Promise<void> {
-    await this.api.completeRun(this.runId!);
+    if (!this.runId) {
+      throw new Error('Run ID is not set');
+    }
+    await this.api.completeRun(this.runId);
 
-    this.logger.log(chalk`{green Run ${this.runId!} completed}`);
+    this.logger.log(chalk`{green Run ${this.runId} completed}`);
   }
 
   /**
@@ -191,7 +197,10 @@ export class TestOpsReporter extends AbstractReporter {
    * @private
    */
   private prepareFailedTestLink(id: number | null, title: string): string {
-    const baseLink = `${this.baseUrl}/run/${this.projectCode}/dashboard/${this.runId!}?source=logs&status=%5B2%5D&search=`;
+    if (!this.runId) {
+      throw new Error('Run ID is not set');
+    }
+    const baseLink = `${this.baseUrl}/run/${this.projectCode}/dashboard/${this.runId}?source=logs&status=%5B2%5D&search=`;
     if (id) {
       return `${baseLink}${id}`;
     }
