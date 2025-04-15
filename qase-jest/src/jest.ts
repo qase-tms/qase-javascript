@@ -1,6 +1,5 @@
-import { QaseStep, StepFunction } from './step';
 import path from 'path';
-import { getMimeTypes } from 'qase-javascript-commons';
+import { getMimeTypes, QaseStep, StepFunction } from 'qase-javascript-commons';
 import { v4 as uuidv4 } from 'uuid';
 
 export const qase = (
