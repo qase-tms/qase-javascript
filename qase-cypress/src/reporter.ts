@@ -227,7 +227,7 @@ export class CypressQaseReporter extends reporters.Base {
     }
 
     const result: TestResultType = {
-      attachments: attachments ?? [],
+      attachments: attachments,
       author: null,
       fields: metadata?.fields ?? {},
       message: message,

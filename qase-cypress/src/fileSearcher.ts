@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class FileSearcher {
   /**
    * Finds all files in the given directory and its subdirectories
