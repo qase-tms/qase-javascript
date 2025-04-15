@@ -1,7 +1,7 @@
 
 import type * as Mocha from "mocha";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
+// @ts-expect-error
 import { default as ParallelBuffered } from "mocha/lib/nodejs/reporters/parallel-buffered.js";
 import { MochaQaseReporter } from "./reporter.js";
 

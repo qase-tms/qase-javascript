@@ -12,7 +12,7 @@ export class StreamInterceptor extends Writable {
     super();
     this.onWrite = onWriteCallback;
   }
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   override _write(chunk: any, _encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-call
     this.onWrite(chunk.toString());
