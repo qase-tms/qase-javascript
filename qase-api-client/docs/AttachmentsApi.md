@@ -53,19 +53,28 @@ This method allows to upload a file to Qase TMS.
 
 ```typescript
 import { AttachmentsApi, Configuration } from 'qase-api-client';
+import FormData from 'form-data';
+import { createReadStream } from "fs";
 
+// Initialize the API client
 const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
+  basePath: "https://api.qase.io/v1",
+  formDataCtor: FormData,
 });
 configuration.apiKey = process.env.API_KEY;
 
 const api = new AttachmentsApi(configuration);
 
+// Upload a content
+const content = new Buffer.from('file content');
+const response = await api.uploadAttachment('PROJECT_CODE', [{ name: "test.log", value: content }]);
+console.log(`Uploaded file hash: ${response.data.result[0].hash}`);
+
 // Upload a file
-const file = new File(['file content'], 'test.txt', { type: 'text/plain' });
-const response = await api.uploadAttachment('PROJECT_CODE', file);
-console.log(`Uploaded file hash: ${response.result.hash}`);
-console.log(`File URL: ${response.result.url}`);
+const filePath = "./image.png";
+const fileData = createReadStream(filePath)
+const fileResponse = await api.uploadAttachment('PROJECT_CODE', [{ name: "image.png", value: fileData }]);
+console.log(`Uploaded file hash: ${fileResponse.data.result[0].hash}`);
 ```
 
 ### Parameters
