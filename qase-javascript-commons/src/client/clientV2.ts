@@ -1,12 +1,11 @@
 import chalk from "chalk";
-import { Configuration, ResultCreate, ResultExecution, ResultRelations, ResultsApi, ResultStep, ResultStepStatus } from "../../../qase-api-v2-client";
+import { Configuration, ResultCreate, ResultExecution, ResultRelations, ResultsApi, ResultStep, ResultStepStatus } from "qase-api-v2-client";
 import { Relation, StepStatusEnum, StepType, SuiteData, TestExecution, TestResultType, TestStatusEnum, TestStepType } from "../models";
 import { LoggerInterface } from "../utils/logger";
 import { ClientV1 } from "./clientV1";
-import { CustomBoundaryFormData } from "../utils/custom-boundary";
+import FormData from 'form-data';
 import { TestOpsOptionsType } from "../models/config/TestOpsOptionsType";
 
-// Константы для конфигурации
 const API_CONFIG = {
     DEFAULT_HOST: 'qase.io',
     BASE_URL: 'https://api-',
@@ -44,7 +43,7 @@ export class ClientV2 extends ClientV1 {
     }
 
     private createApiConfigV2(): Configuration {
-        const apiConfig = new Configuration({ apiKey: this.config.api.token, formDataCtor: CustomBoundaryFormData });
+        const apiConfig = new Configuration({ apiKey: this.config.api.token, formDataCtor: FormData });
 
         apiConfig.basePath = this.config.api.host && this.config.api.host != API_CONFIG.DEFAULT_HOST
             ? `${API_CONFIG.BASE_URL}${this.config.api.host}${API_CONFIG.VERSION}`
