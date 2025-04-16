@@ -45,6 +45,8 @@ export interface ReporterInterface {
 
   startTestRun(): void;
 
+  startTestRunAsync(): Promise<void>;
+
   isCaptureLogs(): boolean;
 
   getResults(): TestResultType[];
