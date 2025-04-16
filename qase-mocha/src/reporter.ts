@@ -102,7 +102,7 @@ export class MochaQaseReporter extends reporters.Base {
   };
 
   private onStartRun() {
-    this.reporter.startTestRun();
+    deasyncPromise(this.reporter.startTestRunAsync());
   }
 
   private onEndRun() {
@@ -234,7 +234,7 @@ export class MochaQaseReporter extends reporters.Base {
       title: this.metadata.title && this.metadata.title != '' ? this.metadata.title : this.removeQaseIdsFromTitle(test.title),
     };
 
-    deasyncPromise(this.reporter.addTestResult(result));
+    void this.reporter.addTestResult(result);
 
     this.metadata.clear();
     this.currentTest = new currentTest();

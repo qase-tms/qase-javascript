@@ -4,6 +4,7 @@
 
 - Updated to the latest minor version of the common package for improved compatibility and features.
 - Fixed all ESLint warnings across the project to ensure code quality and maintainability.
+- Resolved an issue that prevented proper execution of async tests
 
 # qase-mocha@1.0.2
 
