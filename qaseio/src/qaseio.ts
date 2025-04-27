@@ -1,5 +1,5 @@
 import axios from 'axios';
-import * as axiosRetry from 'axios-retry';
+import axiosRetry from 'axios-retry';
 
 import {
   ProjectsApi,
