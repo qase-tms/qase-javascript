@@ -1,3 +1,10 @@
+# qase-newman@2.1.1
+
+## What's new
+
+Fixed an issue where parent suite hierarchy was not properly handled in test results. Now results correctly display the
+full structure of suites.
+
 # qase-newman@2.1.0
 
 ## What's new

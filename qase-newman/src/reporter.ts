@@ -93,15 +93,15 @@ export class NewmanQaseReporter {
   private static getParentTitles(
     item: PropertyBase<PropertyBaseDefinition>,
   ) {
-    const titles: string[] = [];
-
-    if ('name' in item) {
-      titles.push(String(item.name));
-    }
+    let titles: string[] = [];
 
     const parent = item.parent();
     if (parent) {
-      titles.concat(NewmanQaseReporter.getParentTitles(parent));
+      titles = titles.concat(NewmanQaseReporter.getParentTitles(parent));
+    }
+
+    if ('name' in item) {
+      titles.push(String(item.name));
     }
 
     return titles;
