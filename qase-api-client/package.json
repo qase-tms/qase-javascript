@@ -25,7 +25,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "axios": "^1.8.2",
-    "axios-retry": "^3.5.0"
+    "axios-retry": "^4.5.0"
   },
   "devDependencies": {
     "@jest/globals": "^27.5.1",
