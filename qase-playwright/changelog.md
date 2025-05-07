@@ -1,3 +1,19 @@
+# playwright-qase-reporter@2.1.1
+
+## What's new
+
+Support specifying the test case suite in the `annotation`.
+
+```ts
+test('test',
+  {
+    annotation: { type: 'QaseSuite', description: 'My suite' },
+  },
+  async ({ page }) => {
+    await page.goto('https://example.com');
+  });
+```
+
 # playwright-qase-reporter@2.1.0
 
 ## What's new
