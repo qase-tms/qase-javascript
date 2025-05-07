@@ -340,7 +340,11 @@ export class PlaywrightQaseReporter implements Reporter {
     }
 
     const error = result.error ? PlaywrightQaseReporter.transformError(result.errors) : null;
-    const suites = testCaseMetadata.suite != '' ? [testCaseMetadata.suite] : PlaywrightQaseReporter.transformSuiteTitle(test);
+
+    const extractedSuites = this.extractSuiteFromAnnotation(test.annotations);
+    const suites = extractedSuites.length > 0
+      ? extractedSuites
+      : (testCaseMetadata.suite ? [testCaseMetadata.suite] : PlaywrightQaseReporter.transformSuiteTitle(test));
 
     let message: string | null = null;
     if (testCaseMetadata.comment !== '') {
@@ -515,6 +519,22 @@ export class PlaywrightQaseReporter implements Reporter {
   }
 
   /**
+   * @param annotation
+   * @returns {string[]}
+   * @private
+   */
+  private extractSuiteFromAnnotation(annotation: { type: string, description?: string }[]): string[] {
+    const suites: string[] = [];
+    for (const item of annotation) {
+      if (item.type.toLowerCase() === 'qasesuite' && item.description) {
+        suites.push(item.description);
+      }
+    }
+
+    return suites;
+  }
+
+  /**
    * @param {TestStep[]} steps
    * @returns {boolean}
    * @private
@@ -533,7 +553,11 @@ export class PlaywrightQaseReporter implements Reporter {
     return true;
   }
 
-  private extractAndCleanStep(input: string): { expectedResult: string | null; data: string | null; cleanedString: string } {
+  private extractAndCleanStep(input: string): {
+    expectedResult: string | null;
+    data: string | null;
+    cleanedString: string
+  } {
     let expectedResult: string | null = null;
     let data: string | null = null;
     let cleanedString = input;
