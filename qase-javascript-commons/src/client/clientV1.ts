@@ -9,7 +9,7 @@ import { LoggerInterface } from '../utils/logger';
 import chalk from 'chalk';
 import { createReadStream } from 'fs';
 import { Readable } from 'stream';
-import { formatUTCDate } from './dateUtils';
+import { getStartTime } from './dateUtils';
 import FormData from 'form-data';
 
 const DEFAULT_API_HOST = 'qase.io';
@@ -78,11 +78,11 @@ export class ClientV1 implements IClient {
       return this.config.run.id;
     }
 
-    this.logger.logDebug('Creating test run');
-
     try {
       const environmentId = await this.getEnvironmentId();
       const runObject = this.prepareRunObject(environmentId);
+
+      this.logger.logDebug(`Creating test run: ${JSON.stringify(runObject)}`);
 
       const { data } = await this.runClient.createRun(
         this.config.project,
@@ -181,7 +181,7 @@ export class ClientV1 implements IClient {
       description: this.config.run.description ?? '',
       is_autotest: true,
       cases: [],
-      start_time: formatUTCDate(new Date()),
+      start_time: getStartTime(),
     };
 
     if (environmentId !== undefined) {
