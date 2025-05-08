@@ -1,6 +1,6 @@
 {
   "name": "playwright-qase-reporter",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Qase TMS Playwright Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -44,7 +44,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "chalk": "^4.1.2",
-    "qase-javascript-commons": "~2.3.0",
+    "qase-javascript-commons": "~2.3.1",
     "uuid": "^9.0.0"
   },
   "peerDependencies": {
