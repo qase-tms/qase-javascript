@@ -22,7 +22,7 @@ import { Attachment } from './attachment';
  */
 export interface TestStepResult {
     /**
-     * 
+     * 1 - passed, 2 - failed, 3 - blocked, 5 - skipped, 7 - in_progress
      * @type {number}
      * @memberof TestStepResult
      */

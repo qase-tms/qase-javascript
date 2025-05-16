@@ -12,6 +12,7 @@ Enumeration of possible test step statuses.
 | failed | Step failed |
 | blocked | Step is blocked |
 | skipped | Step was skipped |
+| in_progress | Step is in progress |
 
 ## Example
 

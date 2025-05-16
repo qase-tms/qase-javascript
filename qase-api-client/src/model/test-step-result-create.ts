@@ -78,7 +78,8 @@ export interface TestStepResultCreate {
 export enum TestStepResultCreateStatusEnum {
     PASSED = 'passed',
     FAILED = 'failed',
-    BLOCKED = 'blocked'
+    BLOCKED = 'blocked',
+    IN_PROGRESS = 'in_progress'
 }
 
 
