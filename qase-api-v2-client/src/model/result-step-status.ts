@@ -24,7 +24,8 @@ export enum ResultStepStatus {
     PASSED = 'passed',
     FAILED = 'failed',
     BLOCKED = 'blocked',
-    SKIPPED = 'skipped'
+    SKIPPED = 'skipped',
+    IN_PROGRESS = 'in_progress'
 }
 
 
