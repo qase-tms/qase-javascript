@@ -2,10 +2,10 @@
 
 Publish results simple and easy.
 
-To install the latest beta version, run:
+To install the latest version, run:
 
 ```sh
-npm install -D wdio-qase-reporter@beta
+npm install -D wdio-qase-reporter
 ```
 
 ## Getting started
