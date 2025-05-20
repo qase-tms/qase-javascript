@@ -157,7 +157,7 @@ export class ClientV1 implements IClient {
     return {
       name: attachment.file_name,
       value: typeof attachment.content === 'string'
-        ? Buffer.from(attachment.content)
+        ? Buffer.from(attachment.content, attachment.content.match(/^[A-Za-z0-9+/=]+$/) ? 'base64' : undefined)
         : attachment.content,
     };
   }

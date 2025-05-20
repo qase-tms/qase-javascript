@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.3.2
+
+## What's new
+
+Fixed an issue with attachments content type.
+
 # qase-javascript-commons@2.3.0
 
 ## What's new
