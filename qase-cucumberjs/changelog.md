@@ -1,3 +1,11 @@
+# qase-cucumberjs@2.1.1
+
+## What's new
+
+- Improved attachment handling with proper base64 content detection and decoding
+- Fixed issues with corrupted image uploads
+- Enhanced MIME type handling for attachments
+
 # qase-cucumberjs@2.1.0
 
 ## What's new
