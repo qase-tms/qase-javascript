@@ -123,6 +123,21 @@ export class Storage {
         id: uuidv4(),
       });
     }
+
+    if (attachment.testCaseStartedId) {
+      if (!this.attachments[attachment.testCaseStartedId]) {
+        this.attachments[attachment.testCaseStartedId] = [];
+      }
+
+      this.attachments[attachment.testCaseStartedId]?.push({
+        file_name: this.getFileNameFromMediaType(attachment.mediaType),
+        mime_type: attachment.mediaType,
+        file_path: null,
+        content: attachment.body,
+        size: 0,
+        id: uuidv4(),
+      });
+    }
   }
 
   /**
@@ -223,7 +238,7 @@ export class Storage {
     }
 
     return {
-      attachments: [],
+      attachments: this.attachments[testCase.testCaseStartedId] ?? [],
       author: null,
       execution: {
         status: this.testCaseStartedResult[testCase.testCaseStartedId] ?? TestStatusEnum.passed,
