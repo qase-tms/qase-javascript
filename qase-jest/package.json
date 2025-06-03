@@ -1,6 +1,6 @@
 {
   "name": "jest-qase-reporter",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Qase TMS Jest Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -45,7 +45,7 @@
   "dependencies": {
     "lodash.get": "^4.4.2",
     "lodash.has": "^4.5.2",
-    "qase-javascript-commons": "~2.3.0",
+    "qase-javascript-commons": "~2.3.3",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
