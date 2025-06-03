@@ -9,6 +9,7 @@ import {
   composeOptions,
   Attachment,
   TestStepType,
+  generateSignature,
 } from 'qase-javascript-commons';
 import { Qase } from './global';
 
@@ -301,30 +302,15 @@ export class TestcafeQaseReporter {
   private getSignature(fixture: FixtureType, title: string, ids: number[], parameters: Record<string, string>) {
     const executionPath = process.cwd() + '/';
     const path = fixture.path?.replace(executionPath, '') ?? '';
-    let signature = '';
+    const suites = [];
 
     if (path != '') {
-      signature += path.split('/').join('::') + '::';
+      suites.push(...path.split('/'));
     }
 
-    signature += fixture.name.toLowerCase()
-        .replace(/\s/g, '_')
-      + '::'
-      + title.toLowerCase()
-        .replace(/\s/g, '_');
+    suites.push(fixture.name.toLowerCase().replace(/\s/g, '_'));
+    suites.push(title.toLowerCase().replace(/\s/g, '_'));
 
-    if (ids.length > 0) {
-      signature += `::${ids.join('::')}`;
-    }
-
-    if (Object.keys(parameters).length > 0) {
-      signature += '::';
-    }
-
-    signature += Object.entries(parameters)
-      .map(([key, value]) => `{${key}:${value}}`)
-      .join('::');
-
-    return signature;
+    return generateSignature(ids, suites, parameters);
   }
 }
