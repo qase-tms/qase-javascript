@@ -38,6 +38,15 @@ describe('generateSignature', () => {
     expect(result).to.equal("suite1::suite2::{'param1':'value1'}");
   });
 
+  it('should generate signature with empty testopsIds array', () => {
+    const result = generateSignature(
+      [],
+      ['suite1', 'suite2'],
+      { param1: 'value1' }
+    );
+    expect(result).to.equal("suite1::suite2::{'param1':'value1'}");
+  });
+
   it('should generate signature with empty suites array', () => {
     const result = generateSignature(
       [1, 2, 3],
