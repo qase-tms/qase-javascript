@@ -9,6 +9,7 @@ import {
   composeOptions,
   ConfigLoader,
   ConfigType,
+  generateSignature,
   QaseReporter,
   Relation,
   ReporterInterface,
@@ -104,7 +105,6 @@ export class JestQaseReporter implements Reporter {
     test: Test,
     testCaseResult: TestCaseResult,
   ) {
-
     if (this.metadata.ignore) {
       this.cleanMetadata();
       return;
@@ -153,6 +153,10 @@ export class JestQaseReporter implements Reporter {
       result.attachments = this.metadata.attachments;
     }
 
+    // Generate signature with parameters
+    const ids = JestQaseReporter.getCaseId(testCaseResult.title);
+    result.signature = this.getSignature(test.path, testCaseResult.fullName, ids, this.metadata.parameters);
+
     this.cleanMetadata();
 
     void this.reporter.addTestResult(result);
@@ -193,18 +197,15 @@ export class JestQaseReporter implements Reporter {
    * @param {string} filePath
    * @param {string} fullName
    * @param {number[]} ids
+   * @param {Record<string, string>} parameters
    * @private
    */
-  private getSignature(filePath: string, fullName: string, ids: number[]) {
-    let signature = filePath.split('/').join('::');
+  private getSignature(filePath: string, fullName: string, ids: number[], parameters: Record<string, string> = {}) {
+    let suites = filePath.split('/');
 
-    signature += '::' + fullName.toLowerCase().replace(/\s/g, '_');
+    suites.push(fullName.toLowerCase().replace(/\s/g, '_'));
 
-    if (ids.length > 0) {
-      signature += '::' + ids.join('::');
-    }
-
-    return signature;
+    return generateSignature(ids, suites, parameters);
   }
 
   /**
@@ -327,7 +328,7 @@ export class JestQaseReporter implements Reporter {
       group_params: {},
       relations: this.getRelations(filePath, value.ancestorTitles),
       run_id: null,
-      signature: this.getSignature(filePath, value.fullName, ids),
+      signature: this.getSignature(filePath, value.fullName, ids, {}),
       steps: [],
       testops_id: ids.length > 0 ? ids : null,
       id: uuidv4(),

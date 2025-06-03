@@ -10,6 +10,7 @@ import {
   ConfigLoader,
   ConfigType,
   FrameworkOptionsType,
+  generateSignature,
   QaseReporter,
   ReporterInterface,
   StepStatusEnum,
@@ -236,7 +237,7 @@ export class CypressQaseReporter extends reporters.Base {
       group_params: metadata?.groupParams ?? {},
       relations: relations,
       run_id: null,
-      signature: this.getSignature(test, ids),
+      signature: this.getSignature(test, ids, metadata?.parameters ?? {}),
       steps: steps,
       id: uuidv4(),
       execution: {
@@ -263,27 +264,23 @@ export class CypressQaseReporter extends reporters.Base {
    * @param {number[]} ids
    * @private
    */
-  private getSignature(test: Test, ids: number[]) {
-    let signature = '';
+  private getSignature(test: Test, ids: number[], params: Record<string, string>) {
+    const suites = [];
     const file = test.parent ? this.getFile(test.parent) : undefined;
 
     if (file) {
-      signature = file.split(path.sep).join('::');
+      suites.push(file.split(path.sep).join('::'));
     }
 
     if (test.parent) {
       for (const suite of test.parent.titlePath()) {
-        signature += '::' + suite.toLowerCase().replace(/\s/g, '_');
+        suites.push(suite.toLowerCase().replace(/\s/g, '_'));
       }
     }
 
-    signature += '::' + test.title.toLowerCase().replace(/\s/g, '_');
+    suites.push(test.title.toLowerCase().replace(/\s/g, '_'));
 
-    if (ids.length > 0) {
-      signature += '::' + ids.join('::');
-    }
-
-    return signature;
+    return generateSignature(ids, suites, params);
   }
 
   private getTestFileName(test: Test): string {
