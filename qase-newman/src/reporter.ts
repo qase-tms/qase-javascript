@@ -15,6 +15,7 @@ import {
   composeOptions,
   Relation,
   SuiteData,
+  generateSignature,
 } from 'qase-javascript-commons';
 
 export type NewmanQaseOptionsType = ConfigType;
@@ -293,19 +294,7 @@ export class NewmanQaseReporter {
    * @private
    */
   private getSignature(suites: string[], title: string, ids: number[]) {
-    let signature = '';
-
-    for (const suite of suites) {
-      signature += suite.toLowerCase().replace(/\s/g, '_') + '::';
-    }
-
-    signature += title.toLowerCase().replace(/\s/g, '_');
-
-    if (ids.length > 0) {
-      signature += '::' + ids.join('::');
-    }
-
-    return signature;
+    return generateSignature(ids, [...suites, title], {});
   }
 
   /**
