@@ -182,6 +182,7 @@ export class ClientV1 implements IClient {
       is_autotest: true,
       cases: [],
       start_time: getStartTime(),
+      tags: this.config.run.tags ?? [],
     };
 
     if (environmentId !== undefined) {

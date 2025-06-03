@@ -53,9 +53,11 @@ All configuration options are listed in the table below:
 | Qase test run title                                                                                                   | `testops.run.title`        | `QASE_TESTOPS_RUN_TITLE`        | `Automated run <Current date and time>` | No       | Any string                 |
 | Qase test run description                                                                                             | `testops.run.description`  | `QASE_TESTOPS_RUN_DESCRIPTION`  | `<Framework name> automated run`        | No       | Any string                 |
 | Qase test run complete                                                                                                | `testops.run.complete`     | `QASE_TESTOPS_RUN_COMPLETE`     | `True`                                  |          | `True`, `False`            |
+| Array of tags to be added to the test run                                                                             | `testops.run.tags`         | `QASE_TESTOPS_RUN_TAGS`         | `[]`                                    | No       | Array of strings           |
 | Qase test plan ID                                                                                                     | `testops.plan.id`          | `QASE_TESTOPS_PLAN_ID`          |  undefined                              | No       | Any integer                |
 | Size of batch for sending test results                                                                                | `testops.batch.size`       | `QASE_TESTOPS_BATCH_SIZE`       | `200`                                   | No       | Any integer                |
 | Enable defects for failed test cases                                                                                  | `testops.defect`           | `QASE_TESTOPS_DEFECT`           | `False`                                 | No       | `True`, `False`            |
+| Enable/disable attachment uploads                                                                                     | `testops.uploadAttachments`        | `QASE_TESTOPS_UPLOAD_ATTACHMENTS`       | `true`                                  | No       | `True`, `False`            |
 
 ### Example `qase.config.json` config:
 
@@ -83,7 +85,8 @@ All configuration options are listed in the table below:
     "run": {
       "title": "Regress run",
       "description": "Regress run description",
-      "complete": true
+      "complete": true,
+      "tags": ["tag1", "tag2"]
     },
     "defect": false,
     "project": "<project_code>",
