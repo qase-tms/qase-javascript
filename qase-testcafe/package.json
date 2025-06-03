@@ -1,6 +1,6 @@
 {
   "name": "testcafe-reporter-qase",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Qase TMS TestCafe Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -40,7 +40,7 @@
   "author": "Qase Team <support@qase.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "qase-javascript-commons": "~2.3.0",
+    "qase-javascript-commons": "~2.3.3",
     "uuid": "^9.0.0"
   },
   "peerDependencies": {
