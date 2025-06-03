@@ -247,7 +247,7 @@ export class MochaQaseReporter extends reporters.Base {
    * @private
    */
   private getSignature(test: Mocha.Test, ids: number[], params: Record<string, string>) {
-    let suites = [];
+    const suites = [];
     const file = test.parent ? this.getFile(test.parent) : undefined;
 
     if (file) {

@@ -201,7 +201,7 @@ export class JestQaseReporter implements Reporter {
    * @private
    */
   private getSignature(filePath: string, fullName: string, ids: number[], parameters: Record<string, string> = {}) {
-    let suites = filePath.split('/');
+    const suites = filePath.split('/');
 
     suites.push(fullName.toLowerCase().replace(/\s/g, '_'));
 
