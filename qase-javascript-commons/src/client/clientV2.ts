@@ -86,6 +86,7 @@ export class ClientV2 extends ClientV1 {
             message: result.message,
             fields: result.fields,
             defect: this.config.defect ?? false,
+            signature: result.signature,
         };
 
         this.logger.logDebug(`Transformed result: ${JSON.stringify(model)}`);

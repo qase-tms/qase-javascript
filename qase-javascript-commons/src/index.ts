@@ -9,4 +9,5 @@ export * from './writer';
 
 export * from './utils/get-package-version';
 export * from './utils/mimeTypes';
+export * from './utils/signature';
 export * from './steps/step';
