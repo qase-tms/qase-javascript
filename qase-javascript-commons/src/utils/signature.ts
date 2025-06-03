@@ -12,7 +12,7 @@ export const generateSignature = (
 ): string => {
   const parts: string[] = [];
   
-  if (testopsIds) {
+  if (testopsIds && testopsIds.length > 0) {
     parts.push(testopsIds.join('-'));
   }
   
