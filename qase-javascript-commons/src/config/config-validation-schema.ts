@@ -91,6 +91,13 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
               type: 'boolean',
               nullable: true,
             },
+            tags: {
+              type: 'array',
+              items: {
+                type: 'string',
+              },
+              nullable: true,
+            },
           },
         },
 

@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.3.3
+
+## What's new
+
+Added support for tags in the test run.
+
 # qase-javascript-commons@2.3.2
 
 ## What's new

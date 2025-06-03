@@ -34,7 +34,8 @@ export enum EnvRunEnum {
   id = 'QASE_TESTOPS_RUN_ID',
   title = 'QASE_TESTOPS_RUN_TITLE',
   description = 'QASE_TESTOPS_RUN_DESCRIPTION',
-  complete = 'QASE_TESTOPS_RUN_COMPLETE'
+  complete = 'QASE_TESTOPS_RUN_COMPLETE',
+  tags = 'QASE_TESTOPS_RUN_TAGS',
 }
 
 /**

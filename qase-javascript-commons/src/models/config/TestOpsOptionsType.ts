@@ -14,6 +14,7 @@ export interface TestOpsRunType {
   title?: string;
   description?: string;
   complete?: boolean | undefined;
+  tags?: string[] | undefined;
 }
 
 export interface TestOpsPlanType {
