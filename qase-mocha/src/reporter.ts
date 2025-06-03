@@ -4,6 +4,7 @@ import {
   Attachment,
   composeOptions,
   ConfigLoader,
+  generateSignature,
   QaseReporter,
   ReporterInterface,
   StepStatusEnum,
@@ -217,7 +218,7 @@ export class MochaQaseReporter extends reporters.Base {
       group_params: this.metadata.groupParameters ?? {},
       relations: relations,
       run_id: null,
-      signature: this.getSignature(test, ids),
+      signature: this.getSignature(test, ids, this.metadata.parameters ?? {}),
       steps: this.currentTest.steps,
       id: uuidv4(),
       execution: {
@@ -245,29 +246,25 @@ export class MochaQaseReporter extends reporters.Base {
    * @param {number[]} ids
    * @private
    */
-  private getSignature(test: Mocha.Test, ids: number[]) {
-    let signature = '';
+  private getSignature(test: Mocha.Test, ids: number[], params: Record<string, string>) {
+    let suites = [];
     const file = test.parent ? this.getFile(test.parent) : undefined;
 
     if (file) {
       const executionPath = process.cwd() + '/';
       const path = file.replace(executionPath, '');
-      signature = path.split('/').join('::');
+      suites.push(path.split('/').join('::'));
     }
 
     if (test.parent) {
       for (const suite of test.parent.titlePath()) {
-        signature += '::' + suite.toLowerCase().replace(/\s/g, '_');
+        suites.push(suite.toLowerCase().replace(/\s/g, '_'));
       }
     }
 
-    signature += '::' + test.title.toLowerCase().replace(/\s/g, '_');
+    suites.push(test.title.toLowerCase().replace(/\s/g, '_'));
 
-    if (ids.length > 0) {
-      signature += '::' + ids.join('::');
-    }
-
-    return signature;
+    return generateSignature(ids, suites, params);
   }
 
   /**
