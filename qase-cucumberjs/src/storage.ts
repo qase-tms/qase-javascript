@@ -11,6 +11,7 @@ import {
 import {
   Attachment,
   CompoundError,
+  generateSignature,
   Relation,
   StepStatusEnum,
   StepType,
@@ -386,15 +387,7 @@ export class Storage {
    * @private
    */
   private getSignature(pickle: Pickle, ids: number[]): string {
-    let signature = pickle.uri.split('/').join('::')
-      + '::'
-      + pickle.name.toLowerCase().replace(/\s/g, '_');
-
-    if (ids.length > 0) {
-      signature += '::' + ids.join('::');
-    }
-
-    return signature;
+    return generateSignature(ids, [...pickle.uri.split('/'), pickle.name], {});
   }
 
   private getError(testCaseId: string): CompoundError | undefined {
