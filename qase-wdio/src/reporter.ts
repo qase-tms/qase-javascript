@@ -11,6 +11,7 @@ import {
   composeOptions,
   CompoundError,
   ConfigLoader,
+  generateSignature,
   getMimeTypes,
   QaseReporter,
   Relation,
@@ -98,7 +99,6 @@ export default class WDIOQaseReporter extends WDIOReporter {
 
   override onRunnerStart(runner: RunnerStats) {
     this._isMultiremote = runner.isMultiremote;
-    // this.reporter.startTestRun();
     this.isSync = false;
   }
 
@@ -302,6 +302,12 @@ export default class WDIOQaseReporter extends WDIOReporter {
     testResult.message = err === null ?
       null : err.message === undefined ?
         null : err.message;
+
+    testResult.signature = generateSignature(
+      Array.isArray(testResult.testops_id) ? testResult.testops_id : testResult.testops_id ? [testResult.testops_id] : null,
+      [...this.storage.suites, testResult.title],
+      testResult.params
+    );
 
     await this.reporter.addTestResult(testResult);
   }
