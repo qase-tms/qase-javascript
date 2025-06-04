@@ -1,3 +1,28 @@
+# playwright-qase-reporter@2.1.3
+
+## What's new
+
+Support specifying the browser name as a parameter.
+New section `framework` was added to the playwright config.
+
+```ts
+[
+  'playwright-qase-reporter',
+   {
+     debug: true,
+     testops: {
+      ...
+     },
+     framework: {
+      browser: {
+       addAsParameter: true,
+       parameterName: 'Browser Name',
+      },
+    },
+  },
+],
+```
+
 # playwright-qase-reporter@2.1.1
 
 ## What's new
