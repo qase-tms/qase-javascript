@@ -18,6 +18,7 @@ import {
   TestStepType,
 } from 'qase-javascript-commons';
 import { MetadataMessage, ReporterContentType } from './playwright';
+import { ReporterOptionsType } from './options';
 
 type ArrayItemType<T> = T extends (infer R)[] ? R : never;
 
@@ -38,7 +39,9 @@ interface TestCaseMetadata {
 
 const defaultSteps: string[] = ['Before Hooks', 'After Hooks', 'Worker Cleanup'];
 
-export type PlaywrightQaseOptionsType = ConfigType;
+export type PlaywrightQaseOptionsType = Omit<ConfigType, 'reporterOptions'> & {
+  framework: ReporterOptionsType;
+};
 
 /**
  * @class PlaywrightQaseReporter
@@ -292,6 +295,8 @@ export class PlaywrightQaseReporter implements Reporter {
    */
   private reporter: ReporterInterface;
 
+  private options: ReporterOptionsType;
+
   /**
    * @param {PlaywrightQaseOptionsType} options
    * @param {ConfigLoaderInterface} configLoader
@@ -301,9 +306,12 @@ export class PlaywrightQaseReporter implements Reporter {
     configLoader = new ConfigLoader(),
   ) {
     const config = configLoader.load();
+    const { framework, ...composedOptions } = composeOptions(options, config);
+
+    this.options = options.framework ?? {};
 
     this.reporter = QaseReporter.getInstance({
-      ...composeOptions(options, config),
+      ...composedOptions,
       frameworkPackage: '@playwright/test',
       frameworkName: 'playwright',
       reporterName: 'playwright-qase-reporter',
@@ -343,7 +351,7 @@ export class PlaywrightQaseReporter implements Reporter {
     const error = result.error ? PlaywrightQaseReporter.transformError(result.errors) : null;
 
     const extractedSuites = this.extractSuiteFromAnnotation(test.annotations);
-    const suites = extractedSuites.length > 0
+    let suites = extractedSuites.length > 0
       ? extractedSuites
       : (testCaseMetadata.suite ? [testCaseMetadata.suite] : PlaywrightQaseReporter.transformSuiteTitle(test));
 
@@ -362,8 +370,17 @@ export class PlaywrightQaseReporter implements Reporter {
       message += error.message;
     }
 
-    const testTitle = this.removeQaseIdsFromTitle(test.title);
+    if (this.options.browser?.addAsParameter) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
+      const browser = (test as any)._projectId ?? null;
+      if (browser) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        testCaseMetadata.parameters[this.options.browser?.parameterName ?? 'browser'] = browser;
+        suites = suites.filter(suite => suite !== browser);
+      }
+    }
 
+    const testTitle = this.removeQaseIdsFromTitle(test.title);
     const testResult: TestResultType = {
       attachments: testCaseMetadata.attachments,
       author: null,

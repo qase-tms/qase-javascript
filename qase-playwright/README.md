@@ -18,11 +18,13 @@ npm install -D playwright-qase-reporter
 
 # Contents
 
-- [Getting started](#getting-started)
-- [Updating from v1](#updating-from-v1)
-- [Example of usage](#example-of-usage)
-- [Configuration](#configuration)
-- [Requirements](#requirements)
+- [Qase TMS Playwright reporter](#qase-tms-playwright-reporter)
+- [Contents](#contents)
+  - [Getting started](#getting-started)
+  - [Updating from v1](#updating-from-v1)
+  - [Example of usage](#example-of-usage)
+  - [Configuration](#configuration)
+  - [Requirements](#requirements)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -172,6 +174,8 @@ Reporter options (\* - required):
 - `testops.run.title` - Set custom Run name, when new run is created
 - `testops.run.description` - Set custom Run description, when new run is created
 - `testops.run.complete` - Whether the run should be completed
+- `framework.browser.addAsParameter` - Whether to add the browser name as a parameter, default - `false`
+- `framework.browser.parameterName` - The name of the parameter to add the browser name to, default - `browser`
 
 Example `playwright.config.js` config:
 
@@ -195,6 +199,12 @@ const config = {
           uploadAttachments: true,
           run: {
             complete: true,
+          },
+        },
+        framework: {
+          browser: {
+            addAsParameter: true,
+            parameterName: 'Browser Name',
           },
         },
       },
