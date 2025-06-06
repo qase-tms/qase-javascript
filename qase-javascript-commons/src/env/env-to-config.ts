@@ -37,7 +37,7 @@ export const envToConfig = (env: EnvType): ConfigType => ({
       title: env[EnvRunEnum.title],
       description: env[EnvRunEnum.description],
       complete: env[EnvRunEnum.complete],
-      tags: env[EnvRunEnum.tags],
+      tags: env[EnvRunEnum.tags]?.split(',').map(tag => tag.trim()) ?? [],
     },
 
     plan: {
