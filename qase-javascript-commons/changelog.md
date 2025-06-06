@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.3.4
+
+## What's new
+
+Fixed an issue with parsing tags from the `QASE_TESTOPS_RUN_TAGS` environment variable. Now tags can be passed as a comma-separated string.
+
 # qase-javascript-commons@2.3.3
 
 ## What's new
