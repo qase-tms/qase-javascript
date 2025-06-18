@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.3.5
+
+## What's new
+
+Fixed a link to failed test in the console output.
+
 # qase-javascript-commons@2.3.4
 
 ## What's new

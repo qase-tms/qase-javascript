@@ -202,7 +202,7 @@ export class TestOpsReporter extends AbstractReporter {
     }
     const baseLink = `${this.baseUrl}/run/${this.projectCode}/dashboard/${this.runId}?source=logs&status=%5B2%5D&search=`;
     if (id) {
-      return `${baseLink}${id}`;
+      return `${baseLink}${this.projectCode}-${id}`;
     }
 
     return `${baseLink}${encodeURI(title)}`;
