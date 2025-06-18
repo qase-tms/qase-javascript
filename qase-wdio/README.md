@@ -28,14 +28,12 @@ For example:
 import {qase} from "wdio-qase-reporter";
 
 describe('My First Test', () => {
-  it('Several ids', () => {
-    qase.id(1);
+  it(qase(1, 'Several ids'), () => {
     expect(true).to.equal(true);
   });
 
   // a test can check multiple test cases
-  it('Correct test', () => {
-    qase.id([2, 3]);
+  it(qase([2,3], 'Correct test'), () => {
     expect(true).to.equal(true);
   });
 
