@@ -38,6 +38,10 @@ import path from 'path';
 import { events } from './events';
 
 export default class WDIOQaseReporter extends WDIOReporter {
+    /**
+   * @type {RegExp}
+   */
+    static qaseIdRegExp = /\(Qase ID:? ([\d,]+)\)/;
 
   /**
    * @type {Record<string, TestStatusEnum>}
@@ -267,8 +271,11 @@ export default class WDIOQaseReporter extends WDIOReporter {
       return;
     }
 
-    await this._endTest(WDIOQaseReporter.statusMap[test.state] ?? TestStatusEnum.skipped,
-      null);
+    if (this.storage.getCurrentTest()?.title !== test.title) {
+      this._startTest(test.title, test.cid, test.start.valueOf() / 1000);
+    }
+
+    await this._endTest(WDIOQaseReporter.statusMap[test.state] ?? TestStatusEnum.skipped, null);
   }
 
   private async _endTest(status: TestStatusEnum, err: CompoundError | null, end_time: number = Date.now().valueOf() / 1000) {
@@ -308,6 +315,12 @@ export default class WDIOQaseReporter extends WDIOReporter {
       [...this.storage.suites, testResult.title],
       testResult.params
     );
+
+    const ids = WDIOQaseReporter.extractQaseIdsFromTitle(testResult.title);
+    if (ids.length > 0) {
+      testResult.testops_id = ids;
+    }
+    testResult.title = this.removeQaseIdsFromTitle(testResult.title);
 
     await this.reporter.addTestResult(testResult);
   }
@@ -584,4 +597,28 @@ export default class WDIOQaseReporter extends WDIOReporter {
 
     return { key, value };
   }
+
+    /**
+   * @param {string} title
+   * @returns {number[]}
+   * @private
+   */
+    private static extractQaseIdsFromTitle(title: string) {
+      const [, ids] = title.match(WDIOQaseReporter.qaseIdRegExp) ?? [];
+  
+      return ids ? ids.split(',').map((id) => Number(id)) : [];
+    }
+
+    /**
+   * @param {string} title
+   * @returns {string}
+   * @private
+   */
+    private removeQaseIdsFromTitle(title: string): string {
+      const matches = title.match(WDIOQaseReporter.qaseIdRegExp);
+      if (matches) {
+        return title.replace(matches[0], '').trimEnd();
+      }
+      return title;
+    }
 }
