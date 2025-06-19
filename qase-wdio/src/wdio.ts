@@ -13,108 +13,199 @@ const sendEvent = (event: string, msg: any = {}) => {
   process.emit(event as any, msg);
 };
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
-export class qase {
-  /**
-   * Assign QaseID to test
-   * @name id
-   * @param {number | number[]} value
-   */
-  public static id(value: number | number[]) {
-    sendEvent(events.addQaseID, { ids: Array.isArray(value) ? value : [value] });
-    return this;
+/**
+ * Set IDs for the test case
+ *
+ * @param qaseId
+ * @param name
+ * @example
+ * describe('suite', () => {
+ *  it(qase(1, 'should work'), () => {
+ *    // test code
+ *  });
+ * });
+ * @returns {string}
+ */
+export const qase = (
+  qaseId: number | string | number[] | string[],
+  name: string,
+): string => {
+  const caseIds = Array.isArray(qaseId) ? qaseId : [qaseId];
+  const ids: number[] = [];
+
+  for (const id of caseIds) {
+    if (typeof id === 'number') {
+      ids.push(id);
+      continue;
+    }
+
+    const parsedId = parseInt(id);
+
+    if (!isNaN(parsedId)) {
+      ids.push(parsedId);
+      continue;
+    }
+
+    console.log(`qase: qase ID ${id} should be a number`);
   }
 
-  /**
-   * Assign title to test
-   * @name title
-   * @param {string} value
-   */
-  public static title(value: string) {
-    sendEvent(events.addTitle, { title: value });
-    return this;
-  }
+  const newName = `${name} (Qase ID: ${caseIds.join(',')})`;
 
-  /**
-   * Assign parameters to test
-   * @name parameters
-   * @param {Record<string, string>} values
-   */
-  public static parameters(values: Record<string, string>) {
-    sendEvent(events.addParameters, { records: values });
+  return newName;
+};
 
-    return this;
-  }
+/**
+ * Set IDs for the test case.
+ * Deprecated: Use qase(qaseId, name) instead.
+ *
+ * @param value
+ * @returns {string}
+ * @example
+ * describe('suite', () => {
+ *  it('should work', () => {
+ *    qase.id(1);
+ *    // test code
+ *  });
+ * });
+ */
+qase.id = (value: number | number[]) => {
+  sendEvent(events.addQaseID, { ids: Array.isArray(value) ? value : [value] });
+  return this;
+};
 
-  /**
-   * Assign group parameters to test
-   * @name groupParameters
-   * @param {Record<string, string>} values
-   */
-  public static groupParameters(values: Record<string, string>) {
-    sendEvent(events.addGroupParameters, { records: values });
+/**
+ * Set a title for the test case
+ * @param {string} value
+ * @example
+ * describe('suite', () => {
+ *  it('should work', () => {
+ *    qase.title("Title");
+ *    // test code
+ *  });
+ * });
+ */
+qase.title = (value: string) => {
+  sendEvent(events.addTitle, { title: value });
+  return this;
+};
 
-    return this;
-  }
+/**
+ * Set parameters for the test case
+ * @param {Record<string, string>} values
+ * @example
+ * describe('suite', () => {
+ *  it('should work', () => {
+ *    qase.parameters({ param1: 'value1', param2: 'value2' });
+ *    // test code
+ *  });
+ * });
+ */
+qase.parameters = (values: Record<string, string>) => {
+  sendEvent(events.addParameters, { records: values });
+  return this;
+};
 
-  /**
-   * Assign fields to test
-   * @name fields
-   * @param {Record<string, string>} values
-   */
-  public static fields(values: Record<string, string>) {
-    sendEvent(events.addFields, { records: values });
+/**
+ * Set group parameters for the test case
+ * @param {Record<string, string>} values
+ * @example
+ * describe('suite', () => {
+ *  it('should work', () => {
+ *    qase.groupParameters({ param1: 'value1', param2: 'value2' });
+ *    // test code
+ *  });
+ * });
+ */
+qase.groupParameters = (values: Record<string, string>) => {
+  sendEvent(events.addGroupParameters, { records: values });
+  return this;
+};
 
-    return this;
-  }
+/**
+ * Set fields for the test case
+ * @param {Record<string, string>} values
+ * @example
+ * describe('suite', () => {
+ *  it('should work', () => {
+ *    qase.fields({ field1: 'value1', field2: 'value2' });
+ *    // test code
+ *  });
+ * });
+ */
+qase.fields = (values: Record<string, string>) => {
+  sendEvent(events.addFields, { records: values });
+  return this;
+};
 
-  /**
-   * Assign suite to test
-   * @name suite
-   * @param {string} value
-   */
-  public static suite(value: string) {
-    sendEvent(events.addSuite, { suite: value });
+/**
+ * Set suite for the test case
+ * @param {string} value
+ * @example
+ * describe('suite', () => {
+ *  it('should work', () => {
+ *    qase.suite('Suite');
+ *    // test code
+ *  });
+ * });
+ */
+qase.suite = (value: string) => {
+  sendEvent(events.addSuite, { suite: value });
+  return this;
+};
 
-    return this;
-  }
+/**
+ * Set ignore for the test case
+ * @example
+ * describe('suite', () => {
+ *  it('should work', () => {
+ *    qase.ignore();
+ *    // test code
+ *  });
+ * });
+ */
+qase.ignore = () => {
+  sendEvent(events.addIgnore, {});
+  return this;
+};
 
-  /**
-   * Assign ignore mark to test
-   * @name ignore
-   */
-  public static ignore() {
-    sendEvent(events.addIgnore, {});
+/**
+ * Set attachment for the test case
+ * @param {object} attach
+ * @example
+ * describe('suite', () => {
+ *  it('should work', () => {
+ *    qase.attach({ name: 'attachment', type: 'text/plain', content: 'attachment content' });   
+ *    // test code
+ *  });
+ * });
+ */
+qase.attach = (attach: {
+  name?: string;
+  type?: string;
+  content?: string;
+  paths?: string[];
+}) => {
+  sendEvent(events.addAttachment, attach);
+  return this;
+};
 
-    return this;
-  }
-
-
-  /**
-   * Assign attachment to test
-   * @name attach
-   * @param attach
-   */
-  public static attach(attach: {
-    name?: string;
-    type?: string;
-    content?: string;
-    paths?: string[];
-  }) {
-    sendEvent(events.addAttachment, attach);
-
-    return this;
-  }
-
-
-  /**
-   * Starts step
-   * @param {string} name - the step name
-   * @param {StepFunction} body - the step content function
-   */
-  public static async step(name: string, body: StepFunction) {
-    const runningStep = new QaseStep(name);
-    // eslint-disable-next-line @typescript-eslint/require-await
-    await runningStep.run(body, async (message) => sendEvent(events.addStep, message));
-  }
-}
+/**
+ * Set step for the test case
+ * @param {string} name
+ * @param {StepFunction} body
+ * @example
+ * describe('suite', () => {
+ *  it('should work', () => {
+ *    qase.step('step', async () => {
+ *      // step code
+ *    });
+ *    // test code
+ *  });
+ * });
+ */
+qase.step = async (name: string, body: StepFunction) => {
+  const runningStep = new QaseStep(name);
+  // eslint-disable-next-line @typescript-eslint/require-await
+  await runningStep.run(body, async (message) => sendEvent(events.addStep, message));
+  return this;
+};

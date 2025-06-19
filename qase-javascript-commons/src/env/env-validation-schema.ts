@@ -86,10 +86,7 @@ export const envValidationSchema: JSONSchemaType<EnvType> = {
       nullable: true,
     },
     [EnvRunEnum.tags]: {
-      type: 'array',
-      items: {
-        type: 'string',
-      },
+      type: 'string',
       nullable: true,
     },
 

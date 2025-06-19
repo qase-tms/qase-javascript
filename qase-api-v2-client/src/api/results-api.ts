@@ -24,6 +24,10 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 import { CreateResultsRequestV2 } from '../model';
 // @ts-ignore
 import { ResultCreate } from '../model';
+// @ts-ignore
+import { ResultCreateBulkResponse } from '../model';
+// @ts-ignore
+import { ResultCreateResponse } from '../model';
 /**
  * ResultsApi - axios parameter creator
  * @export
@@ -143,7 +147,7 @@ export const ResultsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createResultV2(projectCode: string, runId: number, resultCreate: ResultCreate, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async createResultV2(projectCode: string, runId: number, resultCreate: ResultCreate, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ResultCreateResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createResultV2(projectCode, runId, resultCreate, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -156,7 +160,7 @@ export const ResultsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createResultsV2(projectCode: string, runId: number, createResultsRequestV2: CreateResultsRequestV2, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async createResultsV2(projectCode: string, runId: number, createResultsRequestV2: CreateResultsRequestV2, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ResultCreateBulkResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createResultsV2(projectCode, runId, createResultsRequestV2, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -179,7 +183,7 @@ export const ResultsApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createResultV2(projectCode: string, runId: number, resultCreate: ResultCreate, options?: any): AxiosPromise<void> {
+        createResultV2(projectCode: string, runId: number, resultCreate: ResultCreate, options?: any): AxiosPromise<ResultCreateResponse> {
             return localVarFp.createResultV2(projectCode, runId, resultCreate, options).then((request) => request(axios, basePath));
         },
         /**
@@ -191,7 +195,7 @@ export const ResultsApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createResultsV2(projectCode: string, runId: number, createResultsRequestV2: CreateResultsRequestV2, options?: any): AxiosPromise<void> {
+        createResultsV2(projectCode: string, runId: number, createResultsRequestV2: CreateResultsRequestV2, options?: any): AxiosPromise<ResultCreateBulkResponse> {
             return localVarFp.createResultsV2(projectCode, runId, createResultsRequestV2, options).then((request) => request(axios, basePath));
         },
     };
