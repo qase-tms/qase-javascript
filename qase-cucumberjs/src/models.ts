@@ -4,3 +4,10 @@ export interface TestMetadata {
   title: string | null;
   isIgnore: boolean;
 }
+
+export interface ScenarioData {
+  name: string;
+  parameters: Record<string, Record<string, string>>;
+}
+
+
