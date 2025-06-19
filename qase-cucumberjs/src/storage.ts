@@ -22,7 +22,7 @@ import {
 import { TestCase } from '@cucumber/messages/dist/esm/src/messages';
 import { Status } from '@cucumber/cucumber';
 import { v4 as uuidv4 } from 'uuid';
-import { TestMetadata } from './models';
+import { ScenarioData, TestMetadata } from './models';
 
 type TestStepResultStatus = (typeof Status)[keyof typeof Status];
 
@@ -73,7 +73,7 @@ export class Storage {
    * @type {Record<string, string>}
    * @private
    */
-  private scenarios: Record<string, string> = {};
+  private scenarios: Record<string, ScenarioData> = {};
 
   /**
    * @type {Record<string, string>}
@@ -99,7 +99,31 @@ export class Storage {
 
       children.forEach(({ scenario }) => {
         if (scenario) {
-          this.scenarios[scenario.id] = name;
+          const parameters: Record<string, Record<string, string>> = {};
+          
+          scenario.examples?.forEach((example) => {
+            if (example.tableHeader && example.tableBody) {
+              const columnNames = example.tableHeader.cells.map(cell => cell.value);
+              
+              example.tableBody.forEach((row) => {
+                const rowParams: Record<string, string> = {};
+                
+                row.cells.forEach((cell, index) => {
+                  const columnName = columnNames[index];
+                  if (columnName) {
+                    rowParams[columnName] = cell.value;
+                  }
+                });
+                
+                parameters[row.id] = rowParams;
+              });
+            }
+          });
+
+          this.scenarios[scenario.id] = {
+            name: name,
+            parameters: parameters,
+          };
         }
       });
     }
@@ -224,18 +248,25 @@ export class Storage {
     const error = this.getError(tcs.id);
 
     let relations: Relation | null = null;
-    const nodeId = pickle.astNodeIds[pickle.astNodeIds.length - 1];
+    let params: Record<string, string> = {};
+    const nodeId = pickle.astNodeIds[0];
     if (nodeId != undefined && this.scenarios[nodeId] != undefined) {
       relations = {
         suite: {
           data: [
             {
-              title: this.scenarios[nodeId] ?? '',
+              title: this.scenarios[nodeId]?.name ?? '',
               public_id: null,
             },
           ],
         },
       };
+
+      for (const id of pickle.astNodeIds) {
+        if (this.scenarios[nodeId]?.parameters[id] != undefined) {
+          params = { ...params, ...this.scenarios[nodeId]?.parameters[id] };
+        }
+      }
     }
 
     return {
@@ -252,7 +283,7 @@ export class Storage {
       fields: metadata.fields,
       message: error?.message ?? null,
       muted: false,
-      params: {},
+      params: params,
       group_params: {},
       relations: relations,
       run_id: null,

@@ -1,3 +1,9 @@
+# qase-cucumberjs@2.1.3
+
+## What's new
+
+- Added support for table parameters in the test results.
+
 # qase-cucumberjs@2.1.1
 
 ## What's new
