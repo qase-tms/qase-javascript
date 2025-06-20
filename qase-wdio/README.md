@@ -20,6 +20,8 @@ from Qase.io before executing tests. It's a more reliable way to bind
 autotests to test cases, that persists when you rename, move, or
 parameterize your tests.
 
+For more information, see the [Usage Guide](docs/usage.md).
+
 For example:
 
 ### Mocha/Jasmine
