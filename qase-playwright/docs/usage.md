@@ -1,317 +1,224 @@
-# Qase Syntax
+# Qase Integration in Playwright
 
-> [**Click here**](../../examples/playwright/test/) to view Example tests for the following syntax.
-
-Here is the complete list of syntax options available for the reporter:
-- [Qase Id](#qase-id)
-- [Qase Title](#qase-title)
-- [Steps](#steps)
-- [Fields](#fields)
-- [Suite](#suite)
-- [Parameters](#parameters)
-- [Comment](#comment)
-- [Attach](#attach)
-- [Ignore](#ignore)
-
-If you do not use any Qase syntax, the reporter uses the title from the `describe` and `test` functions as the Suite and
-Test case title respectively, when publishing results.
-
-<br>
-
-### Import Statement
+This guide demonstrates how to integrate Qase with Playwright, providing instructions on how to add Qase IDs, titles,
+fields, suites, comments, and file attachments to your test cases.
 
 ---
-Add the following statement at the beginning of your spec file, before any tests.
+
+## Adding QaseID to a Test
+
+To associate a QaseID with a test in Playwright, use the `qase` function. This function accepts a single integer
+representing the test's ID in Qase.
+
+### Example
 
 ```javascript
 import { qase } from 'playwright-qase-reporter';
+
+test(qase(1, 'test'), async ({ page }) => {
+  await page.goto('https://example.com');
+});
+
+test(qase([1, 2, 3], 'test'), async ({ page }) => {
+  await page.goto('https://example.com');
+});
 ```
 
-<br>
-
-### Example Spec file
-
 ---
+
+## Adding a Title to a Test
+
+You can provide a title for your test using the `qase.title` function. The function accepts a string, which will be
+used as the test's title in Qase. If no title is provided, the test method name will be used by default.
+
+### Example
 
 ```javascript
 import { qase } from 'playwright-qase-reporter';
 
-describe('Suite title', () => {
+test('test', async ({ page }) => {
+  qase.title('Title');
+  await page.goto('https://example.com');
+});
+```
 
-  test(qase(1, "This is the test name"), async () => {
-    qase.title("This overrides the test name");
-    qase.suite("Suite name");
-    qase.fields({ 'severity': 'high', 'priority': 'medium' });
-    qase.attach({ paths: './tests/examples/attachments/test-file.txt' });
-    qase.comment("A comment for this result");
-    qase.ignore(); // doesn't report his result to Qase.
-    qase.parameters({ Username: "@test" });
-    qase.groupParameters({ Username: username, Password: "123" });
-    await test.step('Test step title', async () => {
-      // step logic 
-    });
+---
+
+## Adding Fields to a Test
+
+The `qase.fields` function allows you to add additional metadata to a test case. You can specify multiple fields to
+enhance test case information in Qase.
+
+### System Fields
+
+- `description` — Description of the test case.
+- `preconditions` — Preconditions for the test case.
+- `postconditions` — Postconditions for the test case.
+- `severity` — Severity of the test case (e.g., `critical`, `major`).
+- `priority` — Priority of the test case (e.g., `high`, `low`).
+- `layer` — Test layer (e.g., `UI`, `API`).
+
+### Example
+
+```javascript
+import { qase } from 'playwright-qase-reporter';
+
+test('test', async ({ page }) => {
+  qase.fields({ description: "Description", preconditions: "Preconditions" });
+  await page.goto('https://example.com');
+});
+```
+
+---
+
+## Adding a Suite to a Test
+
+To assign a suite or sub-suite to a test, use the `qase.suite` function. It can receive a suite name, and optionally a
+sub-suite, both as strings.
+
+### Example
+
+```javascript
+import { qase } from 'playwright-qase-reporter';
+
+test('test', async ({ page }) => {
+  qase.suite("Suite 01");
+  await page.goto('https://example.com');
+});
+
+test('test', async ({ page }) => {
+  qase.suite("Suite 01\tSuite 02");
+  await page.goto('https://example.com');
+});
+```
+
+---
+
+## Ignoring a Test in Qase
+
+To exclude a test from being reported to Qase (while still executing the test in Playwright), use the `qase.ignore`
+function. The test will run, but its result will not be sent to Qase.
+
+### Example
+
+```javascript
+import { qase } from 'playwright-qase-reporter';
+
+test('test', async ({ page }) => {
+  qase.ignore();
+  await page.goto('https://example.com');
+});
+```
+
+---
+
+## Adding a Comment to a Test
+
+You can attach comments to the test results in Qase using the `qase.comment` function. The comment will be displayed
+alongside the test execution details in Qase.
+
+### Example
+
+```javascript
+import { qase } from 'playwright-qase-reporter';
+
+test('test', async ({ page }) => {
+  qase.comment("Some comment");
+  await page.goto('https://example.com');
+});
+```
+
+---
+
+## Attaching Files to a Test
+
+To attach files to a test result, use the `qase.attach` function. This method supports attaching one or multiple files,
+along with optional file names, comments, and file types.
+
+### Example
+
+```javascript
+import { qase } from 'playwright-qase-reporter';
+
+test('test', async ({ page }) => {
+  qase.attach({ name: 'attachment.txt', content: 'Hello, world!', contentType: 'text/plain' });
+  qase.attach({ paths: '/path/to/file' });
+  qase.attach({ paths: ['/path/to/file', '/path/to/another/file'] });
+  await page.goto('https://example.com');
+});
+```
+
+## Adding Parameters to a Test
+
+You can add parameters to a test case using the `qase.parameters` function. This function accepts an object with
+parameter names and values.
+
+### Example
+
+```javascript
+import { qase } from 'playwright-qase-reporter';
+
+test('test', async ({ page }) => {
+  qase.parameters({ param1: 'value1', param2: 'value2' });
+  await page.goto('https://example.com');
+});
+```
+
+## Adding Group Parameters to a Test
+
+To add group parameters to a test case, use the `qase.groupParameters` function. This function accepts an object with
+group parameter names and values.
+
+### Example
+
+```javascript
+import { qase } from 'playwright-qase-reporter';
+
+test('test', async ({ page }) => {
+  qase.parameters({ param1: 'value1', param2: 'value2' });
+  qase.groupParameters({ param3: 'value3', param4: 'value4' });
+  await page.goto('https://example.com');
+});
+```
+
+## Adding Steps to a Test
+
+You can add steps to a test case using the `qase.step` function. This function accepts a string, which will be used as
+the step description in Qase.
+
+### Example
+
+```javascript
+import { qase } from 'playwright-qase-reporter';
+
+test('test', async ({ page }) => {
+  await test.step(qase.step('Some step'), async () => {
+    // some actions
   });
+  await page.goto('https://example.com');
 });
 ```
 
-<br>
+## Annotations
 
-### Qase ID
+Playwright Qase reporter supports test annotations for setting Qase IDs, titles, and suites.
 
----
-
-Qase IDs can be defined using two different methods. It is best to select one method and consistently use it throughout
-your tests. The first method is recommended.
-
-Only one Qase Id can be linked to a test.
-
-**Inline with the `test` Function**:
+### Example
 
 ```javascript
-test(qase(1, 'A simple test'), () => {
-  // Test logic here
-});
-```
-
-**Inside the `test` Body**:
-
-```javascript
-test('A simple test', () => {
-  qase.id(1);
-  // Test logic here
-});
-```
-
-**In the test's annotations**:
-
-```js
-test('A simple test',
+test('test',
   {
     annotation: { type: 'QaseID', description: '1' },
   },
-  async () => {
-    // Test logic here
-  });
-```
-
-<br>
-
-### Qase Title
-
----
-
-The `qase.title()` method is used to set the title of a test case, both when creating a new test case from the result,
-and when updating the title of an existing test case - *if used with `qase.id()`.*
-
-```javascript
-test("This won't appear in Qase", () => {
-  qase.title("This text will be the title of the test, in Qase");
-  // Test logic here
-});
-```
-
-If you don’t explicitly set a title using this method, the title specified in the `test(..)` function will be used for
-creating new test cases. However, if this method is defined, it always takes precedence and overrides the title from the
-`test(..)` function.
-
-<br>
-
-### Steps
-
----
-
-The reporter uses the title from the `test.step` function as the step title. By providing clear and descriptive step
-names, you make it easier to understand the test’s flow when reviewing the test case.
-
-Additionally, these steps get their own result in the Qase Test run, offering a well-organized summary of the test flow.
-This helps quickly identify the cause of any failures.
-
-```javascript
-test('A Test case with steps, updated from code', async () => {
-  await test.step('Initialize the environment', async () => {
-    // Set up test environment
-  });
-  await test.step('Test Core Functionality of the app', async () => {
-    // Exercise core functionality
+  async ({ page }) => {
+    await page.goto('https://example.com');
   });
 
-  await test.step('Verify Expected Behavior of the app', async () => {
-    // Assert expected behavior
-  });
-});
-```
-
-You also can use the `qase.step()` method to set the expected result and data of the step, which will be used in the
-Qase report.
-
-```javascript
-test('A Test case with steps, updated from code', async () => {
-  await test.step(qase.step('Initialize the environment'), async () => {
-    // Set up test environment
-  });
-  await test.step(qase.step('Test Core Functionality of the app', 'expected result'), async () => {
-    // Exercise core functionality
-  });
-
-  await test.step(qase.step('Verify Expected Behavior of the app', 'expected result', 'data'), async () => {
-    // Assert expected behavior
-  });
-});
-```
-
-<br>
-
-### Fields
-
----
-
-You can define the `description`, `pre-conditions`, `post-conditions`, and fields such as `severity`, `priority`, and
-`layer` using this method, which enables you to specify and maintain the context of the case directly within your code.
-
-```javascript
-test('Maintain your test meta-data from code', async () => {
-  qase.fields({
-    severity: 'high',
-    priority: 'medium',
-    layer: 'api',
-    precondition: 'add your precondition',
-    postcondition: 'add your postcondition',
-    description: `Code it quick, fix it slow,
-                    Tech debt grows where shortcuts go,
-                    Refactor later? Ha! We know.`
-  })
-  //  test logic here
-});
-```
-
-<br>
-
-### Suite
-
----
-
-You can use this method to nest the resulting test cases in a particular suite. There's something to note here – suites,
-unlike test cases, are not identified uniquely by the Reporter. Therefore, when defining an existing suite - the title
-of the suite is used for matching.
-
-```js
-test('Test with a defined suite', () => {
-  qase.suite('Suite defined with qase.suite()');
-});
-
-/*
- *  Or, nest multiple levels of suites. 
- *  `\t` is used for dividing each suite name.
- */
-test('Test with a nested suite', () => {
-  qase.suite('Application\tAuthentication\tLogin\tEdge_case');
-  //  test logic here
-});
-
-test('Test with a suite from annotations',
+test('test',
   {
-    annotation: {
-      type: 'QaseSuite', 
-      description: 'Suite defined in annotation',
-    },
+    annotation: { type: 'QaseSuite', description: 'Suite defined in annotation' },
   },
-  async () => {
-    // Test logic here
+  async ({ page }) => {
+    await page.goto('https://example.com');
   });
-```
-
-<br>
-
-### Parameters
-
----
-Parameters are a great way to make your tests more dynamic, reusable, and data-driven. By defining parameters in this
-method, you can ensure only one test case with all the parameters is created in your Qase project, avoiding duplication.
-
-```javascript
-const testCases = [
-  { browser: "Chromium", username: "@alice", password: "123" },
-  { browser: "Firefox", username: "@bob", password: "456" },
-  { browser: "Webkit", username: "@charlie", password: "789" },
-];
-
-testCases.forEach(({ browser, username, password, }) => {
-  test(`Test login with ${browser}`, async () => {
-    qase.title("Verify if page loads on all browsers");
-
-    qase.parameters({ Browser: browser });  // Single parameter
-    // test logic
-
-    testCases.forEach(({ username, password }) => {
-      test(`Test login with ${username} using qase.groupParameters`, () => {
-        qase.title("Verify if user is able to login with their username.");
-
-        qase.groupParameters({  // Group parameters
-          Username: username,
-          Password: password,
-        });
-        // test logic
-      });
-    });
-  });
-});
-```
-
-<br>
-
-### Comment
-
----
-In addition to `test.step()`, this method can be used to provide any additional context to your test, it helps maintiain
-the code by clarifying the expected result of the test.
-
-```js
-test("A test case with qase.comment()", () => {
-  /*
-   * Please note, this comment is added to a Result, not to the Test case.
-   */
-  qase.comment("This comment is added to the result");
-  // test logic here
-});
-```
-
-<br>
-
-### Attach
-
----
-This method can help attach one, or more files to the test's result. You can also add the file's contents directly from
-code. For example:
-
-```js
-test('Test result with attachment', async () => {
-
-  // To attach a single file
-  qase.attach({
-    paths: "./tests/examples/attachments/test-file.txt",
-  });
-
-  // Add multiple attachments. 
-  qase.attach({ paths: ['/path/to/file', '/path/to/another/file'] });
-
-
-  // Upload file's contents directly from code.
-  qase.attach({ name: 'attachment.txt', content: 'Hello, world!', contentType: 'text/plain' });
-  // test logic here
-});
-```
-
-<br>
-
-### Ignore
-
----
-If this method is added, the reporter will exclude the test’s result from the report sent to Qase. While the test will
-still executed by Playwright, its result will not be considered by the reporter.
-
-```js
-test('This test is executed using Playwright; however, it is NOT reported to Qase', () => {
-  qase.ignore();
-//  test logic here
-});
 ```
