@@ -20,6 +20,8 @@ from Qase.io before executing tests. It's a more reliable way to bind
 autotests to test cases, that persists when you rename, move, or
 parameterize your tests.
 
+For more information, see the [Usage Guide](docs/usage.md).
+
 For example:
 
 ```typescript
@@ -74,7 +76,7 @@ the [Qase CLI](https://github.com/qase-tms/qasectl):
 
 ```bash
 # Create a new test run
-qli testops run create --project DEMO --token token --title 'Mocha test run'
+qasectl testops run create --project DEMO --token token --title 'Mocha test run'
 
 # Save the run ID to the environment variable
 export QASE_TESTOPS_RUN_ID=$(< qase.env grep QASE_TESTOPS_RUN_ID | cut -d'=' -f2)
@@ -89,7 +91,7 @@ QASE_MODE=testops mocha --parallel
 After the tests are finished, you can complete the run:
 
 ```bash
-qli testops run complete --project DEMO --token token --id $(echo $QASE_TESTOPS_RUN_ID)
+qasectl testops run complete --project DEMO --token token --id $(echo $QASE_TESTOPS_RUN_ID)
 ```
 
 ## Configuration
