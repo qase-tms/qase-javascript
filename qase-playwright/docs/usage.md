@@ -222,3 +222,65 @@ test('test',
     await page.goto('https://example.com');
   });
 ```
+
+---
+
+## Selective execution tests
+
+You can use the `grep` property to select tests to run. You can specify a regular expression to match the Qase IDs in `playwright.config.js` or in command line arguments.
+
+### Configuration-based filtering
+
+```javascript
+const config = {
+  grep: /(Qase ID: 1|2|3)/,
+  reporter: [
+    [
+      'playwright-qase-reporter',
+      {
+        debug: true,
+
+        testops: {
+          api: {
+            token: 'api_key',
+          },
+
+          project: 'project_code',
+          uploadAttachments: true,
+
+          run: {
+            complete: true,
+          },
+        },
+      },
+    ],
+  ],
+};
+
+module.exports = config;
+```
+
+### Command line filtering
+
+```bash
+# Run tests with specific Qase IDs
+npx playwright test --grep "(Qase ID: 1|2|3)"
+```
+
+### Using qasectl for test plan filtering
+
+If you use `qase([Id], 'Test name')` syntax for test case IDs, you can use `qasectl` for getting prepared regex with all Qase IDs from your test plan. See [qasectl](https://github.com/qase-tms/qasectl/blob/main/docs/command.md#get-filtered-results) for more information.
+
+For example, if you have a test plan with ID 123, you can get the regular expression with all Qase IDs from it with the following command:
+
+```bash
+qasectl testops filter --project PROJ --token <token> --planID 123 --framework playwright --output qase.env --verbose
+```
+
+Specify result to run command:
+
+```bash
+npx playwright test --grep "$(cat qase.env | grep QASE_FILTERED_RESULTS | cut -d'=' -f2)"
+```
+
+Only tests with Qase IDs from the file will be run and reported to Qase.
