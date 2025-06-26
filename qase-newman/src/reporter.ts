@@ -37,9 +37,8 @@ export class NewmanQaseReporter {
   /**
    * @param {EventList} eventList
    * @returns {number[]}
-   * @private
    */
-  private static getCaseIds(eventList: EventList) {
+  public static getCaseIds(eventList: EventList) {
     const ids: number[] = [];
 
     eventList.each((event) => {
@@ -60,9 +59,8 @@ export class NewmanQaseReporter {
   /**
    * @param {Item} item
    * @returns {string[]}
-   * @private
    */
-  private static getParameters(item: Item): string[] {
+  public static getParameters(item: Item): string[] {
     const params: string[] = [];
 
     item.events.each((event) => {
@@ -89,9 +87,8 @@ export class NewmanQaseReporter {
   /**
    * @param {PropertyBase<PropertyBaseDefinition>} item
    * @returns {string[]}
-   * @private
    */
-  private static getParentTitles(
+  public static getParentTitles(
     item: PropertyBase<PropertyBaseDefinition>,
   ) {
     let titles: string[] = [];
