@@ -26,11 +26,11 @@ import { ScenarioData, TestMetadata } from './models';
 
 type TestStepResultStatus = (typeof Status)[keyof typeof Status];
 
-const qaseIdRegExp = /^@[Qq]-?(\d+)$/g;
-const newQaseIdRegExp = /^@[Qq]ase[Ii][Dd]=(\d+(?:,\s*\d+)*)$/g;
-const qaseTitleRegExp = /^@[Qq]ase[Tt]itle=(.+)$/g;
-const qaseFieldsRegExp = /^@[Qq]ase[Ff]ields=(.+)$/g;
-const qaseIgnoreRegExp = /^@[Qq]ase[Ii][Gg][Nn][Oo][Rr][Ee]$/g;
+const qaseIdRegExp = /^@[Qq]-?(\d+)$/;
+const newQaseIdRegExp = /^@[Qq]ase[Ii][Dd]=(\d+(?:,\s*\d+)*)$/;
+const qaseTitleRegExp = /^@[Qq]ase[Tt]itle=(.+)$/;
+const qaseFieldsRegExp = /^@[Qq]ase[Ff]ields=(.+)$/;
+const qaseIgnoreRegExp = /^@[Qq]ase[Ii][Gg][Nn][Oo][Rr][Ee]$/;
 
 export class Storage {
   /**
