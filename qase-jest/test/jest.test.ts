@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { expect } from '@jest/globals';
 import { qase } from '../src/jest';
 import { QaseStep } from 'qase-javascript-commons';

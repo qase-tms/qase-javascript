@@ -1,6 +1,8 @@
 import { expect } from '@jest/globals';
 import { StateManager, StateModel } from '../../src/state/state';
-import { ModeEnum } from '../../src/options';
+import { ModeEnum } from '../../src/options/mode-enum';
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Mock fs module
 jest.mock('fs', () => ({
@@ -16,14 +18,15 @@ jest.mock('path', () => ({
 }));
 
 // Mock console.error
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
 
 describe('StateManager', () => {
-  const mockExistsSync = require('fs').existsSync;
-  const mockReadFileSync = require('fs').readFileSync;
-  const mockWriteFileSync = require('fs').writeFileSync;
-  const mockUnlinkSync = require('fs').unlinkSync;
-  const mockResolve = require('path').resolve;
+  const mockExistsSync = jest.mocked(fs.existsSync);
+  const mockReadFileSync = jest.mocked(fs.readFileSync);
+  const mockWriteFileSync = jest.mocked(fs.writeFileSync);
+  const mockUnlinkSync = jest.mocked(fs.unlinkSync);
+  const mockResolve = jest.mocked(path.resolve);
 
   const mockStatePath = '/mock/path/reporterState.json';
 

@@ -2,6 +2,8 @@ import { expect } from '@jest/globals';
 import { ConfigLoader } from '../../src/config/config-loader';
 import { QaseError } from '../../src/utils/qase-error';
 import { JSONSchemaType } from 'ajv';
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Mock fs module
 jest.mock('fs', () => ({
@@ -14,8 +16,8 @@ jest.mock('path', () => ({
 }));
 
 describe('ConfigLoader', () => {
-  const mockReadFileSync = require('fs').readFileSync;
-  const mockJoin = require('path').join;
+  const mockReadFileSync = jest.mocked(fs.readFileSync);
+  const mockJoin = jest.mocked(path.join);
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -69,8 +71,8 @@ describe('ConfigLoader', () => {
       
       mockReadFileSync
         .mockImplementationOnce(() => {
-          const error = new Error('File not found');
-          (error as any).code = 'ENOENT';
+          const error = new Error('File not found') as NodeJS.ErrnoException;
+          error.code = 'ENOENT';
           throw error;
         })
         .mockReturnValueOnce(configJson);
@@ -90,8 +92,8 @@ describe('ConfigLoader', () => {
       
       mockReadFileSync
         .mockImplementation(() => {
-          const error = new Error('File not found');
-          (error as any).code = 'ENOENT';
+          const error = new Error('File not found') as NodeJS.ErrnoException;
+          error.code = 'ENOENT';
           throw error;
         });
 
@@ -104,8 +106,8 @@ describe('ConfigLoader', () => {
     it('should throw QaseError for non-ENOENT file system errors', () => {
       mockJoin.mockReturnValue('/path/to/qase.config.json');
       mockReadFileSync.mockImplementation(() => {
-        const error = new Error('Permission denied');
-        (error as any).code = 'EACCES';
+        const error = new Error('Permission denied') as NodeJS.ErrnoException;
+        error.code = 'EACCES';
         throw error;
       });
 
@@ -143,8 +145,8 @@ describe('ConfigLoader', () => {
     it('should handle EISDIR error code', () => {
       mockJoin.mockReturnValue('/path/to/qase.config.json');
       mockReadFileSync.mockImplementation(() => {
-        const error = new Error('Is a directory');
-        (error as any).code = 'EISDIR';
+        const error = new Error('Is a directory') as NodeJS.ErrnoException;
+        error.code = 'EISDIR';
         throw error;
       });
 

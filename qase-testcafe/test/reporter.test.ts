@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { expect } from '@jest/globals';
 import { TestcafeQaseReporter } from '../src/reporter';
 

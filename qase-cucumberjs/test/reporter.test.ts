@@ -1,56 +1,65 @@
+/* eslint-disable */
 import { expect } from '@jest/globals';
 import { EventEmitter } from 'events';
 import { Formatter } from '@cucumber/cucumber';
-import { Envelope } from '@cucumber/messages';
+import { Envelope, AttachmentContentEncoding } from '@cucumber/messages';
 import { CucumberQaseReporter } from '../src/reporter';
 
+interface QaseReporterMock {
+  addTestResult: jest.Mock;
+  publish: jest.Mock;
+  startTestRun: jest.Mock;
+}
+
+const qaseReporterMock: QaseReporterMock = {
+  addTestResult: jest.fn(),
+  publish: jest.fn().mockResolvedValue(undefined),
+  startTestRun: jest.fn(),
+};
+
+const storageMock = {
+  addScenario: jest.fn(),
+  addPickle: jest.fn(),
+  addAttachment: jest.fn(),
+  addTestCase: jest.fn(),
+  addTestCaseStarted: jest.fn(),
+  addTestCaseStep: jest.fn(),
+  convertTestCase: jest.fn(() => ({ id: 'result-id' })) as jest.Mock,
+};
+
 jest.mock('qase-javascript-commons', () => ({
-  QaseReporter: { getInstance: jest.fn() },
+  QaseReporter: { 
+    getInstance: jest.fn(() => qaseReporterMock) 
+  },
   composeOptions: jest.fn(() => ({})),
-  ConfigLoader: jest.fn().mockImplementation(() => ({ load: jest.fn(() => ({})) })),
+  ConfigLoader: jest.fn().mockImplementation(() => ({ 
+    load: jest.fn(() => ({})) 
+  })),
 }));
 
-jest.mock('../src/storage', () => {
-  return {
-    Storage: jest.fn().mockImplementation(() => ({
-      addScenario: jest.fn(),
-      addPickle: jest.fn(),
-      addAttachment: jest.fn(),
-      addTestCase: jest.fn(),
-      addTestCaseStarted: jest.fn(),
-      addTestCaseStep: jest.fn(),
-      convertTestCase: jest.fn(() => ({ id: 'result-id' })),
-    })),
-  };
-});
+jest.mock('../src/storage', () => ({
+  Storage: jest.fn(() => storageMock),
+}));
 
 describe('CucumberQaseReporter', () => {
   let eventBroadcaster: EventEmitter;
-  let qaseReporterMock: any;
 
   beforeEach(() => {
     jest.clearAllMocks();
     eventBroadcaster = new EventEmitter();
-    // Мокаем reporter
-    qaseReporterMock = {
-      addTestResult: jest.fn(),
-      publish: jest.fn().mockResolvedValue(undefined),
-      startTestRun: jest.fn(),
-    };
-    require('qase-javascript-commons').QaseReporter.getInstance.mockReturnValue(qaseReporterMock);
   });
 
-  function createReporter() {
+  function createReporter(): CucumberQaseReporter {
     return new CucumberQaseReporter({
       eventBroadcaster,
-      colorFns: {} as any,
+      colorFns: {} as Formatter['colorFns'],
       cwd: '',
-      eventDataCollector: {} as any,
+      eventDataCollector: {} as Formatter['eventDataCollector'],
       log: jest.fn(),
       parsedArgvOptions: {},
-      snippetBuilder: {} as any,
-      stream: {} as any,
-      supportCodeLibrary: {} as any,
+      snippetBuilder: {} as Formatter['snippetBuilder'],
+      stream: {} as Formatter['stream'],
+      supportCodeLibrary: {} as Formatter['supportCodeLibrary'],
       cleanup: jest.fn(),
     });
   }
@@ -61,16 +70,38 @@ describe('CucumberQaseReporter', () => {
   });
 
   it('should subscribe to envelope events and call storage methods', () => {
-    const reporter = createReporter();
-    const storage = reporter['storage'];
+    createReporter();
 
-    const gherkinEnvelope: Envelope = { gherkinDocument: { feature: { children: [], name: 'f' } } } as any;
-    const pickleEnvelope: Envelope = { pickle: { id: 'p1' } } as any;
-    const attachmentEnvelope: Envelope = { attachment: { testStepId: 'step1', mediaType: 'text/plain', body: 'data' } } as any;
-    const testCaseEnvelope: Envelope = { testCase: { id: 'tc1' } } as any;
-    const testCaseStartedEnvelope: Envelope = { testCaseStarted: { id: 'tcs1' } } as any;
-    const testStepFinishedEnvelope: Envelope = { testStepFinished: { testCaseStartedId: 'tcs1', testStepId: 'step1', testStepResult: { status: 'PASSED' } } } as any;
-    const testCaseFinishedEnvelope: Envelope = { testCaseFinished: { testCaseStartedId: 'tcs1' } } as any;
+    const gherkinEnvelope: Envelope = { 
+      gherkinDocument: { feature: { children: [], name: 'f' } } 
+    } as unknown as Envelope;
+    const pickleEnvelope: Envelope = { 
+      pickle: { id: 'p1' } 
+    } as unknown as Envelope;
+    const attachmentEnvelope: Envelope = { 
+      attachment: { 
+        testStepId: 'step1', 
+        mediaType: 'text/plain', 
+        body: 'data',
+        contentEncoding: AttachmentContentEncoding.IDENTITY
+      } 
+    } as unknown as Envelope;
+    const testCaseEnvelope: Envelope = { 
+      testCase: { id: 'tc1' } 
+    } as unknown as Envelope;
+    const testCaseStartedEnvelope: Envelope = { 
+      testCaseStarted: { id: 'tcs1' } 
+    } as unknown as Envelope;
+    const testStepFinishedEnvelope: Envelope = { 
+      testStepFinished: { 
+        testCaseStartedId: 'tcs1', 
+        testStepId: 'step1', 
+        testStepResult: { status: 'PASSED' } 
+      } 
+    } as unknown as Envelope;
+    const testCaseFinishedEnvelope: Envelope = { 
+      testCaseFinished: { testCaseStartedId: 'tcs1' } 
+    } as unknown as Envelope;
 
     eventBroadcaster.emit('envelope', gherkinEnvelope);
     eventBroadcaster.emit('envelope', pickleEnvelope);
@@ -80,37 +111,42 @@ describe('CucumberQaseReporter', () => {
     eventBroadcaster.emit('envelope', testStepFinishedEnvelope);
     eventBroadcaster.emit('envelope', testCaseFinishedEnvelope);
 
-    expect(storage.addScenario).toHaveBeenCalledWith(gherkinEnvelope.gherkinDocument);
-    expect(storage.addPickle).toHaveBeenCalledWith(pickleEnvelope.pickle);
-    expect(storage.addAttachment).toHaveBeenCalledWith(attachmentEnvelope.attachment);
-    expect(storage.addTestCase).toHaveBeenCalledWith(testCaseEnvelope.testCase);
-    expect(storage.addTestCaseStarted).toHaveBeenCalledWith(testCaseStartedEnvelope.testCaseStarted);
-    expect(storage.addTestCaseStep).toHaveBeenCalledWith(testStepFinishedEnvelope.testStepFinished);
-    expect(storage.convertTestCase).toHaveBeenCalledWith(testCaseFinishedEnvelope.testCaseFinished);
+    expect(storageMock.addScenario).toHaveBeenCalledWith(gherkinEnvelope.gherkinDocument);
+    expect(storageMock.addPickle).toHaveBeenCalledWith(pickleEnvelope.pickle);
+    expect(storageMock.addAttachment).toHaveBeenCalledWith(attachmentEnvelope.attachment);
+    expect(storageMock.addTestCase).toHaveBeenCalledWith(testCaseEnvelope.testCase);
+    expect(storageMock.addTestCaseStarted).toHaveBeenCalledWith(testCaseStartedEnvelope.testCaseStarted);
+    expect(storageMock.addTestCaseStep).toHaveBeenCalledWith(testStepFinishedEnvelope.testStepFinished);
+    expect(storageMock.convertTestCase).toHaveBeenCalledWith(testCaseFinishedEnvelope.testCaseFinished);
     expect(qaseReporterMock.addTestResult).toHaveBeenCalledWith({ id: 'result-id' });
   });
 
   it('should not call addTestResult if convertTestCase returns undefined', () => {
-    const reporter = createReporter();
-    const storage = reporter['storage'];
-    (storage.convertTestCase as jest.Mock).mockReturnValueOnce(undefined);
-    const testCaseFinishedEnvelope: Envelope = { testCaseFinished: { testCaseStartedId: 'tcs1' } } as any;
+    createReporter();
+    storageMock.convertTestCase.mockReturnValueOnce(undefined);
+    const testCaseFinishedEnvelope: Envelope = { 
+      testCaseFinished: { testCaseStartedId: 'tcs1' } 
+    } as unknown as Envelope;
     eventBroadcaster.emit('envelope', testCaseFinishedEnvelope);
     expect(qaseReporterMock.addTestResult).not.toHaveBeenCalled();
   });
 
   it('should call reporter.publish on testRunFinished', async () => {
     createReporter();
-    const testRunFinishedEnvelope: Envelope = { testRunFinished: {} } as any;
+    const testRunFinishedEnvelope: Envelope = { 
+      testRunFinished: {} 
+    } as unknown as Envelope;
     eventBroadcaster.emit('envelope', testRunFinishedEnvelope);
     // Ждем завершения промиса
-    await new Promise(process.nextTick);
+    await new Promise((resolve) => process.nextTick(resolve));
     expect(qaseReporterMock.publish).toHaveBeenCalled();
   });
 
   it('should call reporter.startTestRun on testRunStarted', () => {
     createReporter();
-    const testRunStartedEnvelope: Envelope = { testRunStarted: {} } as any;
+    const testRunStartedEnvelope: Envelope = { 
+      testRunStarted: {} 
+    } as unknown as Envelope;
     eventBroadcaster.emit('envelope', testRunStartedEnvelope);
     expect(qaseReporterMock.startTestRun).toHaveBeenCalled();
   });

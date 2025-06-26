@@ -60,8 +60,11 @@ describe('ReportReporter', () => {
     testResult.steps = [step];
     reporter['results'] = [testResult];
     await reporter.sendResults();
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(writer.clearPreviousResults).toHaveBeenCalled();
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(writer.writeAttachment).toHaveBeenCalled();
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(writer.writeTestResult).toHaveBeenCalledWith(expect.objectContaining({ id: 't1' }));
     expect(reporter['results'][0]?.attachments[0]?.file_path).toBe('/mock/file.txt');
     expect(reporter['results'][0]?.steps[0]?.attachments[0]?.file_path).toBe('/mock/step.txt');
@@ -92,8 +95,11 @@ describe('ReportReporter', () => {
   it('should write report and log path on complete', async () => {
     reporter['results'] = [];
     await reporter.complete();
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(writer.clearPreviousResults).toHaveBeenCalled();
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(writer.writeReport).toHaveBeenCalled();
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(logger.log).toHaveBeenCalledWith(expect.stringContaining('/mock/report.json'));
   });
 
@@ -141,6 +147,7 @@ describe('ReportReporter', () => {
     const steps: TestStepType[] = [parentStep];
     
     const result = reporter['copyStepAttachments'](steps);
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(writer.writeAttachment).toHaveBeenCalledTimes(2);
     expect(result[0]?.attachments[0]?.file_path).toBe('/mock/parent.txt');
     expect(result[0]?.steps[0]?.attachments[0]?.file_path).toBe('/mock/child.txt');

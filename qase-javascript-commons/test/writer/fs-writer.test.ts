@@ -1,11 +1,14 @@
+/* eslint-disable */
+
 import { expect } from '@jest/globals';
 import { FsWriter } from '../../src/writer/fs-writer';
-import { FormatEnum } from '../../src/writer/driver-enum';
-import { JsonFormatter, JsonpFormatter } from '../../src/formatter';
-import { Report, TestResultType, Attachment } from '../../src/models';
-import { HostData } from '../../src/models/host-data';
+import { JsonFormatter } from '../../src/formatter/json-formatter';
+import { JsonpFormatter } from '../../src/formatter/jsonp-formatter';
+import { FormatEnum } from '../../src/writer';
+import { Attachment, Report, TestResultType } from '../../src/models';
+import * as fs from 'fs';
 
-// Mock fs and path modules
+// Mock fs module
 jest.mock('fs', () => ({
   mkdirSync: jest.fn(),
   writeFileSync: jest.fn(),
@@ -17,20 +20,21 @@ jest.mock('fs', () => ({
   rmdirSync: jest.fn(),
 }));
 
+// Mock path module
 jest.mock('path', () => ({
   join: jest.fn((...args: string[]) => args.join('/')),
-  basename: jest.fn((p: string) => p.split('/').pop() || ''),
+  basename: jest.fn((p: string) => p.split('/').pop() ?? ''),
 }));
 
 describe('FsWriter', () => {
-  const mockMkdirSync = require('fs').mkdirSync;
-  const mockWriteFileSync = require('fs').writeFileSync;
-  const mockCopyFileSync = require('fs').copyFileSync;
-  const mockExistsSync = require('fs').existsSync;
-  const mockReaddirSync = require('fs').readdirSync;
-  const mockLstatSync = require('fs').lstatSync;
-  const mockUnlinkSync = require('fs').unlinkSync;
-  const mockRmdirSync = require('fs').rmdirSync;
+  const mockMkdirSync = jest.mocked(fs.mkdirSync);
+  const mockWriteFileSync = jest.mocked(fs.writeFileSync);
+  const mockCopyFileSync = jest.mocked(fs.copyFileSync);
+  const mockExistsSync = jest.mocked(fs.existsSync);
+  const mockReaddirSync = jest.mocked(fs.readdirSync);
+  const mockLstatSync = jest.mocked(fs.lstatSync);
+  const mockUnlinkSync = jest.mocked(fs.unlinkSync);
+  const mockRmdirSync = jest.mocked(fs.rmdirSync);
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -140,7 +144,7 @@ describe('FsWriter', () => {
           commons: 'test',
           apiClientV1: 'test',
           apiClientV2: 'test',
-        } as HostData,
+        },
         stats: { total: 0, passed: 0, failed: 0, skipped: 0, broken: 0, muted: 0 },
         results: [],
         threads: [],
@@ -180,7 +184,7 @@ describe('FsWriter', () => {
           commons: 'test',
           apiClientV1: 'test',
           apiClientV2: 'test',
-        } as HostData,
+        },
         stats: { total: 0, passed: 0, failed: 0, skipped: 0, broken: 0, muted: 0 },
         results: [],
         threads: [],
@@ -228,23 +232,28 @@ describe('FsWriter', () => {
       const writer = new FsWriter({ path: 'test-path' });
       
       mockExistsSync.mockReturnValue(true);
-      mockReaddirSync.mockReturnValue(['file1.txt', 'subdir', 'file2.txt']);
-      mockLstatSync.mockImplementation((path: string) => ({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      mockReaddirSync.mockReturnValue(['file1.txt', 'subdir', 'file2.txt'] as any);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      mockLstatSync.mockImplementation((path: any) => ({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         isDirectory: () => path.includes('subdir'),
-      }));
+      } as any));
 
       // Mock recursive calls for subdirectory
       mockExistsSync
         .mockReturnValueOnce(true) // First call for main directory
         .mockReturnValueOnce(true); // Second call for subdirectory
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       mockReaddirSync
-        .mockReturnValueOnce(['file1.txt', 'subdir', 'file2.txt']) // First call
-        .mockReturnValueOnce(['nested-file.txt']); // Second call for subdirectory
+        .mockReturnValueOnce(['file1.txt', 'subdir', 'file2.txt'] as any) // First call
+        .mockReturnValueOnce(['nested-file.txt'] as any); // Second call for subdirectory
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       mockLstatSync
-        .mockReturnValueOnce({ isDirectory: () => false }) // file1.txt
-        .mockReturnValueOnce({ isDirectory: () => true }) // subdir
-        .mockReturnValueOnce({ isDirectory: () => false }) // file2.txt
-        .mockReturnValueOnce({ isDirectory: () => false }); // nested-file.txt
+        .mockReturnValueOnce({ isDirectory: () => false } as any) // file1.txt
+        .mockReturnValueOnce({ isDirectory: () => true } as any) // subdir
+        .mockReturnValueOnce({ isDirectory: () => false } as any) // file2.txt
+        .mockReturnValueOnce({ isDirectory: () => false } as any); // nested-file.txt
 
       writer['deleteFolderRecursive']('test-path');
 
