@@ -1,5 +1,5 @@
 import { expect } from '@jest/globals';
-import { generateSignature } from '../src/utils/signature';
+import { generateSignature } from '../../src/utils/signature';
 
 describe('generateSignature', () => {
   it('should generate signature with all parameters', () => {
