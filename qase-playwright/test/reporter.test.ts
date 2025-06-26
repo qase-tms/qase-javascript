@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { expect } from '@jest/globals';
 import { PlaywrightQaseReporter } from '../src/reporter';
 import { ReporterContentType } from '../src/playwright';

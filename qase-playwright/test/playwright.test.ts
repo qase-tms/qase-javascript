@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { expect } from '@jest/globals';
 
 // Mock Playwright test functions

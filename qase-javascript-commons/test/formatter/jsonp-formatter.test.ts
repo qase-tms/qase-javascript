@@ -4,6 +4,7 @@ import { JsonpFormatter } from '../../src/formatter/jsonp-formatter';
 // Mock strip-ansi
 jest.mock('strip-ansi', () => ({
   __esModule: true,
+  // eslint-disable-next-line no-control-regex
   default: jest.fn((str: string) => str.replace(/\u001b\[\d+m/g, '')),
 }));
 

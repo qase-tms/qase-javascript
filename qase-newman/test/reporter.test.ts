@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { expect } from '@jest/globals';
 import { NewmanQaseReporter } from '../src/reporter';
 import { EventEmitter } from 'events';

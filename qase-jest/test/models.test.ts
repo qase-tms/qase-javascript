@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { expect } from '@jest/globals';
 import { Metadata } from '../src/models';
 import { StepType, StepStatusEnum } from 'qase-javascript-commons';

@@ -5,29 +5,26 @@ import { LoggerInterface } from '../../src/utils/logger';
 import { IClient } from '../../src/client/interface';
 import { StateManager } from '../../src/state/state';
 
-// Мокаем async-mutex
 jest.mock('async-mutex', () => ({
   Mutex: jest.fn().mockImplementation(() => ({
     acquire: jest.fn().mockResolvedValue(jest.fn()),
   })),
 }));
 
-// Мокаем chalk
 jest.mock('chalk', () => {
-  const mockChalk = jest.fn((strings: string[], ...values: any[]) => {
+  const mockChalk = jest.fn((strings: string[], ...values: string[]) => {
     return strings.reduce((result: string, str: string, i: number) => {
       return result + str + (values[i] || '');
     }, '');
-  }) as any;
+  });
   
-  mockChalk.blue = jest.fn((text: string) => text);
-  mockChalk.green = jest.fn((text: string) => text);
-  mockChalk.yellow = jest.fn((text: string) => text);
+  (mockChalk as unknown as { blue: jest.Mock; green: jest.Mock; yellow: jest.Mock }).blue = jest.fn((text: string) => text);
+  (mockChalk as unknown as { blue: jest.Mock; green: jest.Mock; yellow: jest.Mock }).green = jest.fn((text: string) => text);
+  (mockChalk as unknown as { blue: jest.Mock; green: jest.Mock; yellow: jest.Mock }).yellow = jest.fn((text: string) => text);
   
   return mockChalk;
 });
 
-// Мокаем StateManager
 jest.mock('../../src/state/state', () => ({
   StateManager: {
     setRunId: jest.fn(),
@@ -114,6 +111,7 @@ describe('TestOpsReporter', () => {
 
       await reporter.startTestRun();
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockApiClient.createRun).toHaveBeenCalled();
       expect(reporter['runId']).toBe(456);
       expect(process.env['QASE_TESTOPS_RUN_ID']).toBe('456');
@@ -125,6 +123,7 @@ describe('TestOpsReporter', () => {
 
       await reporter.startTestRun();
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(StateManager.setRunId).toHaveBeenCalledWith(789);
     });
   });
@@ -144,6 +143,7 @@ describe('TestOpsReporter', () => {
 
       await reporter.addTestResult(testResult);
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockLogger.log).not.toHaveBeenCalledWith(
         expect.stringContaining('See why this test failed')
       );
@@ -158,6 +158,7 @@ describe('TestOpsReporter', () => {
 
       await reporter.addTestResult(testResult);
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockLogger.log).toHaveBeenCalledWith(
         expect.stringContaining('See why this test failed')
       );
@@ -172,7 +173,9 @@ describe('TestOpsReporter', () => {
 
       await reporter.addTestResult(testResult);
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockLogger.log).toHaveBeenCalledTimes(3);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockLogger.log).toHaveBeenCalledWith(
         expect.stringContaining('See why this test failed')
       );
@@ -192,7 +195,9 @@ describe('TestOpsReporter', () => {
         await reporter.addTestResult(result);
       }
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockApiClient.uploadResults).toHaveBeenCalledWith(123, testResults);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockLogger.logDebug).toHaveBeenCalledWith('Results sent to Qase: 100');
     });
   });
@@ -211,8 +216,11 @@ describe('TestOpsReporter', () => {
       await reporter.addTestResult(testResult);
       await reporter.publish();
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockApiClient.uploadResults).toHaveBeenCalled();
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockApiClient.completeRun).toHaveBeenCalledWith(123);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockLogger.log).toHaveBeenCalledWith('{green Run 123 completed}');
     });
   });
@@ -226,6 +234,7 @@ describe('TestOpsReporter', () => {
     it('should show message when no results to send', async () => {
       await reporter.sendResults();
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockLogger.log).toHaveBeenCalledWith(
         expect.stringContaining('{yellow No results to send to Qase}')
       );
@@ -247,13 +256,14 @@ describe('TestOpsReporter', () => {
 
       await reporter.sendResults();
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockApiClient.uploadResults).toHaveBeenCalledWith(123, testResults);
     });
 
     it('should send results in chunks when exceeding defaultChunkSize', async () => {
-      // Очищаем предыдущие результаты и моки
       reporter['results'] = [];
       reporter['firstIndex'] = 0;
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       mockApiClient.uploadResults.mockClear();
       
       const testResults = Array.from({ length: 250 }, (_, i) => {
@@ -271,7 +281,7 @@ describe('TestOpsReporter', () => {
 
       await reporter.sendResults();
 
-      // Для 250 результатов: 1 вызов из addTestResult (при достижении batchSize=100) + 2 вызова из sendResults (200 + 50)
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockApiClient.uploadResults).toHaveBeenCalledTimes(3);
     });
   });
@@ -283,7 +293,9 @@ describe('TestOpsReporter', () => {
 
       await reporter.complete();
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockApiClient.completeRun).toHaveBeenCalledWith(123);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockLogger.log).toHaveBeenCalledWith('{green Run 123 completed}');
     });
 
@@ -342,9 +354,11 @@ describe('TestOpsReporter', () => {
     it('should show link for failed test', () => {
       reporter['showLink'](42, 'Failed Test');
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockLogger.log).toHaveBeenCalledWith(
         expect.stringContaining('See why this test failed')
       );
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockLogger.log).toHaveBeenCalledWith(
         expect.stringContaining('TEST_PROJECT-42')
       );
