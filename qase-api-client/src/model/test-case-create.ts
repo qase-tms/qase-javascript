@@ -86,12 +86,6 @@ export interface TestCaseCreate {
      * @type {number}
      * @memberof TestCaseCreate
      */
-    'author_id'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof TestCaseCreate
-     */
     'suite_id'?: number;
     /**
      * 
