@@ -34,6 +34,10 @@ import { RunPublic } from '../model';
 import { RunPublicResponse } from '../model';
 // @ts-ignore
 import { RunResponse } from '../model';
+// @ts-ignore
+import { RunexternalIssues } from '../model';
+// @ts-ignore
+import { Runupdate } from '../model';
 /**
  * RunsApi - axios parameter creator
  * @export
@@ -170,7 +174,7 @@ export const RunsApiAxiosParamCreator = function (configuration?: Configuration)
          * @summary Get a specific run
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
-         * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects 
+         * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects, external_issue 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -223,7 +227,7 @@ export const RunsApiAxiosParamCreator = function (configuration?: Configuration)
          * @param {number} [toStartTime] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
-         * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects 
+         * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects, external_issue 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -287,6 +291,96 @@ export const RunsApiAxiosParamCreator = function (configuration?: Configuration)
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This method allows you to update links between test runs and external issues (such as Jira tickets).  You can use this endpoint to: - Link test runs to external issues by providing the external issue identifier (e.g., \"PROJ-1234\") - Update existing links by providing a new external issue identifier - Remove existing links by setting the external_issue field to null  **Important**: Each test run can have only one link with an external issue. If a test run already has an external issue link, providing a new external_issue value will replace the existing link.  The endpoint supports both Jira Cloud and Jira Server integrations. Each request can update multiple test run links in a single operation. 
+         * @summary Update external issues for runs
+         * @param {string} code Code of project, where to search entities.
+         * @param {RunexternalIssues} runexternalIssues 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        runUpdateExternalIssue: async (code: string, runexternalIssues: RunexternalIssues, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'code' is not null or undefined
+            assertParamExists('runUpdateExternalIssue', 'code', code)
+            // verify required parameter 'runexternalIssues' is not null or undefined
+            assertParamExists('runUpdateExternalIssue', 'runexternalIssues', runexternalIssues)
+            const localVarPath = `/run/{code}/external-issue`
+                .replace(`{${"code"}}`, encodeURIComponent(String(code)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication TokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Token", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(runexternalIssues, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This method allows to update a specific run. 
+         * @summary Update a specific run
+         * @param {string} code Code of project, where to search entities.
+         * @param {number} id Identifier.
+         * @param {Runupdate} runupdate 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateRun: async (code: string, id: number, runupdate: Runupdate, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'code' is not null or undefined
+            assertParamExists('updateRun', 'code', code)
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('updateRun', 'id', id)
+            // verify required parameter 'runupdate' is not null or undefined
+            assertParamExists('updateRun', 'runupdate', runupdate)
+            const localVarPath = `/run/{code}/{id}`
+                .replace(`{${"code"}}`, encodeURIComponent(String(code)))
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication TokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Token", configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(runupdate, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -391,7 +485,7 @@ export const RunsApiFp = function(configuration?: Configuration) {
          * @summary Get a specific run
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
-         * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects 
+         * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects, external_issue 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -411,12 +505,37 @@ export const RunsApiFp = function(configuration?: Configuration) {
          * @param {number} [toStartTime] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
-         * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects 
+         * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects, external_issue 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         async getRuns(code: string, search?: string, status?: string, milestone?: number, environment?: number, fromStartTime?: number, toStartTime?: number, limit?: number, offset?: number, include?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunListResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getRuns(code, search, status, milestone, environment, fromStartTime, toStartTime, limit, offset, include, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * This method allows you to update links between test runs and external issues (such as Jira tickets).  You can use this endpoint to: - Link test runs to external issues by providing the external issue identifier (e.g., \"PROJ-1234\") - Update existing links by providing a new external issue identifier - Remove existing links by setting the external_issue field to null  **Important**: Each test run can have only one link with an external issue. If a test run already has an external issue link, providing a new external_issue value will replace the existing link.  The endpoint supports both Jira Cloud and Jira Server integrations. Each request can update multiple test run links in a single operation. 
+         * @summary Update external issues for runs
+         * @param {string} code Code of project, where to search entities.
+         * @param {RunexternalIssues} runexternalIssues 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async runUpdateExternalIssue(code: string, runexternalIssues: RunexternalIssues, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.runUpdateExternalIssue(code, runexternalIssues, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * This method allows to update a specific run. 
+         * @summary Update a specific run
+         * @param {string} code Code of project, where to search entities.
+         * @param {number} id Identifier.
+         * @param {Runupdate} runupdate 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateRun(code: string, id: number, runupdate: Runupdate, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateRun(code, id, runupdate, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -480,7 +599,7 @@ export const RunsApiFactory = function (configuration?: Configuration, basePath?
          * @summary Get a specific run
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
-         * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects 
+         * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects, external_issue 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -499,12 +618,35 @@ export const RunsApiFactory = function (configuration?: Configuration, basePath?
          * @param {number} [toStartTime] 
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
-         * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects 
+         * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects, external_issue 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         getRuns(code: string, search?: string, status?: string, milestone?: number, environment?: number, fromStartTime?: number, toStartTime?: number, limit?: number, offset?: number, include?: string, options?: any): AxiosPromise<RunListResponse> {
             return localVarFp.getRuns(code, search, status, milestone, environment, fromStartTime, toStartTime, limit, offset, include, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This method allows you to update links between test runs and external issues (such as Jira tickets).  You can use this endpoint to: - Link test runs to external issues by providing the external issue identifier (e.g., \"PROJ-1234\") - Update existing links by providing a new external issue identifier - Remove existing links by setting the external_issue field to null  **Important**: Each test run can have only one link with an external issue. If a test run already has an external issue link, providing a new external_issue value will replace the existing link.  The endpoint supports both Jira Cloud and Jira Server integrations. Each request can update multiple test run links in a single operation. 
+         * @summary Update external issues for runs
+         * @param {string} code Code of project, where to search entities.
+         * @param {RunexternalIssues} runexternalIssues 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        runUpdateExternalIssue(code: string, runexternalIssues: RunexternalIssues, options?: any): AxiosPromise<void> {
+            return localVarFp.runUpdateExternalIssue(code, runexternalIssues, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This method allows to update a specific run. 
+         * @summary Update a specific run
+         * @param {string} code Code of project, where to search entities.
+         * @param {number} id Identifier.
+         * @param {Runupdate} runupdate 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateRun(code: string, id: number, runupdate: Runupdate, options?: any): AxiosPromise<BaseResponse> {
+            return localVarFp.updateRun(code, id, runupdate, options).then((request) => request(axios, basePath));
         },
         /**
          * This method allows to update a publicity of specific run. 
@@ -572,7 +714,7 @@ export class RunsApi extends BaseAPI {
      * @summary Get a specific run
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
-     * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects 
+     * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects, external_issue 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RunsApi
@@ -593,13 +735,40 @@ export class RunsApi extends BaseAPI {
      * @param {number} [toStartTime] 
      * @param {number} [limit] A number of entities in result set.
      * @param {number} [offset] How many entities should be skipped.
-     * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects 
+     * @param {string} [include] Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects, external_issue 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RunsApi
      */
     public getRuns(code: string, search?: string, status?: string, milestone?: number, environment?: number, fromStartTime?: number, toStartTime?: number, limit?: number, offset?: number, include?: string, options?: AxiosRequestConfig) {
         return RunsApiFp(this.configuration).getRuns(code, search, status, milestone, environment, fromStartTime, toStartTime, limit, offset, include, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This method allows you to update links between test runs and external issues (such as Jira tickets).  You can use this endpoint to: - Link test runs to external issues by providing the external issue identifier (e.g., \"PROJ-1234\") - Update existing links by providing a new external issue identifier - Remove existing links by setting the external_issue field to null  **Important**: Each test run can have only one link with an external issue. If a test run already has an external issue link, providing a new external_issue value will replace the existing link.  The endpoint supports both Jira Cloud and Jira Server integrations. Each request can update multiple test run links in a single operation. 
+     * @summary Update external issues for runs
+     * @param {string} code Code of project, where to search entities.
+     * @param {RunexternalIssues} runexternalIssues 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RunsApi
+     */
+    public runUpdateExternalIssue(code: string, runexternalIssues: RunexternalIssues, options?: AxiosRequestConfig) {
+        return RunsApiFp(this.configuration).runUpdateExternalIssue(code, runexternalIssues, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This method allows to update a specific run. 
+     * @summary Update a specific run
+     * @param {string} code Code of project, where to search entities.
+     * @param {number} id Identifier.
+     * @param {Runupdate} runupdate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RunsApi
+     */
+    public updateRun(code: string, id: number, runupdate: Runupdate, options?: AxiosRequestConfig) {
+        return RunsApiFp(this.configuration).updateRun(code, id, runupdate, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -15,6 +15,7 @@
 
 import { CustomFieldValue } from './custom-field-value';
 import { RunEnvironment } from './run-environment';
+import { RunExternalIssue } from './run-external-issue';
 import { RunMilestone } from './run-milestone';
 import { RunStats } from './run-stats';
 import { TagValue } from './tag-value';
@@ -133,5 +134,17 @@ export interface Run {
      * @memberof Run
      */
     'plan_id'?: number | null;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof Run
+     */
+    'configurations'?: Array<number>;
+    /**
+     * 
+     * @type {RunExternalIssue}
+     * @memberof Run
+     */
+    'external_issue'?: RunExternalIssue | null;
 }
 
