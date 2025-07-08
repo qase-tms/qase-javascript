@@ -4,4 +4,5 @@ export type ReporterOptionsType = {
     addAsParameter?: boolean;
     parameterName?: string;
   };
+  markAsFlaky?: boolean;
 };

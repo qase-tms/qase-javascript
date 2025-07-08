@@ -380,6 +380,11 @@ export class PlaywrightQaseReporter implements Reporter {
       }
     }
 
+    // if markAsFlaky is true and the test passed after retries, mark the test as flaky
+    if (this.options.markAsFlaky && result.status === 'passed' && result.retry > 0) {
+      testCaseMetadata.fields['is_flaky'] = 'true';
+    }
+
     const testTitle = this.removeQaseIdsFromTitle(test.title);
     const testResult: TestResultType = {
       attachments: testCaseMetadata.attachments,
