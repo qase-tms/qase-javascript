@@ -1,13 +1,10 @@
-import { JSONSchemaType } from 'ajv';
-
 import { ModeEnum } from '../options';
 import { DriverEnum, FormatEnum } from '../writer';
-import { ConfigType } from './config-type';
 
 /**
  * @type {JSONSchemaType<ConfigType>}
  */
-export const configValidationSchema: JSONSchemaType<ConfigType> = {
+export const configValidationSchema = {
   type: 'object',
 
   properties: {
@@ -128,6 +125,36 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
         defect: {
           type: 'boolean',
           nullable: true,
+        },
+
+        configurations: {
+          type: 'object',
+          nullable: true,
+
+          properties: {
+            values: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  name: {
+                    type: 'string',
+                    nullable: true,
+                  },
+                  value: {
+                    type: 'string',
+                    nullable: true,
+                  },
+                },
+                required: ['name', 'value'],
+              },
+            },
+            createIfNotExists: {
+              type: 'boolean',
+              nullable: true,
+            },
+          },
+          required: ['values'],
         },
       },
     },
