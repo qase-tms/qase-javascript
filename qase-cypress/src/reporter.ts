@@ -1,6 +1,6 @@
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import { spawnSync } from 'child_process';
+// import { spawnSync } from 'child_process';
 
 import { MochaOptions, reporters, Runner, Suite, Test } from 'mocha';
 
@@ -8,8 +8,8 @@ import {
   Attachment,
   composeOptions,
   ConfigLoader,
-  ConfigType,
-  FrameworkOptionsType,
+  // ConfigType,
+  // FrameworkOptionsType,
   generateSignature,
   QaseReporter,
   ReporterInterface,
@@ -26,6 +26,7 @@ import { MetadataManager } from './metadata/manager';
 import { StepEnd, StepStart } from './metadata/models';
 import { FileSearcher } from './fileSearcher';
 import { extractTags } from './utils/tagParser';
+import { ResultsManager } from './metadata/resultsManager';
 
 const {
   EVENT_TEST_FAIL,
@@ -77,6 +78,12 @@ export class CypressQaseReporter extends reporters.Base {
    */
   private screenshotsFolder: string | undefined;
 
+  // /**
+  //  * @type {string | undefined}
+  //  * @private
+  //  */
+  // private videosFolder: string | undefined;
+
   /**
    * @type {ReporterInterface}
    * @private
@@ -85,7 +92,7 @@ export class CypressQaseReporter extends reporters.Base {
 
   private testBeginTime: number = Date.now();
 
-  private options: Omit<(FrameworkOptionsType<'cypress', ReporterOptionsType> & ConfigType & ReporterOptionsType & NonNullable<unknown>) | (null & ReporterOptionsType & NonNullable<unknown>), 'framework'>;
+  // private options: Omit<(FrameworkOptionsType<'cypress', ReporterOptionsType> & ConfigType & ReporterOptionsType & NonNullable<unknown>) | (null & ReporterOptionsType & NonNullable<unknown>), 'framework'>;
 
   /**
    * @param {Runner} runner
@@ -104,7 +111,8 @@ export class CypressQaseReporter extends reporters.Base {
     const { framework, ...composedOptions } = composeOptions(reporterOptions, config);
 
     this.screenshotsFolder = framework?.cypress?.screenshotsFolder;
-    this.options = composedOptions;
+    // this.videosFolder = framework?.cypress?.videosFolder;
+    // this.options = composedOptions;
 
     this.reporter = QaseReporter.getInstance({
       ...composedOptions,
@@ -132,14 +140,14 @@ export class CypressQaseReporter extends reporters.Base {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     runner.once(EVENT_RUN_END, () => {
       const results = this.reporter.getResults();
-
-      spawnSync('node', [`${__dirname}/child.js`], {
-        stdio: 'inherit',
-        env: Object.assign(process.env, {
-          reporterConfig: JSON.stringify(this.options),
-          results: JSON.stringify(results),
-        }),
-      });
+      ResultsManager.setResults(results);
+      // spawnSync('node', [`${__dirname}/child.js`], {
+      //   stdio: 'inherit',
+      //   env: Object.assign(process.env, {
+      //     reporterConfig: JSON.stringify(this.options),
+      //     results: JSON.stringify(results),
+      //   }),
+      // });
     });
   }
 
@@ -165,6 +173,10 @@ export class CypressQaseReporter extends reporters.Base {
       FileSearcher.findFilesBeforeTime(this.screenshotsFolder, testFileName, new Date(this.testBeginTime))
       : [];
 
+    // const videos = this.videosFolder ?
+    //   FileSearcher.findVideoFiles(this.videosFolder, testFileName)
+    //   : [];
+
     const attachments = files.map((file) => ({
       content: '',
       id: uuidv4(),
@@ -173,6 +185,15 @@ export class CypressQaseReporter extends reporters.Base {
       file_name: path.basename(file),
       file_path: file,
     } as Attachment));
+
+    // const videoAttachments = videos.map((file) => ({
+    //   content: '',
+    //   id: uuidv4(),
+    //   mime_type: 'video/mp4',
+    //   size: 0,
+    //   file_name: path.basename(file),
+    //   file_path: file,
+    // } as Attachment));
 
     attachments.push(...(metadata?.attachments ?? []));
 

@@ -22,7 +22,11 @@ export const configSchema: JSONSchemaType<FrameworkOptionsType<'cypress', Report
             screenshotsFolder: {
               type: 'string',
               nullable: true,
-            }
+            },
+            videosFolder: {
+              type: 'string',
+              nullable: true,
+            },
           }
         }
       }

@@ -20,7 +20,7 @@ run the following steps:
    ```diff
    - import { qase } from 'cypress-qase-reporter/dist/mocha'
    + import { qase } from 'cypress-qase-reporter/mocha'
-   ```                                        
+   ```
 
 2. Update reporter configuration in `cypress.config.js` and/or environment variables —
    see the [configuration reference](#configuration) below.
@@ -75,6 +75,28 @@ run the following steps:
        }
      }
      ...
+
+## Updating from v2.3.x to v3.0.0-beta.1
+
+To update an existing test project using Qase reporter from version 2.3.x to version 3.0.0-beta.1,
+run the following steps:
+
+1. Update reporter configuration in `cypress.config.js` file.
+
+    ```diff
+   +  import { afterSpecHook } from 'cypress-qase-reporter/hooks';
+     ...
+     e2e: {
+      setupNodeEvents(on, config) { 
+        require('cypress-qase-reporter/plugin')(on, config)
+        require('cypress-qase-reporter/metadata')(on)
+   +    on('after:spec', async (spec, results) => {
+   +      await afterSpecHook(spec, config);
+   +    });
+       }
+     }
+     ...
+   ```
 
 ## Getting started
 
@@ -167,6 +189,7 @@ Example `cypress.config.js` config:
 
 ```javascript
 import cypress from 'cypress';
+import { afterSpecHook } from 'cypress-qase-reporter/hooks';
 
 module.exports = cypress.defineConfig({
   reporter: 'cypress-multi-reporters',
@@ -194,6 +217,7 @@ module.exports = cypress.defineConfig({
       framework: {
         cypress: {
           screenshotsFolder: 'cypress/screenshots',
+          videosFolder: 'cypress/videos',
         }
       }
     },
@@ -203,6 +227,9 @@ module.exports = cypress.defineConfig({
     setupNodeEvents(on, config) {
       require('cypress-qase-reporter/plugin')(on, config)
       require('cypress-qase-reporter/metadata')(on)
+      on('after:spec', async (spec, results) => {
+         await afterSpecHook(spec, config);
+       });
     },
   },
 });
@@ -215,6 +242,7 @@ If you use Cucumber, you need to add the following configuration in `cypress.con
 
 ```javascript
 import cypress from 'cypress';
+import { afterSpecHook } from 'cypress-qase-reporter/hooks';
 
 const cucumber = require('cypress-cucumber-preprocessor').default;
 
@@ -254,11 +282,14 @@ module.exports = cypress.defineConfig({
       on('file:preprocessor', cucumber());
       require('cypress-qase-reporter/plugin')(on, config);
       require('cypress-qase-reporter/metadata')(on);
+      on('after:spec', async (spec, results) => {
+         await afterSpecHook(spec, config);
+       });
     },
     specPattern: 'cypress/e2e/*.feature',
   },
 });
-``` 
+```
 
 And add the following lines in `support/e2e.js` file:
 
@@ -278,5 +309,3 @@ We maintain the reporter on [LTS versions of Node](https://nodejs.org/en/about/r
 `cypress >= 8.0.0`
 
 <!-- references -->
-
-[auth]: https://developers.qase.io/#authentication
