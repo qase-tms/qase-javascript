@@ -1,3 +1,10 @@
+# cypress-qase-reporter@3.0.0-beta.1
+
+## What's new
+
+- Added support for video attachments.
+- Changed reporter configuration in `cypress.config.js` file.
+
 # cypress-qase-reporter@2.3.0
 
 ## What's new
