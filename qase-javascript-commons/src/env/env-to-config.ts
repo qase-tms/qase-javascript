@@ -5,7 +5,9 @@ import {
   EnvApiEnum,
   EnvRunEnum,
   EnvLocalEnum,
-  EnvPlanEnum, EnvBatchEnum,
+  EnvPlanEnum, 
+  EnvBatchEnum, 
+  EnvConfigurationsEnum,
 } from './env-enum';
 
 import { DriverEnum } from '../writer';
@@ -48,6 +50,13 @@ export const envToConfig = (env: EnvType): ConfigType => ({
       size: env[EnvBatchEnum.size],
     },
     defect: env[EnvTestOpsEnum.defect],
+    configurations: env[EnvConfigurationsEnum.values] ? {
+      values: env[EnvConfigurationsEnum.values].split(',').map(item => {
+        const [name, value] = item.split('=');
+        return { name: (name ?? '').trim(), value: value ? value.trim() : '' };
+      }),
+      createIfNotExists: env[EnvConfigurationsEnum.createIfNotExists],
+    } : undefined,
   },
 
   report: {

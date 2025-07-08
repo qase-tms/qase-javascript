@@ -55,6 +55,14 @@ export enum EnvBatchEnum {
 /**
  * @enum {string}
  */
+export enum EnvConfigurationsEnum {
+  values = 'QASE_TESTOPS_CONFIGURATIONS_VALUES',
+  createIfNotExists = 'QASE_TESTOPS_CONFIGURATIONS_CREATE_IF_NOT_EXISTS',
+}
+
+/**
+ * @enum {string}
+ */
 export enum EnvLocalEnum {
   path = 'QASE_REPORT_CONNECTION_PATH',
   format = 'QASE_REPORT_CONNECTION_FORMAT',

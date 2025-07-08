@@ -7,7 +7,8 @@ import {
   EnvLocalEnum,
   EnvPlanEnum,
   EnvRunEnum,
-  EnvTestOpsEnum,
+  EnvTestOpsEnum, 
+  EnvConfigurationsEnum,
 } from './env-enum';
 
 import { ModeEnum } from '../options';
@@ -97,6 +98,15 @@ export const envValidationSchema: JSONSchemaType<EnvType> = {
 
     [EnvBatchEnum.size]: {
       type: 'number',
+      nullable: true,
+    },
+
+    [EnvConfigurationsEnum.values]: {
+      type: 'string',
+      nullable: true,
+    },
+    [EnvConfigurationsEnum.createIfNotExists]: {
+      type: 'boolean',
       nullable: true,
     },
 
