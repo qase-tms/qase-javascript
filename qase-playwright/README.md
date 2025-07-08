@@ -176,6 +176,7 @@ Reporter options (\* - required):
 - `testops.run.complete` - Whether the run should be completed
 - `framework.browser.addAsParameter` - Whether to add the browser name as a parameter, default - `false`
 - `framework.browser.parameterName` - The name of the parameter to add the browser name to, default - `browser`
+- `framework.markAsFlaky` - Whether to mark tests as flaky if they passed after retries, default - `false`
 
 Example `playwright.config.js` config:
 
@@ -206,6 +207,7 @@ const config = {
             addAsParameter: true,
             parameterName: 'Browser Name',
           },
+          markAsFlaky: true,
         },
       },
     ],

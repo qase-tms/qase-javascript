@@ -33,7 +33,11 @@ export const configSchema: JSONSchemaType<FrameworkOptionsType<'playwright', Rep
                   nullable: true,
                 },
               }
-            }
+            },
+            markAsFlaky: {
+              type: 'boolean',
+              nullable: true,
+            },
           }
         }
       }

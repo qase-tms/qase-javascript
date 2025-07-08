@@ -1,3 +1,20 @@
+# playwright-qase-reporter@2.1.4
+
+## What's new
+
+Support marking tests as flaky if they passed after retries.
+
+```ts
+[
+  'playwright-qase-reporter',
+  {
+    framework: {
+      markAsFlaky: true,
+    },
+  },
+],
+```
+
 # playwright-qase-reporter@2.1.3
 
 ## What's new
