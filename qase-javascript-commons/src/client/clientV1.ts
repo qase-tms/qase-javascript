@@ -1,6 +1,16 @@
 import { AxiosError } from 'axios';
-import { AttachmentsApi, Configuration, EnvironmentsApi, RunCreate, RunsApi, Environment } from 'qase-api-client';
-import { Attachment, TestResultType } from '../models';
+import {
+  AttachmentsApi,
+  Configuration,
+  EnvironmentsApi,
+  RunCreate,
+  RunsApi,
+  Environment,
+  ConfigurationsApi,
+  ConfigurationGroupCreate,
+  ConfigurationCreate
+} from 'qase-api-client';
+import { Attachment, TestResultType, ConfigurationGroup } from '../models';
 import { TestOpsOptionsType } from '../models/config/TestOpsOptionsType';
 import { isAxiosError } from '../utils/is-axios-error';
 import { QaseError } from '../utils/qase-error';
@@ -42,6 +52,7 @@ export class ClientV1 implements IClient {
   private readonly runClient: RunsApi;
   private readonly environmentClient: EnvironmentsApi;
   private readonly attachmentClient: AttachmentsApi;
+  private readonly configurationClient: ConfigurationsApi;
 
   constructor(
     protected readonly logger: LoggerInterface,
@@ -54,6 +65,7 @@ export class ClientV1 implements IClient {
     this.runClient = new RunsApi(apiConfig);
     this.environmentClient = new EnvironmentsApi(apiConfig);
     this.attachmentClient = new AttachmentsApi(apiConfig);
+    this.configurationClient = new ConfigurationsApi(apiConfig);
   }
 
   private createApiConfig(): { apiConfig: Configuration; appUrl: string } {
@@ -79,8 +91,14 @@ export class ClientV1 implements IClient {
     }
 
     try {
+      // Handle configurations if provided
+      let configurationIds: number[] = [];
+      if (this.config.configurations) {
+        configurationIds = await this.handleConfigurations();
+      }
+
       const environmentId = await this.getEnvironmentId();
-      const runObject = this.prepareRunObject(environmentId);
+      const runObject = this.prepareRunObject(environmentId, configurationIds);
 
       this.logger.logDebug(`Creating test run: ${JSON.stringify(runObject)}`);
 
@@ -175,7 +193,7 @@ export class ClientV1 implements IClient {
     return data.result?.entities?.find((env: Environment) => env.slug === this.environment)?.id;
   }
 
-  private prepareRunObject(environmentId?: number): RunCreate {
+  private prepareRunObject(environmentId?: number, configurationIds?: number[]): RunCreate {
     const runObject: RunCreate = {
       title: this.config.run.title ?? `Automated run ${new Date().toISOString()}`,
       description: this.config.run.description ?? '',
@@ -193,7 +211,140 @@ export class ClientV1 implements IClient {
       runObject.plan_id = this.config.plan.id;
     }
 
+    if (configurationIds && configurationIds.length > 0) {
+      runObject.configurations = configurationIds;
+    }
+
     return runObject;
+  }
+
+  /**
+   * Get all configuration groups with their configurations
+   * @returns Promise<ConfigurationGroup[]> Array of configuration groups
+   * @private
+   */
+  private async getConfigurations(): Promise<ConfigurationGroup[]> {
+    try {
+      const { data } = await this.configurationClient.getConfigurations(this.config.project);
+      const entities = data.result?.entities ?? [];
+
+      // Convert API response to domain model
+      return entities.map(group => ({
+        id: group.id ?? 0,
+        title: group.title ?? '',
+        configurations: group.configurations?.map(config => ({
+          id: config.id ?? 0,
+          title: config.title ?? ''
+        })) ?? []
+      }));
+    } catch (error) {
+      throw this.processError(error, 'Error getting configurations');
+    }
+  }
+
+  /**
+   * Create a configuration group
+   * @param title Group title
+   * @returns Promise<number | undefined> Created group ID
+   * @private
+   */
+  private async createConfigurationGroup(title: string): Promise<number | undefined> {
+    try {
+      const group: ConfigurationGroupCreate = { title };
+      const { data } = await this.configurationClient.createConfigurationGroup(this.config.project, group);
+      return data.result?.id;
+    } catch (error) {
+      throw this.processError(error, 'Error creating configuration group');
+    }
+  }
+
+  /**
+   * Create a configuration in a group
+   * @param title Configuration title
+   * @param groupId Group ID
+   * @returns Promise<number | undefined> Created configuration ID
+   * @private
+   */
+  private async createConfiguration(title: string, groupId: number): Promise<number | undefined> {
+    try {
+      const config: ConfigurationCreate = { title, group_id: groupId };
+      const { data } = await this.configurationClient.createConfiguration(this.config.project, config);
+      return data.result?.id;
+    } catch (error) {
+      throw this.processError(error, 'Error creating configuration');
+    }
+  }
+
+  /**
+   * Handle configuration creation based on config settings
+   * @returns Promise<number[]> Array of configuration IDs
+   * @private
+   */
+    private async handleConfigurations(): Promise<number[]> {
+    if (!this.config.configurations?.values.length) {
+      return [];
+    }
+
+    const configurationIds: number[] = [];
+
+    try {
+      // Get existing configuration groups
+      const existingGroups = await this.getConfigurations();
+      
+      for (const configValue of this.config.configurations.values) {
+        const { name: groupName, value: configName } = configValue;
+        
+        // Find existing group or create new one
+        const group = existingGroups.find(g => g.title === groupName);
+        let groupId: number;
+
+        if (group) {
+          groupId = group.id;
+          this.logger.logDebug(`Found existing configuration group: ${groupName}`);
+        } else {
+          if (this.config.configurations.createIfNotExists) {
+            const newGroupId = await this.createConfigurationGroup(groupName);
+            if (newGroupId) {
+              groupId = newGroupId;
+              this.logger.logDebug(`Created new configuration group: ${groupName} with ID: ${groupId}`);
+            } else {
+              this.logger.logDebug(`Failed to create configuration group: ${groupName}, skipping`);
+              continue;
+            }
+          } else {
+            this.logger.logDebug(`Configuration group not found: ${groupName}, skipping`);
+            continue;
+          }
+        }
+
+        if (groupId) {
+          // Check if configuration already exists in the group
+          const existingConfig = group?.configurations.find(c => c.title === configName);
+          if (!existingConfig) {
+            // Check if we should create configuration if it doesn't exist
+            if (this.config.configurations.createIfNotExists) {
+              const configId = await this.createConfiguration(configName, groupId);
+              if (configId) {
+                configurationIds.push(configId);
+              }
+              this.logger.logDebug(`Created configuration: ${configName} in group: ${groupName}`);
+            } else {
+              this.logger.logDebug(`Configuration not found: ${configName} in group: ${groupName}, skipping`);
+            }
+          } else {
+            if (existingConfig.id) {
+              configurationIds.push(existingConfig.id);
+            }
+            this.logger.logDebug(`Configuration already exists: ${configName} in group: ${groupName}`);
+          }
+        }
+      }
+    } catch (error) {
+      this.logger.logError('Error handling configurations:', error);
+      // Don't throw error to avoid blocking test run creation
+    }
+
+    return configurationIds;
   }
 
   /**
