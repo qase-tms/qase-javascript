@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.3.6
+
+## What's new
+
+Added support for configurations in the test run.
+
 # qase-javascript-commons@2.3.5
 
 ## What's new
