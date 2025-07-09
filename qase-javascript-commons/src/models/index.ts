@@ -5,3 +5,4 @@ export { StepStatusEnum } from './step-execution';
 export { Attachment } from './attachment';
 export { Report } from './report';
 export { CompoundError } from './error';
+export { ConfigurationGroup, ConfigurationItem, ConfigurationGroupResponse } from './configuration';

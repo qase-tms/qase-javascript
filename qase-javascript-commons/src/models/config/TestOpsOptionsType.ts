@@ -7,7 +7,7 @@ export interface TestOpsOptionsType {
   plan: TestOpsPlanType;
   batch?: TestOpsBatchType;
   defect?: boolean | undefined;
-  configuration?: TestOpsConfigurationType | undefined;
+  configurations?: TestOpsConfigurationType | undefined;
 }
 
 export interface TestOpsConfigurationType {
