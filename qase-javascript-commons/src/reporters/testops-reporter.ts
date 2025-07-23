@@ -3,6 +3,7 @@ import chalk from 'chalk';
 import { AbstractReporter } from './abstract-reporter';
 
 import {
+  Attachment,
   TestResultType,
   TestStatusEnum,
 } from '../models';
@@ -163,6 +164,14 @@ export class TestOpsReporter extends AbstractReporter {
 
     // Clear results because we don't need to send them again then we use Cypress reporter
     this.results.length = 0;
+  }
+
+  /**
+   * @param {Attachment} attachment
+   * @returns {Promise<string>}
+   */
+  override async uploadAttachment(attachment: Attachment): Promise<string> {
+    return await this.api.uploadAttachment(attachment);
   }
 
   /**

@@ -1,4 +1,4 @@
-import { TestResultType } from '../models';
+import { Attachment, TestResultType } from '../models';
 import { v4 as uuidv4 } from 'uuid';
 import { LoggerInterface } from '../utils/logger';
 
@@ -16,6 +16,8 @@ export interface InternalReporterInterface {
   sendResults(): Promise<void>;
 
   complete(): Promise<void>;
+
+  uploadAttachment(attachments: Attachment): Promise<string>;
 }
 
 /**
@@ -55,6 +57,12 @@ export abstract class AbstractReporter implements InternalReporterInterface {
    * @returns {Promise<void>}
    */
   abstract sendResults(): Promise<void>;
+
+  /**
+   * @param {Attachment} attachment
+   * @returns {Promise<string>}
+   */
+  abstract uploadAttachment(attachment: Attachment): Promise<string>;
 
   /**
    * @protected

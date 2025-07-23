@@ -18,6 +18,7 @@ export class TestResultType {
   relations: Relation | null;
   muted: boolean;
   message: string | null;
+  preparedAttachments?: string[];
 
   constructor(title: string) {
     this.id = '';
@@ -35,6 +36,7 @@ export class TestResultType {
     this.relations = null;
     this.muted = false;
     this.message = null;
+    this.preparedAttachments = [];
   }
 }
 
