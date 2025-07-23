@@ -15,7 +15,7 @@ import {
   envToConfig,
   envValidationSchema,
 } from './env';
-import { TestStatusEnum, TestResultType } from './models';
+import { TestStatusEnum, TestResultType, Attachment } from './models';
 import { DriverEnum, FsWriter } from './writer';
 
 import { DisabledException } from './utils/disabled-exception';
@@ -54,6 +54,8 @@ export interface ReporterInterface {
   sendResults(): Promise<void>;
 
   complete(): Promise<void>;
+
+  uploadAttachment(attachment: Attachment): Promise<string>;
 }
 
 /**
@@ -188,6 +190,18 @@ export class QaseReporter implements ReporterInterface {
         StateManager.setState(state);
       }
     }
+  }
+
+  async uploadAttachment(attachment: Attachment): Promise<string> {
+    if (this.disabled) {
+      return '';
+    }
+
+    if (this.useFallback) {
+      return await this.fallbackReporter?.uploadAttachment(attachment) ?? '';
+    }
+
+    return await this.upstreamReporter?.uploadAttachment(attachment) ?? '';
   }
 
   getResults(): TestResultType[] {

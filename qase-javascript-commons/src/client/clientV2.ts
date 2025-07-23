@@ -67,6 +67,9 @@ export class ClientV2 extends ClientV1 {
 
     private async transformTestResult(result: TestResultType): Promise<ResultCreate> {
         const attachments = await this.uploadAttachments(result.attachments);
+        if (result.preparedAttachments) {
+            attachments.push(...result.preparedAttachments);
+        }
         const steps = await this.transformSteps(result.steps, result.title);
         const params = this.transformParams(result.params);
         const groupParams = this.transformGroupParams(result.group_params, params);
