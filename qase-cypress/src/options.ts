@@ -2,4 +2,5 @@
 export type ReporterOptionsType = {
   screenshotsFolder?: string;
   videosFolder?: string;
+  uploadDelay?: number;
 };

@@ -76,9 +76,9 @@ run the following steps:
      }
      ...
 
-## Updating from v2.3.x to v3.0.0-beta.1
+## Updating from v2.3.x to v3.0.0-beta.2
 
-To update an existing test project using Qase reporter from version 2.3.x to version 3.0.0-beta.1,
+To update an existing test project using Qase reporter from version 2.3.x to version 3.0.0-beta.2,
 run the following steps:
 
 1. Update reporter configuration in `cypress.config.js` file.
@@ -86,6 +86,21 @@ run the following steps:
     ```diff
    +  import { afterSpecHook } from 'cypress-qase-reporter/hooks';
      ...
+     reporter: 'cypress-multi-reporters',
+     reporterOptions: {
+        reporterEnabled: 'cypress-qase-reporter',
+        cypressQaseReporterReporterOptions: {
+          ... // other options
+          framework: {
+            cypress: {
+              screenshotsFolder: 'cypress/screenshots',
+   +           videosFolder: 'cypress/videos',
+   +           uploadDelay: 10, // Delay in seconds before uploading video files (default: 10)
+            },
+          },
+        },
+      },
+     video: true,
      e2e: {
       setupNodeEvents(on, config) { 
         require('cypress-qase-reporter/plugin')(on, config)
