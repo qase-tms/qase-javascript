@@ -273,6 +273,7 @@ export class CypressQaseReporter extends reporters.Base {
       },
       testops_id: ids.length > 0 ? ids : null,
       title: metadata?.title ?? this.removeQaseIdsFromTitle(test.title),
+      preparedAttachments: [],
     };
 
     void this.reporter.addTestResult(result);
