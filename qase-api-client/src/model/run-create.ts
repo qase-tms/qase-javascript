@@ -13,6 +13,7 @@
  */
 
 
+import { RunCreateCloudRunConfig } from './run-create-cloud-run-config';
 
 /**
  * 
@@ -110,5 +111,17 @@ export interface RunCreate {
      * @memberof RunCreate
      */
     'end_time'?: string;
+    /**
+     * Indicates if the run is created for the Test Cases produced by AIDEN
+     * @type {boolean}
+     * @memberof RunCreate
+     */
+    'is_cloud'?: boolean;
+    /**
+     * 
+     * @type {RunCreateCloudRunConfig}
+     * @memberof RunCreate
+     */
+    'cloud_run_config'?: RunCreateCloudRunConfig;
 }
 

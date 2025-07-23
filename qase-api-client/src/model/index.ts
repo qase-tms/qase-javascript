@@ -120,6 +120,7 @@ export * from './result-update';
 export * from './resultcreate-bulk';
 export * from './run';
 export * from './run-create';
+export * from './run-create-cloud-run-config';
 export * from './run-environment';
 export * from './run-external-issue';
 export * from './run-list-response';
