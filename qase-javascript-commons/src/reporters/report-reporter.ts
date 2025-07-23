@@ -1,5 +1,5 @@
 import { AbstractReporter } from './abstract-reporter';
-import { Report, TestStatusEnum, TestStepType } from '../models';
+import { Attachment, Report, TestStatusEnum, TestStepType } from '../models';
 import { WriterInterface } from '../writer';
 import { LoggerInterface } from '../utils/logger';
 import { getHostInfo } from '../utils/hostData';
@@ -9,6 +9,7 @@ import { getHostInfo } from '../utils/hostData';
  * @extends AbstractReporter
  */
 export class ReportReporter extends AbstractReporter {
+
   private readonly environment: string | undefined;
   private readonly runId: number | undefined;
   private readonly rootSuite: string | undefined;
@@ -149,6 +150,11 @@ export class ReportReporter extends AbstractReporter {
     const path = await this.writer.writeReport(report);
 
     this.logger.log(`Report saved to ${path}`);
+  }
+
+  override uploadAttachment(attachment: Attachment): Promise<string> {
+    this.writer.writeAttachment([attachment]);
+    return Promise.resolve('');
   }
 
   /**

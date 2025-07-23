@@ -136,6 +136,20 @@ export class ClientV1 implements IClient {
     }
   }
 
+  async uploadAttachment(attachment: Attachment): Promise<string> {
+    try {
+      const data = this.prepareAttachmentData(attachment);
+      const response = await this.attachmentClient.uploadAttachment(
+        this.config.project,
+        [data],
+      );
+
+      return response.data.result?.[0]?.hash ?? '';
+    } catch (error) {
+      throw this.processError(error, 'Error on uploading attachment');
+    }
+  }
+
   protected async uploadAttachments(attachments: Attachment[]): Promise<string[]> {
     if (!this.config.uploadAttachments) {
       return [];
