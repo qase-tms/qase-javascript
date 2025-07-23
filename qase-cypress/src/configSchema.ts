@@ -27,6 +27,12 @@ export const configSchema: JSONSchemaType<FrameworkOptionsType<'cypress', Report
               type: 'string',
               nullable: true,
             },
+            uploadDelay: {
+              type: 'number',
+              nullable: true,
+              minimum: 0,
+              maximum: 300,
+            },
           }
         }
       }
