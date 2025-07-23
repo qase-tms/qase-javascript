@@ -28,7 +28,7 @@
     "async-mutex": "~0.5.0",
     "chalk": "^4.1.2",
     "env-schema": "^5.2.0",
-    "form-data": "^4.0.0",
+    "form-data": "^4.0.4",
     "lodash.get": "^4.4.2",
     "lodash.merge": "^4.6.2",
     "lodash.mergewith": "^4.6.2",
