@@ -4,11 +4,66 @@ Publish results simple and easy.
 
 ## Installation
 
-To install the latest release version (2.2.x), run:
+To install the latest release version, run:
 
 ```sh
 npm install -D cypress-qase-reporter
 ```
+
+## Updating from v2.3.x to v3.0.x
+
+To update an existing test project using Qase reporter from version 2.3.x to version 3.0.x,
+run the following steps:
+
+- Update reporter configuration in `cypress.config.js` file.
+
+    ```diff
+   +  import { afterSpecHook } from 'cypress-qase-reporter/hooks';
+     ...
+     reporter: 'cypress-multi-reporters',
+     reporterOptions: {
+        reporterEnabled: 'cypress-qase-reporter',
+        cypressQaseReporterReporterOptions: {
+          ... // other options
+          framework: {
+            cypress: {
+              screenshotsFolder: 'cypress/screenshots',
+   +          videosFolder: 'cypress/videos',
+   +          uploadDelay: 10, // Delay in seconds before uploading video files (default: 10)
+            },
+          },
+        },
+      },
+     video: true,
+     e2e: {
+      setupNodeEvents(on, config) { 
+        require('cypress-qase-reporter/plugin')(on, config)
+        require('cypress-qase-reporter/metadata')(on)
+   +    on('after:spec', async (spec, results) => {
+   +      await afterSpecHook(spec, config);
+   +    });
+       }
+     }
+     ...
+   ```
+
+## Updating from v2.1 to v2.2
+
+To update an existing test project using Qase reporter from version 2.1 to version 2.2,
+run the following steps:
+
+- Add metadata in the `e2e` section of `cypress.config.js`
+
+   ```diff
+     ...
+     e2e: {
+      setupNodeEvents(on, config) { 
+        require('cypress-qase-reporter/plugin')(on, config)
+   +    require('cypress-qase-reporter/metadata')(on)
+       }
+     }
+     ...
+   ```
 
 ## Updating from v1 to v2.1
 
@@ -56,60 +111,6 @@ run the following steps:
    +     });
        },
      },
-     ...
-   ```
-
-## Updating from v2.1 to v2.2
-
-To update an existing test project using Qase reporter from version 2.1 to version 2.2,
-run the following steps:
-
-1. Add a metadata in the `e2e` section of `cypress.config.js`
-
-   ```diff
-     ...
-     e2e: {
-      setupNodeEvents(on, config) { 
-        require('cypress-qase-reporter/plugin')(on, config)
-   +    require('cypress-qase-reporter/metadata')(on)
-       }
-     }
-     ...
-
-## Updating from v2.3.x to v3.0.0-beta.2
-
-To update an existing test project using Qase reporter from version 2.3.x to version 3.0.0-beta.2,
-run the following steps:
-
-1. Update reporter configuration in `cypress.config.js` file.
-
-    ```diff
-   +  import { afterSpecHook } from 'cypress-qase-reporter/hooks';
-     ...
-     reporter: 'cypress-multi-reporters',
-     reporterOptions: {
-        reporterEnabled: 'cypress-qase-reporter',
-        cypressQaseReporterReporterOptions: {
-          ... // other options
-          framework: {
-            cypress: {
-              screenshotsFolder: 'cypress/screenshots',
-   +           videosFolder: 'cypress/videos',
-   +           uploadDelay: 10, // Delay in seconds before uploading video files (default: 10)
-            },
-          },
-        },
-      },
-     video: true,
-     e2e: {
-      setupNodeEvents(on, config) { 
-        require('cypress-qase-reporter/plugin')(on, config)
-        require('cypress-qase-reporter/metadata')(on)
-   +    on('after:spec', async (spec, results) => {
-   +      await afterSpecHook(spec, config);
-   +    });
-       }
-     }
      ...
    ```
 
@@ -233,6 +234,7 @@ module.exports = cypress.defineConfig({
         cypress: {
           screenshotsFolder: 'cypress/screenshots',
           videosFolder: 'cypress/videos',
+          uploadDelay: 10, // Delay in seconds before uploading video files (default: 10)
         }
       }
     },
@@ -287,6 +289,8 @@ module.exports = cypress.defineConfig({
       framework: {
         cypress: {
           screenshotsFolder: 'cypress/screenshots',
+          videosFolder: 'cypress/videos',
+          uploadDelay: 10, // Delay in seconds before uploading video files (default: 10)
         },
       },
     },
