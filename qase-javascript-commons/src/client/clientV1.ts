@@ -116,6 +116,7 @@ export class ClientV1 implements IClient {
 
       if (this.config.run.externalLink && data.result.id) {
         // Map our enum values to API enum values
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
         const apiType = this.config.run.externalLink.type === 'jiraCloud' 
           ? RunexternalIssuesTypeEnum.CLOUD 
           : RunexternalIssuesTypeEnum.SERVER;
