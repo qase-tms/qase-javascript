@@ -28,6 +28,7 @@ export const envToConfig = (env: EnvType): ConfigType => ({
   testops: {
     project: env[EnvTestOpsEnum.project],
     uploadAttachments: env[EnvTestOpsEnum.uploadAttachments],
+    uploadTrace: env[EnvTestOpsEnum.uploadTrace],
 
     api: {
       token: env[EnvApiEnum.token],

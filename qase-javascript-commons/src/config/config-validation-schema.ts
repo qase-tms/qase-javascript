@@ -67,6 +67,11 @@ export const configValidationSchema = {
           nullable: true,
         },
 
+        uploadTrace: {
+          type: 'boolean',
+          nullable: true,
+        },
+
         run: {
           type: 'object',
           nullable: true,

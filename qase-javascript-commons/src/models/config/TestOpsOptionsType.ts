@@ -2,6 +2,7 @@
 export interface TestOpsOptionsType {
   project: string;
   uploadAttachments?: boolean | undefined;
+  uploadTrace?: boolean | undefined;
   api: TestOpsApiType;
   run: TestOpsRunType;
   plan: TestOpsPlanType;

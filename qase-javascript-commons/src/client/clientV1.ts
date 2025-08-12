@@ -143,6 +143,9 @@ export class ClientV1 implements IClient {
     const uploadedHashes: string[] = [];
 
     for (const attachment of attachments) {
+      if (attachment.file_path?.endsWith('trace.zip') && attachment.mime_type === 'application/zip' && this.config.uploadTrace === true) {
+        continue;
+      }
       try {
         this.logger.logDebug(`Uploading attachment: ${attachment.file_path ?? attachment.file_name}`);
 

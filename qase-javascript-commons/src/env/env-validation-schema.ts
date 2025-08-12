@@ -56,6 +56,10 @@ export const envValidationSchema: JSONSchemaType<EnvType> = {
       type: 'boolean',
       nullable: true,
     },
+    [EnvTestOpsEnum.uploadTrace]: {
+      type: 'boolean',
+      nullable: true,
+    },
     [EnvTestOpsEnum.defect]: {
       type: 'boolean',
       nullable: true,

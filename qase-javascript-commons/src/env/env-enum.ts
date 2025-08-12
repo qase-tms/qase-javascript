@@ -16,6 +16,7 @@ export enum EnvEnum {
 export enum EnvTestOpsEnum {
   project = 'QASE_TESTOPS_PROJECT',
   uploadAttachments = 'QASE_TESTOPS_UPLOAD_ATTACHMENTS',
+  uploadTrace = 'QASE_TESTOPS_UPLOAD_TRACE',
   defect = 'QASE_TESTOPS_DEFECT',
 }
 
