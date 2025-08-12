@@ -49,6 +49,7 @@ describe('TestOpsReporter', () => {
       createRun: jest.fn(),
       completeRun: jest.fn(),
       uploadResults: jest.fn(),
+      uploadAttachment: jest.fn(),
     };
 
     reporter = new TestOpsReporter(

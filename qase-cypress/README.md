@@ -4,11 +4,66 @@ Publish results simple and easy.
 
 ## Installation
 
-To install the latest release version (2.2.x), run:
+To install the latest release version, run:
 
 ```sh
 npm install -D cypress-qase-reporter
 ```
+
+## Updating from v2.3.x to v3.0.x
+
+To update an existing test project using Qase reporter from version 2.3.x to version 3.0.x,
+run the following steps:
+
+- Update reporter configuration in `cypress.config.js` file.
+
+    ```diff
+   +  import { afterSpecHook } from 'cypress-qase-reporter/hooks';
+     ...
+     reporter: 'cypress-multi-reporters',
+     reporterOptions: {
+        reporterEnabled: 'cypress-qase-reporter',
+        cypressQaseReporterReporterOptions: {
+          ... // other options
+          framework: {
+            cypress: {
+              screenshotsFolder: 'cypress/screenshots',
+   +          videosFolder: 'cypress/videos',
+   +          uploadDelay: 10, // Delay in seconds before uploading video files (default: 10)
+            },
+          },
+        },
+      },
+     video: true,
+     e2e: {
+      setupNodeEvents(on, config) { 
+        require('cypress-qase-reporter/plugin')(on, config)
+        require('cypress-qase-reporter/metadata')(on)
+   +    on('after:spec', async (spec, results) => {
+   +      await afterSpecHook(spec, config);
+   +    });
+       }
+     }
+     ...
+   ```
+
+## Updating from v2.1 to v2.2
+
+To update an existing test project using Qase reporter from version 2.1 to version 2.2,
+run the following steps:
+
+- Add metadata in the `e2e` section of `cypress.config.js`
+
+   ```diff
+     ...
+     e2e: {
+      setupNodeEvents(on, config) { 
+        require('cypress-qase-reporter/plugin')(on, config)
+   +    require('cypress-qase-reporter/metadata')(on)
+       }
+     }
+     ...
+   ```
 
 ## Updating from v1 to v2.1
 
@@ -20,7 +75,7 @@ run the following steps:
    ```diff
    - import { qase } from 'cypress-qase-reporter/dist/mocha'
    + import { qase } from 'cypress-qase-reporter/mocha'
-   ```                                        
+   ```
 
 2. Update reporter configuration in `cypress.config.js` and/or environment variables —
    see the [configuration reference](#configuration) below.
@@ -58,23 +113,6 @@ run the following steps:
      },
      ...
    ```
-
-## Updating from v2.1 to v2.2
-
-To update an existing test project using Qase reporter from version 2.1 to version 2.2,
-run the following steps:
-
-1. Add a metadata in the `e2e` section of `cypress.config.js`
-
-   ```diff
-     ...
-     e2e: {
-      setupNodeEvents(on, config) { 
-        require('cypress-qase-reporter/plugin')(on, config)
-   +    require('cypress-qase-reporter/metadata')(on)
-       }
-     }
-     ...
 
 ## Getting started
 
@@ -167,6 +205,7 @@ Example `cypress.config.js` config:
 
 ```javascript
 import cypress from 'cypress';
+import { afterSpecHook } from 'cypress-qase-reporter/hooks';
 
 module.exports = cypress.defineConfig({
   reporter: 'cypress-multi-reporters',
@@ -194,6 +233,8 @@ module.exports = cypress.defineConfig({
       framework: {
         cypress: {
           screenshotsFolder: 'cypress/screenshots',
+          videosFolder: 'cypress/videos',
+          uploadDelay: 10, // Delay in seconds before uploading video files (default: 10)
         }
       }
     },
@@ -203,6 +244,9 @@ module.exports = cypress.defineConfig({
     setupNodeEvents(on, config) {
       require('cypress-qase-reporter/plugin')(on, config)
       require('cypress-qase-reporter/metadata')(on)
+      on('after:spec', async (spec, results) => {
+         await afterSpecHook(spec, config);
+       });
     },
   },
 });
@@ -215,6 +259,7 @@ If you use Cucumber, you need to add the following configuration in `cypress.con
 
 ```javascript
 import cypress from 'cypress';
+import { afterSpecHook } from 'cypress-qase-reporter/hooks';
 
 const cucumber = require('cypress-cucumber-preprocessor').default;
 
@@ -244,6 +289,8 @@ module.exports = cypress.defineConfig({
       framework: {
         cypress: {
           screenshotsFolder: 'cypress/screenshots',
+          videosFolder: 'cypress/videos',
+          uploadDelay: 10, // Delay in seconds before uploading video files (default: 10)
         },
       },
     },
@@ -254,11 +301,14 @@ module.exports = cypress.defineConfig({
       on('file:preprocessor', cucumber());
       require('cypress-qase-reporter/plugin')(on, config);
       require('cypress-qase-reporter/metadata')(on);
+      on('after:spec', async (spec, results) => {
+         await afterSpecHook(spec, config);
+       });
     },
     specPattern: 'cypress/e2e/*.feature',
   },
 });
-``` 
+```
 
 And add the following lines in `support/e2e.js` file:
 
@@ -278,5 +328,3 @@ We maintain the reporter on [LTS versions of Node](https://nodejs.org/en/about/r
 `cypress >= 8.0.0`
 
 <!-- references -->
-
-[auth]: https://developers.qase.io/#authentication

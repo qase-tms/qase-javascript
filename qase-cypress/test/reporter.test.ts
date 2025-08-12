@@ -312,31 +312,4 @@ describe('CypressQaseReporter', () => {
       expect(metadataManagerMock.clear).toHaveBeenCalled();
     });
   });
-
-  describe('run end handler', () => {
-    it('should spawn child process with results', () => {
-      const options = {
-        reporterOptions: {
-          screenshotsFolder: '/screenshots',
-        },
-      };
-
-      new CypressQaseReporter(runner, options);
-
-      const { spawnSync } = require('child_process');
-      
-      if (eventHandlers['end']) eventHandlers['end']();
-
-      expect(spawnSync).toHaveBeenCalledWith(
-        'node',
-        [expect.stringContaining('child.js')],
-        expect.objectContaining({
-          stdio: 'inherit',
-          env: expect.objectContaining({
-            results: JSON.stringify([{ id: 'test-result' }]),
-          }),
-        })
-      );
-    });
-  });
 }); 
