@@ -13,6 +13,7 @@ import {
 import { DriverEnum } from '../writer';
 import { ConfigType } from '../config';
 import { FormatEnum } from '../writer/driver-enum';
+import { ExternalLinkType } from '../models/config/TestOpsOptionsType';
 
 /**
  * @param {EnvType} env
@@ -42,9 +43,18 @@ export const envToConfig = (env: EnvType): ConfigType => ({
       tags: env[EnvRunEnum.tags]?.split(',').map(tag => tag.trim()) ?? [],
       externalLink: env[EnvRunEnum.externalLink] ? (() => {
         try {
-          const parsed = JSON.parse(env[EnvRunEnum.externalLink]!);
+          const externalLinkValue = env[EnvRunEnum.externalLink];
+          if (!externalLinkValue) return undefined;
+          
+          const parsed = JSON.parse(externalLinkValue) as { type: string; link: string };
+          
+          // Validate that type is a valid ExternalLinkType value
+          if (parsed.type !== 'jiraCloud' && parsed.type !== 'jiraServer') {
+            return undefined;
+          }
+          
           return {
-            type: parsed.type,
+            type: parsed.type as ExternalLinkType,
             link: parsed.link,
           };
         } catch {
