@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.4.1
+
+## What's new
+
+Added support for external links in the test run.
+
 # qase-javascript-commons@2.3.6
 
 ## What's new

@@ -54,6 +54,7 @@ All configuration options are listed in the table below:
 | Qase test run description                                                                                             | `testops.run.description`  | `QASE_TESTOPS_RUN_DESCRIPTION`  | `<Framework name> automated run`        | No       | Any string                 |
 | Qase test run complete                                                                                                | `testops.run.complete`     | `QASE_TESTOPS_RUN_COMPLETE`     | `True`                                  |          | `True`, `False`            |
 | Array of tags to be added to the test run                                                                             | `testops.run.tags`         | `QASE_TESTOPS_RUN_TAGS`         | `[]`                                    | No       | Array of strings           |
+| External link to associate with test run (e.g., Jira ticket)                                                          | `testops.run.externalLink` | `QASE_TESTOPS_RUN_EXTERNAL_LINK` | undefined                              | No       | JSON object with `type` (`jiraCloud` or `jiraServer`) and `link` (e.g., `PROJ-123`) |
 | Qase test plan ID                                                                                                     | `testops.plan.id`          | `QASE_TESTOPS_PLAN_ID`          |  undefined                              | No       | Any integer                |
 | Size of batch for sending test results                                                                                | `testops.batch.size`       | `QASE_TESTOPS_BATCH_SIZE`       | `200`                                   | No       | Any integer                |
 | Enable defects for failed test cases                                                                                  | `testops.defect`           | `QASE_TESTOPS_DEFECT`           | `False`                                 | No       | `True`, `False`            |
@@ -88,7 +89,11 @@ All configuration options are listed in the table below:
       "title": "Regress run",
       "description": "Regress run description",
       "complete": true,
-      "tags": ["tag1", "tag2"]
+      "tags": ["tag1", "tag2"],
+      "externalLink": {
+        "type": "jiraCloud",
+        "link": "PROJ-123"
+      }
     },
     "defect": false,
     "project": "<project_code>",
@@ -110,4 +115,14 @@ All configuration options are listed in the table below:
     }
   }
 }
+```
+
+### Environment Variables Example:
+
+```bash
+# Set external link for Jira Cloud
+export QASE_TESTOPS_RUN_EXTERNAL_LINK='{"type":"jiraCloud","link":"PROJ-123"}'
+
+# Set external link for Jira Server
+export QASE_TESTOPS_RUN_EXTERNAL_LINK='{"type":"jiraServer","link":"PROJ-456"}'
 ```

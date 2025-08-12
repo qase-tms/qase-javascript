@@ -90,6 +90,10 @@ export const envValidationSchema: JSONSchemaType<EnvType> = {
       type: 'string',
       nullable: true,
     },
+    [EnvRunEnum.externalLink]: {
+      type: 'string',
+      nullable: true,
+    },
 
     [EnvPlanEnum.id]: {
       type: 'number',

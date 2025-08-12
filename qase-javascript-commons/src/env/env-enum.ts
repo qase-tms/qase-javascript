@@ -36,6 +36,7 @@ export enum EnvRunEnum {
   description = 'QASE_TESTOPS_RUN_DESCRIPTION',
   complete = 'QASE_TESTOPS_RUN_COMPLETE',
   tags = 'QASE_TESTOPS_RUN_TAGS',
+  externalLink = 'QASE_TESTOPS_RUN_EXTERNAL_LINK',
 }
 
 /**

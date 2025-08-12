@@ -32,6 +32,7 @@ export interface EnvType {
   [EnvRunEnum.description]?: string;
   [EnvRunEnum.complete]?: boolean;
   [EnvRunEnum.tags]?: string;
+  [EnvRunEnum.externalLink]?: string;
 
   [EnvPlanEnum.id]?: number;
 

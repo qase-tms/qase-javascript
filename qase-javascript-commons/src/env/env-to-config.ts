@@ -40,6 +40,17 @@ export const envToConfig = (env: EnvType): ConfigType => ({
       description: env[EnvRunEnum.description],
       complete: env[EnvRunEnum.complete],
       tags: env[EnvRunEnum.tags]?.split(',').map(tag => tag.trim()) ?? [],
+      externalLink: env[EnvRunEnum.externalLink] ? (() => {
+        try {
+          const parsed = JSON.parse(env[EnvRunEnum.externalLink]!);
+          return {
+            type: parsed.type,
+            link: parsed.link,
+          };
+        } catch {
+          return undefined;
+        }
+      })() : undefined,
     },
 
     plan: {
