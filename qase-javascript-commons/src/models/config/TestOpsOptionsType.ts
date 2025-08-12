@@ -20,12 +20,23 @@ export interface TestOpsConfigurationValueType {
   value: string;
 }
 
+export enum ExternalLinkType {
+  JIRA_CLOUD = 'jiraCloud',
+  JIRA_SERVER = 'jiraServer',
+}
+
+export interface TestOpsExternalLinkType {
+  type: ExternalLinkType;
+  link: string;
+}
+
 export interface TestOpsRunType {
   id?: number | undefined;
   title?: string;
   description?: string;
   complete?: boolean | undefined;
   tags?: string[] | undefined;
+  externalLink?: TestOpsExternalLinkType | undefined;
 }
 
 export interface TestOpsPlanType {

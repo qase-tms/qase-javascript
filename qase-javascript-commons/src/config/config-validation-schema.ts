@@ -1,5 +1,6 @@
 import { ModeEnum } from '../options';
 import { DriverEnum, FormatEnum } from '../writer';
+import { ExternalLinkType } from '../models/config/TestOpsOptionsType';
 
 /**
  * @type {JSONSchemaType<ConfigType>}
@@ -94,6 +95,20 @@ export const configValidationSchema = {
                 type: 'string',
               },
               nullable: true,
+            },
+            externalLink: {
+              type: 'object',
+              nullable: true,
+              properties: {
+                type: {
+                  type: 'string',
+                  enum: [ExternalLinkType.JIRA_CLOUD, ExternalLinkType.JIRA_SERVER],
+                },
+                link: {
+                  type: 'string',
+                },
+              },
+              required: ['type', 'link'],
             },
           },
         },
