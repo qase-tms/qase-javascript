@@ -15,10 +15,22 @@
 
 
 /**
- * Deprecated, use `parameters` instead.
+ * Single parameter
  * @export
- * @interface TestCaseParams
+ * @interface ParameterSingle
  */
-export interface TestCaseParams {
+export interface ParameterSingle {
+    /**
+     * 
+     * @type {string}
+     * @memberof ParameterSingle
+     */
+    'title': string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ParameterSingle
+     */
+    'values': Array<string>;
 }
 

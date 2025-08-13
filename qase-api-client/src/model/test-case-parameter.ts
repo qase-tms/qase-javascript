@@ -13,12 +13,13 @@
  */
 
 
+import { TestCaseParameterGroup } from './test-case-parameter-group';
+import { TestCaseParameterSingle } from './test-case-parameter-single';
 
 /**
- * Deprecated, use `parameters` instead.
+ * @type TestCaseParameter
  * @export
- * @interface TestCaseParams
  */
-export interface TestCaseParams {
-}
+export type TestCaseParameter = TestCaseParameterGroup | TestCaseParameterSingle;
+
 

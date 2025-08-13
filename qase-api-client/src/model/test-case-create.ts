@@ -13,6 +13,7 @@
  */
 
 
+import { TestCaseParametercreate } from './test-case-parametercreate';
 import { TestStepCreate } from './test-step-create';
 
 /**
@@ -124,11 +125,18 @@ export interface TestCaseCreate {
      */
     'tags'?: Array<string>;
     /**
-     * 
+     * Deprecated, use `parameters` instead.
      * @type {{ [key: string]: Array<string>; }}
      * @memberof TestCaseCreate
+     * @deprecated
      */
     'params'?: { [key: string]: Array<string>; } | null;
+    /**
+     * 
+     * @type {Array<TestCaseParametercreate>}
+     * @memberof TestCaseCreate
+     */
+    'parameters'?: Array<TestCaseParametercreate> | null;
     /**
      * A map of custom fields values (id => value)
      * @type {{ [key: string]: string; }}

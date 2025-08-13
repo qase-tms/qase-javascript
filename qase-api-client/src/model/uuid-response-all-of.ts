@@ -13,12 +13,19 @@
  */
 
 
+import { UuidResponseAllOfResult } from './uuid-response-all-of-result';
 
 /**
- * Deprecated, use `parameters` instead.
+ * 
  * @export
- * @interface TestCaseParams
+ * @interface UuidResponseAllOf
  */
-export interface TestCaseParams {
+export interface UuidResponseAllOf {
+    /**
+     * 
+     * @type {UuidResponseAllOfResult}
+     * @memberof UuidResponseAllOf
+     */
+    'result'?: UuidResponseAllOfResult;
 }
 

@@ -13,12 +13,14 @@
  */
 
 
+import { BaseResponse } from './base-response';
+import { UuidResponseAllOf } from './uuid-response-all-of';
+import { UuidResponseAllOfResult } from './uuid-response-all-of-result';
 
 /**
- * Deprecated, use `parameters` instead.
+ * @type UuidResponse
  * @export
- * @interface TestCaseParams
  */
-export interface TestCaseParams {
-}
+export type UuidResponse = BaseResponse & UuidResponseAllOf;
+
 

@@ -13,12 +13,12 @@
  */
 
 
+import { ParameterSingle } from './parameter-single';
 
 /**
- * Deprecated, use `parameters` instead.
+ * @type SharedParameterParameter
  * @export
- * @interface TestCaseParams
  */
-export interface TestCaseParams {
-}
+export type SharedParameterParameter = Array<ParameterSingle>;
+
 

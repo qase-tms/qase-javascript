@@ -17,6 +17,7 @@ import { Attachment } from './attachment';
 import { CustomFieldValue } from './custom-field-value';
 import { DefectQuery } from './defect-query';
 import { PlanQuery } from './plan-query';
+import { QqlTestCaseParams } from './qql-test-case-params';
 import { RequirementQuery } from './requirement-query';
 import { ResultQuery } from './result-query';
 import { RunEnvironment } from './run-environment';
@@ -24,7 +25,6 @@ import { RunMilestone } from './run-milestone';
 import { RunQuery } from './run-query';
 import { RunStats } from './run-stats';
 import { TagValue } from './tag-value';
-import { TestCaseParams } from './test-case-params';
 import { TestCaseQuery } from './test-case-query';
 import { TestStep } from './test-step';
 

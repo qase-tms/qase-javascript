@@ -27,6 +27,7 @@ export * from './api/projects-api';
 export * from './api/results-api';
 export * from './api/runs-api';
 export * from './api/search-api';
+export * from './api/shared-parameters-api';
 export * from './api/shared-steps-api';
 export * from './api/suites-api';
 export * from './api/system-fields-api';

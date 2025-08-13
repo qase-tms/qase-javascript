@@ -13,12 +13,19 @@
  */
 
 
+import { SharedParameter } from './shared-parameter';
 
 /**
- * Deprecated, use `parameters` instead.
+ * 
  * @export
- * @interface TestCaseParams
+ * @interface SharedParameterResponseAllOf
  */
-export interface TestCaseParams {
+export interface SharedParameterResponseAllOf {
+    /**
+     * 
+     * @type {SharedParameter}
+     * @memberof SharedParameterResponseAllOf
+     */
+    'result'?: SharedParameter;
 }
 
