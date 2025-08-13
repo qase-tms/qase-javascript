@@ -13,12 +13,19 @@
  */
 
 
+import { ParameterSingle } from './parameter-single';
 
 /**
- * Deprecated, use `parameters` instead.
+ * Group parameter
  * @export
- * @interface TestCaseParams
+ * @interface ParameterGroup
  */
-export interface TestCaseParams {
+export interface ParameterGroup {
+    /**
+     * 
+     * @type {Array<ParameterSingle>}
+     * @memberof ParameterGroup
+     */
+    'items': Array<ParameterSingle>;
 }
 

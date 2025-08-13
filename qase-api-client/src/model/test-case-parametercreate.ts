@@ -13,12 +13,14 @@
  */
 
 
+import { ParameterGroup } from './parameter-group';
+import { ParameterShared } from './parameter-shared';
+import { ParameterSingle } from './parameter-single';
 
 /**
- * Deprecated, use `parameters` instead.
+ * @type TestCaseParametercreate
  * @export
- * @interface TestCaseParams
  */
-export interface TestCaseParams {
-}
+export type TestCaseParametercreate = ParameterGroup | ParameterShared | ParameterSingle;
+
 

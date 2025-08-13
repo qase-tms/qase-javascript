@@ -13,12 +13,14 @@
  */
 
 
+import { BaseResponse } from './base-response';
+import { SharedParameter } from './shared-parameter';
+import { SharedParameterResponseAllOf } from './shared-parameter-response-all-of';
 
 /**
- * Deprecated, use `parameters` instead.
+ * @type SharedParameterResponse
  * @export
- * @interface TestCaseParams
  */
-export interface TestCaseParams {
-}
+export type SharedParameterResponse = BaseResponse & SharedParameterResponseAllOf;
+
 

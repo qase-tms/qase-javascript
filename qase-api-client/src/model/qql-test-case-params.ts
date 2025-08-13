@@ -15,10 +15,10 @@
 
 
 /**
- * Deprecated, use `parameters` instead.
+ * 
  * @export
- * @interface TestCaseParams
+ * @interface QqlTestCaseParams
  */
-export interface TestCaseParams {
+export interface QqlTestCaseParams {
 }
 

@@ -13,12 +13,13 @@
  */
 
 
+import { TestCaseParameterBase } from './test-case-parameter-base';
+import { TestCaseParameterGroupAllOf } from './test-case-parameter-group-all-of';
 
 /**
- * Deprecated, use `parameters` instead.
+ * @type TestCaseParameterGroup
  * @export
- * @interface TestCaseParams
  */
-export interface TestCaseParams {
-}
+export type TestCaseParameterGroup = TestCaseParameterBase & TestCaseParameterGroupAllOf;
+
 

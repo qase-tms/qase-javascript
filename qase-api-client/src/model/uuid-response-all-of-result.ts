@@ -15,10 +15,16 @@
 
 
 /**
- * Deprecated, use `parameters` instead.
+ * 
  * @export
- * @interface TestCaseParams
+ * @interface UuidResponseAllOfResult
  */
-export interface TestCaseParams {
+export interface UuidResponseAllOfResult {
+    /**
+     * 
+     * @type {string}
+     * @memberof UuidResponseAllOfResult
+     */
+    'id'?: string;
 }
 

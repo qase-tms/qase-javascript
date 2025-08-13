@@ -15,10 +15,16 @@
 
 
 /**
- * Deprecated, use `parameters` instead.
+ * Shared parameter
  * @export
- * @interface TestCaseParams
+ * @interface ParameterShared
  */
-export interface TestCaseParams {
+export interface ParameterShared {
+    /**
+     * 
+     * @type {string}
+     * @memberof ParameterShared
+     */
+    'shared_id': string;
 }
 

@@ -14,6 +14,7 @@
 
 
 import { TestCaseCreate } from './test-case-create';
+import { TestCaseParametercreate } from './test-case-parametercreate';
 import { TestCasebulkCasesInnerAllOf } from './test-casebulk-cases-inner-all-of';
 import { TestStepCreate } from './test-step-create';
 

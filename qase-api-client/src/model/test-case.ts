@@ -17,6 +17,7 @@ import { Attachment } from './attachment';
 import { CustomFieldValue } from './custom-field-value';
 import { ExternalIssue } from './external-issue';
 import { TagValue } from './tag-value';
+import { TestCaseParameter } from './test-case-parameter';
 import { TestCaseParams } from './test-case-params';
 import { TestStep } from './test-step';
 
@@ -150,8 +151,15 @@ export interface TestCase {
      * 
      * @type {TestCaseParams}
      * @memberof TestCase
+     * @deprecated
      */
     'params'?: TestCaseParams;
+    /**
+     * 
+     * @type {Array<TestCaseParameter>}
+     * @memberof TestCase
+     */
+    'parameters'?: Array<TestCaseParameter>;
     /**
      * 
      * @type {Array<TagValue>}

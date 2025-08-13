@@ -15,8 +15,8 @@
 
 import { Attachment } from './attachment';
 import { CustomFieldValue } from './custom-field-value';
+import { QqlTestCaseParams } from './qql-test-case-params';
 import { TagValue } from './tag-value';
-import { TestCaseParams } from './test-case-params';
 import { TestStep } from './test-step';
 
 /**
@@ -153,10 +153,10 @@ export interface QqlTestCase {
     'steps'?: Array<TestStep>;
     /**
      * 
-     * @type {TestCaseParams}
+     * @type {QqlTestCaseParams}
      * @memberof QqlTestCase
      */
-    'params'?: TestCaseParams;
+    'params'?: QqlTestCaseParams;
     /**
      * 
      * @type {Array<TagValue>}
