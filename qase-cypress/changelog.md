@@ -1,3 +1,9 @@
+# cypress-qase-reporter@3.0.2
+
+## What's new
+
+- Fixed an issue where video attachments were not uploaded for tests located in subdirectories.
+
 # cypress-qase-reporter@3.0.0-beta.1
 
 ## What's new

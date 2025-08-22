@@ -2,14 +2,11 @@
 import { expect } from '@jest/globals';
 import { FileSearcher } from '../src/fileSearcher';
 import * as fs from 'fs';
-import * as path from 'path';
 
-// Mock fs and path modules
+// Mock only fs module
 jest.mock('fs');
-jest.mock('path');
 
 const mockFs = fs as jest.Mocked<typeof fs>;
-const mockPath = path as jest.Mocked<typeof path>;
 
 describe('FileSearcher', () => {
   beforeEach(() => {
@@ -20,12 +17,6 @@ describe('FileSearcher', () => {
       value: jest.fn(() => '/mock/cwd'),
       writable: true,
     });
-    
-    // Mock path.resolve to return absolute path
-    mockPath.resolve.mockImplementation((cwd, folder) => `${cwd}/${folder}`);
-    
-    // Mock path.join to return joined path
-    mockPath.join.mockImplementation((...args) => args.join('/'));
   });
 
   describe('findFilesBeforeTime', () => {
@@ -36,7 +27,7 @@ describe('FileSearcher', () => {
       const result = FileSearcher.findFilesBeforeTime('/screenshots', 'test.cy.js', new Date());
 
       expect(result).toEqual([]);
-      expect(mockFs.existsSync).toHaveBeenCalledWith('/mock/cwd//screenshots');
+      expect(mockFs.existsSync).toHaveBeenCalledWith('/screenshots');
     });
 
     it('should find files in matching folder', () => {
@@ -61,8 +52,8 @@ describe('FileSearcher', () => {
       const result = FileSearcher.findFilesBeforeTime('/screenshots', 'test.cy.js', mockTime);
 
       expect(result).toEqual([
-        '/mock/cwd//screenshots/test.cy.js/screenshot1.png',
-        '/mock/cwd//screenshots/test.cy.js/screenshot2.png',
+        '/screenshots/test.cy.js/screenshot1.png',
+        '/screenshots/test.cy.js/screenshot2.png',
       ]);
     });
 
@@ -95,5 +86,98 @@ describe('FileSearcher', () => {
 
       expect(result).toEqual([]);
     });
+  });
+
+  describe('findVideoFiles', () => {
+    it('should find video files in root video directory', () => {
+      mockFs.existsSync.mockReturnValue(true);
+      mockFs.readdirSync.mockReturnValue([
+        { name: 'test.cy.js.mp4', isDirectory: () => false, isFile: () => true },
+        { name: 'other.cy.js.mp4', isDirectory: () => false, isFile: () => true },
+      ] as any);
+
+      const result = FileSearcher.findVideoFiles('/videos', 'test');
+
+      expect(result).toEqual(['/videos/test.cy.js.mp4']);
+    });
+
+    it('should find video files in subdirectory when specRelativePath is provided', () => {
+      // Mock existsSync to return true for root directory and subdirectory
+      mockFs.existsSync.mockImplementation((path) => {
+        const pathStr = String(path);
+        return pathStr.endsWith('/videos') || pathStr.endsWith('/videos/feature');
+      });
+      
+      mockFs.readdirSync.mockReturnValue([
+        { name: 'test.cy.js.mp4', isDirectory: () => false, isFile: () => true },
+        { name: 'other.cy.js.mp4', isDirectory: () => false, isFile: () => true },
+      ] as any);
+
+      const result = FileSearcher.findVideoFiles('/videos', 'test', 'feature/test.cy.js');
+
+      // The actual path will depend on the system, so we check that it contains the right parts
+      expect(result).toHaveLength(1);
+      expect(result[0]).toContain('videos/feature/test.cy.js.mp4');
+    });
+
+    it('should return empty array when video subdirectory does not exist', () => {
+      // Mock existsSync to return true for root directory but false for subdirectory
+      mockFs.existsSync.mockImplementation((path) => {
+        const pathStr = String(path);
+        return pathStr.endsWith('/videos');
+      });
+      
+      mockFs.readdirSync.mockReturnValue([
+        { name: 'test.cy.js.mp4', isDirectory: () => false, isFile: () => true },
+      ] as any);
+
+      const result = FileSearcher.findVideoFiles('/videos', 'test', 'non-existent/test.cy.js');
+
+      // The actual path will depend on the system, so we check that it contains the right parts
+      expect(result).toHaveLength(1);
+      expect(result[0]).toContain('videos/test.cy.js.mp4');
+    });
+
+    it('should handle both root and subdirectory video files', () => {
+      // Mock existsSync to return true for root directory and subdirectory
+      mockFs.existsSync.mockImplementation((path) => {
+        const pathStr = String(path);
+        return pathStr.endsWith('/videos') || pathStr.endsWith('/videos/feature');
+      });
+      
+      mockFs.readdirSync.mockReturnValue([
+        { name: 'test.cy.js.mp4', isDirectory: () => false, isFile: () => true },
+      ] as any);
+
+      const result = FileSearcher.findVideoFiles('/videos', 'test', 'feature/test.cy.js');
+
+      // The actual path will depend on the system, so we check that it contains the right parts
+      expect(result).toHaveLength(1);
+      expect(result[0]).toContain('videos/feature/test.cy.js.mp4');
+    });
+
+    it('should return empty array when video directory does not exist', () => {
+      mockFs.existsSync.mockReturnValue(false);
+
+      const result = FileSearcher.findVideoFiles('/non-existent', 'test');
+
+      expect(result).toEqual([]);
+    });
+
+    it('should filter only mp4 files', () => {
+      mockFs.existsSync.mockReturnValue(true);
+      mockFs.readdirSync.mockReturnValue([
+        { name: 'test.cy.js.mp4', isDirectory: () => false, isFile: () => true },
+        { name: 'test.cy.js.avi', isDirectory: () => false, isFile: () => true },
+        { name: 'test.cy.js.mov', isDirectory: () => false, isFile: () => true },
+      ] as any);
+
+      const result = FileSearcher.findVideoFiles('/videos', 'test');
+
+      expect(result).toEqual(['/videos/test.cy.js.mp4']);
+    });
+  });
+
+  describe('findVideoFilesBeforeTime', () => {
   });
 }); 

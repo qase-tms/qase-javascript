@@ -101,9 +101,10 @@ export class FileSearcher {
    *
    * @param videoFolderPath Path to the folder with video files.
    * @param specFileName Name of the spec file (without extension).
+   * @param specRelativePath Optional relative path from e2e directory to the spec file.
    * @returns Array of absolute paths to the matching mp4 files.
    */
-  public static findVideoFiles(videoFolderPath: string, specFileName: string): string[] {
+  public static findVideoFiles(videoFolderPath: string, specFileName: string, specRelativePath?: string): string[] {
     const absolutePath = path.resolve(process.cwd(), videoFolderPath);
     const result: string[] = [];
 
@@ -111,17 +112,42 @@ export class FileSearcher {
       return result;
     }
 
-    const entries = fs.readdirSync(absolutePath, { withFileTypes: true });
-
-    for (const entry of entries) {
-      if (entry.isFile()) {
-        const fileName = entry.name;
-        // Check if the file is an mp4 video file with the expected format: {specFileName}.cy.js.mp4
-        if (fileName.toLowerCase().endsWith('.mp4') && fileName.startsWith(specFileName)) {
-          const entryPath = path.join(absolutePath, fileName);
-          result.push(entryPath);
+    // Recursively search for video files in all subdirectories
+    const findVideoFilesRecursively = (dir: string): void => {
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      
+      for (const entry of entries) {
+        if (entry.isFile()) {
+          const fileName = entry.name;
+          // Check if the file is an mp4 video file with the expected format: {specFileName}.cy.js.mp4
+          if (fileName.toLowerCase().endsWith('.mp4') && fileName.startsWith(specFileName)) {
+            const entryPath = path.join(dir, fileName);
+            result.push(entryPath);
+          }
+        } else if (entry.isDirectory()) {
+          const subDirPath = path.join(dir, entry.name);
+          findVideoFilesRecursively(subDirPath);
         }
       }
+    };
+
+    // If we have a relative path, prioritize the corresponding subdirectory
+    if (specRelativePath) {
+      const specDir = path.dirname(specRelativePath);
+      
+      // Only process if specDir is not the current directory ('.')
+      if (specDir !== '.') {
+        const videoSubDir = path.join(absolutePath, specDir);
+        
+        if (fs.existsSync(videoSubDir)) {
+          findVideoFilesRecursively(videoSubDir);
+        }
+      }
+    }
+
+    // If we didn't find files in the expected subdirectory, search the entire videos directory
+    if (result.length === 0) {
+      findVideoFilesRecursively(absolutePath);
     }
 
     return result;
