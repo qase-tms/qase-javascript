@@ -74,9 +74,16 @@ async function afterSpecHook(spec: Spec, options: PluginConfigOptions) {
     const uploadDelay = composedOptions.framework?.cypress?.uploadDelay ?? 10;
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const specFileName = path.basename(spec.name, '.cy.js');
+    
+    // Get the relative path from the spec.relative field
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const specRelativePath = spec.relative && spec.relative !== '__all' 
+      ? spec.relative.replace(/^cypress\/(e2e|integration)\//, '') // Remove cypress/e2e/ or cypress/integration/ prefix
+      : undefined;
+    
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const videoFiles = videosFolder ? FileSearcher.findVideoFiles(videosFolder, specFileName) : [];
-
+    const videoFiles = videosFolder ? FileSearcher.findVideoFiles(videosFolder, specFileName, specRelativePath) : [];
+    
     if (videoFiles.length > 0 && uploadVideos) {
       const existingVideoFiles = videoFiles.filter(file => fs.existsSync(file));
 
