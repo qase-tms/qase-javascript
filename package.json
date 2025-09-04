@@ -29,6 +29,7 @@
     "qase-testcafe",
     "qase-mocha",
     "qase-wdio",
+    "qase-vitest",
     "./examples/*"
   ],
   "devDependencies": {

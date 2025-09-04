@@ -1,0 +1,14 @@
+{
+  "name": "vitest-example",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "vitest",
+    "test:run": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0",
+    "typescript": "^5.0.0",
+    "vitest-qase-reporter": "1.0.0"
+  }
+}
