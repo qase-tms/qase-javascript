@@ -1,13 +1,8 @@
 import type { Reporter } from 'vitest/reporters';
 import type { TestAnnotation } from '@vitest/runner';
 import type {
-  TestSpecification,
-  TestModule,
   TestCase,
   TestSuite,
-  ReportedHookContext,
-  SerializedError,
-  TestRunEndReason,
   TestResult
 } from 'vitest/node';
 import {
@@ -35,8 +30,8 @@ export class VitestQaseReporter implements Reporter {
     parameters?: Record<string, string>;
     groupParameters?: Record<string, string>;
     currentStep?: string;
-    steps: Array<{ name: string; status: 'start' | 'end' | 'failed' }>;
-    attachments: Array<{ name: string; path?: string; content?: string; contentType?: string }>;
+    steps: { name: string; status: 'start' | 'end' | 'failed' }[];
+    attachments: { name: string; path?: string; content?: string; contentType?: string }[];
   }> = new Map();
 
   /**
@@ -79,26 +74,12 @@ export class VitestQaseReporter implements Reporter {
     });
   }
 
-  // Safe JSON stringify function that handles circular references
-  private safeStringify(obj: any, space?: string | number): string {
-    const seen = new WeakSet();
-    return JSON.stringify(obj, (_key, value) => {
-      if (typeof value === 'object' && value !== null) {
-        if (seen.has(value)) {
-          return '[Circular]';
-        }
-        seen.add(value);
-      }
-      return value;
-    }, space);
-  }
+
 
   /**
    * Convert Vitest test result status to Qase TestStatusEnum
    */
   private convertStatus(result: TestResult): TestStatusEnum {
-    if (!result) return TestStatusEnum.skipped;
-
     switch (result.state) {
       case 'passed':
         return TestStatusEnum.passed;
@@ -120,24 +101,24 @@ export class VitestQaseReporter implements Reporter {
     const result = testCase.result();
     const qaseIds = VitestQaseReporter.getCaseId(testCase.name);
     const diagnostic = testCase.diagnostic();
-    const testId = testCase.id || testCase.name;
+    const testId = testCase.id ?? testCase.name;
     const metadata = this.testMetadata.get(testId);
 
     // Use title from metadata if available, otherwise use test name
-    const testTitle = metadata?.title || VitestQaseReporter.removeQaseIdsFromTitle(testCase.name);
+    const testTitle = metadata?.title ?? VitestQaseReporter.removeQaseIdsFromTitle(testCase.name);
     const testResult = new TestResultType(testTitle);
-    testResult.id = testCase.id || '';
-    testResult.signature = testCase.fullName || testCase.name;
+    testResult.id = testCase.id ?? '';
+    testResult.signature = testCase.fullName ?? testCase.name;
 
     // Set testops_id based on extracted qase IDs
     if (qaseIds.length > 0) {
-      testResult.testops_id = qaseIds.length === 1 ? qaseIds[0]! : qaseIds;
+      testResult.testops_id = qaseIds.length === 1 ? qaseIds[0] ?? null : qaseIds;
     } else {
       testResult.testops_id = null;
     }
 
     // Set relations for test suite
-    const suiteToUse = metadata?.suite || this.currentSuite || this.extractSuiteFromTestCase(testCase);
+    const suiteToUse = metadata?.suite ?? this.currentSuite ?? this.extractSuiteFromTestCase(testCase);
     if (suiteToUse) {
       testResult.relations = {
         suite: {
@@ -147,7 +128,7 @@ export class VitestQaseReporter implements Reporter {
 
       const suites = suiteToUse.split(' - ');
       suites.forEach((suite) => {
-        testResult.relations?.suite?.data.push({ title: suite.trim(), public_id: null });
+        testResult.relations!.suite!.data.push({ title: suite.trim(), public_id: null });
       });
     }
 
@@ -158,14 +139,19 @@ export class VitestQaseReporter implements Reporter {
     testResult.execution.duration = Math.round(diagnostic?.duration || 0);
 
     if (result?.errors && result.errors.length > 0) {
-      testResult.execution.stacktrace = result.errors.map((error: any) =>
-        error.stack || error.message || String(error)
-      ).join('\n');
-      testResult.message = result.errors[0]?.message || 'Test failed';
+      testResult.execution.stacktrace = result.errors.map((error: unknown) => {
+        if (error && typeof error === 'object' && 'stack' in error && 'message' in error) {
+          return (error.stack as string) ?? (error.message as string) ?? String(error);
+        }
+        return String(error);
+      }).join('\n');
+      testResult.message = result.errors[0] && typeof result.errors[0] === 'object' && 'message' in result.errors[0] 
+        ? String(result.errors[0].message) ?? 'Test failed'
+        : 'Test failed';
     }
 
     if (result.state === 'skipped') {
-      testResult.message = (result as any).note || null;
+      testResult.message = result && typeof result === 'object' && 'note' in result ? (result.note as string) ?? null : null;
     }
 
     // Add metadata from annotations
@@ -227,25 +213,22 @@ export class VitestQaseReporter implements Reporter {
     return testResult;
   }
 
-  // use for start test run via reporter
-  onTestRunStart?(_specifications: ReadonlyArray<TestSpecification>): void {
+  onTestRunStart?(): void {
     this.reporter.startTestRun();
   }
 
-  // use for complete test run via reporter
-  async onTestRunEnd?(_testModules: ReadonlyArray<TestModule>, _unhandledErrors: ReadonlyArray<SerializedError>, _reason: TestRunEndReason): Promise<void> {
+  async onTestRunEnd?(): Promise<void> {
     await this.reporter.publish();
   }
 
 
-  // use for collecting information about test result
   async onTestCaseResult?(testCase: TestCase): Promise<void> {
     const testResult = this.createTestResult(testCase);
     await this.reporter.addTestResult(testResult);
   }
 
   onTestCaseAnnotate?(testCase: TestCase, annotation: TestAnnotation): void {
-    const testId = testCase.id || testCase.name;
+    const testId = testCase.id ?? testCase.name;
     
     // Initialize metadata if not exists
     if (!this.testMetadata.has(testId)) {
@@ -255,104 +238,129 @@ export class VitestQaseReporter implements Reporter {
       });
     }
     
-    const metadata = this.testMetadata.get(testId)!;
+    const metadata = this.testMetadata.get(testId);
+    if (!metadata) return;
     
     // Process qase annotations
     // Check if this is a qase annotation by looking at the message pattern
     if (annotation.message && annotation.message.startsWith('Qase ')) {
-      const qaseType = annotation.message.split(':')[0]?.replace('Qase ', '').toLowerCase().replace(' ', '-') || '';
+      const qaseType = annotation.message.split(':')[0]?.replace('Qase ', '').toLowerCase().replace(' ', '-') ?? '';
       
       switch (qaseType) {
-        case 'title':
+        case 'title': {
           metadata.title = annotation.message.replace('Qase Title: ', '');
           break;
+        }
           
-        case 'comment':
+        case 'comment': {
           metadata.comment = annotation.message.replace('Qase Comment: ', '');
           break;
+        }
           
-        case 'suite':
+        case 'suite': {
           metadata.suite = annotation.message.replace('Qase Suite: ', '');
           break;
+        }
           
-        case 'fields':
+        case 'fields': {
           const fieldsData = annotation.message.replace('Qase Fields: ', '');
           try {
-            metadata.fields = JSON.parse(fieldsData);
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const parsed = JSON.parse(fieldsData);
+            if (typeof parsed === 'object' && parsed !== null) {
+              metadata.fields = parsed as Record<string, string>;
+            }
           } catch (e) {
             console.warn('Failed to parse qase fields:', fieldsData);
           }
           break;
+        }
           
-        case 'parameters':
+        case 'parameters': {
           const parametersData = annotation.message.replace('Qase Parameters: ', '');
           try {
-            metadata.parameters = JSON.parse(parametersData);
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const parsed = JSON.parse(parametersData);
+            if (typeof parsed === 'object' && parsed !== null) {
+              metadata.parameters = parsed as Record<string, string>;
+            }
           } catch (e) {
             console.warn('Failed to parse qase parameters:', parametersData);
           }
           break;
+        }
           
-        case 'group-parameters':
+        case 'group-parameters': {
           const groupParametersData = annotation.message.replace('Qase Group Parameters: ', '');
           try {
-            metadata.groupParameters = JSON.parse(groupParametersData);
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const parsed = JSON.parse(groupParametersData);
+            if (typeof parsed === 'object' && parsed !== null) {
+              metadata.groupParameters = parsed as Record<string, string>;
+            }
           } catch (e) {
             console.warn('Failed to parse qase group parameters:', groupParametersData);
           }
           break;
+        }
           
-        case 'step-start':
+        case 'step-start': {
           const stepStartData = annotation.message.replace('Qase Step Start: ', '');
           metadata.currentStep = stepStartData;
           break;
+        }
           
-        case 'step-end':
+        case 'step-end': {
           if (metadata.currentStep) {
             metadata.steps.push({ name: metadata.currentStep, status: 'end' });
             delete metadata.currentStep;
           }
           break;
+        }
           
-        case 'step-failed':
+        case 'step-failed': {
           if (metadata.currentStep) {
             metadata.steps.push({ name: metadata.currentStep, status: 'failed' });
             delete metadata.currentStep;
           }
           break;
+        }
           
-        case 'attachment':
+        case 'attachment': {
           const attachmentName = annotation.message.replace('Qase Attachment: ', '');
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const attachment = {
             name: attachmentName,
             ...(annotation.attachment?.path && { path: annotation.attachment.path }),
-            ...(annotation.attachment?.body && { 
+            ...(annotation.attachment?.body && {
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
               content: typeof annotation.attachment.body === 'string' 
                 ? annotation.attachment.body 
-                : new TextDecoder().decode(annotation.attachment.body)
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                : new TextDecoder().decode(annotation.attachment.body as ArrayBuffer)
             }),
             ...(annotation.attachment?.contentType && { contentType: annotation.attachment.contentType })
           };
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           metadata.attachments.push(attachment);
           break;
+        }
       }
     }
   }
 
-  // use for collecting information about test suite (save to variable and use for result reporting)
   onTestSuiteReady?(testSuite: TestSuite): void {
     this.currentSuite = testSuite.name;
   }
 
-  // use for removing information about test suite result
-  onTestSuiteResult?(_testSuite: TestSuite): void {
+  onTestSuiteResult?(): void {
     this.currentSuite = undefined;
   }
 
   private extractSuiteFromTestCase(testCase: TestCase): string | undefined {
     // Extract suite from testCase.fullName or testCase.name
     // Format is usually "Suite Name > Test Name" or just "Test Name"
-    const fullName = testCase.fullName || testCase.name;
+    const fullName = testCase.fullName ?? testCase.name;
     const parts = fullName.split(' > ');
     
     if (parts.length > 1) {
@@ -365,17 +373,7 @@ export class VitestQaseReporter implements Reporter {
     return undefined;
   }
 
-  onHookStart?(hook: ReportedHookContext): void {
-    console.log('VitestQaseReporter.onHookStart called with:', this.safeStringify({
-      name: hook.name
-    }, 2));
-  }
 
-  onHookEnd?(hook: ReportedHookContext): void {
-    console.log('VitestQaseReporter.onHookEnd called with:', this.safeStringify({
-      name: hook.name
-    }, 2));
-  }
 }
 
 export default VitestQaseReporter;
