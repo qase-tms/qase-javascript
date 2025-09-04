@@ -1,21 +1,20 @@
+import { QaseStep, getMimeTypes } from 'qase-javascript-commons';
 import path from 'path';
-import { getMimeTypes, QaseStep, StepFunction } from 'qase-javascript-commons';
 
-export const qase = (
-  caseId: number | string | number[] | string[],
-  name: string,
-): string => {
-  const caseIds = Array.isArray(caseId) ? caseId : [caseId];
+// Type for step function
+type StepFunction = () => Promise<void> | void;
 
+// Function to add Qase ID to test name
+export const addQaseId = (name: string, caseIds: number[]): string => {
   return `${name} (Qase ID: ${caseIds.join(',')})`;
 };
 
 // Type for annotate function from Vitest
-type AnnotateFunction = (message: string, options?: any) => Promise<void>;
+type AnnotateFunction = (message: string, options?: unknown) => Promise<void>;
 
 // Type for qase wrapper functions
 export interface QaseWrapper {
-  annotate(message: string, options?: any): Promise<void>;
+  annotate(message: string, options?: unknown): Promise<void>;
   title(value: string): Promise<void>;
   comment(value: string): Promise<void>;
   suite(value: string): Promise<void>;
@@ -44,7 +43,7 @@ export interface TestContextWithQase {
  */
 const createQaseWrapper = (annotate: AnnotateFunction): QaseWrapper => {
   return {
-    async annotate(message: string, options?: any) {
+    async annotate(message: string, options?: unknown) {
       return await annotate(message, options);
     },
 
@@ -115,7 +114,7 @@ const createQaseWrapper = (annotate: AnnotateFunction): QaseWrapper => {
     },
 
     /**
-     * Set group params for the test case
+     * Set group parameters for the test case
      * @param {Record<string, string>} values
      * @example
      * test('test', withQase(async ({ qase }) => {
@@ -149,7 +148,8 @@ const createQaseWrapper = (annotate: AnnotateFunction): QaseWrapper => {
         });
         await annotate(`Qase Step End: ${name}`, { type: 'qase-step-end', body: name });
       } catch (error) {
-        await annotate(`Qase Step Failed: ${name} - ${error}`, { type: 'qase-step-failed', body: `${name} - ${error}` });
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        await annotate(`Qase Step Failed: ${name} - ${errorMessage}`, { type: 'qase-step-failed', body: `${name} - ${errorMessage}` });
         throw error;
       }
     },
@@ -215,8 +215,8 @@ const createQaseWrapper = (annotate: AnnotateFunction): QaseWrapper => {
  *   }
  * }));
  */
-export const withQase = <T extends any[]>(
-  testFn: (context: TestContextWithQase & T[0]) => any
+export const withQase = <T extends unknown[]>(
+  testFn: (context: TestContextWithQase & T[0]) => unknown
 ) => {
   return async (context: T[0] & { annotate: AnnotateFunction }) => {
     const qase = createQaseWrapper(context.annotate);
