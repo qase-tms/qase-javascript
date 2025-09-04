@@ -25,6 +25,35 @@ export class VitestQaseReporter implements Reporter {
   private reporter: ReporterInterface;
   private currentSuite: string | undefined = undefined;
 
+  /**
+ * @type {RegExp}
+ */
+  static qaseIdRegExp = /\(Qase ID: ([\d,]+)\)/;
+
+  /**
+ * @param {string} title
+ * @returns {number[]}
+ * @private
+ */
+  private static getCaseId(title: string): number[] {
+    const [, ids] = title.match(VitestQaseReporter.qaseIdRegExp) ?? [];
+
+    return ids ? ids.split(',').map((id) => Number(id)) : [];
+  }
+
+    /**
+   * @param {string} title
+   * @returns {string}
+   * @private
+   */
+  private static removeQaseIdsFromTitle(title: string): string {
+      const matches = title.match(VitestQaseReporter.qaseIdRegExp);
+      if (matches) {
+        return title.replace(matches[0], '').trimEnd();
+      }
+      return title;
+  }
+
   constructor(options: VitestQaseOptionsType = {}) {
     const composedOptions = composeOptions(options, {});
 
@@ -48,42 +77,6 @@ export class VitestQaseReporter implements Reporter {
       }
       return value;
     }, space);
-  }
-
-  /**
-   * Extract Qase test case IDs from test annotations
-   */
-  private getQaseIds(testCase: TestCase): number[] {
-    const qaseIds: number[] = [];
-
-    try {
-      if (testCase.annotations) {
-        const annotations = testCase.annotations();
-        for (const annotation of annotations) {
-          // Check for both 'qase' and 'qaseid' types (case insensitive)
-          const type = annotation.type?.toLowerCase();
-          if ((type === 'qase' || type === 'qaseid') && (annotation as any).description) {
-            const ids = (annotation as any).description.split(',').map((id: string) => parseInt(id.trim(), 10));
-            qaseIds.push(...ids.filter((id: number) => !isNaN(id)));
-          }
-        }
-      }
-    } catch (error) {
-      // Ignore annotation errors
-    }
-
-    // Also check test title for Qase ID pattern (e.g., "Test name [Q-123]")
-    const titleMatch = testCase.name.match(/\[Q-(\d+)\]/g);
-    if (titleMatch) {
-      for (const match of titleMatch) {
-        const id = parseInt(match.replace(/\[Q-(\d+)\]/, '$1'), 10);
-        if (!isNaN(id)) {
-          qaseIds.push(id);
-        }
-      }
-    }
-
-    return qaseIds;
   }
 
   /**
@@ -111,10 +104,10 @@ export class VitestQaseReporter implements Reporter {
    */
   private createTestResult(testCase: TestCase): TestResultType {
     const result = testCase.result();
-    const qaseIds = this.getQaseIds(testCase);
+    const qaseIds = VitestQaseReporter.getCaseId(testCase.name);
     const diagnostic = testCase.diagnostic();
 
-    const testResult = new TestResultType(testCase.name);
+    const testResult = new TestResultType(VitestQaseReporter.removeQaseIdsFromTitle(testCase.name));
     testResult.id = testCase.id || '';
     testResult.signature = testCase.fullName || testCase.name;
 

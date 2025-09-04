@@ -6,12 +6,16 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": "./dist/index.js",
+    "./vitest": "./dist/vitest.js",
     "./package.json": "./package.json"
   },
   "typesVersions": {
     "*": {
       ".": [
         "./dist/index.d.ts"
+      ],
+      "vitest": [
+        "./dist/vitest.d.ts"
       ]
     }
   },
