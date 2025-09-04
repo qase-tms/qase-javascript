@@ -1,66 +1,68 @@
-# Qase TestOps Jest reporter
+# Qase TestOps Vitest reporter
 
-Qase Jest reporter sends test results and metadata to Qase.io.
+Qase Vitest reporter sends test results and metadata to Qase.io.
 It can work in different test automation scenarios:
 
 * Create new test cases in Qase from existing autotests.
-* Report Jest test results to existing test cases in Qase.
+* Report Vitest test results to existing test cases in Qase.
 
-Testing frameworks that use Jest as a test runner, such as Puppeteer, Appium, and Detox,
-can also be used with Jest reporter.
+Testing frameworks that use Vitest as a test runner can also be used with Vitest reporter.
 
 To install the latest version, run:
 
 ```shell
-npm install --save-dev jest-qase-reporter
+npm install --save-dev qase-vitest
 ```
 
 # Contents
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
-- [Getting started](#getting-started)
-- [Using Reporter](#using-reporter)
-- [Configuration](#configuration)
-- [Requirements](#requirements)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+- [Qase TestOps Vitest reporter](#qase-testops-vitest-reporter)
+- [Contents](#contents)
+  - [Getting started](#getting-started)
+  - [Using Reporter](#using-reporter)
+    - [Metadata](#metadata)
+    - [Advanced Usage with Annotations](#advanced-usage-with-annotations)
+  - [Configuration](#configuration)
+  - [Requirements](#requirements)
 
 ## Getting started
 
-To report your tests results to Qase, install `jest-qase-reporter`,
-and add a reporter config in the `jest.config.ts` file.
+To report your tests results to Qase, install `qase-vitest`,
+and add a reporter config in the `vitest.config.ts` file.
 A minimal configuration needs just two things:
 
 * Qase project code, for example, in https://app.qase.io/project/DEMO the code is `DEMO`.
-* Qase API token, created on the [Apps page](https://app.qase.io/apps?app=jest-reporter).
+* Qase API token, created on the [Apps page](https://app.qase.io/apps?app=vitest-reporter).
 
-```js
-module.exports = {
-  reporters: [
-    'default',
-    [
-      'jest-qase-reporter',
-      {
-        mode: 'testops',
-        testops: {
-          api: {
-            token: 'api_token'
+```typescript
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    reporters: [
+      'default',
+      [
+        'vitest-qase-reporter',
+        {
+          mode: 'testops',
+          testops: {
+            api: {
+              token: 'api_token'
+            },
+            project: 'project_code',
           },
-          project: 'project_code',
         },
-      },
+      ],
     ],
-  ],
-};
+  },
+});
 ```
 
-Now, run the Jest tests as usual.
+Now, run the Vitest tests as usual.
 Test results will be reported to a new test run in Qase.
 
 ```console
-$ npx jest
+$ npx vitest run
 Determining test suites to run...
 ...
 qase: Project DEMO exists
@@ -72,7 +74,7 @@ Ran all test suites.
 
 ## Using Reporter
 
-The Jest reporter has the ability to auto-generate test cases
+The Vitest reporter has the ability to auto-generate test cases
 and suites from your test data.
 
 But if necessary, you can independently register the ID of already
@@ -91,7 +93,8 @@ existing test cases from TMS before the executing tests. For example:
 - `qase.attach` - attach a file to the test case
 
 ```typescript
-const { qase } = require('jest-qase-reporter/jest');
+import { describe, it, test, expect } from 'vitest';
+import { qase, withQase } from 'vitest-qase-reporter/vitest';
 
 describe('My First Test', () => {
   test(qase([1, 2], 'Several ids'), () => {
@@ -99,7 +102,6 @@ describe('My First Test', () => {
   });
 
   test(qase(3, 'Correct test'), () => {
-    qase.title('Title');
     expect(true).toBe(true);
   });
 
@@ -113,10 +115,71 @@ describe('My First Test', () => {
 });
 ```
 
+### Advanced Usage with Annotations
+
+```typescript
+import { describe, it, expect } from 'vitest';
+import { qase, withQase } from 'vitest-qase-reporter/vitest';
+
+describe('Qase Annotations Example', () => {
+  it(qase(20, 'Basic test with qase ID'), () => {
+    expect(1 + 1).toBe(2);
+  });
+
+  it('Test with qase annotations', withQase(async ({ qase, annotate }) => {
+    // Set test title
+    await qase.title('Advanced Test with Annotations');
+    
+    // Add comment
+    await qase.comment('This test demonstrates qase annotations functionality');
+    
+    // Set suite
+    await qase.suite('Vitest Integration Suite');
+    
+    // Set fields
+    await qase.fields({
+      description: 'Test description for Qase',
+      severity: 'critical',
+      priority: 'high',
+      layer: 'e2e'
+    });
+    
+    // Set parameters
+    await qase.parameters({
+      environment: 'staging',
+      browser: 'chrome',
+      version: '1.0.0'
+    });
+    
+    // Add steps
+    await qase.step('Initialize test data', async () => {
+      expect(true).toBe(true);
+    });
+    
+    await qase.step('Execute main test logic', async () => {
+      expect(2 + 2).toBe(4);
+    });
+    
+    // Add attachment with content
+    await qase.attach({
+      name: 'test-data.json',
+      content: JSON.stringify({ test: 'data' }),
+      type: 'application/json'
+    });
+    
+    // Use regular annotate for custom annotations
+    await annotate('Custom annotation message', 'info');
+    
+    // Final assertion
+    expect(Math.max(1, 2, 3)).toBe(3);
+  }));
+});
+```
+
 To run tests and create a test run, execute the command (for example from folder examples):
 
 ```bash
-QASE_MODE=testops npx jest --runInBand
+QASE_MODE=testops npx vitest run
 ```
 
 or
@@ -124,10 +187,6 @@ or
 ```bash
 npm test
 ```
-
-<p align="center">
-  <img width="65%" src="./screenshots/screenshot.png">
-</p>
 
 A test run will be performed and available at:
 
@@ -141,42 +200,50 @@ Reporter options (* - required):
 
 - `mode` - `testops`/`off` Enables reporter, default - `off`
 - `debug` - Enables debug logging, default - `false`
-- `environment` - To execute with the sending of the envinroment information
+- `environment` - To execute with the sending of the environment information
+- `captureLogs` - Capture console logs, default - `false`
+- `uploadAttachments` - Upload attachments to Qase, default - `false`
 - *`testops.api.token` - Token for API access, you can generate it [here](https://developers.qase.io/#authentication).
 - *`testops.project` - [Your project's code](https://help.qase.io/en/articles/9787250-how-do-i-find-my-project-code)
+- `testops.api.baseUrl` - Qase API base URL (optional)
 - `testops.run.id` - Qase test run ID, used when the test run was created earlier using CLI or API call.
 - `testops.run.title` - Set custom Run name, when new run is created
 - `testops.run.description` - Set custom Run description, when new run is created
 - `testops.run.complete` - Whether the run should be completed
 
-Example `jest.config.js` config:
+Example `vitest.config.ts` config:
 
-```js
-module.exports = {
-  reporters: [
-    'default',
-    [
-      'jest-qase-reporter',
-      {
-        mode: 'testops',
-        testops: {
-          api: {
-            token: 'api_key'
+```typescript
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    reporters: [
+      'default',
+      [
+        'vitest-qase-reporter',
+        {
+          mode: 'testops',
+          testops: {
+            api: {
+              token: 'api_key'
+            },
+            project: 'project_code',
+            run: {
+              complete: true,
+            },
+            uploadAttachments: true,
           },
-          project: 'project_code',
-          run: {
-            complete: true,
-          },
+          debug: true,
+          captureLogs: true,
         },
-        debug: true,
-      },
+      ],
     ],
-  ],
-  ...
-};
+  },
+});
 ```
 
-You can check example configuration with multiple reporters in [example project](../examples/jest/jest.config.js).
+You can check example configuration with multiple reporters in [example project](../examples/vitest/vitest.config.ts).
 
 Supported ENV variables:
 
@@ -189,12 +256,16 @@ Supported ENV variables:
 - `QASE_TESTOPS_RUN_TITLE` - Same as `testops.run.title`
 - `QASE_TESTOPS_RUN_DESCRIPTION` - Same as `testops.run.description`
 
+## Documentation
+
+For detailed documentation and advanced usage, see [USAGE.md](./docs/usage.md).
+
 ## Requirements
 
 We maintain the reporter on LTS versions of Node. You can find the current versions by following
 the [link](https://nodejs.org/en/about/releases/)
 
-`jest >= 28.0.0`
+`vitest >= 3.0.0`
 
 <!-- references -->
 
