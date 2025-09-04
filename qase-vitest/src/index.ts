@@ -14,6 +14,9 @@ import {
   QaseReporter,
   TestResultType,
   TestStatusEnum,
+  TestStepType,
+  StepStatusEnum,
+  Attachment,
   composeOptions,
   ReporterInterface,
   ConfigType
@@ -24,6 +27,17 @@ export type VitestQaseOptionsType = ConfigType;
 export class VitestQaseReporter implements Reporter {
   private reporter: ReporterInterface;
   private currentSuite: string | undefined = undefined;
+  private testMetadata: Map<string, {
+    title?: string;
+    comment?: string;
+    suite?: string;
+    fields?: Record<string, string>;
+    parameters?: Record<string, string>;
+    groupParameters?: Record<string, string>;
+    currentStep?: string;
+    steps: Array<{ name: string; status: 'start' | 'end' | 'failed' }>;
+    attachments: Array<{ name: string; path?: string; content?: string; contentType?: string }>;
+  }> = new Map();
 
   /**
  * @type {RegExp}
@@ -106,8 +120,12 @@ export class VitestQaseReporter implements Reporter {
     const result = testCase.result();
     const qaseIds = VitestQaseReporter.getCaseId(testCase.name);
     const diagnostic = testCase.diagnostic();
+    const testId = testCase.id || testCase.name;
+    const metadata = this.testMetadata.get(testId);
 
-    const testResult = new TestResultType(VitestQaseReporter.removeQaseIdsFromTitle(testCase.name));
+    // Use title from metadata if available, otherwise use test name
+    const testTitle = metadata?.title || VitestQaseReporter.removeQaseIdsFromTitle(testCase.name);
+    const testResult = new TestResultType(testTitle);
     testResult.id = testCase.id || '';
     testResult.signature = testCase.fullName || testCase.name;
 
@@ -119,14 +137,15 @@ export class VitestQaseReporter implements Reporter {
     }
 
     // Set relations for test suite
-    if (this.currentSuite) {
+    const suiteToUse = metadata?.suite || this.currentSuite || this.extractSuiteFromTestCase(testCase);
+    if (suiteToUse) {
       testResult.relations = {
         suite: {
           data: [],
         },
       };
 
-      const suites = this.currentSuite.split(' - ');
+      const suites = suiteToUse.split(' - ');
       suites.forEach((suite) => {
         testResult.relations?.suite?.data.push({ title: suite.trim(), public_id: null });
       });
@@ -149,6 +168,62 @@ export class VitestQaseReporter implements Reporter {
       testResult.message = (result as any).note || null;
     }
 
+    // Add metadata from annotations
+    if (metadata) {
+      // Add comment if available - store in message field since execution doesn't have comment
+      if (metadata.comment) {
+        testResult.message = metadata.comment;
+      }
+
+      // Add fields if available
+      if (metadata.fields) {
+        testResult.fields = metadata.fields;
+      }
+
+      // Add parameters if available
+      if (metadata.parameters) {
+        testResult.params = metadata.parameters;
+      }
+
+      // Add group parameters if available
+      if (metadata.groupParameters) {
+        testResult.group_params = metadata.groupParameters;
+      }
+
+      // Add steps if available - create proper TestStepType objects
+      if (metadata.steps.length > 0) {
+        testResult.steps = metadata.steps.map(step => {
+          const stepObj = new TestStepType();
+          stepObj.id = Math.random().toString(36).substr(2, 9);
+          stepObj.data = {
+            action: step.name,
+            expected_result: null,
+            data: null
+          };
+          stepObj.execution.status = step.status === 'failed' ? StepStatusEnum.failed : StepStatusEnum.passed;
+          return stepObj;
+        });
+      }
+
+      // Add attachments if available
+      if (metadata.attachments.length > 0) {
+        testResult.attachments = metadata.attachments.map(attachment => {
+          const attachmentModel: Attachment = {
+            file_name: attachment.name,
+            mime_type: attachment.contentType || 'application/octet-stream',
+            file_path: attachment.path || null,
+            content: attachment.content || '',
+            size: attachment.content ? Buffer.byteLength(attachment.content) : 0,
+            id: Math.random().toString(36).substr(2, 9)
+          };
+          return attachmentModel;
+        });
+      }
+    }
+
+    // Clean up metadata after processing
+    this.testMetadata.delete(testId);
+
     return testResult;
   }
 
@@ -170,13 +245,98 @@ export class VitestQaseReporter implements Reporter {
   }
 
   onTestCaseAnnotate?(testCase: TestCase, annotation: TestAnnotation): void {
-    console.log('VitestQaseReporter.onTestCaseAnnotate called with:', this.safeStringify({
-      testCase: {
-        name: testCase.name,
-        type: testCase.type
-      },
-      annotation
-    }, 2));
+    const testId = testCase.id || testCase.name;
+    
+    // Initialize metadata if not exists
+    if (!this.testMetadata.has(testId)) {
+      this.testMetadata.set(testId, {
+        steps: [],
+        attachments: []
+      });
+    }
+    
+    const metadata = this.testMetadata.get(testId)!;
+    
+    // Process qase annotations
+    // Check if this is a qase annotation by looking at the message pattern
+    if (annotation.message && annotation.message.startsWith('Qase ')) {
+      const qaseType = annotation.message.split(':')[0]?.replace('Qase ', '').toLowerCase().replace(' ', '-') || '';
+      
+      switch (qaseType) {
+        case 'title':
+          metadata.title = annotation.message.replace('Qase Title: ', '');
+          break;
+          
+        case 'comment':
+          metadata.comment = annotation.message.replace('Qase Comment: ', '');
+          break;
+          
+        case 'suite':
+          metadata.suite = annotation.message.replace('Qase Suite: ', '');
+          break;
+          
+        case 'fields':
+          const fieldsData = annotation.message.replace('Qase Fields: ', '');
+          try {
+            metadata.fields = JSON.parse(fieldsData);
+          } catch (e) {
+            console.warn('Failed to parse qase fields:', fieldsData);
+          }
+          break;
+          
+        case 'parameters':
+          const parametersData = annotation.message.replace('Qase Parameters: ', '');
+          try {
+            metadata.parameters = JSON.parse(parametersData);
+          } catch (e) {
+            console.warn('Failed to parse qase parameters:', parametersData);
+          }
+          break;
+          
+        case 'group-parameters':
+          const groupParametersData = annotation.message.replace('Qase Group Parameters: ', '');
+          try {
+            metadata.groupParameters = JSON.parse(groupParametersData);
+          } catch (e) {
+            console.warn('Failed to parse qase group parameters:', groupParametersData);
+          }
+          break;
+          
+        case 'step-start':
+          const stepStartData = annotation.message.replace('Qase Step Start: ', '');
+          metadata.currentStep = stepStartData;
+          break;
+          
+        case 'step-end':
+          if (metadata.currentStep) {
+            metadata.steps.push({ name: metadata.currentStep, status: 'end' });
+            delete metadata.currentStep;
+          }
+          break;
+          
+        case 'step-failed':
+          if (metadata.currentStep) {
+            metadata.steps.push({ name: metadata.currentStep, status: 'failed' });
+            delete metadata.currentStep;
+          }
+          break;
+          
+        case 'attachment':
+          const attachmentName = annotation.message.replace('Qase Attachment: ', '');
+          const attachment = {
+            name: attachmentName,
+            ...(annotation.attachment?.path && { path: annotation.attachment.path }),
+            ...(annotation.attachment?.body && { 
+              content: typeof annotation.attachment.body === 'string' 
+                ? annotation.attachment.body 
+                : new TextDecoder().decode(annotation.attachment.body)
+            }),
+            ...(annotation.attachment?.contentType && { contentType: annotation.attachment.contentType })
+          };
+          metadata.attachments.push(attachment);
+          break;
+      }
+    }
   }
 
   // use for collecting information about test suite (save to variable and use for result reporting)
@@ -187,6 +347,22 @@ export class VitestQaseReporter implements Reporter {
   // use for removing information about test suite result
   onTestSuiteResult?(_testSuite: TestSuite): void {
     this.currentSuite = undefined;
+  }
+
+  private extractSuiteFromTestCase(testCase: TestCase): string | undefined {
+    // Extract suite from testCase.fullName or testCase.name
+    // Format is usually "Suite Name > Test Name" or just "Test Name"
+    const fullName = testCase.fullName || testCase.name;
+    const parts = fullName.split(' > ');
+    
+    if (parts.length > 1) {
+      // Return the suite part (everything except the last part)
+      return parts.slice(0, -1).join(' > ');
+    }
+    
+    // If no suite separator found, return undefined
+    // The test will be assigned to the default suite
+    return undefined;
   }
 
   onHookStart?(hook: ReportedHookContext): void {
