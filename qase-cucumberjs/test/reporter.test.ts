@@ -137,7 +137,7 @@ describe('CucumberQaseReporter', () => {
       testRunFinished: {} 
     } as unknown as Envelope;
     eventBroadcaster.emit('envelope', testRunFinishedEnvelope);
-    // Ждем завершения промиса
+    // Wait for promise completion
     await new Promise((resolve) => process.nextTick(resolve));
     expect(qaseReporterMock.publish).toHaveBeenCalled();
   });

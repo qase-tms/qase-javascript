@@ -1,1 +1,6 @@
 dist
+test/
+**/*.test.ts
+**/*.test.js
+**/*.spec.ts
+**/*.spec.js
