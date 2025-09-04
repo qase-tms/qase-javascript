@@ -1,0 +1,53 @@
+{
+  "name": "vitest-qase-reporter",
+  "version": "1.0.0",
+  "description": "Qase TMS Vitest Reporter",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      ".": [
+        "./dist/index.d.ts"
+      ]
+    }
+  },
+  "homepage": "https://github.com/qase-tms/qase-javascript",
+  "bugs": {
+    "url": "https://github.com/qase-tms/qase-javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qase-tms/qase-javascript.git"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "scripts": {
+    "build": "npm run clean && tsc --project tsconfig.build.json",
+    "lint": "eslint .",
+    "test": "jest --passWithNoTests",
+    "clean": "rm -rf dist"
+  },
+  "keywords": ["vitest", "qase", "reporter", "testing"],
+  "author": "Qase Team <support@qase.io>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "qase-javascript-commons": "~2.4.1"
+  },
+  "peerDependencies": {
+    "vitest": ">=3.0.0"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.5.0",
+    "@types/jest": "^29.5.2",
+    "@types/node": "^20.0.0",
+    "ajv": "^8.12.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.0"
+  }
+}
