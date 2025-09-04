@@ -1,33 +1,33 @@
 import { describe, it, expect } from 'vitest';
 
 describe('Simple Test Suite 1', () => {
-  it('should pass 1 [Q-101]', () => {
+  it('should pass 1', () => {
     expect(1 + 1).toBe(2);
   });
 
-  it('should fail 1 [Q-102]', () => {
+  it('should fail 1', () => {
     expect(1 + 1).toBe(3);
   });
 
-  it.skip('should be skipped 1 [Q-103]', () => {
+  it.skip('should be skipped 1', () => {
     expect(true).toBe(true);
   });
 
-  it('should pass with annotation [Q-104]', () => {
+  it('should pass with annotation', () => {
     expect(2 * 2).toBe(4);
   });
 });
 
 describe('Simple Test Suite 2', () => {
-  it('should pass 2 [Q-201]', () => {
+  it('should pass 2', () => {
     expect(1 + 1).toBe(2);
   });
 
-  it('should fail 2 [Q-202]', () => {
+  it('should fail 2', () => {
     expect(1 + 1).toBe(3);
   });
 
-  it.skip('should be skipped 2 [Q-203]', () => {
+  it.skip('should be skipped 2', () => {
     expect(true).toBe(true);
   });
 });
