@@ -1,0 +1,4 @@
+This is a test file for attachments demonstration.
+It contains some sample text that will be uploaded to Qase as an attachment.
+
+You can use this file to test the attachment functionality in your tests.
