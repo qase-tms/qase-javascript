@@ -1,3 +1,10 @@
+# qase-newman@2.1.4
+
+## What's new
+
+Fixed an issue where the start and end times were not properly set in the test results. Now results correctly display the
+start and end times.
+
 # qase-newman@2.1.1
 
 ## What's new

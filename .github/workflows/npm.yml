@@ -39,7 +39,7 @@ jobs:
     - uses: actions/setup-node@v4
       if: contains(github.event.ref, matrix.prefix)
       with:
-        node-version: '16'
+        node-version: '20'
         registry-url: 'https://registry.npmjs.org'
 
     - name: Install dependencies

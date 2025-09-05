@@ -245,14 +245,28 @@ export class NewmanQaseReporter {
 
         if (timer) {
           const now = Date.now();
-          pendingResult.execution.duration = now - timer;
-          pendingResult.execution.start_time = timer / 1000;
-          pendingResult.execution.end_time = now / 1000;
+          const durationMs = now - timer;
+          
+          // Ensure duration is not negative and times are valid
+          if (durationMs >= 0) {
+            pendingResult.execution.duration = Math.round(durationMs);
+            pendingResult.execution.start_time = timer / 1000;
+            pendingResult.execution.end_time = now / 1000;
+          } else {
+            // Fallback for edge cases where timer might be incorrect
+            pendingResult.execution.duration = 0;
+            pendingResult.execution.start_time = now / 1000;
+            pendingResult.execution.end_time = now / 1000;
+          }
         }
 
         pendingResult.params = this.prepareParameters(item, exec.cursor.iteration);
 
         void this.reporter.addTestResult(pendingResult);
+        
+        // Clean up timer and pending result after processing
+        this.timerMap.delete(item.id);
+        this.pendingResultMap.delete(item.id);
       }
     });
 
