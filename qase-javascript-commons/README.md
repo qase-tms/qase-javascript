@@ -59,6 +59,7 @@ All configuration options are listed in the table below:
 | Size of batch for sending test results                                                                                | `testops.batch.size`       | `QASE_TESTOPS_BATCH_SIZE`       | `200`                                   | No       | Any integer                |
 | Enable defects for failed test cases                                                                                  | `testops.defect`           | `QASE_TESTOPS_DEFECT`           | `False`                                 | No       | `True`, `False`            |
 | Enable/disable attachment uploads                                                                                     | `testops.uploadAttachments`        | `QASE_TESTOPS_UPLOAD_ATTACHMENTS`       | `true`                                  | No       | `True`, `False`            |
+| Filter test results by status (comma-separated list of statuses to exclude from reporting)                           | `testops.statusFilter`              | `QASE_TESTOPS_STATUS_FILTER`             | undefined                               | No       | Array of strings (`passed`, `failed`, `skipped`, `invalid`) |
 | Configuration values to create/find in groups (format: `group1=value1,group2=value2`)                                | `testops.configurations.values`     | `QASE_TESTOPS_CONFIGURATIONS_VALUES`     | undefined                               | No       | Comma-separated key=value pairs |
 | Create configuration groups if they don't exist                                                                       | `testops.configurations.createIfNotExists` | `QASE_TESTOPS_CONFIGURATIONS_CREATE_IF_NOT_EXISTS` | `false`                          | No       | `True`, `False`            |
 
@@ -97,6 +98,8 @@ All configuration options are listed in the table below:
     },
     "defect": false,
     "project": "<project_code>",
+    "uploadAttachments": true,
+    "statusFilter": ["passed", "skipped"],
     "batch": {
       "size": 100
     },
@@ -125,4 +128,7 @@ export QASE_TESTOPS_RUN_EXTERNAL_LINK='{"type":"jiraCloud","link":"PROJ-123"}'
 
 # Set external link for Jira Server
 export QASE_TESTOPS_RUN_EXTERNAL_LINK='{"type":"jiraServer","link":"PROJ-456"}'
+
+# Filter out test results with specific statuses
+export QASE_TESTOPS_STATUS_FILTER="passed,failed"
 ```

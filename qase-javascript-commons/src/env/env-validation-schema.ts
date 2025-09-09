@@ -60,6 +60,10 @@ export const envValidationSchema: JSONSchemaType<EnvType> = {
       type: 'boolean',
       nullable: true,
     },
+    [EnvTestOpsEnum.statusFilter]: {
+      type: 'string',
+      nullable: true,
+    },
 
     [EnvApiEnum.token]: {
       type: 'string',

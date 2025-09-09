@@ -1,3 +1,15 @@
+# qase-javascript-commons@2.4.2
+
+## What's new
+
+Added support for status filter in the test run.
+
+You can now filter out test results by status.
+The status filter is specified in the `testops.statusFilter` configuration option.
+The status filter is a comma-separated list of statuses to exclude from reporting.
+The statuses are: `passed`, `failed`, `skipped`, `invalid`.
+The status filter is applied to the test results before they are sent to Qase.
+
 # qase-javascript-commons@2.4.1
 
 ## What's new

@@ -49,6 +49,13 @@ jest.mock('qase-javascript-commons', () => ({
     failed: 'failed',
   },
   composeOptions: jest.fn().mockReturnValue({}),
+  determineTestStatus: jest.fn((error, originalStatus) => {
+    if (error) return 'failed';
+    if (originalStatus === 'passed') return 'passed';
+    if (originalStatus === 'pending') return 'skipped';
+    if (originalStatus === 'skipped') return 'skipped';
+    return 'failed';
+  }),
 }));
 
 describe('VitestQaseReporter - Main scenarios', () => {
@@ -62,37 +69,6 @@ describe('VitestQaseReporter - Main scenarios', () => {
     jest.clearAllMocks();
   });
 
-  describe('Test status conversion', () => {
-    it('should convert passed to TestStatusEnum.passed', () => {
-      const result = { state: 'passed' };
-      const status = reporter['convertStatus'](result as any);
-      expect(status).toBe('passed');
-    });
-
-    it('should convert failed to TestStatusEnum.failed', () => {
-      const result = { state: 'failed' };
-      const status = reporter['convertStatus'](result as any);
-      expect(status).toBe('failed');
-    });
-
-    it('should convert skipped to TestStatusEnum.skipped', () => {
-      const result = { state: 'skipped' };
-      const status = reporter['convertStatus'](result as any);
-      expect(status).toBe('skipped');
-    });
-
-    it('should convert pending to TestStatusEnum.skipped', () => {
-      const result = { state: 'pending' };
-      const status = reporter['convertStatus'](result as any);
-      expect(status).toBe('skipped');
-    });
-
-    it('should convert unknown status to TestStatusEnum.skipped', () => {
-      const result = { state: 'unknown' };
-      const status = reporter['convertStatus'](result as any);
-      expect(status).toBe('skipped');
-    });
-  });
 
   describe('Extracting Qase ID from test name', () => {
     it('should extract single Qase ID', () => {

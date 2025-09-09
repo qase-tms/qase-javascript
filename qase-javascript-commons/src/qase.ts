@@ -357,6 +357,12 @@ export class QaseReporter implements ReporterInterface {
    */
   public async addTestResult(result: TestResultType) {
     if (!this.disabled) {
+      // Check if result should be filtered out based on status
+      if (this.shouldFilterResult(result)) {
+        this.logger.logDebug(`Filtering out test result with status: ${result.execution.status}`);
+        return;
+      }
+
       await this.startTestRunOperation;
 
       this.logTestItem(result);
@@ -388,6 +394,30 @@ export class QaseReporter implements ReporterInterface {
         await this.addTestResultToFallback(result);
       }
     }
+  }
+
+  /**
+   * @param {TestResultType} result
+   * @private
+   */
+  private shouldFilterResult(result: TestResultType): boolean {
+    const statusFilter = this.options.testops?.statusFilter;
+    
+    if (!statusFilter || statusFilter.length === 0) {
+      return false;
+    }
+
+    // Convert TestStatusEnum to string for comparison
+    const statusString = result.execution.status.toString();
+    
+    this.logger.logDebug(`Checking filter: status="${statusString}", filter=${JSON.stringify(statusFilter)}`);
+    
+    // Check if the status is in the filter list
+    const shouldFilter = statusFilter.includes(statusString);
+    
+    this.logger.logDebug(`Filter result: ${shouldFilter ? 'FILTERED' : 'NOT FILTERED'}`);
+    
+    return shouldFilter;
   }
 
   /**
