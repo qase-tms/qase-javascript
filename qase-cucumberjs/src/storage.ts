@@ -18,6 +18,7 @@ import {
   TestResultType,
   TestStatusEnum,
   TestStepType,
+  determineTestStatus,
 } from 'qase-javascript-commons';
 import { TestCase } from '@cucumber/messages/dist/esm/src/messages';
 import { Status } from '@cucumber/cucumber';
@@ -190,7 +191,15 @@ export class Storage {
    */
   public addTestCaseStep(testCaseStep: TestStepFinished): void {
     const oldStatus = this.testCaseStartedResult[testCaseStep.testCaseStartedId];
-    const newStatus = Storage.statusMap[testCaseStep.testStepResult.status];
+    
+    // Create error object for status determination
+    let error: Error | null = null;
+    if (testCaseStep.testStepResult.message) {
+      error = new Error(testCaseStep.testStepResult.message);
+    }
+    
+    // Determine status based on error type
+    const newStatus = determineTestStatus(error, testCaseStep.testStepResult.status);
 
     this.testCaseSteps[testCaseStep.testStepId] = testCaseStep;
 
