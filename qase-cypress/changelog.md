@@ -1,3 +1,10 @@
+# cypress-qase-reporter@3.0.3
+
+## What's new
+
+- Added support for status filter in the test run.
+- Improved error handling.
+
 # cypress-qase-reporter@3.0.2
 
 ## What's new

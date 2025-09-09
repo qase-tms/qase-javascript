@@ -8,6 +8,7 @@ export interface TestOpsOptionsType {
   batch?: TestOpsBatchType;
   defect?: boolean | undefined;
   configurations?: TestOpsConfigurationType | undefined;
+  statusFilter?: string[] | undefined;
 }
 
 export interface TestOpsConfigurationType {

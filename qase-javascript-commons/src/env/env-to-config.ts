@@ -29,6 +29,7 @@ export const envToConfig = (env: EnvType): ConfigType => ({
   testops: {
     project: env[EnvTestOpsEnum.project],
     uploadAttachments: env[EnvTestOpsEnum.uploadAttachments],
+    statusFilter: env[EnvTestOpsEnum.statusFilter]?.split(',').map(status => status.trim()) ?? undefined,
 
     api: {
       token: env[EnvApiEnum.token],

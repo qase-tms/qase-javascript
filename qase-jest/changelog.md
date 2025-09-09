@@ -1,3 +1,10 @@
+# jest-qase-reporter@2.1.3
+
+## What's new
+
+- Added support for status filter in the test run.
+- Improved error handling.
+
 # jest-qase-reporter@2.1.0
 
 ## What's new

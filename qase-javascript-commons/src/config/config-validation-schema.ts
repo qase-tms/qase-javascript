@@ -171,6 +171,14 @@ export const configValidationSchema = {
           },
           required: ['values'],
         },
+
+        statusFilter: {
+          type: 'array',
+          items: {
+            type: 'string',
+          },
+          nullable: true,
+        },
       },
     },
 

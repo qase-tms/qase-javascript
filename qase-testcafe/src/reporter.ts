@@ -99,9 +99,11 @@ export class TestcafeQaseReporter {
     } else if (testRunInfo.errs.length > 0) {
       // Create error object for status determination
       const firstError = testRunInfo.errs[0];
-      const error = new Error(firstError?.errMsg || 'Test failed');
+      const error = new Error(firstError?.errMsg ?? 'Test failed');
       if (firstError?.callsite) {
-        error.stack = `Error: ${firstError.errMsg}\n    at ${firstError.callsite.filename}:${firstError.callsite.lineNum}`;
+        const filename = firstError.callsite.filename ?? 'unknown';
+        const lineNum = firstError.callsite.lineNum ?? 'unknown';
+        error.stack = `Error: ${firstError.errMsg}\n    at ${filename}:${lineNum}`;
       }
       
       return determineTestStatus(error, 'failed');

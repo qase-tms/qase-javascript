@@ -22,6 +22,11 @@ jest.mock('qase-javascript-commons', () => ({
     failed: 'failed',
   },
   generateSignature: jest.fn(() => 'mock-signature'),
+  determineTestStatus: jest.fn((error, originalStatus) => {
+    if (error) return 'failed';
+    if (originalStatus === 'passed') return 'passed';
+    return 'failed';
+  }),
   ConfigLoader: jest.fn().mockImplementation(() => ({
     load: jest.fn(() => ({})),
   })),

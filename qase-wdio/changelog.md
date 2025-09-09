@@ -1,3 +1,10 @@
+# qase-wdio@1.1.4
+
+## What's new
+
+- Added support for status filter in the test run.
+- Improved error handling.
+
 # qase-wdio@1.1.2
 
 ## What's new

@@ -1,3 +1,10 @@
+# qase-newman@2.1.5
+
+## What's new
+
+- Added support for status filter in the test run.
+- Improved error handling.
+
 # qase-newman@2.1.4
 
 ## What's new

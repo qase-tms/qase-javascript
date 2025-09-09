@@ -283,7 +283,7 @@ describe('Storage', () => {
       storage.addTestCaseStep(testStepFinished1);
       storage.addTestCaseStep(testStepFinished2);
 
-      expect((storage as any).testCaseStartedResult['started-1']).toBe(TestStatusEnum.failed);
+      expect((storage as any).testCaseStartedResult['started-1']).toBe(TestStatusEnum.invalid);
       expect((storage as any).testCaseStartedErrors['started-1']).toContain('First failure');
       expect((storage as any).testCaseStartedErrors['started-1']).toContain('Second failure');
     });
