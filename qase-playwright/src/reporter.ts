@@ -16,6 +16,7 @@ import {
   TestResultType,
   TestStatusEnum,
   TestStepType,
+  determineTestStatus,
 } from 'qase-javascript-commons';
 import { MetadataMessage, ReporterContentType } from './playwright';
 import { ReporterOptionsType } from './options';
@@ -386,11 +387,24 @@ export class PlaywrightQaseReporter implements Reporter {
     }
 
     const testTitle = this.removeQaseIdsFromTitle(test.title);
+    
+    // Convert CompoundError to regular Error for status determination
+    let errorForStatus: Error | null = null;
+    if (error) {
+      errorForStatus = new Error(error.message || 'Test failed');
+      if (error.stacktrace) {
+        errorForStatus.stack = error.stacktrace;
+      }
+    }
+    
+    // Determine status based on error type
+    const testStatus = determineTestStatus(errorForStatus, result.status);
+    
     const testResult: TestResultType = {
       attachments: testCaseMetadata.attachments,
       author: null,
       execution: {
-        status: PlaywrightQaseReporter.statusMap[result.status],
+        status: testStatus,
         start_time: result.startTime.valueOf() / 1000,
         end_time: null,
         duration: result.duration,

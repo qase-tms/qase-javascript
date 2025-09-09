@@ -18,6 +18,7 @@ import {
   TestResultType,
   TestStatusEnum,
   TestStepType,
+  determineTestStatus,
 } from 'qase-javascript-commons';
 
 import { configSchema } from './configSchema';
@@ -262,9 +263,7 @@ export class CypressQaseReporter extends reporters.Base {
       steps: steps,
       id: uuidv4(),
       execution: {
-        status: test.state
-          ? CypressQaseReporter.statusMap[test.state]
-          : TestStatusEnum.invalid,
+        status: determineTestStatus(test.err || null, test.state || 'failed'),
         start_time: this.testBeginTime / 1000,
         end_time: end_time / 1000,
         duration: duration,

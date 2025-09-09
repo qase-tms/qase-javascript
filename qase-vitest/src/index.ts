@@ -2,19 +2,18 @@ import type { Reporter } from 'vitest/reporters';
 import type { TestAnnotation } from '@vitest/runner';
 import type {
   TestCase,
-  TestSuite,
-  TestResult
+  TestSuite
 } from 'vitest/node';
 import {
   QaseReporter,
   TestResultType,
-  TestStatusEnum,
   TestStepType,
   StepStatusEnum,
   Attachment,
   composeOptions,
   ReporterInterface,
-  ConfigType
+  ConfigType,
+  determineTestStatus
 } from 'qase-javascript-commons';
 
 export type VitestQaseOptionsType = ConfigType;
@@ -76,23 +75,6 @@ export class VitestQaseReporter implements Reporter {
 
 
 
-  /**
-   * Convert Vitest test result status to Qase TestStatusEnum
-   */
-  private convertStatus(result: TestResult): TestStatusEnum {
-    switch (result.state) {
-      case 'passed':
-        return TestStatusEnum.passed;
-      case 'failed':
-        return TestStatusEnum.failed;
-      case 'skipped':
-        return TestStatusEnum.skipped;
-      case 'pending':
-        return TestStatusEnum.skipped;
-      default:
-        return TestStatusEnum.skipped;
-    }
-  }
 
   /**
    * Create TestResultType from Vitest TestCase
@@ -133,12 +115,21 @@ export class VitestQaseReporter implements Reporter {
     }
 
     // Set execution details
-    testResult.execution.status = this.convertStatus(result);
     testResult.execution.start_time = diagnostic?.startTime ? diagnostic.startTime / 1000 : null;
     testResult.execution.end_time = diagnostic?.startTime ? diagnostic.startTime / 1000 + diagnostic.duration : null;
     testResult.execution.duration = Math.round(diagnostic?.duration || 0);
 
+    // Create error object for status determination
+    let error: Error | null = null;
     if (result?.errors && result.errors.length > 0) {
+      const firstError = result.errors[0];
+      if (firstError && typeof firstError === 'object' && 'message' in firstError) {
+        error = new Error(String(firstError.message));
+        if ('stack' in firstError && firstError.stack) {
+          error.stack = String(firstError.stack);
+        }
+      }
+      
       testResult.execution.stacktrace = result.errors.map((error: unknown) => {
         if (error && typeof error === 'object' && 'stack' in error && 'message' in error) {
           return (error.stack as string) ?? (error.message as string) ?? String(error);
@@ -149,6 +140,9 @@ export class VitestQaseReporter implements Reporter {
         ? String(result.errors[0].message) ?? 'Test failed'
         : 'Test failed';
     }
+
+    // Determine status based on error type
+    testResult.execution.status = determineTestStatus(error, result.state);
 
     if (result.state === 'skipped') {
       testResult.message = result && typeof result === 'object' && 'note' in result ? (result.note as string) ?? null : null;

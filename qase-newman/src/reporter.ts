@@ -16,6 +16,7 @@ import {
   Relation,
   SuiteData,
   generateSignature,
+  determineTestStatus,
 } from 'qase-javascript-commons';
 
 export type NewmanQaseOptionsType = ConfigType;
@@ -228,8 +229,8 @@ export class NewmanQaseReporter {
         const pendingResult = this.pendingResultMap.get(item.id);
 
         if (pendingResult && err) {
-
-          pendingResult.execution.status = TestStatusEnum.failed;
+          // Determine status based on error type
+          pendingResult.execution.status = determineTestStatus(err, 'failed');
           pendingResult.execution.stacktrace = err.stack ?? null;
           pendingResult.message = err.message;
         }

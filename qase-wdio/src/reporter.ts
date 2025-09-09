@@ -21,6 +21,7 @@ import {
   TestResultType,
   TestStatusEnum,
   TestStepType,
+  determineTestStatus,
 } from 'qase-javascript-commons';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -301,7 +302,19 @@ export default class WDIOQaseReporter extends WDIOReporter {
     }
 
     testResult.execution.duration = testResult.execution.start_time ? Math.round(end_time - testResult.execution.start_time) : 0;
-    testResult.execution.status = status;
+    
+    // Convert CompoundError to regular Error for status determination
+    let error: Error | null = null;
+    if (err) {
+      error = new Error(err.message || 'Test failed');
+      if (err.stacktrace) {
+        error.stack = err.stacktrace;
+      }
+    }
+    
+    // Determine status based on error type
+    testResult.execution.status = determineTestStatus(error, status);
+    
     testResult.execution.stacktrace = err === null ?
       null : err.stacktrace === undefined ?
         null : err.stacktrace;

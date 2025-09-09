@@ -17,6 +17,7 @@ import {
   TestResultType,
   TestStatusEnum,
   TestStepType,
+  determineTestStatus,
 } from 'qase-javascript-commons';
 import { Qase } from './global';
 import { Metadata } from './models';
@@ -310,11 +311,14 @@ export class JestQaseReporter implements Reporter {
     const ids = JestQaseReporter.getCaseId(value.title);
     const filePath = this.getCurrentTestPath(path);
 
+    // Determine status based on error type
+    const testStatus = determineTestStatus(error || null, value.status);
+
     return {
       attachments: [],
       author: null,
       execution: {
-        status: JestQaseReporter.statusMap[value.status],
+        status: testStatus,
         start_time: null,
         end_time: null,
         duration: value.duration ?? 0,
