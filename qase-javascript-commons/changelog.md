@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.4.3
+
+## What's new
+
+Fixed an issue with the `report` mode not sending results.
+
 # qase-javascript-commons@2.4.2
 
 ## What's new
