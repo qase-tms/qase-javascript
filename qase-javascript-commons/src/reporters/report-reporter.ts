@@ -91,8 +91,6 @@ export class ReportReporter extends AbstractReporter {
   }
 
   public async complete(): Promise<void> {
-    this.writer.clearPreviousResults();
-
     const report: Report = {
       title: 'Test report',
       execution: {

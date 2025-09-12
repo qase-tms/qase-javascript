@@ -61,8 +61,6 @@ describe('ReportReporter', () => {
     reporter['results'] = [testResult];
     await reporter.sendResults();
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(writer.clearPreviousResults).toHaveBeenCalled();
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(writer.writeAttachment).toHaveBeenCalled();
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(writer.writeTestResult).toHaveBeenCalledWith(expect.objectContaining({ id: 't1' }));
@@ -95,8 +93,6 @@ describe('ReportReporter', () => {
   it('should write report and log path on complete', async () => {
     reporter['results'] = [];
     await reporter.complete();
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(writer.clearPreviousResults).toHaveBeenCalled();
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(writer.writeReport).toHaveBeenCalled();
     // eslint-disable-next-line @typescript-eslint/unbound-method
