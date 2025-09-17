@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { BaseResponse } from './base-response';
 import { PlanDetailed } from './plan-detailed';
 import { PlanResponseAllOf } from './plan-response-all-of';

@@ -13,8 +13,6 @@
  */
 
 
-import { ParameterSingle } from './parameter-single';
-
 /**
  * 
  * @export
@@ -27,12 +25,6 @@ export interface TestCaseParameterBase {
      * @memberof TestCaseParameterBase
      */
     'type': string;
-    /**
-     * 
-     * @type {Array<ParameterSingle>}
-     * @memberof TestCaseParameterBase
-     */
-    'items': Array<ParameterSingle>;
     /**
      * 
      * @type {string}

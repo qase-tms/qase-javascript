@@ -1,60 +1,126 @@
 # SearchResponseAllOfResultEntities
 
-Represents an entity returned in search results from Qase TMS. This model can represent different types of entities including test cases, test runs, defects, and more.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **number** | Unique identifier of the entity | optional
-**type** | **string** | Type of the entity (case, run, defect, etc.) | optional
-**title** | **string** | Title or name of the entity | optional
-**description** | **string** | Detailed description of the entity | optional
-**status** | **string** | Current status of the entity | optional
-**status_text** | **string** | Human-readable status representation | optional
-**project_code** | **string** | Code of the project the entity belongs to | optional
+**run_id** | **number** |  | [default to undefined]
+**plan_id** | **number** |  | [default to undefined]
+**result_hash** | **string** |  | [default to undefined]
+**requirement_id** | **number** |  | [default to undefined]
+**test_case_id** | **number** |  | [default to undefined]
+**defect_id** | **number** |  | [default to undefined]
+**id** | **number** |  | [optional] [default to undefined]
+**title** | **string** |  | [optional] [default to undefined]
+**description** | **string** |  | [optional] [default to undefined]
+**status** | **string** |  | [optional] [default to undefined]
+**status_text** | **string** |  | [optional] [default to undefined]
+**start_time** | **string** |  | [optional] [default to undefined]
+**end_time** | **string** |  | [optional] [default to undefined]
+**_public** | **boolean** |  | [optional] [default to undefined]
+**stats** | [**RunStats**](RunStats.md) |  | [optional] [default to undefined]
+**time_spent** | **number** | Time in ms. | [optional] [default to undefined]
+**elapsed_time** | **number** | Time in ms. | [optional] [default to undefined]
+**environment** | [**RunEnvironment**](RunEnvironment.md) |  | [optional] [default to undefined]
+**milestone** | [**RunMilestone**](RunMilestone.md) |  | [optional] [default to undefined]
+**custom_fields** | [**Array&lt;CustomFieldValue&gt;**](CustomFieldValue.md) |  | [optional] [default to undefined]
+**tags** | [**Array&lt;TagValue&gt;**](TagValue.md) |  | [optional] [default to undefined]
+**cases** | **Array&lt;number&gt;** |  | [optional] [default to undefined]
+**hash** | **string** |  | [optional] [default to undefined]
+**comment** | **string** |  | [optional] [default to undefined]
+**stacktrace** | **string** |  | [optional] [default to undefined]
+**case_id** | **number** |  | [optional] [default to undefined]
+**steps** | [**Array&lt;TestStep&gt;**](TestStep.md) |  | [optional] [default to undefined]
+**is_api_result** | **boolean** |  | [optional] [default to undefined]
+**time_spent_ms** | **number** |  | [optional] [default to undefined]
+**attachments** | [**Array&lt;Attachment&gt;**](Attachment.md) |  | [optional] [default to undefined]
+**parent_id** | **number** |  | [optional] [default to undefined]
+**member_id** | **number** | Deprecated, use &#x60;author_id&#x60; instead. | [optional] [default to undefined]
+**type** | **number** |  | [optional] [default to undefined]
+**created_at** | **string** |  | [optional] [default to undefined]
+**updated_at** | **string** |  | [optional] [default to undefined]
+**position** | **number** |  | [optional] [default to undefined]
+**preconditions** | **string** |  | [optional] [default to undefined]
+**postconditions** | **string** |  | [optional] [default to undefined]
+**severity** | **string** |  | [optional] [default to undefined]
+**priority** | **number** |  | [optional] [default to undefined]
+**layer** | **number** |  | [optional] [default to undefined]
+**is_flaky** | **number** |  | [optional] [default to undefined]
+**behavior** | **number** |  | [optional] [default to undefined]
+**automation** | **number** |  | [optional] [default to undefined]
+**milestone_id** | **number** |  | [optional] [default to undefined]
+**suite_id** | **number** |  | [optional] [default to undefined]
+**steps_type** | **string** |  | [optional] [default to undefined]
+**params** | [**QqlTestCaseParams**](QqlTestCaseParams.md) |  | [optional] [default to undefined]
+**author_id** | **number** |  | [optional] [default to undefined]
+**updated_by** | **number** | Author ID of the last update. | [optional] [default to undefined]
+**actual_result** | **string** |  | [optional] [default to undefined]
+**resolved** | **string** |  | [optional] [default to undefined]
+**external_data** | **string** |  | [optional] [default to undefined]
+**cases_count** | **number** |  | [optional] [default to undefined]
 
-### Test Run Specific Fields
+## Example
 
-**run_id** | **number** | Unique identifier of the test run | optional
-**start_time** | **Date** | When the test run started | optional
-**end_time** | **Date** | When the test run completed | optional
-**public** | **boolean** | Whether the run is publicly accessible | optional
-**stats** | [**RunStats**](RunStats.md) | Test execution statistics | optional
-**time_spent** | **number** | Time spent in milliseconds | optional
-**elapsed_time** | **number** | Total elapsed time in milliseconds | optional
-**environment** | [**RunEnvironment**](RunEnvironment.md) | Environment configuration | optional
-**milestone** | [**RunMilestone**](RunMilestone.md) | Associated milestone | optional
+```typescript
+import { SearchResponseAllOfResultEntities } from 'qase-api-client';
 
-### Test Case Specific Fields
-
-**case_id** | **number** | Unique identifier of the test case | optional
-**suite_id** | **number** | ID of the test suite containing the case | optional
-**priority** | **number** | Test case priority level | optional
-**severity** | **string** | Test case severity level | optional
-**behavior** | **number** | Test case behavior type | optional
-**automation** | **number** | Automation status | optional
-**is_flaky** | **number** | Whether the test case is marked as flaky | optional
-**preconditions** | **string** | Test case preconditions | optional
-**postconditions** | **string** | Test case postconditions | optional
-**params** | [**TestCaseParams**](TestCaseParams.md) | Test case parameters | optional
-
-### Test Result Specific Fields
-
-**result_hash** | **string** | Unique hash of the test result | optional
-**comment** | **string** | Result comment or notes | optional
-**stacktrace** | **string** | Error stacktrace if failed | optional
-**steps** | [**TestStep[]**](TestStep.md) | Test execution steps | optional
-**is_api_result** | **boolean** | Whether result was submitted via API | optional
-**attachments** | [**Attachment[]**](Attachment.md) | Attached files | optional
-
-### Common Fields
-
-**custom_fields** | [**CustomFieldValue[]**](CustomFieldValue.md) | Custom field values | optional
-**tags** | [**TagValue[]**](TagValue.md) | Associated tags | optional
-**created_at** | **Date** | Creation timestamp | optional
-**updated_at** | **Date** | Last update timestamp | optional
-**author_id** | **number** | ID of the entity creator | optional
-**updated_by** | **number** | ID of the user who last updated the entity | optional
+const instance: SearchResponseAllOfResultEntities = {
+    run_id,
+    plan_id,
+    result_hash,
+    requirement_id,
+    test_case_id,
+    defect_id,
+    id,
+    title,
+    description,
+    status,
+    status_text,
+    start_time,
+    end_time,
+    _public,
+    stats,
+    time_spent,
+    elapsed_time,
+    environment,
+    milestone,
+    custom_fields,
+    tags,
+    cases,
+    hash,
+    comment,
+    stacktrace,
+    case_id,
+    steps,
+    is_api_result,
+    time_spent_ms,
+    attachments,
+    parent_id,
+    member_id,
+    type,
+    created_at,
+    updated_at,
+    position,
+    preconditions,
+    postconditions,
+    severity,
+    priority,
+    layer,
+    is_flaky,
+    behavior,
+    automation,
+    milestone_id,
+    suite_id,
+    steps_type,
+    params,
+    author_id,
+    updated_by,
+    actual_result,
+    resolved,
+    external_data,
+    cases_count,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -1,12 +1,22 @@
 # ResultCreateResponseAllOfResult
 
-Represents the result details returned in the response after creating a test result in Qase TMS.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**case_id** | **number** | ID of the test case for which the result was created | optional
-**hash** | **string** | Unique hash identifier of the created result | optional
+**case_id** | **number** |  | [optional] [default to undefined]
+**hash** | **string** |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { ResultCreateResponseAllOfResult } from 'qase-api-client';
+
+const instance: ResultCreateResponseAllOfResult = {
+    case_id,
+    hash,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

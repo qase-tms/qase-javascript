@@ -12,15 +12,14 @@
  * Do not edit the class manually.
  */
 
-
 import { ParameterGroup } from './parameter-group';
 import { ParameterShared } from './parameter-shared';
 import { ParameterSingle } from './parameter-single';
 
 /**
- * @type TestCaseParametercreate
+ * @type TestCaseParameterCreate
  * @export
  */
-export type TestCaseParametercreate = ParameterGroup | ParameterShared | ParameterSingle;
+export type TestCaseParameterCreate = ParameterGroup | ParameterShared | ParameterSingle;
 
 

@@ -1,12 +1,22 @@
 # ProjectCountsDefects
 
-Represents statistics about defects in a project in Qase TMS.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**total** | **number** | Total number of defects in the project | optional
-**open** | **number** | Number of currently open defects | optional
+**total** | **number** |  | [optional] [default to undefined]
+**open** | **number** |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { ProjectCountsDefects } from 'qase-api-client';
+
+const instance: ProjectCountsDefects = {
+    total,
+    open,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

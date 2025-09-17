@@ -1,12 +1,22 @@
 # PlanDetailedAllOfCases
 
-Represents a test case within a detailed test plan in Qase TMS.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**case_id** | **number** | Unique identifier of the test case | optional
-**assignee_id** | **number** | ID of the user assigned to execute this test case | optional
+**case_id** | **number** |  | [optional] [default to undefined]
+**assignee_id** | **number** |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { PlanDetailedAllOfCases } from 'qase-api-client';
+
+const instance: PlanDetailedAllOfCases = {
+    case_id,
+    assignee_id,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

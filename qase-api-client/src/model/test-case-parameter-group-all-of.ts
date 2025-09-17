@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-
+import { ParameterSingle } from './parameter-single';
 
 /**
  * Group parameter
@@ -22,16 +22,16 @@
 export interface TestCaseParameterGroupAllOf {
     /**
      * 
+     * @type {Array<ParameterSingle>}
+     * @memberof TestCaseParameterGroupAllOf
+     */
+    'items': Array<ParameterSingle>;
+    /**
+     * 
      * @type {string}
      * @memberof TestCaseParameterGroupAllOf
      */
     'type'?: TestCaseParameterGroupAllOfTypeEnum;
-    /**
-     * 
-     * @type {object}
-     * @memberof TestCaseParameterGroupAllOf
-     */
-    'items'?: object;
 }
 
 /**

@@ -1,211 +1,322 @@
 # EnvironmentsApi
 
-All URIs are relative to *<https://api.qase.io/v1>*
+All URIs are relative to *https://api.qase.io/v1*
 
-| Method | HTTP request | Description |
-| ------------- | ------------- | ------------- |
-| [**createEnvironment**](EnvironmentsApi.md#createEnvironment) | **POST** /environment/{code} | Create a new environment |
-| [**deleteEnvironment**](EnvironmentsApi.md#deleteEnvironment) | **DELETE** /environment/{code}/{id} | Delete environment |
-| [**getEnvironment**](EnvironmentsApi.md#getEnvironment) | **GET** /environment/{code}/{id} | Get a specific environment |
-| [**getEnvironments**](EnvironmentsApi.md#getEnvironments) | **GET** /environment/{code} | Get all environments |
-| [**updateEnvironment**](EnvironmentsApi.md#updateEnvironment) | **PATCH** /environment/{code}/{id} | Update environment |
+|Method | HTTP request | Description|
+|------------- | ------------- | -------------|
+|[**createEnvironment**](#createenvironment) | **POST** /environment/{code} | Create a new environment|
+|[**deleteEnvironment**](#deleteenvironment) | **DELETE** /environment/{code}/{id} | Delete environment|
+|[**getEnvironment**](#getenvironment) | **GET** /environment/{code}/{id} | Get a specific environment|
+|[**getEnvironments**](#getenvironments) | **GET** /environment/{code} | Get all environments|
+|[**updateEnvironment**](#updateenvironment) | **PATCH** /environment/{code}/{id} | Update environment|
 
-## createEnvironment
+# **createEnvironment**
+> IdResponse createEnvironment(environmentCreate)
 
-Create a new environment
-
-This method allows to create an environment in the project.
-
-### Example
-
-```typescript
-import { EnvironmentsApi, Configuration } from 'qase-api-client';
-
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v2"
-});
-configuration.apiKey = process.env.API_KEY;
-
-const api = new EnvironmentsApi(configuration);
-
-const environment = {
-    title: 'Staging Environment',
-    description: 'Staging environment for testing',
-    host: 'staging.example.com',
-    variables: {
-        API_URL: 'https://api.staging.example.com',
-        DB_HOST: 'db.staging.example.com'
-    }
-};
-
-const response = await api.createEnvironment('PROJECT_CODE', environment);
-console.log(`Created environment with ID: ${response.result.id}`);
-```
-
-### Parameters
-
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to create environment. |
-| **environmentCreate** | [**EnvironmentCreate**](EnvironmentCreate.md) |  |
-
-### Return type
-
-[**IdResponse**](IdResponse.md)
-
-## deleteEnvironment
-
-Delete environment
-
-This method allows to delete an environment.
+This method allows to create an environment in selected project. 
 
 ### Example
 
 ```typescript
-import { EnvironmentsApi, Configuration } from 'qase-api-client';
+import {
+    EnvironmentsApi,
+    Configuration,
+    EnvironmentCreate
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new EnvironmentsApi(configuration);
 
-const api = new EnvironmentsApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let environmentCreate: EnvironmentCreate; //
 
-const response = await api.deleteEnvironment('PROJECT_CODE', 1);
-console.log(`Environment deleted: ${response.result}`);
+const { status, data } = await apiInstance.createEnvironment(
+    code,
+    environmentCreate
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to delete environment. |
-| **id** | **number** | ID of environment. |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **environmentCreate** | **EnvironmentCreate**|  | |
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+
 
 ### Return type
 
-[**IdResponse**](IdResponse.md)
+**IdResponse**
 
-## getEnvironment
+### Authorization
 
-Get a specific environment
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to retrieve a specific environment.
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deleteEnvironment**
+> IdResponse deleteEnvironment()
+
+This method completely deletes an environment from repository. 
 
 ### Example
 
 ```typescript
-import { EnvironmentsApi, Configuration } from 'qase-api-client';
+import {
+    EnvironmentsApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new EnvironmentsApi(configuration);
 
-const api = new EnvironmentsApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let id: number; //Identifier. (default to undefined)
 
-const response = await api.getEnvironment('PROJECT_CODE', 1);
-console.log(`Environment title: ${response.result.title}`);
-console.log(`Description: ${response.result.description}`);
-console.log(`Host: ${response.result.host}`);
-console.log(`Variables: ${JSON.stringify(response.result.variables)}`);
+const { status, data } = await apiInstance.deleteEnvironment(
+    code,
+    id
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to get environment. |
-| **id** | **number** | ID of environment. |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **id** | [**number**] | Identifier. | defaults to undefined|
+
 
 ### Return type
 
-[**EnvironmentResponse**](EnvironmentResponse.md)
+**IdResponse**
 
-## getEnvironments
+### Authorization
 
-Get all environments
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to retrieve all environments stored in selected project.
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A Result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getEnvironment**
+> EnvironmentResponse getEnvironment()
+
+This method allows to retrieve a specific environment. 
 
 ### Example
 
 ```typescript
-import { EnvironmentsApi, Configuration } from 'qase-api-client';
+import {
+    EnvironmentsApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new EnvironmentsApi(configuration);
 
-const api = new EnvironmentsApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let id: number; //Identifier. (default to undefined)
 
-const response = await api.getEnvironments('PROJECT_CODE');
-console.log(`Total environments: ${response.result.total}`);
-console.log(`Filtered: ${response.result.filtered}`);
-console.log(`Count: ${response.result.count}`);
-
-response.result.entities.forEach(environment => {
-    console.log(`Title: ${environment.title}`);
-    console.log(`ID: ${environment.id}`);
-    console.log(`Host: ${environment.host}`);
-    console.log('---');
-});
+const { status, data } = await apiInstance.getEnvironment(
+    code,
+    id
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to get environments. |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **id** | [**number**] | Identifier. | defaults to undefined|
+
 
 ### Return type
 
-[**EnvironmentListResponse**](EnvironmentListResponse.md)
+**EnvironmentResponse**
 
-## updateEnvironment
+### Authorization
 
-Update environment
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to update an environment.
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | An environment. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getEnvironments**
+> EnvironmentListResponse getEnvironments()
+
+This method allows to retrieve all environments stored in selected project. 
 
 ### Example
 
 ```typescript
-import { EnvironmentsApi, Configuration } from 'qase-api-client';
+import {
+    EnvironmentsApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new EnvironmentsApi(configuration);
 
-const api = new EnvironmentsApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let search: string; //A search string. Will return all environments with titles containing provided string.  (optional) (default to undefined)
+let slug: string; //A search string.  Will return all environments with slugs equal to provided string.  (optional) (default to undefined)
+let limit: number; //A number of entities in result set. (optional) (default to 10)
+let offset: number; //How many entities should be skipped. (optional) (default to 0)
 
-const environment = {
-    title: 'Updated Staging Environment',
-    description: 'Updated staging environment for testing',
-    host: 'staging.updated.example.com',
-    variables: {
-        API_URL: 'https://api.staging.updated.example.com',
-        DB_HOST: 'db.staging.updated.example.com'
-    }
-};
-
-const response = await api.updateEnvironment('PROJECT_CODE', 1, environment);
-console.log(`Updated environment with ID: ${response.result.id}`);
+const { status, data } = await apiInstance.getEnvironments(
+    code,
+    search,
+    slug,
+    limit,
+    offset
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to update environment. |
-| **id** | **number** | ID of environment. |
-| **environmentUpdate** | [**EnvironmentUpdate**](EnvironmentUpdate.md) |  |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **search** | [**string**] | A search string. Will return all environments with titles containing provided string.  | (optional) defaults to undefined|
+| **slug** | [**string**] | A search string.  Will return all environments with slugs equal to provided string.  | (optional) defaults to undefined|
+| **limit** | [**number**] | A number of entities in result set. | (optional) defaults to 10|
+| **offset** | [**number**] | How many entities should be skipped. | (optional) defaults to 0|
+
 
 ### Return type
 
-[**IdResponse**](IdResponse.md)
+**EnvironmentListResponse**
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A list of all environments. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateEnvironment**
+> IdResponse updateEnvironment(environmentUpdate)
+
+This method updates an environment. 
+
+### Example
+
+```typescript
+import {
+    EnvironmentsApi,
+    Configuration,
+    EnvironmentUpdate
+} from 'qase-api-client';
+
+const configuration = new Configuration();
+const apiInstance = new EnvironmentsApi(configuration);
+
+let code: string; //Code of project, where to search entities. (default to undefined)
+let id: number; //Identifier. (default to undefined)
+let environmentUpdate: EnvironmentUpdate; //
+
+const { status, data } = await apiInstance.updateEnvironment(
+    code,
+    id,
+    environmentUpdate
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **environmentUpdate** | **EnvironmentUpdate**|  | |
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **id** | [**number**] | Identifier. | defaults to undefined|
+
+
+### Return type
+
+**IdResponse**
+
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

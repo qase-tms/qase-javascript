@@ -13,24 +13,41 @@
  */
 
 
-
 /**
  * 
  * @export
- * @interface RunexternalIssuesLinksInner
+ * @interface User
  */
-export interface RunexternalIssuesLinksInner {
+export interface User {
     /**
      * 
      * @type {number}
-     * @memberof RunexternalIssuesLinksInner
+     * @memberof User
      */
-    'run_id': number;
+    'id'?: number;
     /**
-     * An external issue identifier, e.g. \"PROJ-1234\". Or null if you want to remove the link.
+     * 
      * @type {string}
-     * @memberof RunexternalIssuesLinksInner
+     * @memberof User
      */
-    'external_issue'?: string | null;
+    'name'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof User
+     */
+    'email'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof User
+     */
+    'title'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof User
+     */
+    'status'?: number;
 }
 

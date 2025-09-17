@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
 import { Configuration } from '../configuration';
 // Some imports not used depending on template conditions
@@ -27,6 +26,8 @@ import { HashResponse } from '../model';
 // @ts-ignore
 import { ResultCreate } from '../model';
 // @ts-ignore
+import { ResultCreateBulk } from '../model';
+// @ts-ignore
 import { ResultCreateResponse } from '../model';
 // @ts-ignore
 import { ResultListResponse } from '../model';
@@ -34,8 +35,6 @@ import { ResultListResponse } from '../model';
 import { ResultResponse } from '../model';
 // @ts-ignore
 import { ResultUpdate } from '../model';
-// @ts-ignore
-import { ResultcreateBulk } from '../model';
 /**
  * ResultsApi - axios parameter creator
  * @export
@@ -94,17 +93,17 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
          * @summary Bulk create test run result
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
-         * @param {ResultcreateBulk} resultcreateBulk 
+         * @param {ResultCreateBulk} resultCreateBulk 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createResultBulk: async (code: string, id: number, resultcreateBulk: ResultcreateBulk, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createResultBulk: async (code: string, id: number, resultCreateBulk: ResultCreateBulk, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('createResultBulk', 'code', code)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('createResultBulk', 'id', id)
-            // verify required parameter 'resultcreateBulk' is not null or undefined
-            assertParamExists('createResultBulk', 'resultcreateBulk', resultcreateBulk)
+            // verify required parameter 'resultCreateBulk' is not null or undefined
+            assertParamExists('createResultBulk', 'resultCreateBulk', resultCreateBulk)
             const localVarPath = `/result/{code}/{id}/bulk`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
@@ -129,7 +128,7 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(resultcreateBulk, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(resultCreateBulk, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -383,12 +382,12 @@ export const ResultsApiFp = function(configuration?: Configuration) {
          * @summary Bulk create test run result
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
-         * @param {ResultcreateBulk} resultcreateBulk 
+         * @param {ResultCreateBulk} resultCreateBulk 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createResultBulk(code: string, id: number, resultcreateBulk: ResultcreateBulk, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createResultBulk(code, id, resultcreateBulk, options);
+        async createResultBulk(code: string, id: number, resultCreateBulk: ResultCreateBulk, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createResultBulk(code, id, resultCreateBulk, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -477,12 +476,12 @@ export const ResultsApiFactory = function (configuration?: Configuration, basePa
          * @summary Bulk create test run result
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
-         * @param {ResultcreateBulk} resultcreateBulk 
+         * @param {ResultCreateBulk} resultCreateBulk 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createResultBulk(code: string, id: number, resultcreateBulk: ResultcreateBulk, options?: any): AxiosPromise<BaseResponse> {
-            return localVarFp.createResultBulk(code, id, resultcreateBulk, options).then((request) => request(axios, basePath));
+        createResultBulk(code: string, id: number, resultCreateBulk: ResultCreateBulk, options?: any): AxiosPromise<BaseResponse> {
+            return localVarFp.createResultBulk(code, id, resultCreateBulk, options).then((request) => request(axios, basePath));
         },
         /**
          * This method allows to delete test run result. 
@@ -568,13 +567,13 @@ export class ResultsApi extends BaseAPI {
      * @summary Bulk create test run result
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
-     * @param {ResultcreateBulk} resultcreateBulk 
+     * @param {ResultCreateBulk} resultCreateBulk 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ResultsApi
      */
-    public createResultBulk(code: string, id: number, resultcreateBulk: ResultcreateBulk, options?: AxiosRequestConfig) {
-        return ResultsApiFp(this.configuration).createResultBulk(code, id, resultcreateBulk, options).then((request) => request(this.axios, this.basePath));
+    public createResultBulk(code: string, id: number, resultCreateBulk: ResultCreateBulk, options?: AxiosRequestConfig) {
+        return ResultsApiFp(this.configuration).createResultBulk(code, id, resultCreateBulk, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

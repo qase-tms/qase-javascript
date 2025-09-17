@@ -1,12 +1,22 @@
 # ResultListResponse
 
-Represents the response model returned when retrieving a list of test results from Qase TMS.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**status** | **boolean** | Operation success status | optional
-**result** | [**ResultListResponseAllOfResult**](ResultListResponseAllOfResult.md) | List of test results with pagination info | optional
+**status** | **boolean** |  | [optional] [default to undefined]
+**result** | [**ResultListResponseAllOfResult**](ResultListResponseAllOfResult.md) |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { ResultListResponse } from 'qase-api-client';
+
+const instance: ResultListResponse = {
+    status,
+    result,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

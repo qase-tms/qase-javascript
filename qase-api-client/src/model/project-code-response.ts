@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { BaseResponse } from './base-response';
 import { ProjectCodeResponseAllOf } from './project-code-response-all-of';
 import { ProjectCodeResponseAllOfResult } from './project-code-response-all-of-result';

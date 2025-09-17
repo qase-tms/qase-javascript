@@ -1,20 +1,42 @@
 # SharedStep
 
-Represents a reusable test step that can be shared across multiple test cases in Qase TMS.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**hash** | **string** | Unique identifier of the shared step | optional
-**title** | **string** | Title or name of the shared step | optional
-**action** | **string** | Description of the action to perform | optional
-**expected_result** | **string** | Expected outcome of the action | optional
-**steps** | [**SharedStepContent[]**](SharedStepContent.md) | List of sub-steps if this is a multi-step action | optional
-**data** | **string** | Additional test data for the step | optional
-**cases** | **number[]** | List of test case IDs using this shared step | optional
-**cases_count** | **number** | Total number of test cases using this step | optional
-**created_at** | **Date** | Creation timestamp | optional
-**updated_at** | **Date** | Last update timestamp | optional
+**hash** | **string** |  | [optional] [default to undefined]
+**title** | **string** |  | [optional] [default to undefined]
+**action** | **string** |  | [optional] [default to undefined]
+**expected_result** | **string** |  | [optional] [default to undefined]
+**steps** | [**Array&lt;SharedStepContent&gt;**](SharedStepContent.md) |  | [optional] [default to undefined]
+**data** | **string** |  | [optional] [default to undefined]
+**cases** | **Array&lt;number&gt;** |  | [optional] [default to undefined]
+**cases_count** | **number** |  | [optional] [default to undefined]
+**created** | **string** | Deprecated, use the &#x60;created_at&#x60; property instead. | [optional] [default to undefined]
+**updated** | **string** | Deprecated, use the &#x60;updated_at&#x60; property instead. | [optional] [default to undefined]
+**created_at** | **string** |  | [optional] [default to undefined]
+**updated_at** | **string** |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { SharedStep } from 'qase-api-client';
+
+const instance: SharedStep = {
+    hash,
+    title,
+    action,
+    expected_result,
+    steps,
+    data,
+    cases,
+    cases_count,
+    created,
+    updated,
+    created_at,
+    updated_at,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -1,160 +1,243 @@
 # AttachmentsApi
 
-All URIs are relative to *<https://api.qase.io/v1>*
+All URIs are relative to *https://api.qase.io/v1*
 
-| Method                                                     | HTTP request                         | Description       |
-| ---------------------------------------------------------- | ------------------------------------ | ----------------- |
-| [**getAttachments**](AttachmentsApi.md#getAttachments)     | **GET** /attachment                  | Get attachments   |
-| [**uploadAttachment**](AttachmentsApi.md#uploadAttachment) | **POST** /attachment/{code}          | Upload attachment |
-| [**getAttachment**](AttachmentsApi.md#getAttachment)       | **GET** /attachment/{code}/{hash}    | Get attachment    |
-| [**deleteAttachment**](AttachmentsApi.md#deleteAttachment) | **DELETE** /attachment/{code}/{hash} | Delete attachment |
+|Method | HTTP request | Description|
+|------------- | ------------- | -------------|
+|[**deleteAttachment**](#deleteattachment) | **DELETE** /attachment/{hash} | Remove attachment by Hash|
+|[**getAttachment**](#getattachment) | **GET** /attachment/{hash} | Get attachment by Hash|
+|[**getAttachments**](#getattachments) | **GET** /attachment | Get all attachments|
+|[**uploadAttachment**](#uploadattachment) | **POST** /attachment/{code} | Upload attachment|
 
-## getAttachments
+# **deleteAttachment**
+> HashResponse deleteAttachment()
 
-Get attachments
-
-This method allows to retrieve a list of attachments.
-
-### Example
-
-```typescript
-import { AttachmentsApi, Configuration } from 'qase-api-client';
-
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
-
-const api = new AttachmentsApi(configuration);
-
-// Get attachments
-const response = await api.getAttachments(10, 0);
-console.log(`Attachments: ${JSON.stringify(response.result)}`);
-```
-
-### Parameters
-
-| Name       | Type       | Description                     |
-| ---------- | ---------- | ------------------------------- |
-| **limit**  | **number** | Number of attachments to return |
-| **offset** | **number** | Number of attachments to skip   |
-
-### Return type
-
-[**AttachmentListResponse**](AttachmentListResponse.md)
-
-## uploadAttachment
-
-Upload attachment
-
-This method allows to upload a file to Qase TMS.
+This method allows to remove attachment by Hash. 
 
 ### Example
 
 ```typescript
-import { AttachmentsApi, Configuration } from 'qase-api-client';
-import FormData from 'form-data';
-import { createReadStream } from "fs";
+import {
+    AttachmentsApi,
+    Configuration
+} from 'qase-api-client';
 
-// Initialize the API client
-const configuration = new Configuration({
-  basePath: "https://api.qase.io/v1",
-  formDataCtor: FormData,
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new AttachmentsApi(configuration);
 
-const api = new AttachmentsApi(configuration);
+let hash: string; //Hash. (default to undefined)
 
-// Upload a content
-const content = new Buffer.from('file content');
-const response = await api.uploadAttachment('PROJECT_CODE', [{ name: "test.log", value: content }]);
-console.log(`Uploaded file hash: ${response.data.result[0].hash}`);
-
-// Upload a file
-const filePath = "./image.png";
-const fileData = createReadStream(filePath)
-const fileResponse = await api.uploadAttachment('PROJECT_CODE', [{ name: "image.png", value: fileData }]);
-console.log(`Uploaded file hash: ${fileResponse.data.result[0].hash}`);
+const { status, data } = await apiInstance.deleteAttachment(
+    hash
+);
 ```
 
 ### Parameters
 
-| Name     | Type             | Description                                |
-| -------- | ---------------- | ------------------------------------------ |
-| **code** | **string**       | Code of project, where to search entities. |
-| **file** | **File \| Blob** | File to upload                             |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **hash** | [**string**] | Hash. | defaults to undefined|
+
 
 ### Return type
 
-[**AttachmentResponse**](AttachmentResponse.md)
+**HashResponse**
 
-## getAttachment
+### Authorization
 
-Get attachment
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to retrieve a specific attachment.
+### HTTP request headers
 
-### Example
-
-```typescript
-import { AttachmentsApi, Configuration } from 'qase-api-client';
-
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
-
-const api = new AttachmentsApi(configuration);
-
-// Get attachment information
-const attachment = await api.getAttachment('attachment_hash');
-console.log(`Attachment filename: ${attachment.result.filename}`);
-console.log(`Attachment size: ${attachment.result.size} bytes`);
-console.log(`Attachment URL: ${attachment.result.url}`);
-```
-
-### Parameters
-
-| Name     | Type       | Description                                | Notes |
-| -------- | ---------- | ------------------------------------------ | ----- |
-| **hash** | **string** | Hash of attachment.                        |       |
-
-### Return type
-
-[**AttachmentResponse**](AttachmentResponse.md)
-
-## deleteAttachment
-
-Delete attachment
-
-This method allows to delete a specific attachment.
-
-### Example
-
-```typescript
-import { AttachmentsApi, Configuration } from 'qase-api-client';
-
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
-
-const api = new AttachmentsApi(configuration);
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
 
 
-// Delete an attachment
-const response = await api.deleteAttachment('attachment_hash');
-console.log(`Deleted attachment with hash: ${response.result.hash}`);
-```
-
-### Parameters
-
-| Name     | Type       | Description                                | Notes |
-| -------- | ---------- | ------------------------------------------ | ----- |
-| **hash** | **string** | Hash of attachment.                        |       |
-
-### Return type
-
-[**HashResponse**](HashResponse.md)
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getAttachment**
+> AttachmentResponse getAttachment()
+
+This method allows to retrieve attachment by Hash. 
+
+### Example
+
+```typescript
+import {
+    AttachmentsApi,
+    Configuration
+} from 'qase-api-client';
+
+const configuration = new Configuration();
+const apiInstance = new AttachmentsApi(configuration);
+
+let hash: string; //Hash. (default to undefined)
+
+const { status, data } = await apiInstance.getAttachment(
+    hash
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **hash** | [**string**] | Hash. | defaults to undefined|
+
+
+### Return type
+
+**AttachmentResponse**
+
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | Single attachment. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getAttachments**
+> AttachmentListResponse getAttachments()
+
+This method allows to retrieve attachments. 
+
+### Example
+
+```typescript
+import {
+    AttachmentsApi,
+    Configuration
+} from 'qase-api-client';
+
+const configuration = new Configuration();
+const apiInstance = new AttachmentsApi(configuration);
+
+let limit: number; //A number of entities in result set. (optional) (default to 10)
+let offset: number; //How many entities should be skipped. (optional) (default to 0)
+
+const { status, data } = await apiInstance.getAttachments(
+    limit,
+    offset
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **limit** | [**number**] | A number of entities in result set. | (optional) defaults to 10|
+| **offset** | [**number**] | How many entities should be skipped. | (optional) defaults to 0|
+
+
+### Return type
+
+**AttachmentListResponse**
+
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A list of all attachments. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**413** | Payload Too Large. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **uploadAttachment**
+> AttachmentUploadsResponse uploadAttachment()
+
+This method allows to upload attachment to Qase. Max upload size: * Up to 32 Mb per file * Up to 128 Mb per single request * Up to 20 files per single request  If there is no free space left in your team account, you will receive an error with code 507 - Insufficient Storage. 
+
+### Example
+
+```typescript
+import {
+    AttachmentsApi,
+    Configuration
+} from 'qase-api-client';
+
+const configuration = new Configuration();
+const apiInstance = new AttachmentsApi(configuration);
+
+let code: string; //Code of project, where to search entities. (default to undefined)
+let file: Array<File>; // (optional) (default to undefined)
+
+const { status, data } = await apiInstance.uploadAttachment(
+    code,
+    file
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **file** | **Array&lt;File&gt;** |  | (optional) defaults to undefined|
+
+
+### Return type
+
+**AttachmentUploadsResponse**
+
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: multipart/form-data
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | An attachments. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**413** | Payload Too Large. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+

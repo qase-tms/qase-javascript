@@ -1,259 +1,362 @@
 # ProjectsApi
 
-All URIs are relative to *<https://api.qase.io/v1>*
+All URIs are relative to *https://api.qase.io/v1*
 
-| Method | HTTP request | Description |
-| ------------- | ------------- | ------------- |
-| [**createProject**](ProjectsApi.md#createProject) | **POST** /project | Create project |
-| [**deleteProject**](ProjectsApi.md#deleteProject) | **DELETE** /project/{code} | Delete project |
-| [**getProject**](ProjectsApi.md#getProject) | **GET** /project/{code} | Get project |
-| [**getProjects**](ProjectsApi.md#getProjects) | **GET** /project | Get all projects |
-| [**grantAccessToProject**](ProjectsApi.md#grantAccessToProject) | **POST** /project/{code}/access | Grant access to project |
-| [**revokeAccessToProject**](ProjectsApi.md#revokeAccessToProject) | **DELETE** /project/{code}/access | Revoke access to project |
+|Method | HTTP request | Description|
+|------------- | ------------- | -------------|
+|[**createProject**](#createproject) | **POST** /project | Create new project|
+|[**deleteProject**](#deleteproject) | **DELETE** /project/{code} | Delete Project by code|
+|[**getProject**](#getproject) | **GET** /project/{code} | Get Project by code|
+|[**getProjects**](#getprojects) | **GET** /project | Get All Projects|
+|[**grantAccessToProject**](#grantaccesstoproject) | **POST** /project/{code}/access | Grant access to project by code|
+|[**revokeAccessToProject**](#revokeaccesstoproject) | **DELETE** /project/{code}/access | Revoke access to project by code|
 
-## createProject
+# **createProject**
+> ProjectCodeResponse createProject(projectCreate)
 
-Create project
-
-This method allows to create a new project in Qase TMS.
-
-### Example
-
-```typescript
-import { ProjectsApi, Configuration } from 'qase-api-client';
-
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
-
-const api = new ProjectsApi(configuration);
-
-// Create a new project
-const projectData = {
-    title: 'My Project',
-    code: 'MP',
-    description: 'Project description',
-    access: 'all',
-    group: 'Development'
-};
-
-const response = await api.createProject(projectData);
-console.log(`Created project with code: ${response.result.code}`);
-```
-
-### Parameters
-
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **projectCreate** | [**ProjectCreate**](ProjectCreate.md) | Project data |
-
-### Return type
-
-[**ProjectResponse**](ProjectResponse.md)
-
-## deleteProject
-
-Delete project
-
-This method allows to delete a specific project.
+This method is used to create a new project through API. 
 
 ### Example
 
 ```typescript
-import { ProjectsApi, Configuration } from 'qase-api-client';
+import {
+    ProjectsApi,
+    Configuration,
+    ProjectCreate
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new ProjectsApi(configuration);
 
-const api = new ProjectsApi(configuration);
+let projectCreate: ProjectCreate; //
 
-// Delete a project
-const response = await api.deleteProject('PROJECT_CODE');
-if (response.status) {
-    console.log('Project deleted successfully');
-}
+const { status, data } = await apiInstance.createProject(
+    projectCreate
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to search entities. |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **projectCreate** | **ProjectCreate**|  | |
+
 
 ### Return type
 
-[**Response**](Response.md)
+**ProjectCodeResponse**
 
-## getProject
+### Authorization
 
-Get project
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to retrieve a specific project.
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A result of project creation. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deleteProject**
+> BaseResponse deleteProject()
+
+This method allows to delete a specific project. 
 
 ### Example
 
 ```typescript
-import { ProjectsApi, Configuration } from 'qase-api-client';
+import {
+    ProjectsApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new ProjectsApi(configuration);
 
-const api = new ProjectsApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
 
-// Get project information
-const project = await api.getProject('PROJECT_CODE');
-console.log(`Project title: ${project.result.title}`);
-console.log(`Description: ${project.result.description}`);
-console.log(`Access: ${project.result.access}`);
-console.log(`Group: ${project.result.group}`);
+const { status, data } = await apiInstance.deleteProject(
+    code
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to search entities. |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+
 
 ### Return type
 
-[**ProjectResponse**](ProjectResponse.md)
+**BaseResponse**
 
-## getProjects
+### Authorization
 
-Get all projects
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to retrieve all projects.
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A result of project removal. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getProject**
+> ProjectResponse getProject()
+
+This method allows to retrieve a specific project. 
 
 ### Example
 
 ```typescript
-import { ProjectsApi, Configuration } from 'qase-api-client';
+import {
+    ProjectsApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new ProjectsApi(configuration);
 
-const api = new ProjectsApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
 
-// Get all projects with filtering
-const params = {
-    limit: 10,
-    offset: 0,
-    filters: {
-        access: ['all'],
-        group: ['Development']
-    }
-};
-
-const response = await api.getProjects(params);
-console.log(`Total projects: ${response.result.total}`);
-console.log(`Filtered: ${response.result.filtered}`);
-console.log(`Count: ${response.result.count}`);
-
-response.result.entities.forEach(project => {
-    console.log(`[${project.code}] ${project.title}`);
-    console.log(`Access: ${project.access}`);
-    console.log(`Group: ${project.group}`);
-    console.log('---');
-});
+const { status, data } = await apiInstance.getProject(
+    code
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **params** | [**ProjectParams**](ProjectParams.md) | Filter parameters |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+
 
 ### Return type
 
-[**ProjectListResponse**](ProjectListResponse.md)
+**ProjectResponse**
 
-## grantAccessToProject
+### Authorization
 
-Grant access to project
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to grant access to a specific project.
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A Project. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getProjects**
+> ProjectListResponse getProjects()
+
+This method allows to retrieve all projects available for your account. You can limit and offset params to paginate. 
 
 ### Example
 
 ```typescript
-import { ProjectsApi, Configuration } from 'qase-api-client';
+import {
+    ProjectsApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new ProjectsApi(configuration);
 
-const api = new ProjectsApi(configuration);
+let limit: number; //A number of entities in result set. (optional) (default to 10)
+let offset: number; //How many entities should be skipped. (optional) (default to 0)
 
-// Grant access to project
-const accessData = {
-    user_id: 123,
-    access_type: 'read'
-};
-
-const response = await api.grantAccessToProject('PROJECT_CODE', accessData);
-if (response.status) {
-    console.log('Access granted successfully');
-}
+const { status, data } = await apiInstance.getProjects(
+    limit,
+    offset
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to search entities. |
-| **access** | [**ProjectAccess**](ProjectAccess.md) | Access data |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **limit** | [**number**] | A number of entities in result set. | (optional) defaults to 10|
+| **offset** | [**number**] | How many entities should be skipped. | (optional) defaults to 0|
+
 
 ### Return type
 
-[**Response**](Response.md)
+**ProjectListResponse**
 
-## revokeAccessToProject
+### Authorization
 
-Revoke access to project
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to revoke access to a specific project.
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A list of all projects. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **grantAccessToProject**
+> BaseResponse grantAccessToProject(projectAccess)
+
+This method allows to grant access to a specific project. 
 
 ### Example
 
 ```typescript
-import { ProjectsApi, Configuration } from 'qase-api-client';
+import {
+    ProjectsApi,
+    Configuration,
+    ProjectAccess
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new ProjectsApi(configuration);
 
-const api = new ProjectsApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let projectAccess: ProjectAccess; //
 
-// Revoke access from project
-const accessData = {
-    user_id: 123
-};
-
-const response = await api.revokeAccessToProject('PROJECT_CODE', accessData);
-if (response.status) {
-    console.log('Access revoked successfully');
-}
+const { status, data } = await apiInstance.grantAccessToProject(
+    code,
+    projectAccess
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to search entities. |
-| **access** | [**ProjectAccess**](ProjectAccess.md) | Access data |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **projectAccess** | **ProjectAccess**|  | |
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+
 
 ### Return type
 
-[**Response**](Response.md)
+**BaseResponse**
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | Result of operation. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **revokeAccessToProject**
+> BaseResponse revokeAccessToProject(projectAccess)
+
+This method allows to revoke access to a specific project. 
+
+### Example
+
+```typescript
+import {
+    ProjectsApi,
+    Configuration,
+    ProjectAccess
+} from 'qase-api-client';
+
+const configuration = new Configuration();
+const apiInstance = new ProjectsApi(configuration);
+
+let code: string; //Code of project, where to search entities. (default to undefined)
+let projectAccess: ProjectAccess; //
+
+const { status, data } = await apiInstance.revokeAccessToProject(
+    code,
+    projectAccess
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **projectAccess** | **ProjectAccess**|  | |
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+
+
+### Return type
+
+**BaseResponse**
+
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | Result of operation. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

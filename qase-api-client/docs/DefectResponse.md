@@ -1,12 +1,22 @@
 # DefectResponse
 
-Response model for retrieving a single defect in Qase TMS.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**status** | **boolean** | Operation status. `true` indicates successful operation. | [optional]
-**result** | [**Defect**](Defect.md) | The defect object containing all defect properties. | [optional]
+**status** | **boolean** |  | [optional] [default to undefined]
+**result** | [**Defect**](Defect.md) |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { DefectResponse } from 'qase-api-client';
+
+const instance: DefectResponse = {
+    status,
+    result,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

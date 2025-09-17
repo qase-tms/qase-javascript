@@ -1,13 +1,20 @@
 # TestCasebulk
 
-## Description
-
-Model for bulk operations with test cases in Qase TMS.
 
 ## Properties
 
-| Name | Type | Description |
-|------|------|-------------|
-| **cases** | [**TestCasebulkCasesInner[]**](TestCasebulkCasesInner.md) | Array of test cases for bulk operations |
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**cases** | [**Array&lt;TestCasebulkCasesInner&gt;**](TestCasebulkCasesInner.md) |  | [default to undefined]
+
+## Example
+
+```typescript
+import { TestCasebulk } from 'qase-api-client';
+
+const instance: TestCasebulk = {
+    cases,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

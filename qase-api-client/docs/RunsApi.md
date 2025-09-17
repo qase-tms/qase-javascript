@@ -1,328 +1,526 @@
-# Qase API - Runs Management
+# RunsApi
 
-# qase.api_client_v1.RunsApi
+All URIs are relative to *https://api.qase.io/v1*
 
-All URIs are relative to *<https://api.qase.io/v1>*
+|Method | HTTP request | Description|
+|------------- | ------------- | -------------|
+|[**completeRun**](#completerun) | **POST** /run/{code}/{id}/complete | Complete a specific run|
+|[**createRun**](#createrun) | **POST** /run/{code} | Create a new run|
+|[**deleteRun**](#deleterun) | **DELETE** /run/{code}/{id} | Delete run|
+|[**getRun**](#getrun) | **GET** /run/{code}/{id} | Get a specific run|
+|[**getRuns**](#getruns) | **GET** /run/{code} | Get all runs|
+|[**runUpdateExternalIssue**](#runupdateexternalissue) | **POST** /run/{code}/external-issue | Update external issues for runs|
+|[**updateRun**](#updaterun) | **PATCH** /run/{code}/{id} | Update a specific run|
+|[**updateRunPublicity**](#updaterunpublicity) | **PATCH** /run/{code}/{id}/public | Update publicity of a specific run|
 
-The Runs API provides endpoints for managing test runs in Qase TMS. This includes creating, retrieving, updating, and completing test runs.
+# **completeRun**
+> BaseResponse completeRun()
 
-## Available Methods
+This method allows to complete a specific run. 
 
-Method | HTTP request | Description
-------------- | ------------- | -------------
-[**completeRun**](RunsApi.md#completeRun) | **PATCH** /run/{code}/{id}/complete | Complete test run
-[**createRun**](RunsApi.md#createRun) | **POST** /run/{code} | Create a new test run
-[**deleteRun**](RunsApi.md#deleteRun) | **DELETE** /run/{code}/{id} | Delete test run
-[**getRun**](RunsApi.md#getRun) | **GET** /run/{code}/{id} | Get a specific test run
-[**getRuns**](RunsApi.md#getRuns) | **GET** /run/{code} | Get all test runs
-[**updateRun**](RunsApi.md#updateRun) | **PATCH** /run/{code}/{id} | Update test run
-
-## Method Details
-
-### completeRun
-
-Complete test run
-
-This method allows to complete a test run.
-
-#### Example
+### Example
 
 ```typescript
-import { RunsApi, Configuration } from 'qase-api-client';
+import {
+    RunsApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new RunsApi(configuration);
 
-const api = new RunsApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let id: number; //Identifier. (default to undefined)
 
-const response = await api.completeRun('PROJECT_CODE', 1);
-console.log(`Test run completed: ${response.result}`);
+const { status, data } = await apiInstance.completeRun(
+    code,
+    id
+);
 ```
 
-#### Parameters
+### Parameters
 
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **code** | **string** | Code of project, where to complete test run. |
- **id** | **number** | ID of test run. |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **id** | [**number**] | Identifier. | defaults to undefined|
 
-#### Response Type
 
-[**IdResponse**](IdResponse.md)
+### Return type
 
-#### Authorization
+**BaseResponse**
+
+### Authorization
 
 [TokenAuth](../README.md#TokenAuth)
 
-#### HTTP Response Details
+### HTTP request headers
 
-| Status Code | Description | Response Headers |
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
 |-------------|-------------|------------------|
-| **200** | Run completed successfully | - |
-| **400** | Invalid request parameters | - |
-| **401** | Unauthorized - invalid API token | - |
-| **403** | Forbidden - insufficient permissions | - |
-| **404** | Run not found | - |
-| **422** | Run cannot be completed (e.g., already completed) | - |
-| **429** | Too many requests | - |
+|**200** | A result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
 
-### createRun
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-Create a new test run
+# **createRun**
+> IdResponse createRun(runCreate)
 
-This method allows to create a test run in the project.
+This method allows to create a run in selected project. 
 
-#### Example
+### Example
 
 ```typescript
-import { RunsApi, Configuration } from 'qase-api-client';
+import {
+    RunsApi,
+    Configuration,
+    RunCreate
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new RunsApi(configuration);
 
-const api = new RunsApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let runCreate: RunCreate; //
 
-const run = {
-    title: 'Regression Test Run',
-    description: 'Full regression testing before release',
-    cases: [1, 2, 3, 4, 5],
-    environment_id: 1,
-    milestone_id: 1,
-    tags: ['regression', 'release']
-};
-
-const response = await api.createRun('PROJECT_CODE', run);
-console.log(`Created test run with ID: ${response.result.id}`);
+const { status, data } = await apiInstance.createRun(
+    code,
+    runCreate
+);
 ```
 
-#### Parameters
+### Parameters
 
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **code** | **string** | Code of project, where to create test run. |
- **runCreate** | [**RunCreate**](RunCreate.md) |  |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **runCreate** | **RunCreate**|  | |
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
 
-#### Response Type
 
-[**IdResponse**](IdResponse.md)
+### Return type
 
-#### Authorization
+**IdResponse**
+
+### Authorization
 
 [TokenAuth](../README.md#TokenAuth)
 
-#### HTTP Response Details
+### HTTP request headers
 
-| Status Code | Description | Response Headers |
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
 |-------------|-------------|------------------|
-| **200** | Run created successfully | - |
-| **400** | Invalid request parameters | - |
-| **401** | Unauthorized - invalid API token | - |
-| **403** | Forbidden - insufficient permissions | - |
-| **404** | Project not found | - |
-| **422** | Invalid run data | - |
-| **429** | Too many requests | - |
+|**200** | A result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
 
-### deleteRun
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-Delete test run
+# **deleteRun**
+> IdResponse deleteRun()
 
-This method allows to delete a test run.
+This method completely deletes a run from repository. 
 
-#### Example
+### Example
 
 ```typescript
-import { RunsApi, Configuration } from 'qase-api-client';
+import {
+    RunsApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new RunsApi(configuration);
 
-const api = new RunsApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let id: number; //Identifier. (default to undefined)
 
-const response = await api.deleteRun('PROJECT_CODE', 1);
-console.log(`Test run deleted: ${response.result}`);
+const { status, data } = await apiInstance.deleteRun(
+    code,
+    id
+);
 ```
 
-#### Parameters
+### Parameters
 
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **code** | **string** | Code of project, where to delete test run. |
- **id** | **number** | ID of test run. |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **id** | [**number**] | Identifier. | defaults to undefined|
 
-#### Response Type
 
-[**IdResponse**](IdResponse.md)
+### Return type
 
-#### Authorization
+**IdResponse**
+
+### Authorization
 
 [TokenAuth](../README.md#TokenAuth)
 
-#### HTTP Response Details
+### HTTP request headers
 
-| Status Code | Description | Response Headers |
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
 |-------------|-------------|------------------|
-| **200** | Run deleted successfully | - |
-| **400** | Invalid request parameters | - |
-| **401** | Unauthorized - invalid API token | - |
-| **403** | Forbidden - insufficient permissions | - |
-| **404** | Run not found | - |
-| **422** | Run cannot be deleted (e.g., already completed) | - |
-| **429** | Too many requests | - |
+|**200** | A Result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
 
-### getRun
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-Get a specific test run
+# **getRun**
+> RunResponse getRun()
 
-This method allows to retrieve a specific test run.
+This method allows to retrieve a specific run. 
 
-#### Example
+### Example
 
 ```typescript
-import { RunsApi, Configuration } from 'qase-api-client';
+import {
+    RunsApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new RunsApi(configuration);
 
-const api = new RunsApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let id: number; //Identifier. (default to undefined)
+let include: string; //Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects, external_issue  (optional) (default to undefined)
 
-const response = await api.getRun('PROJECT_CODE', 1);
-console.log(`Test run title: ${response.result.title}`);
-console.log(`Description: ${response.result.description}`);
-console.log(`Status: ${response.result.status}`);
-console.log(`Cases: ${JSON.stringify(response.result.cases)}`);
-console.log(`Environment: ${response.result.environment_id}`);
-console.log(`Milestone: ${response.result.milestone_id}`);
+const { status, data } = await apiInstance.getRun(
+    code,
+    id,
+    include
+);
 ```
 
-#### Parameters
+### Parameters
 
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **code** | **string** | Code of project, where to get test run. |
- **id** | **number** | ID of test run. |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **id** | [**number**] | Identifier. | defaults to undefined|
+| **include** | [**string**] | Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects, external_issue  | (optional) defaults to undefined|
 
-#### Response Type
 
-[**RunResponse**](RunResponse.md)
+### Return type
 
-#### Authorization
+**RunResponse**
+
+### Authorization
 
 [TokenAuth](../README.md#TokenAuth)
 
-### getRuns
+### HTTP request headers
 
-Get all test runs
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
 
-This method allows to retrieve all test runs stored in selected project.
 
-#### Example
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A run. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getRuns**
+> RunListResponse getRuns()
+
+This method allows to retrieve all runs stored in selected project. 
+
+### Example
 
 ```typescript
-import { RunsApi, Configuration } from 'qase-api-client';
+import {
+    RunsApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new RunsApi(configuration);
 
-const api = new RunsApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let search: string; // (optional) (default to undefined)
+let status: string; //A list of status values separated by comma. Possible values: in_progress, passed, failed, aborted, active (deprecated), complete (deprecated), abort (deprecated).  (optional) (default to undefined)
+let milestone: number; // (optional) (default to undefined)
+let environment: number; // (optional) (default to undefined)
+let fromStartTime: number; // (optional) (default to undefined)
+let toStartTime: number; // (optional) (default to undefined)
+let limit: number; //A number of entities in result set. (optional) (default to 10)
+let offset: number; //How many entities should be skipped. (optional) (default to 0)
+let include: string; //Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects, external_issue  (optional) (default to undefined)
 
-const response = await api.getRuns('PROJECT_CODE');
-console.log(`Total test runs: ${response.result.total}`);
-console.log(`Filtered: ${response.result.filtered}`);
-console.log(`Count: ${response.result.count}`);
-
-response.result.entities.forEach(run => {
-    console.log(`Title: ${run.title}`);
-    console.log(`ID: ${run.id}`);
-    console.log(`Status: ${run.status}`);
-    console.log(`Cases count: ${run.cases_count}`);
-    console.log('---');
-});
+const { status, data } = await apiInstance.getRuns(
+    code,
+    search,
+    status,
+    milestone,
+    environment,
+    fromStartTime,
+    toStartTime,
+    limit,
+    offset,
+    include
+);
 ```
 
-#### Parameters
+### Parameters
 
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **code** | **string** | Code of project, where to get test runs. |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **search** | [**string**] |  | (optional) defaults to undefined|
+| **status** | [**string**] | A list of status values separated by comma. Possible values: in_progress, passed, failed, aborted, active (deprecated), complete (deprecated), abort (deprecated).  | (optional) defaults to undefined|
+| **milestone** | [**number**] |  | (optional) defaults to undefined|
+| **environment** | [**number**] |  | (optional) defaults to undefined|
+| **fromStartTime** | [**number**] |  | (optional) defaults to undefined|
+| **toStartTime** | [**number**] |  | (optional) defaults to undefined|
+| **limit** | [**number**] | A number of entities in result set. | (optional) defaults to 10|
+| **offset** | [**number**] | How many entities should be skipped. | (optional) defaults to 0|
+| **include** | [**string**] | Include a list of related entities IDs into response. Should be separated by comma. Possible values: cases, defects, external_issue  | (optional) defaults to undefined|
 
-#### Response Type
 
-[**RunListResponse**](RunListResponse.md)
+### Return type
 
-#### Authorization
+**RunListResponse**
+
+### Authorization
 
 [TokenAuth](../README.md#TokenAuth)
 
-### updateRun
+### HTTP request headers
 
-Update test run
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
 
-This method allows to update a test run.
 
-#### Example
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A list of all runs. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **runUpdateExternalIssue**
+> runUpdateExternalIssue(runExternalIssues)
+
+This method allows you to update links between test runs and external issues (such as Jira tickets).  You can use this endpoint to: - Link test runs to external issues by providing the external issue identifier (e.g., \"PROJ-1234\") - Update existing links by providing a new external issue identifier - Remove existing links by setting the external_issue field to null  **Important**: Each test run can have only one link with an external issue. If a test run already has an external issue link, providing a new external_issue value will replace the existing link.  The endpoint supports both Jira Cloud and Jira Server integrations. Each request can update multiple test run links in a single operation. 
+
+### Example
 
 ```typescript
-import { RunsApi, Configuration } from 'qase-api-client';
+import {
+    RunsApi,
+    Configuration,
+    RunExternalIssues
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new RunsApi(configuration);
 
-const api = new RunsApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let runExternalIssues: RunExternalIssues; //
 
-const run = {
-    title: 'Updated Regression Test Run',
-    description: 'Updated full regression testing before release',
-    cases: [1, 2, 3, 4, 5, 6, 7],
-    environment_id: 2,
-    milestone_id: 2,
-    tags: ['regression', 'release', 'critical']
-};
-
-const response = await api.updateRun('PROJECT_CODE', 1, run);
-console.log(`Updated test run with ID: ${response.result.id}`);
+const { status, data } = await apiInstance.runUpdateExternalIssue(
+    code,
+    runExternalIssues
+);
 ```
 
-#### Parameters
+### Parameters
 
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **code** | **string** | Code of project, where to update test run. |
- **id** | **number** | ID of test run. |
- **runUpdate** | [**RunUpdate**](RunUpdate.md) |  |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **runExternalIssues** | **RunExternalIssues**|  | |
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
 
-#### Response Type
 
-[**IdResponse**](IdResponse.md)
+### Return type
 
-#### Authorization
+void (empty response body)
+
+### Authorization
 
 [TokenAuth](../README.md#TokenAuth)
 
-## Related Documentation
+### HTTP request headers
 
-- [Run Model](Run.md)
-- [RunCreate Model](RunCreate.md)
-- [RunResponse Model](RunResponse.md)
-- [RunListResponse Model](RunListResponse.md)
-- [BaseResponse Model](BaseResponse.md)
-- [IdResponse Model](IdResponse.md)
+ - **Content-Type**: application/json
+ - **Accept**: Not defined
 
-## Notes
 
-- All timestamps should be provided in ISO 8601 format
-- Rate limiting applies to all endpoints (429 response if exceeded)
-- Test runs can be created from test cases or test plans
-- Run status changes automatically based on test results
-- Public access can be enabled/disabled for sharing run results externally
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateRun**
+> BaseResponse updateRun(runupdate)
+
+This method allows to update a specific run. 
+
+### Example
+
+```typescript
+import {
+    RunsApi,
+    Configuration,
+    Runupdate
+} from 'qase-api-client';
+
+const configuration = new Configuration();
+const apiInstance = new RunsApi(configuration);
+
+let code: string; //Code of project, where to search entities. (default to undefined)
+let id: number; //Identifier. (default to undefined)
+let runupdate: Runupdate; //
+
+const { status, data } = await apiInstance.updateRun(
+    code,
+    id,
+    runupdate
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **runupdate** | **Runupdate**|  | |
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **id** | [**number**] | Identifier. | defaults to undefined|
+
+
+### Return type
+
+**BaseResponse**
+
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateRunPublicity**
+> RunPublicResponse updateRunPublicity(runPublic)
+
+This method allows to update a publicity of specific run. 
+
+### Example
+
+```typescript
+import {
+    RunsApi,
+    Configuration,
+    RunPublic
+} from 'qase-api-client';
+
+const configuration = new Configuration();
+const apiInstance = new RunsApi(configuration);
+
+let code: string; //Code of project, where to search entities. (default to undefined)
+let id: number; //Identifier. (default to undefined)
+let runPublic: RunPublic; //
+
+const { status, data } = await apiInstance.updateRunPublicity(
+    code,
+    id,
+    runPublic
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **runPublic** | **RunPublic**|  | |
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **id** | [**number**] | Identifier. | defaults to undefined|
+
+
+### Return type
+
+**RunPublicResponse**
+
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+

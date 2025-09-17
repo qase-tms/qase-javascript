@@ -1,29 +1,56 @@
 # Defect
 
-Model representing a defect in Qase TMS.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **number** | Unique identifier of the defect. | [optional]
-**title** | **string** | Title of the defect. | [optional]
-**actual_result** | **string** | Actual result or description of the defect. | [optional]
-**severity** | **string** | Severity level of the defect (e.g., 'blocker', 'critical', 'major', 'minor', 'trivial'). | [optional]
-**status** | **string** | Current status of the defect (e.g., 'open', 'in_progress', 'resolved'). | [optional]
-**milestone_id** | **number** | ID of the associated milestone. | [optional]
-**custom_fields** | [**CustomFieldValue[]**](CustomFieldValue.md) | Array of custom field values associated with the defect. | [optional]
-**attachments** | [**Attachment[]**](Attachment.md) | Array of attachments associated with the defect. | [optional]
-**resolved_at** | **Date** | Timestamp when the defect was resolved. | [optional]
-**member_id** | **number** | Deprecated, use `author_id` instead. | [optional]
-**author_id** | **number** | ID of the user who created the defect. | [optional]
-**external_data** | **string** | External data or references associated with the defect. | [optional]
-**runs** | **number[]** | Array of test run IDs associated with the defect. | [optional]
-**results** | **string[]** | Array of test result IDs associated with the defect. | [optional]
-**tags** | [**TagValue[]**](TagValue.md) | Array of tags associated with the defect. | [optional]
-**created_at** | **Date** | Timestamp when the defect was created. | [optional]
-**updated_at** | **Date** | Timestamp when the defect was last updated. | [optional]
-**created** | **string** | Deprecated, use the `created_at` property instead. | [optional]
-**updated** | **string** | Deprecated, use the `updated_at` property instead. | [optional]
+**id** | **number** |  | [optional] [default to undefined]
+**title** | **string** |  | [optional] [default to undefined]
+**actual_result** | **string** |  | [optional] [default to undefined]
+**severity** | **string** |  | [optional] [default to undefined]
+**status** | **string** |  | [optional] [default to undefined]
+**milestone_id** | **number** |  | [optional] [default to undefined]
+**custom_fields** | [**Array&lt;CustomFieldValue&gt;**](CustomFieldValue.md) |  | [optional] [default to undefined]
+**attachments** | [**Array&lt;Attachment&gt;**](Attachment.md) |  | [optional] [default to undefined]
+**resolved_at** | **string** |  | [optional] [default to undefined]
+**member_id** | **number** | Deprecated, use &#x60;author_id&#x60; instead. | [optional] [default to undefined]
+**author_id** | **number** |  | [optional] [default to undefined]
+**external_data** | **string** |  | [optional] [default to undefined]
+**runs** | **Array&lt;number&gt;** |  | [optional] [default to undefined]
+**results** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
+**tags** | [**Array&lt;TagValue&gt;**](TagValue.md) |  | [optional] [default to undefined]
+**created_at** | **string** |  | [optional] [default to undefined]
+**updated_at** | **string** |  | [optional] [default to undefined]
+**created** | **string** | Deprecated, use the &#x60;created_at&#x60; property instead. | [optional] [default to undefined]
+**updated** | **string** | Deprecated, use the &#x60;updated_at&#x60; property instead. | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { Defect } from 'qase-api-client';
+
+const instance: Defect = {
+    id,
+    title,
+    actual_result,
+    severity,
+    status,
+    milestone_id,
+    custom_fields,
+    attachments,
+    resolved_at,
+    member_id,
+    author_id,
+    external_data,
+    runs,
+    results,
+    tags,
+    created_at,
+    updated_at,
+    created,
+    updated,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

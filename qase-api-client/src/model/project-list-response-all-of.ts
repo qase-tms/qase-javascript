@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { ProjectListResponseAllOfResult } from './project-list-response-all-of-result';
 
 /**

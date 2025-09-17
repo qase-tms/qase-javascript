@@ -12,36 +12,35 @@
  * Do not edit the class manually.
  */
 
-
-import { RunexternalIssuesLinksInner } from './runexternal-issues-links-inner';
+import { RunExternalIssuesLinksInner } from './run-external-issues-links-inner';
 
 /**
  * 
  * @export
- * @interface RunexternalIssues
+ * @interface RunExternalIssues
  */
-export interface RunexternalIssues {
+export interface RunExternalIssues {
     /**
      * 
      * @type {string}
-     * @memberof RunexternalIssues
+     * @memberof RunExternalIssues
      */
-    'type': RunexternalIssuesTypeEnum;
+    'type': RunExternalIssuesTypeEnum;
     /**
      * Array of external issue links. Each test run (run_id) can have only one external issue link.
-     * @type {Array<RunexternalIssuesLinksInner>}
-     * @memberof RunexternalIssues
+     * @type {Array<RunExternalIssuesLinksInner>}
+     * @memberof RunExternalIssues
      */
-    'links': Array<RunexternalIssuesLinksInner>;
+    'links': Array<RunExternalIssuesLinksInner>;
 }
 
 /**
     * @export
     * @enum {string}
     */
-export enum RunexternalIssuesTypeEnum {
-    CLOUD = 'jira-cloud',
-    SERVER = 'jira-server'
+export enum RunExternalIssuesTypeEnum {
+    JIRA_CLOUD = 'jira-cloud',
+    JIRA_SERVER = 'jira-server'
 }
 
 

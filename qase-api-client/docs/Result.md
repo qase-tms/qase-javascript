@@ -1,22 +1,42 @@
 # Result
 
-Represents a test execution result in Qase TMS, containing detailed information about test case execution.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**hash** | **string** | Unique hash identifier for the result | optional
-**result_hash** | **string** | Alternative hash identifier for the result | optional
-**comment** | **string** | Additional comments about the test execution | optional
-**stacktrace** | **string** | Error stacktrace for failed tests | optional
-**run_id** | **number** | ID of the test run this result belongs to | optional
-**case_id** | **number** | ID of the test case that was executed | optional
-**steps** | [**TestStepResult[]**](TestStepResult.md) | Results of individual test steps | optional
-**status** | **string** | Test execution status (passed, failed, blocked, invalid, skipped) | optional
-**is_api_result** | **boolean** | Whether the result was submitted via API | optional
-**time_spent_ms** | **number** | Test execution duration in milliseconds | optional
-**end_time** | **Date** | Test execution completion timestamp | optional
-**attachments** | [**Attachment[]**](Attachment.md) | List of attached files (logs, screenshots, etc.) | optional
+**hash** | **string** |  | [optional] [default to undefined]
+**result_hash** | **string** |  | [optional] [default to undefined]
+**comment** | **string** |  | [optional] [default to undefined]
+**stacktrace** | **string** |  | [optional] [default to undefined]
+**run_id** | **number** |  | [optional] [default to undefined]
+**case_id** | **number** |  | [optional] [default to undefined]
+**steps** | [**Array&lt;TestStepResult&gt;**](TestStepResult.md) |  | [optional] [default to undefined]
+**status** | **string** |  | [optional] [default to undefined]
+**is_api_result** | **boolean** |  | [optional] [default to undefined]
+**time_spent_ms** | **number** |  | [optional] [default to undefined]
+**end_time** | **string** |  | [optional] [default to undefined]
+**attachments** | [**Array&lt;Attachment&gt;**](Attachment.md) |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { Result } from 'qase-api-client';
+
+const instance: Result = {
+    hash,
+    result_hash,
+    comment,
+    stacktrace,
+    run_id,
+    case_id,
+    steps,
+    status,
+    is_api_result,
+    time_spent_ms,
+    end_time,
+    attachments,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

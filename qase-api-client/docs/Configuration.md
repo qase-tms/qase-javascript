@@ -1,12 +1,22 @@
 # Configuration
 
-Represents a configuration entity in Qase TMS, used for managing test environment configurations and settings.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **number** | Unique identifier of the configuration | [optional]
-**title** | **string** | Name or description of the configuration | [optional]
+**id** | **number** |  | [optional] [default to undefined]
+**title** | **string** |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { Configuration } from 'qase-api-client';
+
+const instance: Configuration = {
+    id,
+    title,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -12,8 +12,7 @@
  * Do not edit the class manually.
  */
 
-
-import { TestCaseParametercreate } from './test-case-parametercreate';
+import { TestCaseParameterCreate } from './test-case-parameter-create';
 import { TestStepCreate } from './test-step-create';
 
 /**
@@ -133,10 +132,10 @@ export interface TestCaseUpdate {
     'params'?: { [key: string]: Array<string>; } | null;
     /**
      * 
-     * @type {Array<TestCaseParametercreate>}
+     * @type {Array<TestCaseParameterCreate>}
      * @memberof TestCaseUpdate
      */
-    'parameters'?: Array<TestCaseParametercreate> | null;
+    'parameters'?: Array<TestCaseParameterCreate> | null;
     /**
      * A map of custom fields values (id => value)
      * @type {{ [key: string]: string; }}

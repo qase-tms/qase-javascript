@@ -1,11 +1,20 @@
 # ResultCreateBulk
 
-Represents the model for creating multiple test execution results in a single request in Qase TMS.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**results** | [**ResultCreate[]**](ResultCreate.md) | Array of test results to create | required
+**results** | [**Array&lt;ResultCreate&gt;**](ResultCreate.md) |  | [default to undefined]
+
+## Example
+
+```typescript
+import { ResultCreateBulk } from 'qase-api-client';
+
+const instance: ResultCreateBulk = {
+    results,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

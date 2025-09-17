@@ -12,20 +12,14 @@
  * Do not edit the class manually.
  */
 
-
-import { ResultCreate } from './result-create';
+import { BaseResponse } from './base-response';
+import { UuidResponseAllOf } from './uuid-response-all-of';
+import { UuidResponseAllOfResult } from './uuid-response-all-of-result';
 
 /**
- * 
+ * @type UuidResponse1
  * @export
- * @interface ResultcreateBulk
  */
-export interface ResultcreateBulk {
-    /**
-     * 
-     * @type {Array<ResultCreate>}
-     * @memberof ResultcreateBulk
-     */
-    'results': Array<ResultCreate>;
-}
+export type UuidResponse1 = BaseResponse & UuidResponseAllOf;
+
 

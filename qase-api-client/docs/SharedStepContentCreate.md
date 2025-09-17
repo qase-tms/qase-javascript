@@ -1,15 +1,28 @@
 # SharedStepContentCreate
 
-Represents the request model for creating content of a shared step in Qase TMS.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**hash** | **string** | Unique identifier for the step content | optional
-**action** | **string** | Description of the action to perform | required
-**expected_result** | **string** | Expected outcome of the action | optional
-**data** | **string** | Additional test data in JSON format | optional
-**attachments** | **string[]** | List of attachment hashes to associate with the step | optional
+**action** | **string** |  | [default to undefined]
+**hash** | **string** |  | [optional] [default to undefined]
+**expected_result** | **string** |  | [optional] [default to undefined]
+**data** | **string** |  | [optional] [default to undefined]
+**attachments** | **Array&lt;string&gt;** | A list of Attachment hashes. | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { SharedStepContentCreate } from 'qase-api-client';
+
+const instance: SharedStepContentCreate = {
+    action,
+    hash,
+    expected_result,
+    data,
+    attachments,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

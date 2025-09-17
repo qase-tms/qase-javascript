@@ -1,28 +1,58 @@
 # Run
 
-Represents a test run in Qase TMS, which is a collection of test cases to be executed. A test run is the primary way to track test execution progress and results.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **number** | Unique identifier of the test run | optional
-**run_id** | **number** | Legacy identifier for backward compatibility | optional
-**title** | **string** | Name of the test run | optional
-**description** | **string** | Detailed description of the test run's purpose and scope | optional
-**status** | **number** | Current status code of the run (0-active, 1-complete, 2-aborted) | optional
-**status_text** | **string** | Human-readable representation of the run status | optional
-**start_time** | **Date** | Timestamp when test execution started | optional
-**end_time** | **Date** | Timestamp when test execution completed | optional
-**public** | **boolean** | Indicates if the run is publicly accessible | optional
-**stats** | [**RunStats**](RunStats.md) | Detailed statistics about test execution results | optional
-**time_spent** | **number** | Total time spent on test execution (milliseconds) | optional
-**elapsed_time** | **number** | Time since run creation (milliseconds) | optional
-**environment** | [**RunEnvironment**](RunEnvironment.md) | Environment configuration used for the run | optional
-**milestone** | [**RunMilestone**](RunMilestone.md) | Associated milestone details | optional
-**custom_fields** | [**CustomFieldValue[]**](CustomFieldValue.md) | Custom field values assigned to the run | optional
-**tags** | [**TagValue[]**](TagValue.md) | Tags for run categorization and filtering | optional
-**cases** | **number[]** | IDs of test cases included in the run | optional
-**plan_id** | **number** | ID of the parent test plan (if created from a plan) | optional
+**id** | **number** |  | [optional] [default to undefined]
+**run_id** | **number** |  | [optional] [default to undefined]
+**title** | **string** |  | [optional] [default to undefined]
+**description** | **string** |  | [optional] [default to undefined]
+**status** | **number** |  | [optional] [default to undefined]
+**status_text** | **string** |  | [optional] [default to undefined]
+**start_time** | **string** |  | [optional] [default to undefined]
+**end_time** | **string** |  | [optional] [default to undefined]
+**_public** | **boolean** |  | [optional] [default to undefined]
+**stats** | [**RunStats**](RunStats.md) |  | [optional] [default to undefined]
+**time_spent** | **number** | Time in ms. | [optional] [default to undefined]
+**elapsed_time** | **number** | Time in ms. | [optional] [default to undefined]
+**environment** | [**RunEnvironment**](RunEnvironment.md) |  | [optional] [default to undefined]
+**milestone** | [**RunMilestone**](RunMilestone.md) |  | [optional] [default to undefined]
+**custom_fields** | [**Array&lt;CustomFieldValue&gt;**](CustomFieldValue.md) |  | [optional] [default to undefined]
+**tags** | [**Array&lt;TagValue&gt;**](TagValue.md) |  | [optional] [default to undefined]
+**cases** | **Array&lt;number&gt;** |  | [optional] [default to undefined]
+**plan_id** | **number** |  | [optional] [default to undefined]
+**configurations** | **Array&lt;number&gt;** |  | [optional] [default to undefined]
+**external_issue** | [**RunExternalIssue**](RunExternalIssue.md) |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { Run } from 'qase-api-client';
+
+const instance: Run = {
+    id,
+    run_id,
+    title,
+    description,
+    status,
+    status_text,
+    start_time,
+    end_time,
+    _public,
+    stats,
+    time_spent,
+    elapsed_time,
+    environment,
+    milestone,
+    custom_fields,
+    tags,
+    cases,
+    plan_id,
+    configurations,
+    external_issue,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

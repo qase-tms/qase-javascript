@@ -1,20 +1,38 @@
 # CustomFieldUpdate
 
-Model for updating an existing custom field in Qase TMS.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**title** | **string** | Display name of the custom field. |
-**value** | [**CustomFieldCreateValueInner[]**](CustomFieldCreateValueInner.md) | Array of possible values for selectbox, radio, or multiselect fields. | [optional]
-**replace_values** | **{ [key: string]: string }** | Dictionary of old values and their replacements for updating existing field values. | [optional]
-**placeholder** | **string** | Placeholder text for the field. | [optional]
-**default_value** | **string** | Default value for the field. | [optional]
-**is_filterable** | **boolean** | Whether the field can be used for filtering. | [optional]
-**is_visible** | **boolean** | Whether the field is visible to users. | [optional]
-**is_required** | **boolean** | Whether the field is required to be filled. | [optional]
-**is_enabled_for_all_projects** | **boolean** | Whether the field is available in all projects. | [optional]
-**projects_codes** | **string[]** | List of project codes where this field should be available. | [optional]
+**title** | **string** |  | [default to undefined]
+**value** | [**Array&lt;CustomFieldCreateValueInner&gt;**](CustomFieldCreateValueInner.md) |  | [optional] [default to undefined]
+**replace_values** | **{ [key: string]: string; }** | Dictionary of old values and their replacemants | [optional] [default to undefined]
+**placeholder** | **string** |  | [optional] [default to undefined]
+**default_value** | **string** |  | [optional] [default to undefined]
+**is_filterable** | **boolean** |  | [optional] [default to undefined]
+**is_visible** | **boolean** |  | [optional] [default to undefined]
+**is_required** | **boolean** |  | [optional] [default to undefined]
+**is_enabled_for_all_projects** | **boolean** |  | [optional] [default to undefined]
+**projects_codes** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { CustomFieldUpdate } from 'qase-api-client';
+
+const instance: CustomFieldUpdate = {
+    title,
+    value,
+    replace_values,
+    placeholder,
+    default_value,
+    is_filterable,
+    is_visible,
+    is_required,
+    is_enabled_for_all_projects,
+    projects_codes,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

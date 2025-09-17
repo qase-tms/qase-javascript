@@ -1,19 +1,32 @@
 # SystemFieldOption
 
-## Description
-
-System field option model represents a predefined option for a select-type system field in Qase TMS.
 
 ## Properties
 
-| Name | Type | Description |
-|------|------|-------------|
-| **id** | **number** | Unique identifier of the option |
-| **title** | **string** | Display title of the option |
-| **slug** | **string** | URL-friendly identifier of the option |
-| **color** | **string** | Color code for the option (e.g., '#FF0000') |
-| **icon** | **string** | Icon identifier for the option |
-| **is_default** | **boolean** | Whether this is the default option |
-| **read_only** | **boolean** | Whether the option is read-only |
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**id** | **number** |  | [optional] [default to undefined]
+**title** | **string** |  | [optional] [default to undefined]
+**slug** | **string** |  | [optional] [default to undefined]
+**color** | **string** |  | [optional] [default to undefined]
+**icon** | **string** |  | [optional] [default to undefined]
+**is_default** | **boolean** |  | [optional] [default to undefined]
+**read_only** | **boolean** |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { SystemFieldOption } from 'qase-api-client';
+
+const instance: SystemFieldOption = {
+    id,
+    title,
+    slug,
+    color,
+    icon,
+    is_default,
+    read_only,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

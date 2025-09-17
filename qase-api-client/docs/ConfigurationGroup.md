@@ -1,15 +1,24 @@
 # ConfigurationGroup
 
-## Description
-
-Model representing a configuration group in Qase TMS.
 
 ## Properties
 
-| Name | Type | Description |
-|------|------|-------------|
-| **id** | **number** | Unique identifier of the configuration group |
-| **title** | **string** | Title of the configuration group |
-| **configurations** | [**Configuration[]**](Configuration.md) | List of configurations in this group |
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**id** | **number** |  | [optional] [default to undefined]
+**title** | **string** |  | [optional] [default to undefined]
+**configurations** | [**Array&lt;Configuration&gt;**](Configuration.md) |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { ConfigurationGroup } from 'qase-api-client';
+
+const instance: ConfigurationGroup = {
+    id,
+    title,
+    configurations,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

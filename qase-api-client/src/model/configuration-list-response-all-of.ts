@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { ConfigurationListResponseAllOfResult } from './configuration-list-response-all-of-result';
 
 /**

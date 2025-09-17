@@ -1,233 +1,545 @@
 # CasesApi
 
-All URIs are relative to *<https://api.qase.io/v1>*
+All URIs are relative to *https://api.qase.io/v1*
 
-| Method | HTTP request | Description |
-| ------------- | ------------- | ------------- |
-| [**createCase**](CasesApi.md#createCase) | **POST** /case/{code} | Create test case |
-| [**deleteCase**](CasesApi.md#deleteCase) | **DELETE** /case/{code}/{id} | Delete test case |
-| [**getCase**](CasesApi.md#getCase) | **GET** /case/{code}/{id} | Get test case |
-| [**getCases**](CasesApi.md#getCases) | **GET** /case/{code} | Get all test cases |
-| [**updateCase**](CasesApi.md#updateCase) | **PATCH** /case/{code}/{id} | Update test case |
+|Method | HTTP request | Description|
+|------------- | ------------- | -------------|
+|[**bulk**](#bulk) | **POST** /case/{code}/bulk | Create test cases in bulk|
+|[**caseAttachExternalIssue**](#caseattachexternalissue) | **POST** /case/{code}/external-issue/attach | Attach the external issues to the test cases|
+|[**caseDetachExternalIssue**](#casedetachexternalissue) | **POST** /case/{code}/external-issue/detach | Detach the external issues from the test cases|
+|[**createCase**](#createcase) | **POST** /case/{code} | Create a new test case|
+|[**deleteCase**](#deletecase) | **DELETE** /case/{code}/{id} | Delete test case|
+|[**getCase**](#getcase) | **GET** /case/{code}/{id} | Get a specific test case|
+|[**getCases**](#getcases) | **GET** /case/{code} | Get all test cases|
+|[**updateCase**](#updatecase) | **PATCH** /case/{code}/{id} | Update test case|
 
-## createCase
+# **bulk**
+> Bulk200Response bulk(testCasebulk)
 
-Create test case
-
-This method allows to create a new test case in the project.
-
-### Example
-
-```typescript
-import { CasesApi, Configuration } from 'qase-api-client';
-
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
-
-const api = new CasesApi(configuration);
-
-// Create a new test case
-const testCase = {
-    title: 'New API Test Case',
-    description: 'Testing API functionality',
-    priority: 2,
-    severity: 3,
-    suite_id: 1,
-    steps: [
-        {
-            title: 'Step 1',
-            description: 'First step description',
-            expected_result: 'Expected result'
-        }
-    ]
-};
-
-const response = await api.createCase('PROJECT_CODE', testCase);
-console.log(`Created test case ID: ${response.result.id}`);
-```
-
-### Parameters
-
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to search entities. |
-| **testCase** | [**TestCaseCreate**](TestCaseCreate.md) | Test case data |
-
-### Return type
-
-[**TestCaseResponse**](TestCaseResponse.md)
-
-## deleteCase
-
-Delete test case
-
-This method allows to delete a specific test case.
+This method allows to bulk create new test cases in a project. 
 
 ### Example
 
 ```typescript
-import { CasesApi, Configuration } from 'qase-api-client';
+import {
+    CasesApi,
+    Configuration,
+    TestCasebulk
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new CasesApi(configuration);
 
-const api = new CasesApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let testCasebulk: TestCasebulk; //
 
-// Delete a test case
-const response = await api.deleteCase('PROJECT_CODE', 123);
-if (response.status) {
-    console.log('Test case deleted successfully');
-}
+const { status, data } = await apiInstance.bulk(
+    code,
+    testCasebulk
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to search entities. |
-| **id** | **number** | Test case ID |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **testCasebulk** | **TestCasebulk**|  | |
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+
 
 ### Return type
 
-[**Response**](Response.md)
+**Bulk200Response**
 
-## getCase
+### Authorization
 
-Get test case
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to retrieve a specific test case.
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | List of IDs of the created cases. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **caseAttachExternalIssue**
+> BaseResponse caseAttachExternalIssue(testCaseExternalIssues)
+
 
 ### Example
 
 ```typescript
-import { CasesApi, Configuration } from 'qase-api-client';
+import {
+    CasesApi,
+    Configuration,
+    TestCaseExternalIssues
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new CasesApi(configuration);
 
-const api = new CasesApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let testCaseExternalIssues: TestCaseExternalIssues; //
 
-// Get test case information
-const testCase = await api.getCase('PROJECT_CODE', 123);
-console.log(`Test case title: ${testCase.result.title}`);
-console.log(`Description: ${testCase.result.description}`);
-console.log(`Priority: ${testCase.result.priority}`);
-console.log(`Severity: ${testCase.result.severity}`);
+const { status, data } = await apiInstance.caseAttachExternalIssue(
+    code,
+    testCaseExternalIssues
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to search entities. |
-| **id** | **number** | Test case ID |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **testCaseExternalIssues** | **TestCaseExternalIssues**|  | |
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+
 
 ### Return type
 
-[**TestCaseResponse**](TestCaseResponse.md)
+**BaseResponse**
 
-## getCases
+### Authorization
 
-Get all test cases
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to retrieve all test cases in the project.
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**402** | Payment Required. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **caseDetachExternalIssue**
+> BaseResponse caseDetachExternalIssue(testCaseExternalIssues)
+
 
 ### Example
 
 ```typescript
-import { CasesApi, Configuration } from 'qase-api-client';
+import {
+    CasesApi,
+    Configuration,
+    TestCaseExternalIssues
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new CasesApi(configuration);
 
-const api = new CasesApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let testCaseExternalIssues: TestCaseExternalIssues; //
 
-// Get all test cases with filtering
-const params = {
-    limit: 10,
-    offset: 0,
-    filters: {
-        priority: [1, 2],
-        severity: [3],
-        status: ['active']
-    }
-};
-
-const response = await api.getCases('PROJECT_CODE', params);
-console.log(`Total test cases: ${response.result.total}`);
-console.log(`Filtered: ${response.result.filtered}`);
-console.log(`Count: ${response.result.count}`);
-
-response.result.entities.forEach(testCase => {
-    console.log(`[${testCase.id}] ${testCase.title}`);
-    console.log(`Priority: ${testCase.priority}`);
-    console.log(`Severity: ${testCase.severity}`);
-    console.log('---');
-});
+const { status, data } = await apiInstance.caseDetachExternalIssue(
+    code,
+    testCaseExternalIssues
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to search entities. |
-| **params** | [**TestCaseParams**](TestCaseParams.md) | Filter parameters |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **testCaseExternalIssues** | **TestCaseExternalIssues**|  | |
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+
 
 ### Return type
 
-[**TestCaseListResponse**](TestCaseListResponse.md)
+**BaseResponse**
 
-## updateCase
+### Authorization
 
-Update test case
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to update a specific test case.
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**402** | Payment Required. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **createCase**
+> IdResponse createCase(testCaseCreate)
+
+This method allows to create a new test case in selected project. 
 
 ### Example
 
 ```typescript
-import { CasesApi, Configuration } from 'qase-api-client';
+import {
+    CasesApi,
+    Configuration,
+    TestCaseCreate
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new CasesApi(configuration);
 
-const api = new CasesApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let testCaseCreate: TestCaseCreate; //
 
-// Update test case
-const updateData = {
-    title: 'Updated Test Case Title',
-    description: 'Updated description',
-    priority: 1,
-    severity: 2,
-    status: 'active'
-};
-
-const response = await api.updateCase('PROJECT_CODE', 123, updateData);
-if (response.status) {
-    console.log('Test case updated successfully');
-}
+const { status, data } = await apiInstance.createCase(
+    code,
+    testCaseCreate
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to search entities. |
-| **id** | **number** | Test case ID |
-| **testCase** | [**TestCaseUpdate**](TestCaseUpdate.md) | Test case update data |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **testCaseCreate** | **TestCaseCreate**|  | |
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+
 
 ### Return type
 
-[**TestCaseResponse**](TestCaseResponse.md)
+**IdResponse**
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deleteCase**
+> IdResponse deleteCase()
+
+This method completely deletes a test case from repository. 
+
+### Example
+
+```typescript
+import {
+    CasesApi,
+    Configuration
+} from 'qase-api-client';
+
+const configuration = new Configuration();
+const apiInstance = new CasesApi(configuration);
+
+let code: string; //Code of project, where to search entities. (default to undefined)
+let id: number; //Identifier. (default to undefined)
+
+const { status, data } = await apiInstance.deleteCase(
+    code,
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **id** | [**number**] | Identifier. | defaults to undefined|
+
+
+### Return type
+
+**IdResponse**
+
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A Test Case. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getCase**
+> TestCaseResponse getCase()
+
+This method allows to retrieve a specific test case. 
+
+### Example
+
+```typescript
+import {
+    CasesApi,
+    Configuration
+} from 'qase-api-client';
+
+const configuration = new Configuration();
+const apiInstance = new CasesApi(configuration);
+
+let code: string; //Code of project, where to search entities. (default to undefined)
+let id: number; //Identifier. (default to undefined)
+let include: string; //A list of entities to include in response separated by comma. Possible values: external_issues.  (optional) (default to undefined)
+
+const { status, data } = await apiInstance.getCase(
+    code,
+    id,
+    include
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **id** | [**number**] | Identifier. | defaults to undefined|
+| **include** | [**string**] | A list of entities to include in response separated by comma. Possible values: external_issues.  | (optional) defaults to undefined|
+
+
+### Return type
+
+**TestCaseResponse**
+
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A Test Case. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getCases**
+> TestCaseListResponse getCases()
+
+This method allows to retrieve all test cases stored in selected project. 
+
+### Example
+
+```typescript
+import {
+    CasesApi,
+    Configuration
+} from 'qase-api-client';
+
+const configuration = new Configuration();
+const apiInstance = new CasesApi(configuration);
+
+let code: string; //Code of project, where to search entities. (default to undefined)
+let search: string; //Provide a string that will be used to search by name. (optional) (default to undefined)
+let milestoneId: number; //ID of milestone. (optional) (default to undefined)
+let suiteId: number; //ID of test suite. (optional) (default to undefined)
+let severity: string; //A list of severity values separated by comma. Possible values: undefined, blocker, critical, major, normal, minor, trivial  (optional) (default to undefined)
+let priority: string; //A list of priority values separated by comma. Possible values: undefined, high, medium, low  (optional) (default to undefined)
+let type: string; //A list of type values separated by comma. Possible values: other, functional smoke, regression, security, usability, performance, acceptance  (optional) (default to undefined)
+let behavior: string; //A list of behavior values separated by comma. Possible values: undefined, positive negative, destructive  (optional) (default to undefined)
+let automation: string; //A list of values separated by comma. Possible values: is-not-automated, automated to-be-automated  (optional) (default to undefined)
+let status: string; //A list of values separated by comma. Possible values: actual, draft deprecated  (optional) (default to undefined)
+let externalIssuesType: 'asana' | 'azure-devops' | 'clickup-app' | 'github-app' | 'gitlab-app' | 'jira-cloud' | 'jira-server' | 'linear' | 'monday' | 'redmine-app' | 'trello-app' | 'youtrack-app'; //An integration type.  (optional) (default to undefined)
+let externalIssuesIds: Array<string>; //A list of issue IDs. (optional) (default to undefined)
+let include: string; //A list of entities to include in response separated by comma. Possible values: external_issues.  (optional) (default to undefined)
+let limit: number; //A number of entities in result set. (optional) (default to 10)
+let offset: number; //How many entities should be skipped. (optional) (default to 0)
+
+const { status, data } = await apiInstance.getCases(
+    code,
+    search,
+    milestoneId,
+    suiteId,
+    severity,
+    priority,
+    type,
+    behavior,
+    automation,
+    status,
+    externalIssuesType,
+    externalIssuesIds,
+    include,
+    limit,
+    offset
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **search** | [**string**] | Provide a string that will be used to search by name. | (optional) defaults to undefined|
+| **milestoneId** | [**number**] | ID of milestone. | (optional) defaults to undefined|
+| **suiteId** | [**number**] | ID of test suite. | (optional) defaults to undefined|
+| **severity** | [**string**] | A list of severity values separated by comma. Possible values: undefined, blocker, critical, major, normal, minor, trivial  | (optional) defaults to undefined|
+| **priority** | [**string**] | A list of priority values separated by comma. Possible values: undefined, high, medium, low  | (optional) defaults to undefined|
+| **type** | [**string**] | A list of type values separated by comma. Possible values: other, functional smoke, regression, security, usability, performance, acceptance  | (optional) defaults to undefined|
+| **behavior** | [**string**] | A list of behavior values separated by comma. Possible values: undefined, positive negative, destructive  | (optional) defaults to undefined|
+| **automation** | [**string**] | A list of values separated by comma. Possible values: is-not-automated, automated to-be-automated  | (optional) defaults to undefined|
+| **status** | [**string**] | A list of values separated by comma. Possible values: actual, draft deprecated  | (optional) defaults to undefined|
+| **externalIssuesType** | [**&#39;asana&#39; | &#39;azure-devops&#39; | &#39;clickup-app&#39; | &#39;github-app&#39; | &#39;gitlab-app&#39; | &#39;jira-cloud&#39; | &#39;jira-server&#39; | &#39;linear&#39; | &#39;monday&#39; | &#39;redmine-app&#39; | &#39;trello-app&#39; | &#39;youtrack-app&#39;**]**Array<&#39;asana&#39; &#124; &#39;azure-devops&#39; &#124; &#39;clickup-app&#39; &#124; &#39;github-app&#39; &#124; &#39;gitlab-app&#39; &#124; &#39;jira-cloud&#39; &#124; &#39;jira-server&#39; &#124; &#39;linear&#39; &#124; &#39;monday&#39; &#124; &#39;redmine-app&#39; &#124; &#39;trello-app&#39; &#124; &#39;youtrack-app&#39;>** | An integration type.  | (optional) defaults to undefined|
+| **externalIssuesIds** | **Array&lt;string&gt;** | A list of issue IDs. | (optional) defaults to undefined|
+| **include** | [**string**] | A list of entities to include in response separated by comma. Possible values: external_issues.  | (optional) defaults to undefined|
+| **limit** | [**number**] | A number of entities in result set. | (optional) defaults to 10|
+| **offset** | [**number**] | How many entities should be skipped. | (optional) defaults to 0|
+
+
+### Return type
+
+**TestCaseListResponse**
+
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A list of all cases. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**402** | Payment Required. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateCase**
+> IdResponse updateCase(testCaseUpdate)
+
+This method updates a test case. 
+
+### Example
+
+```typescript
+import {
+    CasesApi,
+    Configuration,
+    TestCaseUpdate
+} from 'qase-api-client';
+
+const configuration = new Configuration();
+const apiInstance = new CasesApi(configuration);
+
+let code: string; //Code of project, where to search entities. (default to undefined)
+let id: number; //Identifier. (default to undefined)
+let testCaseUpdate: TestCaseUpdate; //
+
+const { status, data } = await apiInstance.updateCase(
+    code,
+    id,
+    testCaseUpdate
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **testCaseUpdate** | **TestCaseUpdate**|  | |
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **id** | [**number**] | Identifier. | defaults to undefined|
+
+
+### Return type
+
+**IdResponse**
+
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A Test Case. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+

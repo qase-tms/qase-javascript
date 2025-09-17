@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { SearchResponseAllOfResultEntities } from './search-response-all-of-result-entities';
 
 /**

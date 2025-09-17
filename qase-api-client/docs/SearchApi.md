@@ -1,60 +1,69 @@
 # SearchApi
 
-All URIs are relative to *<https://api.qase.io/v1>*
+All URIs are relative to *https://api.qase.io/v1*
 
-| Method | HTTP request | Description |
-| ------------- | ------------- | ------------- |
-| [**search**](SearchApi.md#search) | **GET** /search/{code} | Search entities |
+|Method | HTTP request | Description|
+|------------- | ------------- | -------------|
+|[**search**](#search) | **GET** /search | Search entities by Qase Query Language (QQL)|
 
-## search
+# **search**
+> SearchResponse search()
 
-Search entities
-
-This method allows to search for entities in the project.
+This method allows to retrieve data sets for various entities using expressions with conditions. 
 
 ### Example
 
 ```typescript
-import { SearchApi, Configuration } from 'qase-api-client';
+import {
+    SearchApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new SearchApi(configuration);
 
-const api = new SearchApi(configuration);
+let query: string; //Expression in Qase Query Language. (default to undefined)
+let limit: number; //A number of entities in result set. (optional) (default to 10)
+let offset: number; //How many entities should be skipped. (optional) (default to 0)
 
-// Search for entities
-const params = {
-    query: 'login',
-    filters: {
-        type: ['case', 'defect'],
-        status: ['active']
-    }
-};
-
-const response = await api.search('PROJECT_CODE', params);
-console.log(`Total results: ${response.result.total}`);
-console.log(`Filtered: ${response.result.filtered}`);
-console.log(`Count: ${response.result.count}`);
-
-response.result.entities.forEach(entity => {
-    console.log(`[${entity.type}] ${entity.title}`);
-    console.log(`ID: ${entity.id}`);
-    console.log(`Status: ${entity.status}`);
-    console.log('---');
-});
+const { status, data } = await apiInstance.search(
+    query,
+    limit,
+    offset
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to search entities. |
-| **params** | [**SearchParams**](SearchParams.md) | Search parameters |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **query** | [**string**] | Expression in Qase Query Language. | defaults to undefined|
+| **limit** | [**number**] | A number of entities in result set. | (optional) defaults to 10|
+| **offset** | [**number**] | How many entities should be skipped. | (optional) defaults to 0|
+
 
 ### Return type
 
-[**SearchResponse**](SearchResponse.md)
+**SearchResponse**
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A list of found entities. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+

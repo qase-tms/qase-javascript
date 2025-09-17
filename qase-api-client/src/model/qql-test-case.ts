@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { Attachment } from './attachment';
 import { CustomFieldValue } from './custom-field-value';
 import { QqlTestCaseParams } from './qql-test-case-params';

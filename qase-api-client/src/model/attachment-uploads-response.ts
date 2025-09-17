@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { AttachmentUploadsResponseAllOf } from './attachment-uploads-response-all-of';
 import { Attachmentupload } from './attachmentupload';
 import { BaseResponse } from './base-response';

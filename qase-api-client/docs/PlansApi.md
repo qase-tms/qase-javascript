@@ -1,202 +1,317 @@
 # PlansApi
 
-All URIs are relative to *<https://api.qase.io/v1>*
+All URIs are relative to *https://api.qase.io/v1*
 
-| Method | HTTP request | Description |
-| ------------- | ------------- | ------------- |
-| [**createPlan**](PlansApi.md#createPlan) | **POST** /plan/{code} | Create a new test plan |
-| [**deletePlan**](PlansApi.md#deletePlan) | **DELETE** /plan/{code}/{id} | Delete test plan |
-| [**getPlan**](PlansApi.md#getPlan) | **GET** /plan/{code}/{id} | Get a specific test plan |
-| [**getPlans**](PlansApi.md#getPlans) | **GET** /plan/{code} | Get all test plans |
-| [**updatePlan**](PlansApi.md#updatePlan) | **PATCH** /plan/{code}/{id} | Update test plan |
+|Method | HTTP request | Description|
+|------------- | ------------- | -------------|
+|[**createPlan**](#createplan) | **POST** /plan/{code} | Create a new plan|
+|[**deletePlan**](#deleteplan) | **DELETE** /plan/{code}/{id} | Delete plan|
+|[**getPlan**](#getplan) | **GET** /plan/{code}/{id} | Get a specific plan|
+|[**getPlans**](#getplans) | **GET** /plan/{code} | Get all plans|
+|[**updatePlan**](#updateplan) | **PATCH** /plan/{code}/{id} | Update plan|
 
-## createPlan
+# **createPlan**
+> IdResponse createPlan(planCreate)
 
-Create a new test plan
-
-This method allows to create a test plan in the project.
-
-### Example
-
-```typescript
-import { PlansApi, Configuration } from 'qase-api-client';
-
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
-
-const api = new PlansApi(configuration);
-
-const plan = {
-    title: 'API Test Plan',
-    description: 'Test plan for API testing',
-    cases: [1, 2, 3]
-};
-
-const response = await api.createPlan('PROJECT_CODE', plan);
-console.log(`Created plan with ID: ${response.result.id}`);
-```
-
-### Parameters
-
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to create test plan. |
-| **planCreate** | [**PlanCreate**](PlanCreate.md) |  |
-
-### Return type
-
-[**IdResponse**](IdResponse.md)
-
-## deletePlan
-
-Delete test plan
-
-This method allows to delete a test plan.
+This method allows to create a plan in selected project. 
 
 ### Example
 
 ```typescript
-import { PlansApi, Configuration } from 'qase-api-client';
+import {
+    PlansApi,
+    Configuration,
+    PlanCreate
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new PlansApi(configuration);
 
-const api = new PlansApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let planCreate: PlanCreate; //
 
-const response = await api.deletePlan('PROJECT_CODE', 1);
-console.log(`Plan deleted: ${response.result}`);
+const { status, data } = await apiInstance.createPlan(
+    code,
+    planCreate
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to delete test plan. |
-| **id** | **number** | ID of test plan. |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **planCreate** | **PlanCreate**|  | |
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+
 
 ### Return type
 
-[**IdResponse**](IdResponse.md)
+**IdResponse**
 
-## getPlan
+### Authorization
 
-Get a specific test plan
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to retrieve a specific test plan.
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deletePlan**
+> IdResponse deletePlan()
+
+This method completely deletes a plan from repository. 
 
 ### Example
 
 ```typescript
-import { PlansApi, Configuration } from 'qase-api-client';
+import {
+    PlansApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new PlansApi(configuration);
 
-const api = new PlansApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let id: number; //Identifier. (default to undefined)
 
-const response = await api.getPlan('PROJECT_CODE', 1);
-console.log(`Plan title: ${response.result.title}`);
-console.log(`Description: ${response.result.description}`);
-console.log(`Cases count: ${response.result.cases?.length || 0}`);
+const { status, data } = await apiInstance.deletePlan(
+    code,
+    id
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to get test plan. |
-| **id** | **number** | ID of test plan. |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **id** | [**number**] | Identifier. | defaults to undefined|
+
 
 ### Return type
 
-[**PlanResponse**](PlanResponse.md)
+**IdResponse**
 
-## getPlans
+### Authorization
 
-Get all test plans
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to retrieve all test plans stored in selected project.
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A Result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getPlan**
+> PlanResponse getPlan()
+
+This method allows to retrieve a specific plan. 
 
 ### Example
 
 ```typescript
-import { PlansApi, Configuration } from 'qase-api-client';
+import {
+    PlansApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new PlansApi(configuration);
 
-const api = new PlansApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let id: number; //Identifier. (default to undefined)
 
-const response = await api.getPlans('PROJECT_CODE');
-console.log(`Total plans: ${response.result.total}`);
-console.log(`Filtered: ${response.result.filtered}`);
-console.log(`Count: ${response.result.count}`);
-
-response.result.entities.forEach(plan => {
-    console.log(`Title: ${plan.title}`);
-    console.log(`ID: ${plan.id}`);
-    console.log(`Cases count: ${plan.cases?.length || 0}`);
-    console.log('---');
-});
+const { status, data } = await apiInstance.getPlan(
+    code,
+    id
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to get test plans. |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **id** | [**number**] | Identifier. | defaults to undefined|
+
 
 ### Return type
 
-[**PlanListResponse**](PlanListResponse.md)
+**PlanResponse**
 
-## updatePlan
+### Authorization
 
-Update test plan
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to update a test plan.
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A plan. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getPlans**
+> PlanListResponse getPlans()
+
+This method allows to retrieve all plans stored in selected project. 
 
 ### Example
 
 ```typescript
-import { PlansApi, Configuration } from 'qase-api-client';
+import {
+    PlansApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new PlansApi(configuration);
 
-const api = new PlansApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let limit: number; //A number of entities in result set. (optional) (default to 10)
+let offset: number; //How many entities should be skipped. (optional) (default to 0)
 
-const plan = {
-    title: 'Updated API Test Plan',
-    description: 'Updated test plan for API testing',
-    cases: [1, 2, 3, 4]
-};
-
-const response = await api.updatePlan('PROJECT_CODE', 1, plan);
-console.log(`Updated plan with ID: ${response.result.id}`);
+const { status, data } = await apiInstance.getPlans(
+    code,
+    limit,
+    offset
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to update test plan. |
-| **id** | **number** | ID of test plan. |
-| **planUpdate** | [**PlanUpdate**](PlanUpdate.md) |  |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **limit** | [**number**] | A number of entities in result set. | (optional) defaults to 10|
+| **offset** | [**number**] | How many entities should be skipped. | (optional) defaults to 0|
+
 
 ### Return type
 
-[**IdResponse**](IdResponse.md)
+**PlanListResponse**
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A list of all plans. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updatePlan**
+> IdResponse updatePlan(planUpdate)
+
+This method updates a plan. 
+
+### Example
+
+```typescript
+import {
+    PlansApi,
+    Configuration,
+    PlanUpdate
+} from 'qase-api-client';
+
+const configuration = new Configuration();
+const apiInstance = new PlansApi(configuration);
+
+let code: string; //Code of project, where to search entities. (default to undefined)
+let id: number; //Identifier. (default to undefined)
+let planUpdate: PlanUpdate; //
+
+const { status, data } = await apiInstance.updatePlan(
+    code,
+    id,
+    planUpdate
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **planUpdate** | **PlanUpdate**|  | |
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **id** | [**number**] | Identifier. | defaults to undefined|
+
+
+### Return type
+
+**IdResponse**
+
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

@@ -9,7 +9,7 @@ import {
   ConfigurationsApi,
   ConfigurationGroupCreate,
   ConfigurationCreate,
-  RunexternalIssuesTypeEnum
+  RunExternalIssuesTypeEnum
 } from 'qase-api-client';
 import { Attachment, TestResultType, ConfigurationGroup } from '../models';
 import { TestOpsOptionsType } from '../models/config/TestOpsOptionsType';
@@ -118,8 +118,8 @@ export class ClientV1 implements IClient {
         // Map our enum values to API enum values
         // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
         const apiType = this.config.run.externalLink.type === 'jiraCloud' 
-          ? RunexternalIssuesTypeEnum.CLOUD 
-          : RunexternalIssuesTypeEnum.SERVER;
+          ? RunExternalIssuesTypeEnum.JIRA_CLOUD 
+          : RunExternalIssuesTypeEnum.JIRA_SERVER;
         
         await this.runClient.runUpdateExternalIssue(this.config.project, {
           type: apiType,
