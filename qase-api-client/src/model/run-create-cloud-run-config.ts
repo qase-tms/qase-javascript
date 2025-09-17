@@ -13,7 +13,6 @@
  */
 
 
-
 /**
  * Configuration for the cloud run, if applicable
  * @export

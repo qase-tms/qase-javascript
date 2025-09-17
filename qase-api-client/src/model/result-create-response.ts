@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { BaseResponse } from './base-response';
 import { ResultCreateResponseAllOf } from './result-create-response-all-of';
 import { ResultCreateResponseAllOfResult } from './result-create-response-all-of-result';

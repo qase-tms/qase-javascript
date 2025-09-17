@@ -1,14 +1,26 @@
 # TestStepResult
 
-Represents the result of a test step execution in Qase TMS, including status, position, attachments, and nested steps results.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**status** | **number** | Status code of the step execution (0 - untested, 1 - passed, 2 - failed, 3 - blocked, 4 - skipped) | [optional]
-**position** | **number** | Position of the step in the test case | [optional]
-**attachments** | [**Attachment[]**](Attachment.md) | Array of attachments related to the step result | [optional]
-**steps** | **object[]** | Nested steps results with the same structure as parent step | [optional]
+**status** | **number** | 1 - passed, 2 - failed, 3 - blocked, 5 - skipped, 7 - in_progress | [optional] [default to undefined]
+**position** | **number** |  | [optional] [default to undefined]
+**attachments** | [**Array&lt;Attachment&gt;**](Attachment.md) |  | [optional] [default to undefined]
+**steps** | **Array&lt;object&gt;** | Nested steps results will be here. The same structure is used for them for them. | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { TestStepResult } from 'qase-api-client';
+
+const instance: TestStepResult = {
+    status,
+    position,
+    attachments,
+    steps,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

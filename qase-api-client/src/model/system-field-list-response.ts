@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { BaseResponse } from './base-response';
 import { SystemField } from './system-field';
 import { SystemFieldListResponseAllOf } from './system-field-list-response-all-of';

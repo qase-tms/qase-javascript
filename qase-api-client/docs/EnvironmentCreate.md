@@ -1,14 +1,26 @@
 # EnvironmentCreate
 
-Represents the model for creating a new test environment in Qase TMS.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**title** | **string** | Name of the environment | required
-**description** | **string** | Detailed description of the environment | optional
-**slug** | **string** | URL-friendly identifier (will be auto-generated if not provided) | required
-**host** | **string** | Host URL or address of the environment | optional
+**title** | **string** |  | [default to undefined]
+**slug** | **string** |  | [default to undefined]
+**description** | **string** |  | [optional] [default to undefined]
+**host** | **string** |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { EnvironmentCreate } from 'qase-api-client';
+
+const instance: EnvironmentCreate = {
+    title,
+    slug,
+    description,
+    host,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

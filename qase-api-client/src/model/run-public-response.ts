@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { BaseResponse } from './base-response';
 import { RunPublicResponseAllOf } from './run-public-response-all-of';
 import { RunPublicResponseAllOfResult } from './run-public-response-all-of-result';

@@ -1,217 +1,306 @@
 # CustomFieldsApi
 
-All URIs are relative to *<https://api.qase.io/v1>*
+All URIs are relative to *https://api.qase.io/v1*
 
-| Method | HTTP request | Description |
-| ------------- | ------------- | ------------- |
-| [**createCustomField**](CustomFieldsApi.md#createCustomField) | **POST** /custom_field/{code} | Create a new custom field |
-| [**deleteCustomField**](CustomFieldsApi.md#deleteCustomField) | **DELETE** /custom_field/{code}/{id} | Delete custom field |
-| [**getCustomField**](CustomFieldsApi.md#getCustomField) | **GET** /custom_field/{code}/{id} | Get a specific custom field |
-| [**getCustomFields**](CustomFieldsApi.md#getCustomFields) | **GET** /custom_field/{code} | Get all custom fields |
-| [**updateCustomField**](CustomFieldsApi.md#updateCustomField) | **PATCH** /custom_field/{code}/{id} | Update custom field |
+|Method | HTTP request | Description|
+|------------- | ------------- | -------------|
+|[**createCustomField**](#createcustomfield) | **POST** /custom_field | Create new Custom Field|
+|[**deleteCustomField**](#deletecustomfield) | **DELETE** /custom_field/{id} | Delete Custom Field by id|
+|[**getCustomField**](#getcustomfield) | **GET** /custom_field/{id} | Get Custom Field by id|
+|[**getCustomFields**](#getcustomfields) | **GET** /custom_field | Get all Custom Fields|
+|[**updateCustomField**](#updatecustomfield) | **PATCH** /custom_field/{id} | Update Custom Field by id|
 
-## createCustomField
+# **createCustomField**
+> IdResponse createCustomField(customFieldCreate)
 
-Create a new custom field
-
-This method allows to create a custom field in the project.
-
-### Example
-
-```typescript
-import { CustomFieldsApi, Configuration } from 'qase-api-client';
-
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v2"
-});
-configuration.apiKey = process.env.API_KEY;
-
-const api = new CustomFieldsApi(configuration);
-
-const customField = {
-    title: 'Browser Version',
-    type: 'text',
-    placeholder: 'Enter browser version',
-    default_value: 'latest',
-    is_filterable: true,
-    is_visible: true,
-    is_required: false,
-    is_enabled_for_all_projects: false
-};
-
-const response = await api.createCustomField('PROJECT_CODE', customField);
-console.log(`Created custom field with ID: ${response.result.id}`);
-```
-
-### Parameters
-
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to create custom field. |
-| **customFieldCreate** | [**CustomFieldCreate**](CustomFieldCreate.md) |  |
-
-### Return type
-
-[**IdResponse**](IdResponse.md)
-
-## deleteCustomField
-
-Delete custom field
-
-This method allows to delete a custom field.
+This method allows to create custom field. 
 
 ### Example
 
 ```typescript
-import { CustomFieldsApi, Configuration } from 'qase-api-client';
+import {
+    CustomFieldsApi,
+    Configuration,
+    CustomFieldCreate
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v2"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new CustomFieldsApi(configuration);
 
-const api = new CustomFieldsApi(configuration);
+let customFieldCreate: CustomFieldCreate; //
 
-const response = await api.deleteCustomField('PROJECT_CODE', 1);
-console.log(`Custom field deleted: ${response.result}`);
+const { status, data } = await apiInstance.createCustomField(
+    customFieldCreate
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to delete custom field. |
-| **id** | **number** | ID of custom field. |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **customFieldCreate** | **CustomFieldCreate**|  | |
+
 
 ### Return type
 
-[**IdResponse**](IdResponse.md)
+**IdResponse**
 
-## getCustomField
+### Authorization
 
-Get a specific custom field
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to retrieve a specific custom field.
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | Created Custom Field id. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deleteCustomField**
+> BaseResponse deleteCustomField()
+
+This method allows to delete custom field. 
 
 ### Example
 
 ```typescript
-import { CustomFieldsApi, Configuration } from 'qase-api-client';
+import {
+    CustomFieldsApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new CustomFieldsApi(configuration);
 
-const api = new CustomFieldsApi(configuration);
+let id: number; //Identifier. (default to undefined)
 
-const response = await api.getCustomField('PROJECT_CODE', 1);
-console.log(`Custom field title: ${response.result.title}`);
-console.log(`Type: ${response.result.type}`);
-console.log(`Placeholder: ${response.result.placeholder}`);
-console.log(`Default value: ${response.result.default_value}`);
-console.log(`Is filterable: ${response.result.is_filterable}`);
-console.log(`Is visible: ${response.result.is_visible}`);
-console.log(`Is required: ${response.result.is_required}`);
+const { status, data } = await apiInstance.deleteCustomField(
+    id
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to get custom field. |
-| **id** | **number** | ID of custom field. |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] | Identifier. | defaults to undefined|
+
 
 ### Return type
 
-[**CustomFieldResponse**](CustomFieldResponse.md)
+**BaseResponse**
 
-## getCustomFields
+### Authorization
 
-Get all custom fields
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to retrieve all custom fields stored in selected project.
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | Custom Field removal result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getCustomField**
+> CustomFieldResponse getCustomField()
+
+This method allows to retrieve custom field. 
 
 ### Example
 
 ```typescript
-import { CustomFieldsApi, Configuration } from 'qase-api-client';
+import {
+    CustomFieldsApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new CustomFieldsApi(configuration);
 
-const api = new CustomFieldsApi(configuration);
+let id: number; //Identifier. (default to undefined)
 
-const response = await api.getCustomFields('PROJECT_CODE');
-console.log(`Total custom fields: ${response.result.total}`);
-console.log(`Filtered: ${response.result.filtered}`);
-console.log(`Count: ${response.result.count}`);
-
-response.result.entities.forEach(field => {
-    console.log(`Title: ${field.title}`);
-    console.log(`ID: ${field.id}`);
-    console.log(`Type: ${field.type}`);
-    console.log(`Is filterable: ${field.is_filterable}`);
-    console.log('---');
-});
+const { status, data } = await apiInstance.getCustomField(
+    id
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to get custom fields. |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] | Identifier. | defaults to undefined|
+
 
 ### Return type
 
-[**CustomFieldListResponse**](CustomFieldListResponse.md)
+**CustomFieldResponse**
 
-## updateCustomField
+### Authorization
 
-Update custom field
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to update a custom field.
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A Custom Field. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getCustomFields**
+> CustomFieldListResponse getCustomFields()
+
+This method allows to retrieve and filter custom fields. 
 
 ### Example
 
 ```typescript
-import { CustomFieldsApi, Configuration } from 'qase-api-client';
+import {
+    CustomFieldsApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new CustomFieldsApi(configuration);
 
-const api = new CustomFieldsApi(configuration);
+let entity: 'case' | 'run' | 'defect'; // (optional) (default to undefined)
+let type: 'string' | 'text' | 'number' | 'checkbox' | 'selectbox' | 'radio' | 'multiselect' | 'url' | 'user' | 'datetime'; // (optional) (default to undefined)
+let limit: number; //A number of entities in result set. (optional) (default to 10)
+let offset: number; //How many entities should be skipped. (optional) (default to 0)
 
-const customField = {
-    title: 'Updated Browser Version',
-    type: 'text',
-    placeholder: 'Enter updated browser version',
-    default_value: 'latest stable',
-    is_filterable: true,
-    is_visible: true,
-    is_required: true,
-    is_enabled_for_all_projects: true
-};
-
-const response = await api.updateCustomField('PROJECT_CODE', 1, customField);
-console.log(`Updated custom field with ID: ${response.result.id}`);
+const { status, data } = await apiInstance.getCustomFields(
+    entity,
+    type,
+    limit,
+    offset
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to update custom field. |
-| **id** | **number** | ID of custom field. |
-| **customFieldUpdate** | [**CustomFieldUpdate**](CustomFieldUpdate.md) |  |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **entity** | [**&#39;case&#39; | &#39;run&#39; | &#39;defect&#39;**]**Array<&#39;case&#39; &#124; &#39;run&#39; &#124; &#39;defect&#39;>** |  | (optional) defaults to undefined|
+| **type** | [**&#39;string&#39; | &#39;text&#39; | &#39;number&#39; | &#39;checkbox&#39; | &#39;selectbox&#39; | &#39;radio&#39; | &#39;multiselect&#39; | &#39;url&#39; | &#39;user&#39; | &#39;datetime&#39;**]**Array<&#39;string&#39; &#124; &#39;text&#39; &#124; &#39;number&#39; &#124; &#39;checkbox&#39; &#124; &#39;selectbox&#39; &#124; &#39;radio&#39; &#124; &#39;multiselect&#39; &#124; &#39;url&#39; &#124; &#39;user&#39; &#124; &#39;datetime&#39;>** |  | (optional) defaults to undefined|
+| **limit** | [**number**] | A number of entities in result set. | (optional) defaults to 10|
+| **offset** | [**number**] | How many entities should be skipped. | (optional) defaults to 0|
+
 
 ### Return type
 
-[**IdResponse**](IdResponse.md)
+**CustomFieldListResponse**
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | Custom Field list. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateCustomField**
+> BaseResponse updateCustomField(customFieldUpdate)
+
+This method allows to update custom field. 
+
+### Example
+
+```typescript
+import {
+    CustomFieldsApi,
+    Configuration,
+    CustomFieldUpdate
+} from 'qase-api-client';
+
+const configuration = new Configuration();
+const apiInstance = new CustomFieldsApi(configuration);
+
+let id: number; //Identifier. (default to undefined)
+let customFieldUpdate: CustomFieldUpdate; //
+
+const { status, data } = await apiInstance.updateCustomField(
+    id,
+    customFieldUpdate
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **customFieldUpdate** | **CustomFieldUpdate**|  | |
+| **id** | [**number**] | Identifier. | defaults to undefined|
+
+
+### Return type
+
+**BaseResponse**
+
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | Custom Field update result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

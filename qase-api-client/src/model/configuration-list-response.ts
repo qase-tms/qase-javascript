@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { BaseResponse } from './base-response';
 import { ConfigurationListResponseAllOf } from './configuration-list-response-all-of';
 import { ConfigurationListResponseAllOfResult } from './configuration-list-response-all-of-result';

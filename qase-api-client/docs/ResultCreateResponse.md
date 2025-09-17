@@ -1,12 +1,22 @@
 # ResultCreateResponse
 
-Represents the response model returned after creating a test result in Qase TMS.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**status** | **boolean** | Operation success status | optional
-**result** | [**ResultCreateResponseAllOfResult**](ResultCreateResponseAllOfResult.md) | Created result details | optional
+**status** | **boolean** |  | [optional] [default to undefined]
+**result** | [**ResultCreateResponseAllOfResult**](ResultCreateResponseAllOfResult.md) |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { ResultCreateResponse } from 'qase-api-client';
+
+const instance: ResultCreateResponse = {
+    status,
+    result,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

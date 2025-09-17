@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { TestStepResultCreate } from './test-step-result-create';
 
 /**

@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { RunPublicResponseAllOfResult } from './run-public-response-all-of-result';
 
 /**

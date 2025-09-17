@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { BaseResponse } from './base-response';
 import { Environment } from './environment';
 import { EnvironmentResponseAllOf } from './environment-response-all-of';

@@ -1,129 +1,130 @@
 # AuthorsApi
 
-All URIs are relative to *<https://api.qase.io/v1>*
+All URIs are relative to *https://api.qase.io/v1*
 
-The Authors API provides methods to retrieve information about authors (users) in Qase TMS.
+|Method | HTTP request | Description|
+|------------- | ------------- | -------------|
+|[**getAuthor**](#getauthor) | **GET** /author/{id} | Get a specific author|
+|[**getAuthors**](#getauthors) | **GET** /author | Get all authors|
 
-## Methods
+# **getAuthor**
+> AuthorResponse getAuthor()
 
-Method | HTTP request | Description
-------------- | ------------- | -------------
-[**getAuthor**](AuthorsApi.md#getAuthor) | **GET** /author/{id} | Get a specific author
-[**getAuthors**](AuthorsApi.md#getAuthors) | **GET** /author | Get all authors
-
-## getAuthor
-
-> AuthorResponse getAuthor(id)
-
-Get details of a specific author by their ID.
+This method allows to retrieve a specific author. 
 
 ### Example
 
 ```typescript
-import { AuthorsApi, Configuration } from 'qase-api-client';
+import {
+    AuthorsApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new AuthorsApi(configuration);
 
-const api = new AuthorsApi(configuration);
+let id: number; //Identifier. (default to undefined)
 
-async function getAuthorDetails(authorId: number) {
-    try {
-        const response = await api.getAuthor(authorId);
-        
-        if (response.status) {
-            const author = response.result;
-            console.log('Author Details:', {
-                id: author.id,
-                name: author.name,
-                email: author.email,
-                role: author.role,
-                status: author.status,
-                lastActivity: author.last_activity
-            });
-            
-            return author;
-        }
-    } catch (error) {
-        if (error.response?.status === 404) {
-            console.error(`Author ${authorId} not found`);
-        } else if (error.response?.status === 401) {
-            console.error('Invalid API token');
-        } else {
-            console.error('Error fetching author:', error.message);
-        }
-    }
-}
-
-// Usage example
-getAuthorDetails(123);
+const { status, data } = await apiInstance.getAuthor(
+    id
+);
 ```
 
 ### Parameters
 
-Name | Type | Description | Notes
-------------- | ------------- | ------------- | -------------
-**id** | **number** | Author identifier | required
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] | Identifier. | defaults to undefined|
 
-### Response Type
 
-[**AuthorResponse**](AuthorResponse.md)
+### Return type
 
-## getAuthors
+**AuthorResponse**
 
-> AuthorListResponse getAuthors(options)
+### Authorization
 
-Retrieve a list of all authors in the project with optional filtering.
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | An author. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getAuthors**
+> AuthorListResponse getAuthors()
+
+This method allows to retrieve all authors in selected project. 
 
 ### Example
 
 ```typescript
-import { AuthorsApi, Configuration } from 'qase-api-client';
+import {
+    AuthorsApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new AuthorsApi(configuration);
 
-const api = new AuthorsApi(configuration);
+let search: string; //Provide a string that will be used to search by name. (optional) (default to undefined)
+let type: 'app' | 'user'; // (optional) (default to undefined)
+let limit: number; //A number of entities in result set. (optional) (default to 10)
+let offset: number; //How many entities should be skipped. (optional) (default to 0)
 
-async function listAuthors(projectCode: string) {
-    try {
-        const response = await api.getAuthors("user@qase.io", "user", 10, 0);
-        
-        if (response.status) {
-            console.log(`Total authors: ${response.result.total}`);
-            
-            // Process authors
-            response.result.entities.forEach(author => {
-                console.log(`${author.name} (${author.role})`);
-            });
-            
-            // Check if there are more pages
-            const hasMorePages = response.result.filtered > response.result.count;
-            if (hasMorePages) {
-                console.log('More authors available in next pages');
-            }
-        }
-    } catch (error) {
-        console.error('Failed to fetch authors:', error.message);
-    }
-}
+const { status, data } = await apiInstance.getAuthors(
+    search,
+    type,
+    limit,
+    offset
+);
 ```
 
 ### Parameters
 
-Name | Type | Description | Notes
-------------- | ------------- | ------------- | -------------
-**search** | **string** | Search string to filter authors by name | optional
-**type** | **string** | Filter by author type | optional
-**limit** | **number** | Number of authors to return (default: 10) | optional
-**offset** | **number** | Number of authors to skip (default: 0) | optional
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **search** | [**string**] | Provide a string that will be used to search by name. | (optional) defaults to undefined|
+| **type** | [**&#39;app&#39; | &#39;user&#39;**]**Array<&#39;app&#39; &#124; &#39;user&#39;>** |  | (optional) defaults to undefined|
+| **limit** | [**number**] | A number of entities in result set. | (optional) defaults to 10|
+| **offset** | [**number**] | How many entities should be skipped. | (optional) defaults to 0|
 
-### Response Type
 
-[**AuthorListResponse**](AuthorListResponse.md)
+### Return type
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+**AuthorListResponse**
+
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | Author list. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+

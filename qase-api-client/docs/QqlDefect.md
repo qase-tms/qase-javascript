@@ -1,26 +1,50 @@
 # QqlDefect
 
-Represents a defect entity in Qase Query Language (QQL) format, used for advanced defect filtering and searching.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **number** | Internal defect identifier | optional
-**defect_id** | **number** | Public defect identifier | required
-**title** | **string** | Defect title | optional
-**actual_result** | **string** | Actual result description | optional
-**severity** | **string** | Defect severity level (e.g., 'blocker', 'critical', 'major', 'minor', 'trivial') | optional
-**status** | **string** | Current defect status (e.g., 'open', 'in_progress', 'resolved') | optional
-**milestone_id** | **number** | Associated milestone identifier | optional
-**custom_fields** | [**CustomFieldValue[]**](CustomFieldValue.md) | List of custom field values | optional
-**attachments** | [**Attachment[]**](Attachment.md) | List of attached files | optional
-**resolved** | **Date** | Resolution timestamp | optional
-**member_id** | **number** | *(Deprecated)* Use **author_id** instead | optional
-**author_id** | **number** | User ID who created the defect | optional
-**external_data** | **string** | External system reference data | optional
-**tags** | [**TagValue[]**](TagValue.md) | List of associated tags | optional
-**created_at** | **Date** | Creation timestamp | optional
-**updated_at** | **Date** | Last update timestamp | optional
+**defect_id** | **number** |  | [default to undefined]
+**id** | **number** |  | [optional] [default to undefined]
+**title** | **string** |  | [optional] [default to undefined]
+**actual_result** | **string** |  | [optional] [default to undefined]
+**severity** | **string** |  | [optional] [default to undefined]
+**status** | **string** |  | [optional] [default to undefined]
+**milestone_id** | **number** |  | [optional] [default to undefined]
+**custom_fields** | [**Array&lt;CustomFieldValue&gt;**](CustomFieldValue.md) |  | [optional] [default to undefined]
+**attachments** | [**Array&lt;Attachment&gt;**](Attachment.md) |  | [optional] [default to undefined]
+**resolved** | **string** |  | [optional] [default to undefined]
+**member_id** | **number** | Deprecated, use &#x60;author_id&#x60; instead. | [optional] [default to undefined]
+**author_id** | **number** |  | [optional] [default to undefined]
+**external_data** | **string** |  | [optional] [default to undefined]
+**tags** | [**Array&lt;TagValue&gt;**](TagValue.md) |  | [optional] [default to undefined]
+**created_at** | **string** |  | [optional] [default to undefined]
+**updated_at** | **string** |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { QqlDefect } from 'qase-api-client';
+
+const instance: QqlDefect = {
+    defect_id,
+    id,
+    title,
+    actual_result,
+    severity,
+    status,
+    milestone_id,
+    custom_fields,
+    attachments,
+    resolved,
+    member_id,
+    author_id,
+    external_data,
+    tags,
+    created_at,
+    updated_at,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

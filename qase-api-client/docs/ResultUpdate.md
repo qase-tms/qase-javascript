@@ -1,17 +1,32 @@
 # ResultUpdate
 
-Represents the model for updating an existing test result in Qase TMS.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**status** | **string** | Test execution status (passed, failed, blocked, invalid, skipped) | optional
-**time_ms** | **number** | Test execution duration in milliseconds | optional
-**defect** | **boolean** | Whether this result should be marked as a defect | optional
-**attachments** | **string[]** | List of attachment hashes to link to the result | optional
-**stacktrace** | **string** | Error stacktrace for failed tests | optional
-**comment** | **string** | Additional comments about the test execution | optional
-**steps** | [**TestStepResultCreate[]**](TestStepResultCreate.md) | Updated results of individual test steps | optional
+**status** | **string** |  | [optional] [default to undefined]
+**time_ms** | **number** |  | [optional] [default to undefined]
+**defect** | **boolean** |  | [optional] [default to undefined]
+**attachments** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
+**stacktrace** | **string** |  | [optional] [default to undefined]
+**comment** | **string** |  | [optional] [default to undefined]
+**steps** | [**Array&lt;TestStepResultCreate&gt;**](TestStepResultCreate.md) |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { ResultUpdate } from 'qase-api-client';
+
+const instance: ResultUpdate = {
+    status,
+    time_ms,
+    defect,
+    attachments,
+    stacktrace,
+    comment,
+    steps,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

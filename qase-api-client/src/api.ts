@@ -13,7 +13,6 @@
  */
 
 
-
 export * from './api/attachments-api';
 export * from './api/authors-api';
 export * from './api/cases-api';
@@ -31,4 +30,5 @@ export * from './api/shared-parameters-api';
 export * from './api/shared-steps-api';
 export * from './api/suites-api';
 export * from './api/system-fields-api';
+export * from './api/users-api';
 

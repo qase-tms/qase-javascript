@@ -1,14 +1,26 @@
 # DefectListResponseAllOfResult
 
-Result model containing paginated list of defects in Qase TMS.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**total** | **number** | Total number of defects in the system. | [optional]
-**filtered** | **number** | Number of defects after applying filters. | [optional]
-**count** | **number** | Number of defects in the current page. | [optional]
-**entities** | [**Defect[]**](Defect.md) | Array of defect objects. | [optional]
+**total** | **number** |  | [optional] [default to undefined]
+**filtered** | **number** |  | [optional] [default to undefined]
+**count** | **number** |  | [optional] [default to undefined]
+**entities** | [**Array&lt;Defect&gt;**](Defect.md) |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { DefectListResponseAllOfResult } from 'qase-api-client';
+
+const instance: DefectListResponseAllOfResult = {
+    total,
+    filtered,
+    count,
+    entities,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

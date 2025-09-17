@@ -1,14 +1,22 @@
 # SearchResponseAllOfResult
 
-Represents the result portion of a search response, containing the found entities and pagination information.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**entities** | [**Array<SearchResponseAllOfResultEntities>**](SearchResponseAllOfResultEntities.md) | List of found entities matching the search criteria | required
-**total** | **number** | Total number of entities matching the search criteria | required
-**filtered** | **number** | Number of entities after applying filters | optional
-**count** | **number** | Number of entities in the current page | optional
+**entities** | [**Array&lt;SearchResponseAllOfResultEntities&gt;**](SearchResponseAllOfResultEntities.md) |  | [default to undefined]
+**total** | **number** |  | [default to undefined]
+
+## Example
+
+```typescript
+import { SearchResponseAllOfResult } from 'qase-api-client';
+
+const instance: SearchResponseAllOfResult = {
+    entities,
+    total,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

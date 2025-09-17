@@ -1,12 +1,22 @@
 # CustomFieldResponse
 
-Response model for retrieving a single custom field in Qase TMS.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**status** | **boolean** | Operation status. `true` indicates successful operation. | [optional]
-**result** | [**CustomField**](CustomField.md) | The custom field object containing all field properties. | [optional]
+**status** | **boolean** |  | [optional] [default to undefined]
+**result** | [**CustomField**](CustomField.md) |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { CustomFieldResponse } from 'qase-api-client';
+
+const instance: CustomFieldResponse = {
+    status,
+    result,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

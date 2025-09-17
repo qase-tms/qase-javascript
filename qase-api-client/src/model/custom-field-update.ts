@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { CustomFieldCreateValueInner } from './custom-field-create-value-inner';
 
 /**

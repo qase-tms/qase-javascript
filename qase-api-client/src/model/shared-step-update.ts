@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { SharedStepContentCreate } from './shared-step-content-create';
 
 /**

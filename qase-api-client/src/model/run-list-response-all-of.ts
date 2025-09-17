@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { RunListResponseAllOfResult } from './run-list-response-all-of-result';
 
 /**

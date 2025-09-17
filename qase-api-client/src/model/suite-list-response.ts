@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { BaseResponse } from './base-response';
 import { SuiteListResponseAllOf } from './suite-list-response-all-of';
 import { SuiteListResponseAllOfResult } from './suite-list-response-all-of-result';

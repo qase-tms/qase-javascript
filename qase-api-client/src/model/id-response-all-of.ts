@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { IdResponseAllOfResult } from './id-response-all-of-result';
 
 /**

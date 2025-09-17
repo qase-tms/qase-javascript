@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { AuthorListResponseAllOfResult } from './author-list-response-all-of-result';
 
 /**

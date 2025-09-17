@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { SearchResponseAllOfResult } from './search-response-all-of-result';
 
 /**

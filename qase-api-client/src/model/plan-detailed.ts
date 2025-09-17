@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { Plan } from './plan';
 import { PlanDetailedAllOf } from './plan-detailed-all-of';
 import { PlanDetailedAllOfCases } from './plan-detailed-all-of-cases';

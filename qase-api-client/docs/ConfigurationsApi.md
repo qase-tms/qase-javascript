@@ -1,224 +1,188 @@
 # ConfigurationsApi
 
-All URIs are relative to *<https://api.qase.io/v1>*
+All URIs are relative to *https://api.qase.io/v1*
 
-| Method | HTTP request | Description |
-| ------------- | ------------- | ------------- |
-| [**createConfiguration**](ConfigurationsApi.md#createConfiguration) | **POST** /configuration/{code} | Create configuration |
-| [**deleteConfiguration**](ConfigurationsApi.md#deleteConfiguration) | **DELETE** /configuration/{code}/{id} | Delete configuration |
-| [**getConfiguration**](ConfigurationsApi.md#getConfiguration) | **GET** /configuration/{code}/{id} | Get configuration |
-| [**getConfigurations**](ConfigurationsApi.md#getConfigurations) | **GET** /configuration/{code} | Get all configurations |
-| [**updateConfiguration**](ConfigurationsApi.md#updateConfiguration) | **PATCH** /configuration/{code}/{id} | Update configuration |
+|Method | HTTP request | Description|
+|------------- | ------------- | -------------|
+|[**createConfiguration**](#createconfiguration) | **POST** /configuration/{code} | Create a new configuration in a particular group.|
+|[**createConfigurationGroup**](#createconfigurationgroup) | **POST** /configuration/{code}/group | Create a new configuration group.|
+|[**getConfigurations**](#getconfigurations) | **GET** /configuration/{code} | Get all configuration groups with configurations.|
 
-## createConfiguration
+# **createConfiguration**
+> IdResponse createConfiguration(configurationCreate)
 
-Create configuration
-
-This method allows to create a new configuration in the project.
+This method allows to create a configuration in selected project. 
 
 ### Example
 
 ```typescript
-import { ConfigurationsApi, Configuration } from 'qase-api-client';
+import {
+    ConfigurationsApi,
+    Configuration,
+    ConfigurationCreate
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new ConfigurationsApi(configuration);
 
-const api = new ConfigurationsApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let configurationCreate: ConfigurationCreate; //
 
-// Create a new configuration
-const configData = {
-    title: 'Production Environment',
-    description: 'Production environment configuration',
-    group: 'Environments',
-    is_active: true
-};
-
-const response = await api.createConfiguration('PROJECT_CODE', configData);
-console.log(`Created configuration ID: ${response.result.id}`);
+const { status, data } = await apiInstance.createConfiguration(
+    code,
+    configurationCreate
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to search entities. |
-| **config** | [**ConfigurationCreate**](ConfigurationCreate.md) | Configuration data |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **configurationCreate** | **ConfigurationCreate**|  | |
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+
 
 ### Return type
 
-[**ConfigurationResponse**](ConfigurationResponse.md)
+**IdResponse**
 
-## deleteConfiguration
+### Authorization
 
-Delete configuration
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to delete a specific configuration.
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **createConfigurationGroup**
+> IdResponse createConfigurationGroup(configurationGroupCreate)
+
+This method allows to create a configuration group in selected project. 
 
 ### Example
 
 ```typescript
-import { ConfigurationsApi, Configuration } from 'qase-api-client';
+import {
+    ConfigurationsApi,
+    Configuration,
+    ConfigurationGroupCreate
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new ConfigurationsApi(configuration);
 
-const api = new ConfigurationsApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let configurationGroupCreate: ConfigurationGroupCreate; //
 
-// Delete a configuration
-const response = await api.deleteConfiguration('PROJECT_CODE', 123);
-if (response.status) {
-    console.log('Configuration deleted successfully');
-}
+const { status, data } = await apiInstance.createConfigurationGroup(
+    code,
+    configurationGroupCreate
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to search entities. |
-| **id** | **number** | Configuration ID |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **configurationGroupCreate** | **ConfigurationGroupCreate**|  | |
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+
 
 ### Return type
 
-[**Response**](Response.md)
+**IdResponse**
 
-## getConfiguration
+### Authorization
 
-Get configuration
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to retrieve a specific configuration.
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getConfigurations**
+> ConfigurationListResponse getConfigurations()
+
+This method allows to retrieve all configurations groups with configurations 
 
 ### Example
 
 ```typescript
-import { ConfigurationsApi, Configuration } from 'qase-api-client';
+import {
+    ConfigurationsApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new ConfigurationsApi(configuration);
 
-const api = new ConfigurationsApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
 
-// Get configuration information
-const config = await api.getConfiguration('PROJECT_CODE', 123);
-console.log(`Configuration title: ${config.result.title}`);
-console.log(`Description: ${config.result.description}`);
-console.log(`Group: ${config.result.group}`);
-console.log(`Active: ${config.result.is_active}`);
+const { status, data } = await apiInstance.getConfigurations(
+    code
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to search entities. |
-| **id** | **number** | Configuration ID |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+
 
 ### Return type
 
-[**ConfigurationResponse**](ConfigurationResponse.md)
+**ConfigurationListResponse**
 
-## getConfigurations
+### Authorization
 
-Get all configurations
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to retrieve all configurations in the project.
+### HTTP request headers
 
-### Example
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
 
-```typescript
-import { ConfigurationsApi, Configuration } from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A list of all configurations. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
 
-const api = new ConfigurationsApi(configuration);
-
-// Get all configurations with filtering
-const params = {
-    limit: 10,
-    offset: 0,
-    filters: {
-        group: ['Environments'],
-        is_active: true
-    }
-};
-
-const response = await api.getConfigurations('PROJECT_CODE', params);
-console.log(`Total configurations: ${response.result.total}`);
-console.log(`Filtered: ${response.result.filtered}`);
-console.log(`Count: ${response.result.count}`);
-
-response.result.entities.forEach(config => {
-    console.log(`[${config.id}] ${config.title}`);
-    console.log(`Group: ${config.group}`);
-    console.log(`Active: ${config.is_active}`);
-    console.log('---');
-});
-```
-
-### Parameters
-
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to search entities. |
-| **params** | [**ConfigurationParams**](ConfigurationParams.md) | Filter parameters |
-
-### Return type
-
-[**ConfigurationListResponse**](ConfigurationListResponse.md)
-
-## updateConfiguration
-
-Update configuration
-
-This method allows to update a specific configuration.
-
-### Example
-
-```typescript
-import { ConfigurationsApi, Configuration } from 'qase-api-client';
-
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
-
-const api = new ConfigurationsApi(configuration);
-
-// Update configuration
-const updateData = {
-    title: 'Updated Configuration Title',
-    description: 'Updated description',
-    group: 'Updated Group',
-    is_active: false
-};
-
-const response = await api.updateConfiguration('PROJECT_CODE', 123, updateData);
-if (response.status) {
-    console.log('Configuration updated successfully');
-}
-```
-
-### Parameters
-
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to search entities. |
-| **id** | **number** | Configuration ID |
-| **config** | [**ConfigurationUpdate**](ConfigurationUpdate.md) | Configuration update data |
-
-### Return type
-
-[**ConfigurationResponse**](ConfigurationResponse.md)
-
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

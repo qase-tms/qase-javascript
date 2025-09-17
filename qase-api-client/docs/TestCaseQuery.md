@@ -1,40 +1,74 @@
 # TestCaseQuery
 
-## Description
-
-Model representing a test case query for filtering and searching test cases in Qase TMS.
 
 ## Properties
 
-| Name | Type | Description |
-|------|------|-------------|
-| **id** | **number** | Test case ID |
-| **test_case_id** | **number** | Test case ID (required) |
-| **position** | **number** | Position in the test suite |
-| **title** | **string** | Test case title |
-| **description** | **string** | Test case description |
-| **preconditions** | **string** | Test case preconditions |
-| **postconditions** | **string** | Test case postconditions |
-| **severity** | **number** | Test case severity level |
-| **priority** | **number** | Test case priority level |
-| **type** | **number** | Test case type |
-| **layer** | **number** | Test case layer |
-| **is_flaky** | **number** | Whether the test case is flaky |
-| **behavior** | **number** | Test case behavior |
-| **automation** | **number** | Test case automation status |
-| **status** | **number** | Test case status |
-| **milestone_id** | **number** | Associated milestone ID |
-| **suite_id** | **number** | Parent suite ID |
-| **custom_fields** | [**CustomFieldValue[]**](CustomFieldValue.md) | Custom field values |
-| **attachments** | [**Attachment[]**](Attachment.md) | Attached files |
-| **steps_type** | **string** | Type of test steps |
-| **steps** | [**TestStep[]**](TestStep.md) | Test steps |
-| **params** | [**TestCaseParams**](TestCaseParams.md) | Additional query parameters |
-| **tags** | [**TagValue[]**](TagValue.md) | Associated tags |
-| **member_id** | **number** | Deprecated, use **author_id** instead |
-| **author_id** | **number** | Test case author ID |
-| **created_at** | **string** | Creation timestamp |
-| **updated_at** | **string** | Last update timestamp |
-| **updated_by** | **number** | ID of the user who last updated the test case |
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**test_case_id** | **number** |  | [default to undefined]
+**id** | **number** |  | [optional] [default to undefined]
+**position** | **number** |  | [optional] [default to undefined]
+**title** | **string** |  | [optional] [default to undefined]
+**description** | **string** |  | [optional] [default to undefined]
+**preconditions** | **string** |  | [optional] [default to undefined]
+**postconditions** | **string** |  | [optional] [default to undefined]
+**severity** | **number** |  | [optional] [default to undefined]
+**priority** | **number** |  | [optional] [default to undefined]
+**type** | **number** |  | [optional] [default to undefined]
+**layer** | **number** |  | [optional] [default to undefined]
+**is_flaky** | **number** |  | [optional] [default to undefined]
+**behavior** | **number** |  | [optional] [default to undefined]
+**automation** | **number** |  | [optional] [default to undefined]
+**status** | **number** |  | [optional] [default to undefined]
+**milestone_id** | **number** |  | [optional] [default to undefined]
+**suite_id** | **number** |  | [optional] [default to undefined]
+**custom_fields** | [**Array&lt;CustomFieldValue&gt;**](CustomFieldValue.md) |  | [optional] [default to undefined]
+**attachments** | [**Array&lt;Attachment&gt;**](Attachment.md) |  | [optional] [default to undefined]
+**steps_type** | **string** |  | [optional] [default to undefined]
+**steps** | [**Array&lt;TestStep&gt;**](TestStep.md) |  | [optional] [default to undefined]
+**params** | [**QqlTestCaseParams**](QqlTestCaseParams.md) |  | [optional] [default to undefined]
+**tags** | [**Array&lt;TagValue&gt;**](TagValue.md) |  | [optional] [default to undefined]
+**member_id** | **number** | Deprecated, use &#x60;author_id&#x60; instead. | [optional] [default to undefined]
+**author_id** | **number** |  | [optional] [default to undefined]
+**created_at** | **string** |  | [optional] [default to undefined]
+**updated_at** | **string** |  | [optional] [default to undefined]
+**updated_by** | **number** | Author ID of the last update. | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { TestCaseQuery } from 'qase-api-client';
+
+const instance: TestCaseQuery = {
+    test_case_id,
+    id,
+    position,
+    title,
+    description,
+    preconditions,
+    postconditions,
+    severity,
+    priority,
+    type,
+    layer,
+    is_flaky,
+    behavior,
+    automation,
+    status,
+    milestone_id,
+    suite_id,
+    custom_fields,
+    attachments,
+    steps_type,
+    steps,
+    params,
+    tags,
+    member_id,
+    author_id,
+    created_at,
+    updated_at,
+    updated_by,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

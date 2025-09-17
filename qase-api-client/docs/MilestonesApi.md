@@ -1,227 +1,320 @@
 # MilestonesApi
 
-All URIs are relative to *<https://api.qase.io/v1>*
+All URIs are relative to *https://api.qase.io/v1*
 
-| Method | HTTP request | Description |
-| ------------- | ------------- | ------------- |
-| [**createMilestone**](MilestonesApi.md#createMilestone) | **POST** /milestone/{code} | Create milestone |
-| [**deleteMilestone**](MilestonesApi.md#deleteMilestone) | **DELETE** /milestone/{code}/{id} | Delete milestone |
-| [**getMilestone**](MilestonesApi.md#getMilestone) | **GET** /milestone/{code}/{id} | Get milestone |
-| [**getMilestones**](MilestonesApi.md#getMilestones) | **GET** /milestone/{code} | Get all milestones |
-| [**updateMilestone**](MilestonesApi.md#updateMilestone) | **PATCH** /milestone/{code}/{id} | Update milestone |
+|Method | HTTP request | Description|
+|------------- | ------------- | -------------|
+|[**createMilestone**](#createmilestone) | **POST** /milestone/{code} | Create a new milestone|
+|[**deleteMilestone**](#deletemilestone) | **DELETE** /milestone/{code}/{id} | Delete milestone|
+|[**getMilestone**](#getmilestone) | **GET** /milestone/{code}/{id} | Get a specific milestone|
+|[**getMilestones**](#getmilestones) | **GET** /milestone/{code} | Get all milestones|
+|[**updateMilestone**](#updatemilestone) | **PATCH** /milestone/{code}/{id} | Update milestone|
 
-## createMilestone
+# **createMilestone**
+> IdResponse createMilestone(milestoneCreate)
 
-Create milestone
-
-This method allows to create a new milestone in the project.
-
-### Example
-
-```typescript
-import { MilestonesApi, Configuration } from 'qase-api-client';
-
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
-
-const api = new MilestonesApi(configuration);
-
-// Create a new milestone
-const milestoneData = {
-    title: 'Sprint 1',
-    description: 'First sprint milestone',
-    due_date: '2024-12-31',
-    status: 'active'
-};
-
-const response = await api.createMilestone('PROJECT_CODE', milestoneData);
-console.log(`Created milestone ID: ${response.result.id}`);
-```
-
-### Parameters
-
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to search entities. |
-| **milestone** | [**MilestoneCreate**](MilestoneCreate.md) | Milestone data |
-
-### Return type
-
-[**MilestoneResponse**](MilestoneResponse.md)
-
-## deleteMilestone
-
-Delete milestone
-
-This method allows to delete a specific milestone.
+This method allows to create a milestone in selected project. 
 
 ### Example
 
 ```typescript
-import { MilestonesApi, Configuration } from 'qase-api-client';
+import {
+    MilestonesApi,
+    Configuration,
+    MilestoneCreate
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new MilestonesApi(configuration);
 
-const api = new MilestonesApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let milestoneCreate: MilestoneCreate; //
 
-// Delete a milestone
-const response = await api.deleteMilestone('PROJECT_CODE', 123);
-if (response.status) {
-    console.log('Milestone deleted successfully');
-}
+const { status, data } = await apiInstance.createMilestone(
+    code,
+    milestoneCreate
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to search entities. |
-| **id** | **number** | Milestone ID |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **milestoneCreate** | **MilestoneCreate**|  | |
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+
 
 ### Return type
 
-[**Response**](Response.md)
+**IdResponse**
 
-## getMilestone
+### Authorization
 
-Get milestone
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to retrieve a specific milestone.
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deleteMilestone**
+> IdResponse deleteMilestone()
+
+This method completely deletes a milestone from repository. 
 
 ### Example
 
 ```typescript
-import { MilestonesApi, Configuration } from 'qase-api-client';
+import {
+    MilestonesApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new MilestonesApi(configuration);
 
-const api = new MilestonesApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let id: number; //Identifier. (default to undefined)
 
-// Get milestone information
-const milestone = await api.getMilestone('PROJECT_CODE', 123);
-console.log(`Milestone title: ${milestone.result.title}`);
-console.log(`Description: ${milestone.result.description}`);
-console.log(`Due date: ${milestone.result.due_date}`);
-console.log(`Status: ${milestone.result.status}`);
+const { status, data } = await apiInstance.deleteMilestone(
+    code,
+    id
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to search entities. |
-| **id** | **number** | Milestone ID |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **id** | [**number**] | Identifier. | defaults to undefined|
+
 
 ### Return type
 
-[**MilestoneResponse**](MilestoneResponse.md)
+**IdResponse**
 
-## getMilestones
+### Authorization
 
-Get all milestones
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to retrieve all milestones in the project.
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A Result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getMilestone**
+> MilestoneResponse getMilestone()
+
+This method allows to retrieve a specific milestone. 
 
 ### Example
 
 ```typescript
-import { MilestonesApi, Configuration } from 'qase-api-client';
+import {
+    MilestonesApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new MilestonesApi(configuration);
 
-const api = new MilestonesApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let id: number; //Identifier. (default to undefined)
 
-// Get all milestones with filtering
-const params = {
-    limit: 10,
-    offset: 0,
-    filters: {
-        status: ['active'],
-        due_date: {
-            from: '2024-01-01',
-            to: '2024-12-31'
-        }
-    }
-};
-
-const response = await api.getMilestones('PROJECT_CODE', params);
-console.log(`Total milestones: ${response.result.total}`);
-console.log(`Filtered: ${response.result.filtered}`);
-console.log(`Count: ${response.result.count}`);
-
-response.result.entities.forEach(milestone => {
-    console.log(`[${milestone.id}] ${milestone.title}`);
-    console.log(`Due date: ${milestone.due_date}`);
-    console.log(`Status: ${milestone.status}`);
-    console.log('---');
-});
+const { status, data } = await apiInstance.getMilestone(
+    code,
+    id
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to search entities. |
-| **params** | [**MilestoneParams**](MilestoneParams.md) | Filter parameters |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **id** | [**number**] | Identifier. | defaults to undefined|
+
 
 ### Return type
 
-[**MilestoneListResponse**](MilestoneListResponse.md)
+**MilestoneResponse**
 
-## updateMilestone
+### Authorization
 
-Update milestone
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to update a specific milestone.
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A Milestone. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getMilestones**
+> MilestoneListResponse getMilestones()
+
+This method allows to retrieve all milestones stored in selected project. 
 
 ### Example
 
 ```typescript
-import { MilestonesApi, Configuration } from 'qase-api-client';
+import {
+    MilestonesApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new MilestonesApi(configuration);
 
-const api = new MilestonesApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let search: string; //Provide a string that will be used to search by name. (optional) (default to undefined)
+let limit: number; //A number of entities in result set. (optional) (default to 10)
+let offset: number; //How many entities should be skipped. (optional) (default to 0)
 
-// Update milestone
-const updateData = {
-    title: 'Updated Milestone Title',
-    description: 'Updated description',
-    due_date: '2024-12-31',
-    status: 'completed'
-};
-
-const response = await api.updateMilestone('PROJECT_CODE', 123, updateData);
-if (response.status) {
-    console.log('Milestone updated successfully');
-}
+const { status, data } = await apiInstance.getMilestones(
+    code,
+    search,
+    limit,
+    offset
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to search entities. |
-| **id** | **number** | Milestone ID |
-| **milestone** | [**MilestoneUpdate**](MilestoneUpdate.md) | Milestone update data |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **search** | [**string**] | Provide a string that will be used to search by name. | (optional) defaults to undefined|
+| **limit** | [**number**] | A number of entities in result set. | (optional) defaults to 10|
+| **offset** | [**number**] | How many entities should be skipped. | (optional) defaults to 0|
+
 
 ### Return type
 
-[**MilestoneResponse**](MilestoneResponse.md)
+**MilestoneListResponse**
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A list of all milestones. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateMilestone**
+> IdResponse updateMilestone(milestoneUpdate)
+
+This method updates a milestone. 
+
+### Example
+
+```typescript
+import {
+    MilestonesApi,
+    Configuration,
+    MilestoneUpdate
+} from 'qase-api-client';
+
+const configuration = new Configuration();
+const apiInstance = new MilestonesApi(configuration);
+
+let code: string; //Code of project, where to search entities. (default to undefined)
+let id: number; //Identifier. (default to undefined)
+let milestoneUpdate: MilestoneUpdate; //
+
+const { status, data } = await apiInstance.updateMilestone(
+    code,
+    id,
+    milestoneUpdate
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **milestoneUpdate** | **MilestoneUpdate**|  | |
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **id** | [**number**] | Identifier. | defaults to undefined|
+
+
+### Return type
+
+**IdResponse**
+
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

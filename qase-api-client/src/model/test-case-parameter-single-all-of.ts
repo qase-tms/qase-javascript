@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-
+import { ParameterSingle } from './parameter-single';
 
 /**
  * Single parameter
@@ -22,16 +22,16 @@
 export interface TestCaseParameterSingleAllOf {
     /**
      * 
+     * @type {ParameterSingle}
+     * @memberof TestCaseParameterSingleAllOf
+     */
+    'item': ParameterSingle;
+    /**
+     * 
      * @type {string}
      * @memberof TestCaseParameterSingleAllOf
      */
     'type'?: TestCaseParameterSingleAllOfTypeEnum;
-    /**
-     * 
-     * @type {object}
-     * @memberof TestCaseParameterSingleAllOf
-     */
-    'items'?: object;
 }
 
 /**

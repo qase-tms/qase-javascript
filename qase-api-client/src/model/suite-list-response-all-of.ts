@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { SuiteListResponseAllOfResult } from './suite-list-response-all-of-result';
 
 /**

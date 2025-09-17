@@ -1,14 +1,26 @@
 # RunListResponseAllOfResult
 
-Represents the paginated result set containing test runs in Qase TMS.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**total** | **number** | Total number of test runs available | optional
-**filtered** | **number** | Number of runs after applying filters | optional
-**count** | **number** | Number of runs in the current page | optional
-**entities** | [**Run[]**](Run.md) | List of test run entities | optional
+**total** | **number** |  | [optional] [default to undefined]
+**filtered** | **number** |  | [optional] [default to undefined]
+**count** | **number** |  | [optional] [default to undefined]
+**entities** | [**Array&lt;Run&gt;**](Run.md) |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { RunListResponseAllOfResult } from 'qase-api-client';
+
+const instance: RunListResponseAllOfResult = {
+    total,
+    filtered,
+    count,
+    entities,
+};
+```
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

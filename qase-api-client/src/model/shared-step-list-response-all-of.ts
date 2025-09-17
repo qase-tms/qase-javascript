@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { SharedStepListResponseAllOfResult } from './shared-step-list-response-all-of-result';
 
 /**

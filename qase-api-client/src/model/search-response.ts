@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { BaseResponse } from './base-response';
 import { SearchResponseAllOf } from './search-response-all-of';
 import { SearchResponseAllOfResult } from './search-response-all-of-result';

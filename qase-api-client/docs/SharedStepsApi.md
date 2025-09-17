@@ -1,220 +1,319 @@
 # SharedStepsApi
 
-All URIs are relative to *<https://api.qase.io/v1>*
+All URIs are relative to *https://api.qase.io/v1*
 
-| Method | HTTP request | Description |
-| ------------- | ------------- | ------------- |
-| [**createSharedStep**](SharedStepsApi.md#createSharedStep) | **POST** /shared_step/{code} | Create a new shared step |
-| [**deleteSharedStep**](SharedStepsApi.md#deleteSharedStep) | **DELETE** /shared_step/{code}/{hash} | Delete shared step |
-| [**getSharedStep**](SharedStepsApi.md#getSharedStep) | **GET** /shared_step/{code}/{hash} | Get a specific shared step |
-| [**getSharedSteps**](SharedStepsApi.md#getSharedSteps) | **GET** /shared_step/{code} | Get all shared steps |
-| [**updateSharedStep**](SharedStepsApi.md#updateSharedStep) | **PATCH** /shared_step/{code}/{hash} | Update shared step |
+|Method | HTTP request | Description|
+|------------- | ------------- | -------------|
+|[**createSharedStep**](#createsharedstep) | **POST** /shared_step/{code} | Create a new shared step|
+|[**deleteSharedStep**](#deletesharedstep) | **DELETE** /shared_step/{code}/{hash} | Delete shared step|
+|[**getSharedStep**](#getsharedstep) | **GET** /shared_step/{code}/{hash} | Get a specific shared step|
+|[**getSharedSteps**](#getsharedsteps) | **GET** /shared_step/{code} | Get all shared steps|
+|[**updateSharedStep**](#updatesharedstep) | **PATCH** /shared_step/{code}/{hash} | Update shared step|
 
-## createSharedStep
+# **createSharedStep**
+> HashResponse createSharedStep(sharedStepCreate)
 
-Create a new shared step
-
-This method allows to create a shared step in the project.
-
-### Example
-
-```typescript
-import { SharedStepsApi, Configuration } from 'qase-api-client';
-
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
-
-const api = new SharedStepsApi(configuration);
-
-const sharedStep = {
-    title: 'Login to application',
-    steps: [
-        {
-            action: 'Open browser',
-            expected_result: 'Browser is opened'
-        },
-        {
-            action: 'Navigate to login page',
-            expected_result: 'Login page is displayed'
-        }
-    ]
-};
-
-const response = await api.createSharedStep('PROJECT_CODE', sharedStep);
-console.log(`Created shared step with hash: ${response.result.hash}`);
-```
-
-### Parameters
-
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to create shared step. |
-| **sharedStepCreate** | [**SharedStepCreate**](SharedStepCreate.md) |  |
-
-### Return type
-
-[**HashResponse**](HashResponse.md)
-
-## deleteSharedStep
-
-Delete shared step
-
-This method allows to delete a shared step.
+This method allows to create a shared step in selected project. 
 
 ### Example
 
 ```typescript
-import { SharedStepsApi, Configuration } from 'qase-api-client';
+import {
+    SharedStepsApi,
+    Configuration,
+    SharedStepCreate
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new SharedStepsApi(configuration);
 
-const api = new SharedStepsApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let sharedStepCreate: SharedStepCreate; //
 
-const response = await api.deleteSharedStep('PROJECT_CODE', 'SHARED_STEP_HASH');
-console.log(`Shared step deleted: ${response.result}`);
+const { status, data } = await apiInstance.createSharedStep(
+    code,
+    sharedStepCreate
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to delete shared step. |
-| **hash** | **string** | Hash of shared step. |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **sharedStepCreate** | **SharedStepCreate**|  | |
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+
 
 ### Return type
 
-[**HashResponse**](HashResponse.md)
+**HashResponse**
 
-## getSharedStep
+### Authorization
 
-Get a specific shared step
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to retrieve a specific shared step.
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**422** | Unprocessable Entity. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deleteSharedStep**
+> HashResponse deleteSharedStep()
+
+This method completely deletes a shared step from repository. 
 
 ### Example
 
 ```typescript
-import { SharedStepsApi, Configuration } from 'qase-api-client';
+import {
+    SharedStepsApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new SharedStepsApi(configuration);
 
-const api = new SharedStepsApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let hash: string; //Hash. (default to undefined)
 
-const response = await api.getSharedStep('PROJECT_CODE', 'SHARED_STEP_HASH');
-console.log(`Shared step title: ${response.result.title}`);
-console.log(`Steps count: ${response.result.steps.length}`);
+const { status, data } = await apiInstance.deleteSharedStep(
+    code,
+    hash
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to get shared step. |
-| **hash** | **string** | Hash of shared step. |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **hash** | [**string**] | Hash. | defaults to undefined|
+
 
 ### Return type
 
-[**SharedStepResponse**](SharedStepResponse.md)
+**HashResponse**
 
-## getSharedSteps
+### Authorization
 
-Get all shared steps
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to retrieve all shared steps stored in selected project.
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A Result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getSharedStep**
+> SharedStepResponse getSharedStep()
+
+This method allows to retrieve a specific shared step. 
 
 ### Example
 
 ```typescript
-import { SharedStepsApi, Configuration } from 'qase-api-client';
+import {
+    SharedStepsApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new SharedStepsApi(configuration);
 
-const api = new SharedStepsApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let hash: string; //Hash. (default to undefined)
 
-const response = await api.getSharedSteps('PROJECT_CODE');
-console.log(`Total shared steps: ${response.result.total}`);
-console.log(`Filtered: ${response.result.filtered}`);
-console.log(`Count: ${response.result.count}`);
-
-response.result.entities.forEach(sharedStep => {
-    console.log(`Title: ${sharedStep.title}`);
-    console.log(`Hash: ${sharedStep.hash}`);
-    console.log(`Steps count: ${sharedStep.steps.length}`);
-    console.log('---');
-});
+const { status, data } = await apiInstance.getSharedStep(
+    code,
+    hash
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to get shared steps. |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **hash** | [**string**] | Hash. | defaults to undefined|
+
 
 ### Return type
 
-[**SharedStepListResponse**](SharedStepListResponse.md)
+**SharedStepResponse**
 
-## updateSharedStep
+### Authorization
 
-Update shared step
+[TokenAuth](../README.md#TokenAuth)
 
-This method allows to update a shared step.
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A shared step. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getSharedSteps**
+> SharedStepListResponse getSharedSteps()
+
+This method allows to retrieve all shared steps stored in selected project. 
 
 ### Example
 
 ```typescript
-import { SharedStepsApi, Configuration } from 'qase-api-client';
+import {
+    SharedStepsApi,
+    Configuration
+} from 'qase-api-client';
 
-const configuration = new Configuration({
-    basePath: "https://api.qase.io/v1"
-});
-configuration.apiKey = process.env.API_KEY;
+const configuration = new Configuration();
+const apiInstance = new SharedStepsApi(configuration);
 
-const api = new SharedStepsApi(configuration);
+let code: string; //Code of project, where to search entities. (default to undefined)
+let search: string; //Provide a string that will be used to search by name. (optional) (default to undefined)
+let limit: number; //A number of entities in result set. (optional) (default to 10)
+let offset: number; //How many entities should be skipped. (optional) (default to 0)
 
-const sharedStep = {
-    title: 'Updated login steps',
-    steps: [
-        {
-            action: 'Open browser',
-            expected_result: 'Browser is opened'
-        },
-        {
-            action: 'Navigate to login page',
-            expected_result: 'Login page is displayed'
-        },
-        {
-            action: 'Enter credentials',
-            expected_result: 'Credentials are entered'
-        }
-    ]
-};
-
-const response = await api.updateSharedStep('PROJECT_CODE', 'SHARED_STEP_HASH', sharedStep);
-console.log(`Updated shared step with hash: ${response.result.hash}`);
+const { status, data } = await apiInstance.getSharedSteps(
+    code,
+    search,
+    limit,
+    offset
+);
 ```
 
 ### Parameters
 
-| Name | Type | Description |
-| ------------- | ------------- | ------------- |
-| **code** | **string** | Code of project, where to update shared step. |
-| **hash** | **string** | Hash of shared step. |
-| **sharedStepUpdate** | [**SharedStepUpdate**](SharedStepUpdate.md) |  |
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **search** | [**string**] | Provide a string that will be used to search by name. | (optional) defaults to undefined|
+| **limit** | [**number**] | A number of entities in result set. | (optional) defaults to 10|
+| **offset** | [**number**] | How many entities should be skipped. | (optional) defaults to 0|
+
 
 ### Return type
 
-[**HashResponse**](HashResponse.md)
+**SharedStepListResponse**
 
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A list of all shared steps. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateSharedStep**
+> HashResponse updateSharedStep(sharedStepUpdate)
+
+This method updates a shared step. 
+
+### Example
+
+```typescript
+import {
+    SharedStepsApi,
+    Configuration,
+    SharedStepUpdate
+} from 'qase-api-client';
+
+const configuration = new Configuration();
+const apiInstance = new SharedStepsApi(configuration);
+
+let code: string; //Code of project, where to search entities. (default to undefined)
+let hash: string; //Hash. (default to undefined)
+let sharedStepUpdate: SharedStepUpdate; //
+
+const { status, data } = await apiInstance.updateSharedStep(
+    code,
+    hash,
+    sharedStepUpdate
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **sharedStepUpdate** | **SharedStepUpdate**|  | |
+| **code** | [**string**] | Code of project, where to search entities. | defaults to undefined|
+| **hash** | [**string**] | Hash. | defaults to undefined|
+
+
+### Return type
+
+**HashResponse**
+
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | A result. |  -  |
+|**400** | Bad Request. |  -  |
+|**401** | Unauthorized. |  -  |
+|**403** | Forbidden. |  -  |
+|**404** | Not Found. |  -  |
+|**429** | Too Many Requests. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+

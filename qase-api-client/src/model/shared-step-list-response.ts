@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { BaseResponse } from './base-response';
 import { SharedStepListResponseAllOf } from './shared-step-list-response-all-of';
 import { SharedStepListResponseAllOfResult } from './shared-step-list-response-all-of-result';

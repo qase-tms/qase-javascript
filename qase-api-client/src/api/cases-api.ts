@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
 import { Configuration } from '../configuration';
 // Some imports not used depending on template conditions
@@ -29,6 +28,8 @@ import { IdResponse } from '../model';
 // @ts-ignore
 import { TestCaseCreate } from '../model';
 // @ts-ignore
+import { TestCaseExternalIssues } from '../model';
+// @ts-ignore
 import { TestCaseListResponse } from '../model';
 // @ts-ignore
 import { TestCaseResponse } from '../model';
@@ -36,8 +37,6 @@ import { TestCaseResponse } from '../model';
 import { TestCaseUpdate } from '../model';
 // @ts-ignore
 import { TestCasebulk } from '../model';
-// @ts-ignore
-import { TestCaseexternalIssues } from '../model';
 /**
  * CasesApi - axios parameter creator
  * @export
@@ -91,15 +90,15 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
          * 
          * @summary Attach the external issues to the test cases
          * @param {string} code Code of project, where to search entities.
-         * @param {TestCaseexternalIssues} testCaseexternalIssues 
+         * @param {TestCaseExternalIssues} testCaseExternalIssues 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        caseAttachExternalIssue: async (code: string, testCaseexternalIssues: TestCaseexternalIssues, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        caseAttachExternalIssue: async (code: string, testCaseExternalIssues: TestCaseExternalIssues, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('caseAttachExternalIssue', 'code', code)
-            // verify required parameter 'testCaseexternalIssues' is not null or undefined
-            assertParamExists('caseAttachExternalIssue', 'testCaseexternalIssues', testCaseexternalIssues)
+            // verify required parameter 'testCaseExternalIssues' is not null or undefined
+            assertParamExists('caseAttachExternalIssue', 'testCaseExternalIssues', testCaseExternalIssues)
             const localVarPath = `/case/{code}/external-issue/attach`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -123,7 +122,7 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(testCaseexternalIssues, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(testCaseExternalIssues, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -134,15 +133,15 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
          * 
          * @summary Detach the external issues from the test cases
          * @param {string} code Code of project, where to search entities.
-         * @param {TestCaseexternalIssues} testCaseexternalIssues 
+         * @param {TestCaseExternalIssues} testCaseExternalIssues 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        caseDetachExternalIssue: async (code: string, testCaseexternalIssues: TestCaseexternalIssues, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        caseDetachExternalIssue: async (code: string, testCaseExternalIssues: TestCaseExternalIssues, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('caseDetachExternalIssue', 'code', code)
-            // verify required parameter 'testCaseexternalIssues' is not null or undefined
-            assertParamExists('caseDetachExternalIssue', 'testCaseexternalIssues', testCaseexternalIssues)
+            // verify required parameter 'testCaseExternalIssues' is not null or undefined
+            assertParamExists('caseDetachExternalIssue', 'testCaseExternalIssues', testCaseExternalIssues)
             const localVarPath = `/case/{code}/external-issue/detach`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -166,7 +165,7 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(testCaseexternalIssues, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(testCaseExternalIssues, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -483,24 +482,24 @@ export const CasesApiFp = function(configuration?: Configuration) {
          * 
          * @summary Attach the external issues to the test cases
          * @param {string} code Code of project, where to search entities.
-         * @param {TestCaseexternalIssues} testCaseexternalIssues 
+         * @param {TestCaseExternalIssues} testCaseExternalIssues 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async caseAttachExternalIssue(code: string, testCaseexternalIssues: TestCaseexternalIssues, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.caseAttachExternalIssue(code, testCaseexternalIssues, options);
+        async caseAttachExternalIssue(code: string, testCaseExternalIssues: TestCaseExternalIssues, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.caseAttachExternalIssue(code, testCaseExternalIssues, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
          * @summary Detach the external issues from the test cases
          * @param {string} code Code of project, where to search entities.
-         * @param {TestCaseexternalIssues} testCaseexternalIssues 
+         * @param {TestCaseExternalIssues} testCaseExternalIssues 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async caseDetachExternalIssue(code: string, testCaseexternalIssues: TestCaseexternalIssues, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.caseDetachExternalIssue(code, testCaseexternalIssues, options);
+        async caseDetachExternalIssue(code: string, testCaseExternalIssues: TestCaseExternalIssues, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.caseDetachExternalIssue(code, testCaseExternalIssues, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -603,23 +602,23 @@ export const CasesApiFactory = function (configuration?: Configuration, basePath
          * 
          * @summary Attach the external issues to the test cases
          * @param {string} code Code of project, where to search entities.
-         * @param {TestCaseexternalIssues} testCaseexternalIssues 
+         * @param {TestCaseExternalIssues} testCaseExternalIssues 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        caseAttachExternalIssue(code: string, testCaseexternalIssues: TestCaseexternalIssues, options?: any): AxiosPromise<BaseResponse> {
-            return localVarFp.caseAttachExternalIssue(code, testCaseexternalIssues, options).then((request) => request(axios, basePath));
+        caseAttachExternalIssue(code: string, testCaseExternalIssues: TestCaseExternalIssues, options?: any): AxiosPromise<BaseResponse> {
+            return localVarFp.caseAttachExternalIssue(code, testCaseExternalIssues, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Detach the external issues from the test cases
          * @param {string} code Code of project, where to search entities.
-         * @param {TestCaseexternalIssues} testCaseexternalIssues 
+         * @param {TestCaseExternalIssues} testCaseExternalIssues 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        caseDetachExternalIssue(code: string, testCaseexternalIssues: TestCaseexternalIssues, options?: any): AxiosPromise<BaseResponse> {
-            return localVarFp.caseDetachExternalIssue(code, testCaseexternalIssues, options).then((request) => request(axios, basePath));
+        caseDetachExternalIssue(code: string, testCaseExternalIssues: TestCaseExternalIssues, options?: any): AxiosPromise<BaseResponse> {
+            return localVarFp.caseDetachExternalIssue(code, testCaseExternalIssues, options).then((request) => request(axios, basePath));
         },
         /**
          * This method allows to create a new test case in selected project. 
@@ -718,26 +717,26 @@ export class CasesApi extends BaseAPI {
      * 
      * @summary Attach the external issues to the test cases
      * @param {string} code Code of project, where to search entities.
-     * @param {TestCaseexternalIssues} testCaseexternalIssues 
+     * @param {TestCaseExternalIssues} testCaseExternalIssues 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CasesApi
      */
-    public caseAttachExternalIssue(code: string, testCaseexternalIssues: TestCaseexternalIssues, options?: AxiosRequestConfig) {
-        return CasesApiFp(this.configuration).caseAttachExternalIssue(code, testCaseexternalIssues, options).then((request) => request(this.axios, this.basePath));
+    public caseAttachExternalIssue(code: string, testCaseExternalIssues: TestCaseExternalIssues, options?: AxiosRequestConfig) {
+        return CasesApiFp(this.configuration).caseAttachExternalIssue(code, testCaseExternalIssues, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
      * @summary Detach the external issues from the test cases
      * @param {string} code Code of project, where to search entities.
-     * @param {TestCaseexternalIssues} testCaseexternalIssues 
+     * @param {TestCaseExternalIssues} testCaseExternalIssues 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CasesApi
      */
-    public caseDetachExternalIssue(code: string, testCaseexternalIssues: TestCaseexternalIssues, options?: AxiosRequestConfig) {
-        return CasesApiFp(this.configuration).caseDetachExternalIssue(code, testCaseexternalIssues, options).then((request) => request(this.axios, this.basePath));
+    public caseDetachExternalIssue(code: string, testCaseExternalIssues: TestCaseExternalIssues, options?: AxiosRequestConfig) {
+        return CasesApiFp(this.configuration).caseDetachExternalIssue(code, testCaseExternalIssues, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { BaseResponse } from './base-response';
 import { SharedParameterListResponseAllOf } from './shared-parameter-list-response-all-of';
 import { SharedParameterListResponseAllOfResult } from './shared-parameter-list-response-all-of-result';
