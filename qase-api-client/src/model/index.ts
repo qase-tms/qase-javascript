@@ -207,5 +207,6 @@ export * from './test-step-create';
 export * from './test-step-result';
 export * from './test-step-result-create';
 export * from './uuid-response';
+export * from './uuid-response1';
 export * from './uuid-response-all-of';
 export * from './uuid-response-all-of-result';

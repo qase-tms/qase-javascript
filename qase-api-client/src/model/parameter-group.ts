@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { ParameterSingle } from './parameter-single';
 
 /**

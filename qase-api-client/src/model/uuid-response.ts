@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { BaseResponse } from './base-response';
 import { UuidResponseAllOf } from './uuid-response-all-of';
 import { UuidResponseAllOfResult } from './uuid-response-all-of-result';

@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { TestCaseListResponseAllOfResult } from './test-case-list-response-all-of-result';
 
 /**

@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { TestCaseParametercreate } from './test-case-parametercreate';
 import { TestStepCreate } from './test-step-create';
 

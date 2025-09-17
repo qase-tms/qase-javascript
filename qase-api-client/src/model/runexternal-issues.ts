@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { RunexternalIssuesLinksInner } from './runexternal-issues-links-inner';
 
 /**
@@ -40,8 +39,8 @@ export interface RunexternalIssues {
     * @enum {string}
     */
 export enum RunexternalIssuesTypeEnum {
-    CLOUD = 'jira-cloud',
-    SERVER = 'jira-server'
+    JIRA_CLOUD = 'jira-cloud',
+    JIRA_SERVER = 'jira-server'
 }
 
 

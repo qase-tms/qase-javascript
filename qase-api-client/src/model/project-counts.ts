@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { ProjectCountsDefects } from './project-counts-defects';
 import { ProjectCountsRuns } from './project-counts-runs';
 

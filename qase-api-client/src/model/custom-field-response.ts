@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { BaseResponse } from './base-response';
 import { CustomField } from './custom-field';
 import { CustomFieldResponseAllOf } from './custom-field-response-all-of';

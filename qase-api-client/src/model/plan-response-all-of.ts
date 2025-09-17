@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { PlanDetailed } from './plan-detailed';
 
 /**

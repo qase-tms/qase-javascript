@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { ParameterGroup } from './parameter-group';
 import { ParameterShared } from './parameter-shared';
 import { ParameterSingle } from './parameter-single';

@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { ResultCreateCase } from './result-create-case';
 import { TestStepResultCreate } from './test-step-result-create';
 

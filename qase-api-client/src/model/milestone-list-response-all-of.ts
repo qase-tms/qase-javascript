@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { MilestoneListResponseAllOfResult } from './milestone-list-response-all-of-result';
 
 /**

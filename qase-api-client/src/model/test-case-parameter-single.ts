@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-
+import { ParameterSingle } from './parameter-single';
 import { TestCaseParameterBase } from './test-case-parameter-base';
 import { TestCaseParameterSingleAllOf } from './test-case-parameter-single-all-of';
 

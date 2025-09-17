@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { BaseResponse } from './base-response';
 import { IdResponseAllOf } from './id-response-all-of';
 import { IdResponseAllOfResult } from './id-response-all-of-result';

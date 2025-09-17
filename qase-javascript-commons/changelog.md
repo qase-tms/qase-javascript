@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.4.4
+
+## What's new
+
+Updated the `qase-api-client` dependency to version `1.0.6`.
+
 # qase-javascript-commons@2.4.3
 
 ## What's new

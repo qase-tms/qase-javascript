@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { ExternalIssueIssuesInner } from './external-issue-issues-inner';
 
 /**

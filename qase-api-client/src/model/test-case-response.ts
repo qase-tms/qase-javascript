@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { BaseResponse } from './base-response';
 import { TestCase } from './test-case';
 import { TestCaseResponseAllOf } from './test-case-response-all-of';

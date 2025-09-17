@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { CustomFieldValue } from './custom-field-value';
 import { RunEnvironment } from './run-environment';
 import { RunMilestone } from './run-milestone';

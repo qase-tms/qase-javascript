@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { EnvironmentListResponseAllOfResult } from './environment-list-response-all-of-result';
 
 /**
