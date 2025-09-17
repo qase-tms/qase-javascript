@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { TestCasebulkCasesInner } from './test-casebulk-cases-inner';
 
 /**

@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { BaseResponse } from './base-response';
 import { Defect } from './defect';
 import { DefectResponseAllOf } from './defect-response-all-of';

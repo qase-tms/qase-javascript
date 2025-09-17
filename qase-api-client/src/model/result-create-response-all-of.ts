@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { ResultCreateResponseAllOfResult } from './result-create-response-all-of-result';
 
 /**

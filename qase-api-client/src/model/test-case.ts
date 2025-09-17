@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { Attachment } from './attachment';
 import { CustomFieldValue } from './custom-field-value';
 import { ExternalIssue } from './external-issue';

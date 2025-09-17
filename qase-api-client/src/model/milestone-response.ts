@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { BaseResponse } from './base-response';
 import { Milestone } from './milestone';
 import { MilestoneResponseAllOf } from './milestone-response-all-of';

@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { SharedParameterListResponseAllOfResult } from './shared-parameter-list-response-all-of-result';
 
 /**

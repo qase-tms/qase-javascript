@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { BaseResponse } from './base-response';
 import { HashResponseAllOf } from './hash-response-all-of';
 import { HashResponseAllOfResult } from './hash-response-all-of-result';

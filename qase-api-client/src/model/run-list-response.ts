@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { BaseResponse } from './base-response';
 import { RunListResponseAllOf } from './run-list-response-all-of';
 import { RunListResponseAllOfResult } from './run-list-response-all-of-result';

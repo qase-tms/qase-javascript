@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { BaseResponse } from './base-response';
 import { Bulk200ResponseAllOf } from './bulk200-response-all-of';
 import { Bulk200ResponseAllOfResult } from './bulk200-response-all-of-result';

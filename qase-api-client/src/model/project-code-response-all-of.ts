@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { ProjectCodeResponseAllOfResult } from './project-code-response-all-of-result';
 
 /**

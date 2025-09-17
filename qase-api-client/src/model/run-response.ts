@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { BaseResponse } from './base-response';
 import { Run } from './run';
 import { RunResponseAllOf } from './run-response-all-of';

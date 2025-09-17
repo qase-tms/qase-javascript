@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
 import { Configuration } from '../configuration';
 // Some imports not used depending on template conditions
@@ -30,6 +29,8 @@ import { SharedParameterResponse } from '../model';
 import { SharedParameterUpdate } from '../model';
 // @ts-ignore
 import { UuidResponse } from '../model';
+// @ts-ignore
+import { UuidResponse1 } from '../model';
 /**
  * SharedParametersApi - axios parameter creator
  * @export
@@ -278,7 +279,7 @@ export const SharedParametersApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteSharedParameter(id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UuidResponse>> {
+        async deleteSharedParameter(id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UuidResponse1>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteSharedParameter(id, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -316,7 +317,7 @@ export const SharedParametersApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateSharedParameter(id: string, sharedParameterUpdate: SharedParameterUpdate, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UuidResponse>> {
+        async updateSharedParameter(id: string, sharedParameterUpdate: SharedParameterUpdate, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UuidResponse1>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateSharedParameter(id, sharedParameterUpdate, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -347,7 +348,7 @@ export const SharedParametersApiFactory = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteSharedParameter(id: string, options?: any): AxiosPromise<UuidResponse> {
+        deleteSharedParameter(id: string, options?: any): AxiosPromise<UuidResponse1> {
             return localVarFp.deleteSharedParameter(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -382,7 +383,7 @@ export const SharedParametersApiFactory = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateSharedParameter(id: string, sharedParameterUpdate: SharedParameterUpdate, options?: any): AxiosPromise<UuidResponse> {
+        updateSharedParameter(id: string, sharedParameterUpdate: SharedParameterUpdate, options?: any): AxiosPromise<UuidResponse1> {
             return localVarFp.updateSharedParameter(id, sharedParameterUpdate, options).then((request) => request(axios, basePath));
         },
     };

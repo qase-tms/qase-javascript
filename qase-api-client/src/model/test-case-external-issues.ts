@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { TestCaseExternalIssuesLinksInner } from './test-case-external-issues-links-inner';
 
 /**
@@ -40,8 +39,8 @@ export interface TestCaseExternalIssues {
     * @enum {string}
     */
 export enum TestCaseExternalIssuesTypeEnum {
-    CLOUD = 'jira-cloud',
-    SERVER = 'jira-server'
+    JIRA_CLOUD = 'jira-cloud',
+    JIRA_SERVER = 'jira-server'
 }
 
 

@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { PlanListResponseAllOfResult } from './plan-list-response-all-of-result';
 
 /**

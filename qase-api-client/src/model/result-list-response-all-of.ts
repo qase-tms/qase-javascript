@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { ResultListResponseAllOfResult } from './result-list-response-all-of-result';
 
 /**

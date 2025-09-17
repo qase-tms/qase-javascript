@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { AttachmentListResponseAllOf } from './attachment-list-response-all-of';
 import { AttachmentListResponseAllOfResult } from './attachment-list-response-all-of-result';
 import { BaseResponse } from './base-response';

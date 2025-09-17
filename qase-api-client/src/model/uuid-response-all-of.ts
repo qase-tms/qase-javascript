@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { UuidResponseAllOfResult } from './uuid-response-all-of-result';
 
 /**

@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { TestCaseCreate } from './test-case-create';
 import { TestCaseParametercreate } from './test-case-parametercreate';
 import { TestCasebulkCasesInnerAllOf } from './test-casebulk-cases-inner-all-of';
