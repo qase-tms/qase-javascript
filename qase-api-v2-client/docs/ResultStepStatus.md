@@ -1,25 +1,16 @@
 # ResultStepStatus
 
-## Description
 
-Enumeration of possible test step statuses.
+## Enum
 
-## Values
+* `PASSED` (value: `'passed'`)
 
-| Value | Description |
-|-------|-------------|
-| passed | Step passed successfully |
-| failed | Step failed |
-| blocked | Step is blocked |
-| skipped | Step was skipped |
-| in_progress | Step is in progress |
+* `FAILED` (value: `'failed'`)
 
-## Example
+* `BLOCKED` (value: `'blocked'`)
 
-```typescript
-const stepStatus: ResultStepStatus = ResultStepStatus.PASSED;
-```
+* `SKIPPED` (value: `'skipped'`)
 
-## Related Models
+* `IN_PROGRESS` (value: `'in_progress'`)
 
-- [ResultStep](ResultStep.md)
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

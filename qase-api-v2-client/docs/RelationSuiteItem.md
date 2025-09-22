@@ -1,25 +1,22 @@
 # RelationSuiteItem
 
-## Description
-
-Model for test case relation.
 
 ## Properties
 
-| Name | Type | Description | Required |
-|------|------|-------------|----------|
-| public_id | number | Suite ID | No |
-| title | string | Suite title | Yes |
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**title** | **string** |  | [default to undefined]
+**public_id** | **number** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-const suiteItem: RelationSuiteItem = {
-    public_id: 1,
-    title: 'Login with valid credentials'
+import { RelationSuiteItem } from 'qase-api-v2-client';
+
+const instance: RelationSuiteItem = {
+    title,
+    public_id,
 };
 ```
 
-## Related Models
-
-- [ResultRelations](ResultRelations.md)
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -1,19 +1,19 @@
-# ResultRelations
+# ResultCreateBulkResponse
 
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**suite** | [**RelationSuite**](RelationSuite.md) |  | [optional] [default to undefined]
+**status** | **boolean** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { ResultRelations } from 'qase-api-v2-client';
+import { ResultCreateBulkResponse } from 'qase-api-v2-client';
 
-const instance: ResultRelations = {
-    suite,
+const instance: ResultCreateBulkResponse = {
+    status,
 };
 ```
 
