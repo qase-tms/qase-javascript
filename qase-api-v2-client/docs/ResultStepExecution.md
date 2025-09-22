@@ -1,33 +1,30 @@
 # ResultStepExecution
 
-## Description
-
-Model for test step execution details.
 
 ## Properties
 
-| Name | Type | Description | Required |
-|------|------|-------------|----------|
-| status | [ResultStepStatus](ResultStepStatus.md) | Step execution status | Yes |
-| start_time | number | Unix epoch time in seconds (whole part) and milliseconds (fractional part) | No |
-| end_time | number | Unix epoch time in seconds (whole part) and milliseconds (fractional part) | No |
-| duration | number | Duration of the test step execution in milliseconds | No |
-| comment | string | Step execution comment | No |
-| attachments | string[] | List of attachment hashes | No |
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**status** | [**ResultStepStatus**](ResultStepStatus.md) |  | [default to undefined]
+**start_time** | **number** | Unix epoch time in seconds (whole part) and milliseconds (fractional part). | [optional] [default to undefined]
+**end_time** | **number** | Unix epoch time in seconds (whole part) and milliseconds (fractional part). | [optional] [default to undefined]
+**duration** | **number** | Duration of the test step execution in milliseconds. | [optional] [default to undefined]
+**comment** | **string** |  | [optional] [default to undefined]
+**attachments** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-const stepExecution: ResultStepExecution = {
-    status: 'passed',
-    start_time: 1678901234.567,
-    end_time: 1678901235.678,
-    duration: 1111,
-    comment: 'Step executed successfully',
-    attachments: ['abc123']
+import { ResultStepExecution } from 'qase-api-v2-client';
+
+const instance: ResultStepExecution = {
+    status,
+    start_time,
+    end_time,
+    duration,
+    comment,
+    attachments,
 };
 ```
 
-## Related Models
-
-- [ResultStepStatus](ResultStepStatus.md)
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -1,23 +1,20 @@
 # RelationSuite
 
-## Description
-
-Model for test suite relation.
 
 ## Properties
 
-| Name | Type | Description | Required |
-|------|------|-------------|----------|
-| data | [RelationSuiteItem](RelationSuiteItem.md)[] | Array of suite items | Yes |
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**data** | [**Array&lt;RelationSuiteItem&gt;**](RelationSuiteItem.md) |  | [default to undefined]
 
 ## Example
 
 ```typescript
-const suite: RelationSuite = {
-    data: [],
+import { RelationSuite } from 'qase-api-v2-client';
+
+const instance: RelationSuite = {
+    data,
 };
 ```
 
-## Related Models
-
-- [ResultRelations](ResultRelations.md)
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

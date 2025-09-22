@@ -1,19 +1,21 @@
-# ResultRelations
+# ResultCreateResponseAllOfResult
 
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**suite** | [**RelationSuite**](RelationSuite.md) |  | [optional] [default to undefined]
+**case_id** | **number** |  | [optional] [default to undefined]
+**hash** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { ResultRelations } from 'qase-api-v2-client';
+import { ResultCreateResponseAllOfResult } from 'qase-api-v2-client';
 
-const instance: ResultRelations = {
-    suite,
+const instance: ResultCreateResponseAllOfResult = {
+    case_id,
+    hash,
 };
 ```
 

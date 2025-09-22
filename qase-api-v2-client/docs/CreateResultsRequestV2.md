@@ -1,41 +1,20 @@
 # CreateResultsRequestV2
 
-## Description
-
-Model for creating multiple test run results at once.
 
 ## Properties
 
-| Name | Type | Description | Required |
-|------|------|-------------|----------|
-| results | [ResultCreate](ResultCreate.md)[] | Array of results to create | Yes |
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**results** | [**Array&lt;ResultCreate&gt;**](ResultCreate.md) |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-const createResultsRequestV2: CreateResultsRequestV2 = {
-    results: [
-        {
-            title: 'Test Result 1',
-            execution: {
-                status: 'passed',
-                duration: 1000
-            },
-            testops_id: 1
-        },
-        {
-            title: 'Test Result 2',
-            execution: {
-                status: 'failed',
-                duration: 2000
-            },
-            testops_id: 2
-        }
-    ]
+import { CreateResultsRequestV2 } from 'qase-api-v2-client';
+
+const instance: CreateResultsRequestV2 = {
+    results,
 };
 ```
 
-## Related Models
-
-- [ResultCreate](ResultCreate.md)
-- [ResultExecution](ResultExecution.md)
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

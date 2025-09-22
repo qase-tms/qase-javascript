@@ -1,89 +1,135 @@
 # ResultsApi
 
-## Description
+All URIs are relative to *https://api.qase.io/v2*
 
-API for managing test run results.
+|Method | HTTP request | Description|
+|------------- | ------------- | -------------|
+|[**createResultV2**](#createresultv2) | **POST** /{project_code}/run/{run_id}/result | Create test run result|
+|[**createResultsV2**](#createresultsv2) | **POST** /{project_code}/run/{run_id}/results | Bulk create test run result|
 
-## Methods
+# **createResultV2**
+> ResultCreateResponse createResultV2(resultCreate)
 
-### createResultV2
+This method allows to create single test run result.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
 
-Create a single test run result.
-
-#### Parameters
-
-| Name | Type | Description | Required |
-|------|------|-------------|----------|
-| projectCode | string | Project code | Yes |
-| runId | number | Test run ID | Yes |
-| resultCreate | [ResultCreate](ResultCreate.md) | Result data | Yes |
-
-#### Returns
-
-Promise<void>
-
-#### Example
+### Example
 
 ```typescript
-const result = await qaseApi.results.createResultV2('MP', 1, {
-    title: 'Test Result',
-    execution: {
-        status: 'passed',
-        duration: 1000
-    },
-    testops_id: 1,
-    steps: [
-        {
-            position: 1,
-            status: 'passed',
-            comment: 'Step completed successfully'
-        }
-    ]
-});
+import {
+    ResultsApi,
+    Configuration,
+    ResultCreate
+} from 'qase-api-v2-client';
+
+const configuration = new Configuration();
+const apiInstance = new ResultsApi(configuration);
+
+let projectCode: string; // (default to undefined)
+let runId: number; // (default to undefined)
+let resultCreate: ResultCreate; //
+
+const { status, data } = await apiInstance.createResultV2(
+    projectCode,
+    runId,
+    resultCreate
+);
 ```
 
-### createResultsV2
+### Parameters
 
-Create multiple test run results at once.
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **resultCreate** | **ResultCreate**|  | |
+| **projectCode** | [**string**] |  | defaults to undefined|
+| **runId** | [**number**] |  | defaults to undefined|
 
-#### Parameters
 
-| Name | Type | Description | Required |
-|------|------|-------------|----------|
-| projectCode | string | Project code | Yes |
-| runId | number | Test run ID | Yes |
-| createResultsRequestV2 | [CreateResultsRequestV2](CreateResultsRequestV2.md) | Results data | Yes |
+### Return type
 
-#### Returns
+**ResultCreateResponse**
 
-Promise<void>
+### Authorization
 
-#### Example
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**202** | OK |  -  |
+|**400** | Bad Request |  -  |
+|**401** | Unauthorized |  -  |
+|**403** | Forbidden |  -  |
+|**404** | Not Found |  -  |
+|**422** | Unprocessable Entity |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **createResultsV2**
+> ResultCreateBulkResponse createResultsV2(createResultsRequestV2)
+
+This method allows to create several test run results at once.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
+
+### Example
 
 ```typescript
-const results = await qaseApi.results.createResultsV2('MP', 1, {
-    results: [
-        {
-            title: 'Test Result 1',
-            execution: {
-                status: 'passed',
-                duration: 1000
-            },
-            testops_id: 1
-        },
-        {
-            title: 'Test Result 2',
-            execution: {
-                status: 'failed',
-                duration: 2000
-            },
-            testops_id: 2
-        }
-    ]
-});
+import {
+    ResultsApi,
+    Configuration,
+    CreateResultsRequestV2
+} from 'qase-api-v2-client';
+
+const configuration = new Configuration();
+const apiInstance = new ResultsApi(configuration);
+
+let projectCode: string; // (default to undefined)
+let runId: number; // (default to undefined)
+let createResultsRequestV2: CreateResultsRequestV2; //
+
+const { status, data } = await apiInstance.createResultsV2(
+    projectCode,
+    runId,
+    createResultsRequestV2
+);
 ```
 
-## Related Models
+### Parameters
 
-- [ResultCreate](ResultCreate.md)
-- [CreateResultsRequestV2](CreateResultsRequestV2.md)
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **createResultsRequestV2** | **CreateResultsRequestV2**|  | |
+| **projectCode** | [**string**] |  | defaults to undefined|
+| **runId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**ResultCreateBulkResponse**
+
+### Authorization
+
+[TokenAuth](../README.md#TokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**202** | OK |  -  |
+|**400** | Bad Request |  -  |
+|**401** | Unauthorized |  -  |
+|**403** | Forbidden |  -  |
+|**404** | Not Found |  -  |
+|**422** | Unprocessable Entity |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+

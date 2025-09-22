@@ -1,29 +1,26 @@
 # ResultStepData
 
-## Description
-
-Model for test step data.
 
 ## Properties
 
-| Name | Type | Description | Required |
-|------|------|-------------|----------|
-| action | string | Step action | Yes |
-| expected_result | string | Expected result | Yes |
-| input_data | string | Data result | No |
-| attachments | string[] | List of attachment hashes | No |
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**action** | **string** |  | [default to undefined]
+**expected_result** | **string** |  | [optional] [default to undefined]
+**input_data** | **string** |  | [optional] [default to undefined]
+**attachments** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-const stepData: ResultStepData = {
-    action: 'Click on the login button',
-    expected_result: 'User is logged in',
-    input_data: 'User name: admin, Password: admin',
-    attachments: ['abc123']
+import { ResultStepData } from 'qase-api-v2-client';
+
+const instance: ResultStepData = {
+    action,
+    expected_result,
+    input_data,
+    attachments,
 };
 ```
 
-## Related Models
-
-- [ResultStep](ResultStep.md)
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

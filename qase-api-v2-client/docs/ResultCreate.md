@@ -1,55 +1,48 @@
 # ResultCreate
 
-## Description
-
-Model for creating a test run result.
 
 ## Properties
 
-| Name | Type | Description | Required |
-|------|------|-------------|----------|
-| title | string | Result title | Yes |
-| execution | [ResultExecution](ResultExecution.md) | Execution details | Yes |
-| id | string | Idempotency key | No |
-| signature | string | Result signature | No |
-| testops_id | number | ID of the test case (cannot be used with testops_ids) | No |
-| testops_ids | number[] | IDs of the test cases (cannot be used with testops_id) | No |
-| fields | [ResultCreateFields](ResultCreateFields.md) | Additional fields | No |
-| attachments | string[] | List of attachment hashes | No |
-| steps | [ResultStep](ResultStep.md)[] | Test steps | No |
-| steps_type | [ResultStepsType](ResultStepsType.md) | Type of steps | No |
-| params | { [key: string]: string } | Parameters | No |
-| param_groups | string[][] | Parameter groups | No |
-| relations | [ResultRelations](ResultRelations.md) | Related entities | No |
-| message | string | Result message | No |
-| defect | boolean | Whether to create a defect if the result is failed | No |
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**title** | **string** |  | [default to undefined]
+**execution** | [**ResultExecution**](ResultExecution.md) |  | [default to undefined]
+**id** | **string** | If passed, used as an idempotency key | [optional] [default to undefined]
+**signature** | **string** |  | [optional] [default to undefined]
+**testops_id** | **number** | ID of the test case. Cannot be specified together with testopd_ids. | [optional] [default to undefined]
+**testops_ids** | **Array&lt;number&gt;** | IDs of the test cases. Cannot be specified together with testopd_id. | [optional] [default to undefined]
+**fields** | [**ResultCreateFields**](ResultCreateFields.md) |  | [optional] [default to undefined]
+**attachments** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
+**steps** | [**Array&lt;ResultStep&gt;**](ResultStep.md) |  | [optional] [default to undefined]
+**steps_type** | [**ResultStepsType**](ResultStepsType.md) |  | [optional] [default to undefined]
+**params** | **{ [key: string]: string; }** |  | [optional] [default to undefined]
+**param_groups** | **Array&lt;Array&lt;string&gt;&gt;** | List parameter groups by name only. Add their values in the \&#39;params\&#39; field | [optional] [default to undefined]
+**relations** | [**ResultRelations**](ResultRelations.md) |  | [optional] [default to undefined]
+**message** | **string** |  | [optional] [default to undefined]
+**defect** | **boolean** | If true and the result is failed, the defect associated with the result will be created | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-const resultCreate: ResultCreate = {
-    title: 'Login Test Result',
-    execution: {
-        status: 'passed',
-        duration: 1000
-    },
-    testops_id: 1,
-    steps: [
-        {
-            position: 1,
-            status: 'passed',
-            comment: 'Step completed successfully'
-        }
-    ],
-    attachments: ['abc123'],
-    defect: true
+import { ResultCreate } from 'qase-api-v2-client';
+
+const instance: ResultCreate = {
+    title,
+    execution,
+    id,
+    signature,
+    testops_id,
+    testops_ids,
+    fields,
+    attachments,
+    steps,
+    steps_type,
+    params,
+    param_groups,
+    relations,
+    message,
+    defect,
 };
 ```
 
-## Related Models
-
-- [ResultExecution](ResultExecution.md)
-- [ResultCreateFields](ResultCreateFields.md)
-- [ResultStep](ResultStep.md)
-- [ResultStepsType](ResultStepsType.md)
-- [ResultRelations](ResultRelations.md)
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

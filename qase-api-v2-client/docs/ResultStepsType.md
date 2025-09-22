@@ -1,22 +1,10 @@
 # ResultStepsType
 
-## Description
 
-Enumeration of test step types.
+## Enum
 
-## Values
+* `CLASSIC` (value: `'classic'`)
 
-| Value | Description |
-|-------|-------------|
-| classic | Classic test steps format |
-| gherkin | Gherkin format steps (Given/When/Then) |
+* `GHERKIN` (value: `'gherkin'`)
 
-## Example
-
-```typescript
-const stepsType: ResultStepsType = ResultStepsType.CLASSIC;
-```
-
-## Related Models
-
-- [ResultCreate](ResultCreate.md)
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
