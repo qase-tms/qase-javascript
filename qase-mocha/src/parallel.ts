@@ -1,20 +1,19 @@
-
 import type * as Mocha from "mocha";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 import { default as ParallelBuffered } from "mocha/lib/nodejs/reporters/parallel-buffered.js";
 import { MochaQaseReporter } from "./reporter.js";
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const originalCreateListeners: (runner: Mocha.Runner) => Mocha.reporters.Base =
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  ParallelBuffered.prototype.createListeners;
+class QaseParallelReporter extends ParallelBuffered {
+  constructor(runner: Mocha.Runner, opts: Mocha.MochaOptions) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    super(runner, opts);
+    const qaseOpts = { ...opts, parallel: false };
+    new MochaQaseReporter(runner, qaseOpts);
+  }
+}
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-ParallelBuffered.prototype.createListeners = function (runner: Mocha.Runner) {
-  console.log("createListeners");
-  const result = originalCreateListeners.call(this, runner);
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  new MochaQaseReporter(runner, this.options as Mocha.MochaOptions);
-  return result;
-};
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+module.exports = QaseParallelReporter;
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+module.exports.default = QaseParallelReporter;

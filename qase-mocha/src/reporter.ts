@@ -81,7 +81,12 @@ export class MochaQaseReporter extends reporters.Base {
 
     if (options.parallel) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      options.require = [...(options.require ?? []), resolveParallelModeSetupFile()];
+      options.require = [...(options.require ?? []), resolveParallelModeSetupFile()];      
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      if (this.runner && typeof (this.runner as any).workerReporter === 'function') {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        (this.runner as any).workerReporter(resolveParallelModeSetupFile());
+      }
     } else {
       this.applyListeners();
     }
@@ -223,7 +228,7 @@ export class MochaQaseReporter extends reporters.Base {
       steps: this.currentTest.steps,
       id: uuidv4(),
       execution: {
-        status: determineTestStatus(test.err || null, test.state || 'failed'),
+        status: determineTestStatus(test.err ?? null, test.state ?? 'failed'),
         start_time: this.testBeginTime / 1000,
         end_time: end_time / 1000,
         duration: duration,
@@ -427,4 +432,3 @@ export class MochaQaseReporter extends reporters.Base {
     return ids ? ids.split(',').map((id) => Number(id)) : [];
   }
 }
-

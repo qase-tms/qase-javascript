@@ -1,3 +1,9 @@
+# qase-mocha@1.1.4
+
+## What's new
+
+- Fixed an issue with the parallel mode compatibility with Mocha 11.0.0.
+
 # qase-mocha@1.1.3
 
 ## What's new
