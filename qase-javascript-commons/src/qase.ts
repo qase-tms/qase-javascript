@@ -25,6 +25,7 @@ import { ConfigType } from './config';
 import { getHostInfo } from './utils/hostData';
 import { ClientV2 } from './client/clientV2';
 import { TestOpsOptionsType } from './models/config/TestOpsOptionsType';
+import { applyStatusMapping } from './utils/status-mapping-utils';
 
 /**
  * @type {Record<TestStatusEnum, (test: TestResultType) => string>}
@@ -353,10 +354,29 @@ export class QaseReporter implements ReporterInterface {
   }
 
   /**
+   * Get status mapping configuration
+   * @returns Status mapping configuration or undefined
+   */
+  public getStatusMapping(): Record<string, string> | undefined {
+    return this.options.statusMapping;
+  }
+
+  /**
    * @param {TestResultType} result
    */
   public async addTestResult(result: TestResultType) {
     if (!this.disabled) {
+      // Apply status mapping if configured
+      const statusMapping = this.getStatusMapping();
+      if (statusMapping) {
+        const originalStatus = result.execution.status;
+        const mappedStatus = applyStatusMapping(originalStatus, statusMapping);
+        if (mappedStatus !== originalStatus) {
+          this.logger.logDebug(`Status mapping applied: ${originalStatus} -> ${mappedStatus}`);
+          result.execution.status = mappedStatus;
+        }
+      }
+
       // Check if result should be filtered out based on status
       if (this.shouldFilterResult(result)) {
         this.logger.logDebug(`Filtering out test result with status: ${result.execution.status}`);

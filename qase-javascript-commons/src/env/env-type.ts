@@ -19,6 +19,7 @@ export interface EnvType {
   [EnvEnum.environment]?: string;
   [EnvEnum.captureLogs]?: boolean;
   [EnvEnum.rootSuite]?: string;
+  [EnvEnum.statusMapping]?: string;
 
   [EnvTestOpsEnum.project]?: string;
   [EnvTestOpsEnum.uploadAttachments]?: boolean;

@@ -25,6 +25,13 @@ export const envToConfig = (env: EnvType): ConfigType => ({
   environment: env[EnvEnum.environment],
   captureLogs: env[EnvEnum.captureLogs],
   rootSuite: env[EnvEnum.rootSuite],
+  statusMapping: env[EnvEnum.statusMapping] ? 
+    Object.fromEntries(
+      env[EnvEnum.statusMapping].split(',').map(item => {
+        const [from, to] = item.split('=');
+        return [from?.trim() || '', to?.trim() || ''];
+      })
+    ) : undefined,
 
   testops: {
     project: env[EnvTestOpsEnum.project],
