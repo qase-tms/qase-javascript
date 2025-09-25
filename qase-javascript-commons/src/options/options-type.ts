@@ -29,6 +29,7 @@ export type OptionsType = {
   debug?: boolean | undefined;
   environment?: string | undefined;
   rootSuite?: string | undefined;
+  statusMapping?: Record<string, string> | undefined;
   testops?:
     | RecursivePartial<TestOpsOptionsType>
     | undefined;

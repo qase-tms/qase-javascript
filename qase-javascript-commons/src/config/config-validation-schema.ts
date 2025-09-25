@@ -36,6 +36,14 @@ export const configValidationSchema = {
       nullable: true,
     },
 
+    statusMapping: {
+      type: 'object',
+      nullable: true,
+      additionalProperties: {
+        type: 'string',
+      },
+    },
+
     testops: {
       type: 'object',
       nullable: true,

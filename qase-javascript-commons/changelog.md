@@ -1,3 +1,10 @@
+# qase-javascript-commons@2.4.5
+
+## What's new
+
+Added support for status mapping in the test run.
+You can now map test result statuses to different values.
+
 # qase-javascript-commons@2.4.4
 
 ## What's new

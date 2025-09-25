@@ -40,6 +40,7 @@ All configuration options are listed in the table below:
 | Root suite                                                                                                            | `rootSuite`                | `QASE_ROOT_SUITE`               | undefined                               | No       | Any string                 |
 | Enable debug logs                                                                                                     | `debug`                    | `QASE_DEBUG`                    | `False`                                 | No       | `True`, `False`            |
 | Enable capture logs from `stdout` and `stderr`                                                                        | `testops.defect`           | `QASE_CAPTURE_LOGS`             | `False`                                 | No       | `True`, `False`            |
+| Map test result statuses to different values (format: `fromStatus=toStatus`)                                          | `statusMapping`                     | `QASE_STATUS_MAPPING`                    | undefined                               | No       | Object mapping statuses (e.g., `{"invalid": "failed", "skipped": "passed"}`) |
 | **Qase Report configuration**                                                                                         |                            |                                 |                                         |          |                            |
 | Driver used for report mode                                                                                           | `report.driver`            | `QASE_REPORT_DRIVER`            | `local`                                 | No       | `local`                    |
 | Path to save the report                                                                                               | `report.connection.path`   | `QASE_REPORT_CONNECTION_PATH`   | `./build/qase-report`                   |          |                            |
@@ -72,6 +73,10 @@ All configuration options are listed in the table below:
   "debug": false,
   "environment": "local",
   "captureLogs": false,
+  "statusMapping": {
+    "invalid": "failed",
+    "skipped": "passed"
+  },
   "report": {
     "driver": "local",
     "connection": {
@@ -131,4 +136,7 @@ export QASE_TESTOPS_RUN_EXTERNAL_LINK='{"type":"jiraServer","link":"PROJ-456"}'
 
 # Filter out test results with specific statuses
 export QASE_TESTOPS_STATUS_FILTER="passed,failed"
+
+# Map test result statuses
+export QASE_STATUS_MAPPING="invalid=failed,skipped=passed"
 ```
