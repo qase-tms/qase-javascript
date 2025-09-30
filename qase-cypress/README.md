@@ -138,6 +138,10 @@ parameterize your tests.
 - `qase.step` - create a step in the test case
 - `qase.attach` - attach a file or content to the test case
 
+#### Cucumber-specific
+
+- `addCucumberStep(stepName)` - manually add a Cucumber step to Qase report (useful for `@badeball/cypress-cucumber-preprocessor`)
+
 For detailed instructions on using annotations and methods, refer to [Usage](docs/usage.md).
 
 For example:
@@ -255,71 +259,23 @@ module.exports = cypress.defineConfig({
 Check out the example of configuration for multiple reporters in the
 [demo project](../examples/cypress/cypress.config.js).
 
-If you use Cucumber, you need to add the following configuration in `cypress.config.js`:
+## Cucumber/Gherkin Integration
 
-```javascript
-import cypress from 'cypress';
-import { afterSpecHook } from 'cypress-qase-reporter/hooks';
+If you use Cucumber with Gherkin feature files in your Cypress tests, Qase reporter provides full support for both the legacy `cypress-cucumber-preprocessor` and the modern `@badeball/cypress-cucumber-preprocessor`.
 
-const cucumber = require('cypress-cucumber-preprocessor').default;
+The reporter can automatically:
 
-module.exports = cypress.defineConfig({
-  reporter: 'cypress-multi-reporters',
-  reporterOptions: {
-    reporterEnabled: 'cypress-mochawesome-reporter, cypress-qase-reporter',
-    cypressMochawesomeReporterReporterOptions: {
-      charts: true,
-    },
-    cypressQaseReporterReporterOptions: {
-      debug: true,
+- Extract test cases from feature files
+- Report individual Gherkin steps (Given/When/Then) with their execution status
+- Link test results to Qase test cases using `@QaseID` tags
+- Attach screenshots and videos to test results
 
-      testops: {
-        api: {
-          token: 'api_key',
-        },
+**📚 For detailed instructions, configuration examples, and troubleshooting, see the [Cucumber Integration Guide](docs/cucumber.md).**
 
-        project: 'project_code',
-        uploadAttachments: true,
+**Quick links:**
 
-        run: {
-          complete: true,
-        },
-      },
-
-      framework: {
-        cypress: {
-          screenshotsFolder: 'cypress/screenshots',
-          videosFolder: 'cypress/videos',
-          uploadDelay: 10, // Delay in seconds before uploading video files (default: 10)
-        },
-      },
-    },
-  },
-  video: false,
-  e2e: {
-    setupNodeEvents(on, config) {
-      on('file:preprocessor', cucumber());
-      require('cypress-qase-reporter/plugin')(on, config);
-      require('cypress-qase-reporter/metadata')(on);
-      on('after:spec', async (spec, results) => {
-         await afterSpecHook(spec, config);
-       });
-    },
-    specPattern: 'cypress/e2e/*.feature',
-  },
-});
-```
-
-And add the following lines in `support/e2e.js` file:
-
-```javascript
-import { enableCucumberSupport } from "cypress-qase-reporter";
-
-enableCucumberSupport();
-```
-
-Check out the example of configuration for multiple reporters in the
-[demo project](../examples/cypressCucumber/cypress.config.js).
+- [Example project for @badeball/cypress-cucumber-preprocessor](../examples/cypressBadeballCucumber/)
+- [Example project for cypress-cucumber-preprocessor (legacy)](../examples/cypressCucumber/)
 
 ## Requirements
 

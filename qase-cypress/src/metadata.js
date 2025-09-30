@@ -77,4 +77,11 @@ module.exports = function(on) {
       return null;
     },
   });
+
+  on('task', {
+    log(message) {
+      console.log(message);
+      return null;
+    },
+  });
 };

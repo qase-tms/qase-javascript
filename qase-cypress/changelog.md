@@ -1,3 +1,10 @@
+# cypress-qase-reporter@3.1.0
+
+## What's new
+
+- Added support for Cucumber steps reporting for `@badeball/cypress-cucumber-preprocessor`.
+- Added `addCucumberStep` function to manually add a Cucumber step to Qase report.
+
 # cypress-qase-reporter@3.0.3
 
 ## What's new

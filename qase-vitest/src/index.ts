@@ -331,7 +331,7 @@ export class VitestQaseReporter implements Reporter {
               content: typeof annotation.attachment.body === 'string' 
                 ? annotation.attachment.body 
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-                : new TextDecoder().decode(annotation.attachment.body as ArrayBuffer)
+                : new TextDecoder().decode(annotation.attachment.body)
             }),
             ...(annotation.attachment?.contentType && { contentType: annotation.attachment.contentType })
           };
