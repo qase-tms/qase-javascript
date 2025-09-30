@@ -1,3 +1,9 @@
+# qase-vitest@1.0.2
+
+## What's new
+
+- Fixed an issue with attachments.
+
 # qase-vitest@1.0.1
 
 ## What's new

@@ -194,3 +194,65 @@ it('test', () => {
   cy.visit('https://example.com');
 });
 ```
+
+---
+
+## Cucumber Steps Reporting
+
+### For @badeball/cypress-cucumber-preprocessor
+
+When using `@badeball/cypress-cucumber-preprocessor`, you can automatically report Cucumber/Gherkin steps to Qase using the `addCucumberStep` function in a `BeforeStep` hook.
+
+#### Automatic Step Reporting
+
+Create a file `cypress/support/step_definitions/hooks.js`:
+
+```javascript
+import { BeforeStep } from '@badeball/cypress-cucumber-preprocessor';
+import { addCucumberStep } from 'cypress-qase-reporter/cucumber';
+
+// Automatically report each Gherkin step to Qase
+BeforeStep(function({ pickleStep }) {
+  const keyword = pickleStep.keyword || '';
+  const stepText = `${keyword}${pickleStep.text}`;
+  addCucumberStep(stepText);
+});
+```
+
+This will automatically capture each step (Given/When/Then/And/But) and report it to Qase with its execution status.
+
+#### Manual Step Reporting
+
+Alternatively, you can manually add steps in your step definitions:
+
+```javascript
+import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor';
+import { addCucumberStep } from 'cypress-qase-reporter/cucumber';
+
+Given('I am on the homepage', () => {
+  addCucumberStep('Given I am on the homepage');
+  cy.visit('https://example.com');
+});
+
+When('I click the button', () => {
+  addCucumberStep('When I click the button');
+  cy.get('button').click();
+});
+
+Then('I should see the result', () => {
+  addCucumberStep('Then I should see the result');
+  cy.get('.result').should('be.visible');
+});
+```
+
+### For cypress-cucumber-preprocessor (legacy)
+
+For the legacy `cypress-cucumber-preprocessor`, steps are automatically captured. Add the following to your `support/e2e.js` file:
+
+```javascript
+import { enableCucumberSupport } from 'cypress-qase-reporter/cucumber';
+
+enableCucumberSupport();
+```
+
+No additional configuration is needed - all Gherkin steps will be automatically reported to Qase.

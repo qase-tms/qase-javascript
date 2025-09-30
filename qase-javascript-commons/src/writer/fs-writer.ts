@@ -74,7 +74,7 @@ export class FsWriter implements WriterInterface {
         continue;
       }
 
-      writeFileSync(filePath, attachment.content);
+      writeFileSync(filePath, attachment.content as string | NodeJS.ArrayBufferView);
       attachment.file_path = filePath;
     }
 
