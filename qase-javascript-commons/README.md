@@ -26,8 +26,9 @@ npm install qase-javascript-commons
 
 Qase JS Reporters can be configured in multiple ways:
 
-- using a config file `qase.config.json`
-- using environment variables
+* using a config file `qase.config.json`
+* using environment variables
+
 
 All configuration options are listed in the table below:
 
@@ -41,6 +42,9 @@ All configuration options are listed in the table below:
 | Enable debug logs                                                                                                     | `debug`                    | `QASE_DEBUG`                    | `False`                                 | No       | `True`, `False`            |
 | Enable capture logs from `stdout` and `stderr`                                                                        | `testops.defect`           | `QASE_CAPTURE_LOGS`             | `False`                                 | No       | `True`, `False`            |
 | Map test result statuses to different values (format: `fromStatus=toStatus`)                                          | `statusMapping`                     | `QASE_STATUS_MAPPING`                    | undefined                               | No       | Object mapping statuses (e.g., `{"invalid": "failed", "skipped": "passed"}`) |
+| **Logging configuration**                                                                                             |                            |                                 |                                         |          |                            |
+| Enable/disable console output for reporter logs                                                                       | `logging.console`          | `QASE_LOGGING_CONSOLE`          | `True`                                  | No       | `True`, `False`            |
+| Enable/disable file output for reporter logs                                                                          | `logging.file`             | `QASE_LOGGING_FILE`             | Same as `debug` setting                 | No       | `True`, `False`            |
 | **Qase Report configuration**                                                                                         |                            |                                 |                                         |          |                            |
 | Driver used for report mode                                                                                           | `report.driver`            | `QASE_REPORT_DRIVER`            | `local`                                 | No       | `local`                    |
 | Path to save the report                                                                                               | `report.connection.path`   | `QASE_REPORT_CONNECTION_PATH`   | `./build/qase-report`                   |          |                            |
@@ -64,7 +68,7 @@ All configuration options are listed in the table below:
 | Configuration values to create/find in groups (format: `group1=value1,group2=value2`)                                | `testops.configurations.values`     | `QASE_TESTOPS_CONFIGURATIONS_VALUES`     | undefined                               | No       | Comma-separated key=value pairs |
 | Create configuration groups if they don't exist                                                                       | `testops.configurations.createIfNotExists` | `QASE_TESTOPS_CONFIGURATIONS_CREATE_IF_NOT_EXISTS` | `false`                          | No       | `True`, `False`            |
 
-### Example `qase.config.json` config:
+### Example `qase.config.json` config
 
 ```json
 {
@@ -76,6 +80,10 @@ All configuration options are listed in the table below:
   "statusMapping": {
     "invalid": "failed",
     "skipped": "passed"
+  },
+  "logging": {
+    "console": true,
+    "file": true
   },
   "report": {
     "driver": "local",
@@ -125,7 +133,7 @@ All configuration options are listed in the table below:
 }
 ```
 
-### Environment Variables Example:
+### Environment Variables Example
 
 ```bash
 # Set external link for Jira Cloud
@@ -139,4 +147,8 @@ export QASE_TESTOPS_STATUS_FILTER="passed,failed"
 
 # Map test result statuses
 export QASE_STATUS_MAPPING="invalid=failed,skipped=passed"
+
+# Logging configuration
+export QASE_LOGGING_CONSOLE=false  # Disable console output
+export QASE_LOGGING_FILE=true      # Enable file output
 ```

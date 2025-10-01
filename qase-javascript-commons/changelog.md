@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.4.6
+
+## What's new
+
+Added ability to control logging to console and file using the `logging` configuration option.
+
 # qase-javascript-commons@2.4.5
 
 ## What's new

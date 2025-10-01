@@ -24,12 +24,25 @@ interface ApiErrorResponse {
 export class Logger implements LoggerInterface {
   private readonly debug: boolean | undefined;
   private readonly filePath: string;
+  private readonly consoleEnabled: boolean;
+  private readonly fileEnabled: boolean;
 
-  constructor(options: { debug?: boolean | undefined, dir?: string }) {
+  constructor(options: { 
+    debug?: boolean | undefined, 
+    dir?: string,
+    consoleLogging?: boolean | undefined,
+    fileLogging?: boolean | undefined,
+  }) {
     this.debug = options.debug;
 
+    // Determine console logging: if explicitly set, use that value; otherwise default to true
+    this.consoleEnabled = options.consoleLogging !== undefined ? options.consoleLogging : true;
+    
+    // Determine file logging: if explicitly set, use that value; otherwise use debug setting
+    this.fileEnabled = options.fileLogging !== undefined ? options.fileLogging : (this.debug ?? false);
+
     const dir = options.dir ?? './logs';
-    if (!fs.existsSync(dir)) {
+    if (this.fileEnabled && !fs.existsSync(dir)) {
       fs.mkdirSync(dir);
     }
 
@@ -38,16 +51,20 @@ export class Logger implements LoggerInterface {
 
   public log(message: string): void {
     const logMessage = `[INFO] qase: ${message}`;
-    console.log(logMessage);
-    if (this.debug) {
+    if (this.consoleEnabled) {
+      console.log(logMessage);
+    }
+    if (this.fileEnabled) {
       this.logToFile(logMessage);
     }
   }
 
   public logError(message: string, error?: unknown): void {
     const logMessage = `[ERROR] qase: ${this.doLogError(message, error)}`;
-    console.error(logMessage);
-    if (this.debug) {
+    if (this.consoleEnabled) {
+      console.error(logMessage);
+    }
+    if (this.fileEnabled) {
       this.logToFile(logMessage);
     }
   }
@@ -55,8 +72,12 @@ export class Logger implements LoggerInterface {
   public logDebug(message: string): void {
     if (this.debug) {
       const logMessage = `[DEBUG] qase: ${message}`;
-      console.log(logMessage);
-      this.logToFile(logMessage);
+      if (this.consoleEnabled) {
+        console.log(logMessage);
+      }
+      if (this.fileEnabled) {
+        this.logToFile(logMessage);
+      }
     }
   }
 

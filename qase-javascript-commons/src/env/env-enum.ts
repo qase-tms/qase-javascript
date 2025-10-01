@@ -70,3 +70,11 @@ export enum EnvLocalEnum {
   path = 'QASE_REPORT_CONNECTION_PATH',
   format = 'QASE_REPORT_CONNECTION_FORMAT',
 }
+
+/**
+ * @enum {string}
+ */
+export enum EnvLoggingEnum {
+  console = 'QASE_LOGGING_CONSOLE',
+  file = 'QASE_LOGGING_FILE',
+}

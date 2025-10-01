@@ -9,6 +9,7 @@ import {
   EnvRunEnum,
   EnvTestOpsEnum, 
   EnvConfigurationsEnum,
+  EnvLoggingEnum,
 } from './env-enum';
 
 import { ModeEnum } from '../options';
@@ -129,6 +130,15 @@ export const envValidationSchema: JSONSchemaType<EnvType> = {
     [EnvLocalEnum.format]: {
       type: 'string',
       enum: [FormatEnum.json, FormatEnum.jsonp],
+      nullable: true,
+    },
+
+    [EnvLoggingEnum.console]: {
+      type: 'boolean',
+      nullable: true,
+    },
+    [EnvLoggingEnum.file]: {
+      type: 'boolean',
       nullable: true,
     },
   },
