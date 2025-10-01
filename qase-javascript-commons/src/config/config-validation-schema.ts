@@ -44,6 +44,22 @@ export const configValidationSchema = {
       },
     },
 
+    logging: {
+      type: 'object',
+      nullable: true,
+
+      properties: {
+        console: {
+          type: 'boolean',
+          nullable: true,
+        },
+        file: {
+          type: 'boolean',
+          nullable: true,
+        },
+      },
+    },
+
     testops: {
       type: 'object',
       nullable: true,

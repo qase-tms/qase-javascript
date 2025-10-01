@@ -127,7 +127,24 @@ export class QaseReporter implements ReporterInterface {
     const composedOptions = composeOptions(options, env);
     this.options = composedOptions;
 
-    this.logger = new Logger({ debug: composedOptions.debug });
+    // Process logging options with backward compatibility
+    const loggerOptions: { 
+      debug?: boolean | undefined, 
+      consoleLogging?: boolean | undefined,
+      fileLogging?: boolean | undefined,
+    } = {
+      debug: composedOptions.debug,
+    };
+
+    if (composedOptions.logging?.console !== undefined) {
+      loggerOptions.consoleLogging = composedOptions.logging.console;
+    }
+
+    if (composedOptions.logging?.file !== undefined) {
+      loggerOptions.fileLogging = composedOptions.logging.file;
+    }
+
+    this.logger = new Logger(loggerOptions);
     this.logger.logDebug(`Config: ${JSON.stringify(this.sanitizeOptions(composedOptions))}`);
 
     const hostData = getHostInfo(options.frameworkPackage, options.reporterName);

@@ -8,6 +8,7 @@ import {
   EnvPlanEnum, 
   EnvBatchEnum, 
   EnvConfigurationsEnum,
+  EnvLoggingEnum,
 } from './env-enum';
 
 import { DriverEnum } from '../writer';
@@ -96,4 +97,9 @@ export const envToConfig = (env: EnvType): ConfigType => ({
       },
     },
   },
+
+  logging: (env[EnvLoggingEnum.console] !== undefined || env[EnvLoggingEnum.file] !== undefined) ? {
+    console: env[EnvLoggingEnum.console],
+    file: env[EnvLoggingEnum.file],
+  } : undefined,
 });

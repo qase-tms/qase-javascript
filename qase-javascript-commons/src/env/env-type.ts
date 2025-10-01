@@ -7,6 +7,7 @@ import {
   EnvPlanEnum, 
   EnvBatchEnum, 
   EnvConfigurationsEnum,
+  EnvLoggingEnum,
 } from './env-enum';
 
 import { ModeEnum } from '../options';
@@ -45,4 +46,7 @@ export interface EnvType {
 
   [EnvLocalEnum.path]?: string;
   [EnvLocalEnum.format]?: `${FormatEnum}`;
+
+  [EnvLoggingEnum.console]?: boolean;
+  [EnvLoggingEnum.file]?: boolean;
 }

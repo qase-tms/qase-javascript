@@ -19,6 +19,12 @@ export type AdditionalReportOptionsType = {
 };
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export type LoggingOptionsType = {
+  console?: boolean | undefined;
+  file?: boolean | undefined;
+};
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type OptionsType = {
   frameworkPackage: string;
   frameworkName: string;
@@ -30,6 +36,7 @@ export type OptionsType = {
   environment?: string | undefined;
   rootSuite?: string | undefined;
   statusMapping?: Record<string, string> | undefined;
+  logging?: RecursivePartial<LoggingOptionsType> | undefined;
   testops?:
     | RecursivePartial<TestOpsOptionsType>
     | undefined;
