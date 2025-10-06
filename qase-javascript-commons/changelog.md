@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.4.7
+
+## Bug fixes
+
+Fixed issue where test results with unknown statuses were incorrectly marked as `skipped` instead of `passed` by default. Now status matching is case-insensitive for better compatibility with different test frameworks.
+
 # qase-javascript-commons@2.4.6
 
 ## What's new

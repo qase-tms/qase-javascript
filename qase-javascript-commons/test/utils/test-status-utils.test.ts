@@ -18,6 +18,16 @@ describe('determineTestStatus', () => {
       const result = determineTestStatus(null, 'disabled');
       expect(result).toBe(TestStatusEnum.disabled);
     });
+
+    it('should handle case-insensitive status matching', () => {
+      const result = determineTestStatus(null, 'PASSED');
+      expect(result).toBe(TestStatusEnum.passed);
+    });
+
+    it('should return skipped as default for unknown status', () => {
+      const result = determineTestStatus(null, 'unknown_status');
+      expect(result).toBe(TestStatusEnum.skipped);
+    });
   });
 
   describe('when assertion error', () => {
