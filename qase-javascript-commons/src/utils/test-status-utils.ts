@@ -115,5 +115,7 @@ function mapOriginalStatus(originalStatus: string): TestStatusEnum {
     'interrupted': TestStatusEnum.failed,
   };
 
-  return statusMap[originalStatus] || TestStatusEnum.skipped;
+  // Convert to lowercase for case-insensitive matching
+  const normalizedStatus = originalStatus.toLowerCase();
+  return statusMap[normalizedStatus] || TestStatusEnum.skipped;
 }
