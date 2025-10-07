@@ -1,0 +1,12 @@
+{
+  "name": "examples-mocha-multi-reporters",
+  "private": true,
+  "scripts": {
+    "test": "QASE_MODE=testops mocha --reporter mocha-multi-reporters --reporter-options configFile=mocha-multi-reporters.json"
+  },
+  "devDependencies": {
+    "mocha": "^10.2.0",
+    "mocha-multi-reporters": "^1.5.1",
+    "mocha-qase-reporter": "^1.1.0"
+  }
+}
