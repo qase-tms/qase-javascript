@@ -71,12 +71,26 @@ function isAssertionError(error: Error): boolean {
     'internal error'
   ];
 
-  // Check for non-assertion patterns first
-  const hasNonAssertionPattern = nonAssertionPatterns.some(pattern => 
+  // Special case: timeout errors with expect should be treated as assertion errors
+  const isTimeoutWithExpect = errorMessage.includes('timeout') && 
+    errorMessage.includes('expect');
+
+  if (isTimeoutWithExpect) {
+    return true;
+  }
+
+  // Check for non-assertion patterns (excluding timeout for special handling above)
+  const nonAssertionPatternsWithoutTimeout = nonAssertionPatterns.filter(pattern => pattern !== 'timeout');
+  const hasNonAssertionPattern = nonAssertionPatternsWithoutTimeout.some(pattern => 
     errorMessage.includes(pattern) || errorStack.includes(pattern)
   );
 
   if (hasNonAssertionPattern) {
+    return false;
+  }
+
+  // For timeout errors without expect, treat as invalid
+  if (errorMessage.includes('timeout')) {
     return false;
   }
 
