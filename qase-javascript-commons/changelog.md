@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.4.8
+
+## What's new
+
+Improved error handling for timeout errors.
+
 # qase-javascript-commons@2.4.7
 
 ## Bug fixes

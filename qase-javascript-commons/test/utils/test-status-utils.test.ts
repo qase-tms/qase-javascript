@@ -68,6 +68,18 @@ describe('determineTestStatus', () => {
       const result = determineTestStatus(error, 'failed');
       expect(result).toBe(TestStatusEnum.failed);
     });
+
+    it('should return failed for timeout error with expect assertion', () => {
+      const error = new Error('Error: Timed out 5000ms waiting for expect(locator).toBeVisible()');
+      const result = determineTestStatus(error, 'failed');
+      expect(result).toBe(TestStatusEnum.failed);
+    });
+
+    it('should return failed for timeout error with expect and toBe', () => {
+      const error = new Error('Timeout of 5000ms exceeded waiting for expect(element).toBe(true)');
+      const result = determineTestStatus(error, 'failed');
+      expect(result).toBe(TestStatusEnum.failed);
+    });
   });
 
   describe('when non-assertion error', () => {
@@ -77,8 +89,26 @@ describe('determineTestStatus', () => {
       expect(result).toBe(TestStatusEnum.invalid);
     });
 
-    it('should return invalid for timeout error', () => {
+    it('should return invalid for timeout error without assertion patterns', () => {
       const error = new Error('Timeout of 5000ms exceeded');
+      const result = determineTestStatus(error, 'failed');
+      expect(result).toBe(TestStatusEnum.invalid);
+    });
+
+    it('should return invalid for timeout error with network context', () => {
+      const error = new Error('Timeout waiting for network request');
+      const result = determineTestStatus(error, 'failed');
+      expect(result).toBe(TestStatusEnum.invalid);
+    });
+
+    it('should return invalid for timeout error with toBe pattern (no expect)', () => {
+      const error = new Error('Timeout waiting for element.toBe(true)');
+      const result = determineTestStatus(error, 'failed');
+      expect(result).toBe(TestStatusEnum.invalid);
+    });
+
+    it('should return invalid for timeout error with matcher pattern (no expect)', () => {
+      const error = new Error('Timed out 5000ms waiting for element.toContain("text")');
       const result = determineTestStatus(error, 'failed');
       expect(result).toBe(TestStatusEnum.invalid);
     });
