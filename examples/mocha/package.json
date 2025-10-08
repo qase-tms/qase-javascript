@@ -2,7 +2,10 @@
   "name": "examples-mocha",
   "private": true,
   "scripts": {
-    "test": "QASE_MODE=testops mocha"
+    "test": "QASE_MODE=testops mocha",
+    "test:parallel": "QASE_MODE=testops mocha --parallel",
+    "test:extra": "QASE_MODE=testops mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec",
+    "test:extra-parallel": "QASE_MODE=testops mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec --parallel"
   },
   "devDependencies": {
     "mocha": "^10.2.0",
