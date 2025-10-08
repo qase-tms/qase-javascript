@@ -271,6 +271,94 @@ describe('User Authentication', function() {
 
 ---
 
+## Using Extra Reporters
+
+The Qase reporter supports additional reporters alongside the main Qase reporter. This is useful when you need multiple output formats (e.g., console output and JSON reports) without using `mocha-multi-reporters`, which can cause hanging issues in parallel mode.
+
+### Configuration
+
+You can configure extra reporters using the `extraReporters` option in the reporter options:
+
+#### Command Line
+
+```bash
+# Single extra reporter
+QASE_MODE=testops mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec
+
+# Multiple extra reporters
+QASE_MODE=testops mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec,json
+
+# With parallel execution
+QASE_MODE=testops mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec --parallel
+```
+
+#### Configuration File
+
+```json
+{
+  "reporter": "mocha-qase-reporter",
+  "reporterOptions": {
+    "extraReporters": "spec"
+  }
+}
+```
+
+#### Multiple Reporters
+
+```json
+{
+  "reporter": "mocha-qase-reporter",
+  "reporterOptions": {
+    "extraReporters": ["spec", "json"]
+  }
+}
+```
+
+#### Reporters with Options
+
+```json
+{
+  "reporter": "mocha-qase-reporter",
+  "reporterOptions": {
+    "extraReporters": [
+      "spec",
+      {
+        "name": "json",
+        "options": {
+          "output": "results.json"
+        }
+      }
+    ]
+  }
+}
+```
+
+### Parallel Mode Compatibility
+
+Some reporters are incompatible with parallel mode and will be automatically filtered out with a warning:
+
+- `markdown`
+- `progress`
+- `json-stream`
+- `mocha-multi-reporters`
+- `mocha-jenkins-reporter`
+- `mocha-junit-reporter`
+
+### Example Usage
+
+```bash
+# Basic usage with spec reporter
+npm run test:extra
+
+# Parallel execution with spec reporter
+npm run test:extra-parallel
+
+# Multiple reporters
+QASE_MODE=testops mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec,json --parallel
+```
+
+---
+
 ### Parallel Execution
 
 The reporter supports parallel execution of tests. First, create a new run in Qase.io using the Qase CLI:

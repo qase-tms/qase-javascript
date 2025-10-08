@@ -1,3 +1,9 @@
+# qase-mocha@1.1.5
+
+## What's new
+
+- Added support for extra reporters in the reporter. You can find more information in the [usage guide](docs/usage.md#using-extra-reporters).
+
 # qase-mocha@1.1.4
 
 ## What's new

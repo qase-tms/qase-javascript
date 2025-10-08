@@ -94,6 +94,23 @@ After the tests are finished, you can complete the run:
 qasectl testops run complete --project DEMO --token token --id $(echo $QASE_TESTOPS_RUN_ID)
 ```
 
+### Extra Reporters
+
+The reporter supports additional reporters alongside the main Qase reporter. This allows you to use multiple output formats (e.g., console output and JSON reports) without the hanging issues that can occur with `mocha-multi-reporters` in parallel mode.
+
+```bash
+# Single extra reporter
+QASE_MODE=testops mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec
+
+# Multiple extra reporters
+QASE_MODE=testops mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec,json
+
+# With parallel execution
+QASE_MODE=testops mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec --parallel
+```
+
+For detailed configuration options and examples, see the [Extra Reporters section](docs/usage.md#using-extra-reporters) in the usage guide.
+
 ## Configuration
 
 Qase Mocha reporter can be configured in multiple ways:

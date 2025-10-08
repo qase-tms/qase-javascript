@@ -18,6 +18,11 @@ import deasyncPromise from 'deasync-promise';
 import { extname, join } from 'node:path';
 import { v4 as uuidv4 } from 'uuid';
 import { StreamInterceptor, TestOutput } from './interceptor';
+import { 
+  parseExtraReporters, 
+  createExtraReporters, 
+  validateExtraReportersForParallel 
+} from './extraReporters';
 
 
 const Events = Runner.constants;
@@ -38,6 +43,7 @@ export class MochaQaseReporter extends reporters.Base {
   private originalStdoutWrite: typeof process.stdout.write;
   private originalStderrWrite: typeof process.stderr.write;
   private testOutputs: Map<string, TestOutput>;
+  // readonly #extraReporters: reporters.Base[] = [];
 
   /**
    * @type {Record<CypressState, TestStatusEnum>}
@@ -72,12 +78,32 @@ export class MochaQaseReporter extends reporters.Base {
     super(runner, options);
     const config = configLoader.load();
 
+    // Parse and validate extraReporters configuration
+    const extraReportersConfig = parseExtraReporters(options);
+
     this.reporter = QaseReporter.getInstance({
       ...composeOptions(options, config),
       frameworkPackage: 'mocha',
       frameworkName: 'mocha',
       reporterName: 'mocha-qase-reporter',
     });
+
+    // Create extra reporters in both modes, but validate compatibility for parallel mode
+    if (extraReportersConfig) {
+      if (options.parallel) {
+        const validation = validateExtraReportersForParallel(extraReportersConfig);
+        if (validation.valid) {
+          createExtraReporters(runner, options, extraReportersConfig);
+        } else {
+          console.warn(
+            `Warning: The following reporters are incompatible with parallel mode: ${validation.incompatibleReporters.join(', ')}. ` +
+            'They will be ignored in parallel mode to prevent hanging issues.'
+          );
+        }
+      } else {
+        createExtraReporters(runner, options, extraReportersConfig);
+      }
+    }
 
     if (options.parallel) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

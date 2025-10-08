@@ -1,6 +1,6 @@
 {
   "name": "mocha-qase-reporter",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Mocha Cypress Reporter",
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "sideEffects": false,
@@ -43,7 +43,7 @@
   "dependencies": {
     "mocha": "^11.0.0",
     "deasync-promise": "^1.0.1",
-    "qase-javascript-commons": "~2.4.4",
+    "qase-javascript-commons": "~2.4.8",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
