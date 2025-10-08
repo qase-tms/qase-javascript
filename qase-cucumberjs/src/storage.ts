@@ -199,7 +199,7 @@ export class Storage {
     }
     
     // Determine status based on error type
-    const newStatus = determineTestStatus(error, testCaseStep.testStepResult.status);
+    const newStatus = determineTestStatus(error, Storage.statusMap[testCaseStep.testStepResult.status]);
 
     this.testCaseSteps[testCaseStep.testStepId] = testCaseStep;
 
@@ -214,7 +214,7 @@ export class Storage {
       }
 
       if (oldStatus) {
-        if (oldStatus !== TestStatusEnum.failed) {
+        if (oldStatus !== TestStatusEnum.failed && oldStatus !== TestStatusEnum.invalid) {
           this.testCaseStartedResult[testCaseStep.testCaseStartedId] = newStatus;
         }
       } else {
@@ -278,6 +278,8 @@ export class Storage {
       }
     }
 
+    const steps = this.convertSteps(pickle.steps, tc);
+
     return {
       attachments: this.attachments[testCase.testCaseStartedId] ?? [],
       author: null,
@@ -297,7 +299,7 @@ export class Storage {
       relations: relations,
       run_id: null,
       signature: this.getSignature(pickle, metadata.ids),
-      steps: this.convertSteps(pickle.steps, tc),
+      steps: steps,
       testops_id: metadata.ids.length > 0 ? metadata.ids : null,
       id: tcs.id,
       title: metadata.title ?? pickle.name,
@@ -359,7 +361,7 @@ export class Storage {
     [Status.PASSED]: TestStatusEnum.passed,
     [Status.FAILED]: TestStatusEnum.failed,
     [Status.SKIPPED]: TestStatusEnum.skipped,
-    [Status.AMBIGUOUS]: TestStatusEnum.failed,
+    [Status.AMBIGUOUS]: TestStatusEnum.invalid,
     [Status.PENDING]: TestStatusEnum.skipped,
     [Status.UNDEFINED]: TestStatusEnum.skipped,
     [Status.UNKNOWN]: TestStatusEnum.skipped,

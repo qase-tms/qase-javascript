@@ -1,3 +1,9 @@
+# qase-cucumberjs@2.1.6
+
+## Bug fixes
+
+Fixed issue where cucumber-specific statuses like `AMBIGUOUS` were incorrectly mapped using generic status mapping instead of cucumber-specific mapping. Now cucumber-specific statuses are properly mapped according to cucumberjs conventions.
+
 # qase-cucumberjs@2.1.5
 
 ## What's new
