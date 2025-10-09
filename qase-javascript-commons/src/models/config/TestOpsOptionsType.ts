@@ -9,6 +9,7 @@ export interface TestOpsOptionsType {
   defect?: boolean | undefined;
   configurations?: TestOpsConfigurationType | undefined;
   statusFilter?: string[] | undefined;
+  showPublicReportLink?: boolean | undefined;
 }
 
 export interface TestOpsConfigurationType {

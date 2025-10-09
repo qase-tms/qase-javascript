@@ -5,4 +5,5 @@ export interface IClient {
     completeRun(runId: number): Promise<void>;
     uploadResults(runId: number, results: TestResultType[]): Promise<void>;
     uploadAttachment(attachment: Attachment): Promise<string>;
+    enablePublicReport(runId: number): Promise<void>;
 }
