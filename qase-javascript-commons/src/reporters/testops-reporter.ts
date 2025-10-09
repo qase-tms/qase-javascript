@@ -185,7 +185,11 @@ export class TestOpsReporter extends AbstractReporter {
     await this.api.completeRun(this.runId);
 
     if (this.showPublicReportLink) {
-      await this.api.enablePublicReport(this.runId);
+      try {
+        await this.api.enablePublicReport(this.runId);
+      } catch (error) {
+        // Error is already logged in enablePublicReport
+      }
     }
 
     this.logger.log(chalk`{green Run ${this.runId} completed}`);

@@ -15,6 +15,7 @@ module.exports = cypress.defineConfig({
 
         project: '<project_code>',
         uploadAttachments: true,
+        showPublicReportLink: true,
 
         run: {
           complete: true,

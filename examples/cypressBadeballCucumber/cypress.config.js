@@ -14,6 +14,7 @@ const qaseReporterOptions = {
         },
         project: '<project_code>',
         uploadAttachments: true,
+        showPublicReportLink: true,
         run: {
             complete: true,
         },

@@ -19,6 +19,7 @@ export default defineConfig({
             },
             project: "<project_code>",
             uploadAttachments: true,
+            showPublicReportLink: true,
           },
           captureLogs: true,
         }

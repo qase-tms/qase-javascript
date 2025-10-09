@@ -26,6 +26,7 @@ export interface EnvType {
   [EnvTestOpsEnum.uploadAttachments]?: boolean;
   [EnvTestOpsEnum.defect]?: boolean;
   [EnvTestOpsEnum.statusFilter]?: string;
+  [EnvTestOpsEnum.showPublicReportLink]?: boolean;
 
   [EnvApiEnum.token]?: string;
   [EnvApiEnum.host]?: string;

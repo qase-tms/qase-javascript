@@ -166,8 +166,17 @@ export class ClientV1 implements IClient {
         this.logger.log(chalk`{blue Public report link: ${data.result.url}}`);
       }
     } catch (error) {
-      throw this.processError(error, 'Error enabling public report');
+      this.logger.log(chalk`{yellow Failed to generate public report link: ${this.getErrorMessage(error)}}`);
     }
+  }
+
+  private getErrorMessage(error: unknown): string {
+    if (isAxiosError(error)) {
+      const err = error as AxiosError<ApiErrorResponse>;
+      const errorData = err.response?.data;
+      return errorData?.errorMessage ?? errorData?.error ?? errorData?.message ?? 'Unknown API error';
+    }
+    return error instanceof Error ? error.message : 'Unknown error';
   }
 
   async uploadAttachment(attachment: Attachment): Promise<string> {
