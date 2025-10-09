@@ -9,7 +9,7 @@ import {
   ConfigurationsApi,
   ConfigurationGroupCreate,
   ConfigurationCreate,
-  RunExternalIssuesTypeEnum
+  RunExternalIssuesTypeEnum,
 } from 'qase-api-client';
 import { Attachment, TestResultType, ConfigurationGroup } from '../models';
 import { TestOpsOptionsType } from '../models/config/TestOpsOptionsType';
@@ -117,10 +117,10 @@ export class ClientV1 implements IClient {
       if (this.config.run.externalLink && data.result.id) {
         // Map our enum values to API enum values
         // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-        const apiType = this.config.run.externalLink.type === 'jiraCloud' 
-          ? RunExternalIssuesTypeEnum.JIRA_CLOUD 
+        const apiType = this.config.run.externalLink.type === 'jiraCloud'
+          ? RunExternalIssuesTypeEnum.JIRA_CLOUD
           : RunExternalIssuesTypeEnum.JIRA_SERVER;
-        
+
         await this.runClient.runUpdateExternalIssue(this.config.project, {
           type: apiType,
           links: [
@@ -152,6 +152,21 @@ export class ClientV1 implements IClient {
     if (this.appUrl) {
       const runUrl = `${this.appUrl}/run/${this.config.project}/dashboard/${runId}`;
       this.logger.log(chalk`{blue Test run link: ${runUrl}}`);
+    }
+  }
+
+  async enablePublicReport(runId: number): Promise<void> {
+    try {
+      const { data } = await this.runClient.updateRunPublicity(
+        this.config.project,
+        runId,
+        { status: true }
+      );
+      if (data.result?.url) {
+        this.logger.log(chalk`{blue Public report link: ${data.result.url}}`);
+      }
+    } catch (error) {
+      throw this.processError(error, 'Error enabling public report');
     }
   }
 
@@ -323,10 +338,10 @@ export class ClientV1 implements IClient {
     try {
       // Get existing configuration groups
       const existingGroups = await this.getConfigurations();
-      
+
       for (const configValue of this.config.configurations.values) {
         const { name: groupName, value: configName } = configValue;
-        
+
         // Find existing group or create new one
         const group = existingGroups.find(g => g.title === groupName);
         let groupId: number;

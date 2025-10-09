@@ -47,6 +47,7 @@ export class TestOpsReporter extends AbstractReporter {
     baseUrl?: string,
     batchSize?: number,
     runId?: number,
+    private showPublicReportLink?: boolean,
   ) {
     super(logger);
     this.baseUrl = this.getBaseUrl(baseUrl);
@@ -182,6 +183,10 @@ export class TestOpsReporter extends AbstractReporter {
       throw new Error('Run ID is not set');
     }
     await this.api.completeRun(this.runId);
+
+    if (this.showPublicReportLink) {
+      await this.api.enablePublicReport(this.runId);
+    }
 
     this.logger.log(chalk`{green Run ${this.runId} completed}`);
   }

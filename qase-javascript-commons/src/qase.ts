@@ -128,8 +128,8 @@ export class QaseReporter implements ReporterInterface {
     this.options = composedOptions;
 
     // Process logging options with backward compatibility
-    const loggerOptions: { 
-      debug?: boolean | undefined, 
+    const loggerOptions: {
+      debug?: boolean | undefined,
       consoleLogging?: boolean | undefined,
       fileLogging?: boolean | undefined,
     } = {
@@ -439,21 +439,21 @@ export class QaseReporter implements ReporterInterface {
    */
   private shouldFilterResult(result: TestResultType): boolean {
     const statusFilter = this.options.testops?.statusFilter;
-    
+
     if (!statusFilter || statusFilter.length === 0) {
       return false;
     }
 
     // Convert TestStatusEnum to string for comparison
     const statusString = result.execution.status.toString();
-    
+
     this.logger.logDebug(`Checking filter: status="${statusString}", filter=${JSON.stringify(statusFilter)}`);
-    
+
     // Check if the status is in the filter list
     const shouldFilter = statusFilter.includes(statusString);
-    
+
     this.logger.logDebug(`Filter result: ${shouldFilter ? 'FILTERED' : 'NOT FILTERED'}`);
-    
+
     return shouldFilter;
   }
 
@@ -579,7 +579,8 @@ export class QaseReporter implements ReporterInterface {
           options.testops.project,
           options.testops.api.host,
           options.testops.batch?.size,
-          options.testops.run?.id
+          options.testops.run?.id,
+          options.testops.showPublicReportLink
         );
       }
 
