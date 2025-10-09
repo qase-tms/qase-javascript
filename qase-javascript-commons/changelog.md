@@ -1,3 +1,10 @@
+# qase-javascript-commons@2.4.9
+
+## What's new
+
+Added support for public report link in the test run.
+You can now generate a public report link for the test run.
+
 # qase-javascript-commons@2.4.8
 
 ## What's new

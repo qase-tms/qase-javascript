@@ -73,6 +73,7 @@ This runs Mocha directly with Qase integration.
     },
     "project": "your_project_code_here",
     "uploadAttachments": true,
+    "showPublicReportLink": true,
     "run": {
       "complete": true,
       "title": "Mocha test run"

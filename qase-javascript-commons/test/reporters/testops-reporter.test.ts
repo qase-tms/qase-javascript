@@ -50,6 +50,7 @@ describe('TestOpsReporter', () => {
       completeRun: jest.fn(),
       uploadResults: jest.fn(),
       uploadAttachment: jest.fn(),
+      enablePublicReport: jest.fn(),
     };
 
     reporter = new TestOpsReporter(
@@ -296,6 +297,72 @@ describe('TestOpsReporter', () => {
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockApiClient.completeRun).toHaveBeenCalledWith(123);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockLogger.log).toHaveBeenCalledWith('{green Run 123 completed}');
+    });
+
+    it('should enable public report when showPublicReportLink is true', async () => {
+      const reporterWithPublicLink = new TestOpsReporter(
+        mockLogger,
+        mockApiClient,
+        true,
+        'TEST_PROJECT',
+        'qase.io',
+        100,
+        123,
+        true // showPublicReportLink
+      );
+
+      mockApiClient.createRun.mockResolvedValue(123);
+      await reporterWithPublicLink.startTestRun();
+
+      await reporterWithPublicLink.complete();
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockApiClient.completeRun).toHaveBeenCalledWith(123);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockApiClient.enablePublicReport).toHaveBeenCalledWith(123);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockLogger.log).toHaveBeenCalledWith('{green Run 123 completed}');
+    });
+
+    it('should not enable public report when showPublicReportLink is false', async () => {
+      mockApiClient.createRun.mockResolvedValue(123);
+      await reporter.startTestRun();
+
+      await reporter.complete();
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockApiClient.completeRun).toHaveBeenCalledWith(123);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockApiClient.enablePublicReport).not.toHaveBeenCalled();
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockLogger.log).toHaveBeenCalledWith('{green Run 123 completed}');
+    });
+
+    it('should handle enablePublicReport error gracefully', async () => {
+      const reporterWithPublicLink = new TestOpsReporter(
+        mockLogger,
+        mockApiClient,
+        true,
+        'TEST_PROJECT',
+        'qase.io',
+        100,
+        123,
+        true // showPublicReportLink
+      );
+
+      mockApiClient.createRun.mockResolvedValue(123);
+      mockApiClient.enablePublicReport.mockRejectedValue(new Error('API Error'));
+      await reporterWithPublicLink.startTestRun();
+
+      await reporterWithPublicLink.complete();
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockApiClient.completeRun).toHaveBeenCalledWith(123);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockApiClient.enablePublicReport).toHaveBeenCalledWith(123);
+      // Error message is logged in enablePublicReport implementation, not here
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockLogger.log).toHaveBeenCalledWith('{green Run 123 completed}');
     });

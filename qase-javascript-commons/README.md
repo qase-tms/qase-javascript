@@ -29,7 +29,6 @@ Qase JS Reporters can be configured in multiple ways:
 * using a config file `qase.config.json`
 * using environment variables
 
-
 All configuration options are listed in the table below:
 
 | Description                                                                                                           | Config file                | Environment variable            | Default value                           | Required | Possible values            |
@@ -67,6 +66,7 @@ All configuration options are listed in the table below:
 | Filter test results by status (comma-separated list of statuses to exclude from reporting)                           | `testops.statusFilter`              | `QASE_TESTOPS_STATUS_FILTER`             | undefined                               | No       | Array of strings (`passed`, `failed`, `skipped`, `invalid`) |
 | Configuration values to create/find in groups (format: `group1=value1,group2=value2`)                                | `testops.configurations.values`     | `QASE_TESTOPS_CONFIGURATIONS_VALUES`     | undefined                               | No       | Comma-separated key=value pairs |
 | Create configuration groups if they don't exist                                                                       | `testops.configurations.createIfNotExists` | `QASE_TESTOPS_CONFIGURATIONS_CREATE_IF_NOT_EXISTS` | `false`                          | No       | `True`, `False`            |
+| Enable public report link generation and display after test run completion                                            | `testops.showPublicReportLink`      | `QASE_TESTOPS_SHOW_PUBLIC_REPORT_LINK`   | `False`                                 | No       | `True`, `False`            |
 
 ### Example `qase.config.json` config
 
@@ -112,6 +112,7 @@ All configuration options are listed in the table below:
     "defect": false,
     "project": "<project_code>",
     "uploadAttachments": true,
+    "showPublicReportLink": true,
     "statusFilter": ["passed", "skipped"],
     "batch": {
       "size": 100
@@ -151,4 +152,7 @@ export QASE_STATUS_MAPPING="invalid=failed,skipped=passed"
 # Logging configuration
 export QASE_LOGGING_CONSOLE=false  # Disable console output
 export QASE_LOGGING_FILE=true      # Enable file output
+
+# Enable public report link generation
+export QASE_TESTOPS_SHOW_PUBLIC_REPORT_LINK=true
 ```

@@ -15,6 +15,7 @@ module.exports = {
             token: 'api_key',
           },
           project: 'project_code',
+          showPublicReportLink: true,
           run: {
             complete: true,
           },

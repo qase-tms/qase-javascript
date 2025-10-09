@@ -19,6 +19,7 @@ export enum EnvTestOpsEnum {
   uploadAttachments = 'QASE_TESTOPS_UPLOAD_ATTACHMENTS',
   defect = 'QASE_TESTOPS_DEFECT',
   statusFilter = 'QASE_TESTOPS_STATUS_FILTER',
+  showPublicReportLink = 'QASE_TESTOPS_SHOW_PUBLIC_REPORT_LINK',
 }
 
 /**
