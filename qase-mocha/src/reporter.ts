@@ -79,7 +79,7 @@ export class MochaQaseReporter extends reporters.Base {
     const config = configLoader.load();
 
     // Parse and validate extraReporters configuration
-    const extraReportersConfig = parseExtraReporters(options);
+    const extraReportersConfig = parseExtraReporters(options, config || undefined);
 
     this.reporter = QaseReporter.getInstance({
       ...composeOptions(options, config),

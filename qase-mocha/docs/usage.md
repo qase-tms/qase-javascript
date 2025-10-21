@@ -277,7 +277,7 @@ The Qase reporter supports additional reporters alongside the main Qase reporter
 
 ### Configuration
 
-You can configure extra reporters using the `extraReporters` option in the reporter options:
+You can configure extra reporters using the `extraReporters` option in the `qase.config.json` file or via command line:
 
 #### Command Line
 
@@ -292,43 +292,24 @@ QASE_MODE=testops mocha --reporter mocha-qase-reporter --reporter-options extraR
 QASE_MODE=testops mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec --parallel
 ```
 
-#### Configuration File
+#### qase.config.json
 
 ```json
 {
-  "reporter": "mocha-qase-reporter",
-  "reporterOptions": {
-    "extraReporters": "spec"
-  }
-}
-```
-
-#### Multiple Reporters
-
-```json
-{
-  "reporter": "mocha-qase-reporter",
-  "reporterOptions": {
-    "extraReporters": ["spec", "json"]
-  }
-}
-```
-
-#### Reporters with Options
-
-```json
-{
-  "reporter": "mocha-qase-reporter",
-  "reporterOptions": {
-    "extraReporters": [
-      "spec",
-      {
-        "name": "json",
-        "options": {
-          "output": "results.json"
-        }
+  "extraReporters": [
+    "spec",
+    {
+      "name": "json",
+      "options": {
+        "output": "results.json"
       }
-    ]
+    }
+  ],
+  "testops": {
+    "api": {
+      "token": "your-api-token"
+    },
+    "project": "your-project"
   }
 }
 ```
