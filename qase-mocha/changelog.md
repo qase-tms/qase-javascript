@@ -1,3 +1,9 @@
+# qase-mocha@1.1.6
+
+## What's new
+
+- Improved the handling of extra reporters in the reporter.
+
 # qase-mocha@1.1.5
 
 ## What's new

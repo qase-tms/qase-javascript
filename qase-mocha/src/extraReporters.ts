@@ -11,24 +11,38 @@ export type ExtraReportersConfig = string | ExtraReporterConfig | (string | Extr
  * Parses extraReporters configuration from Mocha options
  * Supports both string format and object format
  */
-export function parseExtraReporters(options: Mocha.MochaOptions): ExtraReportersConfig | undefined {
+export function parseExtraReporters(options: Mocha.MochaOptions, config?: Record<string, unknown>): ExtraReportersConfig | undefined {
+  // First, try to get extraReporters from Mocha reporterOptions
   const reporterOptions = options.reporterOptions as Record<string, unknown> | undefined;
   
-  if (!reporterOptions) {
-    return undefined;
+  if (reporterOptions) {
+    // Handle different formats of extraReporters from Mocha options
+    if (typeof reporterOptions['extraReporters'] === 'string') {
+      return reporterOptions['extraReporters'];
+    }
+    
+    if (Array.isArray(reporterOptions['extraReporters'])) {
+      return reporterOptions['extraReporters'] as (string | ExtraReporterConfig)[];
+    }
+    
+    if (typeof reporterOptions['extraReporters'] === 'object' && reporterOptions['extraReporters'] !== null) {
+      return reporterOptions['extraReporters'] as ExtraReporterConfig;
+    }
   }
 
-  // Handle different formats of extraReporters
-  if (typeof reporterOptions['extraReporters'] === 'string') {
-    return reporterOptions['extraReporters'];
-  }
-  
-  if (Array.isArray(reporterOptions['extraReporters'])) {
-    return reporterOptions['extraReporters'] as (string | ExtraReporterConfig)[];
-  }
-  
-  if (typeof reporterOptions['extraReporters'] === 'object' && reporterOptions['extraReporters'] !== null) {
-    return reporterOptions['extraReporters'] as ExtraReporterConfig;
+  // If not found in Mocha options, try to get from qase.config.json
+  if (config && config['extraReporters']) {
+    if (typeof config['extraReporters'] === 'string') {
+      return config['extraReporters'];
+    }
+    
+    if (Array.isArray(config['extraReporters'])) {
+      return config['extraReporters'] as (string | ExtraReporterConfig)[];
+    }
+    
+    if (typeof config['extraReporters'] === 'object' && config['extraReporters'] !== null) {
+      return config['extraReporters'] as ExtraReporterConfig;
+    }
   }
 
   return undefined;
@@ -84,9 +98,25 @@ export function createExtraReporters(
       }
 
       if (ReporterClass && typeof ReporterClass === 'function') {
-        // Create reporter instance with options
-        const reporterOptionsForMocha = { ...options, ...reporterOptions };
-        const reporter = new ReporterClass(runner, reporterOptionsForMocha);
+        // Create reporter instance with clean options (without main reporter options)
+        const cleanOptions = {
+          ...options,
+          // Remove main reporter specific options
+          reporter: undefined,
+          reporterOptions: undefined,
+          'reporter-option': undefined,
+          reporterOption: undefined,
+          // Add extra reporter specific options
+          ...reporterOptions
+        };
+        
+        // Special handling for JSON reporter
+        if (reporterName === 'json' && reporterOptions['output']) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (cleanOptions as any).reporterOption = { output: reporterOptions['output'] };
+        }
+        
+        const reporter = new ReporterClass(runner, cleanOptions);
         reporters.push(reporter);
       }
     } catch (error) {
