@@ -25,7 +25,7 @@ import FormData from 'form-data';
 
 const DEFAULT_API_HOST = 'qase.io';
 const API_BASE_URL = 'https://api-';
-const APP_BASE_URL = 'https://app-';
+const APP_BASE_URL = 'https://';
 const API_VERSION = '/v1';
 
 enum ApiErrorCode {
