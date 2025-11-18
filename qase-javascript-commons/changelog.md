@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.4.10
+
+## What's new
+
+Fixed an issue with report link for enterprise customers.
+
 # qase-javascript-commons@2.4.9
 
 ## What's new
