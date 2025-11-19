@@ -26,6 +26,7 @@ describe('StateManager', () => {
   const mockReadFileSync = jest.mocked(fs.readFileSync);
   const mockWriteFileSync = jest.mocked(fs.writeFileSync);
   const mockUnlinkSync = jest.mocked(fs.unlinkSync);
+  // eslint-disable-next-line @typescript-eslint/unbound-method
   const mockResolve = jest.mocked(path.resolve);
 
   const mockStatePath = '/mock/path/reporterState.json';

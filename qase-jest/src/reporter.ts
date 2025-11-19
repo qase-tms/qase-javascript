@@ -91,6 +91,7 @@ export class JestQaseReporter implements Reporter {
       reporterName: 'jest-qase-reporter',
     });
 
+    // @ts-expect-error - global.Qase is dynamically added at runtime
     global.Qase = new Qase(this);
     this.metadata = this.createEmptyMetadata();
   }
@@ -312,7 +313,7 @@ export class JestQaseReporter implements Reporter {
     const filePath = this.getCurrentTestPath(path);
 
     // Determine status based on error type
-    const testStatus = determineTestStatus(error || null, value.status);
+    const testStatus = determineTestStatus(error ?? null, value.status);
 
     return {
       attachments: [],

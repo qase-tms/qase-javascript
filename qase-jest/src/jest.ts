@@ -21,6 +21,8 @@ export const qase = (
  * });
  */
 qase.title = (value: string): void => {
+  // @ts-expect-error - global.Qase is dynamically added at runtime
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   global.Qase.title(value);
 };
 
@@ -33,6 +35,8 @@ qase.title = (value: string): void => {
  * });
  */
 qase.ignore = (): void => {
+  // @ts-expect-error - global.Qase is dynamically added at runtime
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   global.Qase.ignore();
 };
 
@@ -46,6 +50,8 @@ qase.ignore = (): void => {
  * });
  */
 qase.comment = (value: string): void => {
+  // @ts-expect-error - global.Qase is dynamically added at runtime
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   global.Qase.comment(value);
 };
 
@@ -59,6 +65,8 @@ qase.comment = (value: string): void => {
  * });
  */
 qase.suite = (value: string): void => {
+  // @ts-expect-error - global.Qase is dynamically added at runtime
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   global.Qase.suite(value);
 };
 
@@ -72,6 +80,8 @@ qase.suite = (value: string): void => {
  * });
  */
 qase.fields = (values: Record<string, string>): void => {
+  // @ts-expect-error - global.Qase is dynamically added at runtime
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   global.Qase.fields(values);
 };
 
@@ -85,6 +95,8 @@ qase.fields = (values: Record<string, string>): void => {
  * });
  */
 qase.parameters = (values: Record<string, string>): void => {
+  // @ts-expect-error - global.Qase is dynamically added at runtime
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   global.Qase.parameters(values);
 };
 
@@ -98,6 +110,8 @@ qase.parameters = (values: Record<string, string>): void => {
  * });
  */
 qase.groupParameters = (values: Record<string, string>): void => {
+  // @ts-expect-error - global.Qase is dynamically added at runtime
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   global.Qase.groupParams(values);
 };
 
@@ -116,7 +130,11 @@ qase.groupParameters = (values: Record<string, string>): void => {
 qase.step = async (name: string, body: StepFunction) => {
   const runningStep = new QaseStep(name);
   // eslint-disable-next-line @typescript-eslint/require-await
-  await runningStep.run(body, async (step) => global.Qase.step(step));
+  await runningStep.run(body, async (step) => {
+    // @ts-expect-error - global.Qase is dynamically added at runtime
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
+    return global.Qase.step(step);
+  });
 };
 
 
@@ -141,6 +159,8 @@ qase.attach = (attach: {
       const attachmentName = path.basename(file);
       const contentType: string = getMimeTypes(file);
 
+      // @ts-expect-error - global.Qase is dynamically added at runtime
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       global.Qase.attachment({
         file_path: file,
         size: 0,
@@ -154,6 +174,8 @@ qase.attach = (attach: {
   }
 
   if (attach.content) {
+    // @ts-expect-error - global.Qase is dynamically added at runtime
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     global.Qase.attachment({
       file_path: null,
       size: attach.content.length,

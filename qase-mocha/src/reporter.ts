@@ -171,11 +171,9 @@ export class MochaQaseReporter extends reporters.Base {
 
     });
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
     process.stdout.write = stdoutInterceptor.write.bind(stdoutInterceptor);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
     process.stderr.write = stderrInterceptor.write.bind(stderrInterceptor);
 
     this.testOutputs.set(test.title, { stdout: '', stderr: '' });

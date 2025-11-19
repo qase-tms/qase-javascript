@@ -6,13 +6,13 @@
     "test:testops": "QASE_MODE=testops cypress run"
   },
   "devDependencies": {
-    "@badeball/cypress-cucumber-preprocessor": "^20.0.0",
-    "@bahmutov/cypress-esbuild-preprocessor": "^2.2.0",
-    "cypress": "^12.17.2",
-    "cypress-multi-reporters": "^1.6.3",
+    "@badeball/cypress-cucumber-preprocessor": "^20.1.2",
+    "@bahmutov/cypress-esbuild-preprocessor": "^2.2.7",
+    "cypress": "^12.17.4",
+    "cypress-multi-reporters": "^1.6.4",
     "cypress-qase-reporter": "3.1.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "cypress-cucumber-preprocessor": "^4.3.1"

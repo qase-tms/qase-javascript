@@ -17,6 +17,7 @@ jest.mock('path', () => ({
 
 describe('ConfigLoader', () => {
   const mockReadFileSync = jest.mocked(fs.readFileSync);
+  // eslint-disable-next-line @typescript-eslint/unbound-method
   const mockJoin = jest.mocked(path.join);
 
   beforeEach(() => {

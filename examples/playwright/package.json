@@ -5,7 +5,7 @@
     "test": "QASE_MODE=testops npx playwright test"
   },
   "devDependencies": {
-    "@playwright/test": "^1.34.3",
-    "playwright-qase-reporter": "^2.0.16"
+    "@playwright/test": "^1.56.1",
+    "playwright-qase-reporter": "^2.1.6"
   }
 }

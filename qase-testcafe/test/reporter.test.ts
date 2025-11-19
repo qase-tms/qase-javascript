@@ -71,6 +71,7 @@ describe('TestcafeQaseReporter', () => {
   describe('constructor', () => {
     it('should initialize reporter and global.Qase', () => {
       expect((reporter as any).reporter).toBe(reporterMock);
+      // @ts-expect-error - global.Qase is dynamically added at runtime
       expect(global.Qase).toBeDefined();
     });
   });
