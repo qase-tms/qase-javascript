@@ -45,6 +45,7 @@
     "@types/lodash.merge": "^4.6.9",
     "@types/lodash.mergewith": "^4.6.9",
     "@types/mime-types": "^2.1.4",
+    "@types/minimatch": "^6.0.0",
     "@types/node": "^20.19.25",
     "@types/uuid": "^9.0.8",
     "axios": "^1.13.2",

@@ -5,8 +5,8 @@
     "test": "QASE_MODE=testops cypress run"
   },
   "devDependencies": {
-    "cypress": "^12.17.4",
-    "cypress-mochawesome-reporter": "^3.8.4",
+    "cypress": "^15.6.0",
+    "cypress-mochawesome-reporter": "^4.0.2",
     "cypress-multi-reporters": "^1.6.4",
     "cypress-qase-reporter": "^3.1.0",
     "eslint-plugin-cypress": "^2.15.2"

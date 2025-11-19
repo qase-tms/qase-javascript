@@ -3,7 +3,8 @@
 
   "compilerOptions": {
     "noEmit": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": []
   },
 
   "include": ["./src/**/*.ts"]
