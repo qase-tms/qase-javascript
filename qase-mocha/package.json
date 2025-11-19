@@ -41,19 +41,19 @@
   "author": "Qase Team <support@qase.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "mocha": "^11.0.0",
+    "mocha": "^11.7.5",
     "deasync-promise": "^1.0.1",
-    "qase-javascript-commons": "~2.4.8",
+    "qase-javascript-commons": "~2.4.10",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/deasync-promise": "^1.0.2",
-    "@types/mocha": "^10.0.1",
-    "@types/node": "^20.2.4",
-    "@types/request": "^2.48.8",
-    "@typescript-eslint/eslint-plugin": "^5.59.7",
-    "@typescript-eslint/parser": "^5.59.7",
-    "eslint": "^8.41.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^20.19.25",
+    "@types/request": "^2.48.13",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "eslint": "^8.57.1",
     "prettier": "^2.8.8"
   }
 }

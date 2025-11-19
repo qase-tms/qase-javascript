@@ -161,6 +161,7 @@ export class TestcafeQaseReporter {
       reporterName: 'testcafe-reporter-qase',
     });
 
+    // @ts-expect-error - global.Qase is dynamically added at runtime
     global.Qase = new Qase(this);
   }
 

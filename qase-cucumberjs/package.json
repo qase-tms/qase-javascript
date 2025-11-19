@@ -40,16 +40,16 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@cucumber/messages": "^22.0.0",
-    "qase-javascript-commons": "~2.4.8"
+    "qase-javascript-commons": "~2.4.10"
   },
   "peerDependencies": {
     "@cucumber/cucumber": ">=7.0.0"
   },
   "devDependencies": {
-    "@jest/globals": "^29.5.0",
-    "@types/jest": "^29.5.2",
-    "jest": "^29.5.0",
-    "ts-jest": "^29.1.0",
-    "uuid": "^9.0.0"
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.4.5",
+    "uuid": "^9.0.1"
   }
 }

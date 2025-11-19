@@ -116,7 +116,12 @@ export class qase {
   public static step = async (name: string, body: StepFunction) => {
     const runningStep = new QaseStep(name);
     // eslint-disable-next-line @typescript-eslint/require-await
-    await runningStep.run(body, async (step) => global.Qase.step(step));
+    await runningStep.run(body, async (step) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
+      // @ts-expect-error - global.Qase is dynamically added at runtime
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      return global.Qase.step(step);
+    });
   };
 
 
@@ -141,6 +146,8 @@ export class qase {
         const attachmentName = path.basename(file);
         const contentType: string = getMimeTypes(file);
 
+        // @ts-expect-error - global.Qase is dynamically added at runtime
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         global.Qase.attachment({
           file_path: file,
           size: 0,
@@ -154,6 +161,8 @@ export class qase {
     }
 
     if (attach.content) {
+      // @ts-expect-error - global.Qase is dynamically added at runtime
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       global.Qase.attachment({
         file_path: null,
         size: attach.content.length,

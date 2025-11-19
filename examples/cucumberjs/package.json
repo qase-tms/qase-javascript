@@ -6,6 +6,6 @@
   },
   "devDependencies": {
     "@cucumber/cucumber": "^7.3.2",
-    "cucumberjs-qase-reporter": "^2.0.6"
+    "cucumberjs-qase-reporter": "^2.1.6"
   }
 }
