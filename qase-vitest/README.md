@@ -11,7 +11,7 @@ Testing frameworks that use Vitest as a test runner can also be used with Vitest
 To install the latest version, run:
 
 ```shell
-npm install --save-dev qase-vitest
+npm install vitest-qase-reporter
 ```
 
 # Contents
@@ -23,6 +23,7 @@ npm install --save-dev qase-vitest
     - [Metadata](#metadata)
     - [Advanced Usage with Annotations](#advanced-usage-with-annotations)
   - [Configuration](#configuration)
+  - [Documentation](#documentation)
   - [Requirements](#requirements)
 
 ## Getting started
@@ -94,22 +95,22 @@ existing test cases from TMS before the executing tests. For example:
 
 ```typescript
 import { describe, it, test, expect } from 'vitest';
-import { qase, withQase } from 'vitest-qase-reporter/vitest';
+import { addQaseId, withQase } from 'vitest-qase-reporter/vitest';
 
 describe('My First Test', () => {
-  test(qase([1, 2], 'Several ids'), () => {
+  test(addQaseId([1, 2], 'Several ids'), () => {
     expect(true).toBe(true);
   });
 
-  test(qase(3, 'Correct test'), () => {
+  test(addQaseId(3, 'Correct test'), () => {
     expect(true).toBe(true);
   });
 
-  test.skip(qase('4', 'Skipped test'), () => {
+  test.skip(addQaseId('4', 'Skipped test'), () => {
     expect(true).toBe(true);
   });
 
-  test(qase(['5', '6'], 'Failed test'), () => {
+  test(addQaseId(['5', '6'], 'Failed test'), () => {
     expect(true).toBe(false);
   });
 });
@@ -119,10 +120,10 @@ describe('My First Test', () => {
 
 ```typescript
 import { describe, it, expect } from 'vitest';
-import { qase, withQase } from 'vitest-qase-reporter/vitest';
+import { addQaseId, withQase } from 'vitest-qase-reporter/vitest';
 
 describe('Qase Annotations Example', () => {
-  it(qase(20, 'Basic test with qase ID'), () => {
+  it(addQaseId(20, 'Basic test with qase ID'), () => {
     expect(1 + 1).toBe(2);
   });
 
