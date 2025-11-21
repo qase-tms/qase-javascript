@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { RelationSuiteItem } from './relation-suite-item';
 
 /**

@@ -12,14 +12,19 @@
  * Do not edit the class manually.
  */
 
-import { BaseResponse } from './base-response';
-import { ResultCreateResponseAllOf } from './result-create-response-all-of';
-import { ResultCreateResponseAllOfResult } from './result-create-response-all-of-result';
+import { CustomFieldListResponseAllOfResult } from './custom-field-list-response-all-of-result';
 
 /**
- * @type ResultCreateResponse
+ * 
  * @export
+ * @interface CustomFieldListResponseAllOf
  */
-export type ResultCreateResponse = BaseResponse & ResultCreateResponseAllOf;
-
+export interface CustomFieldListResponseAllOf {
+    /**
+     * 
+     * @type {CustomFieldListResponseAllOfResult}
+     * @memberof CustomFieldListResponseAllOf
+     */
+    'result'?: CustomFieldListResponseAllOfResult;
+}
 
