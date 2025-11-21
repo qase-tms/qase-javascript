@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { RelationSuite } from './relation-suite';
 
 /**

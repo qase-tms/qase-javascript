@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import { ResultCreateFields } from './result-create-fields';
 import { ResultExecution } from './result-execution';
 import { ResultRelations } from './result-relations';

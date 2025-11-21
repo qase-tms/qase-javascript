@@ -13,13 +13,13 @@
  */
 
 import { BaseResponse } from './base-response';
-import { ResultCreateResponseAllOf } from './result-create-response-all-of';
-import { ResultCreateResponseAllOfResult } from './result-create-response-all-of-result';
+import { CustomField } from './custom-field';
+import { CustomFieldResponseAllOf } from './custom-field-response-all-of';
 
 /**
- * @type ResultCreateResponse
+ * @type CustomFieldResponse
  * @export
  */
-export type ResultCreateResponse = BaseResponse & ResultCreateResponseAllOf;
+export type CustomFieldResponse = BaseResponse & CustomFieldResponseAllOf;
 
 

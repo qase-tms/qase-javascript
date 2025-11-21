@@ -92,12 +92,18 @@ All URIs are relative to *<https://api.qase.io/v2>*
 
 | Class | Method | HTTP request | Description |
 |-------|--------|--------------|-------------|
+| *CustomFieldsApi* | [**getCustomFieldV2**](docs/CustomFieldsApi.md#getcustomfieldv2) | **GET** /custom_field/{id} | Get Custom Field |
+| *CustomFieldsApi* | [**getCustomFieldsV2**](docs/CustomFieldsApi.md#getcustomfieldsv2) | **GET** /custom_field | Get all Custom Fields |
 | *ResultsApi* | [**createResultV2**](docs/ResultsApi.md#createresultv2) | **POST** /{project_code}/run/{run_id}/result | Create test run result |
 | *ResultsApi* | [**createResultsV2**](docs/ResultsApi.md#createresultsv2) | **POST** /{project_code}/run/{run_id}/results | Bulk create test run result |
 
 ## Documentation For Models
 
 * [CreateResultsRequestV2](docs/CreateResultsRequestV2.md)
+* [CustomField](docs/CustomField.md)
+* [CustomFieldListResponse](docs/CustomFieldListResponse.md)
+* [CustomFieldOption](docs/CustomFieldOption.md)
+* [CustomFieldResponse](docs/CustomFieldResponse.md)
 * [RelationSuite](docs/RelationSuite.md)
 * [RelationSuiteItem](docs/RelationSuiteItem.md)
 * [ResultCreate](docs/ResultCreate.md)
