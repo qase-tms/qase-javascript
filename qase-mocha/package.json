@@ -1,6 +1,6 @@
 {
   "name": "mocha-qase-reporter",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Mocha Cypress Reporter",
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "sideEffects": false,
