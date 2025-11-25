@@ -101,20 +101,14 @@ export function createExtraReporters(
         // Create reporter instance with clean options (without main reporter options)
         const cleanOptions = {
           ...options,
-          // Remove main reporter specific options
+          // Remove main reporter property
           reporter: undefined,
-          reporterOptions: undefined,
-          'reporter-option': undefined,
-          reporterOption: undefined,
-          // Add extra reporter specific options
-          ...reporterOptions
+          // Add extra reporter specific options to all reporter option properties
+          // This ensures compatibility with different reporters that may expect different property names
+          reporterOptions,
+          reporterOption: reporterOptions,
+          'reporter-option': reporterOptions
         };
-        
-        // Special handling for JSON reporter
-        if (reporterName === 'json' && reporterOptions['output']) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          (cleanOptions as any).reporterOption = { output: reporterOptions['output'] };
-        }
         
         const reporter = new ReporterClass(runner, cleanOptions);
         reporters.push(reporter);
