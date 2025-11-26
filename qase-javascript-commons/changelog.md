@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.4.11
+
+## What's new
+
+Added retry mechanism for uploading attachments.
+
 # qase-javascript-commons@2.4.10
 
 ## What's new

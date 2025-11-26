@@ -199,14 +199,20 @@ export class ClientV1 implements IClient {
     }
     const uploadedHashes: string[] = [];
 
-    for (const attachment of attachments) {
+    for (let i = 0; i < attachments.length; i++) {
+      const attachment = attachments[i];
+      if (!attachment) {
+        continue;
+      }
+
       try {
         this.logger.logDebug(`Uploading attachment: ${attachment.file_path ?? attachment.file_name}`);
 
         const data = this.prepareAttachmentData(attachment);
-        const response = await this.attachmentClient.uploadAttachment(
+        const response = await this.uploadAttachmentWithRetry(
           this.config.project,
           [data],
+          attachment.file_path ?? attachment.file_name,
         );
 
         const hash = response.data.result?.[0]?.hash;
@@ -216,9 +222,105 @@ export class ClientV1 implements IClient {
       } catch (error) {
         this.logger.logError('Cannot upload attachment:', error);
       }
+
+      // Add delay between requests to avoid rate limiting
+      // Skip delay after the last attachment
+      if (i < attachments.length - 1) {
+        await this.delay(100); // 100ms delay between requests
+      }
     }
 
     return uploadedHashes;
+  }
+
+  /**
+   * Upload attachment with retry logic for 429 errors
+   * @param project Project code
+   * @param data Attachment data
+   * @param attachmentName Attachment name for logging
+   * @param maxRetries Maximum number of retry attempts
+   * @param initialDelay Initial delay in milliseconds
+   * @returns Promise with upload response
+   */
+  private async uploadAttachmentWithRetry(
+    project: string,
+    data: AttachmentData[],
+    attachmentName: string,
+    maxRetries = 5,
+    initialDelay = 1000,
+  ): Promise<{ data: { result?: { hash?: string }[] } }> {
+    let lastError: unknown;
+    let delay = initialDelay;
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return await this.attachmentClient.uploadAttachment(project, data);
+      } catch (error) {
+        lastError = error;
+
+        // Check if it's a 429 error (Too Many Requests)
+        if (isAxiosError(error)) {
+          if (error.response?.status === 429) {
+            if (attempt < maxRetries) {
+              const retryAfter = this.getRetryAfter(error);
+              const waitTime = retryAfter ?? delay;
+              
+              this.logger.logDebug(
+                `Rate limit exceeded (429) for attachment "${attachmentName}". ` +
+                `Retrying in ${waitTime}ms (attempt ${attempt + 1}/${maxRetries})`
+              );
+
+              await this.delay(waitTime);
+              
+              // Exponential backoff: double the delay for next attempt
+              delay = Math.min(delay * 2, 30000); // Cap at 30 seconds
+            } else {
+              this.logger.logError(
+                `Failed to upload attachment "${attachmentName}" after ${maxRetries} retries due to rate limiting`
+              );
+            }
+          } else {
+            // For non-429 errors, throw immediately
+            throw error;
+          }
+        } else {
+          // For non-Axios errors, throw immediately
+          throw error;
+        }
+      }
+    }
+
+    // If we exhausted all retries, throw the last error
+    throw lastError;
+  }
+
+  /**
+   * Extract Retry-After header value from response or return null
+   * @param error Axios error
+   * @returns Retry-After value in milliseconds or null
+   */
+  private getRetryAfter(error: AxiosError): number | null {
+    const headers = error.response?.headers;
+    if (!headers) {
+      return null;
+    }
+    
+    const retryAfterHeader: unknown = headers['retry-after'];
+    if (retryAfterHeader && typeof retryAfterHeader === 'string') {
+      const retryAfterSeconds = parseInt(retryAfterHeader, 10);
+      if (!isNaN(retryAfterSeconds)) {
+        return retryAfterSeconds * 1000; // Convert to milliseconds
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Delay execution for specified milliseconds
+   * @param ms Milliseconds to delay
+   */
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   private prepareAttachmentData(attachment: Attachment): AttachmentData {
