@@ -199,6 +199,13 @@ export class ClientV1 implements IClient {
     }
     const uploadedHashes: string[] = [];
 
+    // Add initial random delay to spread out requests from different workers/shard
+    // This helps prevent all workers from hitting the API at the same time
+    if (attachments.length > 0) {
+      const initialJitter = Math.random() * 500; // 0-500ms random delay
+      await this.delay(initialJitter);
+    }
+
     for (let i = 0; i < attachments.length; i++) {
       const attachment = attachments[i];
       if (!attachment) {
@@ -226,7 +233,10 @@ export class ClientV1 implements IClient {
       // Add delay between requests to avoid rate limiting
       // Skip delay after the last attachment
       if (i < attachments.length - 1) {
-        await this.delay(100); // 100ms delay between requests
+        // Increased delay with random jitter to prevent synchronization
+        const baseDelay = 1000; // 1000ms (1 second) base delay
+        const jitter = Math.random() * 300; // 0-300ms random jitter
+        await this.delay(baseDelay + jitter);
       }
     }
 
@@ -263,7 +273,13 @@ export class ClientV1 implements IClient {
           if (error.response?.status === 429) {
             if (attempt < maxRetries) {
               const retryAfter = this.getRetryAfter(error);
-              const waitTime = retryAfter ?? delay;
+              const baseWaitTime = retryAfter ?? delay;
+              
+              // Add jitter (random delay) to prevent all workers from retrying simultaneously
+              // Jitter is 10-30% of the wait time to spread out retry attempts
+              const jitterPercent = 0.1 + Math.random() * 0.2; // 10-30%
+              const jitter = baseWaitTime * jitterPercent;
+              const waitTime = Math.floor(baseWaitTime + jitter);
               
               this.logger.logDebug(
                 `Rate limit exceeded (429) for attachment "${attachmentName}". ` +
