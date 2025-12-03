@@ -65,15 +65,17 @@ The reporter uses the title from the `test.step` function as the step title. By 
 Additionally, these steps get their own result in the Qase Test run, offering a well-organized summary of the test flow. This helps quickly identify the cause of any failures.
 
 ```javascript
+const { qase } = require("jest-qase-reporter/jest");
+
 test('A Test case with steps, updated from code', async () => {
-  await test.step('Initialize the environment', async () => {
+  await qase.step('Initialize the environment', async () => {
     // Set up test environment
   });
-  await test.step('Test Core Functionality of the app', async () => {
+  await qase.step('Test Core Functionality of the app', async () => {
     // Exercise core functionality
   });
 
-  await test.step('Verify Expected Behavior of the app', async () => {
+  await qase.step('Verify Expected Behavior of the app', async () => {
     // Assert expected behavior
   });
 });
