@@ -78,7 +78,7 @@ export const CustomFieldsApiAxiosParamCreator = function (configuration?: Config
         },
         /**
          * This method allows to delete custom field. 
-         * @summary Delete Custom Field by id
+         * @summary Delete Custom Field
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -115,7 +115,7 @@ export const CustomFieldsApiAxiosParamCreator = function (configuration?: Config
         },
         /**
          * This method allows to retrieve custom field. 
-         * @summary Get Custom Field by id
+         * @summary Get Custom Field
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -205,7 +205,7 @@ export const CustomFieldsApiAxiosParamCreator = function (configuration?: Config
         },
         /**
          * This method allows to update custom field. 
-         * @summary Update Custom Field by id
+         * @summary Update Custom Field
          * @param {number} id Identifier.
          * @param {CustomFieldUpdate} customFieldUpdate 
          * @param {*} [options] Override http request option.
@@ -269,7 +269,7 @@ export const CustomFieldsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to delete custom field. 
-         * @summary Delete Custom Field by id
+         * @summary Delete Custom Field
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -280,7 +280,7 @@ export const CustomFieldsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to retrieve custom field. 
-         * @summary Get Custom Field by id
+         * @summary Get Custom Field
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -305,7 +305,7 @@ export const CustomFieldsApiFp = function(configuration?: Configuration) {
         },
         /**
          * This method allows to update custom field. 
-         * @summary Update Custom Field by id
+         * @summary Update Custom Field
          * @param {number} id Identifier.
          * @param {CustomFieldUpdate} customFieldUpdate 
          * @param {*} [options] Override http request option.
@@ -337,7 +337,7 @@ export const CustomFieldsApiFactory = function (configuration?: Configuration, b
         },
         /**
          * This method allows to delete custom field. 
-         * @summary Delete Custom Field by id
+         * @summary Delete Custom Field
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -347,7 +347,7 @@ export const CustomFieldsApiFactory = function (configuration?: Configuration, b
         },
         /**
          * This method allows to retrieve custom field. 
-         * @summary Get Custom Field by id
+         * @summary Get Custom Field
          * @param {number} id Identifier.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -370,7 +370,7 @@ export const CustomFieldsApiFactory = function (configuration?: Configuration, b
         },
         /**
          * This method allows to update custom field. 
-         * @summary Update Custom Field by id
+         * @summary Update Custom Field
          * @param {number} id Identifier.
          * @param {CustomFieldUpdate} customFieldUpdate 
          * @param {*} [options] Override http request option.
@@ -403,7 +403,7 @@ export class CustomFieldsApi extends BaseAPI {
 
     /**
      * This method allows to delete custom field. 
-     * @summary Delete Custom Field by id
+     * @summary Delete Custom Field
      * @param {number} id Identifier.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -415,7 +415,7 @@ export class CustomFieldsApi extends BaseAPI {
 
     /**
      * This method allows to retrieve custom field. 
-     * @summary Get Custom Field by id
+     * @summary Get Custom Field
      * @param {number} id Identifier.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -442,7 +442,7 @@ export class CustomFieldsApi extends BaseAPI {
 
     /**
      * This method allows to update custom field. 
-     * @summary Update Custom Field by id
+     * @summary Update Custom Field
      * @param {number} id Identifier.
      * @param {CustomFieldUpdate} customFieldUpdate 
      * @param {*} [options] Override http request option.

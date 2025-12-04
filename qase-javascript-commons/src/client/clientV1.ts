@@ -18,7 +18,7 @@ import { QaseError } from '../utils/qase-error';
 import { IClient } from './interface';
 import { LoggerInterface } from '../utils/logger';
 import chalk from 'chalk';
-import { createReadStream } from 'fs';
+import { createReadStream, statSync } from 'fs';
 import { Readable } from 'stream';
 import { getStartTime } from './dateUtils';
 import FormData from 'form-data';
@@ -27,6 +27,11 @@ const DEFAULT_API_HOST = 'qase.io';
 const API_BASE_URL = 'https://api-';
 const APP_BASE_URL = 'https://';
 const API_VERSION = '/v1';
+
+// Attachment upload limits
+const MAX_FILE_SIZE = 32 * 1024 * 1024; // 32 MB per file
+const MAX_REQUEST_SIZE = 128 * 1024 * 1024; // 128 MB per request
+const MAX_FILES_PER_REQUEST = 20; // 20 files per request
 
 enum ApiErrorCode {
   UNAUTHORIZED = 401,
@@ -199,40 +204,86 @@ export class ClientV1 implements IClient {
     }
     const uploadedHashes: string[] = [];
 
-    // Add initial random delay to spread out requests from different workers/shard
-    // This helps prevent all workers from hitting the API at the same time
-    if (attachments.length > 0) {
-      const initialJitter = Math.random() * 500; // 0-500ms random delay
-      await this.delay(initialJitter);
-    }
-
-    for (let i = 0; i < attachments.length; i++) {
-      const attachment = attachments[i];
+    // Filter out invalid attachments and check file size limits
+    const validAttachments: Attachment[] = [];
+    for (const attachment of attachments) {
       if (!attachment) {
         continue;
       }
 
-      try {
-        this.logger.logDebug(`Uploading attachment: ${attachment.file_path ?? attachment.file_name}`);
+      // Ensure attachment size is calculated if not set or is 0
+      this.ensureAttachmentSize(attachment);
 
-        const data = this.prepareAttachmentData(attachment);
-        const response = await this.uploadAttachmentWithRetry(
-          this.config.project,
-          [data],
-          attachment.file_path ?? attachment.file_name,
+      // Skip attachments with unknown size (0)
+      if (attachment.size === 0) {
+        this.logger.logError(
+          `Cannot determine size for attachment "${attachment.file_path ?? attachment.file_name}". Skipping.`
         );
-
-        const hash = response.data.result?.[0]?.hash;
-        if (hash) {
-          uploadedHashes.push(hash);
-        }
-      } catch (error) {
-        this.logger.logError('Cannot upload attachment:', error);
+        continue;
       }
 
-      // Add delay between requests to avoid rate limiting
-      // Skip delay after the last attachment
-      if (i < attachments.length - 1) {
+      // Check if file exceeds maximum size per file (32 MB)
+      if (attachment.size > MAX_FILE_SIZE) {
+        this.logger.logError(
+          `Attachment "${attachment.file_path ?? attachment.file_name}" exceeds maximum file size (32 MB). ` +
+          `File size: ${(attachment.size / (1024 * 1024)).toFixed(2)} MB. Skipping.`
+        );
+        continue;
+      }
+
+      validAttachments.push(attachment);
+    }
+
+    if (validAttachments.length === 0) {
+      return uploadedHashes;
+    }
+
+    // Add initial random delay to spread out requests from different workers/shard
+    // This helps prevent all workers from hitting the API at the same time
+    const initialJitter = Math.random() * 500; // 0-500ms random delay
+    await this.delay(initialJitter);
+
+    // Group attachments into batches that respect API limits
+    const batches = this.groupAttachmentsIntoBatches(validAttachments);
+
+    this.logger.logDebug(`Uploading ${validAttachments.length} attachments in ${batches.length} batch(es)`);
+
+    // Upload each batch
+    for (let i = 0; i < batches.length; i++) {
+      const batch = batches[i];
+      if (!batch || batch.length === 0) {
+        continue;
+      }
+
+      try {
+        const batchNames = batch.map(a => a.file_path ?? a.file_name).join(', ');
+        this.logger.logDebug(
+          `Uploading batch ${i + 1}/${batches.length} with ${batch.length} file(s): ${batchNames}`
+        );
+
+        const batchData = batch.map(attachment => this.prepareAttachmentData(attachment));
+        const response = await this.uploadAttachmentWithRetry(
+          this.config.project,
+          batchData,
+          batchNames,
+        );
+
+        // Extract all hashes from the response
+        if (response.data.result) {
+          for (const result of response.data.result) {
+            if (result.hash) {
+              uploadedHashes.push(result.hash);
+            }
+          }
+        }
+      } catch (error) {
+        this.logger.logError(`Cannot upload batch ${i + 1}:`, error);
+        // Continue with next batch even if current batch fails
+      }
+
+      // Add delay between batches to avoid rate limiting
+      // Skip delay after the last batch
+      if (i < batches.length - 1) {
         // Increased delay with random jitter to prevent synchronization
         const baseDelay = 1000; // 1000ms (1 second) base delay
         const jitter = Math.random() * 300; // 0-300ms random jitter
@@ -244,10 +295,60 @@ export class ClientV1 implements IClient {
   }
 
   /**
+   * Group attachments into batches respecting API limits:
+   * - Up to 20 files per batch
+   * - Up to 128 MB per batch
+   * @param attachments Array of attachments to group
+   * @returns Array of attachment batches
+   */
+  private groupAttachmentsIntoBatches(attachments: Attachment[]): Attachment[][] {
+    const batches: Attachment[][] = [];
+    let currentBatch: Attachment[] = [];
+    let currentBatchSize = 0;
+
+    for (const attachment of attachments) {
+      const attachmentSize = attachment.size;
+
+      // Check if adding this attachment would exceed limits
+      const wouldExceedFileLimit = currentBatch.length >= MAX_FILES_PER_REQUEST;
+      const wouldExceedSizeLimit = currentBatchSize + attachmentSize > MAX_REQUEST_SIZE;
+
+      // If current batch is full or would exceed limits, start a new batch
+      if (wouldExceedFileLimit || wouldExceedSizeLimit) {
+        if (currentBatch.length > 0) {
+          batches.push(currentBatch);
+          currentBatch = [];
+          currentBatchSize = 0;
+        }
+      }
+
+      // If a single file exceeds request size limit, it should have been filtered earlier
+      // but we check again as a safety measure
+      if (attachmentSize > MAX_REQUEST_SIZE) {
+        this.logger.logError(
+          `Attachment "${attachment.file_path ?? attachment.file_name}" exceeds maximum request size (128 MB). ` +
+          `File size: ${(attachmentSize / (1024 * 1024)).toFixed(2)} MB. Skipping.`
+        );
+        continue;
+      }
+
+      currentBatch.push(attachment);
+      currentBatchSize += attachmentSize;
+    }
+
+    // Add the last batch if it's not empty
+    if (currentBatch.length > 0) {
+      batches.push(currentBatch);
+    }
+
+    return batches;
+  }
+
+  /**
    * Upload attachment with retry logic for 429 errors
    * @param project Project code
-   * @param data Attachment data
-   * @param attachmentName Attachment name for logging
+   * @param data Attachment data array (can contain multiple files)
+   * @param attachmentNames Attachment names for logging (comma-separated for batches)
    * @param maxRetries Maximum number of retry attempts
    * @param initialDelay Initial delay in milliseconds
    * @returns Promise with upload response
@@ -255,7 +356,7 @@ export class ClientV1 implements IClient {
   private async uploadAttachmentWithRetry(
     project: string,
     data: AttachmentData[],
-    attachmentName: string,
+    attachmentNames: string,
     maxRetries = 5,
     initialDelay = 1000,
   ): Promise<{ data: { result?: { hash?: string }[] } }> {
@@ -282,7 +383,7 @@ export class ClientV1 implements IClient {
               const waitTime = Math.floor(baseWaitTime + jitter);
               
               this.logger.logDebug(
-                `Rate limit exceeded (429) for attachment "${attachmentName}". ` +
+                `Rate limit exceeded (429) for attachment(s) "${attachmentNames}". ` +
                 `Retrying in ${waitTime}ms (attempt ${attempt + 1}/${maxRetries})`
               );
 
@@ -292,7 +393,7 @@ export class ClientV1 implements IClient {
               delay = Math.min(delay * 2, 30000); // Cap at 30 seconds
             } else {
               this.logger.logError(
-                `Failed to upload attachment "${attachmentName}" after ${maxRetries} retries due to rate limiting`
+                `Failed to upload attachment(s) "${attachmentNames}" after ${maxRetries} retries due to rate limiting`
               );
             }
           } else {
@@ -337,6 +438,49 @@ export class ClientV1 implements IClient {
    */
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Ensure attachment size is calculated if not set or is 0
+   * @param attachment Attachment to ensure size for
+   */
+  private ensureAttachmentSize(attachment: Attachment): void {
+    // If size is already set and greater than 0, use it
+    if (attachment.size > 0) {
+      return;
+    }
+
+    try {
+      if (attachment.file_path) {
+        // Get file size from file system
+        const stats = statSync(attachment.file_path);
+        attachment.size = stats.size;
+      } else if (attachment.content) {
+        // Calculate size from content
+        if (typeof attachment.content === 'string') {
+          // For strings, check if it's base64 encoded
+          if (attachment.content.match(/^[A-Za-z0-9+/=]+$/)) {
+            // Base64 encoded string
+            attachment.size = Buffer.from(attachment.content, 'base64').length;
+          } else {
+            // Regular string - use byte length
+            attachment.size = Buffer.byteLength(attachment.content, 'utf8');
+          }
+        } else if (Buffer.isBuffer(attachment.content)) {
+          // Buffer - use length
+          attachment.size = attachment.content.length;
+        } else {
+          // Fallback: try to convert to string and get byte length
+          attachment.size = Buffer.byteLength(String(attachment.content), 'utf8');
+        }
+      }
+    } catch (error) {
+      // If we can't determine size, log warning and set to 0
+      this.logger.logDebug(
+        `Could not determine size for attachment "${attachment.file_path ?? attachment.file_name}": ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+      attachment.size = 0;
+    }
   }
 
   private prepareAttachmentData(attachment: Attachment): AttachmentData {

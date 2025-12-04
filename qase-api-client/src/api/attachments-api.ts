@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
 import { Configuration } from '../configuration';
 // Some imports not used depending on template conditions
@@ -182,9 +181,9 @@ export const AttachmentsApiAxiosParamCreator = function (configuration?: Configu
       if (file) {
         file.forEach((element) => {
           if (element?.name !== undefined && element?.value !== undefined) {
-            localVarFormParams.append('file', element.value, element.name);
+            localVarFormParams.append('file[]', element.value, element.name);
           } else {
-            localVarFormParams.append('file', element as any);
+            localVarFormParams.append('file[]', element as any);
           }
         });
       }
