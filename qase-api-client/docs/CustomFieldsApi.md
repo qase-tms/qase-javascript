@@ -5,10 +5,10 @@ All URIs are relative to *https://api.qase.io/v1*
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
 |[**createCustomField**](#createcustomfield) | **POST** /custom_field | Create new Custom Field|
-|[**deleteCustomField**](#deletecustomfield) | **DELETE** /custom_field/{id} | Delete Custom Field by id|
-|[**getCustomField**](#getcustomfield) | **GET** /custom_field/{id} | Get Custom Field by id|
+|[**deleteCustomField**](#deletecustomfield) | **DELETE** /custom_field/{id} | Delete Custom Field|
+|[**getCustomField**](#getcustomfield) | **GET** /custom_field/{id} | Get Custom Field|
 |[**getCustomFields**](#getcustomfields) | **GET** /custom_field | Get all Custom Fields|
-|[**updateCustomField**](#updatecustomfield) | **PATCH** /custom_field/{id} | Update Custom Field by id|
+|[**updateCustomField**](#updatecustomfield) | **PATCH** /custom_field/{id} | Update Custom Field|
 
 # **createCustomField**
 > IdResponse createCustomField(customFieldCreate)

@@ -1,3 +1,10 @@
+# qase-javascript-commons@2.4.13
+
+## What's new
+
+Improved the upload mechanism for attachments.
+Now the reporter will upload attachments in batches of 20 files.
+
 # qase-javascript-commons@2.4.12
 
 ## What's new
