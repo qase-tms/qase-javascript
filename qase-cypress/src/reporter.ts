@@ -35,6 +35,7 @@ const {
   EVENT_TEST_PENDING,
   EVENT_RUN_END,
   EVENT_TEST_BEGIN,
+  EVENT_SUITE_END
 } = Runner.constants;
 
 type CypressState = 'failed' | 'passed' | 'pending';
@@ -93,6 +94,13 @@ export class CypressQaseReporter extends reporters.Base {
 
   private testBeginTime: number = Date.now();
 
+  /**
+   * Set to track processed tests to identify skipped tests when beforeEach fails
+   * @type {Set<string>}
+   * @private
+   */
+  private processedTests: Set<string> = new Set();
+
   // private options: Omit<(FrameworkOptionsType<'cypress', ReporterOptionsType> & ConfigType & ReporterOptionsType & NonNullable<unknown>) | (null & ReporterOptionsType & NonNullable<unknown>), 'framework'>;
 
   /**
@@ -130,26 +138,177 @@ export class CypressQaseReporter extends reporters.Base {
    * @private
    */
   private addRunnerListeners(runner: Runner) {
-    runner.on(EVENT_TEST_PASS, (test: Test) => this.addTestResult(test));
-    runner.on(EVENT_TEST_PENDING, (test: Test) => this.addTestResult(test));
-    runner.on(EVENT_TEST_FAIL, (test: Test) => this.addTestResult(test));
+    runner.on(EVENT_TEST_PASS, (test: Test) => {
+      this.markTestAsProcessed(test);
+      this.addTestResult(test);
+    });
+    runner.on(EVENT_TEST_PENDING, (test: Test) => {
+      this.markTestAsProcessed(test);
+      this.addTestResult(test);
+    });
+    runner.on(EVENT_TEST_FAIL, (test: Test) => {
+      this.markTestAsProcessed(test);
+      this.addTestResult(test);
+    });
     runner.on(EVENT_TEST_BEGIN, () => {
       this.testBeginTime = Date.now();
       MetadataManager.clear();
+    });
+    runner.on(EVENT_SUITE_END, (suite: Suite) => {
+      this.handleSkippedTestsInSuite(suite);
     });
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     runner.once(EVENT_RUN_END, () => {
       const results = this.reporter.getResults();
       ResultsManager.setResults(results);
-      // spawnSync('node', [`${__dirname}/child.js`], {
-      //   stdio: 'inherit',
-      //   env: Object.assign(process.env, {
-      //     reporterConfig: JSON.stringify(this.options),
-      //     results: JSON.stringify(results),
-      //   }),
-      // });
+      this.processedTests.clear();
     });
+  }
+
+  /**
+   * Generate a unique identifier for a test
+   * @param {Test} test
+   * @returns {string}
+   * @private
+   */
+  private getTestIdentifier(test: Test): string {
+    const file = test.parent ? this.getFile(test.parent) ?? '' : '';
+    const suitePath = test.parent ? test.parent.titlePath().join(' > ') : '';
+    let testTitle = test.fullTitle();
+    // Remove "before each" hook prefix and quotes if present (can be anywhere in the string)
+    testTitle = testTitle.replace(/"before each" hook for "/g, '');
+    // Remove trailing quote if present
+    if (testTitle.endsWith('"')) {
+      testTitle = testTitle.slice(0, -1);
+    }
+    return `${file}::${suitePath}::${testTitle}`;
+  }
+
+  /**
+   * Mark a test as processed
+   * @param {Test} test
+   * @private
+   */
+  private markTestAsProcessed(test: Test): void {
+    const identifier = this.getTestIdentifier(test);
+    this.processedTests.add(identifier);
+  }
+
+  /**
+   * Check if a test was processed
+   * @param {Test} test
+   * @returns {boolean}
+   * @private
+   */
+  private isTestProcessed(test: Test): boolean {
+    const identifier = this.getTestIdentifier(test);
+    return this.processedTests.has(identifier);
+  }
+
+  /**
+   * Handle skipped tests in a suite when beforeEach hook fails
+   * @param {Suite} suite
+   * @private
+   */
+  private handleSkippedTestsInSuite(suite: Suite): void {
+    // Get tests only from the current suite (not nested suites, they will be processed separately)
+    const tests = suite.tests ?? [];
+
+    // Find tests that were not processed (skipped due to beforeEach failure)
+    for (const test of tests) {     
+      // Skip if test was already processed (e.g., first test that got EVENT_TEST_FAIL)
+      if (!this.isTestProcessed(test)) {
+        // Test was skipped due to beforeEach failure, report it as skipped
+        this.addSkippedTestResult(test);
+      }
+    }
+  }
+
+  /**
+     * Add a test result for a skipped test (due to beforeEach failure)
+     * @param {Test} test
+     * @private
+     */
+  private addSkippedTestResult(test: Test): void {
+    const end_time = Date.now();
+    const duration = 0; // Skipped tests have no duration
+
+    const start_time = this.testBeginTime || Date.now();
+
+    const ids = CypressQaseReporter.getCaseId(test.title);
+
+    const testFileName = this.getTestFileName(test);
+    const files = this.screenshotsFolder ?
+      FileSearcher.findFilesBeforeTime(this.screenshotsFolder, testFileName, new Date(start_time))
+      : [];
+
+    const attachments = files.map((file) => ({
+      content: '',
+      id: uuidv4(),
+      mime_type: 'image/png',
+      size: 0,
+      file_name: path.basename(file),
+      file_path: file,
+    } as Attachment));
+
+    let relations = {};
+    if (test.parent !== undefined) {
+      const data = [];
+      for (const suite of test.parent.titlePath()) {
+        data.push({
+          title: suite,
+          public_id: null,
+        });
+      }
+
+      relations = {
+        suite: {
+          data: data,
+        },
+      };
+    }
+
+    // For skipped tests, we don't have metadata since the test never ran
+    // But we can still check for cucumber tags if the test has a parent with a file
+    if (test.parent) {
+      const file = this.getFile(test.parent);
+      if (file) {
+        const tags = extractTags(file, test.title);
+        ids.push(...this.extractQaseIds(tags));
+      }
+    }
+
+    const result: TestResultType = {
+      attachments: attachments,
+      author: null,
+      fields: {},
+      message: null,
+      muted: false,
+      params: {},
+      group_params: {},
+      relations: relations,
+      run_id: null,
+      signature: this.getSignature(test, ids, {}),
+      steps: [],
+      id: uuidv4(),
+      execution: {
+        status: TestStatusEnum.skipped,
+        start_time: this.testBeginTime / 1000,
+        end_time: end_time / 1000,
+        duration: duration,
+        stacktrace: null,
+        thread: null,
+      },
+      testops_id: ids.length > 0 ? ids : null,
+      title: this.removeQaseIdsFromTitle(test.title),
+      preparedAttachments: [],
+    };
+
+    void this.reporter.addTestResult(result);
+
+    // Mark as processed to avoid duplicate reporting
+    this.markTestAsProcessed(test);
   }
 
   /**
@@ -163,6 +322,8 @@ export class CypressQaseReporter extends reporters.Base {
     const metadata = MetadataManager.getMetadata();
 
     if (metadata?.ignore) {
+      // Mark as processed even if ignored to avoid duplicate reporting
+      this.markTestAsProcessed(test);
       MetadataManager.clear();
       return;
     }
@@ -263,7 +424,7 @@ export class CypressQaseReporter extends reporters.Base {
       steps: steps,
       id: uuidv4(),
       execution: {
-        status: determineTestStatus(test.err || null, test.state || 'failed'),
+        status: determineTestStatus(test.err ?? null, test.state ?? 'failed'),
         start_time: this.testBeginTime / 1000,
         end_time: end_time / 1000,
         duration: duration,

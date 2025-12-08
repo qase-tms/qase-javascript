@@ -1,3 +1,9 @@
+# cypress-qase-reporter@3.1.1
+
+## What's new
+
+- Fixed an issue where the reporter was not reporting skipped tests due to failing beforeEach hooks.
+
 # cypress-qase-reporter@3.1.0
 
 ## What's new
