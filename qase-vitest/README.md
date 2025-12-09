@@ -98,19 +98,19 @@ import { describe, it, test, expect } from 'vitest';
 import { addQaseId, withQase } from 'vitest-qase-reporter/vitest';
 
 describe('My First Test', () => {
-  test(addQaseId([1, 2], 'Several ids'), () => {
+  test(addQaseId('Several ids', [1, 2]), () => {
     expect(true).toBe(true);
   });
 
-  test(addQaseId(3, 'Correct test'), () => {
+  test(addQaseId('Correct test', [3]), () => {
     expect(true).toBe(true);
   });
 
-  test.skip(addQaseId('4', 'Skipped test'), () => {
+  test.skip(addQaseId('Skipped test', [4]), () => {
     expect(true).toBe(true);
   });
 
-  test(addQaseId(['5', '6'], 'Failed test'), () => {
+  test(addQaseId('Failed test', ['5', '6']), () => {
     expect(true).toBe(false);
   });
 });

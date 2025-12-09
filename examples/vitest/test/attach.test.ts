@@ -18,7 +18,7 @@ describe("Example: attach.test.ts", () => {
     await qase.attach({
       name: "attachment.txt",
       content: "Hello, world!",
-      contentType: "text/plain",
+      type: "text/plain",
     });
 
     expect(true).toBe(true);

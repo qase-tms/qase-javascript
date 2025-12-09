@@ -59,7 +59,7 @@ describe("Example: E2E Testing with Qase", () => {
       await qase.attach({
         name: "dashboard-screenshot.png",
         content: screenshot,
-        contentType: "image/png"
+        type: "image/png"
       });
     });
   }));

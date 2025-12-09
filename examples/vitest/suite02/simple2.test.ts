@@ -1,8 +1,8 @@
 import { describe, it, test, expect } from 'vitest';
-import { qase, withQase } from 'vitest-qase-reporter/vitest';
+import { addQaseId, withQase } from 'vitest-qase-reporter/vitest';
 
 describe('Suite 02 - Advanced Test Examples', () => {
-  test(qase(10, 'should demonstrate withQase annotations'), withQase(async ({ qase }) => {
+  test(addQaseId('should demonstrate withQase annotations', [10]), withQase(async ({ qase }) => {
     await qase.title('Advanced test with annotations');
     await qase.comment('This test demonstrates advanced Qase features');
     await qase.suite('Advanced Test Suite from annotations');
@@ -22,17 +22,17 @@ describe('Suite 02 - Advanced Test Examples', () => {
     });
   }));
 
-  it(qase(11, 'should demonstrate priority field'), withQase(async ({ qase }) => {
+  it(addQaseId('should demonstrate priority field', [11]), withQase(async ({ qase }) => {
     await qase.fields({ priority: 'high' });
     expect(1 + 1).toBe(2);
   }));
 
-  it(qase(12, 'should demonstrate severity field'), withQase(async ({ qase }) => {
+  it(addQaseId('should demonstrate severity field', [12]), withQase(async ({ qase }) => {
     await qase.fields({ severity: 'critical' });
     expect(1 + 1).toBe(2);
   }));
 
-  it(qase(13, 'should demonstrate layer field'), withQase(async ({ qase }) => {
+  it(addQaseId('should demonstrate layer field', [13]), withQase(async ({ qase }) => {
     await qase.fields({ layer: 'e2e' });
     expect(1 + 1).toBe(2);
   }));
