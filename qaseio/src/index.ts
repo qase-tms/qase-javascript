@@ -1,3 +1,4 @@
 export * from './generated';
 
-export { QaseApi, QaseApiInterface } from './qaseio';
+export { QaseApi } from './qaseio';
+export type { QaseApiInterface } from './qaseio';

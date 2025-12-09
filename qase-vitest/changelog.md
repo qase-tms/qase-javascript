@@ -1,3 +1,9 @@
+# qase-vitest@1.0.3
+
+## What's new
+
+- Added support for expected results and data for steps.
+
 # qase-vitest@1.0.2
 
 ## What's new

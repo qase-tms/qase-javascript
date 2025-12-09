@@ -21,7 +21,7 @@ export interface QaseWrapper {
   fields(values: Record<string, string>): Promise<void>;
   parameters(values: Record<string, string>): Promise<void>;
   groupParameters(values: Record<string, string>): Promise<void>;
-  step(name: string, body: StepFunction): Promise<void>;
+  step(name: string, body: StepFunction, expectedResult?: string, data?: string): Promise<void>;
   attach(attach: {
     name?: string;
     type?: string;
@@ -130,6 +130,8 @@ const createQaseWrapper = (annotate: AnnotateFunction): QaseWrapper => {
      * Add a step to the test case
      * @param name
      * @param body
+     * @param expectedResult
+     * @param data
      * @example
      * test('test', withQase(async ({ qase }) => {
      *    await qase.step("Step", () => {
@@ -137,19 +139,29 @@ const createQaseWrapper = (annotate: AnnotateFunction): QaseWrapper => {
      *    });
      *     expect(true).toBe(true);
      * }));
+     * @example
+     * test('test', withQase(async ({ qase }) => {
+     *    await qase.step("Step", () => {
+     *      expect(true).toBe(true);
+     *    }, "Expected result", "Input data");
+     *     expect(true).toBe(true);
+     * }));
      */
-    async step(name: string, body: StepFunction): Promise<void> {
-      await annotate(`Qase Step Start: ${name}`, { type: 'qase-step-start', body: name });
+    async step(name: string, body: StepFunction, expectedResult?: string, data?: string): Promise<void> {
+      const stepName = expectedResult || data 
+        ? `${name} QaseExpRes:${expectedResult ? `: ${expectedResult}` : ''} QaseData:${data ? `: ${data}` : ''}` 
+        : name;
+      await annotate(`Qase Step Start: ${stepName}`, { type: 'qase-step-start', body: stepName });
       try {
-        const runningStep = new QaseStep(name);
+        const runningStep = new QaseStep(stepName);
         await runningStep.run(body, async (step) => {
           const stepName = 'action' in step.data ? step.data.action : step.data.name;
           await annotate(`Qase Step: ${stepName}`, { type: 'qase-step', body: stepName });
         });
-        await annotate(`Qase Step End: ${name}`, { type: 'qase-step-end', body: name });
+        await annotate(`Qase Step End: ${stepName}`, { type: 'qase-step-end', body: stepName });
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
-        await annotate(`Qase Step Failed: ${name} - ${errorMessage}`, { type: 'qase-step-failed', body: `${name} - ${errorMessage}` });
+        await annotate(`Qase Step Failed: ${stepName} - ${errorMessage}`, { type: 'qase-step-failed', body: `${stepName} - ${errorMessage}` });
         throw error;
       }
     },

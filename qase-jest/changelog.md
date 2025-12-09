@@ -1,3 +1,9 @@
+# jest-qase-reporter@2.1.4
+
+## What's new
+
+- Added support for expected results and data for steps.
+
 # jest-qase-reporter@2.1.3
 
 ## What's new

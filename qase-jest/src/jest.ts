@@ -119,6 +119,8 @@ qase.groupParameters = (values: Record<string, string>): void => {
  * Add a step to the test case
  * @param name
  * @param body
+ * @param expectedResult
+ * @param data
  * @example
  * test('test', () => {
  *    qase.step("Step", () => {
@@ -126,9 +128,19 @@ qase.groupParameters = (values: Record<string, string>): void => {
  *    });
  *     expect(true).toBe(true);
  * });
+ * @example
+ * test('test', () => {
+ *    qase.step("Step", () => {
+ *      expect(true).toBe(true);
+ *    }, "Expected result", "Input data");
+ *     expect(true).toBe(true);
+ * });
  */
-qase.step = async (name: string, body: StepFunction) => {
-  const runningStep = new QaseStep(name);
+qase.step = async (name: string, body: StepFunction, expectedResult?: string, data?: string) => {
+  const stepName = expectedResult || data 
+    ? `${name} QaseExpRes:${expectedResult ? `: ${expectedResult}` : ''} QaseData:${data ? `: ${data}` : ''}` 
+    : name;
+  const runningStep = new QaseStep(stepName);
   // eslint-disable-next-line @typescript-eslint/require-await
   await runningStep.run(body, async (step) => {
     // @ts-expect-error - global.Qase is dynamically added at runtime

@@ -40,7 +40,7 @@ export interface Methods {
 
   comment(message: string): void;
 
-  step(title: string, func: () => void): void;
+  step(title: string, func: () => void, expectedResult?: string, data?: string): void;
 }
 
 export class Metadata {

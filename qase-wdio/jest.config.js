@@ -8,7 +8,6 @@ module.exports = {
       tsconfig: {
         skipLibCheck: true,
       },
-      isolatedModules: true,
     }],
   },
   collectCoverageFrom: [
