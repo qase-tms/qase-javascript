@@ -1,20 +1,20 @@
 import { describe, it, expect } from 'vitest';
-import { qase } from 'vitest-qase-reporter/vitest';
+import { addQaseId } from 'vitest-qase-reporter/vitest';
 
 describe('Suite 01 - Basic Test Examples', () => {
-  it(qase(1, 'should pass basic assertion'), () => {
+  it(addQaseId('should pass basic assertion', [1]), () => {
     expect(1 + 1).toBe(2);
   });
 
-  it(qase(2, 'should fail basic assertion'), () => {
+  it(addQaseId('should fail basic assertion', [2]), () => {
     expect(1 + 1).toBe(3);
   });
 
-  it.skip(qase(3, 'should be skipped'), () => {
+  it.skip(addQaseId('should be skipped', [3]), () => {
     expect(true).toBe(true);
   });
 
-  it(qase(4, 'test with multiple calculations'), () => {
+  it(addQaseId('test with multiple calculations', [4]), () => {
     expect(Math.max(1, 2, 3)).toBe(3);
     expect(Math.min(1, 2, 3)).toBe(1);
   });
