@@ -66,6 +66,8 @@ The reporter uses the title from the `qase.step` function as the step title. By 
 
 Additionally, these steps get their own result in the Qase Test run, offering a well-organized summary of the test flow. This helps quickly identify the cause of any failures.
 
+You can also provide an expected result and input data for each step, which will be displayed in Qase.
+
 ```typescript
 it('A Test case with steps, updated from code', withQase(async ({ qase }) => {
   await qase.step('Initialize the environment', async () => {
@@ -78,6 +80,20 @@ it('A Test case with steps, updated from code', withQase(async ({ qase }) => {
   await qase.step('Verify Expected Behavior of the app', async () => {
     // Assert expected behavior
   });
+}));
+```
+
+#### Steps with Expected Result and Data
+
+```typescript
+it('A Test case with steps including expected results and data', withQase(async ({ qase }) => {
+  await qase.step('Click button', async () => {
+    // Click action
+  }, 'Button should be clicked', 'Button data');
+  
+  await qase.step('Fill form', async () => {
+    // Form filling action
+  }, 'Form should be filled', 'Form input data');
 }));
 ```
 <br>

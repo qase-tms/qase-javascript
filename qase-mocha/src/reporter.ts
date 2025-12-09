@@ -389,18 +389,24 @@ export class MochaQaseReporter extends reporters.Base {
     this.metadata.addComment(message);
   };
 
-  step = (title: string, func: () => void) => {
+  step = (title: string, func: () => void, expectedResult?: string, data?: string) => {
 
     const previousType = this.currentType;
 
     this.currentType = 'step';
 
+    const stepTitle = expectedResult || data 
+      ? `${title} QaseExpRes:${expectedResult ? `: ${expectedResult}` : ''} QaseData:${data ? `: ${data}` : ''}` 
+      : title;
+
+    const stepData = this.extractAndCleanStep(stepTitle);
+
     const step: TestStepType = {
       step_type: StepType.TEXT,
       data: {
-        action: title,
-        expected_result: null,
-        data: null,
+        action: stepData.cleanedString,
+        expected_result: stepData.expectedResult,
+        data: stepData.data,
       },
       execution: {
         start_time: Date.now(),
@@ -454,5 +460,41 @@ export class MochaQaseReporter extends reporters.Base {
     const [, ids] = title.match(MochaQaseReporter.qaseIdRegExp) ?? [];
 
     return ids ? ids.split(',').map((id) => Number(id)) : [];
+  }
+
+  /**
+   * Extract expected result and data from step title and return cleaned string
+   * @param {string} input
+   * @returns {{expectedResult: string | null, data: string | null, cleanedString: string}}
+   * @private
+   */
+  private extractAndCleanStep(input: string): {
+    expectedResult: string | null;
+    data: string | null;
+    cleanedString: string
+  } {
+    let expectedResult: string | null = null;
+    let data: string | null = null;
+    let cleanedString = input;
+
+    const hasExpectedResult = input.includes('QaseExpRes:');
+    const hasData = input.includes('QaseData:');
+
+    if (hasExpectedResult || hasData) {
+      const regex = /QaseExpRes:\s*:?\s*(.*?)\s*(?=QaseData:|$)QaseData:\s*:?\s*(.*)?/;
+      const match = input.match(regex);
+
+      if (match) {
+        expectedResult = match[1]?.trim() ?? null;
+        data = match[2]?.trim() ?? null;
+
+        cleanedString = input
+          .replace(/QaseExpRes:\s*:?\s*.*?(?=QaseData:|$)/, '')
+          .replace(/QaseData:\s*:?\s*.*/, '')
+          .trim();
+      }
+    }
+
+    return { expectedResult, data, cleanedString };
   }
 }

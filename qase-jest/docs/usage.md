@@ -80,6 +80,22 @@ test('A Test case with steps, updated from code', async () => {
   });
 });
 ```
+
+#### Steps with Expected Result and Data
+
+```javascript
+const { qase } = require("jest-qase-reporter/jest");
+
+test('A Test case with steps including expected results and data', async () => {
+  await qase.step('Click button', async () => {
+    // Click action
+  }, 'Button should be clicked', 'Button data');
+  
+  await qase.step('Fill form', async () => {
+    // Form filling action
+  }, 'Form should be filled', 'Form input data');
+});
+```
 <br>
 
 ### Fields

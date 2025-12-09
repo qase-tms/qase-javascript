@@ -184,7 +184,7 @@ describe('User Authentication', function() {
 ## Adding Steps to a Test
 
 You can add custom steps to your test cases using the `this.step()` method. Each step should
-have a title and optionally a function.
+have a title and optionally a function. You can also provide an expected result and input data for each step, which will be displayed in Qase.
 
 ### Example
 
@@ -205,6 +205,26 @@ describe('User Authentication', function() {
     this.step('Verify successful login', function() {
       // Step implementation
     });
+    expect(true).to.equal(true);
+  });
+});
+```
+
+### Example with Expected Result and Data
+
+```javascript
+const { qase } = require('mocha-qase-reporter/mocha');
+
+describe('User Authentication', function() {
+  it('test with steps including expected results and data', function() {
+    this.step('Click button', function() {
+      // Click action
+    }, 'Button should be clicked', 'Button data');
+    
+    this.step('Fill form', function() {
+      // Form filling action
+    }, 'Form should be filled', 'Form input data');
+    
     expect(true).to.equal(true);
   });
 });

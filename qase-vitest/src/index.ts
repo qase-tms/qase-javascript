@@ -175,10 +175,11 @@ export class VitestQaseReporter implements Reporter {
         testResult.steps = metadata.steps.map(step => {
           const stepObj = new TestStepType();
           stepObj.id = Math.random().toString(36).substr(2, 9);
+          const stepData = this.extractAndCleanStep(step.name);
           stepObj.data = {
-            action: step.name,
-            expected_result: null,
-            data: null
+            action: stepData.cleanedString,
+            expected_result: stepData.expectedResult,
+            data: stepData.data
           };
           stepObj.execution.status = step.status === 'failed' ? StepStatusEnum.failed : StepStatusEnum.passed;
           return stepObj;
@@ -306,7 +307,10 @@ export class VitestQaseReporter implements Reporter {
           
         case 'step-end': {
           if (metadata.currentStep) {
-            metadata.steps.push({ name: metadata.currentStep, status: 'end' });
+            metadata.steps.push({ 
+              name: metadata.currentStep, 
+              status: 'end'
+            });
             delete metadata.currentStep;
           }
           break;
@@ -314,7 +318,10 @@ export class VitestQaseReporter implements Reporter {
           
         case 'step-failed': {
           if (metadata.currentStep) {
-            metadata.steps.push({ name: metadata.currentStep, status: 'failed' });
+            metadata.steps.push({ 
+              name: metadata.currentStep, 
+              status: 'failed'
+            });
             delete metadata.currentStep;
           }
           break;
@@ -365,6 +372,36 @@ export class VitestQaseReporter implements Reporter {
     // If no suite separator found, return undefined
     // The test will be assigned to the default suite
     return undefined;
+  }
+
+  private extractAndCleanStep(input: string): {
+    expectedResult: string | null;
+    data: string | null;
+    cleanedString: string
+  } {
+    let expectedResult: string | null = null;
+    let data: string | null = null;
+    let cleanedString = input;
+
+    const hasExpectedResult = input.includes('QaseExpRes:');
+    const hasData = input.includes('QaseData:');
+
+    if (hasExpectedResult || hasData) {
+      const regex = /QaseExpRes:\s*:?\s*(.*?)\s*(?=QaseData:|$)QaseData:\s*:?\s*(.*)?/;
+      const match = input.match(regex);
+
+      if (match) {
+        expectedResult = match[1]?.trim() ?? null;
+        data = match[2]?.trim() ?? null;
+
+        cleanedString = input
+          .replace(/QaseExpRes:\s*:?\s*.*?(?=QaseData:|$)/, '')
+          .replace(/QaseData:\s*:?\s*.*/, '')
+          .trim();
+      }
+    }
+
+    return { expectedResult, data, cleanedString };
   }
 
 

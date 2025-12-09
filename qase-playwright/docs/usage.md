@@ -183,8 +183,7 @@ test('test', async ({ page }) => {
 
 ## Adding Steps to a Test
 
-You can add steps to a test case using the `qase.step` function. This function accepts a string, which will be used as
-the step description in Qase.
+You can add steps to a test case using the `qase.step` function. This function accepts a string for the action, and optionally an expected result and input data, which will be used as the step description in Qase.
 
 ### Example
 
@@ -194,6 +193,19 @@ import { qase } from 'playwright-qase-reporter';
 test('test', async ({ page }) => {
   await test.step(qase.step('Some step'), async () => {
     // some actions
+  });
+  await page.goto('https://example.com');
+});
+```
+
+### Example with Expected Result and Data
+
+```javascript
+import { qase } from 'playwright-qase-reporter';
+
+test('test', async ({ page }) => {
+  await test.step(qase.step('Click button', 'Button should be clicked', 'Button data'), async () => {
+    await page.click('button');
   });
   await page.goto('https://example.com');
 });

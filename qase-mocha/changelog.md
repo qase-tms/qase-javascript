@@ -1,3 +1,9 @@
+# qase-mocha@1.1.8
+
+## What's new
+
+- Added support for expected results and data for steps.
+
 # qase-mocha@1.1.6
 
 ## What's new

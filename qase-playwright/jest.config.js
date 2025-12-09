@@ -7,7 +7,6 @@ module.exports = {
       tsconfig: {
         skipLibCheck: true,
       },
-      isolatedModules: true,
     }],
   },
   testMatch: ['**/*.test.ts'],

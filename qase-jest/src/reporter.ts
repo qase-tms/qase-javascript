@@ -13,6 +13,7 @@ import {
   QaseReporter,
   Relation,
   ReporterInterface,
+  StepType,
   Suite,
   TestResultType,
   TestStatusEnum,
@@ -278,6 +279,17 @@ export class JestQaseReporter implements Reporter {
   }
 
   public addStep(step: TestStepType) {
+    // Parse expectedResult and data from step name if present
+    // Only process text steps (not gherkin steps)
+    // Check if step is a text step (either explicitly TEXT type, undefined, or string 'text')
+    const isTextStep = (StepType && step.step_type === StepType.TEXT) || step.step_type === undefined || step.step_type === 'text';
+    if (isTextStep && step.data && 'action' in step.data) {
+      const stepTextData = step.data as { action: string; expected_result: string | null; data: string | null };
+      const stepData = this.extractAndCleanStep(stepTextData.action);
+      stepTextData.action = stepData.cleanedString;
+      stepTextData.expected_result = stepData.expectedResult;
+      stepTextData.data = stepData.data;
+    }
     this.metadata.steps.push(step);
   }
 
@@ -370,6 +382,42 @@ export class JestQaseReporter implements Reporter {
       return title.replace(matches[0], '').trimEnd();
     }
     return title;
+  }
+
+  /**
+   * Extract expected result and data from step title and return cleaned string
+   * @param {string} input
+   * @returns {{expectedResult: string | null, data: string | null, cleanedString: string}}
+   * @private
+   */
+  private extractAndCleanStep(input: string): {
+    expectedResult: string | null;
+    data: string | null;
+    cleanedString: string
+  } {
+    let expectedResult: string | null = null;
+    let data: string | null = null;
+    let cleanedString = input;
+
+    const hasExpectedResult = input.includes('QaseExpRes:');
+    const hasData = input.includes('QaseData:');
+
+    if (hasExpectedResult || hasData) {
+      const regex = /QaseExpRes:\s*:?\s*(.*?)\s*(?=QaseData:|$)QaseData:\s*:?\s*(.*)?/;
+      const match = input.match(regex);
+
+      if (match) {
+        expectedResult = match[1]?.trim() ?? null;
+        data = match[2]?.trim() ?? null;
+
+        cleanedString = input
+          .replace(/QaseExpRes:\s*:?\s*.*?(?=QaseData:|$)/, '')
+          .replace(/QaseData:\s*:?\s*.*/, '')
+          .trim();
+      }
+    }
+
+    return { expectedResult, data, cleanedString };
   }
 
   async onRunnerEnd() {
