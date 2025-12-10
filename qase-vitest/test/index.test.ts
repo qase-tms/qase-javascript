@@ -144,8 +144,8 @@ describe('VitestQaseReporter - Main scenarios', () => {
       expect(result.signature).toBe('Suite > Test Name (Qase ID: 123)');
       expect(result.testops_id).toBe(123);
       expect(result.execution.status).toBe('passed');
-      expect(result.execution.start_time).toBe(1);
-      expect(result.execution.end_time).toBe(501);
+      expect(result.execution.start_time).toBe(null);
+      expect(result.execution.end_time).toBe(null);
       expect(result.execution.duration).toBe(500);
     });
 
