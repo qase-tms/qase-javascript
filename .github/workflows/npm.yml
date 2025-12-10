@@ -6,6 +6,10 @@ on:
     branches:
       - 'main'
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -42,6 +46,8 @@ jobs:
         node-version: '20'
         registry-url: 'https://registry.npmjs.org'
 
+    - name: Update npm
+      run: npm install -g npm@latest    
     - name: Install dependencies
       if: contains(github.event.ref, matrix.prefix)
       run: npm ci
@@ -53,11 +59,7 @@ jobs:
     - name: Publish a release version
       if: contains(github.event.ref, matrix.prefix) && !contains(github.event.ref, 'beta')
       run: npm publish -w ${{ matrix.prefix }}
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
     - name: Publish a beta version
       if: contains(github.event.ref, matrix.prefix) && contains(github.event.ref, 'beta')
       run: npm publish -w ${{ matrix.prefix }} --tag beta
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
