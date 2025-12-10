@@ -45,9 +45,7 @@ jobs:
       with:
         node-version: '20'
         registry-url: 'https://registry.npmjs.org'
-
-    - name: Update npm
-      run: npm install -g npm@latest    
+ 
     - name: Install dependencies
       if: contains(github.event.ref, matrix.prefix)
       run: npm ci
