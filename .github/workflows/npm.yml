@@ -16,14 +16,15 @@ jobs:
     strategy:
       max-parallel: 5
       matrix:
-        node-version: [ '20', '22' ]
+        node-version: [ '22', '24' ]
         prefix: [ "qase-api-client", "qase-api-v2-client", "qase-javascript-commons", "qase-cypress", "qase-cucumberjs", "qase-newman", "qase-testcafe", "qase-jest", "qase-playwright", "qase-mocha", "qase-wdio", "qase-vitest" ]
     name: Project ${{ matrix.prefix }} - Node ${{ matrix.node-version }}
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v6
       with:
         node-version: ${{ matrix.node-version }}
+    - run: npm install npm@latest    
     - run: npm ci
     - run: npm run build -ws --if-present
     - run: npm run lint -w ${{ matrix.prefix }}
@@ -40,12 +41,16 @@ jobs:
     name: Publish ${{ matrix.prefix }}
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v6
       if: contains(github.event.ref, matrix.prefix)
       with:
-        node-version: '20'
+        node-version: '24'
         registry-url: 'https://registry.npmjs.org'
- 
+    
+    - name: Update npm
+      if: contains(github.event.ref, matrix.prefix)
+      run: npm install npm@latest
+
     - name: Install dependencies
       if: contains(github.event.ref, matrix.prefix)
       run: npm ci
