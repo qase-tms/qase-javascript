@@ -115,8 +115,8 @@ export class VitestQaseReporter implements Reporter {
     }
 
     // Set execution details
-    testResult.execution.start_time = diagnostic?.startTime ? diagnostic.startTime / 1000 : null;
-    testResult.execution.end_time = diagnostic?.startTime ? diagnostic.startTime / 1000 + diagnostic.duration : null;
+    testResult.execution.start_time = null;
+    testResult.execution.end_time = null;
     testResult.execution.duration = Math.round(diagnostic?.duration || 0);
 
     // Create error object for status determination
