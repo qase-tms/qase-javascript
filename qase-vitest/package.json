@@ -1,6 +1,6 @@
 {
   "name": "vitest-qase-reporter",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Qase TMS Vitest Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
