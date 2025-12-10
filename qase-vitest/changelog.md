@@ -1,3 +1,9 @@
+# qase-vitest@1.0.4
+
+## What's new
+
+- Fixed an issue with multi-threaded test runs.
+
 # qase-vitest@1.0.3
 
 ## What's new
