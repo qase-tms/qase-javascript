@@ -26,6 +26,7 @@ import { getHostInfo } from './utils/hostData';
 import { ClientV2 } from './client/clientV2';
 import { TestOpsOptionsType } from './models/config/TestOpsOptionsType';
 import { applyStatusMapping } from './utils/status-mapping-utils';
+import { HostData } from './models/host-data';
 
 /**
  * @type {Record<TestStatusEnum, (test: TestResultType) => string>}
@@ -104,6 +105,8 @@ export class QaseReporter implements ReporterInterface {
 
   private withState: boolean;
 
+  private readonly hostData: HostData;
+
   /**
    * @param {OptionsType} options
    */
@@ -147,8 +150,8 @@ export class QaseReporter implements ReporterInterface {
     this.logger = new Logger(loggerOptions);
     this.logger.logDebug(`Config: ${JSON.stringify(this.sanitizeOptions(composedOptions))}`);
 
-    const hostData = getHostInfo(options.frameworkPackage, options.reporterName);
-    this.logger.logDebug(`Host data: ${JSON.stringify(hostData)}`);
+    this.hostData = getHostInfo(options.frameworkPackage, options.reporterName);
+    this.logger.logDebug(`Host data: ${JSON.stringify(this.hostData)}`);
 
     this.captureLogs = composedOptions.captureLogs;
 
@@ -570,6 +573,9 @@ export class QaseReporter implements ReporterInterface {
           options.testops as TestOpsOptionsType,
           options.environment,
           options.rootSuite,
+          this.hostData,
+          options.reporterName,
+          options.frameworkPackage
         );
 
         return new TestOpsReporter(
