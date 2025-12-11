@@ -5,6 +5,7 @@ import { LoggerInterface } from "../utils/logger";
 import { ClientV1 } from "./clientV1";
 import FormData from 'form-data';
 import { TestOpsOptionsType } from "../models/config/TestOpsOptionsType";
+import { HostData } from "../models/host-data";
 
 const API_CONFIG = {
     DEFAULT_HOST: 'qase.io',
@@ -35,21 +36,93 @@ export class ClientV2 extends ClientV1 {
         logger: LoggerInterface,
         config: TestOpsOptionsType,
         environment: string | undefined,
-        private readonly rootSuite: string | undefined
+        private readonly rootSuite: string | undefined,
+        hostData?: HostData,
+        reporterName?: string,
+        frameworkName?: string
     ) {
         super(logger, config, environment);
-        const apiConfig = this.createApiConfigV2();
+        const apiConfig = this.createApiConfigV2(hostData, reporterName, frameworkName);
         this.resultsClient = new ResultsApi(apiConfig);
     }
 
-    private createApiConfigV2(): Configuration {
+    private createApiConfigV2(hostData?: HostData, reporterName?: string, frameworkName?: string): Configuration {
         const apiConfig = new Configuration({ apiKey: this.config.api.token, formDataCtor: FormData });
 
         apiConfig.basePath = this.config.api.host && this.config.api.host != API_CONFIG.DEFAULT_HOST
             ? `${API_CONFIG.BASE_URL}${this.config.api.host}${API_CONFIG.VERSION}`
             : `https://api.${API_CONFIG.DEFAULT_HOST}${API_CONFIG.VERSION}`;
 
+        // Set default headers for all requests
+        if (hostData) {
+            const headers = this.buildHeaders(hostData, reporterName, frameworkName);
+            const existingHeaders = (apiConfig.baseOptions as { headers?: Record<string, string> } | undefined)?.headers || {};
+            const baseOptionsWithHeaders: { headers: Record<string, string> } = {
+                ...(apiConfig.baseOptions as Record<string, unknown> || {}),
+                headers: {
+                    ...existingHeaders,
+                    ...headers,
+                },
+            };
+            apiConfig.baseOptions = baseOptionsWithHeaders;
+        }
+
         return apiConfig;
+    }
+
+    private buildHeaders(hostData: HostData, reporterName?: string, frameworkName?: string): Record<string, string> {
+        const headers: Record<string, string> = {};
+
+        // Build X-Client header
+        const clientParts: string[] = [];
+        
+        if (reporterName && reporterName.trim()) {
+            clientParts.push(`reporter=${reporterName}`);
+        }
+        if (hostData.reporter && hostData.reporter.trim()) {
+            clientParts.push(`reporter_version=v${hostData.reporter}`);
+        }
+        if (frameworkName && frameworkName.trim()) {
+            clientParts.push(`framework=${frameworkName}`);
+        }
+        if (hostData.framework && hostData.framework.trim()) {
+            clientParts.push(`framework_version=v${hostData.framework}`);
+        }
+        if (hostData.apiClientV1 && hostData.apiClientV1.trim()) {
+            clientParts.push(`client_version_v1=v${hostData.apiClientV1}`);
+        }
+        if (hostData.apiClientV2 && hostData.apiClientV2.trim()) {
+            clientParts.push(`client_version_v2=v${hostData.apiClientV2}`);
+        }
+        if (hostData.commons && hostData.commons.trim()) {
+            clientParts.push(`core_version=v${hostData.commons}`);
+        }
+
+        if (clientParts.length > 0) {
+            headers['X-Client'] = clientParts.join(';');
+        }
+
+        // Build X-Platform header
+        const platformParts: string[] = [];
+        
+        if (hostData.system && hostData.system.trim()) {
+            platformParts.push(`os=${hostData.system}`);
+        }
+        if (hostData.arch && hostData.arch.trim()) {
+            platformParts.push(`arch=${hostData.arch}`);
+        }
+        if (hostData.node && hostData.node.trim()) {
+            platformParts.push(`node=${hostData.node}`);
+        }
+        if (hostData.npm && hostData.npm.trim()) {
+            platformParts.push(`npm=${hostData.npm}`);
+        }
+
+        if (platformParts.length > 0) {
+            headers['X-Platform'] = platformParts.join(';');
+        }
+
+        return headers;
     }
 
     override async uploadResults(runId: number, results: TestResultType[]): Promise<void> {
