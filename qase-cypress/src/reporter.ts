@@ -211,12 +211,31 @@ export class CypressQaseReporter extends reporters.Base {
    * @param {Suite} suite
    * @private
    */
+  /**
+   * Recursively collect all tests from a suite and its nested suites
+   * @param {Suite} suite
+   * @param {Test[]} tests
+   * @private
+   */
+  private collectAllTestsFromSuite(suite: Suite, tests: Test[]): void {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const suiteTests = suite.tests ?? [];
+    tests.push(...suiteTests);
+
+    // Recursively process nested suites
+    const nestedSuites = suite.suites ?? [];
+    for (const nestedSuite of nestedSuites) {
+      this.collectAllTestsFromSuite(nestedSuite, tests);
+    }
+  }
+
   private handleSkippedTestsInSuite(suite: Suite): void {
-    // Get tests only from the current suite (not nested suites, they will be processed separately)
-    const tests = suite.tests ?? [];
+    // Collect all tests from this suite and nested suites recursively
+    const allTests: Test[] = [];
+    this.collectAllTestsFromSuite(suite, allTests);
 
     // Find tests that were not processed (skipped due to beforeEach failure)
-    for (const test of tests) {     
+    for (const test of allTests) {     
       // Skip if test was already processed (e.g., first test that got EVENT_TEST_FAIL)
       if (!this.isTestProcessed(test)) {
         // Test was skipped due to beforeEach failure, report it as skipped

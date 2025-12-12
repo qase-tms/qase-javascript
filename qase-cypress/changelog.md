@@ -1,3 +1,9 @@
+# cypress-qase-reporter@3.1.2
+
+## What's new
+
+- Improved handling of skipped tests due to failing beforeEach hooks.
+
 # cypress-qase-reporter@3.1.1
 
 ## What's new
