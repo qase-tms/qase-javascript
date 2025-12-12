@@ -18,7 +18,7 @@ export class ClientV2 extends ClientV1 {
         [TestStatusEnum.passed]: 'passed',
         [TestStatusEnum.failed]: 'failed',
         [TestStatusEnum.skipped]: 'skipped',
-        [TestStatusEnum.disabled]: 'disabled',
+        [TestStatusEnum.disabled]: 'skipped',
         [TestStatusEnum.blocked]: 'blocked',
         [TestStatusEnum.invalid]: 'invalid',
     };
@@ -75,7 +75,7 @@ export class ClientV2 extends ClientV1 {
 
         // Build X-Client header
         const clientParts: string[] = [];
-        
+
         if (reporterName && reporterName.trim()) {
             clientParts.push(`reporter=${reporterName}`);
         }
@@ -104,7 +104,7 @@ export class ClientV2 extends ClientV1 {
 
         // Build X-Platform header
         const platformParts: string[] = [];
-        
+
         if (hostData.system && hostData.system.trim()) {
             platformParts.push(`os=${hostData.system}`);
         }
@@ -151,7 +151,7 @@ export class ClientV2 extends ClientV1 {
         const model: ResultCreate = {
             title: result.title,
             execution: this.getExecution(result.execution),
-            testops_ids: Array.isArray(result.testops_id) 
+            testops_ids: Array.isArray(result.testops_id)
                 ? result.testops_id
                 : result.testops_id !== null ? [result.testops_id] : null,
             attachments: attachments,
