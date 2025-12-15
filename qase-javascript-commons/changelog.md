@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.4.16
+
+## What's new
+
+Fixed issue with incorrect 'disabled' status.
+
 # qase-javascript-commons@2.4.13
 
 ## What's new
