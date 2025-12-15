@@ -80,22 +80,22 @@ export class ClientV2 extends ClientV1 {
             clientParts.push(`reporter=${reporterName}`);
         }
         if (hostData.reporter && hostData.reporter.trim()) {
-            clientParts.push(`reporter_version=v${hostData.reporter}`);
+            clientParts.push(`reporter_version=${hostData.reporter}`);
         }
         if (frameworkName && frameworkName.trim()) {
             clientParts.push(`framework=${frameworkName}`);
         }
         if (hostData.framework && hostData.framework.trim()) {
-            clientParts.push(`framework_version=v${hostData.framework}`);
+            clientParts.push(`framework_version=${hostData.framework}`);
         }
         if (hostData.apiClientV1 && hostData.apiClientV1.trim()) {
-            clientParts.push(`client_version_v1=v${hostData.apiClientV1}`);
+            clientParts.push(`client_version_v1=${hostData.apiClientV1}`);
         }
         if (hostData.apiClientV2 && hostData.apiClientV2.trim()) {
-            clientParts.push(`client_version_v2=v${hostData.apiClientV2}`);
+            clientParts.push(`client_version_v2=${hostData.apiClientV2}`);
         }
         if (hostData.commons && hostData.commons.trim()) {
-            clientParts.push(`core_version=v${hostData.commons}`);
+            clientParts.push(`core_version=${hostData.commons}`);
         }
 
         if (clientParts.length > 0) {
