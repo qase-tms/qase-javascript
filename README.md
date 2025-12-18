@@ -1,46 +1,47 @@
-# [Qase TestOps](https://qase.io) reporters for JavaScript
+# [Qase TestOps](https://qase.io) Reporters for JavaScript
 
-Monorepo with [Qase TestOps](https://qase.io) reporters for JavaScript testing frameworks.
+Monorepo containing [Qase TestOps](https://qase.io) integration tools for JavaScript testing frameworks. This repository includes reporters and API clients designed to streamline the process of reporting test results to Qase TestOps.
 
-For all of our reporters, there are two versions:
+## Projects Overview
 
-* The latest v2 series, either already released or in the beta stage.
-* The v1 series, stable and receiving only bugfixes.
+### Reporters
 
-If you're just starting, pick v2.
-If your project is using a v1 reporter, check out the reporter's readme for the migration guide.
+- **[qase-cucumberjs](/qase-cucumberjs)**  
+  Reporter for CucumberJS, enabling seamless integration with Qase TestOps.
 
-| Name                          | Package name               | v2 series                                                                                          | v1 series                                                                                      |
-|:------------------------------|:---------------------------|:---------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------|
-| **Qase JavaScript Reporters** |
-| CucumberJS                    | `cucumberjs-qase-reporter` | [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qase-cucumberjs#readme)         | [🗿deprecated](https://github.com/qase-tms/qase-javascript/tree/master/qase-cucumberjs#readme) |
-| Cypress                       | `cypress-qase-reporter`    | [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qase-cypress#readme)            | [🗿deprecated](https://github.com/qase-tms/qase-javascript/tree/master/qase-cypress#readme)    |
-| Jest                          | `jest-qase-reporter`       | [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qase-jest#readme)               | [🗿deprecated](https://github.com/qase-tms/qase-javascript/tree/master/qase-jest#readme)       |
-| Newman                        | `newman-reporter-qase`     | [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qase-newman#readme)             | [🗿deprecated](https://github.com/qase-tms/qase-javascript/tree/master/qase-newman#readme)     |
-| Playwright                    | `playwright-qase-reporter` | [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qase-playwright#readme)         | [🗿deprecated](https://github.com/qase-tms/qase-javascript/tree/master/qase-playwright#readme) |
-| Testcafe                      | `testcafe-reporter-qase`   | [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qase-testcafe#readme)           | [🗿deprecated](https://github.com/qase-tms/qase-javascript/tree/master/qase-testcafe#readme)   |
-| Mocha                         | `mocha-qase-reporter`      | not available                                                                                      | [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qase-mocha#readme)          |
-| WebDriverIO                   | `wdio-qase-reporter`       | not available                                                                                      | [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qase-wdio#readme)         |
-| **Qase JavaScript SDK**       |
-| Common functions library      | `qase-javascript-commons`  | [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qase-javascript-commons#readme) | not available                                                                                  |
-| JavaScript API client v1      | `qase-api-client`          |  not available      |         [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qase-api-client#readme)                                                                             |
-| JavaScript API client v2      | `qase-api-v2-client`       |  not available    |       [✅ released](https://github.com/qase-tms/qase-javascript/tree/main/qase-api-v2-client#readme)                                                                         |
-| JavaScript API client         | `qaseio`                   | [🗿deprecated](https://github.com/qase-tms/qase-javascript/tree/main/qaseio#readme)                  | [🗿deprecated](https://github.com/qase-tms/qase-javascript/tree/master/qaseio#readme)          |
+- **[qase-cypress](/qase-cypress)**  
+  Reporter for Cypress, enabling seamless integration with Qase TestOps.
 
-What each status means:
+- **[qase-jest](/qase-jest)**  
+  Reporter for Jest, enabling seamless integration with Qase TestOps.
 
-* The "✅ released" reporters are stable and well-tested versions.
-  They will receive more new features as well as bugfixes, should we find bugs.
+- **[qase-mocha](/qase-mocha)**  
+  Reporter for Mocha, enabling seamless integration with Qase TestOps.
 
-* The "🧪 open beta" reporters are in active development and rigorous testing.
-  It's completely usable (and much more fun to use than v1), but there can be some bugs and minor syntax changes.
-  When starting a new test project, the "🧪 open beta" versions are the recommended choice.
-  For existing projects, we recommend planning a migration — see the migration section in each
-  reporter's readme and try out the new features.
+- **[qase-newman](/qase-newman)**  
+  Reporter for Newman, enabling seamless integration with Qase TestOps.
 
-* The "🧰 closed beta" reporters are in active development, and
-  can still have major bugs and future syntax changes.
-  However, we encourage experimenting with them.
-  Your feedback is always welcome.
+- **[qase-playwright](/qase-playwright)**  
+  Reporter for Playwright, enabling seamless integration with Qase TestOps.
 
-* The v1 series reporters in the "🗿stable" or "🗿deprecated" status only get some fixes, but no new features.
+- **[qase-testcafe](/qase-testcafe)**  
+  Reporter for TestCafe, enabling seamless integration with Qase TestOps.
+
+- **[qase-vitest](/qase-vitest)**  
+  Reporter for Vitest, enabling seamless integration with Qase TestOps.
+
+- **[qase-wdio](/qase-wdio)**  
+  Reporter for WebDriverIO, enabling seamless integration with Qase TestOps.
+
+### Libraries
+
+- **[qase-javascript-commons](/qase-javascript-commons/)**  
+  Shared library containing common components and utilities used by Qase reporters.
+
+### API Clients
+
+- **[qase-api-client](/qase-api-client)**  
+  Official client for interacting with the Qase TestOps API (v1). Recommended for most use cases.
+  
+- **[qase-api-v2-client](/qase-api-v2-client)**  
+  API client supporting the new Qase TestOps API (v2). Use this client for projects leveraging the latest API features.
