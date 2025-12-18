@@ -8,7 +8,7 @@ on:
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
 
 jobs:
   test:
@@ -20,7 +20,7 @@ jobs:
         prefix: [ "qase-api-client", "qase-api-v2-client", "qase-javascript-commons", "qase-cypress", "qase-cucumberjs", "qase-newman", "qase-testcafe", "qase-jest", "qase-playwright", "qase-mocha", "qase-wdio", "qase-vitest" ]
     name: Project ${{ matrix.prefix }} - Node ${{ matrix.node-version }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - uses: actions/setup-node@v6
       with:
         node-version: ${{ matrix.node-version }}
@@ -40,7 +40,7 @@ jobs:
     if: startsWith(github.event.ref, 'refs/tags')
     name: Publish ${{ matrix.prefix }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - uses: actions/setup-node@v6
       if: contains(github.event.ref, matrix.prefix)
       with:
@@ -62,6 +62,16 @@ jobs:
     - name: Publish a release version
       if: contains(github.event.ref, matrix.prefix) && !contains(github.event.ref, 'beta')
       run: npm publish -w ${{ matrix.prefix }}
+
+    - name: Create GitHub Release
+      if: contains(github.event.ref, matrix.prefix) && !contains(github.event.ref, 'beta')
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: ${{ github.ref_name }}
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Publish a beta version
       if: contains(github.event.ref, matrix.prefix) && contains(github.event.ref, 'beta')
