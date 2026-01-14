@@ -1,3 +1,9 @@
+# playwright-qase-reporter@2.1.7
+
+## What's new
+
+- Improved handling thread id for parallel and shared workers tests.
+
 # playwright-qase-reporter@2.1.6
 
 ## What's new
