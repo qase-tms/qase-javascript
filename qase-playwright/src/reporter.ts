@@ -411,7 +411,7 @@ export class PlaywrightQaseReporter implements Reporter {
         stacktrace: error === null ?
           null : error.stacktrace === undefined ?
             null : error.stacktrace,
-        thread: result.parallelIndex.toString(),
+        thread: process.ppid.toString() + '-' + result.parallelIndex.toString(),
       },
       fields: testCaseMetadata.fields,
       id: uuidv4(),
