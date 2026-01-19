@@ -3,6 +3,8 @@ export interface TestMetadata {
   fields: Record<string, string>;
   title: string | null;
   isIgnore: boolean;
+  parameters: Record<string, string>;
+  group_params: Record<string, string>;
 }
 
 export interface ScenarioData {

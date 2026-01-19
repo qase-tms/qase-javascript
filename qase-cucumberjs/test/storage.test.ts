@@ -343,6 +343,185 @@ describe('Storage', () => {
       const result = storage.convertTestCase(testCaseFinished);
       expect(result).toBeUndefined();
     });
+
+    it('should include parameters from QaseParameters tag in test result', () => {
+      const pickle: Pickle = { 
+        id: 'pickle-1', 
+        name: 'Test Pickle',
+        language: 'en',
+        steps: [],
+        tags: [
+          { name: '@QaseParameters={"browser":"chrome","environment":"staging"}' },
+        ],
+        astNodeIds: [],
+        uri: 'test.feature'
+      };
+      storage.addPickle(pickle);
+
+      const testCase: TestCase = { 
+        id: 'case-1', 
+        testSteps: [],
+        pickleId: 'pickle-1'
+      };
+      storage.addTestCase(testCase);
+
+      const testCaseStarted: TestCaseStarted = { 
+        id: 'started-1', 
+        testCaseId: 'case-1',
+        timestamp: { seconds: 0, nanos: 0 },
+        attempt: 1
+      };
+      storage.addTestCaseStarted(testCaseStarted);
+
+      const testCaseFinished: TestCaseFinished = {
+        testCaseStartedId: 'started-1',
+        timestamp: { seconds: 1, nanos: 0 },
+        willBeRetried: false,
+      };
+
+      const result = storage.convertTestCase(testCaseFinished);
+
+      expect(result).toBeDefined();
+      if (result) {
+        expect(result.params).toEqual({ browser: 'chrome', environment: 'staging' });
+      }
+    });
+
+    it('should include group_params from QaseGroupParameters tag in test result', () => {
+      const pickle: Pickle = { 
+        id: 'pickle-1', 
+        name: 'Test Pickle',
+        language: 'en',
+        steps: [],
+        tags: [
+          { name: '@QaseGroupParameters={"test_group":"authentication","test_type":"smoke"}' },
+        ],
+        astNodeIds: [],
+        uri: 'test.feature'
+      };
+      storage.addPickle(pickle);
+
+      const testCase: TestCase = { 
+        id: 'case-1', 
+        testSteps: [],
+        pickleId: 'pickle-1'
+      };
+      storage.addTestCase(testCase);
+
+      const testCaseStarted: TestCaseStarted = { 
+        id: 'started-1', 
+        testCaseId: 'case-1',
+        timestamp: { seconds: 0, nanos: 0 },
+        attempt: 1
+      };
+      storage.addTestCaseStarted(testCaseStarted);
+
+      const testCaseFinished: TestCaseFinished = {
+        testCaseStartedId: 'started-1',
+        timestamp: { seconds: 1, nanos: 0 },
+        willBeRetried: false,
+      };
+
+      const result = storage.convertTestCase(testCaseFinished);
+
+      expect(result).toBeDefined();
+      if (result) {
+        expect(result.group_params).toEqual({ test_group: 'authentication', test_type: 'smoke' });
+      }
+    });
+
+    it('should merge parameters from tags with parameters from Gherkin examples', () => {
+      const document: GherkinDocument = {
+        uri: 'test.feature',
+        feature: {
+          location: { line: 1, column: 1 },
+          language: 'en',
+          keyword: 'Feature',
+          name: 'Test Feature',
+          description: '',
+          children: [
+            {
+              scenario: {
+                id: 'scenario-1',
+                location: { line: 2, column: 1 },
+                keyword: 'Scenario',
+                name: 'Test Scenario',
+                description: '',
+                steps: [],
+                tags: [],
+                examples: [
+                  {
+                    id: 'examples-1',
+                    location: { line: 3, column: 1 },
+                    keyword: 'Examples',
+                    name: '',
+                    description: '',
+                    tags: [],
+                    tableHeader: {
+                      id: 'header-1',
+                      location: { line: 4, column: 1 },
+                      cells: [{ location: { line: 4, column: 1 }, value: 'param1' }],
+                    },
+                    tableBody: [
+                      {
+                        id: 'row-1',
+                        location: { line: 5, column: 1 },
+                        cells: [{ location: { line: 5, column: 1 }, value: 'value1' }],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+          tags: [],
+        },
+        comments: [],
+      };
+      storage.addScenario(document);
+
+      const pickle: Pickle = { 
+        id: 'pickle-1', 
+        name: 'Test Pickle',
+        language: 'en',
+        steps: [],
+        tags: [
+          { name: '@QaseParameters={"param2":"value2"}' },
+        ],
+        astNodeIds: ['scenario-1', 'row-1'],
+        uri: 'test.feature'
+      };
+      storage.addPickle(pickle);
+
+      const testCase: TestCase = { 
+        id: 'case-1', 
+        testSteps: [],
+        pickleId: 'pickle-1'
+      };
+      storage.addTestCase(testCase);
+
+      const testCaseStarted: TestCaseStarted = { 
+        id: 'started-1', 
+        testCaseId: 'case-1',
+        timestamp: { seconds: 0, nanos: 0 },
+        attempt: 1
+      };
+      storage.addTestCaseStarted(testCaseStarted);
+
+      const testCaseFinished: TestCaseFinished = {
+        testCaseStartedId: 'started-1',
+        timestamp: { seconds: 1, nanos: 0 },
+        willBeRetried: false,
+      };
+
+      const result = storage.convertTestCase(testCaseFinished);
+
+      expect(result).toBeDefined();
+      if (result) {
+        // Parameters from tags should merge with parameters from Gherkin examples
+        expect(result.params).toEqual({ param1: 'value1', param2: 'value2' });
+      }
+    });
   });
 
   describe('private methods', () => {
@@ -380,6 +559,69 @@ describe('Storage', () => {
       const result = (storage as any).parseTags(tags);
 
       expect(result.fields).toEqual({});
+    });
+
+    it('should parse QaseParameters tag', () => {
+      const tags = [
+        { name: '@QaseParameters={"browser":"chrome","environment":"staging"}' },
+      ];
+
+      const result = (storage as any).parseTags(tags);
+
+      expect(result.parameters).toEqual({ browser: 'chrome', environment: 'staging' });
+    });
+
+    it('should parse QaseGroupParameters tag', () => {
+      const tags = [
+        { name: '@QaseGroupParameters={"test_group":"authentication","test_type":"smoke"}' },
+      ];
+
+      const result = (storage as any).parseTags(tags);
+
+      expect(result.group_params).toEqual({ test_group: 'authentication', test_type: 'smoke' });
+    });
+
+    it('should parse both QaseParameters and QaseGroupParameters', () => {
+      const tags = [
+        { name: '@QaseParameters={"browser":"chrome"}' },
+        { name: '@QaseGroupParameters={"test_group":"authentication"}' },
+      ];
+
+      const result = (storage as any).parseTags(tags);
+
+      expect(result.parameters).toEqual({ browser: 'chrome' });
+      expect(result.group_params).toEqual({ test_group: 'authentication' });
+    });
+
+    it('should handle invalid JSON in parameters', () => {
+      const tags = [
+        { name: '@QaseParameters=invalid json' },
+      ];
+
+      const result = (storage as any).parseTags(tags);
+
+      expect(result.parameters).toEqual({});
+    });
+
+    it('should handle invalid JSON in group parameters', () => {
+      const tags = [
+        { name: '@QaseGroupParameters=invalid json' },
+      ];
+
+      const result = (storage as any).parseTags(tags);
+
+      expect(result.group_params).toEqual({});
+    });
+
+    it('should merge multiple QaseParameters tags', () => {
+      const tags = [
+        { name: '@QaseParameters={"browser":"chrome"}' },
+        { name: '@QaseParameters={"environment":"staging"}' },
+      ];
+
+      const result = (storage as any).parseTags(tags);
+
+      expect(result.parameters).toEqual({ browser: 'chrome', environment: 'staging' });
     });
 
     it('should get file name from media type', () => {
