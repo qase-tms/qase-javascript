@@ -31,6 +31,8 @@ const qaseIdRegExp = /^@[Qq]-?(\d+)$/;
 const newQaseIdRegExp = /^@[Qq]ase[Ii][Dd]=(\d+(?:,\s*\d+)*)$/;
 const qaseTitleRegExp = /^@[Qq]ase[Tt]itle=(.+)$/;
 const qaseFieldsRegExp = /^@[Qq]ase[Ff]ields=(.+)$/;
+const qaseParametersRegExp = /^@[Qq]ase[Pp]arameters=(.+)$/;
+const qaseGroupParametersRegExp = /^@[Qq]ase[Gg]roup[Pp]arameters=(.+)$/;
 const qaseIgnoreRegExp = /^@[Qq]ase[Ii][Gg][Nn][Oo][Rr][Ee]$/;
 
 export class Storage {
@@ -278,6 +280,10 @@ export class Storage {
       }
     }
 
+    // Merge parameters from tags with parameters from Gherkin examples
+    // Parameters from tags take precedence over Gherkin examples
+    params = { ...params, ...metadata.parameters };
+
     const steps = this.convertSteps(pickle.steps, tc);
 
     return {
@@ -295,10 +301,10 @@ export class Storage {
       message: error?.message ?? null,
       muted: false,
       params: params,
-      group_params: {},
+      group_params: metadata.group_params,
       relations: relations,
       run_id: null,
-      signature: this.getSignature(pickle, metadata.ids),
+      signature: this.getSignature(pickle, metadata.ids, params),
       steps: steps,
       testops_id: metadata.ids.length > 0 ? metadata.ids : null,
       id: tcs.id,
@@ -386,6 +392,8 @@ export class Storage {
       fields: {},
       title: null,
       isIgnore: false,
+      parameters: {},
+      group_params: {},
     };
 
     for (const tag of tags) {
@@ -415,6 +423,28 @@ export class Storage {
         }
       }
 
+      if (qaseParametersRegExp.test(tag.name)) {
+        const value = tag.name.replace(/^@[Qq]ase[Pp]arameters=/, '');
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const record: Record<string, string> = JSON.parse(value);
+          metadata.parameters = { ...metadata.parameters, ...record };
+        } catch (e) {
+          // do nothing
+        }
+      }
+
+      if (qaseGroupParametersRegExp.test(tag.name)) {
+        const value = tag.name.replace(/^@[Qq]ase[Gg]roup[Pp]arameters=/, '');
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const record: Record<string, string> = JSON.parse(value);
+          metadata.group_params = { ...metadata.group_params, ...record };
+        } catch (e) {
+          // do nothing
+        }
+      }
+
       if (qaseIgnoreRegExp.test(tag.name)) {
         metadata.isIgnore = true;
       }
@@ -426,10 +456,11 @@ export class Storage {
   /**
    * @param {Pickle} pickle
    * @param {number[]} ids
+   * @param {Record<string, string>} parameters
    * @private
    */
-  private getSignature(pickle: Pickle, ids: number[]): string {
-    return generateSignature(ids, [...pickle.uri.split('/'), pickle.name], {});
+  private getSignature(pickle: Pickle, ids: number[], parameters: Record<string, string> = {}): string {
+    return generateSignature(ids, [...pickle.uri.split('/'), pickle.name], parameters);
   }
 
   private getError(testCaseId: string): CompoundError | undefined {
