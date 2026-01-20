@@ -1,3 +1,9 @@
+# qase-cucumberjs@2.1.8
+
+## What's new
+
+- Improved support for QaseParameters and QaseGroupParameters tags.
+
 # qase-cucumberjs@2.1.7
 
 ## What's new

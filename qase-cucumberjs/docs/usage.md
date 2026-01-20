@@ -8,7 +8,7 @@ fields, suites, comments, and file attachments to your test cases.
 ## Adding QaseID to a Test
 
 To associate a QaseID with a test in Cucumber.js, use the `@QaseId` tag in your Gherkin feature files. This tag accepts
-a single integer or multiple integers separated by commas representing the test's ID(s) in Qase.
+a single integer or multiple integers separated by commas representing the test"s ID(s) in Qase.
 
 ### Example
 
@@ -33,7 +33,7 @@ Feature: User Authentication
 ## Adding a Title to a Test
 
 You can provide a custom title for your test using the `@Title` tag. The tag accepts a string, which will be used as
-the test's title in Qase. If no title is provided, the scenario name will be used by default.
+the test"s title in Qase. If no title is provided, the scenario name will be used by default.
 
 ### Example
 
@@ -70,7 +70,7 @@ enhance test case information in Qase.
 Feature: User Authentication
 
   @QaseId=1
-  @QaseFields={'severity':'high','priority':'medium','description':'Login functionality test'}
+  @QaseFields={"severity":"high","priority":"medium","description":"Login functionality test"}
   Scenario: Successful login
     Given I am on the login page
     When I enter valid credentials
@@ -136,7 +136,7 @@ parameter names and values.
 Feature: User Authentication
 
   @QaseId=1
-  @QaseParameters={'browser':'chrome','environment':'staging'}
+  @QaseParameters={"browser":"chrome","environment":"staging"}
   Scenario: Successful login
     Given I am on the login page
     When I enter valid credentials
@@ -156,8 +156,8 @@ group parameter names and values.
 Feature: User Authentication
 
   @QaseId=1
-  @QaseParameters={'browser':'chrome','environment':'staging'}
-  @QaseGroupParameters={'test_group':'authentication','test_type':'smoke'}
+  @QaseParameters={"browser":"chrome","environment":"staging"}
+  @QaseGroupParameters={"test_group":"authentication","test_type":"smoke"}
   Scenario: Successful login
     Given I am on the login page
     When I enter valid credentials
@@ -185,23 +185,23 @@ Feature: User Authentication
 
 ```javascript
 // step_definitions/login_steps.js
-const { Given, When, Then } = require('@cucumber/cucumber');
+const { Given, When, Then } = require("@cucumber/cucumber");
 
-Given('I am on the login page', async function() {
+Given("I am on the login page", async function() {
   // Step implementation
-  await this.page.goto('https://example.com/login');
+  await this.page.goto("https://example.com/login");
 });
 
-When('I enter valid credentials', async function() {
+When("I enter valid credentials", async function() {
   // Step implementation
-  await this.page.fill('#username', 'testuser');
-  await this.page.fill('#password', 'password');
-  await this.page.click('#login-button');
+  await this.page.fill("#username", "testuser");
+  await this.page.fill("#password", "password");
+  await this.page.click("#login-button");
 });
 
-Then('I should be logged in', async function() {
+Then("I should be logged in", async function() {
   // Step implementation
-  await this.page.waitForSelector('.dashboard');
+  await this.page.waitForSelector(".dashboard");
 });
 ```
 
@@ -216,32 +216,32 @@ attaching files with content, paths, or media types.
 
 ```javascript
 // step_definitions/login_steps.js
-const { Given, When, Then } = require('@cucumber/cucumber');
+const { Given, When, Then } = require("@cucumber/cucumber");
 
-Given('I am on the login page', async function() {
-  await this.page.goto('https://example.com/login');
+Given("I am on the login page", async function() {
+  await this.page.goto("https://example.com/login");
   
   // Attach screenshot
   const screenshot = await this.page.screenshot();
-  await this.attach(screenshot, 'image/png');
+  await this.attach(screenshot, "image/png");
 });
 
-When('I enter valid credentials', async function() {
-  await this.page.fill('#username', 'testuser');
-  await this.page.fill('#password', 'password');
+When("I enter valid credentials", async function() {
+  await this.page.fill("#username", "testuser");
+  await this.page.fill("#password", "password");
   
   // Attach text content
-  await this.attach('Credentials entered successfully', 'text/plain');
+  await this.attach("Credentials entered successfully", "text/plain");
   
-  await this.page.click('#login-button');
+  await this.page.click("#login-button");
 });
 
-Then('I should be logged in', async function() {
-  await this.page.waitForSelector('.dashboard');
+Then("I should be logged in", async function() {
+  await this.page.waitForSelector(".dashboard");
   
   // Attach JSON data
-  const userData = { username: 'testuser', status: 'logged_in' };
-  await this.attach(JSON.stringify(userData, null, 2), 'application/json');
+  const userData = { username: "testuser", status: "logged_in" };
+  await this.attach(JSON.stringify(userData, null, 2), "application/json");
 });
 ```
 

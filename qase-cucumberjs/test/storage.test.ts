@@ -581,6 +581,26 @@ describe('Storage', () => {
       expect(result.group_params).toEqual({ test_group: 'authentication', test_type: 'smoke' });
     });
 
+    it('should parse QaseParameters tag with single quotes', () => {
+      const tags = [
+        { name: "@QaseParameters={'browser':'chrome','environment':'staging'}" },
+      ];
+
+      const result = (storage as any).parseTags(tags);
+
+      expect(result.parameters).toEqual({ browser: 'chrome', environment: 'staging' });
+    });
+
+    it('should parse QaseGroupParameters tag with single quotes', () => {
+      const tags = [
+        { name: "@QaseGroupParameters={'group':'regression'}" },
+      ];
+
+      const result = (storage as any).parseTags(tags);
+
+      expect(result.group_params).toEqual({ group: 'regression' });
+    });
+
     it('should parse both QaseParameters and QaseGroupParameters', () => {
       const tags = [
         { name: '@QaseParameters={"browser":"chrome"}' },
