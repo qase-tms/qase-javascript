@@ -33,6 +33,7 @@ const qaseTitleRegExp = /^@[Qq]ase[Tt]itle=(.+)$/;
 const qaseFieldsRegExp = /^@[Qq]ase[Ff]ields=(.+)$/;
 const qaseParametersRegExp = /^@[Qq]ase[Pp]arameters=(.+)$/;
 const qaseGroupParametersRegExp = /^@[Qq]ase[Gg]roup[Pp]arameters=(.+)$/;
+const qaseSuiteRegExp = /^@[Qq]ase[Ss]uite=(.+)$/;
 const qaseIgnoreRegExp = /^@[Qq]ase[Ii][Gg][Nn][Oo][Rr][Ee]$/;
 
 export class Storage {
@@ -261,7 +262,20 @@ export class Storage {
     let relations: Relation | null = null;
     let params: Record<string, string> = {};
     const nodeId = pickle.astNodeIds[0];
-    if (nodeId != undefined && this.scenarios[nodeId] != undefined) {
+    
+    // If suite is specified in metadata, use it (split by tab for sub-suites)
+    if (metadata.suite) {
+      const suiteParts = metadata.suite.split('\t').filter(part => part.trim().length > 0);
+      relations = {
+        suite: {
+          data: suiteParts.map((suite) => ({
+            title: suite.trim(),
+            public_id: null,
+          })),
+        },
+      };
+    } else if (nodeId != undefined && this.scenarios[nodeId] != undefined) {
+      // Otherwise, use feature name as suite
       relations = {
         suite: {
           data: [
@@ -272,7 +286,10 @@ export class Storage {
           ],
         },
       };
+    }
 
+    // Extract parameters from Gherkin examples
+    if (nodeId != undefined && this.scenarios[nodeId] != undefined) {
       for (const id of pickle.astNodeIds) {
         if (this.scenarios[nodeId]?.parameters[id] != undefined) {
           params = { ...params, ...this.scenarios[nodeId]?.parameters[id] };
@@ -394,6 +411,7 @@ export class Storage {
       isIgnore: false,
       parameters: {},
       group_params: {},
+      suite: null,
     };
 
     for (const tag of tags) {
@@ -443,6 +461,11 @@ export class Storage {
         } catch (e) {
           // do nothing
         }
+      }
+
+      if (qaseSuiteRegExp.test(tag.name)) {
+        metadata.suite = tag.name.replace(/^@[Qq]ase[Ss]uite=/, '');
+        continue;
       }
 
       if (qaseIgnoreRegExp.test(tag.name)) {
