@@ -430,6 +430,242 @@ describe('Storage', () => {
       }
     });
 
+    it('should include suite from QaseSuite tag in test result', () => {
+      const pickle: Pickle = { 
+        id: 'pickle-1', 
+        name: 'Test Pickle',
+        language: 'en',
+        steps: [],
+        tags: [
+          { name: '@QaseSuite=Authentication' },
+        ],
+        astNodeIds: [],
+        uri: 'test.feature'
+      };
+      storage.addPickle(pickle);
+
+      const testCase: TestCase = { 
+        id: 'case-1', 
+        testSteps: [],
+        pickleId: 'pickle-1'
+      };
+      storage.addTestCase(testCase);
+
+      const testCaseStarted: TestCaseStarted = { 
+        id: 'started-1', 
+        testCaseId: 'case-1',
+        timestamp: { seconds: 0, nanos: 0 },
+        attempt: 1
+      };
+      storage.addTestCaseStarted(testCaseStarted);
+
+      const testCaseFinished: TestCaseFinished = {
+        testCaseStartedId: 'started-1',
+        timestamp: { seconds: 1, nanos: 0 },
+        willBeRetried: false,
+      };
+
+      const result = storage.convertTestCase(testCaseFinished);
+
+      expect(result).toBeDefined();
+      if (result) {
+        expect(result.relations).toBeDefined();
+        expect(result.relations?.suite).toBeDefined();
+        expect(result.relations?.suite?.data).toHaveLength(1);
+        expect(result.relations?.suite?.data[0]?.title).toBe('Authentication');
+        expect(result.relations?.suite?.data[0]?.public_id).toBeNull();
+      }
+    });
+
+    it('should include suite with sub-suites from QaseSuite tag in test result', () => {
+      const pickle: Pickle = { 
+        id: 'pickle-1', 
+        name: 'Test Pickle',
+        language: 'en',
+        steps: [],
+        tags: [
+          { name: '@QaseSuite=Authentication\tLogin\tEdge Cases' },
+        ],
+        astNodeIds: [],
+        uri: 'test.feature'
+      };
+      storage.addPickle(pickle);
+
+      const testCase: TestCase = { 
+        id: 'case-1', 
+        testSteps: [],
+        pickleId: 'pickle-1'
+      };
+      storage.addTestCase(testCase);
+
+      const testCaseStarted: TestCaseStarted = { 
+        id: 'started-1', 
+        testCaseId: 'case-1',
+        timestamp: { seconds: 0, nanos: 0 },
+        attempt: 1
+      };
+      storage.addTestCaseStarted(testCaseStarted);
+
+      const testCaseFinished: TestCaseFinished = {
+        testCaseStartedId: 'started-1',
+        timestamp: { seconds: 1, nanos: 0 },
+        willBeRetried: false,
+      };
+
+      const result = storage.convertTestCase(testCaseFinished);
+
+      expect(result).toBeDefined();
+      if (result) {
+        expect(result.relations).toBeDefined();
+        expect(result.relations?.suite).toBeDefined();
+        expect(result.relations?.suite?.data).toHaveLength(3);
+        expect(result.relations?.suite?.data[0]?.title).toBe('Authentication');
+        expect(result.relations?.suite?.data[1]?.title).toBe('Login');
+        expect(result.relations?.suite?.data[2]?.title).toBe('Edge Cases');
+      }
+    });
+
+    it('should use feature name as suite when QaseSuite tag is not present', () => {
+      const document: GherkinDocument = {
+        uri: 'test.feature',
+        feature: {
+          location: { line: 1, column: 1 },
+          language: 'en',
+          keyword: 'Feature',
+          name: 'Test Feature',
+          description: '',
+          children: [
+            {
+              scenario: {
+                id: 'scenario-1',
+                location: { line: 2, column: 1 },
+                keyword: 'Scenario',
+                name: 'Test Scenario',
+                description: '',
+                steps: [],
+                tags: [],
+              },
+            },
+          ],
+        },
+      };
+      storage.addScenario(document);
+
+      const pickle: Pickle = { 
+        id: 'pickle-1', 
+        name: 'Test Pickle',
+        language: 'en',
+        steps: [],
+        tags: [],
+        astNodeIds: ['scenario-1'],
+        uri: 'test.feature'
+      };
+      storage.addPickle(pickle);
+
+      const testCase: TestCase = { 
+        id: 'case-1', 
+        testSteps: [],
+        pickleId: 'pickle-1'
+      };
+      storage.addTestCase(testCase);
+
+      const testCaseStarted: TestCaseStarted = { 
+        id: 'started-1', 
+        testCaseId: 'case-1',
+        timestamp: { seconds: 0, nanos: 0 },
+        attempt: 1
+      };
+      storage.addTestCaseStarted(testCaseStarted);
+
+      const testCaseFinished: TestCaseFinished = {
+        testCaseStartedId: 'started-1',
+        timestamp: { seconds: 1, nanos: 0 },
+        willBeRetried: false,
+      };
+
+      const result = storage.convertTestCase(testCaseFinished);
+
+      expect(result).toBeDefined();
+      if (result) {
+        expect(result.relations).toBeDefined();
+        expect(result.relations?.suite).toBeDefined();
+        expect(result.relations?.suite?.data).toHaveLength(1);
+        expect(result.relations?.suite?.data[0]?.title).toBe('Test Feature');
+      }
+    });
+
+    it('should prioritize QaseSuite tag over feature name', () => {
+      const document: GherkinDocument = {
+        uri: 'test.feature',
+        feature: {
+          location: { line: 1, column: 1 },
+          language: 'en',
+          keyword: 'Feature',
+          name: 'Test Feature',
+          description: '',
+          children: [
+            {
+              scenario: {
+                id: 'scenario-1',
+                location: { line: 2, column: 1 },
+                keyword: 'Scenario',
+                name: 'Test Scenario',
+                description: '',
+                steps: [],
+                tags: [],
+              },
+            },
+          ],
+        },
+      };
+      storage.addScenario(document);
+
+      const pickle: Pickle = { 
+        id: 'pickle-1', 
+        name: 'Test Pickle',
+        language: 'en',
+        steps: [],
+        tags: [
+          { name: '@QaseSuite=Custom Suite' },
+        ],
+        astNodeIds: ['scenario-1'],
+        uri: 'test.feature'
+      };
+      storage.addPickle(pickle);
+
+      const testCase: TestCase = { 
+        id: 'case-1', 
+        testSteps: [],
+        pickleId: 'pickle-1'
+      };
+      storage.addTestCase(testCase);
+
+      const testCaseStarted: TestCaseStarted = { 
+        id: 'started-1', 
+        testCaseId: 'case-1',
+        timestamp: { seconds: 0, nanos: 0 },
+        attempt: 1
+      };
+      storage.addTestCaseStarted(testCaseStarted);
+
+      const testCaseFinished: TestCaseFinished = {
+        testCaseStartedId: 'started-1',
+        timestamp: { seconds: 1, nanos: 0 },
+        willBeRetried: false,
+      };
+
+      const result = storage.convertTestCase(testCaseFinished);
+
+      expect(result).toBeDefined();
+      if (result) {
+        expect(result.relations).toBeDefined();
+        expect(result.relations?.suite).toBeDefined();
+        expect(result.relations?.suite?.data).toHaveLength(1);
+        expect(result.relations?.suite?.data[0]?.title).toBe('Custom Suite');
+        expect(result.relations?.suite?.data[0]?.title).not.toBe('Test Feature');
+      }
+    });
+
     it('should merge parameters from tags with parameters from Gherkin examples', () => {
       const document: GherkinDocument = {
         uri: 'test.feature',
@@ -599,6 +835,26 @@ describe('Storage', () => {
       const result = (storage as any).parseTags(tags);
 
       expect(result.group_params).toEqual({ group: 'regression' });
+    });
+
+    it('should parse QaseSuite tag', () => {
+      const tags = [
+        { name: '@QaseSuite=Authentication' },
+      ];
+
+      const result = (storage as any).parseTags(tags);
+
+      expect(result.suite).toBe('Authentication');
+    });
+
+    it('should parse QaseSuite tag with sub-suites', () => {
+      const tags = [
+        { name: '@QaseSuite=Authentication\tLogin\tEdge Cases' },
+      ];
+
+      const result = (storage as any).parseTags(tags);
+
+      expect(result.suite).toBe('Authentication\tLogin\tEdge Cases');
     });
 
     it('should parse both QaseParameters and QaseGroupParameters', () => {

@@ -5,6 +5,7 @@ export interface TestMetadata {
   isIgnore: boolean;
   parameters: Record<string, string>;
   group_params: Record<string, string>;
+  suite: string | null;
 }
 
 export interface ScenarioData {

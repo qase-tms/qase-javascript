@@ -1,3 +1,9 @@
+# qase-cucumberjs@2.1.9
+
+## What's new
+
+- Added support for QaseSuite tag.
+
 # qase-cucumberjs@2.1.8
 
 ## What's new
