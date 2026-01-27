@@ -151,6 +151,28 @@ function getPackageVersion(packageName: string): string | null {
 }
 
 /**
+ * Returns minimal host data without slow operations (no npm list, no execSync for node/npm).
+ * Use when reporter mode is "off" to avoid startup delay.
+ * @returns {HostData} Minimal host information object
+ */
+export function getMinimalHostData(): HostData {
+  return {
+    system: os.platform(),
+    machineName: os.hostname(),
+    release: os.release(),
+    version: '',
+    arch: os.arch(),
+    node: '',
+    npm: '',
+    framework: '',
+    reporter: '',
+    commons: '',
+    apiClientV1: '',
+    apiClientV2: '',
+  };
+}
+
+/**
  * Gets information about the current host environment
  * @param {string} framework The framework name to check version for
  * @param {string} reporterName The reporter name to check version for

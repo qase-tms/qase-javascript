@@ -22,7 +22,7 @@ import { DisabledException } from './utils/disabled-exception';
 import { Logger, LoggerInterface } from './utils/logger';
 import { StateManager, StateModel } from './state/state';
 import { ConfigType } from './config';
-import { getHostInfo } from './utils/hostData';
+import { getHostInfo, getMinimalHostData } from './utils/hostData';
 import { ClientV2 } from './client/clientV2';
 import { TestOpsOptionsType } from './models/config/TestOpsOptionsType';
 import { applyStatusMapping } from './utils/status-mapping-utils';
@@ -150,15 +150,19 @@ export class QaseReporter implements ReporterInterface {
     this.logger = new Logger(loggerOptions);
     this.logger.logDebug(`Config: ${JSON.stringify(this.sanitizeOptions(composedOptions))}`);
 
-    this.hostData = getHostInfo(options.frameworkPackage, options.reporterName);
+    const effectiveMode = (composedOptions.mode as ModeEnum) || ModeEnum.off;
+    const effectiveFallback = (composedOptions.fallback as ModeEnum) || ModeEnum.off;
+    const needsHostData = effectiveMode === ModeEnum.testops || effectiveFallback === ModeEnum.testops;
+    this.hostData = needsHostData
+      ? getHostInfo(options.frameworkPackage, options.reporterName)
+      : getMinimalHostData();
     this.logger.logDebug(`Host data: ${JSON.stringify(this.hostData)}`);
 
     this.captureLogs = composedOptions.captureLogs;
 
     try {
       this.upstreamReporter = this.createReporter(
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        composedOptions.mode as ModeEnum || ModeEnum.off,
+        effectiveMode,
         composedOptions,
       );
     } catch (error) {
@@ -178,8 +182,7 @@ export class QaseReporter implements ReporterInterface {
 
     try {
       this.fallbackReporter = this.createReporter(
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        composedOptions.fallback as ModeEnum || ModeEnum.off,
+        effectiveFallback,
         composedOptions,
       );
     } catch (error) {
