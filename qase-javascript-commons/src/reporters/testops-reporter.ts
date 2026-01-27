@@ -218,7 +218,7 @@ export class TestOpsReporter extends AbstractReporter {
     if (!this.runId) {
       throw new Error('Run ID is not set');
     }
-    const baseLink = `${this.baseUrl}/run/${this.projectCode}/dashboard/${this.runId}?source=logs&status=%5B2%5D&search=`;
+    const baseLink = `${this.baseUrl}/run/${this.projectCode}/dashboard/${this.runId}?source=logs&search=`;
     if (id) {
       return `${baseLink}${this.projectCode}-${id}`;
     }

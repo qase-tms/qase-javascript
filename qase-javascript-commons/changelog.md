@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.4.18
+
+## What's new
+
+Fixed issue with incorrect link to failed test in the console output.
+
 # qase-javascript-commons@2.4.17
 
 ## What's new
