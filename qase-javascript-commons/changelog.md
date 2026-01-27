@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.4.17
+
+## What's new
+
+Eliminated startup delay when reporter mode is `off`.
+
 # qase-javascript-commons@2.4.16
 
 ## What's new
