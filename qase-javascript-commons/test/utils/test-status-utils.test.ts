@@ -28,6 +28,21 @@ describe('determineTestStatus', () => {
       const result = determineTestStatus(null, 'unknown_status');
       expect(result).toBe(TestStatusEnum.skipped);
     });
+
+    it('should return failed when no error but original status is failed', () => {
+      const result = determineTestStatus(null, 'failed');
+      expect(result).toBe(TestStatusEnum.failed);
+    });
+
+    it('should return failed when no error but original status is timedOut', () => {
+      const result = determineTestStatus(null, 'timedOut');
+      expect(result).toBe(TestStatusEnum.failed);
+    });
+
+    it('should return failed when no error but original status is interrupted', () => {
+      const result = determineTestStatus(null, 'interrupted');
+      expect(result).toBe(TestStatusEnum.failed);
+    });
   });
 
   describe('when assertion error', () => {
@@ -80,6 +95,34 @@ describe('determineTestStatus', () => {
       const result = determineTestStatus(error, 'failed');
       expect(result).toBe(TestStatusEnum.failed);
     });
+
+    it('should return failed for TypeError from expect.objectContaining on null (deep matcher)', () => {
+      const error = new Error("TypeError: Cannot read properties of null (reading 'id')");
+      error.stack = 'Error: Cannot read properties of null\n    at ObjectContaining (expect.js:10:5)\n    at expect (matcher.js:5:10)';
+      const result = determineTestStatus(error, 'failed');
+      expect(result).toBe(TestStatusEnum.failed);
+    });
+
+    it('should return failed for TypeError with expect in stack (assertion context)', () => {
+      const error = new Error('TypeError: Cannot read properties of undefined (reading "createdBy")');
+      error.stack = 'TypeError: Cannot read properties of undefined\n    at toEqual (node_modules/expect/build/index.js:1:1)\n    at expect (test.spec.ts:42:10)';
+      const result = determineTestStatus(error, 'failed');
+      expect(result).toBe(TestStatusEnum.failed);
+    });
+
+    it('should return failed when error has "not found" in message but assertion context and runner failed (Playwright diff case)', () => {
+      const error = new Error('Expected: ObjectContaining {...}\nReceived: {... field: "not found" ...}');
+      error.stack = 'at expect (body.spec.js:97:71)';
+      const result = determineTestStatus(error, 'failed');
+      expect(result).toBe(TestStatusEnum.failed);
+    });
+
+    it('should return failed when error has "forbidden" in message but expect in stack and runner failed', () => {
+      const error = new Error('Received: 403 Forbidden');
+      error.stack = 'at expect (test.spec.ts:10:5)\n    at toEqual (expect.js:1:1)';
+      const result = determineTestStatus(error, 'failed');
+      expect(result).toBe(TestStatusEnum.failed);
+    });
   });
 
   describe('when non-assertion error', () => {
@@ -127,6 +170,19 @@ describe('determineTestStatus', () => {
 
     it('should return invalid for type error', () => {
       const error = new Error('TypeError: Cannot read property of undefined');
+      const result = determineTestStatus(error, 'failed');
+      expect(result).toBe(TestStatusEnum.invalid);
+    });
+
+    it('should return invalid when error has "not found" and "expected" but runner status is passed (no override)', () => {
+      const error = new Error('Expected: X\nReceived: not found');
+      error.stack = 'at expect (test.js:1:1)';
+      const result = determineTestStatus(error, 'passed');
+      expect(result).toBe(TestStatusEnum.invalid);
+    });
+
+    it('should return invalid for "internal error" without assertion context', () => {
+      const error = new Error('Internal error: something went wrong');
       const result = determineTestStatus(error, 'failed');
       expect(result).toBe(TestStatusEnum.invalid);
     });

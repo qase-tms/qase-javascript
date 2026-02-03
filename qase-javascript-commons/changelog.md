@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.5.1
+
+## What's new
+
+Fixed issue with incorrect test status determination.
+
 # qase-javascript-commons@2.5.0
 
 ## What's new

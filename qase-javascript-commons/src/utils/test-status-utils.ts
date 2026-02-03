@@ -13,7 +13,7 @@ export function determineTestStatus(error: Error | null, originalStatus: string)
   }
 
   // Check if it's an assertion error
-  if (isAssertionError(error)) {
+  if (isAssertionError(error, originalStatus)) {
     return TestStatusEnum.failed;
   }
 
@@ -24,17 +24,20 @@ export function determineTestStatus(error: Error | null, originalStatus: string)
 /**
  * Checks if error is an assertion error
  * @param error - Error object
+ * @param originalStatus - Original test status from test runner
  * @returns boolean - true if assertion error
  */
-function isAssertionError(error: Error): boolean {
+function isAssertionError(error: Error, originalStatus: string): boolean {
   const errorMessage = error.message.toLowerCase();
   const errorStack = error.stack?.toLowerCase() || '';
+  const normalizedOriginalStatus = originalStatus.toLowerCase();
   
   // Common assertion error patterns
   const assertionPatterns = [
     'expect',
     'assert',
     'matcher',
+    'objectcontaining',
     'assertion',
     'expected',
     'actual',
@@ -81,11 +84,21 @@ function isAssertionError(error: Error): boolean {
 
   // Check for non-assertion patterns (excluding timeout for special handling above)
   const nonAssertionPatternsWithoutTimeout = nonAssertionPatterns.filter(pattern => pattern !== 'timeout');
-  const hasNonAssertionPattern = nonAssertionPatternsWithoutTimeout.some(pattern => 
+  const hasNonAssertionPattern = nonAssertionPatternsWithoutTimeout.some(pattern =>
     errorMessage.includes(pattern) || errorStack.includes(pattern)
   );
 
   if (hasNonAssertionPattern) {
+    const hasAssertionContext = assertionPatterns.some(pattern =>
+      errorMessage.includes(pattern) || errorStack.includes(pattern)
+    );
+    const isRunnerFailed = normalizedOriginalStatus === 'failed' || normalizedOriginalStatus === 'timedout' || normalizedOriginalStatus === 'interrupted';
+    const isSyntaxError = errorMessage.includes('syntaxerror') || errorStack.includes('syntaxerror');
+    // When runner reported failure and error has assertion context (expect, ObjectContaining, diff),
+    // treat as Failed. Exception: SyntaxError (e.g. "Unexpected token") contains "expected" as false positive.
+    if (isRunnerFailed && hasAssertionContext && !isSyntaxError) {
+      return true;
+    }
     return false;
   }
 
@@ -117,6 +130,7 @@ function isAssertionError(error: Error): boolean {
  * @returns TestStatusEnum
  */
 function mapOriginalStatus(originalStatus: string): TestStatusEnum {
+  // Keys must be lowercase to match normalizedStatus (case-insensitive matching)
   const statusMap: Record<string, TestStatusEnum> = {
     'passed': TestStatusEnum.passed,
     'failed': TestStatusEnum.failed,
@@ -125,11 +139,10 @@ function mapOriginalStatus(originalStatus: string): TestStatusEnum {
     'pending': TestStatusEnum.skipped,
     'todo': TestStatusEnum.disabled,
     'focused': TestStatusEnum.passed,
-    'timedOut': TestStatusEnum.failed,
+    'timedout': TestStatusEnum.failed,
     'interrupted': TestStatusEnum.failed,
   };
 
-  // Convert to lowercase for case-insensitive matching
   const normalizedStatus = originalStatus.toLowerCase();
   return statusMap[normalizedStatus] || TestStatusEnum.skipped;
 }
