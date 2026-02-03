@@ -1,5 +1,9 @@
+import type { TestopsProjectMapping } from 'qase-javascript-commons';
+
 export interface TestMetadata {
   ids: number[];
+  /** Multi-project mapping (from @qaseid.PROJ(ids) tags). */
+  projectMapping: TestopsProjectMapping;
   fields: Record<string, string>;
   title: string | null;
   isIgnore: boolean;

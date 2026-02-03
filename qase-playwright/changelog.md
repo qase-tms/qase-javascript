@@ -1,3 +1,9 @@
+# playwright-qase-reporter@2.2.0
+
+## What's new
+
+- Added support for multi-project support.
+
 # playwright-qase-reporter@2.1.7
 
 ## What's new

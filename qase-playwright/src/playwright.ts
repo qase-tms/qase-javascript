@@ -2,13 +2,18 @@ import test from '@playwright/test';
 import { v4 as uuidv4 } from 'uuid';
 import { PlaywrightQaseReporter } from './reporter';
 import * as path from 'path';
-import { getMimeTypes } from 'qase-javascript-commons';
+import { getMimeTypes, formatTitleWithProjectMapping } from 'qase-javascript-commons';
 
 export const ReporterContentType = 'application/qase.metadata+json';
 const defaultContentType = 'application/octet-stream';
 
+/** Project code -> test case IDs for multi-project (testops_multi) mode. */
+export type ProjectMapping = Record<string, number[]>;
+
 export interface MetadataMessage {
   ids?: number[];
+  /** Multi-project mapping: project code -> list of test case IDs. */
+  projectMapping?: ProjectMapping;
   title?: string;
   fields?: Record<string, string>;
   parameters?: Record<string, string>;
@@ -77,6 +82,44 @@ qase.id = function(value: number | number[]) {
     ids: Array.isArray(value) ? value : [value],
   });
   return this;
+};
+
+/**
+ * Set multi-project mapping: project code -> test case IDs (for testops_multi mode).
+ * @param mapping — e.g. { PROJ1: [1, 2], PROJ2: [3] }
+ * @example
+ * test('test', async ({ page }) => {
+ *   qase.projects({ PROJ1: [1, 2], PROJ2: [3] });
+ *   await page.goto('https://example.com');
+ * });
+ */
+qase.projects = function(mapping: ProjectMapping) {
+  const normalized: ProjectMapping = {};
+  for (const [code, ids] of Object.entries(mapping)) {
+    if (Array.isArray(ids) && ids.length > 0) {
+      normalized[code] = ids.map((id) => (typeof id === 'number' ? id : parseInt(String(id), 10))).filter((n) => !Number.isNaN(n));
+    }
+  }
+  if (Object.keys(normalized).length > 0) {
+    addMetadata({ projectMapping: normalized });
+  }
+  return this;
+};
+
+/**
+ * Return test title with multi-project markers (for testops_multi mode).
+ * Use as the test name: test(qase.projectsTitle('Test name', { PROJ1: [1], PROJ2: [2] }), () => { ... }).
+ * @param name — base test title
+ * @param mapping — project code → test case IDs, e.g. { PROJ1: [1], PROJ2: [2] }
+ */
+qase.projectsTitle = function(name: string, mapping: ProjectMapping): string {
+  const normalized: ProjectMapping = {};
+  for (const [code, ids] of Object.entries(mapping)) {
+    if (Array.isArray(ids) && ids.length > 0) {
+      normalized[code] = ids.map((id) => (typeof id === 'number' ? id : parseInt(String(id), 10))).filter((n) => !Number.isNaN(n));
+    }
+  }
+  return Object.keys(normalized).length > 0 ? formatTitleWithProjectMapping(name, normalized) : name;
 };
 
 /**

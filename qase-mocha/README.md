@@ -67,6 +67,12 @@ A test run will be performed and available at:
 https://app.qase.io/run/QASE_PROJECT_CODE
 ```
 
+### Multi-Project Support
+
+Qase Mocha Reporter supports sending test results to multiple Qase projects simultaneously. You can specify different test case IDs for each project using `qase.projects(mapping, name)`.
+
+For detailed information, configuration, and examples, see the [Multi-Project Support Guide](docs/MULTI_PROJECT.md).
+
 ### Parallel execution
 
 The reporter supports parallel execution of tests.

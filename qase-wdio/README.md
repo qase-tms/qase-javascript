@@ -83,6 +83,12 @@ A test run will be performed and available at:
 https://app.qase.io/run/QASE_PROJECT_CODE
 ```
 
+### Multi-Project Support
+
+Qase WebdriverIO Reporter supports sending test results to multiple Qase projects simultaneously. You can specify different test case IDs for each project using `qase.projects(mapping, name)`.
+
+For detailed information, configuration, and examples, see the [Multi-Project Support Guide](docs/MULTI_PROJECT.md).
+
 ## Configuration
 
 Qase WebDriverIO reporter can be configured in multiple ways:

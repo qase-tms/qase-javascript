@@ -1,6 +1,6 @@
 {
   "name": "cypress-qase-reporter",
-  "version": "3.1.2",
+  "version": "3.2.0",
   "description": "Qase Cypress Reporter",
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "sideEffects": false,
@@ -51,7 +51,7 @@
   "author": "Qase Team <support@qase.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "qase-javascript-commons": "~2.4.14",
+    "qase-javascript-commons": "~2.5.0",
     "uuid": "^9.0.1"
   },
   "peerDependencies": {

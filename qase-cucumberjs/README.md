@@ -80,6 +80,12 @@ https://app.qase.io/run/QASE_PROJECT_CODE
   <img src="./screenshots/demo.gif">
 </p>
 
+### Multi-Project Support
+
+Qase CucumberJS Reporter supports sending test results to multiple Qase projects simultaneously. Use tags in feature files: `@qaseid.PROJ1(1) @qaseid.PROJ2(2)`.
+
+For detailed information, configuration, and examples, see the [Multi-Project Support Guide](docs/MULTI_PROJECT.md).
+
 ## Configuration
 
 Qase Cucumber JS reporter can be configured in multiple ways:

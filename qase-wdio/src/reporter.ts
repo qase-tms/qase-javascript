@@ -22,6 +22,7 @@ import {
   TestStatusEnum,
   TestStepType,
   determineTestStatus,
+  parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -329,11 +330,15 @@ export default class WDIOQaseReporter extends WDIOReporter {
       testResult.params
     );
 
-    const ids = WDIOQaseReporter.extractQaseIdsFromTitle(testResult.title);
-    if (ids.length > 0) {
-      testResult.testops_id = ids;
+    const parsed = parseProjectMappingFromTitle(testResult.title);
+    const hasProjectMapping = Object.keys(parsed.projectMapping).length > 0;
+    if (hasProjectMapping) {
+      testResult.testops_project_mapping = parsed.projectMapping;
+      testResult.testops_id = null;
+    } else if (parsed.legacyIds.length > 0) {
+      testResult.testops_id = parsed.legacyIds.length === 1 ? parsed.legacyIds[0]! : parsed.legacyIds;
     }
-    testResult.title = this.removeQaseIdsFromTitle(testResult.title);
+    testResult.title = parsed.cleanedTitle || this.removeQaseIdsFromTitle(testResult.title);
 
     await this.reporter.addTestResult(testResult);
   }
@@ -610,17 +615,6 @@ export default class WDIOQaseReporter extends WDIOReporter {
 
     return { key, value };
   }
-
-    /**
-   * @param {string} title
-   * @returns {number[]}
-   * @private
-   */
-    private static extractQaseIdsFromTitle(title: string) {
-      const [, ids] = title.match(WDIOQaseReporter.qaseIdRegExp) ?? [];
-  
-      return ids ? ids.split(',').map((id) => Number(id)) : [];
-    }
 
     /**
    * @param {string} title

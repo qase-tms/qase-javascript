@@ -160,6 +160,12 @@ https://app.qase.io/run/QASE_PROJECT_CODE
   <img width="85%" src="./screenshots/test-run.gif">
 </p>
 
+### Multi-Project Support
+
+Qase Playwright Reporter supports sending test results to multiple Qase projects simultaneously. You can specify different test case IDs for each project using `qase.projects(mapping)` or `qase.projectsTitle(name, mapping)`.
+
+For detailed information, configuration, and examples, see the [Multi-Project Support Guide](docs/MULTI_PROJECT.md).
+
 ## Configuration
 
 Reporter options (\* - required):

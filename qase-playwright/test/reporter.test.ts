@@ -35,52 +35,56 @@ const reporterMock = {
   isCaptureLogs: jest.fn(() => false),
 };
 
-jest.mock('qase-javascript-commons', () => ({
-  QaseReporter: {
-    getInstance: jest.fn(() => reporterMock),
-  },
-  composeOptions: jest.fn(() => ({})),
-  TestStatusEnum: {
-    passed: 'passed',
-    failed: 'failed',
-    skipped: 'skipped',
-    disabled: 'disabled',
-    timedOut: 'failed',
-    interrupted: 'failed',
-    invalid: 'invalid',
-  },
-  StepStatusEnum: {
-    passed: 'passed',
-    failed: 'failed',
-  },
-  StepType: {
-    TEXT: 'text',
-  },
-  generateSignature: jest.fn(() => 'mock-signature'),
-  determineTestStatus: jest.fn((error, originalStatus) => {
-    if (error) return 'failed';
-    if (originalStatus === 'passed') return 'passed';
-    if (originalStatus === 'pending') return 'skipped';
-    if (originalStatus === 'todo') return 'disabled';
-    if (originalStatus === 'timedOut') return 'failed';
-    if (originalStatus === 'interrupted') return 'failed';
-    return 'failed';
-  }),
-  ConfigLoader: jest.fn().mockImplementation(() => ({
-    load: jest.fn(() => ({})),
-  })),
-  CompoundError: class CompoundError extends Error {
-    addMessage(message: string) {
-      this.message = message;
-    }
-    addStacktrace(stacktrace: string) {
-      this.stack = stacktrace;
-    }
-    get stacktrace() {
-      return this.stack;
-    }
-  },
-}));
+jest.mock('qase-javascript-commons', () => {
+  const actual = jest.requireActual<typeof import('qase-javascript-commons')>('qase-javascript-commons');
+  return {
+    ...actual,
+    QaseReporter: {
+      getInstance: jest.fn(() => reporterMock),
+    },
+    composeOptions: jest.fn(() => ({})),
+    TestStatusEnum: {
+      passed: 'passed',
+      failed: 'failed',
+      skipped: 'skipped',
+      disabled: 'disabled',
+      timedOut: 'failed',
+      interrupted: 'failed',
+      invalid: 'invalid',
+    },
+    StepStatusEnum: {
+      passed: 'passed',
+      failed: 'failed',
+    },
+    StepType: {
+      TEXT: 'text',
+    },
+    generateSignature: jest.fn(() => 'mock-signature'),
+    determineTestStatus: jest.fn((error: unknown, originalStatus: string) => {
+      if (error) return 'failed';
+      if (originalStatus === 'passed') return 'passed';
+      if (originalStatus === 'pending') return 'skipped';
+      if (originalStatus === 'todo') return 'disabled';
+      if (originalStatus === 'timedOut') return 'failed';
+      if (originalStatus === 'interrupted') return 'failed';
+      return 'failed';
+    }),
+    ConfigLoader: jest.fn().mockImplementation(() => ({
+      load: jest.fn(() => ({})),
+    })),
+    CompoundError: class CompoundError extends Error {
+      addMessage(message: string) {
+        this.message = message;
+      }
+      addStacktrace(stacktrace: string) {
+        this.stack = stacktrace;
+      }
+      get stacktrace() {
+        return this.stack;
+      }
+    },
+  };
+});
 
 describe('PlaywrightQaseReporter', () => {
   let reporter: PlaywrightQaseReporter;
@@ -433,7 +437,7 @@ describe('PlaywrightQaseReporter', () => {
       const result = { ...testResultMock };
       await reporter.onTestEnd(testCase as any, result as any);
       const call = reporterMock.addTestResult.mock.calls[0][0];
-      expect(call.testops_id).toEqual([123]);
+      expect(call.testops_id).toBe(123);
     });
 
     it('should handle test with qasesuite annotation', async () => {

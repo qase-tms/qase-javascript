@@ -1,3 +1,9 @@
+# qase-mocha@1.2.0
+
+## What's new
+
+- Added support for multi-project support.
+
 # qase-mocha@1.1.8
 
 ## What's new

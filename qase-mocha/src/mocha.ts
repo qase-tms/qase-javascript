@@ -1,3 +1,8 @@
+import { formatTitleWithProjectMapping } from 'qase-javascript-commons';
+
+/** Project code → test case IDs for multi-project (testops_multi) mode. */
+export type ProjectMapping = Record<string, number[]>;
+
 /**
  * Set IDs for the test case
  *
@@ -33,4 +38,14 @@ export const qase = (
   }
 
   return `${name} (Qase ID: ${caseIds.join(',')})`;
+};
+
+/**
+ * Build test name with multi-project markers (for testops_multi mode).
+ * @param mapping — e.g. { PROJ1: [1, 2], PROJ2: [3] }
+ * @param name — test title
+ * @example it(qase.projects({ PROJ1: [100], PROJ2: [200] }, 'Login flow'), function() { ... });
+ */
+qase.projects = (mapping: ProjectMapping, name: string): string => {
+  return formatTitleWithProjectMapping(name, mapping);
 };

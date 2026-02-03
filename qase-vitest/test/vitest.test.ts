@@ -1,5 +1,5 @@
 import { describe, it, expect } from '@jest/globals';
-import { addQaseId } from '../src/vitest';
+import { addQaseId, addQaseProjects } from '../src/vitest';
 
 describe('vitest.ts - Main functions', () => {
   describe('addQaseId', () => {
@@ -32,6 +32,22 @@ describe('vitest.ts - Main functions', () => {
     });
   });
 
+  describe('addQaseProjects', () => {
+    it('should add multi-project markers to test name', () => {
+      const name = 'Login flow';
+      const mapping = { PROJ1: [100], PROJ2: [200] };
+      const result = addQaseProjects(name, mapping);
+      expect(result).toBe('Login flow (Qase PROJ1: 100) (Qase PROJ2: 200)');
+    });
+
+    it('should handle multiple IDs per project', () => {
+      const name = 'Checkout';
+      const mapping = { PROJ1: [10, 11], PROJ2: [20] };
+      const result = addQaseProjects(name, mapping);
+      expect(result).toBe('Checkout (Qase PROJ1: 10,11) (Qase PROJ2: 20)');
+    });
+  });
+
   describe('withQase', () => {
     it('should be a function', () => {
       const { withQase } = require('../src/vitest');
@@ -50,6 +66,11 @@ describe('vitest.ts - Main functions', () => {
     it('should export addQaseId', () => {
       const { addQaseId } = require('../src/vitest');
       expect(typeof addQaseId).toBe('function');
+    });
+
+    it('should export addQaseProjects', () => {
+      const { addQaseProjects } = require('../src/vitest');
+      expect(typeof addQaseProjects).toBe('function');
     });
 
     it('should export withQase', () => {

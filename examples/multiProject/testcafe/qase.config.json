@@ -1,0 +1,16 @@
+{
+  "debug": true,
+  "mode": "testops_multi",
+  "testops": {
+    "api": {
+      "token": "api_key"
+    }
+  },
+  "testops_multi": {
+    "default_project": "PROJ1",
+    "projects": [
+      { "code": "PROJ1", "run": { "title": "TestCafe multi-project run", "complete": true } },
+      { "code": "PROJ2", "run": { "title": "TestCafe multi-project run", "complete": true } }
+    ]
+  }
+}

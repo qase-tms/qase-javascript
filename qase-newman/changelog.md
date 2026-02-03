@@ -1,3 +1,9 @@
+# qase-newman@2.2.0
+
+## What's new
+
+- Added support for multi-project support.
+
 # qase-newman@2.1.5
 
 ## What's new

@@ -1,9 +1,13 @@
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { VitestQaseReporter } from '../src/index';
+import { parseProjectMappingFromTitle } from 'qase-javascript-commons';
 
-// Mock qase-javascript-commons
-jest.mock('qase-javascript-commons', () => ({
-  QaseReporter: {
+// Mock qase-javascript-commons (use real parseProjectMappingFromTitle and other utils)
+jest.mock('qase-javascript-commons', () => {
+  const actual = jest.requireActual('qase-javascript-commons') as typeof import('qase-javascript-commons');
+  return {
+    ...actual,
+    QaseReporter: {
     getInstance: jest.fn().mockReturnValue({
       startTestRun: jest.fn(),
       publish: jest.fn().mockResolvedValue(undefined),
@@ -56,7 +60,8 @@ jest.mock('qase-javascript-commons', () => ({
     if (originalStatus === 'skipped') return 'skipped';
     return 'failed';
   }),
-}));
+  };
+});
 
 describe('VitestQaseReporter - Main scenarios', () => {
   let reporter: VitestQaseReporter;
@@ -70,55 +75,64 @@ describe('VitestQaseReporter - Main scenarios', () => {
   });
 
 
-  describe('Extracting Qase ID from test name', () => {
+  describe('Extracting Qase ID from test name (parseProjectMappingFromTitle)', () => {
     it('should extract single Qase ID', () => {
       const title = 'Test Name (Qase ID: 123)';
-      const result = VitestQaseReporter['getCaseId'](title);
-      expect(result).toEqual([123]);
+      const parsed = parseProjectMappingFromTitle(title);
+      expect(parsed.legacyIds).toEqual([123]);
+      expect(Object.keys(parsed.projectMapping)).toHaveLength(0);
     });
 
     it('should extract multiple Qase IDs', () => {
       const title = 'Test Name (Qase ID: 123,456,789)';
-      const result = VitestQaseReporter['getCaseId'](title);
-      expect(result).toEqual([123, 456, 789]);
+      const parsed = parseProjectMappingFromTitle(title);
+      expect(parsed.legacyIds).toEqual([123, 456, 789]);
     });
 
     it('should return empty array if Qase ID not found', () => {
       const title = 'Test Name without Qase ID';
-      const result = VitestQaseReporter['getCaseId'](title);
-      expect(result).toEqual([]);
+      const parsed = parseProjectMappingFromTitle(title);
+      expect(parsed.legacyIds).toEqual([]);
     });
 
     it('should handle invalid Qase IDs', () => {
       const title = 'Test Name (Qase ID: abc,def)';
-      const result = VitestQaseReporter['getCaseId'](title);
-      expect(result).toEqual([]);
+      const parsed = parseProjectMappingFromTitle(title);
+      expect(parsed.legacyIds).toEqual([]);
+    });
+
+    it('should extract multi-project mapping', () => {
+      const title = 'Test (Qase PROJ1: 100) (Qase PROJ2: 200)';
+      const parsed = parseProjectMappingFromTitle(title);
+      expect(parsed.legacyIds).toEqual([]);
+      expect(parsed.projectMapping).toEqual({ PROJ1: [100], PROJ2: [200] });
+      expect(parsed.cleanedTitle).toBe('Test');
     });
   });
 
-  describe('Removing Qase ID from test name', () => {
+  describe('Removing Qase ID from test name (parseProjectMappingFromTitle cleanedTitle)', () => {
     it('should remove Qase ID from name', () => {
       const title = 'Test Name (Qase ID: 123)';
-      const result = VitestQaseReporter['removeQaseIdsFromTitle'](title);
-      expect(result).toBe('Test Name');
+      const parsed = parseProjectMappingFromTitle(title);
+      expect(parsed.cleanedTitle).toBe('Test Name');
     });
 
     it('should remove multiple Qase IDs from name', () => {
       const title = 'Test Name (Qase ID: 123,456,789)';
-      const result = VitestQaseReporter['removeQaseIdsFromTitle'](title);
-      expect(result).toBe('Test Name');
+      const parsed = parseProjectMappingFromTitle(title);
+      expect(parsed.cleanedTitle).toBe('Test Name');
     });
 
     it('should return original name if Qase ID not found', () => {
       const title = 'Test Name without Qase ID';
-      const result = VitestQaseReporter['removeQaseIdsFromTitle'](title);
-      expect(result).toBe(title);
+      const parsed = parseProjectMappingFromTitle(title);
+      expect(parsed.cleanedTitle).toBe(title);
     });
 
     it('should handle trailing spaces', () => {
       const title = 'Test Name (Qase ID: 123)   ';
-      const result = VitestQaseReporter['removeQaseIdsFromTitle'](title);
-      expect(result).toBe('Test Name');
+      const parsed = parseProjectMappingFromTitle(title);
+      expect(parsed.cleanedTitle).toBe('Test Name');
     });
   });
 

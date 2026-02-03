@@ -9,29 +9,33 @@ const reporterMock = {
   publish: jest.fn().mockResolvedValue(undefined),
 };
 
-jest.mock('qase-javascript-commons', () => ({
-  QaseReporter: {
-    getInstance: jest.fn(() => reporterMock),
-  },
-  composeOptions: jest.fn(() => ({})),
-  TestStatusEnum: {
-    passed: 'passed',
-    failed: 'failed',
-    skipped: 'skipped',
-    disabled: 'disabled',
-  },
-  generateSignature: jest.fn(() => 'mock-signature'),
-  determineTestStatus: jest.fn((error, originalStatus) => {
-    if (error) return 'failed';
-    if (originalStatus === 'passed') return 'passed';
-    if (originalStatus === 'pending') return 'skipped';
-    if (originalStatus === 'todo') return 'disabled';
-    return 'failed';
-  }),
-  ConfigLoader: jest.fn().mockImplementation(() => ({
-    load: jest.fn(() => ({})),
-  })),
-}));
+jest.mock('qase-javascript-commons', () => {
+  const actual = jest.requireActual<typeof import('qase-javascript-commons')>('qase-javascript-commons');
+  return {
+    ...actual,
+    QaseReporter: {
+      getInstance: jest.fn(() => reporterMock),
+    },
+    composeOptions: jest.fn(() => ({})),
+    TestStatusEnum: {
+      passed: 'passed',
+      failed: 'failed',
+      skipped: 'skipped',
+      disabled: 'disabled',
+    },
+    generateSignature: jest.fn(() => 'mock-signature'),
+    determineTestStatus: jest.fn((error: unknown, originalStatus: string) => {
+      if (error) return 'failed';
+      if (originalStatus === 'passed') return 'passed';
+      if (originalStatus === 'pending') return 'skipped';
+      if (originalStatus === 'todo') return 'disabled';
+      return 'failed';
+    }),
+    ConfigLoader: jest.fn().mockImplementation(() => ({
+      load: jest.fn(() => ({})),
+    })),
+  };
+});
 
 describe('JestQaseReporter', () => {
   let reporter: JestQaseReporter;
@@ -112,7 +116,7 @@ describe('JestQaseReporter', () => {
       expect(reporterMock.addTestResult).toHaveBeenCalled();
       const call = reporterMock.addTestResult.mock.calls[0][0];
       expect(call.title).toBe('Test');
-      expect(call.testops_id).toEqual([123]);
+      expect(call.testops_id).toBe(123);
       expect(call.execution.duration).toBe(1000);
     });
 
@@ -296,7 +300,7 @@ describe('JestQaseReporter', () => {
 
       const result = (reporter as any).convertToResult(value, '/test/path');
       expect(result.title).toBe('Test');
-      expect(result.testops_id).toEqual([123]);
+      expect(result.testops_id).toBe(123);
       expect(result.execution.status).toBe('passed');
       expect(result.execution.duration).toBe(1000);
     });

@@ -1,0 +1,16 @@
+{
+  "name": "cypress-cucumber-multiproject",
+  "private": true,
+  "scripts": {
+    "test": "QASE_MODE=testops_multi cypress run"
+  },
+  "devDependencies": {
+    "cypress": "^15.6.0",
+    "cypress-cucumber-preprocessor": "^4.3.1",
+    "cypress-multi-reporters": "^1.6.4",
+    "cypress-qase-reporter": "^3.1.0"
+  },
+  "cypress-cucumber-preprocessor": {
+    "step_definitions": "cypress/step_definitions/"
+  }
+}

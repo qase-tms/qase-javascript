@@ -10,6 +10,7 @@ import {
   ReporterInterface,
   TestStatusEnum,
   TestResultType,
+  TestopsProjectMapping,
   getPackageVersion,
   ConfigLoader,
   composeOptions,
@@ -34,6 +35,39 @@ export class NewmanQaseReporter {
    * @type {RegExp}
    */
   static qaseParamRegExp = /qase\.parameters:\s*([\w.]+(?:\s*,\s*[\w.]+)*)/i;
+
+  /** Matches // qase PROJ1: 1,2 or // qase PROJ2: 3 for multi-project. */
+  static qaseProjectRegExp = /\/\/\s*[qQ]ase\s+([A-Za-z0-9_]+):\s*([\d,\s]+)/g;
+
+  /**
+   * Parse multi-project mapping from test script comments (e.g. // qase PROJ1: 1,2).
+   * @param {EventList} eventList
+   * @returns {TestopsProjectMapping}
+   */
+  public static getProjectMapping(eventList: EventList): TestopsProjectMapping {
+    const projectMapping: TestopsProjectMapping = {};
+
+    eventList.each((event) => {
+      if (event.listen === 'test' && event.script.exec) {
+        event.script.exec.forEach((line) => {
+          let m: RegExpExecArray | null;
+          const re = new RegExp(NewmanQaseReporter.qaseProjectRegExp.source, 'gi');
+          while ((m = re.exec(line)) !== null) {
+            const projectCode = m[1]?.trim();
+            const idsStr = (m[2] ?? '').replace(/\s/g, '');
+            const ids = idsStr.split(',').map((s) => parseInt(s, 10)).filter((n) => !Number.isNaN(n));
+
+            if (projectCode && projectCode.toUpperCase() !== 'ID' && ids.length > 0) {
+              const existing = projectMapping[projectCode] ?? [];
+              projectMapping[projectCode] = [...existing, ...ids];
+            }
+          }
+        });
+      }
+    });
+
+    return projectMapping;
+  }
 
   /**
    * @param {EventList} eventList
@@ -193,7 +227,9 @@ export class NewmanQaseReporter {
           };
         }
         const ids = NewmanQaseReporter.getCaseIds(item.events);
-        this.pendingResultMap.set(item.id, {
+        const projectMapping = NewmanQaseReporter.getProjectMapping(item.events);
+
+        const pendingResult = {
           attachments: [],
           author: null,
           execution: {
@@ -216,7 +252,10 @@ export class NewmanQaseReporter {
           testops_id: ids.length > 0 ? ids : null,
           id: item.id,
           title: item.name,
-        });
+          testops_project_mapping: Object.keys(projectMapping).length > 0 ? projectMapping : null,
+        } as unknown as TestResultType;
+
+        this.pendingResultMap.set(item.id, pendingResult);
 
         this.timerMap.set(item.id, Date.now());
       },

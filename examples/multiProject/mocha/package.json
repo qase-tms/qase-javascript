@@ -1,0 +1,11 @@
+{
+  "name": "mocha-multiproject-example",
+  "private": true,
+  "scripts": {
+    "test": "QASE_MODE=testops_multi mocha"
+  },
+  "devDependencies": {
+    "mocha": "^10.8.2",
+    "mocha-qase-reporter": "^1.1.6"
+  }
+}

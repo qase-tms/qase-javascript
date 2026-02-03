@@ -3,6 +3,8 @@ import path from 'path';
 import { QaseStep, StepFunction, getMimeTypes } from 'qase-javascript-commons';
 import { v4 as uuidv4 } from 'uuid';
 
+import type { TestopsProjectMapping } from 'qase-javascript-commons';
+
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class qase {
   private static _qaseID = '';
@@ -11,6 +13,22 @@ export class qase {
   private static _qaseParameters = '';
   private static _qaseGroupParameters = '';
   private static _qaseIgnore = '';
+  private static _qaseProjects = '';
+
+  /**
+   * Set multi-project mapping (for testops_multi mode). Project code → test case IDs.
+   * Don't forget to call `create` after setting parameters.
+   * @param {TestopsProjectMapping} mapping — e.g. { PROJ1: [1, 2], PROJ2: [3] }
+   * @example
+   * const q = qase.projects({ PROJ1: [1], PROJ2: [2] }).create();
+   * test.meta(q)('Test reported to two projects', async t => { ... });
+   */
+  public static projects = (mapping: TestopsProjectMapping) => {
+    if (mapping && typeof mapping === 'object' && Object.keys(mapping).length > 0) {
+      this._qaseProjects = JSON.stringify(mapping);
+    }
+    return this;
+  };
 
   /**
    * Set a Qase ID for the test case
@@ -191,6 +209,7 @@ export class qase {
       QaseParameters: this._qaseParameters,
       QaseGroupParameters: this._qaseGroupParameters,
       QaseIgnore: this._qaseIgnore,
+      QaseProjects: this._qaseProjects,
     };
 
     this._qaseID = '';
@@ -199,6 +218,7 @@ export class qase {
     this._qaseParameters = '';
     this._qaseGroupParameters = '';
     this._qaseIgnore = '';
+    this._qaseProjects = '';
 
     return meta;
   };

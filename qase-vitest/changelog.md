@@ -1,3 +1,9 @@
+# qase-vitest@1.1.0
+
+## What's new
+
+- Added support for multi-project support.
+
 # qase-vitest@1.0.4
 
 ## What's new

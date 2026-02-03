@@ -11,12 +11,12 @@ export const configValidationSchema = {
   properties: {
     mode: {
       type: 'string',
-      enum: [ModeEnum.report, ModeEnum.testops, ModeEnum.off],
+      enum: [ModeEnum.report, ModeEnum.testops, ModeEnum.testops_multi, ModeEnum.off],
       nullable: true,
     },
     fallback: {
       type: 'string',
-      enum: [ModeEnum.report, ModeEnum.testops, ModeEnum.off],
+      enum: [ModeEnum.report, ModeEnum.testops, ModeEnum.testops_multi, ModeEnum.off],
       nullable: true,
     },
     debug: {
@@ -204,6 +204,71 @@ export const configValidationSchema = {
           nullable: true,
         },
       },
+    },
+
+    testops_multi: {
+      type: 'object',
+      nullable: true,
+
+      properties: {
+        default_project: {
+          type: 'string',
+          nullable: true,
+        },
+        projects: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              code: {
+                type: 'string',
+                nullable: true,
+              },
+              run: {
+                type: 'object',
+                nullable: true,
+                properties: {
+                  id: { type: 'number', nullable: true },
+                  title: { type: 'string', nullable: true },
+                  description: { type: 'string', nullable: true },
+                  complete: { type: 'boolean', nullable: true },
+                  tags: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    nullable: true,
+                  },
+                  externalLink: {
+                    type: 'object',
+                    nullable: true,
+                    properties: {
+                      type: {
+                        type: 'string',
+                        enum: [ExternalLinkType.JIRA_CLOUD, ExternalLinkType.JIRA_SERVER],
+                      },
+                      link: { type: 'string' },
+                    },
+                    required: ['type', 'link'],
+                  },
+                },
+              },
+              plan: {
+                type: 'object',
+                nullable: true,
+                properties: {
+                  id: { type: 'number', nullable: true },
+                },
+              },
+              environment: {
+                type: 'string',
+                nullable: true,
+              },
+            },
+            required: ['code'],
+          },
+          nullable: true,
+        },
+      },
+      required: ['projects'],
     },
 
     report: {

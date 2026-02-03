@@ -19,6 +19,7 @@ import {
   TestStatusEnum,
   TestStepType,
   determineTestStatus,
+  parseProjectMappingFromTags,
 } from 'qase-javascript-commons';
 import { TestCase } from '@cucumber/messages/dist/esm/src/messages';
 import { Status } from '@cucumber/cucumber';
@@ -303,7 +304,8 @@ export class Storage {
 
     const steps = this.convertSteps(pickle.steps, tc);
 
-    return {
+    const hasProjectMapping = Object.keys(metadata.projectMapping).length > 0;
+    const result = {
       attachments: this.attachments[testCase.testCaseStartedId] ?? [],
       author: null,
       execution: {
@@ -324,9 +326,11 @@ export class Storage {
       signature: this.getSignature(pickle, metadata.ids, params),
       steps: steps,
       testops_id: metadata.ids.length > 0 ? metadata.ids : null,
+      testops_project_mapping: hasProjectMapping ? metadata.projectMapping : null,
       id: tcs.id,
       title: metadata.title ?? pickle.name,
-    };
+    } as unknown as TestResultType;
+    return result;
   }
 
   /**
@@ -404,8 +408,12 @@ export class Storage {
   };
 
   private parseTags(tags: readonly PickleTag[]): TestMetadata {
+    const tagNames = tags.map((t) => t.name);
+    const { legacyIds, projectMapping } = parseProjectMappingFromTags(tagNames);
+
     const metadata: TestMetadata = {
-      ids: [],
+      ids: [...legacyIds],
+      projectMapping: { ...projectMapping },
       fields: {},
       title: null,
       isIgnore: false,
@@ -421,7 +429,8 @@ export class Storage {
       }
 
       if (newQaseIdRegExp.test(tag.name)) {
-        metadata.ids.push(...(tag.name.replace(/^@[Qq]ase[Ii][Dd]=/, '')).split(',').map(Number));
+        const idsStr = tag.name.replace(/^@[Qq]ase[Ii][Dd]=/, '');
+        metadata.ids.push(...idsStr.split(',').map((s) => Number(s.trim())));
         continue;
       }
 

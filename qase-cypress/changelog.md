@@ -1,3 +1,9 @@
+# cypress-qase-reporter@3.2.0
+
+## What's new
+
+- Added support for multi-project support.
+
 # cypress-qase-reporter@3.1.2
 
 ## What's new

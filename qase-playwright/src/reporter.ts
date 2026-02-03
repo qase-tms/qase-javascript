@@ -17,6 +17,7 @@ import {
   TestStatusEnum,
   TestStepType,
   determineTestStatus,
+  parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
 import { MetadataMessage, ReporterContentType } from './playwright';
 import { ReporterOptionsType } from './options';
@@ -28,6 +29,8 @@ const logMimeType = 'text/plain';
 
 interface TestCaseMetadata {
   ids: number[];
+  /** Multi-project mapping: project code -> test case IDs. */
+  projectMapping?: Record<string, number[]>;
   title: string;
   fields: Record<string, string>;
   parameters: Record<string, string>;
@@ -124,6 +127,10 @@ export class PlaywrightQaseReporter implements Reporter {
 
         if (message.ids) {
           metadata.ids = message.ids;
+        }
+
+        if (message.projectMapping && typeof message.projectMapping === 'object') {
+          metadata.projectMapping = message.projectMapping as Record<string, number[]>;
         }
 
         if (message.fields) {
@@ -386,8 +393,45 @@ export class PlaywrightQaseReporter implements Reporter {
       testCaseMetadata.fields['is_flaky'] = 'true';
     }
 
-    const testTitle = this.removeQaseIdsFromTitle(test.title);
-    
+    const titleParsed = parseProjectMappingFromTitle(test.title);
+    const testTitle = titleParsed.cleanedTitle || this.removeQaseIdsFromTitle(test.title);
+
+    const annotationProjectMapping = this.extractProjectMappingFromAnnotation(test.annotations);
+    const ids = this.extractQaseIdsFromAnnotation(test.annotations);
+
+    const hasMetadataProjectMapping = testCaseMetadata.projectMapping != null && Object.keys(testCaseMetadata.projectMapping).length > 0;
+    const hasAnnotationProjectMapping = annotationProjectMapping != null && Object.keys(annotationProjectMapping).length > 0;
+    const hasTitleProjectMapping = titleParsed.projectMapping != null && Object.keys(titleParsed.projectMapping).length > 0;
+
+    const projectMapping = hasMetadataProjectMapping
+      ? testCaseMetadata.projectMapping ?? null
+      : hasAnnotationProjectMapping
+        ? annotationProjectMapping
+        : hasTitleProjectMapping
+          ? titleParsed.projectMapping
+          : null;
+
+    const hasProjectMapping = projectMapping != null && Object.keys(projectMapping).length > 0;
+
+    let testops_id: number | number[] | null;
+    let testops_project_mapping: Record<string, number[]> | null;
+    if (hasProjectMapping) {
+      testops_project_mapping = projectMapping;
+      testops_id = null;
+    } else if (ids.length > 0) {
+      testops_id = ids.length === 1 ? ids[0]! : ids;
+      testops_project_mapping = null;
+    } else if (testCaseMetadata.ids.length > 0) {
+      testops_id = testCaseMetadata.ids.length === 1 ? testCaseMetadata.ids[0]! : testCaseMetadata.ids;
+      testops_project_mapping = null;
+    } else if (titleParsed.legacyIds.length > 0) {
+      testops_id = titleParsed.legacyIds.length === 1 ? titleParsed.legacyIds[0]! : titleParsed.legacyIds;
+      testops_project_mapping = null;
+    } else {
+      testops_id = PlaywrightQaseReporter.qaseIds.get(test.title) ?? null;
+      testops_project_mapping = null;
+    }
+
     // Convert CompoundError to regular Error for status determination
     let errorForStatus: Error | null = null;
     if (error) {
@@ -396,11 +440,11 @@ export class PlaywrightQaseReporter implements Reporter {
         errorForStatus.stack = error.stacktrace;
       }
     }
-    
-    // Determine status based on error type
+
     const testStatus = determineTestStatus(errorForStatus, result.status);
-    
-    const testResult: TestResultType = {
+    const idsForSignature = testops_id == null ? null : (Array.isArray(testops_id) ? testops_id : [testops_id]);
+
+    const testResult = {
       attachments: testCaseMetadata.attachments,
       author: null,
       execution: {
@@ -432,9 +476,10 @@ export class PlaywrightQaseReporter implements Reporter {
         },
       },
       run_id: null,
-      signature: '',
+      signature: generateSignature(idsForSignature, suites, testCaseMetadata.parameters),
       steps: this.transformSteps(result.steps, null),
-      testops_id: null,
+      testops_id,
+      testops_project_mapping,
       title: testCaseMetadata.title === '' ? testTitle : testCaseMetadata.title,
     };
 
@@ -448,18 +493,7 @@ export class PlaywrightQaseReporter implements Reporter {
       }
     }
 
-    const ids = this.extractQaseIdsFromAnnotation(test.annotations);
-    if (ids.length > 0) {
-      testResult.testops_id = ids;
-    } else if (testCaseMetadata.ids.length > 0) {
-      testResult.testops_id = testCaseMetadata.ids;
-    } else {
-      testResult.testops_id = PlaywrightQaseReporter.qaseIds.get(test.title) ?? null;
-    }
-
-    testResult.signature = generateSignature(testResult.testops_id, suites, testCaseMetadata.parameters);
-
-    await this.reporter.addTestResult(testResult);
+    await this.reporter.addTestResult(testResult as unknown as TestResultType);
   }
 
   /**
@@ -525,6 +559,26 @@ export class PlaywrightQaseReporter implements Reporter {
     }
 
     return ids;
+  }
+
+  /**
+   * Extract multi-project mapping from annotation (type "QaseProjects", description JSON).
+   * @param annotation — e.g. [{ type: "QaseProjects", description: '{"PROJ1":[1],"PROJ2":[2]}' }]
+   */
+  private extractProjectMappingFromAnnotation(annotation: { type: string, description?: string }[]): Record<string, number[]> | null {
+    for (const item of annotation) {
+      if (item.type.toLowerCase() === 'qaseprojects' && item.description) {
+        try {
+          const parsed = JSON.parse(item.description) as Record<string, number[]>;
+          if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+            return parsed;
+          }
+        } catch {
+          // ignore invalid JSON
+        }
+      }
+    }
+    return null;
   }
 
   /**

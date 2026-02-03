@@ -11,6 +11,7 @@ import {
   TestStepType,
   generateSignature,
   determineTestStatus,
+  TestResultType,
 } from 'qase-javascript-commons';
 import { Qase } from './global';
 
@@ -59,6 +60,7 @@ enum metadataEnum {
   groupParameters = 'QaseGroupParameters',
   oldID = 'CID',
   ignore = 'QaseIgnore',
+  projects = 'QaseProjects',
 }
 
 interface MetadataType {
@@ -68,6 +70,7 @@ interface MetadataType {
   [metadataEnum.parameters]: Record<string, string>;
   [metadataEnum.groupParameters]: Record<string, string>;
   [metadataEnum.ignore]: boolean;
+  [metadataEnum.projects]: Record<string, number[]>;
 }
 
 export interface TestRunInfoType {
@@ -218,7 +221,8 @@ export class TestcafeQaseReporter {
 
     attachments.push(...this.attachments);
 
-    await this.reporter.addTestResult({
+    const projectMapping = metadata[metadataEnum.projects];
+    const result = {
       author: null,
       execution: {
         status: TestcafeQaseReporter.getStatus(testRunInfo),
@@ -250,7 +254,10 @@ export class TestcafeQaseReporter {
       testops_id: metadata[metadataEnum.id].length > 0 ? metadata[metadataEnum.id] : null,
       title: metadata[metadataEnum.title] != undefined ? metadata[metadataEnum.title] : title,
       attachments: attachments,
-    });
+      testops_project_mapping: (projectMapping && Object.keys(projectMapping).length > 0) ? projectMapping : null,
+    } as unknown as TestResultType;
+
+    await this.reporter.addTestResult(result);
   };
 
   /**
@@ -268,6 +275,7 @@ export class TestcafeQaseReporter {
       QaseParameters: {},
       QaseGroupParameters: {},
       QaseIgnore: false,
+      QaseProjects: {},
     };
 
     if (meta[metadataEnum.oldID] !== undefined && meta[metadataEnum.oldID] !== '') {
@@ -298,6 +306,17 @@ export class TestcafeQaseReporter {
 
     if (meta[metadataEnum.ignore] !== undefined && meta[metadataEnum.ignore] !== '') {
       metadata.QaseIgnore = meta[metadataEnum.ignore] === 'true';
+    }
+
+    if (meta[metadataEnum.projects] !== undefined && meta[metadataEnum.projects] !== '') {
+      try {
+        const parsed = JSON.parse(meta[metadataEnum.projects]) as Record<string, number[]>;
+        if (parsed && typeof parsed === 'object') {
+          metadata.QaseProjects = parsed;
+        }
+      } catch {
+        // ignore invalid JSON
+      }
     }
 
     return metadata;

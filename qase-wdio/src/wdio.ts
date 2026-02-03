@@ -1,5 +1,5 @@
 import { events } from './events';
-import { QaseStep, StepFunction } from 'qase-javascript-commons';
+import { QaseStep, StepFunction, formatTitleWithProjectMapping } from 'qase-javascript-commons';
 
 /**
  * Send event to reporter
@@ -52,6 +52,19 @@ export const qase = (
   const newName = `${name} (Qase ID: ${caseIds.join(',')})`;
 
   return newName;
+};
+
+/** Project code → test case IDs for multi-project (testops_multi) mode. */
+export type ProjectMapping = Record<string, number[]>;
+
+/**
+ * Build test name with multi-project markers (for testops_multi mode).
+ * @param mapping — e.g. { PROJ1: [1, 2], PROJ2: [3] }
+ * @param name — test title
+ * @example it(qase.projects({ PROJ1: [100], PROJ2: [200] }, 'Login flow'), () => { ... });
+ */
+qase.projects = (mapping: ProjectMapping, name: string): string => {
+  return formatTitleWithProjectMapping(name, mapping);
 };
 
 /**

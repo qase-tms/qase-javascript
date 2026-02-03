@@ -1,6 +1,9 @@
 import path from 'path';
-import { getMimeTypes, QaseStep, StepFunction } from 'qase-javascript-commons';
+import { getMimeTypes, QaseStep, StepFunction, formatTitleWithProjectMapping } from 'qase-javascript-commons';
 import { v4 as uuidv4 } from 'uuid';
+
+/** Project code → test case IDs for multi-project (testops_multi) mode. */
+export type ProjectMapping = Record<string, number[]>;
 
 export const qase = (
   caseId: number | string | number[] | string[],
@@ -9,6 +12,16 @@ export const qase = (
   const caseIds = Array.isArray(caseId) ? caseId : [caseId];
 
   return `${name} (Qase ID: ${caseIds.join(',')})`;
+};
+
+/**
+ * Build test name with multi-project markers (for testops_multi mode).
+ * @param mapping — e.g. { PROJ1: [1, 2], PROJ2: [3] }
+ * @param name — test title
+ * @example test(qase.projects({ PROJ1: [100], PROJ2: [200] }, 'Login flow'), () => { ... });
+ */
+qase.projects = (mapping: ProjectMapping, name: string): string => {
+  return formatTitleWithProjectMapping(name, mapping);
 };
 
 /**
