@@ -1,7 +1,7 @@
 import { ModeEnum } from './mode-enum';
 
 import { DriverEnum, FsWriterOptionsType } from '../writer';
-import { TestOpsOptionsType } from '../models/config/TestOpsOptionsType';
+import { TestOpsOptionsType, TestOpsMultiConfigType } from '../models/config/TestOpsOptionsType';
 
 type RecursivePartial<T> = {
   [K in keyof T]?: RecursivePartial<T[K]> | undefined;
@@ -40,6 +40,8 @@ export type OptionsType = {
   testops?:
     | RecursivePartial<TestOpsOptionsType>
     | undefined;
+  /** Multi-project configuration (used when mode is testops_multi). */
+  testops_multi?: TestOpsMultiConfigType | undefined;
   report?: RecursivePartial<AdditionalReportOptionsType> | undefined;
 };
 

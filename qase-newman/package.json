@@ -1,6 +1,6 @@
 {
   "name": "newman-reporter-qase",
-  "version": "2.1.5",
+  "version": "2.2.0",
   "description": "Qase TMS Newman Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -39,7 +39,7 @@
   "author": "Qase Team <support@qase.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "qase-javascript-commons": "~2.4.10",
+    "qase-javascript-commons": "~2.5.0",
     "semver": "^7.7.3"
   },
   "devDependencies": {

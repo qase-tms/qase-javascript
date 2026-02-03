@@ -1,0 +1,14 @@
+{
+  "name": "jest-multiproject-example",
+  "private": true,
+  "scripts": {
+    "test": "QASE_MODE=testops_multi jest --runInBand"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.28.5",
+    "@jest/globals": "^29.7.0",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
+    "jest-qase-reporter": "^2.1.3"
+  }
+}

@@ -107,7 +107,7 @@ export abstract class AbstractReporter implements InternalReporterInterface {
     let firstCase = true;
 
     for (const id of result.testops_id) {
-      const testResultCopy = { ...result };
+      const testResultCopy = { ...result } as TestResultType;
       testResultCopy.testops_id = id;
       testResultCopy.id = uuidv4();
 
@@ -127,7 +127,7 @@ export abstract class AbstractReporter implements InternalReporterInterface {
     this.results = results;
   }
 
-  private removeAnsiEscapeCodes(str: string): string {
+  protected removeAnsiEscapeCodes(str: string): string {
     const ansiEscapeSequences = new RegExp([
       '\x1B[[(?);]{0,2}(;?\\d)*.',
     ].join('|'), 'g');

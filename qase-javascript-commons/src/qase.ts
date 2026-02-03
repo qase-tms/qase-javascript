@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import {
   InternalReporterInterface,
   TestOpsReporter,
+  TestOpsMultiReporter,
   ReportReporter,
 } from './reporters';
 import { composeOptions, ModeEnum, OptionsType } from './options';
@@ -152,7 +153,11 @@ export class QaseReporter implements ReporterInterface {
 
     const effectiveMode = (composedOptions.mode as ModeEnum) || ModeEnum.off;
     const effectiveFallback = (composedOptions.fallback as ModeEnum) || ModeEnum.off;
-    const needsHostData = effectiveMode === ModeEnum.testops || effectiveFallback === ModeEnum.testops;
+    const needsHostData =
+      effectiveMode === ModeEnum.testops ||
+      effectiveMode === ModeEnum.testops_multi ||
+      effectiveFallback === ModeEnum.testops ||
+      effectiveFallback === ModeEnum.testops_multi;
     this.hostData = needsHostData
       ? getHostInfo(options.frameworkPackage, options.reporterName)
       : getMinimalHostData();
@@ -589,6 +594,40 @@ export class QaseReporter implements ReporterInterface {
           options.testops.api.host,
           options.testops.batch?.size,
           options.testops.run?.id,
+          options.testops.showPublicReportLink
+        );
+      }
+
+      case ModeEnum.testops_multi: {
+        if (!options.testops?.api?.token) {
+          throw new Error(
+            `Either "testops.api.token" parameter or "${EnvApiEnum.token}" environment variable is required in "testops_multi" mode`,
+          );
+        }
+
+        const multi = options.testops_multi;
+        if (!multi?.projects?.length) {
+          throw new Error(
+            '"testops_multi.projects" must contain at least one project with a "code" field',
+          );
+        }
+        for (const p of multi.projects) {
+          if (!p?.code) {
+            throw new Error('Each project in "testops_multi.projects" must have a "code" field');
+          }
+        }
+
+        return new TestOpsMultiReporter(
+          this.logger,
+          options.testops as TestOpsOptionsType,
+          multi,
+          this.withState,
+          this.hostData,
+          options.reporterName,
+          options.frameworkPackage,
+          options.environment,
+          options.testops.api?.host,
+          options.testops.batch?.size,
           options.testops.showPublicReportLink
         );
       }

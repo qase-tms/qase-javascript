@@ -30,7 +30,6 @@ async function beforeRunHook(options: PluginConfigOptions) {
 }
 
 async function afterRunHook(options: PluginConfigOptions) {
-
   const configLoader = new ConfigLoader(configSchema);
   const config = configLoader.load();
   const { reporterOptions } = options;
@@ -135,8 +134,8 @@ async function afterSpecHook(spec: Spec, options: PluginConfigOptions) {
       } catch (error) {
         console.error('Failed to upload video attachments:', error);
       }
-    }
-
+    }    
+    
     // eslint-disable-next-line @typescript-eslint/await-thenable
     await reporter.setTestResults(results);
     await reporter.sendResults();

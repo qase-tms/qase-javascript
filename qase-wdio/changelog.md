@@ -1,3 +1,9 @@
+# qase-wdio@1.2.0
+
+## What's new
+
+- Added support for multi-project support.
+
 # qase-wdio@1.1.4
 
 ## What's new

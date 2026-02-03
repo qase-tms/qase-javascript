@@ -13,6 +13,7 @@ import {
   TestStatusEnum,
   TestStepType,
   determineTestStatus,
+  parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
 import deasyncPromise from 'deasync-promise';
 import { extname, join } from 'node:path';
@@ -211,10 +212,12 @@ export class MochaQaseReporter extends reporters.Base {
       return;
     }
 
+    const fromTitle = parseProjectMappingFromTitle(test.title);
     const ids = this.getQaseId();
     if (ids.length === 0) {
-      ids.push(...MochaQaseReporter.getCaseId(test.title));
+      ids.push(...fromTitle.legacyIds);
     }
+    const hasProjectMapping = Object.keys(fromTitle.projectMapping).length > 0;
     const suites = this.getSuites(test);
     let relations = {};
     if (suites.length > 0) {
@@ -248,7 +251,7 @@ export class MochaQaseReporter extends reporters.Base {
       group_params: this.metadata.groupParameters ?? {},
       relations: relations,
       run_id: null,
-      signature: this.getSignature(test, ids, this.metadata.parameters ?? {}),
+      signature: this.getSignature(test, hasProjectMapping ? [] : ids, this.metadata.parameters ?? {}),
       steps: this.currentTest.steps,
       id: uuidv4(),
       execution: {
@@ -259,9 +262,10 @@ export class MochaQaseReporter extends reporters.Base {
         stacktrace: test.err?.stack ?? null,
         thread: null,
       },
-      testops_id: ids.length > 0 ? ids : null,
-      title: this.metadata.title && this.metadata.title != '' ? this.metadata.title : this.removeQaseIdsFromTitle(test.title),
-    };
+      testops_id: hasProjectMapping ? null : (ids.length > 0 ? ids : null),
+      testops_project_mapping: hasProjectMapping ? fromTitle.projectMapping : null,
+      title: this.metadata.title && this.metadata.title != '' ? this.metadata.title : (fromTitle.cleanedTitle || this.removeQaseIdsFromTitle(test.title)),
+    } as TestResultType;
 
     void this.reporter.addTestResult(result);
 
@@ -449,18 +453,8 @@ export class MochaQaseReporter extends reporters.Base {
   /**
    * @type {RegExp}
    */
+  /** @deprecated Use parseProjectMappingFromTitle from qase-javascript-commons for multi-project support. */
   static qaseIdRegExp = /\(Qase ID: ([\d,]+)\)/;
-
-  /**
-   * @param {string} title
-   * @returns {number[]}
-   * @private
-   */
-  private static getCaseId(title: string): number[] {
-    const [, ids] = title.match(MochaQaseReporter.qaseIdRegExp) ?? [];
-
-    return ids ? ids.split(',').map((id) => Number(id)) : [];
-  }
 
   /**
    * Extract expected result and data from step title and return cleaned string

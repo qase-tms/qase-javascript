@@ -1,3 +1,22 @@
+/**
+ * Per-project configuration for multi-project (testops_multi) mode.
+ */
+export interface TestOpsProjectConfigType {
+  code: string;
+  run?: TestOpsRunType;
+  plan?: TestOpsPlanType;
+  environment?: string;
+}
+
+/**
+ * Multi-project TestOps configuration.
+ */
+export interface TestOpsMultiConfigType {
+  /** Default project for tests without explicit mapping (and for results without any case ID). */
+  default_project?: string;
+  /** List of project configurations. */
+  projects: TestOpsProjectConfigType[];
+}
 
 export interface TestOpsOptionsType {
   project: string;

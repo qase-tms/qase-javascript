@@ -259,6 +259,12 @@ module.exports = cypress.defineConfig({
 Check out the example of configuration for multiple reporters in the
 [demo project](../examples/cypress/cypress.config.js).
 
+### Multi-Project Support
+
+Qase Cypress Reporter supports sending test results to multiple Qase projects simultaneously. You can specify different test case IDs for each project using `qase.projects(mapping, it(...))`.
+
+For detailed information, configuration, and examples, see the [Multi-Project Support Guide](docs/MULTI_PROJECT.md).
+
 ## Cucumber/Gherkin Integration
 
 If you use Cucumber with Gherkin feature files in your Cypress tests, Qase reporter provides full support for both the legacy `cypress-cucumber-preprocessor` and the modern `@badeball/cypress-cucumber-preprocessor`.

@@ -13,7 +13,8 @@ import {
   composeOptions,
   ReporterInterface,
   ConfigType,
-  determineTestStatus
+  determineTestStatus,
+  parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
 
 export type VitestQaseOptionsType = ConfigType;
@@ -33,34 +34,8 @@ export class VitestQaseReporter implements Reporter {
     attachments: { name: string; path?: string; content?: string; contentType?: string }[];
   }> = new Map();
 
-  /**
- * @type {RegExp}
- */
+  /** @deprecated Use parseProjectMappingFromTitle from qase-javascript-commons for multi-project support. */
   static qaseIdRegExp = /\(Qase ID: ([\d,]+)\)/;
-
-  /**
- * @param {string} title
- * @returns {number[]}
- * @private
- */
-  private static getCaseId(title: string): number[] {
-    const [, ids] = title.match(VitestQaseReporter.qaseIdRegExp) ?? [];
-
-    return ids ? ids.split(',').map((id) => Number(id)) : [];
-  }
-
-    /**
-   * @param {string} title
-   * @returns {string}
-   * @private
-   */
-  private static removeQaseIdsFromTitle(title: string): string {
-      const matches = title.match(VitestQaseReporter.qaseIdRegExp);
-      if (matches) {
-        return title.replace(matches[0], '').trimEnd();
-      }
-      return title;
-  }
 
   constructor(options: VitestQaseOptionsType = {}) {
     const composedOptions = composeOptions(options, {});
@@ -81,20 +56,24 @@ export class VitestQaseReporter implements Reporter {
    */
   private createTestResult(testCase: TestCase): TestResultType {
     const result = testCase.result();
-    const qaseIds = VitestQaseReporter.getCaseId(testCase.name);
+    const parsed = parseProjectMappingFromTitle(testCase.name);
     const diagnostic = testCase.diagnostic();
     const testId = testCase.id ?? testCase.name;
     const metadata = this.testMetadata.get(testId);
 
-    // Use title from metadata if available, otherwise use test name
-    const testTitle = metadata?.title ?? VitestQaseReporter.removeQaseIdsFromTitle(testCase.name);
+    // Use title from metadata if available, otherwise use cleaned name (multi-project markers stripped)
+    const testTitle = metadata?.title ?? (parsed.cleanedTitle.replace(/\s+/g, ' ').trim() || testCase.name);
     const testResult = new TestResultType(testTitle);
     testResult.id = testCase.id ?? '';
     testResult.signature = testCase.fullName ?? testCase.name;
 
-    // Set testops_id based on extracted qase IDs
-    if (qaseIds.length > 0) {
-      testResult.testops_id = qaseIds.length === 1 ? qaseIds[0] ?? null : qaseIds;
+    // Multi-project: set testops_project_mapping when any (Qase PROJECT: ids) is present
+    const hasProjectMapping = Object.keys(parsed.projectMapping).length > 0;
+    if (hasProjectMapping) {
+      testResult.testops_project_mapping = parsed.projectMapping;
+      testResult.testops_id = null;
+    } else if (parsed.legacyIds.length > 0) {
+      testResult.testops_id = parsed.legacyIds.length === 1 ? parsed.legacyIds[0]! : parsed.legacyIds;
     } else {
       testResult.testops_id = null;
     }

@@ -1,3 +1,14 @@
+# qase-javascript-commons@2.5.0
+
+## What's new
+
+Added **multi-project support** (`testops_multi` mode):
+
+- New mode `testops_multi` sends results to multiple Qase projects in one run; each project gets its own run.
+- New field `testops_project_mapping` on `TestResultType`: project code → list of test case IDs. Helpers: `setTestopsProjectMapping()`, `getTestopsProjectMapping()`, `getTestopsIdsForProject()`, `getProjects()`.
+- New config: `testops_multi.default_project` and `testops_multi.projects[]` with `code`, `run`, `plan`, `environment` per project.
+- New reporter `TestOpsMultiReporter`; selected when `mode` is `testops_multi`. Single-project behavior is unchanged.
+
 # qase-javascript-commons@2.4.18
 
 ## What's new

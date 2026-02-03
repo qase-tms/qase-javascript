@@ -9,6 +9,7 @@ export * from './writer';
 
 export * from './utils/get-package-version';
 export * from './utils/mimeTypes';
+export * from './utils/project-mapping-utils';
 export * from './utils/signature';
 export * from './utils/test-status-utils';
 export * from './steps/step';

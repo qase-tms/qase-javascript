@@ -1,12 +1,25 @@
-import { QaseStep, getMimeTypes } from 'qase-javascript-commons';
+import { QaseStep, getMimeTypes, formatTitleWithProjectMapping } from 'qase-javascript-commons';
 import path from 'path';
 
 // Type for step function
 type StepFunction = () => Promise<void> | void;
 
-// Function to add Qase ID to test name
+/** Project code → test case IDs for multi-project (testops_multi) mode. */
+export type ProjectMapping = Record<string, number[]>;
+
+// Function to add Qase ID to test name (single project)
 export const addQaseId = (name: string, caseIds: number[]): string => {
   return `${name} (Qase ID: ${caseIds.join(',')})`;
+};
+
+/**
+ * Build test name with multi-project markers (for testops_multi mode).
+ * @param name — test title
+ * @param mapping — e.g. { PROJ1: [1, 2], PROJ2: [3] }
+ * @example it(addQaseProjects('Login flow', { PROJ1: [100], PROJ2: [200] }), async () => { ... });
+ */
+export const addQaseProjects = (name: string, mapping: ProjectMapping): string => {
+  return formatTitleWithProjectMapping(name, mapping);
 };
 
 // Type for annotate function from Vitest

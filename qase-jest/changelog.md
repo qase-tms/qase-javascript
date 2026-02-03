@@ -1,3 +1,9 @@
+# jest-qase-reporter@2.2.0
+
+## What's new
+
+- Added support for multi-project support.
+
 # jest-qase-reporter@2.1.4
 
 ## What's new

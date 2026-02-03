@@ -1,3 +1,9 @@
+# qase-cucumberjs@2.2.0
+
+## What's new
+
+- Added support for multi-project support.
+
 # qase-cucumberjs@2.1.9
 
 ## What's new

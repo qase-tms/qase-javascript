@@ -1,4 +1,8 @@
 import { Test } from 'mocha';
+import { formatTitleWithProjectMapping } from 'qase-javascript-commons';
+
+/** Project code → test case IDs for multi-project (testops_multi) mode. */
+export type ProjectMapping = Record<string, number[]>;
 
 export const qase = (
   caseId: number | string | number[] | string[],
@@ -13,6 +17,28 @@ export const qase = (
   test.title = `${test.title} (Qase ID: ${caseIds.join(',')})`;
 
   return test;
+};
+
+/**
+ * Build test title with multi-project markers (for testops_multi mode).
+ * Supports two usages:
+ * - it(qase.projects({ PROJ1: [100], PROJ2: [200] }, 'Login flow'), () => { ... }) — returns formatted title string.
+ * - qase.projects({ PROJ1: [100], PROJ2: [200] }, it('Login flow', () => { ... })) — mutates test.title and returns the test.
+ * @param mapping — e.g. { PROJ1: [1, 2], PROJ2: [3] }
+ * @param nameOrTest — test title string or Mocha Test (when passing it(...)); the test title is updated with markers so the reporter can parse testops_project_mapping.
+ */
+function isTestObject(nameOrTest: string | Test): nameOrTest is Test {
+  return Boolean(
+    nameOrTest && typeof nameOrTest === 'object' && 'title' in nameOrTest && typeof (nameOrTest as { title: unknown }).title === 'string',
+  );
+}
+
+qase.projects = (mapping: ProjectMapping, nameOrTest: string | Test): string | Test => {
+  if (isTestObject(nameOrTest)) {
+    nameOrTest.title = formatTitleWithProjectMapping(nameOrTest.title, mapping);
+    return nameOrTest;
+  }
+  return formatTitleWithProjectMapping(String(nameOrTest), mapping);
 };
 
 /**

@@ -19,6 +19,7 @@ import {
   TestStatusEnum,
   TestStepType,
   determineTestStatus,
+  parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
 import { Qase } from './global';
 import { Metadata } from './models';
@@ -321,13 +322,15 @@ export class JestQaseReporter implements Reporter {
       error.stack = value.failureMessages.join('\n\n');
     }
 
-    const ids = JestQaseReporter.getCaseId(value.title);
+    const parsed = parseProjectMappingFromTitle(value.title);
     const filePath = this.getCurrentTestPath(path);
+    const hasProjectMapping = Object.keys(parsed.projectMapping).length > 0;
+    const ids = hasProjectMapping ? [] : parsed.legacyIds;
 
     // Determine status based on error type
     const testStatus = determineTestStatus(error ?? null, value.status);
 
-    return {
+    const result: TestResultType = {
       attachments: [],
       author: null,
       execution: {
@@ -347,10 +350,14 @@ export class JestQaseReporter implements Reporter {
       run_id: null,
       signature: this.getSignature(filePath, value.fullName, ids, {}),
       steps: [],
-      testops_id: ids.length > 0 ? ids : null,
+      testops_id: parsed.legacyIds.length > 0 && !hasProjectMapping
+        ? (parsed.legacyIds.length === 1 ? parsed.legacyIds[0]! : parsed.legacyIds)
+        : null,
+      testops_project_mapping: hasProjectMapping ? parsed.projectMapping : null,
       id: uuidv4(),
-      title: this.removeQaseIdsFromTitle(value.title),
-    };
+      title: parsed.cleanedTitle || this.removeQaseIdsFromTitle(value.title),
+    } as unknown as TestResultType;
+    return result;
   }
 
   /**

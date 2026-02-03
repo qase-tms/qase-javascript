@@ -12,10 +12,10 @@ const config = {
 
         testops: {
           api: {
-            token: 'api_key',
+            token: '<token>',
           },
 
-          project: 'project_code',
+          project: '<project_code>',
           uploadAttachments: true,
           showPublicReportLink: true,
 

@@ -1,6 +1,6 @@
 {
   "name": "wdio-qase-reporter",
-  "version": "1.1.4",
+  "version": "1.2.0",
   "description": "Qase WebDriverIO Reporter",
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "sideEffects": false,
@@ -32,7 +32,7 @@
   "author": "Qase Team <support@qase.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "qase-javascript-commons": "~2.4.10",
+    "qase-javascript-commons": "~2.5.0",
     "uuid": "^9.0.1",
     "@types/node": "^20.19.25",
     "@wdio/reporter": "^8.43.0",

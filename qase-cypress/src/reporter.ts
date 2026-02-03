@@ -8,8 +8,6 @@ import {
   Attachment,
   composeOptions,
   ConfigLoader,
-  // ConfigType,
-  // FrameworkOptionsType,
   generateSignature,
   QaseReporter,
   ReporterInterface,
@@ -19,6 +17,8 @@ import {
   TestStatusEnum,
   TestStepType,
   determineTestStatus,
+  parseProjectMappingFromTitle,
+  parseProjectMappingFromTags,
 } from 'qase-javascript-commons';
 
 import { configSchema } from './configSchema';
@@ -52,6 +52,7 @@ export class CypressQaseReporter extends reporters.Base {
   /**
    * @type {RegExp}
    */
+  /** @deprecated Use parseProjectMappingFromTitle from qase-javascript-commons for multi-project support. */
   static qaseIdRegExp = /\(Qase ID:? ([\d,]+)\)/;
 
   /**
@@ -62,17 +63,6 @@ export class CypressQaseReporter extends reporters.Base {
     passed: TestStatusEnum.passed,
     pending: TestStatusEnum.skipped,
   };
-
-  /**
-   * @param {string} title
-   * @returns {number[]}
-   * @private
-   */
-  private static getCaseId(title: string) {
-    const [, ids] = title.match(CypressQaseReporter.qaseIdRegExp) ?? [];
-
-    return ids ? ids.split(',').map((id) => Number(id)) : [];
-  }
 
   /**
    * @type {string | undefined}
@@ -255,8 +245,9 @@ export class CypressQaseReporter extends reporters.Base {
 
     const start_time = this.testBeginTime || Date.now();
 
-    const ids = CypressQaseReporter.getCaseId(test.title);
-
+    const fromTitle = parseProjectMappingFromTitle(test.title);
+    const legacyIds = [...fromTitle.legacyIds];
+    const projectMapping: Record<string, number[]> = { ...fromTitle.projectMapping };
     const testFileName = this.getTestFileName(test);
     const files = this.screenshotsFolder ?
       FileSearcher.findFilesBeforeTime(this.screenshotsFolder, testFileName, new Date(start_time))
@@ -294,10 +285,15 @@ export class CypressQaseReporter extends reporters.Base {
       const file = this.getFile(test.parent);
       if (file) {
         const tags = extractTags(file, test.title);
-        ids.push(...this.extractQaseIds(tags));
+        const fromTags = parseProjectMappingFromTags(tags);
+        legacyIds.push(...fromTags.legacyIds);
+        for (const [code, idsFromTag] of Object.entries(fromTags.projectMapping)) {
+          projectMapping[code] = [...(projectMapping[code] ?? []), ...idsFromTag];
+        }
       }
     }
 
+    const hasProjectMapping = Object.keys(projectMapping).length > 0;
     const result: TestResultType = {
       attachments: attachments,
       author: null,
@@ -308,7 +304,7 @@ export class CypressQaseReporter extends reporters.Base {
       group_params: {},
       relations: relations,
       run_id: null,
-      signature: this.getSignature(test, ids, {}),
+      signature: this.getSignature(test, hasProjectMapping ? [] : legacyIds, {}),
       steps: [],
       id: uuidv4(),
       execution: {
@@ -319,10 +315,13 @@ export class CypressQaseReporter extends reporters.Base {
         stacktrace: null,
         thread: null,
       },
-      testops_id: ids.length > 0 ? ids : null,
-      title: this.removeQaseIdsFromTitle(test.title),
+      testops_id: !hasProjectMapping && legacyIds.length > 0
+        ? (legacyIds.length === 1 ? legacyIds[0]! : legacyIds)
+        : null,
+      testops_project_mapping: hasProjectMapping ? projectMapping : null,
+      title: fromTitle.cleanedTitle || this.removeQaseIdsFromTitle(test.title),
       preparedAttachments: [],
-    };
+    } as unknown as TestResultType;
 
     void this.reporter.addTestResult(result);
 
@@ -347,7 +346,9 @@ export class CypressQaseReporter extends reporters.Base {
       return;
     }
 
-    const ids = CypressQaseReporter.getCaseId(test.title);
+    const fromTitle = parseProjectMappingFromTitle(test.title);
+    const legacyIds = [...fromTitle.legacyIds];
+    const projectMapping: Record<string, number[]> = { ...fromTitle.projectMapping };
 
     const testFileName = this.getTestFileName(test);
     const files = this.screenshotsFolder ?
@@ -424,11 +425,16 @@ export class CypressQaseReporter extends reporters.Base {
 
         if (file) {
           const tags = extractTags(file, test.title);
-          ids.push(...this.extractQaseIds(tags));
+          const fromTags = parseProjectMappingFromTags(tags);
+          legacyIds.push(...fromTags.legacyIds);
+          for (const [code, idsFromTag] of Object.entries(fromTags.projectMapping)) {
+            projectMapping[code] = [...(projectMapping[code] ?? []), ...idsFromTag];
+          }
         }
       }
     }
 
+    const hasProjectMapping = Object.keys(projectMapping).length > 0;
     const result: TestResultType = {
       attachments: attachments,
       author: null,
@@ -439,7 +445,7 @@ export class CypressQaseReporter extends reporters.Base {
       group_params: metadata?.groupParams ?? {},
       relations: relations,
       run_id: null,
-      signature: this.getSignature(test, ids, metadata?.parameters ?? {}),
+      signature: this.getSignature(test, hasProjectMapping ? [] : legacyIds, metadata?.parameters ?? {}),
       steps: steps,
       id: uuidv4(),
       execution: {
@@ -450,10 +456,13 @@ export class CypressQaseReporter extends reporters.Base {
         stacktrace: test.err?.stack ?? null,
         thread: null,
       },
-      testops_id: ids.length > 0 ? ids : null,
-      title: metadata?.title ?? this.removeQaseIdsFromTitle(test.title),
+      testops_id: !hasProjectMapping && legacyIds.length > 0
+        ? (legacyIds.length === 1 ? legacyIds[0]! : legacyIds)
+        : null,
+      testops_project_mapping: hasProjectMapping ? projectMapping : null,
+      title: metadata?.title ?? (fromTitle.cleanedTitle || this.removeQaseIdsFromTitle(test.title)),
       preparedAttachments: [],
-    };
+    } as unknown as TestResultType;
 
     void this.reporter.addTestResult(result);
 
@@ -527,28 +536,6 @@ export class CypressQaseReporter extends reporters.Base {
       return title.replace(matches[0], '').trimEnd();
     }
     return title;
-  }
-
-  /**
-   * Extracts numbers from @qaseid tags, regardless of case.
-   * @param tags - An array of tags to process.
-   * @returns An array of numbers extracted from the tags.
-   */
-  private extractQaseIds(tags: string[]): number[] {
-    const qaseIdRegex = /@qaseid\((\d+(?:,\d+)*)\)/i;
-    const qaseIds: number[] = [];
-
-    for (const tag of tags) {
-      const match = qaseIdRegex.exec(tag);
-      if (match) {
-        const ids = match[1]?.split(',').map(id => parseInt(id, 10));
-        if (ids) {
-          qaseIds.push(...ids);
-        }
-      }
-    }
-
-    return qaseIds;
   }
 
   private convertCypressMessages(messages: StepStart[], testStatus: string): TestStepType[] {
