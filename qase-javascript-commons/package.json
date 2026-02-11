@@ -48,7 +48,7 @@
     "@types/minimatch": "^6.0.0",
     "@types/node": "^20.19.25",
     "@types/uuid": "^9.0.8",
-    "axios": "^1.13.2",
+    "axios": "^1.13.5",
     "jest": "^29.7.0",
     "ts-jest": "^29.4.5"
   }
