@@ -226,7 +226,7 @@ test('Test with content attachment', async (t) => {
   qase.attach({
     name: 'test-data.json',
     content: JSON.stringify({ key: 'value' }),
-    contentType: 'application/json',
+    type: 'application/json',
   });
   await t.expect(true).ok();
 });
@@ -241,7 +241,7 @@ test('Test with screenshot', async (t) => {
   qase.attach({
     name: 'page-screenshot.png',
     content: screenshot,
-    contentType: 'image/png',
+    type: 'image/png',
   });
 
   await t.expect(true).ok();
@@ -258,7 +258,7 @@ test('Test with step attachments', async (t) => {
     step.attach({
       name: 'current-state.png',
       content: screenshot,
-      contentType: 'image/png',
+      type: 'image/png',
     });
   });
 });
@@ -335,7 +335,7 @@ test('Test with step attachments', async (t) => {
     step.attach({
       name: 'application-state.png',
       content: screenshot,
-      contentType: 'image/png',
+      type: 'image/png',
     });
 
     await t.expect(true).ok();
@@ -603,7 +603,7 @@ QASE_MODE=testops npx testcafe
    qase.attach({
      name: 'log.txt',
      content: 'Log content',
-     contentType: 'text/plain',  // Must be specified for content
+     type: 'text/plain',  // Must be specified for content
    });
    ```
 
@@ -730,7 +730,7 @@ fixture\`E2E Tests\`
       step.attach({
         name: 'final-state.png',
         content: screenshot,
-        contentType: 'image/png',
+        type: 'image/png',
       });
     });
   });
@@ -772,7 +772,7 @@ test.meta(qase.id(201).create())(
     qase.attach({
       name: 'login-page.png',
       content: screenshot,
-      contentType: 'image/png',
+      type: 'image/png',
     });
 
     await t.expect('#login-form').exists;
@@ -808,7 +808,7 @@ test.meta(qase.id(301).create())(
     qase.attach({
       name: 'api-response.json',
       content: JSON.stringify(apiLogger.requests[0].response.body, null, 2),
-      contentType: 'application/json',
+      type: 'application/json',
     });
   }
 );
@@ -948,7 +948,7 @@ test.meta(qase.id(901).create())(
     qase.attach({
       name: 'performance-metrics.json',
       content: JSON.stringify({ loadTime, threshold: 3000 }, null, 2),
-      contentType: 'application/json',
+      type: 'application/json',
     });
 
     await t.expect(loadTime).lt(3000, 'Page load time exceeds 3 seconds');
@@ -1023,7 +1023,7 @@ test.meta(
       qase.attach({
         name: 'page-load.txt',
         content: 'Page loaded successfully',
-        contentType: 'text/plain',
+        type: 'text/plain',
       });
     });
 
