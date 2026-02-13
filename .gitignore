@@ -80,3 +80,4 @@ tmp
 *.tmp
 
 CLAUDE.md
+.planning/
