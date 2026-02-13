@@ -13,15 +13,17 @@ This guide provides comprehensive instructions for integrating Qase with Webdriv
 - [Adding Fields](#adding-fields)
 - [Adding Suite](#adding-suite)
 - [Ignoring Tests](#ignoring-tests)
+- [Muting Tests](#muting-tests)
 - [Adding Comments](#adding-comments)
 - [Working with Attachments](#working-with-attachments)
 - [Working with Steps](#working-with-steps)
 - [Working with Parameters](#working-with-parameters)
 - [Cucumber Integration](#cucumber-integration)
 - [Running Tests](#running-tests)
-- [Troubleshooting](#troubleshooting)
 - [Integration Patterns](#integration-patterns)
 - [Common Use Cases](#common-use-cases)
+- [Troubleshooting](#troubleshooting)
+- [Complete Examples](#complete-examples)
 
 ---
 
@@ -203,6 +205,35 @@ it('Ignored test', () => {
 ### Cucumber
 
 Cucumber does not support ignore functionality via tags. Filter tests using standard Cucumber tag filtering.
+
+---
+
+## Muting Tests
+
+Mark a test as muted. Muted tests are reported but do not affect the test run status.
+
+### Mocha/Jasmine
+
+```javascript
+import { qase } from 'wdio-qase-reporter';
+
+it(qase(1, 'Known failing test'), () => {
+  qase.mute();
+  expect(false).to.equal(true); // This failure won't affect the run status
+});
+```
+
+### Cucumber
+
+```gherkin
+Feature: User Authentication
+
+  @QaseMuted
+  Scenario: Known failing test
+    Given I am on the login page
+    When I enter invalid credentials
+    Then I should see an error
+```
 
 ---
 
@@ -1057,6 +1088,117 @@ jobs:
     "test": "wdio run wdio.conf.js"
   }
 }
+```
+
+---
+
+## Complete Examples
+
+### Full Test Example (Mocha/Jasmine)
+
+```javascript
+import { qase } from 'wdio-qase-reporter';
+
+describe('Complete Example', () => {
+  it(qase([1, 2], 'Comprehensive test with all features'), async () => {
+    // Set metadata
+    qase.title('User can complete full registration flow');
+    qase.suite('Registration\tEnd-to-End');
+    qase.fields({
+      severity: 'critical',
+      priority: 'high',
+      layer: 'e2e',
+      description: 'Tests complete user registration flow from start to finish',
+      preconditions: 'Application is running and database is accessible',
+    });
+    qase.parameters({
+      Browser: 'Chrome',
+      Environment: 'staging',
+    });
+
+    // Execute test with steps
+    await qase.step('Navigate to registration page', async () => {
+      await browser.url('/register');
+      qase.attach({
+        name: 'page-load.txt',
+        content: 'Page loaded successfully',
+        contentType: 'text/plain',
+      });
+    });
+
+    await qase.step('Fill registration form', async () => {
+      await $('#username').setValue('testuser');
+      await $('#email').setValue('test@example.com');
+      await $('#password').setValue('SecurePass123!');
+    });
+
+    await qase.step('Submit form', async () => {
+      await $('button[type="submit"]').click();
+      await expect($('.success-message')).toBeDisplayed();
+    });
+
+    await qase.step('Verify email confirmation', async () => {
+      const message = await $('.email-sent').getText();
+      expect(message).toContain('Verification email sent');
+    });
+  });
+});
+```
+
+### Full Feature Example (Cucumber)
+
+```gherkin
+Feature: User Authentication
+  As a user
+  I want to log in to the application
+  So I can access my account
+
+  @QaseID=1
+  @QaseTitle=User can successfully log in with valid credentials
+  @QaseFields={"severity":"blocker","priority":"high","layer":"e2e"}
+  @QaseSuite=Authentication\tLogin\tHappy Path
+  Scenario: Successful login
+    Given I am on the login page
+    When I enter username "testuser@example.com"
+    And I enter password "SecurePass123!"
+    And I click the login button
+    Then I should be redirected to the dashboard
+    And I should see "Welcome back, Test User"
+```
+
+### Example Project Structure
+
+**Mocha/Jasmine:**
+```
+my-project/
+├── qase.config.json
+├── wdio.conf.js
+├── test/
+│   ├── specs/
+│   │   ├── auth.spec.js
+│   │   ├── checkout.spec.js
+│   │   └── ...
+│   └── pageobjects/
+│       ├── LoginPage.js
+│       ├── DashboardPage.js
+│       └── ...
+└── package.json
+```
+
+**Cucumber:**
+```
+my-project/
+├── qase.config.json
+├── wdio.conf.js
+├── features/
+│   ├── authentication.feature
+│   ├── checkout.feature
+│   └── ...
+├── step-definitions/
+│   ├── login.steps.js
+│   ├── checkout.steps.js
+│   └── ...
+└── package.json
 ```
 
 ---
