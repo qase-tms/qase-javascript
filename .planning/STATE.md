@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 3 of 5 (Feature Guides)
-Plan: 2 of 6 completed
+Plan: 3 of 6 completed
 Status: In progress
-Last activity: 2026-02-13 — Completed 03-02-PLAN.md: STEPS documentation for Jest, Playwright, Cypress, Mocha, Vitest
+Last activity: 2026-02-13 — Completed 03-03-PLAN.md: Framework-Specific Attachment and Step Guides
 
-Progress: [████████░░] 33% (Phase 3: 2/6 plans complete)
+Progress: [████████░░] 50% (Phase 3: 3/6 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
-- Average duration: 18 min
-- Total execution time: 2.46 hours
+- Total plans completed: 11
+- Average duration: 17 min
+- Total execution time: 2.56 hours
 
 **By Phase:**
 
@@ -29,17 +29,17 @@ Progress: [████████░░] 33% (Phase 3: 2/6 plans complete)
 |-------|-------|-------|----------|
 | 01-foundation | 3 | 11 min | 4 min |
 | 02-core-documentation | 5 | 134 min | 27 min |
-| 03-feature-guides | 2 | 3 min | 2 min |
+| 03-feature-guides | 3 | 9 min | 3 min |
 
 **Recent Plans:**
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
+| 03-feature-guides | 03 | 6 min | 2 | 8 |
 | 03-feature-guides | 02 | 3 min | 2 | 5 |
 | 03-feature-guides | 01 | 0 min | 2 | 5 |
 | 02-core-documentation | 06 | 3 min | 1 | 18 reviewed |
 | 02-core-documentation | 05 | 69 min | 1 | 5 |
-| 02-core-documentation | 04 | 29 min | 3 | 6 |
 
 ## Accumulated Context
 
@@ -85,6 +85,12 @@ Recent decisions affecting current work:
 - [Phase 03]: Documented both qase.step() and native test.step() for Playwright
 - [Phase 03]: Emphasized synchronous callbacks for Cypress (no async/await)
 - [Phase 03]: Used function() syntax for Mocha to access this.step() context
+- [Phase 03-feature-guides]: TestCafe uses 'type' parameter (not 'contentType') for attachments
+- [Phase 03-feature-guides]: TestCafe nested steps use callback parameter (s, s1, s2) for nesting
+- [Phase 03-feature-guides]: WDIO documents both Mocha/Jasmine and Cucumber modes
+- [Phase 03-feature-guides]: CucumberJS uses native this.attach() not qase.attach()
+- [Phase 03-feature-guides]: CucumberJS steps are Gherkin Given/When/Then, not qase.step()
+- [Phase 03-feature-guides]: Newman guides clearly state no programmatic API for attachments/steps
 
 ### Pending Todos
 
@@ -97,6 +103,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 03-02-PLAN.md: STEPS documentation for Jest, Playwright, Cypress, Mocha, Vitest
-Resume file: .planning/phases/03-feature-guides/03-02-SUMMARY.md
-Next plan: 03-03-PLAN.md - ATTACHMENTS.md and STEPS.md for TestCafe and WDIO
+Stopped at: Completed 03-03-PLAN.md: Framework-Specific Attachment and Step Guides
+Resume file: .planning/phases/03-feature-guides/03-03-SUMMARY.md
+Next plan: 03-04-PLAN.md - Complete usage.md for TestCafe, WDIO, CucumberJS, Newman
