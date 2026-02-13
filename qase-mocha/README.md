@@ -1,84 +1,229 @@
-# Qase TMS Mocha reporter
+# [Qase TestOps](https://qase.io) Mocha Reporter
 
-Publish results simple and easy.
+[![License](https://lxgaming.github.io/badges/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
-To install the latest version, run:
+Qase Mocha Reporter enables seamless integration between your Mocha tests and [Qase TestOps](https://qase.io), providing automatic test result reporting, test case management, and comprehensive test analytics.
+
+## Features
+
+- Link automated tests to Qase test cases by ID
+- Auto-create test cases from your test code
+- Report test results with rich metadata (fields, attachments, steps)
+- Support for parameterized tests
+- Multi-project reporting support
+- Flexible configuration (file, environment variables, Mocha config)
+- Parallel execution support
+- Extra reporters support (spec, json, etc.)
+
+## Installation
 
 ```sh
-npm install -D mocha-qase-reporter
+npm install --save-dev mocha-qase-reporter
 ```
 
-## Getting started
+## Quick Start
 
-The Mocha reporter can auto-generate test cases
-and suites from your test data.
-Test results of subsequent test runs will match the same test cases
-as long as their names and file paths don't change.
+**1. Create `qase.config.json` in your project root:**
 
-You can also annotate the tests with the IDs of existing test cases
-from Qase.io before executing tests. It's a more reliable way to bind
-autotests to test cases, that persists when you rename, move, or
-parameterize your tests.
+```json
+{
+  "mode": "testops",
+  "testops": {
+    "project": "YOUR_PROJECT_CODE",
+    "api": {
+      "token": "YOUR_API_TOKEN"
+    }
+  }
+}
+```
 
-For more information, see the [Usage Guide](docs/usage.md).
+**2. Configure Mocha to use the reporter in `.mocharc.js`:**
 
-For example:
+```javascript
+module.exports = {
+  reporter: 'mocha-qase-reporter',
+  // ... other mocha options
+};
+```
 
-```typescript
-import { qase } from 'mocha-qase-reporter/mocha';
+**3. Add Qase ID to your test:**
 
-describe('My First Test', () => {
-  it(qase(1,'Several ids'), () => {;
-    expect(true).to.equal(true);
-  });
+```javascript
+const { qase } = require('mocha-qase-reporter/mocha');
 
-  // a test can check multiple test cases
-  it(qase([2,3],'Correct test'), () => {
-    expect(true).to.equal(true);
-  });
-
-  it.skip('Skipped test', () => {
-    expect(true).to.equal(true);
+describe('Authentication', function() {
+  it(qase(1, 'User can login with valid credentials'), function() {
+    expect(login('user@example.com', 'password123')).to.equal(true);
   });
 });
 ```
 
-To execute Mocha tests and report them to Qase.io, run the command:
+**4. Run your tests:**
+
+```sh
+QASE_MODE=testops npx mocha
+```
+
+## Configuration
+
+The reporter is configured via (in order of priority):
+
+1. **Environment variables** (`QASE_*`, highest priority)
+2. **Config file** (`qase.config.json`)
+
+### Minimal Configuration
+
+| Option | Environment Variable | Description |
+|--------|---------------------|-------------|
+| `mode` | `QASE_MODE` | Set to `testops` to enable reporting |
+| `testops.project` | `QASE_TESTOPS_PROJECT` | Your Qase project code |
+| `testops.api.token` | `QASE_TESTOPS_API_TOKEN` | Your Qase API token |
+
+### Example `.mocharc.js`
+
+```javascript
+module.exports = {
+  reporter: 'mocha-qase-reporter',
+  require: ['@babel/register'],
+  spec: 'tests/**/*.spec.js',
+  timeout: 5000,
+};
+```
+
+### Example `qase.config.json`
+
+```json
+{
+  "mode": "testops",
+  "fallback": "report",
+  "debug": false,
+  "testops": {
+    "project": "YOUR_PROJECT_CODE",
+    "api": {
+      "token": "YOUR_API_TOKEN"
+    },
+    "run": {
+      "title": "Mocha Automated Run",
+      "complete": true
+    },
+    "batch": {
+      "size": 100
+    }
+  },
+  "report": {
+    "driver": "local",
+    "connection": {
+      "local": {
+        "path": "./build/qase-report",
+        "format": "json"
+      }
+    }
+  }
+}
+```
+
+> **Full configuration reference:** See [qase-javascript-commons](../qase-javascript-commons/README.md) for all available options including logging, status mapping, execution plans, and more.
+
+## Usage
+
+### Link Tests with Test Cases
+
+Associate your tests with Qase test cases using test case IDs:
+
+**Single ID:**
+
+```javascript
+const { qase } = require('mocha-qase-reporter/mocha');
+
+describe('User Management', function() {
+  it(qase(1, 'Create new user'), function() {
+    const user = createUser('john@example.com');
+    expect(user.email).to.equal('john@example.com');
+  });
+});
+```
+
+**Multiple IDs:**
+
+```javascript
+describe('Login Tests', function() {
+  it(qase([1, 2, 3], 'Login works across different browsers'), function() {
+    const result = login('user@example.com', 'password');
+    expect(result.success).to.be.true;
+  });
+});
+```
+
+### Add Metadata
+
+Enhance your tests with additional information:
+
+```javascript
+it('User registration', function() {
+  qase.title('User can register with valid email and password');
+  qase.fields({
+    severity: 'critical',
+    priority: 'high',
+    layer: 'api',
+    description: 'Tests user registration flow with validation',
+  });
+  qase.suite('Authentication / Registration');
+
+  const user = register('newuser@example.com', 'SecurePass123');
+  expect(user.id).to.exist;
+});
+```
+
+### Ignore Tests
+
+Exclude specific tests from Qase reporting (test still runs, but results are not sent):
+
+```javascript
+it('Test under development', function() {
+  qase.ignore();
+
+  expect(true).to.be.true;
+});
+```
+
+### Test Result Statuses
+
+| Mocha Result | Qase Status |
+|--------------|-------------|
+| Passed | Passed |
+| Failed | Failed |
+| Pending | Skipped |
+| Skipped | Skipped |
+
+> For more usage examples, see the [Usage Guide](docs/usage.md).
+
+## Running Tests
+
+Run Mocha tests with Qase reporting:
 
 ```bash
-QASE_MODE=testops mocha
+# Run all tests
+QASE_MODE=testops npx mocha
+
+# Run with specific spec pattern
+QASE_MODE=testops npx mocha "tests/**/*.spec.js"
+
+# Run with grep filter
+QASE_MODE=testops npx mocha --grep "authentication"
+
+# Run with .mocharc.js configuration
+QASE_MODE=testops npx mocha
+
+# Run in parallel
+QASE_MODE=testops npx mocha --parallel
+
+# Run with extra reporters
+QASE_MODE=testops npx mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec
 ```
 
-or
+## Parallel Execution
 
-```bash
-npm test
-```
-
-You can try it with the example project at [`examples/mocha`](../examples/mocha/).
-
-<p align="center">
-  <img width="65%" src="./screenshots/screenshot.png">
-</p>
-
-A test run will be performed and available at:
-
-```
-https://app.qase.io/run/QASE_PROJECT_CODE
-```
-
-### Multi-Project Support
-
-Qase Mocha Reporter supports sending test results to multiple Qase projects simultaneously. You can specify different test case IDs for each project using `qase.projects(mapping, name)`.
-
-For detailed information, configuration, and examples, see the [Multi-Project Support Guide](docs/MULTI_PROJECT.md).
-
-### Parallel execution
-
-The reporter supports parallel execution of tests.
-
-First, you need to create a new run in Qase.io. You can use
-the [Qase CLI](https://github.com/qase-tms/qasectl):
+The reporter supports parallel execution of tests. First, create a new run in Qase.io using the [Qase CLI](https://github.com/qase-tms/qasectl):
 
 ```bash
 # Create a new test run
@@ -86,82 +231,53 @@ qasectl testops run create --project DEMO --token token --title 'Mocha test run'
 
 # Save the run ID to the environment variable
 export QASE_TESTOPS_RUN_ID=$(< qase.env grep QASE_TESTOPS_RUN_ID | cut -d'=' -f2)
-```
 
-Then, you can run tests in parallel:
+# Run tests in parallel
+QASE_MODE=testops npx mocha --parallel
 
-```bash
-QASE_MODE=testops mocha --parallel
-```
-
-After the tests are finished, you can complete the run:
-
-```bash
+# Complete the run after tests finish
 qasectl testops run complete --project DEMO --token token --id $(echo $QASE_TESTOPS_RUN_ID)
 ```
 
-### Extra Reporters
+## Extra Reporters
 
 The reporter supports additional reporters alongside the main Qase reporter. This allows you to use multiple output formats (e.g., console output and JSON reports) without the hanging issues that can occur with `mocha-multi-reporters` in parallel mode.
 
 ```bash
 # Single extra reporter
-QASE_MODE=testops mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec
+QASE_MODE=testops npx mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec
 
 # Multiple extra reporters
-QASE_MODE=testops mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec,json
+QASE_MODE=testops npx mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec,json
 
 # With parallel execution
-QASE_MODE=testops mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec --parallel
+QASE_MODE=testops npx mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec --parallel
 ```
 
 For detailed configuration options and examples, see the [Extra Reporters section](docs/usage.md#using-extra-reporters) in the usage guide.
 
-## Configuration
-
-Qase Mocha reporter can be configured in multiple ways:
-
-- using a separate config file `qase.config.json`,
-- using environment variables (they override the values from the configuration files).
-
-For a full list of configuration options, see
-the [Configuration reference](../qase-javascript-commons/README.md#configuration).
-
-Example `qase.config.json` config:
-
-```json
-{
-  "mode": "testops",
-  "debug": true,
-  "testops": {
-    "api": {
-      "token": "api_key"
-    },
-    "project": "project_code",
-    "run": {
-      "complete": true
-    }
-  }
-}
-```
-
-Also, you need to configure the reporter using the `.mocharc.js` file:
-
-```js
-// .mocharc.js
-
-module.exports = {
-  reporter: "mocha-qase-reporter",
-  // ... other mocha options
-}
-```
-
 ## Requirements
 
-We maintain the reporter on [LTS versions of Node](https://nodejs.org/en/about/releases/).
+- Node.js >= 14
+- Mocha >= 8.0.0
 
-`mocha >= 10.2.0`
+## Documentation
 
-<!-- references -->
+| Guide | Description |
+|-------|-------------|
+| [Usage Guide](docs/usage.md) | Complete usage reference with all methods and options |
+| [Attachments](docs/ATTACHMENTS.md) | Adding screenshots, logs, and files to test results |
+| [Steps](docs/STEPS.md) | Defining test steps for detailed reporting |
+| [Multi-Project Support](docs/MULTI_PROJECT.md) | Reporting to multiple Qase projects |
+| [Upgrade Guide](docs/UPGRADE.md) | Migration guide for breaking changes |
 
-[auth]: https://developers.qase.io/#authentication
+## Examples
+
+See the [examples directory](../examples/) for complete working examples:
+
+- [Single project example](../examples/mocha/)
+- [Multi-project example](../examples/multi/)
+
+## License
+
+Apache License 2.0. See [LICENSE](../LICENSE) for details.
