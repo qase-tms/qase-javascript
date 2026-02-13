@@ -33,7 +33,7 @@ Link your automated tests to existing test cases in Qase by specifying the test 
 ### Single ID
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
 test(qase(1, 'Test name'), () => {
@@ -44,7 +44,7 @@ test(qase(1, 'Test name'), () => {
 ### Multiple IDs
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
 test(qase([1, 2, 3], 'Test covering multiple cases'), () => {
@@ -63,7 +63,7 @@ To send test results to multiple Qase projects simultaneously, see the [Multi-Pr
 Set a custom title for the test case (overrides auto-generated title):
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
 test('Test with custom title', () => {
@@ -92,7 +92,7 @@ Add metadata to your test cases using fields. Both system and custom fields are 
 ### Example
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
 test('Test with fields', () => {
@@ -118,7 +118,7 @@ Organize tests into suites and sub-suites:
 ### Simple Suite
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
 test('Test in a suite', () => {
@@ -130,7 +130,7 @@ test('Test in a suite', () => {
 ### Nested Suites
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
 test('Test in nested suites', () => {
@@ -146,7 +146,7 @@ test('Test in nested suites', () => {
 Exclude a test from Qase reporting. The test still executes, but results are not sent to Qase:
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
 test('Test not reported to Qase', () => {
@@ -162,7 +162,7 @@ test('Test not reported to Qase', () => {
 Mark a test as muted. Muted tests are reported but do not affect the test run status:
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
 test('Muted test', () => {
@@ -180,7 +180,7 @@ Attach files, screenshots, logs, and other content to your test results.
 ### Attach File from Path
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
 test('Test with file attachment', () => {
@@ -211,13 +211,13 @@ test('Test with inline content', () => {
   qase.attach({
     name: 'test-log.txt',
     content: 'Test execution log content',
-    contentType: 'text/plain',
+    type: 'text/plain',
   });
 
   qase.attach({
     name: 'data.json',
     content: JSON.stringify({ test: 'data', status: 'passed' }),
-    contentType: 'application/json',
+    type: 'application/json',
   });
 
   expect(true).toBe(true);
@@ -233,7 +233,7 @@ test('Test with step-specific attachment', async () => {
     qase.attach({
       name: 'screenshot.png',
       content: screenshot,
-      contentType: 'image/png',
+      type: 'image/png',
     });
   });
 
@@ -267,7 +267,7 @@ Define test steps for detailed reporting in Qase.
 ### Using Async Function
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
 test('Test with steps', async () => {
@@ -327,7 +327,7 @@ Report parameterized test data to Qase.
 ### Basic Parameterized Test
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect, describe } from 'vitest';
 
 const browsers = ['Chrome', 'Firefox', 'Safari'];
@@ -404,7 +404,7 @@ QASE_TESTOPS_RUN_ID=456 npx vitest run
 ### Full Test Example
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect, describe } from 'vitest';
 
 describe('User Authentication', () => {
@@ -436,7 +436,7 @@ describe('User Authentication', () => {
       qase.attach({
         name: 'login-success.png',
         content: Buffer.from('screenshot-data'),
-        contentType: 'image/png',
+        type: 'image/png',
       });
       expect(true).toBe(true);
     });
@@ -469,12 +469,12 @@ my-project/
 
 ### ESM Module Resolution Errors
 
-**Problem:** `Cannot find module 'vitest-qase-reporter'`
+**Problem:** `Cannot find module 'vitest-qase-reporter/vitest'`
 
 **Solution:**
 1. Verify package is installed: `npm list vitest-qase-reporter`
 2. Check `package.json` has `"type": "module"` for ESM projects
-3. Use correct import syntax: `import { qase } from 'vitest-qase-reporter'`
+3. Use correct import syntax: `import { qase } from 'vitest-qase-reporter/vitest'`
 
 ### vitest.config.ts vs vite.config.ts
 
@@ -488,7 +488,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    reporters: ['default', 'vitest-qase-reporter'],
+    reporters: ['default', 'vitest-qase-reporter/vitest'],
   },
 });
 ```
@@ -544,14 +544,14 @@ export default defineWorkspace([
     test: {
       name: 'unit',
       include: ['src/**/*.test.ts'],
-      reporters: ['default', 'vitest-qase-reporter'],
+      reporters: ['default', 'vitest-qase-reporter/vitest'],
     },
   },
   {
     test: {
       name: 'integration',
       include: ['tests/**/*.test.ts'],
-      reporters: ['default', 'vitest-qase-reporter'],
+      reporters: ['default', 'vitest-qase-reporter/vitest'],
     },
   },
 ]);
@@ -569,7 +569,7 @@ export function add(a: number, b: number) {
 
 if (import.meta.vitest) {
   const { test, expect } = import.meta.vitest;
-  const { qase } = await import('vitest-qase-reporter');
+  const { qase } = await import('vitest-qase-reporter/vitest');
 
   test(qase(1, 'Addition works'), () => {
     expect(add(1, 2)).toBe(3);
@@ -580,7 +580,7 @@ if (import.meta.vitest) {
 ### Concurrent Tests with Qase
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect, describe } from 'vitest';
 
 describe.concurrent('Parallel test suite', () => {
@@ -601,7 +601,7 @@ describe.concurrent('Parallel test suite', () => {
 ### Snapshot Testing with Qase
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
 test(qase(1, 'Component snapshot'), () => {
@@ -618,7 +618,7 @@ test(qase(1, 'Component snapshot'), () => {
 ### Using vi.mock with Qase Reporting
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect, vi } from 'vitest';
 
 vi.mock('./api', () => ({
@@ -655,7 +655,7 @@ export default defineWorkspace([
       reporters: [
         'default',
         [
-          'vitest-qase-reporter',
+          'vitest-qase-reporter/vitest',
           {
             testops: { project: 'BACKEND' },
           },
@@ -670,7 +670,7 @@ export default defineWorkspace([
       reporters: [
         'default',
         [
-          'vitest-qase-reporter',
+          'vitest-qase-reporter/vitest',
           {
             testops: { project: 'FRONTEND' },
           },
@@ -708,7 +708,7 @@ jobs:
 ### Use Case 3: Use Concurrent Tests for Performance
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect, describe } from 'vitest';
 
 describe.concurrent('API performance tests', () => {
@@ -743,7 +743,7 @@ test(qase(1, 'Test name'), () => {
 
 **After (Vitest):**
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
 test(qase(1, 'Test name'), () => {
@@ -754,7 +754,7 @@ test(qase(1, 'Test name'), () => {
 ### Use Case 5: Dynamic Test Generation with Parameters
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect, describe } from 'vitest';
 
 const testMatrix = [
@@ -783,7 +783,7 @@ describe('Cross-browser compatibility', () => {
 ### Use Case 6: Test with Rich Metadata and Attachments
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
 test(qase(1, 'E2E checkout flow'), async () => {
@@ -804,7 +804,7 @@ test(qase(1, 'E2E checkout flow'), async () => {
     qase.attach({
       name: 'cart-items.json',
       content: JSON.stringify({ items: ['item1', 'item2'] }),
-      contentType: 'application/json',
+      type: 'application/json',
     });
   });
 
@@ -816,7 +816,7 @@ test(qase(1, 'E2E checkout flow'), async () => {
     qase.attach({
       name: 'payment-confirmation.png',
       content: Buffer.from('screenshot-data'),
-      contentType: 'image/png',
+      type: 'image/png',
     });
   });
 

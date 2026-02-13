@@ -24,7 +24,7 @@ Attachments can be added to:
 ### From File Path
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
 test('Test with file attachment', async () => {
@@ -37,7 +37,7 @@ test('Test with file attachment', async () => {
 ### Multiple Files
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
 test('Test with multiple attachments', async () => {
@@ -60,14 +60,14 @@ test('Test with multiple attachments', async () => {
 ### Text Content
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
 test('Test with text attachment', async () => {
   await qase.attach({
     name: 'log.txt',
     content: 'Test execution log content',
-    contentType: 'text/plain',
+    type: 'text/plain',
   });
 
   expect(true).toBe(true);
@@ -77,7 +77,7 @@ test('Test with text attachment', async () => {
 ### Binary Content (Screenshots)
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 import fs from 'fs';
 
@@ -87,7 +87,7 @@ test('Test with binary attachment', async () => {
   await qase.attach({
     name: 'screenshot.png',
     content: screenshot,
-    contentType: 'image/png',
+    type: 'image/png',
   });
 
   expect(true).toBe(true);
@@ -97,7 +97,7 @@ test('Test with binary attachment', async () => {
 ### JSON Data
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
 test('Test with JSON attachment', async () => {
@@ -110,7 +110,7 @@ test('Test with JSON attachment', async () => {
   await qase.attach({
     name: 'test-data.json',
     content: JSON.stringify(data, null, 2),
-    contentType: 'application/json',
+    type: 'application/json',
   });
 
   expect(true).toBe(true);
@@ -124,7 +124,7 @@ test('Test with JSON attachment', async () => {
 Attach content to a specific test step:
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
 test('Test with step attachments', async () => {
@@ -134,7 +134,7 @@ test('Test with step attachments', async () => {
     await qase.attach({
       name: 'init-data.json',
       content: JSON.stringify(testData, null, 2),
-      contentType: 'application/json',
+      type: 'application/json',
     });
   });
 
@@ -142,7 +142,7 @@ test('Test with step attachments', async () => {
     await qase.attach({
       name: 'execution-log.txt',
       content: 'Test execution completed successfully',
-      contentType: 'text/plain',
+      type: 'text/plain',
     });
 
     expect(true).toBe(true);
@@ -163,20 +163,20 @@ Attach content to the test case.
 | `paths` | `string` or `string[]` | No* | Path(s) to file(s) to attach |
 | `content` | `string` or `Buffer` | No* | Content to attach |
 | `name` | `string` | No | Custom filename (auto-detected from path) |
-| `contentType` | `string` | No | MIME type (auto-detected from extension) |
+| `type` | `string` | No | MIME type (auto-detected from extension) |
 
 \* Either `paths` or `content` must be provided, but not both.
 
 **CommonJS:**
 ```javascript
-const { qase } = require('vitest-qase-reporter');
+const { qase } = require('vitest-qase-reporter/vitest');
 
 await qase.attach({ paths: './path/to/file.txt' });
 ```
 
 **ES Modules:**
 ```javascript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 
 await qase.attach({ paths: './path/to/file.txt' });
 ```
@@ -202,7 +202,7 @@ Common MIME types are auto-detected based on file extension:
 | `.pdf` | `application/pdf` |
 | `.zip` | `application/zip` |
 
-For other file types, specify `contentType` explicitly.
+For other file types, specify `type` explicitly.
 
 ---
 
@@ -211,7 +211,7 @@ For other file types, specify `contentType` explicitly.
 ### File Attachments
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 import fs from 'fs';
 
@@ -233,7 +233,7 @@ test('Test with generated file attachment', async () => {
 ### JSON Data Logging
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
 test('Test with structured data logging', async () => {
@@ -247,7 +247,7 @@ test('Test with structured data logging', async () => {
   await qase.attach({
     name: 'test-results.json',
     content: JSON.stringify(testResults, null, 2),
-    contentType: 'application/json',
+    type: 'application/json',
   });
 
   expect(testResults.passed).toBeGreaterThan(0);
@@ -257,7 +257,7 @@ test('Test with structured data logging', async () => {
 ### Binary Content
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { qase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
 test('Test with binary data attachment', async () => {
@@ -266,7 +266,7 @@ test('Test with binary data attachment', async () => {
   await qase.attach({
     name: 'test-image.png',
     content: imageData,
-    contentType: 'image/png',
+    type: 'image/png',
   });
 
   expect(imageData).toBeDefined();
@@ -299,7 +299,7 @@ Large attachments may slow down test execution. Consider:
 
 When attaching binary data, always specify:
 - `name` with appropriate extension
-- `contentType` if extension doesn't match content type
+- `type` if extension doesn't match content type
 
 ---
 
