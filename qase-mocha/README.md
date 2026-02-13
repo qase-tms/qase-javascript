@@ -275,9 +275,9 @@ For detailed configuration options and examples, see the [Extra Reporters sectio
 
 See the [examples directory](../examples/) for complete working examples:
 
-- [Single project example](../examples/mocha/)
-- [Multi-project example](../examples/multi/)
+- [Single project example](../examples/single/mocha/)
+- [Multi-project example](../examples/multiProject/mocha/)
 
 ## License
 
-Apache License 2.0. See [LICENSE](../LICENSE) for details.
+Apache License 2.0. See [LICENSE](LICENSE) for details.

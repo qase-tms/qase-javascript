@@ -59,7 +59,7 @@ Major release of the Mocha reporter package
 
 ## What's new
 
-- Added a `qase` function to allow specifying QaseID for tests.
+- Added a `Qase` function to allow specifying QaseID for tests.
 - Marked the old syntax for QaseID as deprecated.
 - Implemented functionality to capture console logs and include them as attachments in tests.
 

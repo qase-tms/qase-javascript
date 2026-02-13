@@ -16,7 +16,7 @@
 ## What's new
 
 - Fixed an issue where the test result was not uploaded to the Qase TMS when the test has skipped status.
-- Added a new function `qase` to set the test case ID.
+- Added a new function `Qase` to set the test case ID.
 - Marked the function `qase.id` as deprecated.
 
 # qase-wdio@1.1.0

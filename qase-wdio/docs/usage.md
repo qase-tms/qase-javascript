@@ -25,6 +25,7 @@ This guide provides comprehensive instructions for integrating Qase with Webdriv
 - [Troubleshooting](#troubleshooting)
 - [Complete Examples](#complete-examples)
 
+- [See Also](#see-also)
 ---
 
 ## Adding QaseID
@@ -646,7 +647,7 @@ npx wdio run wdio.conf.js
    ```json
    {
      "debug": true,
-     "mode": "testops"
+     "mode": "TestOps"
    }
    ```
 

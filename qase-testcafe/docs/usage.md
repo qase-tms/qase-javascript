@@ -23,6 +23,7 @@ This guide provides comprehensive instructions for integrating Qase with TestCaf
 - [Troubleshooting](#troubleshooting)
 - [Complete Examples](#complete-examples)
 
+- [See Also](#see-also)
 ---
 
 ## Adding QaseID
@@ -470,27 +471,27 @@ QASE_MODE=testops npx testcafe
 
 ### Reporter Not Found
 
-**Problem:** `Error: Reporter "qase" not found` or tests run without Qase reporting.
+**Problem:** `Error: Reporter "Qase" not found` or tests run without Qase reporting.
 
 **Solutions:**
 
 1. **Verify installation:**
    ```bash
-   npm list testcafe-reporter-qase
+   npm list testcafe-reporter-Qase
    ```
 
 2. **Reinstall if needed:**
    ```bash
-   npm install --save-dev testcafe-reporter-qase
+   npm install --save-dev testcafe-reporter-Qase
    ```
 
 3. **Check reporter name in command:**
    ```bash
    # Correct
-   npx testcafe chrome tests/ -r qase
+   npx testcafe chrome tests/ -r Qase
 
    # Incorrect
-   npx testcafe chrome tests/ -r testcafe-reporter-qase
+   npx testcafe chrome tests/ -r testcafe-reporter-Qase
    ```
 
 ### Tests Not Appearing in Qase
@@ -513,7 +514,7 @@ QASE_MODE=testops npx testcafe
    ```json
    {
      "debug": true,
-     "mode": "testops"
+     "mode": "TestOps"
    }
    ```
 
@@ -539,10 +540,10 @@ QASE_MODE=testops npx testcafe
 2. **Check import path:**
    ```javascript
    // Correct
-   import { qase } from 'testcafe-reporter-qase/qase';
+   import { Qase } from 'testcafe-reporter-qase/qase';
 
    // Incorrect
-   import { qase } from 'testcafe-reporter-qase';
+   import { Qase } from 'testcafe-reporter-Qase';
    ```
 
 ### Steps Not Reporting
@@ -1069,4 +1070,4 @@ my-project/
 
 - [Configuration Reference](../../qase-javascript-commons/README.md)
 - [TestCafe Documentation](https://testcafe.io/documentation)
-- [Example Tests](../../examples/testcafe/)
+- [Example Tests](../../examples/single/testcafe/)

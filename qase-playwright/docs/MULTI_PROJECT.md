@@ -170,7 +170,7 @@ test.describe('Multi-project test suite', () => {
 
 ### Results Not Appearing in All Projects
 
-* Ensure `mode` is `testops_multi` (not `testops`) and project codes in your code match the config
+* Ensure `mode` is `testops_multi` (not `TestOps`) and project codes in your code match the config
 * Check that project codes match config codes exactly (case-sensitive)
 * Ensure each project has a valid API token with write permissions
 * If results do not appear, check that `qase.projects()` is called (or the title/annotation is set) before the test body runs

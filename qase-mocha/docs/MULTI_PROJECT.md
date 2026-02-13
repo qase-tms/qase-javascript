@@ -147,7 +147,7 @@ describe('Multi-project test suite', function () {
 
 ### Results Not Appearing in All Projects
 
-* Verify `mode` is `testops_multi` (not `testops`) in reporter config
+* Verify `mode` is `testops_multi` (not `TestOps`) in reporter config
 * Check that project codes in `qase.projects()` match config codes exactly (case-sensitive)
 * Ensure each project has a valid API token with write permissions
 * Ensure the first argument to `it()` is the string returned by `qase.projects(mapping, name)`

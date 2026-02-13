@@ -234,7 +234,7 @@ Collection: API Tests
 
 #### Issue: Reporter not running
 
-**Solution:** Ensure you're using the `-r qase` flag:
+**Solution:** Ensure you're using the `-r Qase` flag:
 
 ```bash
 # Correct
@@ -274,7 +274,7 @@ pm.test("Test name", function () { /* ... */ });
 1. Check that `QASE_MODE=testops` is set
 2. Verify API token: `QASE_TESTOPS_API_TOKEN=your_token`
 3. Check project code: `QASE_TESTOPS_PROJECT=YOUR_PROJECT_CODE`
-4. Ensure reporter is specified: `-r qase`
+4. Ensure reporter is specified: `-r Qase`
 
 #### Issue: Cannot add custom fields or steps
 
@@ -324,7 +324,7 @@ npx newman run collection.json -r qase \
 If you encounter issues:
 
 1. Check the [GitHub Issues](https://github.com/qase-tms/qase-javascript/issues)
-2. Review the [CHANGELOG](../../CHANGELOG.md)
+2. Review the CHANGELOG
 3. Open a new issue with:
    - Current version (2.2.0)
    - Newman version
@@ -341,6 +341,6 @@ If you encounter issues:
 - [Usage Guide](usage.md)
 - [Configuration Reference](../../qase-javascript-commons/README.md)
 - [Multi-Project Support](MULTI_PROJECT.md)
-- [CHANGELOG](../../CHANGELOG.md)
+- CHANGELOG
 - [Newman Documentation](https://learning.postman.com/docs/collections/using-newman-cli/command-line-integration-with-newman/)
 - [Postman Documentation](https://learning.postman.com/docs/getting-started/introduction/)

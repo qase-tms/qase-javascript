@@ -24,6 +24,7 @@ This guide provides comprehensive instructions for integrating Qase with Playwri
 - [Troubleshooting](#troubleshooting)
 - [Complete Examples](#complete-examples)
 
+- [See Also](#see-also)
 ---
 
 ## Adding QaseID
@@ -779,12 +780,12 @@ test(qase(201, 'GET /users returns 200'), async () => {
 
 **Solutions:**
 
-1. Verify `mode` is set to `testops` in playwright.config.ts:
+1. Verify `mode` is set to `TestOps` in playwright.config.ts:
    ```typescript
    reporter: [
      [
        'playwright-qase-reporter',
-       { mode: 'testops', testops: { ... } }
+       { mode: 'TestOps', TestOps: { ... } }
      ],
    ]
    ```
@@ -795,7 +796,7 @@ test(qase(201, 'GET /users returns 200'), async () => {
 
 3. Verify project code is correct:
    ```typescript
-   testops: {
+   TestOps: {
      project: 'DEMO', // Check this matches your project
    }
    ```
@@ -804,7 +805,7 @@ test(qase(201, 'GET /users returns 200'), async () => {
    ```typescript
    {
      debug: true,
-     testops: { ... }
+     TestOps: { ... }
    }
    ```
 
@@ -828,11 +829,11 @@ test(qase(201, 'GET /users returns 200'), async () => {
 
 ### Qase Object Not Available in Tests
 
-**Problem:** `qase is not defined` or `Cannot read property 'id' of undefined`
+**Problem:** `Qase is not defined` or `Cannot read property 'id' of undefined`
 
 **Solutions:**
 
-1. Import qase at the top of your test file:
+1. Import Qase at the top of your test file:
    ```typescript
    import { qase } from 'playwright-qase-reporter';
    ```
@@ -869,7 +870,7 @@ test(qase(201, 'GET /users returns 200'), async () => {
 
 1. Verify `uploadAttachments` is enabled:
    ```typescript
-   testops: {
+   TestOps: {
      uploadAttachments: true,
    }
    ```

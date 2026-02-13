@@ -16,6 +16,8 @@ This guide provides comprehensive instructions for integrating Qase with Newman 
 - [Integration Patterns](#integration-patterns)
 - [Common Use Cases](#common-use-cases)
 
+- [Limitations](#limitations)
+- [See Also](#see-also)
 ---
 
 ## Adding QaseID
@@ -299,7 +301,7 @@ newman run ./api-tests.json \
 
 **Solutions:**
 
-1. **Verify mode is set to testops:**
+1. **Verify mode is set to TestOps:**
    ```bash
    # Check environment variable
    echo $QASE_MODE  # Should output: testops
@@ -322,7 +324,7 @@ newman run ./api-tests.json \
    ```json
    {
      "debug": true,
-     "testops": {
+     "TestOps": {
        "api": { "token": "..." },
        "project": "DEMO"
      }
@@ -405,18 +407,18 @@ newman run ./api-tests.json \
 
 ### Reporter Not Found
 
-**Problem:** `Error: Reporter "qase" not found`.
+**Problem:** `Error: Reporter "Qase" not found`.
 
 **Solutions:**
 
 1. **Install the reporter:**
    ```bash
-   npm install --save-dev newman-reporter-qase
+   npm install --save-dev newman-reporter-Qase
    ```
 
 2. **Verify installation:**
    ```bash
-   npm list newman-reporter-qase
+   npm list newman-reporter-Qase
    ```
 
 3. **Check Node.js and Newman versions:**
@@ -730,4 +732,4 @@ Individual tests cannot be excluded from reporting.
 - [Configuration Reference](../../qase-javascript-commons/README.md)
 - [Newman Documentation](https://www.npmjs.com/package/newman)
 - [Postman Collection Format](https://schema.postman.com/)
-- [Example Collections](../../examples/newman/)
+- [Example Collections](../../examples/single/newman/)

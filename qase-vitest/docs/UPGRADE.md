@@ -303,7 +303,7 @@ Or configure `mode: 'testops'` in your `vitest.config.ts` or `qase.config.json`.
 **Solution:** Check that:
 1. API token is set: `process.env.QASE_API_TOKEN`
 2. Project code is correct: `project: 'YOUR_PROJECT_CODE'`
-3. Mode is set to testops: `mode: 'testops'`
+3. Mode is set to TestOps: `mode: 'TestOps'`
 4. Reporter is in the `reporters` array in vitest.config.ts
 
 #### Issue: Configuration format errors
@@ -327,7 +327,7 @@ Or configure `mode: 'testops'` in your `vitest.config.ts` or `qase.config.json`.
 If you encounter issues:
 
 1. Check the [GitHub Issues](https://github.com/qase-tms/qase-javascript/issues)
-2. Review the [CHANGELOG](../../CHANGELOG.md)
+2. Review the CHANGELOG
 3. Open a new issue with:
    - Current version (1.1.0)
    - Vitest version
@@ -342,5 +342,5 @@ If you encounter issues:
 - [Usage Guide](usage.md)
 - [Configuration Reference](../../qase-javascript-commons/README.md)
 - [Multi-Project Support](MULTI_PROJECT.md)
-- [CHANGELOG](../../CHANGELOG.md)
+- CHANGELOG
 - [Vitest Documentation](https://vitest.dev/)

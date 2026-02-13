@@ -104,7 +104,7 @@ If a test does not use `qase.projects()` and has no `(Qase PROJ: ids)` markers i
 ## Important Notes
 
 1. **Project codes must match**: The project codes in `qase.projects({ PROJ1: [1], ... })` must exactly match the codes in `testops_multi.projects[].code`.
-2. **Mode requirement**: Set `mode` to `testops_multi` in your reporter config. Single-project mode (`testops`) does not use project mapping.
+2. **Mode requirement**: Set `mode` to `testops_multi` in your reporter config. Single-project mode (`TestOps`) does not use project mapping.
 3. **Cucumber/BDD**: When using Cypress with Cucumber (e.g. `@badeball/cypress-cucumber-preprocessor`), use tags in feature files: `@qaseid.PROJ1(1) @qaseid.PROJ2(2)`. See [Cucumber documentation](cucumber.md).
 4. **API tokens**: Each project in `testops_multi.projects[]` can have its own API token for separate authentication.
 

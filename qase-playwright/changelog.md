@@ -289,7 +289,7 @@ Right now, the reporter will convert all parameters to strings before sending th
 
 ## What's new
 
-- Using the `qase` annotation in a chain
+- Using the `Qase` annotation in a chain
 
 ```js
 test('Ultimate Question of Life, The Universe, and Everything', async ({ page }) => {

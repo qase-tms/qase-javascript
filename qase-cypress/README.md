@@ -287,10 +287,10 @@ QASE_MODE=testops QASE_TESTOPS_PROJECT=DEMO npx cypress run
 
 See the [examples directory](../examples/) for complete working examples:
 
-- [Single project example](../examples/cypress/)
-- [Cucumber (badeball) example](../examples/cypressBadeballCucumber/)
-- [Cucumber (legacy) example](../examples/cypressCucumber/)
+- [Single project example](../examples/single/cypress/)
+- [Cucumber (badeball) example](../examples/single/cypressBadeballCucumber/)
+- [Cucumber (legacy) example](../examples/single/cypressCucumber/)
 
 ## License
 
-Apache License 2.0. See [LICENSE](../LICENSE) for details.
+Apache License 2.0. See [LICENSE](LICENSE) for details.

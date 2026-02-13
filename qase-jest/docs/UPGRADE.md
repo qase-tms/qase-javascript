@@ -105,7 +105,7 @@ const { qase } = require('jest-qase-reporter/jest');
 import { qase } from 'jest-qase-reporter/jest';
 ```
 
-**Note:** The `/jest` subpath is required to access the `qase` helper function for test annotations.
+**Note:** The `/jest` subpath is required to access the `Qase` helper function for test annotations.
 
 ---
 
@@ -220,7 +220,7 @@ const { qase } = require('jest-qase-reporter');
 QASE_MODE=testops npx jest
 ```
 
-Or configure `mode: 'testops'` in your reporter options.
+Or configure `mode: 'TestOps'` in your reporter options.
 
 #### Issue: Configuration not recognized
 
@@ -243,7 +243,7 @@ Or configure `mode: 'testops'` in your reporter options.
 If you encounter issues:
 
 1. Check the [GitHub Issues](https://github.com/qase-tms/qase-javascript/issues)
-2. Review the [CHANGELOG](../../CHANGELOG.md)
+2. Review the CHANGELOG
 3. Open a new issue with:
    - Current version (2.2.0)
    - Error messages
@@ -257,4 +257,4 @@ If you encounter issues:
 - [Usage Guide](usage.md)
 - [Configuration Reference](../../qase-javascript-commons/README.md)
 - [Multi-Project Support](MULTI_PROJECT.md)
-- [CHANGELOG](../../CHANGELOG.md)
+- CHANGELOG
