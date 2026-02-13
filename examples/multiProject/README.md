@@ -184,11 +184,37 @@ Project codes (e.g. `PROJ1`, `PROJ2`) must match `testops_multi.projects[].code`
 
 When you run the examples:
 
-1. **Test runs are created** in each configured project (e.g. DEVX and DEMO).
+1. **Test runs are created** in each configured project (e.g. PROJ1 and PROJ2).
 2. **Test results are sent** to the appropriate projects based on the mapping you specify.
 3. **Each project has its own test run** with the title and description from config.
-4. **Results appear** in both projects’ dashboards.
+4. **Results appear** in both projects' dashboards.
 5. **Tests without any Qase ID** are sent to the `default_project` without linking to a test case.
+
+## Expected Behavior by Framework
+
+### CucumberJS
+* Uses Gherkin tag syntax: `@qaseid.PROJ1(1)` and `@qaseid.PROJ2(2)` in feature files
+* Each scenario can be reported to multiple projects using separate tags
+* Native Gherkin Given/When/Then steps are automatically captured
+* Attachments via `this.attach()` in step definitions
+
+### Newman
+* Uses comment-based markers: `// qase PROJ1: 1` and `// qase PROJ2: 2` in test scripts
+* Multiple comments before `pm.test()` map the same test to multiple projects
+* No programmatic steps or attachments API (Postman limitation)
+* Collection structure determines test organization
+
+### TestCafe
+* Uses builder pattern: `test.meta(qase.projects({ PROJ1: [1], PROJ2: [2] }).create())`
+* Chaining supported: `qase.projects({...}).title('...').fields({...}).create()`
+* Nested steps use callback parameter (s, s1, s2) for hierarchy
+* Attachments use `type` parameter (not `contentType`)
+
+### WDIO
+* **Mocha/Jasmine mode:** `it(qase.projects({ PROJ1: [1], PROJ2: [2] }, 'Test name'), () => {...})`
+* **Cucumber mode:** Uses Gherkin tags like CucumberJS
+* Supports both programmatic steps and Gherkin steps depending on framework
+* Reporter options: `disableWebdriverStepsReporting`, `useCucumber`
 
 ## Mapping Tests to Projects (Summary)
 
