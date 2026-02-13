@@ -1,39 +1,68 @@
-# Qase TestOps Vitest reporter
+# [Qase TestOps](https://qase.io) Vitest Reporter
 
-Qase Vitest reporter sends test results and metadata to Qase.io.
-It can work in different test automation scenarios:
+[![License](https://lxgaming.github.io/badges/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
-* Create new test cases in Qase from existing autotests.
-* Report Vitest test results to existing test cases in Qase.
+Qase Vitest Reporter enables seamless integration between your Vitest tests and [Qase TestOps](https://qase.io), providing automatic test result reporting, test case management, and comprehensive test analytics.
 
-Testing frameworks that use Vitest as a test runner can also be used with Vitest reporter.
+## Features
 
-To install the latest version, run:
+- Link automated tests to Qase test cases by ID
+- Auto-create test cases from your test code
+- Report test results with rich metadata (fields, attachments, steps)
+- Support for parameterized tests
+- Multi-project reporting support
+- Flexible configuration (file, environment variables, Vitest config)
 
-```shell
-npm install vitest-qase-reporter
+## Installation
+
+```sh
+npm install --save-dev vitest-qase-reporter
 ```
 
-# Contents
+## Quick Start
 
-- [Qase TestOps Vitest reporter](#qase-testops-vitest-reporter)
-- [Contents](#contents)
-  - [Getting started](#getting-started)
-  - [Using Reporter](#using-reporter)
-    - [Metadata](#metadata)
-    - [Advanced Usage with Annotations](#advanced-usage-with-annotations)
-  - [Configuration](#configuration)
-  - [Documentation](#documentation)
-  - [Requirements](#requirements)
+**1. Create `qase.config.json` in your project root:**
 
-## Getting started
+```json
+{
+  "mode": "testops",
+  "testops": {
+    "project": "YOUR_PROJECT_CODE",
+    "api": {
+      "token": "YOUR_API_TOKEN"
+    }
+  }
+}
+```
 
-To report your tests results to Qase, install `qase-vitest`,
-and add a reporter config in the `vitest.config.ts` file.
-A minimal configuration needs just two things:
+**2. Add Qase ID to your test:**
 
-* Qase project code, for example, in https://app.qase.io/project/DEMO the code is `DEMO`.
-* Qase API token, created on the [Apps page](https://app.qase.io/apps?app=vitest-reporter).
+```typescript
+import { qase } from 'vitest-qase-reporter';
+import { test, expect } from 'vitest';
+
+test(qase(1, 'Test name'), () => {
+  expect(true).toBe(true);
+});
+```
+
+**3. Run your tests:**
+
+```sh
+npx vitest run
+```
+
+## Configuration
+
+The reporter is configured via (in order of priority):
+
+1. **vitest.config.ts** (Vitest-specific, highest priority)
+2. **Environment variables** (`QASE_*`)
+3. **Config file** (`qase.config.json`)
+
+### Vitest Configuration
+
+Add the reporter to your `vitest.config.ts`:
 
 ```typescript
 import { defineConfig } from 'vitest/config';
@@ -59,221 +88,157 @@ export default defineConfig({
 });
 ```
 
-Now, run the Vitest tests as usual.
-Test results will be reported to a new test run in Qase.
+### Minimal Configuration
 
-```console
-$ npx vitest run
-Determining test suites to run...
-...
-qase: Project DEMO exists
-qase: Using run 42 to publish test results
-...
+| Option | Environment Variable | Description |
+|--------|---------------------|-------------|
+| `mode` | `QASE_MODE` | Set to `testops` to enable reporting |
+| `testops.project` | `QASE_TESTOPS_PROJECT` | Your Qase project code |
+| `testops.api.token` | `QASE_TESTOPS_API_TOKEN` | Your Qase API token |
 
-Ran all test suites.
+### Example `qase.config.json`
+
+```json
+{
+  "mode": "testops",
+  "fallback": "report",
+  "testops": {
+    "project": "YOUR_PROJECT_CODE",
+    "api": {
+      "token": "YOUR_API_TOKEN"
+    },
+    "run": {
+      "title": "Vitest Automated Run"
+    },
+    "batch": {
+      "size": 100
+    }
+  },
+  "report": {
+    "driver": "local",
+    "connection": {
+      "local": {
+        "path": "./build/qase-report",
+        "format": "json"
+      }
+    }
+  }
+}
 ```
 
-## Using Reporter
+> **Full configuration reference:** See [qase-javascript-commons](../qase-javascript-commons/README.md) for all available options including logging, status mapping, execution plans, and more.
 
-The Vitest reporter has the ability to auto-generate test cases
-and suites from your test data.
+## Usage
 
-But if necessary, you can independently register the ID of already
-existing test cases from TMS before the executing tests. For example:
+### Link Tests with Test Cases
 
-### Metadata
+Associate your tests with Qase test cases using test case IDs:
 
-- `qase.title` - set the title of the test case
-- `qase.fields` - set the fields of the test case
-- `qase.suite` - set the suite of the test case
-- `qase.comment` - set the comment of the test case
-- `qase.parameters` - set the parameters of the test case
-- `qase.groupParameters` - set the group parameters of the test case
-- `qase.ignore` - ignore the test case in Qase. The test will be executed, but the results will not be sent to Qase.
-- `qase.step` - create a step in the test case
-- `qase.attach` - attach a file to the test case
-
+**Single ID:**
 ```typescript
-import { describe, it, test, expect } from 'vitest';
-import { addQaseId, withQase } from 'vitest-qase-reporter/vitest';
+import { qase } from 'vitest-qase-reporter';
+import { test, expect } from 'vitest';
 
-describe('My First Test', () => {
-  test(addQaseId('Several ids', [1, 2]), () => {
-    expect(true).toBe(true);
-  });
-
-  test(addQaseId('Correct test', [3]), () => {
-    expect(true).toBe(true);
-  });
-
-  test.skip(addQaseId('Skipped test', [4]), () => {
-    expect(true).toBe(true);
-  });
-
-  test(addQaseId('Failed test', ['5', '6']), () => {
-    expect(true).toBe(false);
-  });
+test(qase(1, 'Test name'), () => {
+  expect(true).toBe(true);
 });
 ```
 
-### Advanced Usage with Annotations
-
+**Multiple IDs:**
 ```typescript
-import { describe, it, expect } from 'vitest';
-import { addQaseId, withQase } from 'vitest-qase-reporter/vitest';
-
-describe('Qase Annotations Example', () => {
-  it(addQaseId(20, 'Basic test with qase ID'), () => {
-    expect(1 + 1).toBe(2);
-  });
-
-  it('Test with qase annotations', withQase(async ({ qase, annotate }) => {
-    // Set test title
-    await qase.title('Advanced Test with Annotations');
-    
-    // Add comment
-    await qase.comment('This test demonstrates qase annotations functionality');
-    
-    // Set suite
-    await qase.suite('Vitest Integration Suite');
-    
-    // Set fields
-    await qase.fields({
-      description: 'Test description for Qase',
-      severity: 'critical',
-      priority: 'high',
-      layer: 'e2e'
-    });
-    
-    // Set parameters
-    await qase.parameters({
-      environment: 'staging',
-      browser: 'chrome',
-      version: '1.0.0'
-    });
-    
-    // Add steps
-    await qase.step('Initialize test data', async () => {
-      expect(true).toBe(true);
-    });
-    
-    await qase.step('Execute main test logic', async () => {
-      expect(2 + 2).toBe(4);
-    });
-    
-    // Add attachment with content
-    await qase.attach({
-      name: 'test-data.json',
-      content: JSON.stringify({ test: 'data' }),
-      type: 'application/json'
-    });
-    
-    // Use regular annotate for custom annotations
-    await annotate('Custom annotation message', 'info');
-    
-    // Final assertion
-    expect(Math.max(1, 2, 3)).toBe(3);
-  }));
+test(qase([1, 2], 'Test covering multiple cases'), () => {
+  expect(true).toBe(true);
 });
 ```
 
-To run tests and create a test run, execute the command (for example from folder examples):
+### Add Metadata
 
-```bash
+Enhance your tests with additional information:
+
+```typescript
+import { qase } from 'vitest-qase-reporter';
+import { test, expect } from 'vitest';
+
+test('Test with metadata', async () => {
+  qase.title('Custom test title');
+
+  qase.fields({
+    severity: 'critical',
+    priority: 'high',
+    layer: 'api',
+    description: 'Tests core authentication flow',
+  });
+
+  qase.suite('Authentication / Login');
+
+  expect(true).toBe(true);
+});
+```
+
+### Ignore Tests
+
+Exclude specific tests from Qase reporting (test still runs, but results are not sent):
+
+```typescript
+test('Test not reported to Qase', () => {
+  qase.ignore();
+  expect(true).toBe(true);
+});
+```
+
+### Test Result Statuses
+
+| Vitest Result | Qase Status |
+|---------------|-------------|
+| Passed | Passed |
+| Failed | Failed |
+| Skipped | Skipped |
+
+> For more usage examples, see the [Usage Guide](docs/usage.md).
+
+## Running Tests
+
+**Basic test execution:**
+```sh
+npx vitest run
+```
+
+**With environment variables:**
+```sh
 QASE_MODE=testops npx vitest run
 ```
 
-or
-
-```bash
-npm test
+**With reporter enabled via config:**
+```sh
+npx vitest run --reporter=vitest-qase-reporter
 ```
 
-A test run will be performed and available at:
-
-```
-https://app.qase.io/run/QASE_PROJECT_CODE
-```
-
-### Multi-Project Support
-
-Qase Vitest Reporter supports sending test results to multiple Qase projects simultaneously. You can specify different test case IDs for each project using `addQaseProjects(name, mapping)`.
-
-For detailed information, configuration, and examples, see the [Multi-Project Support Guide](docs/MULTI_PROJECT.md).
-
-## Configuration
-
-Reporter options (* - required):
-
-- `mode` - `testops`/`off` Enables reporter, default - `off`
-- `debug` - Enables debug logging, default - `false`
-- `environment` - To execute with the sending of the environment information
-- `captureLogs` - Capture console logs, default - `false`
-- `uploadAttachments` - Upload attachments to Qase, default - `false`
-- *`testops.api.token` - Token for API access, you can generate it [here](https://developers.qase.io/#authentication).
-- *`testops.project` - [Your project's code](https://help.qase.io/en/articles/9787250-how-do-i-find-my-project-code)
-- `testops.api.baseUrl` - Qase API base URL (optional)
-- `testops.run.id` - Qase test run ID, used when the test run was created earlier using CLI or API call.
-- `testops.run.title` - Set custom Run name, when new run is created
-- `testops.run.description` - Set custom Run description, when new run is created
-- `testops.run.complete` - Whether the run should be completed
-
-Example `vitest.config.ts` config:
-
-```typescript
-import { defineConfig } from 'vitest/config';
-
-export default defineConfig({
-  test: {
-    reporters: [
-      'default',
-      [
-        'vitest-qase-reporter',
-        {
-          mode: 'testops',
-          testops: {
-            api: {
-              token: 'api_key'
-            },
-            project: 'project_code',
-            run: {
-              complete: true,
-            },
-            uploadAttachments: true,
-          },
-          debug: true,
-          captureLogs: true,
-        },
-      ],
-    ],
-  },
-});
+**Watch mode (note: reporting happens on full run completion):**
+```sh
+npx vitest
 ```
 
-You can check example configuration with multiple reporters in [example project](../examples/vitest/vitest.config.ts).
-
-Supported ENV variables:
-
-- `QASE_MODE` - Same as `mode`
-- `QASE_DEBUG` - Same as `debug`
-- `QASE_ENVIRONMENT` - Same as `environment`
-- `QASE_TESTOPS_API_TOKEN` - Same as `testops.api.token`
-- `QASE_TESTOPS_PROJECT` - Same as `testops.project`
-- `QASE_TESTOPS_RUN_ID` - Pass Run ID from ENV and override reporter option `testops.run.id`
-- `QASE_TESTOPS_RUN_TITLE` - Same as `testops.run.title`
-- `QASE_TESTOPS_RUN_DESCRIPTION` - Same as `testops.run.description`
-
-## Documentation
-
-For detailed documentation and advanced usage, see [USAGE.md](./docs/usage.md).
+> **Note:** Vitest is ESM-first and uses Jest-compatible API. If you're migrating from Jest, the qase wrapper syntax is identical.
 
 ## Requirements
 
-We maintain the reporter on LTS versions of Node. You can find the current versions by following
-the [link](https://nodejs.org/en/about/releases/)
+- Node.js >= 14
+- Vitest >= 3.0.0
 
-`vitest >= 3.0.0`
+## Documentation
 
-<!-- references -->
+| Guide | Description |
+|-------|-------------|
+| [Usage Guide](docs/usage.md) | Complete usage reference with all methods and options |
+| [Attachments](docs/ATTACHMENTS.md) | Adding screenshots, logs, and files to test results |
+| [Steps](docs/STEPS.md) | Defining test steps for detailed reporting |
+| [Multi-Project Support](docs/MULTI_PROJECT.md) | Reporting to multiple Qase projects |
+| [Upgrade Guide](docs/UPGRADE.md) | Migration guide for breaking changes |
 
-[auth]: https://developers.qase.io/#authentication
+## Examples
+
+See the [examples directory](../examples/) for complete working examples.
+
+## License
+
+Apache License 2.0. See [LICENSE](../LICENSE) for details.
