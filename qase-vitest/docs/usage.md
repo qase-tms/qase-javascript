@@ -1,286 +1,835 @@
-# Qase Syntax
+# Qase Integration in Vitest
 
-> [**Click here**](../../examples/vitest) to view Example tests for the following syntax.
+This guide provides comprehensive instructions for integrating Qase with Vitest.
 
-Here is the complete list of syntax options available for the reporter:
-- [Qase Id](#qase-id)
-- [Qase Title](#qase-title)
-- [Steps](#steps)
-- [Fields](#fields)
-- [Suite](#suite)
-- [Parameters](#parameters)
-- [Comment](#comment)
-- [Attach](#attach)
-- [Ignore](#ignore)
+> **Configuration:** For complete configuration reference including all available options, environment variables, and examples, see the [qase-javascript-commons README](../../qase-javascript-commons/README.md).
 
-If you do not use any Qase syntax, the reporter uses the title from the `describe` and `it`/`test` functions as the Suite and Test case title respectively, when publishing results.
-
-<br>
-
-### Import Statement
----
-Add the following statement at the beginning of your spec file, before any tests.
-
-```typescript
-import { qase, withQase } from 'vitest-qase-reporter/vitest';
-```
-<br>
-
-### Qase ID
 ---
 
-You can link one or more Qase Ids to a test.
+## Table of Contents
+
+- [Adding QaseID](#adding-qaseid)
+- [Adding Title](#adding-title)
+- [Adding Fields](#adding-fields)
+- [Adding Suite](#adding-suite)
+- [Ignoring Tests](#ignoring-tests)
+- [Muting Tests](#muting-tests)
+- [Working with Attachments](#working-with-attachments)
+- [Working with Steps](#working-with-steps)
+- [Working with Parameters](#working-with-parameters)
+- [Multi-Project Support](#multi-project-support)
+- [Running Tests](#running-tests)
+- [Complete Examples](#complete-examples)
+- [Troubleshooting](#troubleshooting)
+- [Integration Patterns](#integration-patterns)
+- [Common Use Cases](#common-use-cases)
+
+---
+
+## Adding QaseID
+
+Link your automated tests to existing test cases in Qase by specifying the test case ID.
+
+### Single ID
 
 ```typescript
-it(qase(1, "A test with Qase Id"), () => {
-    // test logic
+import { qase } from 'vitest-qase-reporter';
+import { test, expect } from 'vitest';
+
+test(qase(1, 'Test name'), () => {
+  expect(true).toBe(true);
 });
+```
 
-it(qase(['2', '3'], "A test with multiple Qase Ids"), () => {
-    // test logic
+### Multiple IDs
+
+```typescript
+import { qase } from 'vitest-qase-reporter';
+import { test, expect } from 'vitest';
+
+test(qase([1, 2, 3], 'Test covering multiple cases'), () => {
+  expect(true).toBe(true);
 });
 ```
 
-<br>
+### Multi-Project Support
 
-### Qase Title
---- 
+To send test results to multiple Qase projects simultaneously, see the [Multi-Project Support Guide](MULTI_PROJECT.md).
 
-The `qase.title()` method is used to set the title of a test case, both when creating a new test case from the result, and when updating the title of an existing test case - *if used with `qase.id()`.*
-
-```typescript
-it("This won't appear in Qase", withQase(async ({ qase }) => {
-  await qase.title("This text will be the title of the test, in Qase");
-    // Test logic here
-}));
-```
-
-If you don't explicitly set a title using this method, the title specified in the `it(..)` function will be used for creating new test cases. However, if this method is defined, it always takes precedence and overrides the title from the `it(..)` function.
-
-<br>
-
-### Steps
---- 
-
-The reporter uses the title from the `qase.step` function as the step title. By providing clear and descriptive step names, you make it easier to understand the test's flow when reviewing the test case.
-
-Additionally, these steps get their own result in the Qase Test run, offering a well-organized summary of the test flow. This helps quickly identify the cause of any failures.
-
-You can also provide an expected result and input data for each step, which will be displayed in Qase.
-
-```typescript
-it('A Test case with steps, updated from code', withQase(async ({ qase }) => {
-  await qase.step('Initialize the environment', async () => {
-    // Set up test environment
-  });
-  await qase.step('Test Core Functionality of the app', async () => {
-    // Exercise core functionality
-  });
-
-  await qase.step('Verify Expected Behavior of the app', async () => {
-    // Assert expected behavior
-  });
-}));
-```
-
-#### Steps with Expected Result and Data
-
-```typescript
-it('A Test case with steps including expected results and data', withQase(async ({ qase }) => {
-  await qase.step('Click button', async () => {
-    // Click action
-  }, 'Button should be clicked', 'Button data');
-  
-  await qase.step('Fill form', async () => {
-    // Form filling action
-  }, 'Form should be filled', 'Form input data');
-}));
-```
-<br>
-
-### Fields
 ---
 
-You can define the `description`, `pre-conditions`, `post-conditions`, and fields such as `severity`, `priority`, and `layer` using this method, which enables you to specify and maintain the context of the case directly within your code.
+## Adding Title
+
+Set a custom title for the test case (overrides auto-generated title):
 
 ```typescript
-it('Maintain your test meta-data from code', withQase(async ({ qase }) => {
-  await qase.fields({
-    severity: 'high',
-    priority: 'medium',
+import { qase } from 'vitest-qase-reporter';
+import { test, expect } from 'vitest';
+
+test('Test with custom title', () => {
+  qase.title('User can successfully complete checkout');
+  expect(true).toBe(true);
+});
+```
+
+---
+
+## Adding Fields
+
+Add metadata to your test cases using fields. Both system and custom fields are supported.
+
+### System Fields
+
+| Field | Description | Example Values |
+|-------|-------------|----------------|
+| `description` | Test case description | Any text |
+| `preconditions` | Test preconditions | Any text (supports Markdown) |
+| `postconditions` | Test postconditions | Any text |
+| `severity` | Test severity | `blocker`, `critical`, `major`, `normal`, `minor`, `trivial` |
+| `priority` | Test priority | `high`, `medium`, `low` |
+| `layer` | Test layer | `e2e`, `api`, `unit` |
+
+### Example
+
+```typescript
+import { qase } from 'vitest-qase-reporter';
+import { test, expect } from 'vitest';
+
+test('Test with fields', () => {
+  qase.fields({
+    severity: 'critical',
+    priority: 'high',
     layer: 'api',
-    precondition: 'add your precondition',
-    postcondition: 'add your postcondition',
-    description: `Code it quick, fix it slow,
-                  Tech debt grows where shortcuts go,
-                  Refactor later? Ha! We know.`
+    description: 'Tests core authentication flow',
+    preconditions: 'User database must be seeded with test data',
+    postconditions: 'Test user is deleted after test completion',
   });
-    //  test logic here
-}));
+
+  expect(true).toBe(true);
+});
 ```
 
-<br>
-
-
-### Suite 
 ---
 
-You can use this method to nest the resulting test cases in a particular suite. There's something to note here – suites, unlike test cases, are not identified uniquely by the Reporter. Therefore, when defining an existing suite - the title of the suite is used for matching.
+## Adding Suite
+
+Organize tests into suites and sub-suites:
+
+### Simple Suite
 
 ```typescript
-it("Test with a defined suite", withQase(async ({ qase }) => {
-  await qase.suite("Suite defined with qase.suite()");
-    /*
-     *  Or, nest multiple levels of suites. 
-     *  `\t` is used for dividing each suite name.
-     */
-}));
+import { qase } from 'vitest-qase-reporter';
+import { test, expect } from 'vitest';
 
-it("Test with a nested suite", withQase(async ({ qase }) => {
-  await qase.suite("Application\tAuthentication\tLogin\tEdge_case");
-  //  test logic here
-}));
+test('Test in a suite', () => {
+  qase.suite('Authentication');
+  expect(true).toBe(true);
+});
 ```
-<br>
 
-### Parameters
----
-Parameters are a great way to make your tests more dynamic, reusable, and data-driven. By defining parameters in this method, you can ensure only one test case with all the parameters is created in your Qase project, avoiding duplication.
-
+### Nested Suites
 
 ```typescript
-const testCases = [
-  { browser: "Chromium", username: "@alice", password: "123" },
-  { browser: "Firefox", username: "@bob", password: "456" },
-  { browser: "Webkit", username: "@charlie", password: "789" },
+import { qase } from 'vitest-qase-reporter';
+import { test, expect } from 'vitest';
+
+test('Test in nested suites', () => {
+  qase.suite('Application\tAuthentication\tLogin\tEdge Cases');
+  expect(true).toBe(true);
+});
+```
+
+---
+
+## Ignoring Tests
+
+Exclude a test from Qase reporting. The test still executes, but results are not sent to Qase:
+
+```typescript
+import { qase } from 'vitest-qase-reporter';
+import { test, expect } from 'vitest';
+
+test('Test not reported to Qase', () => {
+  qase.ignore();
+  expect(true).toBe(true);
+});
+```
+
+---
+
+## Muting Tests
+
+Mark a test as muted. Muted tests are reported but do not affect the test run status:
+
+```typescript
+import { qase } from 'vitest-qase-reporter';
+import { test, expect } from 'vitest';
+
+test('Muted test', () => {
+  qase.mute();
+  expect(true).toBe(true);
+});
+```
+
+---
+
+## Working with Attachments
+
+Attach files, screenshots, logs, and other content to your test results.
+
+### Attach File from Path
+
+```typescript
+import { qase } from 'vitest-qase-reporter';
+import { test, expect } from 'vitest';
+
+test('Test with file attachment', () => {
+  qase.attach({ paths: './test-data/screenshot.png' });
+  expect(true).toBe(true);
+});
+```
+
+### Attach Multiple Files
+
+```typescript
+test('Test with multiple attachments', () => {
+  qase.attach({
+    paths: [
+      './test-data/log.txt',
+      './test-data/config.json',
+      './test-data/screenshot.png',
+    ],
+  });
+  expect(true).toBe(true);
+});
+```
+
+### Attach Content from Code
+
+```typescript
+test('Test with inline content', () => {
+  qase.attach({
+    name: 'test-log.txt',
+    content: 'Test execution log content',
+    contentType: 'text/plain',
+  });
+
+  qase.attach({
+    name: 'data.json',
+    content: JSON.stringify({ test: 'data', status: 'passed' }),
+    contentType: 'application/json',
+  });
+
+  expect(true).toBe(true);
+});
+```
+
+### Attach to Specific Step
+
+```typescript
+test('Test with step-specific attachment', async () => {
+  await qase.step('Capture screenshot', async () => {
+    const screenshot = Buffer.from('image-data', 'base64');
+    qase.attach({
+      name: 'screenshot.png',
+      content: screenshot,
+      contentType: 'image/png',
+    });
+  });
+
+  expect(true).toBe(true);
+});
+```
+
+### Supported MIME Types
+
+Common MIME types are auto-detected. You can also specify explicitly:
+
+| Extension | MIME Type |
+|-----------|-----------|
+| `.png` | `image/png` |
+| `.jpg`, `.jpeg` | `image/jpeg` |
+| `.gif` | `image/gif` |
+| `.txt` | `text/plain` |
+| `.json` | `application/json` |
+| `.xml` | `application/xml` |
+| `.html` | `text/html` |
+| `.pdf` | `application/pdf` |
+
+> For more details, see [Attachments Guide](ATTACHMENTS.md).
+
+---
+
+## Working with Steps
+
+Define test steps for detailed reporting in Qase.
+
+### Using Async Function
+
+```typescript
+import { qase } from 'vitest-qase-reporter';
+import { test, expect } from 'vitest';
+
+test('Test with steps', async () => {
+  await qase.step('Initialize the environment', async () => {
+    // Setup code
+  });
+
+  await qase.step('Test Core Functionality', async () => {
+    // Test logic
+  });
+
+  await qase.step('Verify Expected Behavior', async () => {
+    // Assertions
+  });
+});
+```
+
+### Nested Steps
+
+```typescript
+test('Test with nested steps', async () => {
+  await qase.step('Parent step', async () => {
+    await qase.step('Child step 1', async () => {
+      // Nested step logic
+    });
+
+    await qase.step('Child step 2', async () => {
+      // Another nested step
+    });
+  });
+});
+```
+
+### Steps with Expected Result
+
+```typescript
+test('Test with step metadata', async () => {
+  await qase.step(
+    'Click login button',
+    async () => {
+      // Click action
+    },
+    'Button should be clicked',  // Expected result
+    'Button data'                 // Data
+  );
+});
+```
+
+> For more details, see [Steps Guide](STEPS.md).
+
+---
+
+## Working with Parameters
+
+Report parameterized test data to Qase.
+
+### Basic Parameterized Test
+
+```typescript
+import { qase } from 'vitest-qase-reporter';
+import { test, expect, describe } from 'vitest';
+
+const browsers = ['Chrome', 'Firefox', 'Safari'];
+
+describe('Browser compatibility tests', () => {
+  test.each(browsers)('Test on %s', (browser) => {
+    qase.title(`Test on ${browser}`);
+    qase.parameters({ browser });
+    expect(true).toBe(true);
+  });
+});
+```
+
+### Group Parameters
+
+```typescript
+const testData = [
+  { username: 'user1', password: 'pass1' },
+  { username: 'user2', password: 'pass2' },
 ];
 
-testCases.forEach(({ browser, username, password }) => {
-  it(`Test login with ${browser}`, withQase(async ({ qase }) => {
-    await qase.title("Verify if page loads on all browsers");
-
-    await qase.parameters({ Browser: browser });  // Single parameter
-  // test logic
-  }));
-});
-
-testCases.forEach(({ username, password }) => {
-  it(`Test login with ${username} using qase.groupParameters`, withQase(async ({ qase }) => {
-    await qase.title("Verify if user is able to login with their username.");
-
-    await qase.groupParameters({  // Group parameters
+describe('Login tests', () => {
+  test.each(testData)('Login with $username', ({ username, password }) => {
+    qase.title('User login test');
+    qase.groupParameters({
       Username: username,
       Password: password,
     });
-  // test logic
-  }));
+    expect(true).toBe(true);
+  });
 });
 ```
-<br>
 
-### Comment
 ---
-In addition to `qase.step()`, this method can be used to provide any additional context to your test, it helps maintain the code by clarifying the expected result of the test.
 
-```typescript
-it("A test case with qase.comment()", withQase(async ({ qase }) => {
-    /*
-     * Please note, this comment is added to a Result, not to the Test case.
-     */
-  await qase.comment("This comment is added to the result");
-  // test logic here
-}));
-```
-<br>
+## Multi-Project Support
 
-### Attach
+Send test results to multiple Qase projects simultaneously with different test case IDs for each project.
+
+For detailed configuration, examples, and troubleshooting, see the [Multi-Project Support Guide](MULTI_PROJECT.md).
+
 ---
-This method can help attach one, or more files to the test's result. You can also add the file's contents directly from code. For example: 
 
-```typescript
-it('Test result with attachment', withQase(async ({ qase }) => {
-    
-    // To attach a single file
-  await qase.attach({
-    paths: "./attachments/test-file.txt",
-  });
+## Running Tests
 
-    // Add multiple attachments. 
-  await qase.attach({ paths: ['/path/to/file', '/path/to/another/file'] });
+### Basic Execution
 
-    // Upload file's contents directly from code.
-  await qase.attach({
-    name: "attachment.txt",
-    content: "Hello, world!",
-    type: "text/plain",
-  });
-    // test logic here
-}));
-```
-<br>
-
-### Ignore
----
-If this method is added, the reporter will exclude the test's result from the report sent to Qase. While the test will still be executed by vitest, its result will not be considered by the reporter.
-
-```typescript
-it("This test is executed by vitest; however, it is NOT reported to Qase", withQase(async ({ qase }) => {
-  await qase.ignore();
-//  test logic here
-}));
+```sh
+npx vitest run
 ```
 
-### Advanced Usage with Annotations
+### With Environment Variables
+
+```sh
+QASE_MODE=testops QASE_TESTOPS_PROJECT=DEMO npx vitest run
+```
+
+### With Test Plan
+
+```sh
+QASE_TESTOPS_PLAN_ID=123 npx vitest run
+```
+
+### With Existing Test Run
+
+```sh
+QASE_TESTOPS_RUN_ID=456 npx vitest run
+```
+
 ---
 
-For more complex scenarios, you can combine multiple annotations in a single test:
+## Complete Examples
+
+### Full Test Example
 
 ```typescript
-it('Advanced test with multiple annotations', withQase(async ({ qase, annotate }) => {
-  // Set test title
-  await qase.title('Advanced Test with Multiple Annotations');
-  
-  // Add comment
-  await qase.comment('This test demonstrates advanced qase annotations functionality');
-  
-  // Set suite
-  await qase.suite('Vitest Integration Suite');
-  
-  // Set fields
-  await qase.fields({
-    description: 'Test description for Qase',
-    severity: 'critical',
-    priority: 'high',
-    layer: 'e2e'
+import { qase } from 'vitest-qase-reporter';
+import { test, expect, describe } from 'vitest';
+
+describe('User Authentication', () => {
+  test(qase(1, 'User can login with valid credentials'), async () => {
+    qase.title('Successful user login');
+
+    qase.fields({
+      severity: 'critical',
+      priority: 'high',
+      layer: 'e2e',
+      description: 'Verifies that a user can log in with valid credentials',
+    });
+
+    qase.suite('Authentication\tLogin');
+
+    await qase.step('Navigate to login page', async () => {
+      // Navigation logic
+    });
+
+    await qase.step('Enter credentials', async () => {
+      // Form filling logic
+    });
+
+    await qase.step('Submit form', async () => {
+      // Submit logic
+    });
+
+    await qase.step('Verify successful login', async () => {
+      qase.attach({
+        name: 'login-success.png',
+        content: Buffer.from('screenshot-data'),
+        contentType: 'image/png',
+      });
+      expect(true).toBe(true);
+    });
   });
-  
-  // Set parameters
-  await qase.parameters({
-    environment: 'staging',
-    browser: 'chrome',
-    version: '1.0.0'
+});
+```
+
+### Example Project Structure
+
+```
+my-project/
+├── qase.config.json
+├── vitest.config.ts
+├── tests/
+│   ├── auth.test.ts
+│   └── ...
+└── package.json
+```
+
+---
+
+## Troubleshooting
+
+### Tests Not Appearing in Qase
+
+1. Verify `mode` is set to `testops` (not `off` or `report`)
+2. Check API token has write permissions
+3. Verify project code is correct
+4. Check for errors in console output (enable `debug: true`)
+
+### ESM Module Resolution Errors
+
+**Problem:** `Cannot find module 'vitest-qase-reporter'`
+
+**Solution:**
+1. Verify package is installed: `npm list vitest-qase-reporter`
+2. Check `package.json` has `"type": "module"` for ESM projects
+3. Use correct import syntax: `import { qase } from 'vitest-qase-reporter'`
+
+### vitest.config.ts vs vite.config.ts
+
+**Problem:** Reporter not loaded when using `vite.config.ts`
+
+**Solution:** Always use `vitest.config.ts` for Vitest-specific configuration. While Vitest can use `vite.config.ts`, test reporters should be configured in `vitest.config.ts`:
+
+```typescript
+// vitest.config.ts (preferred)
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    reporters: ['default', 'vitest-qase-reporter'],
+  },
+});
+```
+
+### Watch Mode vs Run Mode Reporting
+
+**Problem:** Results not reported in watch mode
+
+**Solution:** Qase reporter sends results after full test suite completion. In watch mode (`npx vitest`), results are sent only when you exit or trigger a full re-run. Use `npx vitest run` for CI/CD reporting.
+
+### Attachments Not Uploading
+
+**Problem:** Attachments missing in Qase
+
+**Solution:**
+1. Verify file path exists and is readable
+2. Enable `uploadAttachments: true` in config
+3. Check file size (large files may take time)
+4. Enable debug logging to see upload status
+
+### Results Going to Wrong Test Cases
+
+**Problem:** Test results mapped to incorrect test case IDs
+
+**Solution:**
+1. Verify QaseID matches the test case ID in Qase
+2. Check for duplicate IDs in your test suite
+3. Verify you're using the correct project code
+
+### TypeScript Import Errors
+
+**Problem:** `Module '"vitest-qase-reporter"' has no exported member 'qase'`
+
+**Solution:**
+1. Ensure TypeScript version compatibility (>= 4.5)
+2. Check `tsconfig.json` has `"moduleResolution": "node"` or `"bundler"`
+3. Try restarting TypeScript server in your IDE
+
+---
+
+## Integration Patterns
+
+### Vitest Workspace Support
+
+For monorepo setups with Vitest workspaces:
+
+```typescript
+// vitest.workspace.ts
+import { defineWorkspace } from 'vitest/config';
+
+export default defineWorkspace([
+  {
+    test: {
+      name: 'unit',
+      include: ['src/**/*.test.ts'],
+      reporters: ['default', 'vitest-qase-reporter'],
+    },
+  },
+  {
+    test: {
+      name: 'integration',
+      include: ['tests/**/*.test.ts'],
+      reporters: ['default', 'vitest-qase-reporter'],
+    },
+  },
+]);
+```
+
+### In-Source Testing with Qase
+
+Vitest supports in-source testing. You can use Qase with this pattern:
+
+```typescript
+// src/math.ts
+export function add(a: number, b: number) {
+  return a + b;
+}
+
+if (import.meta.vitest) {
+  const { test, expect } = import.meta.vitest;
+  const { qase } = await import('vitest-qase-reporter');
+
+  test(qase(1, 'Addition works'), () => {
+    expect(add(1, 2)).toBe(3);
   });
-  
-  // Add steps
-  await qase.step('Initialize test data', async () => {
-    // Setup logic
+}
+```
+
+### Concurrent Tests with Qase
+
+```typescript
+import { qase } from 'vitest-qase-reporter';
+import { test, expect, describe } from 'vitest';
+
+describe.concurrent('Parallel test suite', () => {
+  test(qase(1, 'Test 1'), async () => {
+    await qase.step('Step 1', async () => {
+      expect(true).toBe(true);
+    });
   });
-  
-  await qase.step('Execute main test logic', async () => {
-    // Main test logic
+
+  test(qase(2, 'Test 2'), async () => {
+    await qase.step('Step 2', async () => {
+      expect(true).toBe(true);
+    });
   });
-  
-  // Add attachment with content
-  await qase.attach({
-    name: 'test-data.json',
-    content: JSON.stringify({ test: 'data' }),
-    type: 'application/json'
+});
+```
+
+### Snapshot Testing with Qase
+
+```typescript
+import { qase } from 'vitest-qase-reporter';
+import { test, expect } from 'vitest';
+
+test(qase(1, 'Component snapshot'), () => {
+  qase.fields({
+    layer: 'unit',
+    description: 'Verifies component renders correctly',
   });
-  
-  // Use regular annotate for custom annotations
-  await annotate('Custom annotation message', 'info');
-  
-  // Test assertions
+
+  const component = { name: 'Button', props: { label: 'Click me' } };
+  expect(component).toMatchSnapshot();
+});
+```
+
+### Using vi.mock with Qase Reporting
+
+```typescript
+import { qase } from 'vitest-qase-reporter';
+import { test, expect, vi } from 'vitest';
+
+vi.mock('./api', () => ({
+  fetchUser: vi.fn(() => Promise.resolve({ id: 1, name: 'Test User' })),
+}));
+
+test(qase(1, 'Test with mocked API'), async () => {
+  qase.fields({
+    layer: 'unit',
+    description: 'Tests component with mocked API calls',
+  });
+
+  const { fetchUser } = await import('./api');
+  const user = await fetchUser();
+  expect(user.name).toBe('Test User');
+});
+```
+
+---
+
+## Common Use Cases
+
+### Use Case 1: Report with Workspace Projects
+
+```typescript
+// vitest.workspace.ts
+import { defineWorkspace } from 'vitest/config';
+
+export default defineWorkspace([
+  {
+    test: {
+      name: 'backend',
+      include: ['packages/backend/**/*.test.ts'],
+      reporters: [
+        'default',
+        [
+          'vitest-qase-reporter',
+          {
+            testops: { project: 'BACKEND' },
+          },
+        ],
+      ],
+    },
+  },
+  {
+    test: {
+      name: 'frontend',
+      include: ['packages/frontend/**/*.test.ts'],
+      reporters: [
+        'default',
+        [
+          'vitest-qase-reporter',
+          {
+            testops: { project: 'FRONTEND' },
+          },
+        ],
+      ],
+    },
+  },
+]);
+```
+
+### Use Case 2: Run in CI with Coverage
+
+```yaml
+# .github/workflows/test.yml
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm ci
+      - run: npx vitest run --coverage
+        env:
+          QASE_MODE: testops
+          QASE_TESTOPS_API_TOKEN: ${{ secrets.QASE_API_TOKEN }}
+          QASE_TESTOPS_PROJECT: DEMO
+```
+
+### Use Case 3: Use Concurrent Tests for Performance
+
+```typescript
+import { qase } from 'vitest-qase-reporter';
+import { test, expect, describe } from 'vitest';
+
+describe.concurrent('API performance tests', () => {
+  const endpoints = ['/users', '/posts', '/comments'];
+
+  endpoints.forEach((endpoint, index) => {
+    test(qase(index + 1, `Test ${endpoint} endpoint`), async () => {
+      qase.parameters({ endpoint });
+      qase.fields({ layer: 'api', priority: 'high' });
+
+      await qase.step(`Call ${endpoint}`, async () => {
+        // API call logic
+        expect(true).toBe(true);
+      });
+    });
+  });
+});
+```
+
+### Use Case 4: Migrate from Jest Reporter
+
+Vitest uses Jest-compatible API, so migration is straightforward:
+
+**Before (Jest):**
+```typescript
+const { qase } = require('jest-qase-reporter/jest');
+
+test(qase(1, 'Test name'), () => {
   expect(true).toBe(true);
-}));
+});
 ```
+
+**After (Vitest):**
+```typescript
+import { qase } from 'vitest-qase-reporter';
+import { test, expect } from 'vitest';
+
+test(qase(1, 'Test name'), () => {
+  expect(true).toBe(true);
+});
+```
+
+### Use Case 5: Dynamic Test Generation with Parameters
+
+```typescript
+import { qase } from 'vitest-qase-reporter';
+import { test, expect, describe } from 'vitest';
+
+const testMatrix = [
+  { browser: 'Chrome', os: 'Windows', viewport: '1920x1080' },
+  { browser: 'Firefox', os: 'macOS', viewport: '1920x1080' },
+  { browser: 'Safari', os: 'macOS', viewport: '1440x900' },
+];
+
+describe('Cross-browser compatibility', () => {
+  testMatrix.forEach(({ browser, os, viewport }, index) => {
+    test(qase(index + 1, `Test on ${browser}`), () => {
+      qase.title(`Compatibility test: ${browser} on ${os}`);
+      qase.groupParameters({ Browser: browser, OS: os, Viewport: viewport });
+      qase.fields({
+        severity: 'normal',
+        priority: 'medium',
+        layer: 'e2e',
+      });
+
+      expect(true).toBe(true);
+    });
+  });
+});
+```
+
+### Use Case 6: Test with Rich Metadata and Attachments
+
+```typescript
+import { qase } from 'vitest-qase-reporter';
+import { test, expect } from 'vitest';
+
+test(qase(1, 'E2E checkout flow'), async () => {
+  qase.title('User completes checkout successfully');
+
+  qase.fields({
+    severity: 'blocker',
+    priority: 'high',
+    layer: 'e2e',
+    description: 'Tests the complete checkout flow from cart to confirmation',
+    preconditions: '- User logged in\n- Cart has items\n- Payment method configured',
+    postconditions: 'Order created in database',
+  });
+
+  qase.suite('E2E\tCheckout\tHappy Path');
+
+  await qase.step('Add items to cart', async () => {
+    qase.attach({
+      name: 'cart-items.json',
+      content: JSON.stringify({ items: ['item1', 'item2'] }),
+      contentType: 'application/json',
+    });
+  });
+
+  await qase.step('Proceed to checkout', async () => {
+    // Checkout logic
+  });
+
+  await qase.step('Complete payment', async () => {
+    qase.attach({
+      name: 'payment-confirmation.png',
+      content: Buffer.from('screenshot-data'),
+      contentType: 'image/png',
+    });
+  });
+
+  expect(true).toBe(true);
+});
+```
+
+---
+
+## See Also
+
+- [Configuration Reference](../../qase-javascript-commons/README.md)
+- [Attachments Guide](ATTACHMENTS.md)
+- [Steps Guide](STEPS.md)
+- [Multi-Project Support](MULTI_PROJECT.md)
+- [Upgrade Guide](UPGRADE.md)
