@@ -6,6 +6,8 @@ Qase Mocha Reporter supports sending test results to multiple Qase projects simu
 * Different projects track the same functionality with different test case IDs
 * You want to maintain separate test runs for different environments or teams
 
+---
+
 ## Configuration
 
 For detailed configuration options, refer to the [qase-javascript-commons README](../../qase-javascript-commons/README.md#multi-project-support).
@@ -14,40 +16,158 @@ For detailed configuration options, refer to the [qase-javascript-commons README
 
 Set `mode` to `testops_multi` in your Mocha reporter options (e.g. in `.mocharc.js` or `qase.config.json`) and add the `testops_multi` section with `default_project` and `projects`.
 
+**Example configuration:**
+
+```json
+{
+  "mode": "testops_multi",
+  "testops_multi": {
+    "default_project": "PROJ1",
+    "projects": [
+      {
+        "code": "PROJ1",
+        "api": {
+          "token": "your_api_token_for_proj1"
+        }
+      },
+      {
+        "code": "PROJ2",
+        "api": {
+          "token": "your_api_token_for_proj2"
+        }
+      }
+    ]
+  }
+}
+```
+
+---
+
 ## Using `qase.projects(mapping, name)`
 
 Use `qase.projects(mapping, name)` to set the test title with multi-project markers. Use the returned string as the first argument to `it()`:
 
 ```javascript
-const { qase } = require('mocha-qase-reporter');
+const { qase } = require('mocha-qase-reporter/mocha');
 
 // Single project
-it(qase(100, 'login flow'), function () { ... });
+it(qase(100, 'login flow'), function () {
+  expect(true).to.equal(true);
+});
 
 // Multi-project
-it(qase.projects({ PROJ1: [100], PROJ2: [200] }, 'login flow'), function () { ... });
+it(qase.projects({ PROJ1: [100], PROJ2: [200] }, 'login flow'), function () {
+  expect(true).to.equal(true);
+});
 
 // Multiple IDs per project
-it(qase.projects({ PROJ1: [10, 11], PROJ2: [20] }, 'checkout'), function () { ... });
+it(qase.projects({ PROJ1: [10, 11], PROJ2: [20] }, 'checkout'), function () {
+  expect(true).to.equal(true);
+});
 ```
 
+**Key points:**
+
+- Single project with single ID: `it(qase(100, 'test name'), function () { ... })`
+- Multi-project: `it(qase.projects({ PROJ1: [100], PROJ2: [200] }, 'test name'), function () { ... })`
+- Multiple IDs per project: `it(qase.projects({ PROJ1: [10, 11], PROJ2: [20] }, 'test name'), function () { ... })`
+
 Project codes (e.g. `PROJ1`, `PROJ2`) must match `testops_multi.projects[].code` in your config.
+
+---
 
 ## Tests Without Project Mapping
 
 Tests that do not use `qase.projects()` and have no `(Qase PROJ: ids)` in the title are sent to the `default_project`. If they use `qase(id, name)` (single-project), that ID is used for the default project.
 
+---
+
 ## Important Notes
 
-1. **Project codes must match**: Codes in `qase.projects({ PROJ1: [1], ... })` must match `testops_multi.projects[].code`.
+1. **Project codes must match**: Codes in `qase.projects({ PROJ1: [1], ... })` must match `testops_multi.projects[].code` in config.
 2. **Mode**: Set `mode` to `testops_multi` in reporter config.
 3. **Title format**: The helper produces a title like `Name (Qase PROJ1: 1,2) (Qase PROJ2: 3)` so the reporter can parse the mapping.
+4. **API tokens**: Each project in `testops_multi.projects[]` can have its own API token for separate authentication.
+
+---
 
 ## Examples
 
 See the [multi-project Mocha example](../../examples/multiProject/mocha/) for a complete runnable setup.
 
+### Complete Example
+
+Here's a complete Mocha test file showing multi-project usage:
+
+```javascript
+const { qase } = require('mocha-qase-reporter/mocha');
+const { expect } = require('chai');
+
+describe('Multi-project test suite', function () {
+  // Test reported to two projects
+  it(qase.projects({ PROJ1: [1], PROJ2: [2] }, 'User can login successfully'), function () {
+    const username = 'testuser';
+    const password = 'password123';
+
+    expect(username).to.be.a('string');
+    expect(password).to.be.a('string');
+  });
+
+  // Test with multiple case IDs per project
+  it(qase.projects({ PROJ1: [10, 11], PROJ2: [20] }, 'Checkout process works'), function () {
+    const cart = { items: 2, total: 99.99 };
+
+    expect(cart.items).to.be.greaterThan(0);
+    expect(cart.total).to.be.greaterThan(0);
+  });
+
+  // Combining multi-project with other Qase methods
+  it(qase.projects({ PROJ1: [100], PROJ2: [200] }, 'User registration'), function () {
+    qase.title('Complete user registration flow');
+    qase.fields({ severity: 'critical', priority: 'high' });
+
+    expect(true).to.equal(true);
+  });
+
+  // Single-project test (uses default_project)
+  it(qase(50, 'Test reported to default project'), function () {
+    expect(1 + 1).to.equal(2);
+  });
+
+  // Test without Qase metadata (goes to default_project without case ID)
+  it('Regular test without Qase tracking', function () {
+    expect(true).to.equal(true);
+  });
+});
+```
+
+---
+
 ## Troubleshooting
 
-* Verify `mode` is `testops_multi` and project codes in `qase.projects()` match the config.
-* Ensure the first argument to `it()` is the string returned by `qase.projects(mapping, name)` (or an equivalent title with markers).
+### Results Not Appearing in All Projects
+
+* Verify `mode` is `testops_multi` (not `testops`) in reporter config
+* Check that project codes in `qase.projects()` match config codes exactly (case-sensitive)
+* Ensure each project has a valid API token with write permissions
+* Ensure the first argument to `it()` is the string returned by `qase.projects(mapping, name)`
+
+### Wrong Test Cases Linked
+
+* Verify the mapping object has correct project codes as keys
+* Check that test case IDs exist in the respective projects
+* Enable debug logging to see how the reporter parses multi-project markers
+
+### Default Project Not Working
+
+* Ensure `default_project` is set in `testops_multi` config
+* Verify the default project code matches one of the projects in the `projects` array
+* Tests without `qase.projects()` will only report to the default project
+
+---
+
+## See Also
+
+- [Usage Guide](usage.md)
+- [Configuration Reference](../../qase-javascript-commons/README.md)
+- [Examples](../../examples/multiProject/mocha/)
