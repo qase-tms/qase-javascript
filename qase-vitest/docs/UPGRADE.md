@@ -119,7 +119,7 @@ const { qase } = require('vitest-qase-reporter');
 
 ## API Reference
 
-### Test ID Linking
+### Test Case ID Linking
 
 The Vitest reporter uses Jest-compatible syntax:
 

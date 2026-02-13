@@ -116,7 +116,7 @@ import { qase } from 'mocha-qase-reporter/mocha';
 
 ## API Reference
 
-### Test ID Linking
+### Test Case ID Linking
 
 ```javascript
 const { qase } = require('mocha-qase-reporter/mocha');

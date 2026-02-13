@@ -111,7 +111,7 @@ import { qase } from 'jest-qase-reporter/jest';
 
 ## API Reference
 
-### Test ID Linking
+### Test Case ID Linking
 
 ```javascript
 const { qase } = require('jest-qase-reporter/jest');

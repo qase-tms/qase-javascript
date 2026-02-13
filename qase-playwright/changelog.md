@@ -446,7 +446,7 @@ npm install playwright-qase-reporter@latest
 
 This release brings a major syntax change for specifying more test parameters.
 
-Old syntax allowed only test ID and title, and wasn't improving code readability:
+Old syntax allowed only test case ID and title, and wasn't improving code readability:
 
 ```js
 test(qase(42, 'Ultimate Question of Life, The Universe, and Everything'), async ({ page }) => {

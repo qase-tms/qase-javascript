@@ -121,7 +121,7 @@ Newman reporter has a unique constraint compared to other Qase reporters:
 
 | Feature | Other Reporters | Newman |
 |---------|----------------|--------|
-| Test ID linking | `qase(id, 'name')` wrapper | `// qase: id` comment |
+| Test case ID linking | `qase(id, 'name')` wrapper | `// qase: id` comment |
 | Metadata (fields) | `qase.fields({...})` | Not supported |
 | Steps | `qase.step()` or native steps | Not supported |
 | Attachments | `qase.attach()` | Not supported |
