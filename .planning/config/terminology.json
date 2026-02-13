@@ -1,0 +1,82 @@
+{
+  "canonical": {
+    "Qase": {
+      "pattern": "\\b(?:qase|QASE)\\b",
+      "correct": "Qase",
+      "context": "prose",
+      "notes": "Always 'Qase' with capital Q in prose. Lowercase 'qase' is correct in code, env vars (QASE_MODE), package names (jest-qase-reporter), and imports."
+    },
+    "TestOps": {
+      "pattern": "\\b(?:testops|Testops|test ops|Test Ops)\\b",
+      "correct": "TestOps",
+      "context": "prose",
+      "notes": "Product name is 'Qase TestOps' (capital T, capital O, no space)."
+    },
+    "test case": {
+      "pattern": "\\b(?:testcase|test-case)\\b",
+      "correct": "test case",
+      "context": "prose",
+      "notes": "Two words with space. Not 'testcase' or 'test-case'."
+    },
+    "test run": {
+      "pattern": "\\b(?:testrun|test-run)\\b",
+      "correct": "test run",
+      "context": "prose",
+      "notes": "Two words with space. Not 'testrun' or 'test-run'."
+    },
+    "test case ID": {
+      "pattern": "\\b(?:case ID|test ID|testcase ID)\\b",
+      "correct": "test case ID",
+      "context": "prose",
+      "notes": "Full form preferred. 'case ID' is ambiguous. 'test ID' is ambiguous."
+    },
+    "QaseID": {
+      "pattern": "\\b(?:Qase ID|qase id|qaseId)\\b",
+      "correct": "QaseID",
+      "context": "headings",
+      "notes": "In headings like '## Adding QaseID', use compound word. In prose, prefer 'test case ID'."
+    },
+    "qase.config.json": {
+      "pattern": "\\b(?:qase\\.config|config\\.json|configuration file)\\b",
+      "correct": "qase.config.json",
+      "context": "both",
+      "notes": "Full filename when referring to Qase configuration file. Generic 'config' needs qualification."
+    },
+    "reporter": {
+      "pattern": "\\b(?:plugin|extension)\\b",
+      "correct": "reporter",
+      "context": "both",
+      "notes": "Qase packages are 'reporters', not 'plugins' or 'extensions'. Package names are like 'jest-qase-reporter'."
+    },
+    "API token": {
+      "pattern": "\\b(?:api token|Api token|api-token)\\b",
+      "correct": "API token",
+      "context": "prose",
+      "notes": "Uppercase 'API', lowercase 'token'. Two words with space."
+    }
+  },
+  "deprecated": {
+    "reporter plugin": {
+      "replacement": "reporter",
+      "reason": "All Qase packages are reporters. 'plugin' is redundant and inconsistent with package naming."
+    },
+    "Qase plugin": {
+      "replacement": "Qase reporter",
+      "reason": "Consistent with package naming (jest-qase-reporter, playwright-qase-reporter)."
+    },
+    "test ID": {
+      "replacement": "test case ID",
+      "reason": "Ambiguous - could mean test case ID or test run ID. Use full form."
+    }
+  },
+  "ambiguous": {
+    "config": {
+      "guidance": "Prefer 'configuration' in prose. 'config' is acceptable in code contexts, filenames (qase.config.json), and variable names.",
+      "context_matters": true
+    },
+    "ID": {
+      "guidance": "Always qualify: 'test case ID', 'run ID', 'project code'. Standalone 'ID' is ambiguous.",
+      "context_matters": true
+    }
+  }
+}
