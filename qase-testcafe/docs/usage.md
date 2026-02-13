@@ -13,13 +13,15 @@ This guide provides comprehensive instructions for integrating Qase with TestCaf
 - [Adding Fields](#adding-fields)
 - [Adding Suite](#adding-suite)
 - [Ignoring Tests](#ignoring-tests)
+- [Muting Tests](#muting-tests)
 - [Working with Attachments](#working-with-attachments)
 - [Working with Steps](#working-with-steps)
 - [Working with Parameters](#working-with-parameters)
 - [Running Tests](#running-tests)
-- [Troubleshooting](#troubleshooting)
 - [Integration Patterns](#integration-patterns)
 - [Common Use Cases](#common-use-cases)
+- [Troubleshooting](#troubleshooting)
+- [Complete Examples](#complete-examples)
 
 ---
 
@@ -163,6 +165,24 @@ test.meta(qase.ignore().create())(
   'Ignored test',
   async (t) => {
     await t.expect(true).ok();
+  }
+);
+```
+
+---
+
+## Muting Tests
+
+Mark a test as muted. Muted tests are reported but do not affect the test run status:
+
+```javascript
+import { qase } from 'testcafe-reporter-qase/qase';
+
+test.meta(qase.id(1).create())(
+  'Known failing test',
+  async (t) => {
+    qase.mute();
+    await t.expect(false).ok(); // This failure won't affect the run status
   }
 );
 ```
@@ -967,6 +987,80 @@ jobs:
     "test": "testcafe chrome:headless tests/ -r spec,qase"
   }
 }
+```
+
+---
+
+## Complete Examples
+
+### Full Test Example
+
+```javascript
+import { qase } from 'testcafe-reporter-qase/qase';
+
+fixture('Complete Example')
+  .page('https://example.com');
+
+test.meta(
+  qase
+    .id(1)
+    .title('User can complete full registration flow')
+    .fields({
+      severity: 'critical',
+      priority: 'high',
+      layer: 'e2e',
+      description: 'Tests complete user registration flow from start to finish',
+      preconditions: 'Application is running and database is accessible',
+    })
+    .suite('Registration\tEnd-to-End')
+    .parameters({ Browser: 'Chrome', Environment: 'staging' })
+    .create()
+)(
+  'Comprehensive test with all features',
+  async (t) => {
+    await qase.step('Navigate to registration page', async () => {
+      await t.navigateTo('/register');
+      qase.attach({
+        name: 'page-load.txt',
+        content: 'Page loaded successfully',
+        contentType: 'text/plain',
+      });
+    });
+
+    await qase.step('Fill registration form', async () => {
+      await t
+        .typeText('#username', 'testuser')
+        .typeText('#email', 'test@example.com')
+        .typeText('#password', 'SecurePass123!');
+    });
+
+    await qase.step('Submit form', async () => {
+      await t.click('button[type="submit"]');
+      await t.expect(Selector('.success-message').exists).ok();
+    });
+
+    await qase.step('Verify email confirmation', async () => {
+      await t.expect(Selector('.email-sent').innerText)
+        .contains('Verification email sent');
+    });
+  }
+);
+```
+
+### Example Project Structure
+
+```
+my-project/
+├── qase.config.json
+├── tests/
+│   ├── auth.test.js
+│   ├── checkout.test.js
+│   └── ...
+├── pages/
+│   ├── LoginPage.js
+│   ├── DashboardPage.js
+│   └── ...
+└── package.json
 ```
 
 ---

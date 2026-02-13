@@ -18,11 +18,12 @@ This guide provides comprehensive instructions for integrating Qase with Mocha.
 - [Working with Steps](#working-with-steps)
 - [Working with Parameters](#working-with-parameters)
 - [Multi-Project Support](#multi-project-support)
-- [Integration Patterns](#integration-patterns)
-- [Common Use Cases](#common-use-cases)
 - [Using Extra Reporters](#using-extra-reporters)
 - [Running Tests](#running-tests)
+- [Integration Patterns](#integration-patterns)
+- [Common Use Cases](#common-use-cases)
 - [Troubleshooting](#troubleshooting)
+- [Complete Examples](#complete-examples)
 
 ---
 
@@ -1112,6 +1113,71 @@ const { qase } = require('mocha-qase-reporter');
 qase.step('Step name', function() {
   // Step implementation
 });
+```
+
+---
+
+## Complete Examples
+
+### Full Test Example
+
+```javascript
+const { qase } = require('mocha-qase-reporter');
+
+describe('Complete Example', function() {
+  it(qase([1, 2], 'Comprehensive test with all features'), async function() {
+    // Set metadata
+    qase.title('User can complete full registration flow');
+    qase.suite('Registration\tEnd-to-End');
+    qase.fields({
+      severity: 'critical',
+      priority: 'high',
+      layer: 'e2e',
+      description: 'Tests complete user registration flow from start to finish',
+      preconditions: 'Application is running and database is accessible',
+    });
+    qase.parameters({
+      Browser: 'Chrome',
+      Environment: 'staging',
+    });
+
+    // Execute test with steps
+    await qase.step('Navigate to registration page', async function() {
+      // Navigation logic
+      qase.attach({
+        name: 'page-load.txt',
+        content: 'Page loaded successfully',
+        contentType: 'text/plain',
+      });
+    });
+
+    await qase.step('Fill registration form', async function() {
+      // Form filling logic
+    });
+
+    await qase.step('Submit form', async function() {
+      // Submit logic
+    });
+
+    await qase.step('Verify email confirmation', async function() {
+      // Verification logic
+    });
+  });
+});
+```
+
+### Example Project Structure
+
+```
+my-project/
+├── qase.config.json
+├── test/
+│   ├── auth.test.js
+│   ├── checkout.test.js
+│   └── ...
+├── helpers/
+│   └── ...
+└── package.json
 ```
 
 ---

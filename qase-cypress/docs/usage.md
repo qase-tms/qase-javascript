@@ -18,10 +18,11 @@ This guide provides comprehensive instructions for integrating Qase with Cypress
 - [Working with Steps](#working-with-steps)
 - [Working with Parameters](#working-with-parameters)
 - [Multi-Project Support](#multi-project-support)
+- [Running Tests](#running-tests)
 - [Integration Patterns](#integration-patterns)
 - [Common Use Cases](#common-use-cases)
-- [Running Tests](#running-tests)
 - [Troubleshooting](#troubleshooting)
+- [Complete Examples](#complete-examples)
 
 ---
 
@@ -1018,6 +1019,79 @@ module.exports = defineConfig({
     mode: 'testops',
   },
 });
+```
+
+---
+
+## Complete Examples
+
+### Full Test Example
+
+```javascript
+import { qase } from 'cypress-qase-reporter/mocha';
+
+describe('Complete Example', () => {
+  it(qase([1, 2], 'Comprehensive test with all features'), () => {
+    // Set metadata
+    qase.title('User can complete full registration flow');
+    qase.suite('Registration\tEnd-to-End');
+    qase.fields({
+      severity: 'critical',
+      priority: 'high',
+      layer: 'e2e',
+      description: 'Tests complete user registration flow from start to finish',
+      preconditions: 'Application is running and database is accessible',
+    });
+    qase.parameters({
+      Browser: 'Chrome',
+      Environment: 'staging',
+    });
+
+    // Execute test with steps
+    qase.step('Navigate to registration page', () => {
+      cy.visit('/register');
+      qase.attach({
+        name: 'page-load.txt',
+        content: 'Page loaded successfully',
+        contentType: 'text/plain',
+      });
+    });
+
+    qase.step('Fill registration form', () => {
+      cy.get('#username').type('testuser');
+      cy.get('#email').type('test@example.com');
+      cy.get('#password').type('SecurePass123!');
+    });
+
+    qase.step('Submit form', () => {
+      cy.get('button[type="submit"]').click();
+      cy.get('.success-message').should('be.visible');
+    });
+
+    qase.step('Verify email confirmation', () => {
+      cy.get('.email-sent').should('contain.text', 'Verification email sent');
+    });
+  });
+});
+```
+
+### Example Project Structure
+
+```
+my-project/
+├── qase.config.json
+├── cypress.config.js
+├── cypress/
+│   ├── e2e/
+│   │   ├── auth.cy.js
+│   │   ├── checkout.cy.js
+│   │   └── ...
+│   ├── support/
+│   │   ├── commands.js
+│   │   └── e2e.js
+│   └── fixtures/
+│       └── ...
+└── package.json
 ```
 
 ---

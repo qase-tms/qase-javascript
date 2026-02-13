@@ -13,15 +13,16 @@ This guide provides comprehensive instructions for integrating Qase with Cucumbe
 - [Adding Fields](#adding-fields)
 - [Adding Suite](#adding-suite)
 - [Ignoring Tests](#ignoring-tests)
+- [Muting Tests](#muting-tests)
 - [Working with Attachments](#working-with-attachments)
 - [Working with Steps](#working-with-steps)
 - [Working with Parameters](#working-with-parameters)
 - [Multi-Project Support](#multi-project-support)
 - [Running Tests](#running-tests)
-- [Complete Examples](#complete-examples)
-- [Troubleshooting](#troubleshooting)
 - [Integration Patterns](#integration-patterns)
 - [Common Use Cases](#common-use-cases)
+- [Troubleshooting](#troubleshooting)
+- [Complete Examples](#complete-examples)
 
 ---
 
@@ -154,6 +155,22 @@ Feature: User Authentication
     Given I am on the login page
     When I enter valid credentials
     Then I should be logged in
+```
+
+---
+
+## Muting Tests
+
+Mark a scenario as muted using the `@QaseMuted` tag. Muted tests are reported but do not affect the test run status:
+
+```gherkin
+Feature: User Authentication
+
+  @QaseMuted
+  Scenario: Known failing test
+    Given I am on the login page
+    When I enter invalid credentials
+    Then I should see an error
 ```
 
 ---
