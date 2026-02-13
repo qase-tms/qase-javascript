@@ -25,6 +25,7 @@ This guide provides comprehensive instructions for integrating Qase with Mocha.
 - [Troubleshooting](#troubleshooting)
 - [Complete Examples](#complete-examples)
 
+- [See Also](#see-also)
 ---
 
 ## Adding QaseID
@@ -968,7 +969,7 @@ qasectl testops run complete --project DEMO --token token --id $(echo $QASE_TEST
 
 **Solutions:**
 
-1. Verify `mode` is set to `testops` (not `off` or `report`)
+1. Verify `mode` is set to `TestOps` (not `off` or `report`)
 2. Check API token has write permissions
 3. Verify project code is correct
 4. Check for errors in console output
@@ -1015,7 +1016,7 @@ npx mocha --reporter mocha-qase-reporter
 
 ### This Context Issues with Arrow Functions
 
-**Issue:** Cannot access `qase` methods when using arrow functions.
+**Issue:** Cannot access `Qase` methods when using arrow functions.
 
 **Solution:** Use regular `function()` syntax (not arrow functions) for Mocha tests:
 

@@ -296,4 +296,4 @@ See the [examples directory](../examples/) for complete working examples.
 
 ## License
 
-Apache License 2.0. See [LICENSE](../LICENSE) for details.
+Apache License 2.0. See [LICENSE](LICENSE) for details.

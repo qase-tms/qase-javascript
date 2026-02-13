@@ -428,7 +428,7 @@ Or use `qase.config.json`:
 If you encounter issues:
 
 1. Check the [GitHub Issues](https://github.com/qase-tms/qase-javascript/issues)
-2. Review the [CHANGELOG](../../CHANGELOG.md)
+2. Review the CHANGELOG
 3. Open a new issue with:
    - Current version (1.2.0)
    - WebdriverIO version
@@ -445,5 +445,5 @@ If you encounter issues:
 - [Usage Guide](usage.md)
 - [Configuration Reference](../../qase-javascript-commons/README.md)
 - [Multi-Project Support](MULTI_PROJECT.md)
-- [CHANGELOG](../../CHANGELOG.md)
+- CHANGELOG
 - [WebdriverIO Documentation](https://webdriver.io/docs/gettingstarted)

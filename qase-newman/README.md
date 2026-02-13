@@ -263,8 +263,8 @@ newman.run({
 
 ## Examples
 
-See the [examples directory](../examples/newman/) for complete working examples.
+See the [examples directory](../examples/single/newman/) for complete working examples.
 
 ## License
 
-Apache License 2.0. See [LICENSE](../LICENSE) for details.
+Apache License 2.0. See [LICENSE](LICENSE) for details.

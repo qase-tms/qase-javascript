@@ -24,6 +24,7 @@ This guide provides comprehensive instructions for integrating Qase with Jest.
 - [Troubleshooting](#troubleshooting)
 - [Complete Examples](#complete-examples)
 
+- [See Also](#see-also)
 ---
 
 ## Adding QaseID
@@ -679,7 +680,7 @@ describe('Authentication Feature', () => {
 
 **Solutions:**
 
-1. Verify `mode` is set to `testops`:
+1. Verify `mode` is set to `TestOps`:
    ```bash
    QASE_MODE=testops npx jest
    ```
@@ -691,7 +692,7 @@ describe('Authentication Feature', () => {
 3. Verify project code is correct:
    ```javascript
    // Should match your project code in Qase
-   testops: {
+   TestOps: {
      project: 'DEMO', // Check this matches your project
    }
    ```
@@ -700,7 +701,7 @@ describe('Authentication Feature', () => {
    ```javascript
    {
      debug: true,
-     testops: { ... }
+     TestOps: { ... }
    }
    ```
 
@@ -725,11 +726,11 @@ describe('Authentication Feature', () => {
 
 ### Qase Object Not Available in Tests
 
-**Problem:** `qase is not defined` or `Cannot read property 'title' of undefined`
+**Problem:** `Qase is not defined` or `Cannot read property 'title' of undefined`
 
 **Solutions:**
 
-1. Import qase at the top of your test file:
+1. Import Qase at the top of your test file:
    ```javascript
    const { qase } = require('jest-qase-reporter/jest');
    ```

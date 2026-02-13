@@ -188,7 +188,7 @@ CucumberJS reporter has a unique pattern compared to other Qase reporters:
 | Titles | `qase.title()` | Scenario name (auto) |
 | Suites | `qase.suite()` | Feature name (auto) |
 
-**No programmatic qase API** - Everything is tag-based or native CucumberJS.
+**No programmatic Qase API** - Everything is tag-based or native CucumberJS.
 
 ---
 
@@ -309,7 +309,7 @@ export QASE_TESTOPS_PROJECT=YOUR_PROJECT_CODE
 If you encounter issues:
 
 1. Check the [GitHub Issues](https://github.com/qase-tms/qase-javascript/issues)
-2. Review the [CHANGELOG](../../CHANGELOG.md)
+2. Review the CHANGELOG
 3. Open a new issue with:
    - Current version (2.2.0)
    - CucumberJS version
@@ -325,5 +325,5 @@ If you encounter issues:
 - [Usage Guide](usage.md)
 - [Configuration Reference](../../qase-javascript-commons/README.md)
 - [Multi-Project Support](MULTI_PROJECT.md)
-- [CHANGELOG](../../CHANGELOG.md)
+- CHANGELOG
 - [CucumberJS Documentation](https://cucumber.io/docs/cucumber/)

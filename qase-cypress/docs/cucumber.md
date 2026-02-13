@@ -268,8 +268,8 @@ The Qase reporter will automatically extract these IDs and link the test results
 
 Check out our example projects:
 
-- **[@badeball/cypress-cucumber-preprocessor Example](../../examples/cypressBadeballCucumber/)** - Modern implementation with automatic step reporting
-- **[cypress-cucumber-preprocessor Example](../../examples/cypressCucumber/)** - Legacy implementation
+- **[@badeball/cypress-cucumber-preprocessor Example](../../examples/single/cypressBadeballCucumber/)** - Modern implementation with automatic step reporting
+- **[cypress-cucumber-preprocessor Example](../../examples/single/cypressCucumber/)** - Legacy implementation
 
 Each example includes:
 - Complete Cypress configuration
@@ -317,7 +317,7 @@ If you see errors like "Cypress detected that you returned a promise from a comm
 - Verify your API token is correct in `cypress.config.js`
 - Check that your project code matches your Qase project
 - Enable `debug: true` in reporter options to see detailed logs
-- Ensure `mode: 'testops'` is set in your configuration
+- Ensure `mode: 'TestOps'` is set in your configuration
 
 ---
 

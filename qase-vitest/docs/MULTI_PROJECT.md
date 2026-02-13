@@ -140,7 +140,7 @@ describe('Multi-project test suite', () => {
 
 ### Results Not Appearing in All Projects
 
-* Ensure `mode` is `testops_multi` (not `testops`) and project codes match the config
+* Ensure `mode` is `testops_multi` (not `TestOps`) and project codes match the config
 * Check that project codes in `addQaseProjects()` match config codes exactly (case-sensitive)
 * Ensure each project has a valid API token with write permissions
 * Use `addQaseProjects(name, mapping)` (or an equivalent title format) so the reporter can parse the mapping from the test name

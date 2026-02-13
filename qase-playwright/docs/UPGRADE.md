@@ -269,7 +269,7 @@ reporter: [
 **Solution:** Check that:
 1. API token is set: `process.env.QASE_API_TOKEN`
 2. Project code is correct: `project: 'YOUR_PROJECT_CODE'`
-3. Mode is set to testops: `mode: 'testops'`
+3. Mode is set to TestOps: `mode: 'TestOps'`
 
 #### Issue: Configuration format errors
 
@@ -292,7 +292,7 @@ reporter: [
 If you encounter issues:
 
 1. Check the [GitHub Issues](https://github.com/qase-tms/qase-javascript/issues)
-2. Review the [CHANGELOG](../../CHANGELOG.md)
+2. Review the CHANGELOG
 3. Open a new issue with:
    - Current version (2.2.0)
    - Playwright version
@@ -307,4 +307,4 @@ If you encounter issues:
 - [Usage Guide](usage.md)
 - [Configuration Reference](../../qase-javascript-commons/README.md)
 - [Multi-Project Support](MULTI_PROJECT.md)
-- [CHANGELOG](../../CHANGELOG.md)
+- CHANGELOG

@@ -341,7 +341,7 @@ describe('User tests', () => {
 ### Steps Not Appearing
 
 1. Verify you're using `withQase` wrapper for tests with steps
-2. Check that steps are executed within a test context with `qase` parameter
+2. Check that steps are executed within a test context with `Qase` parameter
 3. Enable debug logging to trace step recording
 4. **Ensure you're using `await` with async step callbacks** - Missing `await` is the most common issue
 

@@ -112,7 +112,7 @@ Ensure video recording is enabled in your Cypress configuration:
 
 #### 4. Update Test Annotations
 
-No changes required for test annotations. The qase API remains unchanged:
+No changes required for test annotations. The Qase API remains unchanged:
 
 ```javascript
 import { qase } from 'cypress-qase-reporter/mocha';
@@ -161,7 +161,7 @@ reporterOptions: {
 
 ### No Breaking API Changes
 
-The qase test annotation API remains fully backward compatible:
+The Qase test annotation API remains fully backward compatible:
 
 ```javascript
 // All existing patterns work in v3.x
@@ -319,7 +319,7 @@ const { afterSpecHook } = require('cypress-qase-reporter');
 
 #### Issue: Configuration not recognized
 
-**Solution:** Verify the `reporterOptions` structure includes the `testops` object:
+**Solution:** Verify the `reporterOptions` structure includes the `TestOps` object:
 
 ```javascript
 reporterOptions: {
@@ -347,7 +347,7 @@ npm install
 If you encounter issues during migration:
 
 1. Check the [GitHub Issues](https://github.com/qase-tms/qase-javascript/issues)
-2. Review the [CHANGELOG](../../CHANGELOG.md)
+2. Review the CHANGELOG
 3. Open a new issue with:
    - Previous version (e.g., 2.3.1)
    - Target version (3.2.0)
@@ -363,5 +363,5 @@ If you encounter issues during migration:
 - [Usage Guide](usage.md)
 - [Configuration Reference](../../qase-javascript-commons/README.md)
 - [Multi-Project Support](MULTI_PROJECT.md)
-- [CHANGELOG](../../CHANGELOG.md)
+- CHANGELOG
 - [Cypress Configuration Migration Guide](https://docs.cypress.io/guides/references/migration-guide)

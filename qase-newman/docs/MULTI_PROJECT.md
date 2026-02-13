@@ -85,8 +85,8 @@ pm.test('User registration', function () {
 **Key points:**
 
 - Single project with single ID: `// qase: 100`
-- Multi-project: `// qase PROJ1: 1` and `// qase PROJ2: 2` (separate comments)
-- Multiple IDs per project: `// qase PROJ1: 10,11` (comma-separated, no spaces)
+- Multi-project: `// Qase PROJ1: 1` and `// Qase PROJ2: 2` (separate comments)
+- Multiple IDs per project: `// Qase PROJ1: 10,11` (comma-separated, no spaces)
 
 Project codes (e.g. `PROJ1`, `PROJ2`) must match `testops_multi.projects[].code` in your config.
 
@@ -94,15 +94,15 @@ Project codes (e.g. `PROJ1`, `PROJ2`) must match `testops_multi.projects[].code`
 
 ## Tests Without Project Mapping
 
-Tests that do not have `// qase PROJECT: ids` comments are sent to the `default_project`. If they use the single-project format `// qase: id`, that ID is used for the default project.
+Tests that do not have `// Qase PROJECT: ids` comments are sent to the `default_project`. If they use the single-project format `// qase: id`, that ID is used for the default project.
 
 ---
 
 ## Important Notes
 
-1. **Project codes must match**: Codes in `// qase PROJ1: 1` comments must match `testops_multi.projects[].code` in config.
+1. **Project codes must match**: Codes in `// Qase PROJ1: 1` comments must match `testops_multi.projects[].code` in config.
 2. **Mode**: Set `mode` to `testops_multi` in qase.config.json.
-3. **Comment format**: Use exact format `// qase PROJECT_CODE: id1,id2` before `pm.test()` calls.
+3. **Comment format**: Use exact format `// Qase PROJECT_CODE: id1,id2` before `pm.test()` calls.
 4. **API tokens**: Each project in `testops_multi.projects[]` can have its own API token for separate authentication.
 
 ---
@@ -159,7 +159,7 @@ pm.test('Response time is acceptable', function () {
 
 ### Wrong Test Cases Linked
 
-* Verify the comment format: `// qase PROJECT_CODE: id1,id2` (no spaces after commas)
+* Verify the comment format: `// Qase PROJECT_CODE: id1,id2` (no spaces after commas)
 * Check that test case IDs exist in the respective projects
 * Enable debug logging to see how the reporter parses multi-project markers
 

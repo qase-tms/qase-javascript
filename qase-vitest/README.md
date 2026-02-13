@@ -218,7 +218,7 @@ npx vitest run --reporter=vitest-qase-reporter
 npx vitest
 ```
 
-> **Note:** Vitest is ESM-first and uses Jest-compatible API. If you're migrating from Jest, the qase wrapper syntax is identical.
+> **Note:** Vitest is ESM-first and uses Jest-compatible API. If you're migrating from Jest, the Qase wrapper syntax is identical.
 
 ## Requirements
 
@@ -241,4 +241,4 @@ See the [examples directory](../examples/) for complete working examples.
 
 ## License
 
-Apache License 2.0. See [LICENSE](../LICENSE) for details.
+Apache License 2.0. See [LICENSE](LICENSE) for details.

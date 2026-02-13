@@ -101,7 +101,7 @@ const { qase } = require('testcafe-reporter-qase/qase');
 
 ## API Reference
 
-### Test ID Linking with Builder Pattern
+### Test Case ID Linking with Builder Pattern
 
 TestCafe uses a builder pattern with `.meta()` for test metadata:
 
@@ -392,7 +392,7 @@ export QASE_TESTOPS_PROJECT=YOUR_PROJECT_CODE
 If you encounter issues:
 
 1. Check the [GitHub Issues](https://github.com/qase-tms/qase-javascript/issues)
-2. Review the [CHANGELOG](../../CHANGELOG.md)
+2. Review the CHANGELOG
 3. Open a new issue with:
    - Current version (2.2.0)
    - TestCafe version
@@ -409,5 +409,5 @@ If you encounter issues:
 - [Usage Guide](usage.md)
 - [Configuration Reference](../../qase-javascript-commons/README.md)
 - [Multi-Project Support](MULTI_PROJECT.md)
-- [CHANGELOG](../../CHANGELOG.md)
+- CHANGELOG
 - [TestCafe Documentation](https://testcafe.io/documentation/)

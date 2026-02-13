@@ -332,8 +332,8 @@ QASE_MODE=testops npx testcafe
 
 ## Examples
 
-See the [examples directory](../examples/testcafe/) for complete working examples.
+See the [examples directory](../examples/single/testcafe/) for complete working examples.
 
 ## License
 
-Apache License 2.0. See [LICENSE](../LICENSE) for details.
+Apache License 2.0. See [LICENSE](LICENSE) for details.

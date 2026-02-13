@@ -110,7 +110,7 @@ const { qase } = require('mocha-qase-reporter/mocha');
 import { qase } from 'mocha-qase-reporter/mocha';
 ```
 
-**Note:** The `/mocha` subpath is required to access the `qase` helper function.
+**Note:** The `/mocha` subpath is required to access the `Qase` helper function.
 
 ---
 
@@ -309,7 +309,7 @@ it('Test', () => {
 If you encounter issues:
 
 1. Check the [GitHub Issues](https://github.com/qase-tms/qase-javascript/issues)
-2. Review the [CHANGELOG](../../CHANGELOG.md)
+2. Review the CHANGELOG
 3. Open a new issue with:
    - Current version (1.2.0)
    - Mocha version
@@ -324,4 +324,4 @@ If you encounter issues:
 - [Usage Guide](usage.md)
 - [Configuration Reference](../../qase-javascript-commons/README.md)
 - [Multi-Project Support](MULTI_PROJECT.md)
-- [CHANGELOG](../../CHANGELOG.md)
+- CHANGELOG

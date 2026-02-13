@@ -24,6 +24,7 @@ This guide provides comprehensive instructions for integrating Qase with Vitest.
 - [Integration Patterns](#integration-patterns)
 - [Common Use Cases](#common-use-cases)
 
+- [See Also](#see-also)
 ---
 
 ## Adding QaseID
@@ -462,7 +463,7 @@ my-project/
 
 ### Tests Not Appearing in Qase
 
-1. Verify `mode` is set to `testops` (not `off` or `report`)
+1. Verify `mode` is set to `TestOps` (not `off` or `report`)
 2. Check API token has write permissions
 3. Verify project code is correct
 4. Check for errors in console output (enable `debug: true`)

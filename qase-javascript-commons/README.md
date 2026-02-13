@@ -253,12 +253,12 @@ For detailed framework-specific documentation on multi-project support, see:
 * **[Mocha Multi-Project Guide](../qase-mocha/docs/MULTI_PROJECT.md)** — `qase.projects(mapping, name)`
 * **[WDIO Multi-Project Guide](../qase-wdio/docs/MULTI_PROJECT.md)** — `qase.projects(mapping, name)`
 * **[CucumberJS Multi-Project Guide](../qase-cucumberjs/docs/MULTI_PROJECT.md)** — tags `@qaseid.PROJ(ids)` in feature files
-* **[Newman](../examples/multiProject/newman/README.md)** — comments in test script
-* **[TestCafe](../examples/multiProject/testcafe/README.md)** — `qase.projects(mapping).create()` in `test.meta()`
+* **[Newman](../examples/single/multiProject/newman/README.md)** — comments in test script
+* **[TestCafe](../examples/single/multiProject/testcafe/README.md)** — `qase.projects(mapping).create()` in `test.meta()`
 
 ### Example Usage
 
-For runnable examples, see the [multi-project examples directory](../examples/multiProject/).
+For runnable examples, see the [multi-project examples directory](../examples/single/multiProject/).
 
 ### Configuration
 

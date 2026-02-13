@@ -24,6 +24,7 @@ This guide provides comprehensive instructions for integrating Qase with Cypress
 - [Troubleshooting](#troubleshooting)
 - [Complete Examples](#complete-examples)
 
+- [See Also](#see-also)
 ---
 
 ## Adding QaseID
@@ -864,7 +865,7 @@ npx cypress run --spec "cypress/e2e/auth/**/*.cy.js"
 
 **Solutions:**
 
-1. Verify `mode` is set to `testops` (not `off` or `report`)
+1. Verify `mode` is set to `TestOps` (not `off` or `report`)
 2. Check API token has write permissions
 3. Verify project code is correct
 4. Check for errors in Cypress console output
