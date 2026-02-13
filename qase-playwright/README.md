@@ -39,7 +39,7 @@ npm install --save-dev playwright-qase-reporter
 
 **2. Add Qase ID to your test:**
 
-Playwright offers **two ways** to link tests with Qase test cases:
+Playwright offers **three ways** to link tests with Qase test cases:
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -55,6 +55,14 @@ test(qase(1, 'User can login with valid credentials'), async ({ page }) => {
 test('User can login', async ({ page }) => {
   qase.id(1);
   qase.title('User can login with valid credentials');
+  await page.goto('https://example.com');
+  expect(await page.title()).toBe('Example Domain');
+});
+
+// Option 3: Native Playwright annotations
+test('User can login', {
+  annotation: { type: 'QaseID', description: '1' },
+}, async ({ page }) => {
   await page.goto('https://example.com');
   expect(await page.title()).toBe('Example Domain');
 });
