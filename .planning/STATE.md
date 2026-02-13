@@ -5,34 +5,36 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** Users can quickly understand and implement Qase reporter integration in their testing framework without confusion or missing information, regardless of which JavaScript testing framework they use.
-**Current focus:** Phase 1 - Foundation & Templates
+**Current focus:** Phase 2 - Core Documentation
 
 ## Current Position
 
-Phase: 1 of 5 (Foundation & Templates)
-Plan: 3 of 3 completed
-Status: Phase 1 complete
-Last activity: 2026-02-13 — Completed 01-03-PLAN.md: Template usage guide created and foundation verified
+Phase: 2 of 5 (Core Documentation)
+Plan: 1 of 3 completed
+Status: In progress
+Last activity: 2026-02-13 — Completed 02-01-PLAN.md: Applied templates to Jest and Playwright reporters
 
-Progress: [████░░░░░░] 20%
+Progress: [████░░░░░░] 27%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 4 min
-- Total execution time: 0.18 hours
+- Total plans completed: 4
+- Average duration: 8 min
+- Total execution time: 0.46 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 3 | 11 min | 4 min |
+| 02-core-documentation | 1 | 17 min | 17 min |
 
 **Recent Plans:**
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
+| 02-core-documentation | 01 | 17 min | 2 | 4 |
 | 01-foundation | 03 | 1 min | 2 | 1 |
 | 01-foundation | 02 | 6 min | 3 | 3 |
 | 01-foundation | 01 | 4 min | 3 | 7 |
@@ -58,6 +60,13 @@ Recent decisions affecting current work:
 - [Phase 01-foundation]: Create comprehensive 8-step workflow (detailed guidance for consistent template application)
 - [Phase 01-foundation]: Include framework-specific considerations section (highlights unique patterns for Jest, Playwright, Cypress)
 - [Phase 01-foundation]: Verify foundation through human checkpoint (ensures quality before Phase 2)
+- [Phase 02-core-documentation]: Use wrapper function pattern prominently in Jest examples
+- [Phase 02-core-documentation]: Highlight Playwright's dual pattern (wrapper vs method-based)
+- [Phase 02-core-documentation]: Include Integration Patterns section with framework-specific hooks
+- [Phase 02-core-documentation]: Add Common Use Cases section with 5+ goal-oriented recipes
+- [Phase 02-core-documentation]: Use TypeScript syntax for Playwright examples
+- [Phase 02-core-documentation]: Use CommonJS syntax for Jest examples
+- [Phase 02-core-documentation]: Document both native test.step() and qase.step() for Playwright
 
 ### Pending Todos
 
@@ -70,5 +79,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 01-03-PLAN.md: Template usage guide and foundation verification
-Resume file: .planning/phases/01-foundation/01-03-SUMMARY.md
+Stopped at: Completed 02-01-PLAN.md: Applied templates to Jest and Playwright reporters
+Resume file: .planning/phases/02-core-documentation/02-01-SUMMARY.md
