@@ -1,6 +1,7 @@
 # [Qase TestOps](https://qase.io) TestCafe Reporter
 
 [![License](https://lxgaming.github.io/badges/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![npm downloads](https://img.shields.io/npm/dm/testcafe-qase-reporter.svg)](https://www.npmjs.com/package/testcafe-qase-reporter)
 
 Qase TestCafe Reporter enables seamless integration between your TestCafe tests and [Qase TestOps](https://qase.io), providing automatic test result reporting, test case management, and comprehensive test analytics.
 

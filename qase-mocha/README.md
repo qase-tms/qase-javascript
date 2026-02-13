@@ -1,6 +1,7 @@
 # [Qase TestOps](https://qase.io) Mocha Reporter
 
 [![License](https://lxgaming.github.io/badges/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![npm downloads](https://img.shields.io/npm/dm/mocha-qase-reporter.svg)](https://www.npmjs.com/package/mocha-qase-reporter)
 
 Qase Mocha Reporter enables seamless integration between your Mocha tests and [Qase TestOps](https://qase.io), providing automatic test result reporting, test case management, and comprehensive test analytics.
 
