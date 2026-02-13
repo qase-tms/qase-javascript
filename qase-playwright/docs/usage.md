@@ -29,7 +29,7 @@ This guide provides comprehensive instructions for integrating Qase with Playwri
 
 ## Adding QaseID
 
-Playwright offers **three flexible patterns** for linking automated tests to existing test cases in Qase.
+Playwright offers **four flexible patterns** for linking automated tests to existing test cases in Qase.
 
 ### Pattern 1: Wrapper Function (Single ID)
 
@@ -68,6 +68,32 @@ test('User can login', async ({ page }) => {
   expect(await page.title()).toBe('Login');
 });
 ```
+
+### Pattern 4: Native Playwright Annotations
+
+Use Playwright's native annotation system to specify Qase test case IDs:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Single ID
+test('User can login', {
+  annotation: { type: 'QaseID', description: '1' },
+}, async ({ page }) => {
+  await page.goto('https://example.com/login');
+  expect(await page.title()).toBe('Login');
+});
+
+// Multiple IDs (comma-separated)
+test('Test covering multiple scenarios', {
+  annotation: { type: 'QaseID', description: '1,2,3' },
+}, async ({ page }) => {
+  await page.goto('https://example.com');
+  expect(await page.title()).toBe('Example Domain');
+});
+```
+
+**Note:** The annotation pattern is useful when you want to avoid importing the Qase reporter in your test files, or when integrating with existing Playwright test metadata.
 
 ### Multi-Project Support
 
