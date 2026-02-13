@@ -1,246 +1,299 @@
-# Qase TMS Playwright reporter
+# [Qase TestOps](https://qase.io) Playwright Reporter
 
-Qase Playwright reporter sends test results and metadata to Qase.io.
-It can work in different test automation scenarios:
+[![License](https://lxgaming.github.io/badges/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
-* Create new test cases in Qase from existing autotests.
-* Report Playwright test results to existing test cases in Qase.
-* Update existing cases with metadata, such as parameters and fields.
+Qase Playwright Reporter enables seamless integration between your Playwright tests and [Qase TestOps](https://qase.io), providing automatic test result reporting, test case management, and comprehensive test analytics.
 
-To install the latest version, run:
+## Features
+
+- Link automated tests to Qase test cases by ID
+- Auto-create test cases from your test code
+- Report test results with rich metadata (fields, attachments, steps)
+- Support for parameterized tests
+- Multi-project reporting support
+- Flexible configuration (file, environment variables, Playwright config)
+- **Unique to Playwright:** Multiple API patterns (wrapper function, method-based, annotations)
+
+## Installation
 
 ```sh
-npm install -D playwright-qase-reporter
+npm install --save-dev playwright-qase-reporter
 ```
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+## Quick Start
 
-# Contents
+**1. Create `qase.config.json` in your project root:**
 
-- [Qase TMS Playwright reporter](#qase-tms-playwright-reporter)
-- [Contents](#contents)
-  - [Getting started](#getting-started)
-  - [Updating from v1](#updating-from-v1)
-  - [Example of usage](#example-of-usage)
-  - [Configuration](#configuration)
-  - [Requirements](#requirements)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-## Getting started
-
-To report your tests results to Qase, install `playwright-qase-reporter`,
-and add a reporter config in the `playwright.config.ts` file.
-A minimal configuration needs just two things:
-
-* Qase project code, for example, in https://app.qase.io/project/DEMO the code is `DEMO`.
-* Qase API token, created on the [Apps page](https://app.qase.io/apps?app=playwright-reporter).
-
-```js
-const config: PlaywrightTestConfig = {
-  // ...  
-  reporter: [
-    [
-      'playwright-qase-reporter',
-      {
-        testops: {
-          api: {
-            token: 'api_token',
-          },
-          project: 'project_code',
-        },
-      },
-    ],
-  ],
-  // ...  
-};
-module.exports = config;
+```json
+{
+  "mode": "testops",
+  "testops": {
+    "project": "YOUR_PROJECT_CODE",
+    "api": {
+      "token": "YOUR_API_TOKEN"
+    }
+  }
+}
 ```
 
-Now run the tests as usual.
-Test results will be reported to a new test run in Qase:
+**2. Add Qase ID to your test:**
 
-```console
-$ npx playwright test
-Running 5 tests using 1 worker
-...
-...
-...
-qase: 5 results sent to Qase
-qase: run 1 completed
-qase: Test run link: https://app.qase.io/run/DEMO/dashboard/1
-```
-
-## Updating from v1
-
-To update a test project using qase-playwright-reporter@v1 to version 2:
-
-1.  Change the import paths:
-
-    ```diff
-    - import { qase } from 'playwright-qase-reporter/dist/playwright'
-    + import { qase } from 'playwright-qase-reporter'
-    ```
-
-2.  Update reporter configuration in `playwright.config.js` and/or environment variables —
-    see the [configuration reference](#configuration) below.
-
-The previous test annotation syntax is still supported, so there is no need to rewrite the tests.
-However, check out the docs for the new, more flexible and powerful syntax.
-
-## Example of usage
-
-The Playwright reporter has the ability to auto-generate test cases
-and suites from your test data.
-
-But if necessary, you can independently register the ID of already
-existing test cases from TMS before the executing tests. For example:
+Playwright offers **two ways** to link tests with Qase test cases:
 
 ```typescript
+import { test, expect } from '@playwright/test';
 import { qase } from 'playwright-qase-reporter';
 
-describe('Test suite', () => {
-  test(qase(2, 'Test with Qase ID'), () => {
-    expect(true).toBe(true);
-  });
-  
-  test('Simple test', () => {
-    qase.title('Example of simple test');
-    expect(true).toBe(true);
-  });
+// Option 1: Wrapper function (similar to Jest)
+test(qase(1, 'User can login with valid credentials'), async ({ page }) => {
+  await page.goto('https://example.com');
+  expect(await page.title()).toBe('Example Domain');
+});
 
-  test('Test with annotated fields', () => {
-    qase.fields({ 'severity': 'high', 'priority': 'medium' });
-    expect(true).toBe(true);
-  });
-  
-  test('Running, but not reported to Qase', () => {
-    qase.ignore();
-    expect(true).toBe(true);
-  });
-
-  test('Test with steps', async () => {
-    await test.step('Step 1', async () => {
-      expect(true).toBe(true);
-    });
-    await test.step('Step 2', async () => {
-      expect(true).toBe(true);
-    });
-    expect(true).toBe(true);
-  });
+// Option 2: Method-based (Playwright's unique approach)
+test('User can login', async ({ page }) => {
+  qase.id(1);
+  qase.title('User can login with valid credentials');
+  await page.goto('https://example.com');
+  expect(await page.title()).toBe('Example Domain');
 });
 ```
 
----
+**3. Configure Playwright reporter in `playwright.config.ts`:**
 
-To run tests and create a test run, execute the command (for example from folder examples):
+```typescript
+import { defineConfig } from '@playwright/test';
 
-```bash
-QASE_MODE=testops npx playwright test
-```
-
-or
-
-```bash
-npm test
-```
-
-<p align="center">
-  <img width="65%" src="./screenshots/screenshot.png">
-</p>
-
-A test run will be performed and available at:
-
-```
-https://app.qase.io/run/QASE_PROJECT_CODE
-```
-
-<p align="center">
-  <img width="85%" src="./screenshots/test-run.gif">
-</p>
-
-### Multi-Project Support
-
-Qase Playwright Reporter supports sending test results to multiple Qase projects simultaneously. You can specify different test case IDs for each project using `qase.projects(mapping)` or `qase.projectsTitle(name, mapping)`.
-
-For detailed information, configuration, and examples, see the [Multi-Project Support Guide](docs/MULTI_PROJECT.md).
-
-## Configuration
-
-Reporter options (\* - required):
-
-- `mode` - `testops`/`off` Enables reporter, default - `off`
-- `debug` - Enables debug logging, default - `false`
-- `environment` - To execute with the sending of the environment information 
-- *`testops.api.token` - Token for API access, you can generate it [here](https://developers.qase.io/#authentication).
-- *`testops.project` - [Your project's code](https://help.qase.io/en/articles/9787250-how-do-i-find-my-project-code)
-- `testops.uploadAttachments` - Permission to send screenshots to Qase TMS
-- `testops.run.id` - Pass Run ID
-- `testops.run.title` - Set custom Run name, when new run is created
-- `testops.run.description` - Set custom Run description, when new run is created
-- `testops.run.complete` - Whether the run should be completed
-- `framework.browser.addAsParameter` - Whether to add the browser name as a parameter, default - `false`
-- `framework.browser.parameterName` - The name of the parameter to add the browser name to, default - `browser`
-- `framework.markAsFlaky` - Whether to mark tests as flaky if they passed after retries, default - `false`
-
-Example `playwright.config.js` config:
-
-```js
-const config = {
-  use: {
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
-  },
+export default defineConfig({
   reporter: [
     ['list'],
     [
       'playwright-qase-reporter',
       {
-        debug: true,
+        mode: 'testops',
         testops: {
           api: {
-            token: 'api_key',
+            token: process.env.QASE_API_TOKEN,
           },
-          project: 'project_code',
+          project: 'YOUR_PROJECT_CODE',
+        },
+      },
+    ],
+  ],
+});
+```
+
+**4. Run your tests:**
+
+```sh
+npx playwright test
+```
+
+## Configuration
+
+The reporter is configured via (in order of priority):
+
+1. **playwright.config.ts** (Playwright-specific, highest priority)
+2. **Environment variables** (`QASE_*`)
+3. **Config file** (`qase.config.json`)
+
+### Minimal Configuration
+
+| Option | Environment Variable | Description |
+|--------|---------------------|-------------|
+| `mode` | `QASE_MODE` | Set to `testops` to enable reporting |
+| `testops.project` | `QASE_TESTOPS_PROJECT` | Your Qase project code |
+| `testops.api.token` | `QASE_TESTOPS_API_TOKEN` | Your Qase API token |
+
+### Example `qase.config.json`
+
+```json
+{
+  "mode": "testops",
+  "fallback": "report",
+  "testops": {
+    "project": "YOUR_PROJECT_CODE",
+    "api": {
+      "token": "YOUR_API_TOKEN"
+    },
+    "run": {
+      "title": "Playwright Automated Run"
+    },
+    "batch": {
+      "size": 100
+    }
+  },
+  "report": {
+    "driver": "local",
+    "connection": {
+      "local": {
+        "path": "./build/qase-report",
+        "format": "json"
+      }
+    }
+  }
+}
+```
+
+### Example `playwright.config.ts`
+
+```typescript
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  reporter: [
+    ['list'],
+    [
+      'playwright-qase-reporter',
+      {
+        mode: 'testops',
+        debug: false,
+        testops: {
+          api: {
+            token: process.env.QASE_API_TOKEN,
+          },
+          project: 'YOUR_PROJECT_CODE',
           uploadAttachments: true,
           run: {
+            title: 'Automated Playwright Run',
+            description: 'Nightly regression tests',
             complete: true,
+          },
+          batch: {
+            size: 100,
           },
         },
         framework: {
           browser: {
             addAsParameter: true,
-            parameterName: 'Browser Name',
+            parameterName: 'Browser',
           },
           markAsFlaky: true,
         },
       },
     ],
   ],
-};
-module.exports = config;
+});
 ```
 
-You can check example configuration with multiple reporters in [example project](../examples/playwright/playwright.config.js).
+> **Full configuration reference:** See [qase-javascript-commons](../qase-javascript-commons/README.md) for all available options including logging, status mapping, execution plans, and more.
 
-Supported ENV variables:
+## Usage
 
-- `QASE_MODE` - Same as `mode`
-- `QASE_DEBUG` - Same as `debug`
-- `QASE_ENVIRONMENT` - Same as `environment` 
-- `QASE_TESTOPS_API_TOKEN` - Same as `testops.api.token`
-- `QASE_TESTOPS_PROJECT` - Same as `testops.project`
-- `QASE_TESTOPS_RUN_ID` - Pass Run ID from ENV and override reporter option `testops.run.id`
-- `QASE_TESTOPS_RUN_TITLE` - Same as `testops.run.title`
-- `QASE_TESTOPS_RUN_DESCRIPTION` - Same as `testops.run.description`
+### Link Tests with Test Cases
+
+Playwright provides **multiple patterns** for linking tests. Choose the one that fits your style:
+
+```typescript
+import { test, expect } from '@playwright/test';
+import { qase } from 'playwright-qase-reporter';
+
+// Pattern 1: Wrapper function with single ID
+test(qase(1, 'Test name'), async ({ page }) => {
+  expect(true).toBe(true);
+});
+
+// Pattern 2: Wrapper function with multiple IDs
+test(qase([1, 2, 3], 'Test covering multiple cases'), async ({ page }) => {
+  expect(true).toBe(true);
+});
+
+// Pattern 3: Method-based ID assignment
+test('Test name', async ({ page }) => {
+  qase.id(1);
+  expect(true).toBe(true);
+});
+```
+
+### Add Metadata
+
+Enhance your tests with additional information:
+
+```typescript
+import { qase } from 'playwright-qase-reporter';
+
+test('Login test', async ({ page }) => {
+  qase.id(1);
+  qase.title('User can successfully login');
+  qase.fields({
+    severity: 'critical',
+    priority: 'high',
+    layer: 'e2e',
+  });
+  qase.suite('Authentication / Login');
+
+  // Test logic
+  await page.goto('https://example.com/login');
+  expect(await page.title()).toBe('Login');
+});
+```
+
+### Ignore Tests
+
+Exclude specific tests from Qase reporting (test still runs, but results are not sent):
+
+```typescript
+import { qase } from 'playwright-qase-reporter';
+
+test('This test runs but is not reported to Qase', async ({ page }) => {
+  qase.ignore();
+  expect(true).toBe(true);
+});
+```
+
+### Test Result Statuses
+
+| Playwright Result | Qase Status |
+|-------------------|-------------|
+| passed            | passed      |
+| failed            | failed      |
+| timedOut          | failed      |
+| skipped           | skipped     |
+| interrupted       | skipped     |
+
+> For more usage examples, see the [Usage Guide](docs/usage.md).
+
+## Running Tests
+
+```bash
+# Run all tests with Qase reporting
+npx playwright test
+
+# Run specific test file
+npx playwright test tests/auth.spec.ts
+
+# Run tests with specific tag
+npx playwright test --grep "@smoke"
+
+# Run tests in headed mode
+npx playwright test --headed
+
+# Run with specific browser
+npx playwright test --project=chromium
+
+# Run with custom test run title
+QASE_TESTOPS_RUN_TITLE="Nightly Regression" npx playwright test
+```
 
 ## Requirements
 
-We maintain the reporter on [LTS versions of Node.js](https://nodejs.org/en/about/releases/).
+- Node.js >= 14
+- Playwright >= 1.20.0
 
-`@playwright/test >= 1.16.3`
+## Documentation
 
-<!-- references -->
+| Guide | Description |
+|-------|-------------|
+| [Usage Guide](docs/usage.md) | Complete usage reference with all methods and options |
+| [Attachments](docs/ATTACHMENTS.md) | Adding screenshots, logs, and files to test results |
+| [Steps](docs/STEPS.md) | Defining test steps for detailed reporting |
+| [Multi-Project Support](docs/MULTI_PROJECT.md) | Reporting to multiple Qase projects |
+| [Upgrade Guide](docs/UPGRADE.md) | Migration guide for breaking changes |
 
-[auth]: https://developers.qase.io/#authentication
+## Examples
+
+See the [examples directory](../examples/) for complete working examples.
+
+## License
+
+Apache License 2.0. See [LICENSE](../LICENSE) for details.
