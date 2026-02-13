@@ -181,7 +181,7 @@ CucumberJS reporter has a unique pattern compared to other Qase reporters:
 
 | Feature | Other Reporters | CucumberJS |
 |---------|----------------|------------|
-| Test ID linking | `qase(id, 'name')` wrapper | `@QaseID=1` tag |
+| Test case ID linking | `qase(id, 'name')` wrapper | `@QaseID=1` tag |
 | Fields | `qase.fields({...})` | `@QaseFields={...}` tag |
 | Steps | `qase.step()` or native framework steps | Native Gherkin steps only |
 | Attachments | `qase.attach()` | `this.attach()` in step definitions |

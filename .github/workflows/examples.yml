@@ -87,3 +87,15 @@ jobs:
           done
       - name: Validate examples match docs
         run: node .planning/tools/validate-examples.js all
+      - name: Validate terminology consistency
+        run: |
+          for fw in jest playwright cypress mocha vitest cucumberjs newman testcafe wdio; do
+            echo "Checking qase-$fw..."
+            node .planning/tools/validate-terminology.js "qase-$fw/"
+          done
+      - name: Validate internal links
+        run: |
+          for fw in jest playwright cypress mocha vitest cucumberjs newman testcafe wdio; do
+            echo "Checking qase-$fw..."
+            node .planning/tools/validate-links.js "qase-$fw/"
+          done

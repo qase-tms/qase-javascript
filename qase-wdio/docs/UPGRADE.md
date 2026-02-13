@@ -128,7 +128,7 @@ exports.config = {
 import { qase } from 'wdio-qase-reporter';
 ```
 
-**Test ID Linking:**
+**Test Case ID Linking:**
 
 ```javascript
 import { qase } from 'wdio-qase-reporter';

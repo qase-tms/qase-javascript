@@ -107,7 +107,7 @@ import { qase } from 'playwright-qase-reporter';
 
 ## API Reference
 
-### Test ID Linking
+### Test Case ID Linking
 
 **Wrapper Function Pattern:**
 
