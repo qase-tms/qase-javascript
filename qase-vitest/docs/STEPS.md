@@ -166,7 +166,7 @@ describe('Test suite', () => {
       qase.attach({
         name: 'app-state.json',
         content: state,
-        contentType: 'application/json',
+        type: 'application/json',
       });
     });
 
