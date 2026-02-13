@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 ## Current Position
 
-Phase: 4 of 5 (Examples and Validation)
-Plan: 4 of 4 completed
-Status: Phase Complete
-Last activity: 2026-02-13 — Completed 04-04-PLAN.md: CI Workflow and Final Validation
+Phase: 5 of 5 (Quality Assurance)
+Plan: 1 of 2 completed
+Status: In Progress
+Last activity: 2026-02-13 — Completed 05-01-PLAN.md: Validation Tooling for Terminology and Links
 
-Progress: [████████████████████] 100% (Phase 4: 4/4 plans complete)
+Progress: [████████████████████░] 95% (Phase 5: 1/2 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18
-- Average duration: 11 min
-- Total execution time: 4.2 hours
+- Total plans completed: 19
+- Average duration: 10 min
+- Total execution time: 4.3 hours
 
 **By Phase:**
 
@@ -31,16 +31,17 @@ Progress: [████████████████████] 100% (P
 | 02-core-documentation | 5 | 134 min | 27 min |
 | 03-feature-guides | 6 | 29 min | 5 min |
 | 04-examples-validation | 4 | 20 min | 5 min |
+| 05-quality-assurance | 1 | 4 min | 4 min |
 
 **Recent Plans:**
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
+| 05-quality-assurance | 01 | 4 min | 2 | 4 |
 | 04-examples-validation | 04 | 2 min | 3 | 2 |
 | 04-examples-validation | 03 | 4 min | 2 | 5 |
 | 04-examples-validation | 02 | 7 min | 2 | 10 |
 | 04-examples-validation | 01 | 3 min | 2 | 4 |
-| 03-feature-guides | 06 | 8 min | 2 | 2 |
 
 ## Accumulated Context
 
@@ -112,6 +113,11 @@ Recent decisions affecting current work:
 - [Phase 04-examples-validation]: Extended CI matrix to include all 10 single and 11 multi-project example directories
 - [Phase 04-examples-validation]: Separate validation job for documentation checks (placeholders, example patterns)
 - [Phase 04-examples-validation]: Phase 4 complete - all requirements (EX-01, EX-02, EX-04, QA-03) satisfied with evidence
+- [Phase 05-quality-assurance]: Terminology dictionary focused on 9 canonical terms, 3 deprecated, 2 ambiguous (start small, expand later)
+- [Phase 05-quality-assurance]: Strip markdown URLs from prose text to avoid false positives from domain names (e.g., qase.io)
+- [Phase 05-quality-assurance]: Zero npm dependencies for validation tools (consistent with validate-placeholders.js pattern)
+- [Phase 05-quality-assurance]: Warnings for canonical variants and ambiguous terms, errors only for deprecated terms
+- [Phase 05-quality-assurance]: GitHub-compatible anchor slug generation for link fragment validation
 
 ### Pending Todos
 
@@ -124,6 +130,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 04-04-PLAN.md: CI Workflow and Final Validation (Phase 4 Complete)
-Resume file: .planning/phases/04-examples-validation/04-04-SUMMARY.md
-Next plan: Phase 5 - Final Polish
+Stopped at: Completed 05-01-PLAN.md: Validation Tooling for Terminology and Links
+Resume file: .planning/phases/05-quality-assurance/05-01-SUMMARY.md
+Next plan: 05-02-PLAN.md: Audit and Fix Terminology and Link Issues
