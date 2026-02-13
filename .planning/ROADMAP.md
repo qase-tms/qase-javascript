@@ -13,7 +13,7 @@ This roadmap transforms 9 framework-specific reporters (Jest, Playwright, Cypres
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation & Templates** - Create master templates and validation infrastructure
-- [ ] **Phase 2: Core Documentation** - Apply templates to README and usage.md for all 9 frameworks
+- [x] **Phase 2: Core Documentation** - Apply templates to README and usage.md for all 9 frameworks
 - [ ] **Phase 3: Feature Guides** - Add specialized guides (ATTACHMENTS, STEPS, MULTI_PROJECT, UPGRADE)
 - [ ] **Phase 4: Examples & Validation** - Validate code examples and establish CI testing
 - [ ] **Phase 5: Quality Assurance** - Consistency audit and polish across all documentation
@@ -53,12 +53,12 @@ Plans:
 **Plans**: 6 plans in 3 waves
 
 Plans:
-- [ ] 02-01-PLAN.md — Apply templates to Jest and Playwright reporters (README + usage.md)
-- [ ] 02-02-PLAN.md — Apply templates to Cypress and Mocha reporters (README + usage.md)
-- [ ] 02-03-PLAN.md — Apply templates to Vitest and CucumberJS reporters (README + usage.md)
-- [ ] 02-04-PLAN.md — Apply templates to Newman, TestCafe, and WDIO reporters (README + usage.md)
-- [ ] 02-05-PLAN.md — Cross-validate structural consistency and configuration tables across all 9 frameworks
-- [ ] 02-06-PLAN.md — Human review of complete Phase 2 documentation
+- [x] 02-01-PLAN.md — Apply templates to Jest and Playwright reporters (README + usage.md)
+- [x] 02-02-PLAN.md — Apply templates to Cypress and Mocha reporters (README + usage.md)
+- [x] 02-03-PLAN.md — Apply templates to Vitest and CucumberJS reporters (README + usage.md)
+- [x] 02-04-PLAN.md — Apply templates to Newman, TestCafe, and WDIO reporters (README + usage.md)
+- [x] 02-05-PLAN.md — Cross-validate structural consistency and configuration tables across all 9 frameworks
+- [x] 02-06-PLAN.md — Human review of complete Phase 2 documentation
 
 ### Phase 3: Feature Guides
 **Goal**: Specialized capability guides exist for all frameworks
@@ -70,10 +70,15 @@ Plans:
   3. User can configure multiple Qase projects in monorepo using MULTI_PROJECT.md
   4. User can migrate between versions using UPGRADE.md migration paths
   5. Each guide exists in all 9 framework documentation directories
-**Plans**: TBD
+**Plans**: 6 plans in 3 waves
 
 Plans:
-- [ ] 03-01: TBD
+- [ ] 03-01-PLAN.md — Create ATTACHMENTS.md for Jest, Playwright, Cypress, Mocha, and Vitest
+- [ ] 03-02-PLAN.md — Create STEPS.md for Jest, Playwright, Cypress, Mocha, and Vitest
+- [ ] 03-03-PLAN.md — Create ATTACHMENTS.md and STEPS.md for TestCafe, WDIO, CucumberJS, and Newman
+- [ ] 03-04-PLAN.md — Create and enhance MULTI_PROJECT.md for all 9 frameworks
+- [ ] 03-05-PLAN.md — Create UPGRADE.md for all 9 frameworks
+- [ ] 03-06-PLAN.md — Cross-validate all 36 feature guides and human review
 
 ### Phase 4: Examples & Validation
 **Goal**: All code examples are validated and tested in CI
@@ -113,7 +118,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Templates | 3/3 | ✓ Complete | 2026-02-13 |
-| 2. Core Documentation | 0/6 | Not started | - |
-| 3. Feature Guides | 0/TBD | Not started | - |
+| 2. Core Documentation | 6/6 | ✓ Complete | 2026-02-13 |
+| 3. Feature Guides | 0/6 | Not started | - |
 | 4. Examples & Validation | 0/TBD | Not started | - |
 | 5. Quality Assurance | 0/TBD | Not started | - |
