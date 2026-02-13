@@ -50,14 +50,15 @@ Plans:
   5. User can troubleshoot common errors using documented solutions
   6. User can discover common use cases with goal-oriented recipe examples
   7. All 9 frameworks have structurally identical documentation (same sections, same order)
-**Plans**: 5 plans in 2 waves
+**Plans**: 6 plans in 3 waves
 
 Plans:
 - [ ] 02-01-PLAN.md — Apply templates to Jest and Playwright reporters (README + usage.md)
 - [ ] 02-02-PLAN.md — Apply templates to Cypress and Mocha reporters (README + usage.md)
 - [ ] 02-03-PLAN.md — Apply templates to Vitest and CucumberJS reporters (README + usage.md)
 - [ ] 02-04-PLAN.md — Apply templates to Newman, TestCafe, and WDIO reporters (README + usage.md)
-- [ ] 02-05-PLAN.md — Cross-validate structural consistency across all 9 frameworks with human review
+- [ ] 02-05-PLAN.md — Cross-validate structural consistency and configuration tables across all 9 frameworks
+- [ ] 02-06-PLAN.md — Human review of complete Phase 2 documentation
 
 ### Phase 3: Feature Guides
 **Goal**: Specialized capability guides exist for all frameworks
@@ -112,7 +113,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Templates | 3/3 | ✓ Complete | 2026-02-13 |
-| 2. Core Documentation | 0/5 | Not started | - |
+| 2. Core Documentation | 0/6 | Not started | - |
 | 3. Feature Guides | 0/TBD | Not started | - |
 | 4. Examples & Validation | 0/TBD | Not started | - |
 | 5. Quality Assurance | 0/TBD | Not started | - |
