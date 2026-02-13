@@ -357,7 +357,10 @@ For detailed information, see the [Multi-Project Support Guide](docs/MULTI_PROJE
 | Guide | Description |
 |-------|-------------|
 | [Usage Guide](docs/usage.md) | Complete usage reference with all methods and options |
+| [Attachments](docs/ATTACHMENTS.md) | Adding screenshots, logs, and files to test results |
+| [Steps](docs/STEPS.md) | Defining test steps for detailed reporting |
 | [Multi-Project Support](docs/MULTI_PROJECT.md) | Reporting to multiple Qase projects |
+| [Upgrade Guide](docs/UPGRADE.md) | Migration guide for breaking changes |
 | [Configuration Reference](../qase-javascript-commons/README.md) | Full configuration options |
 
 ## Examples
