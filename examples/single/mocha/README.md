@@ -96,6 +96,46 @@ This runs Mocha directly with Qase integration.
    - The project code is shown in the URL: `https://app.qase.io/project/YOUR_PROJECT_CODE`
    - Or find it in project settings
 
+## Expected Behavior
+
+### Running with QASE_MODE=off (Local Development)
+
+When running tests with `QASE_MODE=off`, tests execute normally without Qase reporting:
+
+- Tests run and pass/fail as usual
+- No data is sent to Qase TestOps
+- No Qase API token required
+- Output shows standard Mocha test results
+
+This mode is useful for local development and debugging.
+
+### Running with QASE_MODE=testops (CI/CD and Reporting)
+
+When running tests with `QASE_MODE=testops`, test results are reported to Qase:
+
+- Tests execute and results are sent to Qase TestOps
+- A new test run is created in your Qase project
+- Test results include all metadata (steps, attachments, fields, etc.)
+- Console output includes Qase test run link
+- Requires valid Qase API token and project code in `qase.config.json`
+
+**Steps Example:**
+- Creates test result with multiple named steps using `this.step()`
+- Each step shows execution status, duration, and any errors
+- Nested steps appear hierarchically in Qase
+- Steps with callbacks can contain assertions and actions
+
+**Attachments Example:**
+- Files attached via `this.attach()` appear in test results
+- Content can be strings, buffers, or file paths
+- Attachments are visible in the test run details
+- Supports text, JSON, images, and binary files
+
+**Context Methods:**
+- Mocha provides Qase methods via test context (`this` keyword)
+- Must use `function()` syntax (not arrow functions) to access `this`
+- Available methods: `this.title()`, `this.suite()`, `this.fields()`, `this.comment()`, `this.parameters()`, `this.attach()`, `this.step()`
+
 ## What You'll See
 
 ### Test Execution Output
