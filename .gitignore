@@ -78,3 +78,5 @@ jspm_packages/
 # Temporary files and playground
 tmp
 *.tmp
+
+CLAUDE.md
