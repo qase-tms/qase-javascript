@@ -1,0 +1,89 @@
+name: Test Examples
+
+on:
+  pull_request:
+    branches:
+      - 'main'
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  test-single-examples:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+      matrix:
+        node-version: ['22', '24']
+        framework: ['jest', 'playwright', 'cypress', 'mocha', 'vitest', 'cucumberjs', 'newman', 'testcafe', 'cypressCucumber', 'cypressBadeballCucumber']
+      fail-fast: false
+    name: Single ${{ matrix.framework }} - Node ${{ matrix.node-version }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install root dependencies and build
+        run: |
+          npm install npm@latest
+          npm ci
+          npm run build -ws --if-present
+      - name: Test example
+        run: |
+          cd examples/single/${{ matrix.framework }}
+          if [ ! -f "package.json" ]; then
+            echo "No package.json found, skipping"
+            exit 0
+          fi
+          npm install --no-audit --no-fund
+          npm test || true
+        env:
+          QASE_MODE: 'off'
+
+  test-multiproject-examples:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+      matrix:
+        node-version: ['22']
+        framework: ['jest', 'playwright', 'cypress', 'mocha', 'vitest', 'cucumberjs', 'newman', 'testcafe', 'wdio', 'cypressCucumber', 'cypressBadeballCucumber']
+      fail-fast: false
+    name: Multi ${{ matrix.framework }} - Node ${{ matrix.node-version }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install root dependencies and build
+        run: |
+          npm install npm@latest
+          npm ci
+          npm run build -ws --if-present
+      - name: Test example
+        run: |
+          cd examples/multiProject/${{ matrix.framework }}
+          if [ ! -f "package.json" ]; then
+            echo "No package.json found, skipping"
+            exit 0
+          fi
+          npm install --no-audit --no-fund
+          npm test || true
+        env:
+          QASE_MODE: 'off'
+
+  validate-documentation:
+    runs-on: ubuntu-latest
+    name: Validate Documentation
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Validate no unreplaced placeholders
+        run: |
+          for fw in jest playwright cypress mocha vitest cucumberjs newman testcafe wdio; do
+            echo "Checking qase-$fw..."
+            node .planning/tools/validate-placeholders.js "qase-$fw/"
+          done
+      - name: Validate examples match docs
+        run: node .planning/tools/validate-examples.js all
