@@ -10,35 +10,35 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 2 of 5 (Core Documentation)
-Plan: 2 of 6 completed
+Plan: 3 of 6 completed
 Status: In progress
-Last activity: 2026-02-13 — Completed 02-02-PLAN.md: Cypress and Mocha documentation with Mocha-style it() syntax
+Last activity: 2026-02-13 — Completed 02-04-PLAN.md: Newman, TestCafe, and WDIO documentation with framework-specific patterns
 
-Progress: [█████░░░░░] 33%
+Progress: [██████░░░░] 40%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: 9 min
-- Total execution time: 0.73 hours
+- Total plans completed: 6
+- Average duration: 14 min
+- Total execution time: 1.21 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 3 | 11 min | 4 min |
-| 02-core-documentation | 2 | 33 min | 17 min |
+| 02-core-documentation | 3 | 62 min | 21 min |
 
 **Recent Plans:**
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
+| 02-core-documentation | 04 | 29 min | 3 | 6 |
 | 02-core-documentation | 02 | 16 min | 2 | 4 |
 | 02-core-documentation | 01 | 17 min | 2 | 4 |
 | 01-foundation | 03 | 1 min | 2 | 1 |
 | 01-foundation | 02 | 6 min | 3 | 3 |
-| 01-foundation | 01 | 4 min | 3 | 7 |
 
 ## Accumulated Context
 
@@ -71,6 +71,11 @@ Recent decisions affecting current work:
 - [Phase 02-core-documentation]: Use synchronous callbacks for Cypress/Mocha steps (framework pattern)
 - [Phase 02-core-documentation]: Show function() syntax for Mocha (this context requirement)
 - [Phase 02-core-documentation]: Include extra reporters section for Mocha (unique feature)
+- [Phase 02-core-documentation]: Newman uses comment-based annotations (unique pattern, no programmatic imports)
+- [Phase 02-core-documentation]: Document Newman limitations explicitly (no steps, no fields, no attachments)
+- [Phase 02-core-documentation]: TestCafe uses builder pattern with .meta(qase.id().create())
+- [Phase 02-core-documentation]: WDIO supports both Mocha/Jasmine and Cucumber frameworks
+- [Phase 02-core-documentation]: Document WDIO reporter options (disableWebdriverStepsReporting, etc.)
 
 ### Pending Todos
 
@@ -83,5 +88,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 02-02-PLAN.md: Cypress and Mocha documentation with Mocha-style it() syntax
-Resume file: .planning/phases/02-core-documentation/02-02-SUMMARY.md
+Stopped at: Completed 02-04-PLAN.md: Newman, TestCafe, and WDIO documentation
+Resume file: .planning/phases/02-core-documentation/02-04-SUMMARY.md
