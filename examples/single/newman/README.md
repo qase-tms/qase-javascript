@@ -1,92 +1,120 @@
-# Newman Example
+# Newman Collection Example
 
-This is a sample project demonstrating how to run Postman collections using the Newman CLI runner with integration to Qase Test Management.
+This example demonstrates realistic API testing using a Postman collection with the Newman CLI runner and Qase Test Management integration. Tests exercise the JSONPlaceholder REST API with organized collection folders providing suite hierarchy.
 
 ## Prerequisites
 
-Ensure that the following tools are installed on your machine:
+1. [Node.js](https://nodejs.org/) (version 18 or higher recommended)
+2. [npm](https://www.npmjs.com/)
 
-1. [Node.js](https://nodejs.org/) (version 18 or higher is recommended)
-2. [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
+## Setup
 
-## Setup Instructions
-
-1. Clone this repository by running the following commands:
+1. Clone the repository:
    ```bash
    git clone https://github.com/qase-tms/qase-javascript.git
    cd qase-javascript/examples/single/newman
    ```
 
-2. Install the project dependencies:
+2. Install dependencies:
    ```bash
    npm install
    ```
 
-3. Create a `qase.config.json` file in the root of the project. Follow the instructions on [how to configure the file](https://github.com/qase-tms/qase-javascript/tree/main/qase-javascript-commons#configuration).
+3. Configure Qase credentials in `qase.config.json`:
+   - Set your API token in `testops.api.token`
+   - Set your project code in `testops.project`
 
-## Example Files
+## Collection Structure
 
-This example includes:
+### Users (4 requests)
+CRUD operations on JSONPlaceholder users:
+- **Get all users** -- Verify 10 users with required fields (id, name, email, address)
+- **Get single user** -- Verify user 1 data and nested address structure
+- **Create user** -- POST with JSON body, verify 201 response and returned user
+- **Delete user** -- DELETE request, verify 200 and empty response body
 
-* **sample-collection.json** — Postman collection with test assertions
-  * Contains examples with and without Qase ID comments
-  * Demonstrates comment-based test case linking
-* **qase.config.json** — Qase reporter configuration
+### Posts (3 requests)
+Post validation and filtering:
+- **Get all posts** -- Verify 100 posts with required fields (userId, id, title, body)
+- **Filter posts by user** -- Query string filtering with parameterized userId
+- **Get post comments** -- Nested resource, verify 5 comments with valid email
+
+### Error Handling (3 requests)
+Error and edge case scenarios:
+- **Non-existent user** -- Verify 200 with empty object for /users/999
+- **Invalid endpoint** -- Verify 404 for unknown routes
+- **POST with empty body** -- Verify graceful handling (201 with generated ID)
+
+### Advanced (3 requests)
+Advanced testing patterns:
+- **Chained request** -- Pre-request script fetches user, stores in collection variable, test validates
+- **Parameterized user lookup** -- Data-driven testing with `// qase.parameters:` annotation
+- **Response time validation** -- Performance assertion (response under 2000ms)
+
+## Qase Features Demonstrated
+
+| Feature | How It's Used | Example |
+|---------|---------------|---------|
+| Test Case ID | `// qase: N` comment before pm.test() | `// qase: 1` |
+| Parameters | `// qase.parameters: key1, key2` comment | `// qase.parameters: userId, expectedName` |
+| Auto-collect Params | `autoCollectParams: true` in qase.config.json | Reports all data file fields automatically |
+| Suite Hierarchy | Collection folder structure | `JSONPlaceholder API Tests > Users > Get all users` |
+| Data-driven Testing | `-d data.json` flag with iteration data | 3 iterations with different userId/expectedName |
+
+### Newman Limitations
+
+Newman reporter has limited Qase feature support compared to other frameworks:
+
+| Feature | Supported | Notes |
+|---------|-----------|-------|
+| Test Case ID | Yes | Via `// qase: N` comments |
+| Parameters | Yes | Via `// qase.parameters:` + data file |
+| Suite Hierarchy | Yes | Via collection folder structure |
+| Title Override | No | Test name comes from request name |
+| Custom Fields | No | No severity, priority, etc. |
+| Steps | No | Each pm.test() is a separate result |
+| Attachments | No | No file attachment support |
+| Ignore | No | Cannot exclude specific tests |
+| Comments | No | No comment annotation support |
 
 ## Running Tests
 
-To run tests locally without reporting to Qase:
-
+Run tests locally (no Qase reporting):
 ```bash
 QASE_MODE=off npm test
 ```
 
-To run tests and upload the results to Qase Test Management:
-
+Run tests with Qase reporting:
 ```bash
 npm test
 ```
 
-Or with explicit mode:
-
+Run with parameterized data file:
 ```bash
-QASE_MODE=testops npx newman run sample-collection.json -r qase
+npm run test:data
 ```
 
-## Expected Behavior
+This runs the collection 3 times (one per data row), with each iteration using different `userId` and `expectedName` values.
 
-When tests execute with Qase reporting enabled:
+## Newman-Specific Patterns
 
-* **Each pm.test()** in the collection is reported as a separate test result
-* **Comment-based IDs** (`// qase: 123`) link tests to existing Qase test cases
-* **Postman assertions** determine pass/fail status
-* **Collection structure** (folders) organizes tests in Qase
-* **Request/response data** is captured in test result details
+- **Comment-based annotations** -- Use `// qase: N` in exec array before pm.test() calls
+- **Each pm.test() is a separate result** -- No nesting or step hierarchy
+- **Folder = Suite** -- Collection folders automatically create suite hierarchy in Qase
+- **Pre-request scripts** -- Run before the main request; useful for chaining and setup
+- **Data-driven iterations** -- `-d data.json` runs collection once per data row
+- **Collection variables** -- Share data between pre-request and test scripts
 
-## Limitations
+## API Notes
 
-Newman reporter has the following limitations compared to other frameworks:
-
-* **No programmatic steps API** — All assertions are reported at the test level (no qase.step())
-* **No programmatic attachments API** — No qase.attach() support (Postman security/portability constraint)
-* **No custom fields support** — Severity, priority, and other fields cannot be set via comments
-* **Comment-based only** — Test configuration uses special comments, not programmatic imports
-
-### Workarounds
-
-* **For step-like organization:** Use multiple `pm.test()` calls with descriptive names
-* **For attachments:** Use Postman console logging or store data in collection variables
-* **For test organization:** Use Postman collection folders to group related tests
-
-## Framework-Specific Features
-
-Newman with Qase has unique patterns:
-
-* **Comment-based annotations** — Use `// qase: 123` comments before `pm.test()` calls
-* **Data-driven testing** — Run with `-d data.json` for parameterized tests
-* **Multiple reporters** — Combine with other Newman reporters (`-r cli,qase`)
-* **Collection-level config** — Parameters can be specified at folder/collection level
+Tests use [JSONPlaceholder](https://jsonplaceholder.typicode.com/) as the test API:
+- Free, public REST API -- no authentication required
+- Returns realistic data (users, posts, comments, todos)
+- Write operations (POST, PUT, DELETE) are faked -- they return success responses but don't persist data
+- Stable and widely used for testing and prototyping
 
 ## Additional Resources
 
-For more details on how to use this integration with Qase Test Management, visit the [Qase Newman documentation](https://github.com/qase-tms/qase-javascript/tree/main/qase-newman).
+- [Qase Newman Reporter](https://github.com/qase-tms/qase-javascript/tree/main/qase-newman)
+- [Newman Documentation](https://learning.postman.com/docs/collections/using-newman-cli/command-line-integration-with-newman/)
+- [JSONPlaceholder API Guide](https://jsonplaceholder.typicode.com/guide/)
