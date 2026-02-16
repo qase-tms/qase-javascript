@@ -8,7 +8,7 @@ const createMockWriter = (): jest.Mocked<WriterInterface> => ({
   clearPreviousResults: jest.fn(),
   writeAttachment: jest.fn((attachments) => attachments.map(a => ({ ...a, file_path: '/mock/' + a.file_name }))),
   writeTestResult: jest.fn().mockResolvedValue(undefined),
-  writeReport: jest.fn().mockResolvedValue('/mock/report.json'),
+  writeReport: jest.fn().mockResolvedValue('/mock/run.json'),
 });
 
 const createMockLogger = (): jest.Mocked<LoggerInterface> => ({
@@ -96,7 +96,7 @@ describe('ReportReporter', () => {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(writer.writeReport).toHaveBeenCalled();
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(logger.log).toHaveBeenCalledWith(expect.stringContaining('/mock/report.json'));
+    expect(logger.log).toHaveBeenCalledWith(expect.stringContaining('/mock/run.json'));
   });
 
   it('should correctly calculate stats and cumulative duration in complete', async () => {
@@ -123,7 +123,7 @@ describe('ReportReporter', () => {
     reporter['results'] = [testResult1, testResult2, testResult3, testResult4, testResult5];
     await reporter.complete();
     const reportArg = writer.writeReport.mock.calls[0]?.[0];
-    expect(reportArg?.stats).toEqual({ total: 5, passed: 1, failed: 1, skipped: 1, broken: 1, muted: 1 });
+    expect(reportArg?.stats).toEqual({ total: 5, passed: 1, failed: 1, skipped: 1, invalid: 1, blocked: 1, muted: 0 });
     expect(reportArg?.execution.cumulative_duration).toBe(45);
     expect(reportArg?.results.length).toBe(5);
   });

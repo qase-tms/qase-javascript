@@ -92,7 +92,7 @@ export class FsWriter implements WriterInterface {
     } catch (error) {/* ignore */
     }
 
-    const filePath = path.join(this.path, `report.${this.format}`);
+    const filePath = path.join(this.path, `run.${this.format}`);
 
     writeFileSync(filePath, await this.formatter.format(results));
 

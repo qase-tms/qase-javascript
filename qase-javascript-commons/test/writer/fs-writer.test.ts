@@ -145,7 +145,7 @@ describe('FsWriter', () => {
           apiClientV1: 'test',
           apiClientV2: 'test',
         },
-        stats: { total: 0, passed: 0, failed: 0, skipped: 0, broken: 0, muted: 0 },
+        stats: { total: 0, passed: 0, failed: 0, skipped: 0, blocked: 0, invalid: 0, muted: 0 },
         results: [],
         threads: [],
         suites: [],
@@ -157,8 +157,8 @@ describe('FsWriter', () => {
       const result = await writer.writeReport(report);
 
       expect(mockMkdirSync).toHaveBeenCalledWith('test-path', { recursive: true });
-      expect(mockWriteFileSync).toHaveBeenCalledWith('test-path/report.json', 'formatted-report');
-      expect(result).toBe('test-path/report.json');
+      expect(mockWriteFileSync).toHaveBeenCalledWith('test-path/run.json', 'formatted-report');
+      expect(result).toBe('test-path/run.json');
     });
 
     it('should handle mkdirSync error gracefully', async () => {
@@ -185,7 +185,7 @@ describe('FsWriter', () => {
           apiClientV1: 'test',
           apiClientV2: 'test',
         },
-        stats: { total: 0, passed: 0, failed: 0, skipped: 0, broken: 0, muted: 0 },
+        stats: { total: 0, passed: 0, failed: 0, skipped: 0, blocked: 0, invalid: 0, muted: 0 },
         results: [],
         threads: [],
         suites: [],
@@ -193,7 +193,7 @@ describe('FsWriter', () => {
 
       writer['formatter'].format = jest.fn().mockResolvedValue('formatted-report');
 
-      await expect(writer.writeReport(report)).resolves.toBe('test-path/report.json');
+      await expect(writer.writeReport(report)).resolves.toBe('test-path/run.json');
     });
   });
 
