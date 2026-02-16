@@ -1,7 +1,6 @@
-# Cypress Example
+# Cypress Example - E-commerce Test Suite
 
-This is a sample project demonstrating how to write and execute tests using the Cypress framework with integration to
-Qase Test Management.
+This is a realistic e-commerce test suite demonstrating how to write and execute end-to-end tests using Cypress with integration to Qase Test Management. The tests run against [saucedemo.com](https://www.saucedemo.com), a demo e-commerce site.
 
 ## Prerequisites
 
@@ -12,7 +11,7 @@ Ensure that the following tools are installed on your machine:
 
 ## Setup Instructions
 
-1. Clone this repository by running the following commands:
+1. Clone this repository:
    ```bash
    git clone https://github.com/qase-tms/qase-javascript.git
    cd qase-javascript/examples/single/cypress
@@ -26,82 +25,179 @@ Ensure that the following tools are installed on your machine:
 3. Create a `qase.config.json` file in the root of the project. Follow the instructions
    on [how to configure the file](https://github.com/qase-tms/qase-javascript/tree/main/qase-javascript-commons#configuration).
 
-4. To run tests locally without Qase reporting (interactive mode):
-   ```bash
-   QASE_MODE=off npx cypress open
-   ```
+## Running Tests
 
-5. To run tests locally without Qase reporting (headless mode):
-   ```bash
-   QASE_MODE=off npx cypress run
-   ```
+### Local Development (Without Qase Reporting)
 
-6. To run tests and upload the results to Qase Test Management:
-   ```bash
-   QASE_MODE=testops npx cypress run
-   ```
+Run tests locally without sending results to Qase:
 
-## Example Files
+```bash
+# Interactive mode with Cypress UI
+QASE_MODE=off npx cypress open
 
-This project contains several test files demonstrating different Qase features:
+# Headless mode
+QASE_MODE=off npx cypress run
+```
 
-| File | Feature | Description |
-|------|---------|-------------|
-| `simpleTests.cy.js` | Basic tests | Simple Cypress tests with and without Qase integration |
-| `methodTests.cy.js` | Qase methods | Demonstrates `qase.comment()` and `qase.attach()` methods |
-| `stepTests.cy.js` | Test steps | Defines execution steps with `qase.step()` (synchronous callbacks) |
-| `parametrizedTests.cy.js` | Parameters | Reports parameterized test data with `qase.parameters()` |
-
-## Expected Behavior
-
-### Running with QASE_MODE=off (Local Development)
-
-When running tests with `QASE_MODE=off`, tests execute normally without Qase reporting:
-
-- Tests run and pass/fail as usual
+In this mode:
+- Tests execute normally
 - No data is sent to Qase TestOps
 - No Qase API token required
-- Output shows standard Cypress test results
-- Cypress screenshots and videos work normally
+- Standard Cypress test output
 
-This mode is useful for local development and debugging.
+### CI/CD Mode (With Qase Reporting)
 
-### Running with QASE_MODE=testops (CI/CD and Reporting)
+Run tests and upload results to Qase TestOps:
 
-When running tests with `QASE_MODE=testops`, test results are reported to Qase:
+```bash
+QASE_MODE=testops npx cypress run
+```
 
+In this mode:
 - Tests execute and results are sent to Qase TestOps
 - A new test run is created in your Qase project
-- Test results include all metadata (steps, attachments, comments, etc.)
+- Test results include all metadata (steps, attachments, comments, parameters, etc.)
 - Console output includes Qase test run link
 - Requires valid `QASE_TESTOPS_API_TOKEN` and `QASE_TESTOPS_PROJECT` configuration
 - Cypress screenshots on failure can be attached automatically
 
-**Steps Example (`stepTests.cy.js`):**
-- Creates test result with multiple named steps using `qase.step()`
-- Each step shows execution status, duration, and any errors
-- **Important:** Cypress steps use synchronous callbacks (no async/await)
-- Nested steps can be created by calling `qase.step()` within another step
-- Steps are visible in Qase test run details
+## Test Scenarios
 
-**Attachments Example (`methodTests.cy.js`):**
-- Content attached via `qase.attach()` appears in test results
-- Supports attaching text, JSON, and other content types
-- Cypress screenshots and videos can be attached automatically on failure
-- Attachments are visible in the test run details
+This example demonstrates realistic e-commerce test scenarios across four test files:
 
-**Parameters Example (`parametrizedTests.cy.js`):**
-- Parameterized tests report their parameter values to Qase
-- Parameters help identify which test variant produced which result
-- Useful for data-driven testing scenarios
+| File | Scenarios | Description |
+|------|-----------|-------------|
+| `login.cy.js` | Authentication | Login with valid/invalid credentials, locked user |
+| `inventory.cy.js` | Product Browsing | Browse products, sort by price, view details |
+| `cart.cy.js` | Shopping Cart | Add/remove products, multiple items |
+| `checkout.cy.js` | Checkout Flow | Complete purchase, validation, cancel checkout |
 
-**Multi-Project Support:**
-- When configured for multi-project reporting, same test results are sent to multiple Qase projects
-- Each project can have different test case IDs for the same test
+**Total:** 13 test cases covering the complete e-commerce user journey.
+
+## Page Objects
+
+This example uses the Page Object Model pattern to organize test code:
+
+| Page Object | Purpose |
+|------------|---------|
+| `LoginPage.js` | Authentication page interactions |
+| `InventoryPage.js` | Product browsing and cart operations |
+| `CartPage.js` | Shopping cart management |
+| `CheckoutPage.js` | Checkout flow operations |
+
+Page objects are located in `cypress/support/pages/` and follow Cypress patterns (synchronous operations, returning `cy` chains).
+
+## Qase Features Demonstrated
+
+This example demonstrates all Qase reporter features in realistic test scenarios:
+
+| Feature | API Method | Example Location | Description |
+|---------|-----------|------------------|-------------|
+| **Test ID** | `qase(id, it(...))` | All tests | Link Cypress tests to Qase test cases |
+| **Title** | `it('title', ...)` | All tests | Test case title (from Cypress test name) |
+| **Fields** | `qase.fields({...})` | All tests | Severity, priority, layer metadata |
+| **Suite** | `qase.suite('...')` | All tests | Hierarchical test organization using `\t` separator |
+| **Steps** | `qase.step('name', () => {...})` | All tests | Named test execution steps |
+| **Attachments** | `qase.attach({...})` | inventory, cart, checkout | Attach JSON, text, or other content |
+| **Comments** | `qase.comment('...')` | All tests | Additional context for test results |
+| **Parameters** | `qase.parameters({...})` | login, inventory, checkout | Report test parameters/inputs |
+| **Ignore** | `qase.ignore()` | checkout test 13 | Exclude specific tests from reporting |
+
+### Example: Complete Test with Multiple Features
+
+```javascript
+qase(10,
+  it('User can complete checkout with valid information', () => {
+    qase.fields({ severity: 'critical', priority: 'high', layer: 'e2e' });
+    qase.suite('E-commerce\tCheckout\tComplete Flow');
+    qase.parameters({ firstName: 'John', lastName: 'Doe', postalCode: '12345' });
+
+    qase.step('Fill in checkout information', () => {
+      CheckoutPage.fillInfo('John', 'Doe', '12345');
+    });
+
+    qase.step('Complete the order', () => {
+      CheckoutPage.finish();
+    });
+
+    qase.step('Attach order details', () => {
+      qase.attach({
+        name: 'order-details.txt',
+        content: 'Order Details: ...',
+        contentType: 'text/plain'
+      });
+    });
+
+    qase.comment('Checkout completed successfully');
+  })
+);
+```
+
+## Important Cypress-Specific Notes
+
+### Synchronous Steps (CRITICAL)
+
+Unlike Jest or Playwright, Cypress steps use **synchronous callbacks**. Do NOT use `async/await` with `qase.step()`:
+
+```javascript
+// ✅ CORRECT - Synchronous callback
+qase.step('Add product to cart', () => {
+  InventoryPage.addToCart('sauce-labs-backpack');
+  InventoryPage.getCartBadge().should('have.text', '1');
+});
+
+// ❌ WRONG - Do not use async/await
+qase.step('Add product to cart', async () => {  // ❌ NO async
+  await InventoryPage.addToCart('...');          // ❌ NO await
+});
+```
+
+Cypress commands are already queued and executed asynchronously by Cypress itself. Adding `async/await` will break the Cypress command chain.
+
+### Import Pattern
+
+Use the `/mocha` import path, as Cypress uses Mocha under the hood:
+
+```javascript
+import { qase } from 'cypress-qase-reporter/mocha';  // ✅ CORRECT
+```
+
+### Attachment Content Type
+
+Use `contentType` parameter (not `type`) for attachments:
+
+```javascript
+qase.attach({
+  name: 'data.json',
+  content: JSON.stringify({ ... }),
+  contentType: 'application/json'  // ✅ Use contentType
+});
+```
+
+### Test ID Wrapper Pattern
+
+Use the wrapper pattern to link test IDs:
+
+```javascript
+qase(1,                          // ✅ Wrap the entire it() call
+  it('Test name', () => {
+    // test implementation
+  })
+);
+```
+
+### Suite Hierarchy
+
+Use `\t` (tab character) to define suite hierarchy:
+
+```javascript
+qase.suite('E-commerce\tCheckout\tValidation');
+// Creates: E-commerce > Checkout > Validation
+```
 
 ## Configuration
 
-Example `qase.config.json`:
+### Option 1: qase.config.json
 
 ```json
 {
@@ -113,46 +209,68 @@ Example `qase.config.json`:
     },
     "project": "YOUR_PROJECT_CODE",
     "run": {
-      "title": "Cypress Automated Test Run",
+      "title": "Cypress E-commerce Test Run",
       "complete": true
     }
   }
 }
 ```
 
-Or configure via `cypress.config.js`:
+### Option 2: cypress.config.js
+
+The configuration is already set up in `cypress.config.js` with the Qase reporter. You can customize it further:
 
 ```javascript
-const { defineConfig } = require('cypress');
-
 module.exports = defineConfig({
-  reporter: 'cypress-qase-reporter',
+  reporter: 'cypress-multi-reporters',
   reporterOptions: {
-    mode: 'testops',
-    testops: {
-      api: {
-        token: process.env.QASE_TESTOPS_API_TOKEN,
-      },
-      project: 'YOUR_PROJECT_CODE',
-      run: {
-        complete: true,
+    reporterEnabled: 'cypress-qase-reporter',
+    cypressQaseReporterReporterOptions: {
+      debug: true,
+      testops: {
+        api: {
+          token: process.env.QASE_TESTOPS_API_TOKEN,
+        },
+        project: process.env.QASE_TESTOPS_PROJECT,
+        uploadAttachments: true,
+        run: {
+          complete: true,
+        },
       },
     },
   },
   e2e: {
+    baseUrl: 'https://www.saucedemo.com',
     setupNodeEvents(on, config) {
-      // implement node event listeners here
+      require('cypress-qase-reporter/plugin')(on, config);
+      require('cypress-qase-reporter/metadata')(on);
+      // ... other event handlers
     },
   },
 });
 ```
 
-## Important Notes
+### Environment Variables
 
-- **Synchronous Steps:** Unlike Jest or Playwright, Cypress steps use synchronous callbacks. Do NOT use `async/await` with `qase.step()` in Cypress tests.
-- **Import Pattern:** Use `import { qase } from 'cypress-qase-reporter/mocha';` (note the `/mocha` suffix, as Cypress uses Mocha under the hood)
+You can also configure via environment variables:
+
+- `QASE_MODE` - Set to `testops` to enable reporting, `off` to disable
+- `QASE_TESTOPS_API_TOKEN` - Your Qase API token
+- `QASE_TESTOPS_PROJECT` - Your Qase project code
+
+## Custom Commands
+
+This example includes a custom `login` command for convenience:
+
+```javascript
+// Usage in tests
+cy.login();  // Logs in with default credentials (standard_user/secret_sauce)
+cy.login('problem_user', 'secret_sauce');  // Logs in with custom credentials
+```
 
 ## Additional Resources
 
-For more details on how to use this integration with Qase Test Management, visit
-the [Qase Cypress documentation](https://github.com/qase-tms/qase-javascript/tree/main/qase-cypress).
+- [Qase Cypress Reporter Documentation](https://github.com/qase-tms/qase-javascript/tree/main/qase-cypress)
+- [Cypress Documentation](https://docs.cypress.io/)
+- [Saucedemo Test Site](https://www.saucedemo.com)
+- [Qase TestOps](https://qase.io/)
