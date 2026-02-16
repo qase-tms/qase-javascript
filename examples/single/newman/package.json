@@ -2,10 +2,11 @@
   "name": "examples-newman",
   "private": true,
   "scripts": {
-    "test": "QASE_MODE=testops newman run ./sample-collection.json -r qase"
+    "test": "QASE_MODE=testops newman run ./api-collection.json -r qase",
+    "test:data": "QASE_MODE=testops newman run ./api-collection.json -r qase -d data.json"
   },
   "devDependencies": {
     "newman": "^6.2.1",
-    "newman-reporter-qase": "^2.1.5"
+    "newman-reporter-qase": "^2.2.0"
   }
 }
