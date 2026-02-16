@@ -1,5 +1,6 @@
 import { AbstractReporter } from './abstract-reporter';
-import { Attachment, Report, TestStatusEnum, TestStepType, TestResultType } from '../models';
+import { Attachment, Report, TestStatusEnum, TestStepType, StepType, TestResultType } from '../models';
+import { StepTextData, StepGherkinData } from '../models/step-data';
 import { WriterInterface } from '../writer';
 import { LoggerInterface } from '../utils/logger';
 import { getHostInfo } from '../utils/hostData';
@@ -88,7 +89,7 @@ export class ReportReporter extends AbstractReporter {
 
       // Serialize to spec-compliant format before writing
       const serialized = this.serializeResultForReport(result);
-      await this.writer.writeTestResult(serialized as any);
+      await this.writer.writeTestResult(serialized as unknown as TestResultType);
     }
   }
 
@@ -295,8 +296,8 @@ export class ReportReporter extends AbstractReporter {
     const data = { ...step.data };
 
     // For text steps, rename data.data to data.input_data (STEP-01)
-    if (step.step_type === 'text' && 'data' in data) {
-      const textData = data as any;
+    if (step.step_type === StepType.TEXT && 'data' in data) {
+      const textData = data as StepTextData;
       return {
         action: textData.action,
         expected_result: textData.expected_result,
@@ -305,8 +306,8 @@ export class ReportReporter extends AbstractReporter {
     }
 
     // For gherkin steps, convert to text format (STEP-03)
-    if (step.step_type === 'gherkin' && 'keyword' in data && 'name' in data) {
-      const gherkinData = data as any;
+    if (step.step_type === StepType.GHERKIN && 'keyword' in data && 'name' in data) {
+      const gherkinData = data as StepGherkinData;
       return {
         action: `${gherkinData.keyword} ${gherkinData.name}`,
         expected_result: null,

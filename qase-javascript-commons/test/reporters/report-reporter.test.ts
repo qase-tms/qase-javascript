@@ -4,6 +4,61 @@ import { TestStatusEnum, TestResultType, TestStepType, StepType } from '../../sr
 import { WriterInterface } from '../../src/writer';
 import { LoggerInterface } from '../../src/utils/logger';
 
+/** Shape of a serialized attachment in report output */
+interface SerializedAttachment {
+  id: string;
+  file_name: string;
+  mime_type: string;
+  file_path: string;
+  size?: number;
+  content?: string;
+}
+
+/** Shape of serialized step data in report output */
+interface SerializedStepData {
+  action: string;
+  expected_result: string | null;
+  input_data: string | null;
+  data?: string | null;
+  keyword?: string;
+  name?: string;
+  line?: number;
+}
+
+/** Shape of a serialized step in report output */
+interface SerializedStep {
+  id: string;
+  step_type: string;
+  data: SerializedStepData;
+  parent_id: string | null;
+  execution: { attachments: SerializedAttachment[]; [key: string]: unknown };
+  steps: SerializedStep[];
+  attachments?: unknown;
+}
+
+/** Shape of a serialized result in report output */
+interface SerializedResult {
+  id: string;
+  title: string;
+  signature: string;
+  execution: Record<string, unknown>;
+  fields: Record<string, string>;
+  attachments: SerializedAttachment[];
+  steps: SerializedStep[];
+  params: Record<string, string>;
+  param_groups: string[][];
+  testops_ids: number[] | null;
+  relations: unknown;
+  muted: boolean;
+  message: string | null;
+  testops_id?: unknown;
+  group_params?: unknown;
+  run_id?: unknown;
+  author?: unknown;
+  testops_project_mapping?: unknown;
+  preparedAttachments?: unknown;
+}
+
 const createMockWriter = (): jest.Mocked<WriterInterface> => ({
   clearPreviousResults: jest.fn(),
   writeAttachment: jest.fn((attachments) => attachments.map(a => ({ ...a, file_path: '/mock/' + a.file_name }))),
@@ -159,7 +214,7 @@ describe('ReportReporter', () => {
 
       await reporter.sendResults();
 
-      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as unknown as SerializedResult;
       expect(serialized.testops_ids).toEqual([42]);
       expect(serialized.testops_id).toBeUndefined();
     });
@@ -173,7 +228,7 @@ describe('ReportReporter', () => {
 
       await reporter.sendResults();
 
-      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as unknown as SerializedResult;
       expect(serialized.testops_ids).toEqual([1, 2, 3]);
       expect(serialized.testops_id).toBeUndefined();
     });
@@ -187,7 +242,7 @@ describe('ReportReporter', () => {
 
       await reporter.sendResults();
 
-      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as unknown as SerializedResult;
       expect(serialized.testops_ids).toBeNull();
       expect(serialized.testops_id).toBeUndefined();
     });
@@ -201,7 +256,7 @@ describe('ReportReporter', () => {
 
       await reporter.sendResults();
 
-      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as unknown as SerializedResult;
       expect(serialized.param_groups).toEqual([['browser', 'os']]);
       expect(serialized.group_params).toBeUndefined();
     });
@@ -215,7 +270,7 @@ describe('ReportReporter', () => {
 
       await reporter.sendResults();
 
-      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as unknown as SerializedResult;
       expect(serialized.param_groups).toEqual([]);
       expect(serialized.group_params).toBeUndefined();
     });
@@ -233,7 +288,7 @@ describe('ReportReporter', () => {
       reporter['results'] = [testResult];
       await reporter.sendResults();
 
-      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as unknown as SerializedResult;
       const serializedStep = serialized.steps[0];
       expect(serializedStep.data.input_data).toBe('some input data');
       expect(serializedStep.data.data).toBeUndefined();
@@ -257,7 +312,7 @@ describe('ReportReporter', () => {
       reporter['results'] = [testResult];
       await reporter.sendResults();
 
-      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as unknown as SerializedResult;
       const serializedStep = serialized.steps[0];
 
       // No top-level attachments field
@@ -280,7 +335,7 @@ describe('ReportReporter', () => {
       reporter['results'] = [testResult];
       await reporter.sendResults();
 
-      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as unknown as SerializedResult;
       const attachment = serialized.attachments[0];
 
       expect(attachment.id).toBe('a1');
@@ -304,7 +359,7 @@ describe('ReportReporter', () => {
       reporter['results'] = [testResult];
       await reporter.sendResults();
 
-      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as unknown as SerializedResult;
 
       expect(serialized.run_id).toBeUndefined();
       expect(serialized.author).toBeUndefined();
@@ -352,7 +407,7 @@ describe('ReportReporter', () => {
       reporter['results'] = [testResult];
       await reporter.sendResults();
 
-      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as unknown as SerializedResult;
       const serializedParent = serialized.steps[0];
       const serializedChild = serializedParent.steps[0];
 
@@ -384,7 +439,7 @@ describe('ReportReporter', () => {
       reporter['results'] = [testResult];
       await reporter.sendResults();
 
-      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as unknown as SerializedResult;
       const serializedStep = serialized.steps[0];
 
       // Gherkin data should be converted to text format (STEP-03)
@@ -416,7 +471,7 @@ describe('ReportReporter', () => {
       await reporter.sendResults();
 
       const calls = writer.writeTestResult.mock.calls;
-      const serializedResult = calls[0]?.[0] as any;
+      const serializedResult = calls[0]?.[0] as unknown as SerializedResult;
       const serializedStep = serializedResult.steps[0];
 
       // Verify Gherkin converted to TEXT format
@@ -449,7 +504,7 @@ describe('ReportReporter', () => {
       reporter['results'] = [testResult];
       await reporter.sendResults();
 
-      const serializedResult = (writer.writeTestResult.mock.calls[0]?.[0]) as any;
+      const serializedResult = writer.writeTestResult.mock.calls[0]?.[0] as unknown as SerializedResult;
       const serializedParent = serializedResult.steps[0];
       const serializedChild = serializedParent.steps[0];
 
@@ -482,7 +537,7 @@ describe('ReportReporter', () => {
 
       await reporter.sendResults();
 
-      const serializedResult = (writer.writeTestResult.mock.calls[0]?.[0]) as any;
+      const serializedResult = writer.writeTestResult.mock.calls[0]?.[0] as unknown as SerializedResult;
 
       // TEXT step: data -> input_data
       expect(serializedResult.steps[0].data.action).toBe('Manual step');
