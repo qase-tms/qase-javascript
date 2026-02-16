@@ -55,6 +55,7 @@ interface FixtureType {
 enum metadataEnum {
   id = 'QaseID',
   title = 'QaseTitle',
+  suite = 'QaseSuite',
   fields = 'QaseFields',
   parameters = 'QaseParameters',
   groupParameters = 'QaseGroupParameters',
@@ -66,6 +67,7 @@ enum metadataEnum {
 interface MetadataType {
   [metadataEnum.id]: number[];
   [metadataEnum.title]: string | undefined;
+  [metadataEnum.suite]: string | undefined;
   [metadataEnum.fields]: Record<string, string>;
   [metadataEnum.parameters]: Record<string, string>;
   [metadataEnum.groupParameters]: Record<string, string>;
@@ -239,12 +241,17 @@ export class TestcafeQaseReporter {
       group_params: metadata[metadataEnum.groupParameters],
       relations: {
         suite: {
-          data: [
-            {
-              title: testRunInfo.fixture.name,
-              public_id: null,
-            },
-          ],
+          data: metadata[metadataEnum.suite]
+            ? metadata[metadataEnum.suite].split('\t').map((s) => ({
+                title: s,
+                public_id: null,
+              }))
+            : [
+                {
+                  title: testRunInfo.fixture.name,
+                  public_id: null,
+                },
+              ],
         },
       },
       run_id: null,
@@ -271,6 +278,7 @@ export class TestcafeQaseReporter {
     const metadata: MetadataType = {
       QaseID: [],
       QaseTitle: undefined,
+      QaseSuite: undefined,
       QaseFields: {},
       QaseParameters: {},
       QaseGroupParameters: {},
@@ -290,6 +298,10 @@ export class TestcafeQaseReporter {
 
     if (meta[metadataEnum.title] !== undefined && meta[metadataEnum.title] !== '') {
       metadata.QaseTitle = meta[metadataEnum.title];
+    }
+
+    if (meta[metadataEnum.suite] !== undefined && meta[metadataEnum.suite] !== '') {
+      metadata.QaseSuite = meta[metadataEnum.suite];
     }
 
     if (meta[metadataEnum.fields] !== undefined && meta[metadataEnum.fields] !== '') {

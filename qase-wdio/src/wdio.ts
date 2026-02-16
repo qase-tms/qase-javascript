@@ -167,6 +167,22 @@ qase.suite = (value: string) => {
 };
 
 /**
+ * Set a comment for the test case
+ * @param {string} value
+ * @example
+ * describe('suite', () => {
+ *  it('should work', () => {
+ *    qase.comment('Some comment');
+ *    // test code
+ *  });
+ * });
+ */
+qase.comment = (value: string) => {
+  sendEvent(events.addComment, { comment: value });
+  return this;
+};
+
+/**
  * Set ignore for the test case
  * @example
  * describe('suite', () => {

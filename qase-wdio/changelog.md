@@ -1,3 +1,16 @@
+# qase-wdio@1.2.1
+
+## What's new
+
+- Added `qase.comment()` method to set a comment for the test case. The comment is included in the test result message, prepended before any error message.
+
+```ts
+it('should work', () => {
+  qase.comment('This test verifies login flow');
+  // test code
+});
+```
+
 # qase-wdio@1.2.0
 
 ## What's new

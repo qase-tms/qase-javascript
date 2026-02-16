@@ -4,6 +4,7 @@ export class Storage {
   currentFile?: string | undefined;
   suites: string[] = [];
   ignore = false;
+  comment: string | undefined;
   items: (TestResultType | TestStepType)[] = [];
 
 
@@ -11,6 +12,7 @@ export class Storage {
     this.currentFile = undefined;
     this.items = [];
     this.ignore = false;
+    this.comment = undefined;
 
     if (this.suites.length > 0) {
       this.suites.pop();
