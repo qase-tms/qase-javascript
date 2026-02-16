@@ -2,7 +2,7 @@
   "name": "examples-playwright",
   "private": true,
   "scripts": {
-    "test": "QASE_MODE=testops npx playwright test"
+    "test": "QASE_MODE=${QASE_MODE:-off} npx playwright test"
   },
   "devDependencies": {
     "@playwright/test": "^1.56.1",

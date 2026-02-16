@@ -2,7 +2,7 @@
   "name": "examples-cypress",
   "private": true,
   "scripts": {
-    "test": "QASE_MODE=testops cypress run"
+    "test": "QASE_MODE=${QASE_MODE:-off} cypress run"
   },
   "devDependencies": {
     "cypress": "^15.6.0",

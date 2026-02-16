@@ -2,7 +2,7 @@
   "name": "examples-jest",
   "private": true,
   "scripts": {
-    "test": "QASE_MODE=testops jest --runInBand"
+    "test": "QASE_MODE=${QASE_MODE:-off} jest --runInBand"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.28.5",

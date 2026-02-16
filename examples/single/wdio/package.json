@@ -2,7 +2,7 @@
   "name": "examples-wdio",
   "private": true,
   "scripts": {
-    "test": "QASE_MODE=testops wdio run ./wdio.conf.js"
+    "test": "QASE_MODE=${QASE_MODE:-off} wdio run ./wdio.conf.js"
   },
   "devDependencies": {
     "@wdio/cli": "^8.40.0",
