@@ -59,6 +59,7 @@ Progress: [████████░░] 79% (30/38 total plans across v1.0 + 
 | Plan | Duration | Tasks | Files Changed | Status |
 |------|----------|-------|---------------|--------|
 | 08-01 | 166s | 2 | 13 | Complete |
+| 08-02 | 185s | 2 | 5 | Complete |
 
 ## Accumulated Context
 
@@ -129,6 +130,16 @@ Recent decisions from PROJECT.md affecting v1.1:
 - JSONPlaceholder /users/999 and /posts/999 return 200 with empty {} (not 404) -- corrected from plan
 - Upgraded @cucumber/cucumber from ^7.3.2 to ^11.0.0 -- modern version compatible with reporter
 
+**From 08-02 execution (Newman Collection):**
+- Comment-based annotations: // qase: N before pm.test() in same exec array -- only way to link tests to Qase
+- Parameter annotations: // qase.parameters: key1, key2 for selective parameter reporting from data file
+- Collection folder structure provides automatic suite hierarchy via getParentTitles()
+- Pre-request scripts with pm.sendRequest for chained API call patterns (store in collectionVariables)
+- autoCollectParams: true in qase.config.json auto-reports all data file parameters
+- Default npm test without data file; npm run test:data for parameterized variant with -d flag
+- Newman has NO fields, NO attachments, NO steps, NO ignore, NO title override -- most limited reporter
+- JSONPlaceholder /users/999 returns 200 with empty {} (not 404) -- consistent with 08-01 finding
+
 ### Pending Todos
 
 None yet.
@@ -147,9 +158,9 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 08-01-PLAN.md (CucumberJS BDD example)
-Resume file: .planning/phases/08-bdd-and-collection-examples/08-02-PLAN.md
+Stopped at: Completed 08-02-PLAN.md (Newman collection example) -- Phase 8 complete
+Resume file: Phase 9 planning
 
 ---
 
-*Last updated: 2026-02-16 after 08-01 execution*
+*Last updated: 2026-02-16 after 08-02 execution*
