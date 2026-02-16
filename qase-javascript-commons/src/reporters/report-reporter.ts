@@ -304,6 +304,16 @@ export class ReportReporter extends AbstractReporter {
       };
     }
 
+    // For gherkin steps, convert to text format (STEP-03)
+    if (step.step_type === 'gherkin' && 'keyword' in data && 'name' in data) {
+      const gherkinData = data as any;
+      return {
+        action: `${gherkinData.keyword} ${gherkinData.name}`,
+        expected_result: null,
+        input_data: null, // JS GherkinData has no data field
+      };
+    }
+
     return data;
   }
 }
