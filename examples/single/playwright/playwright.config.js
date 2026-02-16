@@ -1,5 +1,8 @@
 const config = {
+  timeout: 30000,
+  testDir: './test',
   use: {
+    baseURL: 'https://www.saucedemo.com',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
