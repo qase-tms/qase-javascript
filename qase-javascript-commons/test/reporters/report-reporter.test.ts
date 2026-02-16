@@ -396,5 +396,103 @@ describe('ReportReporter', () => {
       expect(serializedStep.data.name).toBeUndefined();
       expect(serializedStep.data.line).toBeUndefined();
     });
+
+    it('should convert gherkin steps to text format with all BDD keywords', async () => {
+      const testResult = new TestResultType('Gherkin Step Conversion Test');
+      testResult.id = 'test-gherkin-conversion';
+      testResult.execution.status = TestStatusEnum.passed;
+
+      const gherkinStep = new TestStepType(StepType.GHERKIN);
+      gherkinStep.id = 'step-gherkin-1';
+      gherkinStep.data = {
+        keyword: 'Given',
+        name: 'I am on the login page',
+        line: 5,
+      };
+
+      testResult.steps = [gherkinStep];
+      reporter['results'] = [testResult];
+
+      await reporter.sendResults();
+
+      const calls = writer.writeTestResult.mock.calls;
+      const serializedResult = calls[0]?.[0] as any;
+      const serializedStep = serializedResult.steps[0];
+
+      // Verify Gherkin converted to TEXT format
+      expect(serializedStep.data.action).toBe('Given I am on the login page');
+      expect(serializedStep.data.expected_result).toBe(null);
+      expect(serializedStep.data.input_data).toBe(null);
+
+      // Verify no Gherkin fields in output
+      expect(serializedStep.data.keyword).toBeUndefined();
+      expect(serializedStep.data.name).toBeUndefined();
+      expect(serializedStep.data.line).toBeUndefined();
+    });
+
+    it('should recursively convert nested gherkin steps', async () => {
+      const testResult = new TestResultType('Nested Gherkin Conversion Test');
+      testResult.id = 'test-nested-gherkin';
+      testResult.execution.status = TestStatusEnum.passed;
+
+      const parentStep = new TestStepType(StepType.GHERKIN);
+      parentStep.id = 'parent-gherkin';
+      parentStep.data = { keyword: 'When', name: 'I perform login', line: 10 };
+
+      const childStep = new TestStepType(StepType.GHERKIN);
+      childStep.id = 'child-gherkin';
+      childStep.data = { keyword: 'And', name: 'I enter credentials', line: 11 };
+
+      parentStep.steps = [childStep];
+      testResult.steps = [parentStep];
+
+      reporter['results'] = [testResult];
+      await reporter.sendResults();
+
+      const serializedResult = (writer.writeTestResult.mock.calls[0]?.[0]) as any;
+      const serializedParent = serializedResult.steps[0];
+      const serializedChild = serializedParent.steps[0];
+
+      expect(serializedParent.data.action).toBe('When I perform login');
+      expect(serializedParent.data.expected_result).toBe(null);
+      expect(serializedParent.data.input_data).toBe(null);
+      expect(serializedParent.data.keyword).toBeUndefined();
+
+      expect(serializedChild.data.action).toBe('And I enter credentials');
+      expect(serializedChild.data.expected_result).toBe(null);
+      expect(serializedChild.data.input_data).toBe(null);
+      expect(serializedChild.data.keyword).toBeUndefined();
+    });
+
+    it('should handle mixed text and gherkin steps', async () => {
+      const testResult = new TestResultType('Mixed Steps Test');
+      testResult.id = 'test-mixed-steps';
+      testResult.execution.status = TestStatusEnum.passed;
+
+      const textStep = new TestStepType(StepType.TEXT);
+      textStep.id = 'text-step';
+      textStep.data = { action: 'Manual step', expected_result: 'Success', data: 'test data' };
+
+      const gherkinStep = new TestStepType(StepType.GHERKIN);
+      gherkinStep.id = 'gherkin-step';
+      gherkinStep.data = { keyword: 'Then', name: 'I see success message', line: 15 };
+
+      testResult.steps = [textStep, gherkinStep];
+      reporter['results'] = [testResult];
+
+      await reporter.sendResults();
+
+      const serializedResult = (writer.writeTestResult.mock.calls[0]?.[0]) as any;
+
+      // TEXT step: data -> input_data
+      expect(serializedResult.steps[0].data.action).toBe('Manual step');
+      expect(serializedResult.steps[0].data.expected_result).toBe('Success');
+      expect(serializedResult.steps[0].data.input_data).toBe('test data');
+
+      // Gherkin step: keyword + name -> action
+      expect(serializedResult.steps[1].data.action).toBe('Then I see success message');
+      expect(serializedResult.steps[1].data.expected_result).toBe(null);
+      expect(serializedResult.steps[1].data.input_data).toBe(null);
+    });
   });
 }); 
