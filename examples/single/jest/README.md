@@ -1,13 +1,12 @@
-# Jest Example
+# Jest Example - API Testing with JSONPlaceholder
 
-This is a sample project demonstrating how to write and execute tests using the Jest framework with integration to
-Qase Test Management.
+This example project demonstrates how to write realistic API tests using the Jest framework with integration to Qase Test Management. The tests use [JSONPlaceholder](https://jsonplaceholder.typicode.com), a free fake REST API for testing and prototyping.
 
 ## Prerequisites
 
 Ensure that the following tools are installed on your machine:
 
-1. [Node.js](https://nodejs.org/) (version 18 or higher is recommended)
+1. [Node.js](https://nodejs.org/) (version 18 or higher is required for native fetch support)
 2. [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
 
 ## Setup Instructions
@@ -36,21 +35,139 @@ Ensure that the following tools are installed on your machine:
    QASE_MODE=testops npm test
    ```
 
-## Example Files
+## Test Scenarios
 
-This project contains several test files demonstrating different Qase features:
+This project contains 4 test files with realistic API testing scenarios:
 
-| File | Feature | Description |
-|------|---------|-------------|
-| `id.test.js` | Test case linking | Links test to Qase test case by ID using `qase(id, name)` wrapper |
-| `title.test.js` | Custom titles | Sets custom test result titles with `qase.title()` |
-| `fields.test.js` | Custom fields | Sets severity, priority, description, and other metadata with `qase.fields()` |
-| `suite.test.js` | Suite organization | Groups tests into suites and sub-suites with `qase.suite()` |
-| `steps.test.js` | Test steps | Defines execution steps with `await qase.step()` for detailed reporting |
-| `attach.test.js` | Attachments | Attaches files and content to test results with `qase.attach()` |
-| `comment.test.js` | Comments | Adds comments to test results with `qase.comment()` |
-| `ignore.test.js` | Ignoring tests | Excludes tests from Qase reporting with `qase.ignore()` |
-| `params.test.js` | Parameters | Reports parameterized test data with `qase.parameters()` |
+### api-crud.test.js - User CRUD Operations
+
+Tests CRUD (Create, Read, Update, Delete) operations on the users endpoint:
+- GET all users (verify 10 users returned)
+- GET single user by ID (verify user details)
+- POST create new user (verify 201 response and ID assignment)
+- DELETE user (verify 200 response)
+
+**Qase features demonstrated:** `qase.id`, `qase.fields`, `qase.step`, `qase.parameters`, `qase.attach`, `qase.comment`
+
+### api-posts.test.js - Post Validation
+
+Tests post retrieval and validation with filtering:
+- GET all posts (verify 100 posts returned)
+- GET posts filtered by user ID (verify query parameters)
+- GET post with comments (verify nested data structure)
+
+**Qase features demonstrated:** `qase.id`, `qase.fields`, `qase.parameters`, `qase.step`, `qase.attach`
+
+### api-errors.test.js - Error Handling
+
+Tests error handling and edge cases:
+- GET non-existent user (verify empty object response)
+- GET non-existent post (verify graceful handling)
+- Invalid endpoint (verify 404 with HTML)
+- POST with minimal data (verify API resilience)
+
+**Qase features demonstrated:** `qase.id`, `qase.fields`, `qase.comment`, `qase.attach`, `qase.step`
+
+### api-advanced.test.js - Advanced Features
+
+Tests demonstrating advanced Qase features:
+- Complex nested steps (user and posts retrieval)
+- Suite hierarchy with tab separator
+- Parameterized test pattern (multiple user IDs)
+- Albums with nested photos
+- Ignored test placeholder (future authentication feature)
+
+**Qase features demonstrated:** `qase.suite`, nested `qase.step`, `qase.parameters`, `qase.ignore`, `qase.comment`
+
+## Qase Features Reference
+
+All 9 Qase reporter features are demonstrated across the test files:
+
+| Feature | API Method | Used In | Description |
+|---------|-----------|---------|-------------|
+| Test ID | `qase(id, name)` | All files | Links test to Qase test case using wrapper pattern |
+| Title | `qase.title()` | (implicit via wrapper) | Test name is set via qase() wrapper |
+| Fields | `qase.fields()` | All files | Sets severity, priority, layer metadata |
+| Suite | `qase.suite()` | api-advanced.test.js | Organizes tests into hierarchical suites with `\t` separator |
+| Steps | `await qase.step()` | All files | Defines execution steps with async/await support |
+| Attachments | `qase.attach()` | api-crud, api-posts, api-errors | Attaches JSON content with `contentType` parameter |
+| Comments | `qase.comment()` | api-crud, api-errors, api-advanced | Adds contextual notes to test results |
+| Parameters | `qase.parameters()` | api-crud, api-posts, api-advanced | Reports parameterized test data |
+| Ignore | `qase.ignore()` | api-advanced.test.js | Excludes specific test from Qase reporting |
+
+## Jest-Specific Patterns
+
+This example demonstrates Jest-specific Qase integration patterns:
+
+1. **Import Path:** Use `jest-qase-reporter/jest` (not the base package)
+   ```javascript
+   const { qase } = require('jest-qase-reporter/jest');
+   ```
+
+2. **Test ID Wrapper:** Use `qase(id, name)` wrapper pattern
+   ```javascript
+   test(qase(1, 'Test name'), async () => {
+     // test code
+   });
+   ```
+
+3. **Attachments:** Use `contentType` parameter (NOT `type`)
+   ```javascript
+   qase.attach({
+     name: 'data.json',
+     content: JSON.stringify(data, null, 2),
+     contentType: 'application/json',
+   });
+   ```
+
+4. **Async Steps:** Use `await qase.step()` for async operations
+   ```javascript
+   await qase.step('Step name', async () => {
+     // async operations
+   });
+   ```
+
+5. **Suite Hierarchy:** Use `\t` (tab character) as separator
+   ```javascript
+   qase.suite('API Tests\tAdvanced\tRelationships');
+   ```
+
+## About JSONPlaceholder
+
+[JSONPlaceholder](https://jsonplaceholder.typicode.com) is a free fake REST API for testing and prototyping. It provides:
+
+- **Free and stable:** No authentication required, always available
+- **Realistic data:** 10 users, 100 posts, 500 comments, and more
+- **Faked writes:** POST/PUT/DELETE operations are faked (return success but don't persist)
+- **No rate limits:** Perfect for CI/CD pipelines
+
+### Available Endpoints
+
+- `/users` - 10 users with full profile information
+- `/posts` - 100 posts associated with users
+- `/comments` - 500 comments on posts
+- `/albums` - 100 photo albums
+- `/photos` - 5000 photos in albums
+- `/todos` - 200 todo items
+
+## Running the Examples
+
+```bash
+# Install dependencies
+npm install
+
+# Run tests locally (no Qase reporting)
+QASE_MODE=off npm test
+
+# Run tests with Qase reporting
+QASE_MODE=testops npm test
+
+# Run specific test file
+npm test -- api-crud.test.js
+
+# Run tests with verbose output
+npm test -- --verbose
+```
 
 ## Expected Behavior
 
@@ -59,37 +176,21 @@ This project contains several test files demonstrating different Qase features:
 When running tests with `QASE_MODE=off`, tests execute normally without Qase reporting:
 
 - Tests run and pass/fail as usual
+- Real HTTP requests are made to JSONPlaceholder API
 - No data is sent to Qase TestOps
 - No Qase API token required
 - Output shows standard Jest test results
-
-This mode is useful for local development and debugging.
 
 ### Running with QASE_MODE=testops (CI/CD and Reporting)
 
 When running tests with `QASE_MODE=testops`, test results are reported to Qase:
 
-- Tests execute and results are sent to Qase TestOps
+- Tests execute with real API calls to JSONPlaceholder
+- Results are sent to Qase TestOps with all metadata
 - A new test run is created in your Qase project
-- Test results include all metadata (steps, attachments, fields, etc.)
 - Console output includes Qase test run link
+- All steps, attachments, fields, and comments are captured
 - Requires valid `QASE_TESTOPS_API_TOKEN` and `QASE_TESTOPS_PROJECT` configuration
-
-**Steps Example (`steps.test.js`):**
-- Creates test result with multiple named steps
-- Each step shows execution status, duration, and any errors
-- Nested steps appear hierarchically in Qase
-- Steps with expected results and data are captured
-
-**Attachments Example (`attach.test.js`):**
-- Files attached via `paths` option appear in test results
-- Content attached via `content` option is uploaded to Qase
-- Attachments are visible in the test run details
-- Supports text, JSON, images, and binary files
-
-**Multi-Project Support:**
-- When configured for multi-project reporting, same test results are sent to multiple Qase projects
-- Each project can have different test case IDs for the same test
 
 ## Configuration
 
@@ -105,7 +206,7 @@ Example `qase.config.json`:
     },
     "project": "YOUR_PROJECT_CODE",
     "run": {
-      "title": "Jest Automated Test Run",
+      "title": "Jest API Test Run",
       "complete": true
     }
   }
@@ -116,6 +217,7 @@ Or configure via `jest.config.js`:
 
 ```javascript
 module.exports = {
+  testTimeout: 10000, // API requests may take longer
   reporters: [
     'default',
     [
