@@ -1,16 +1,22 @@
 Feature: Multi-project tests with @badeball/cypress-cucumber-preprocessor
 
-  # Multi-project: case 1 in PROJ1, case 2 in PROJ2. Use @qaseid.PROJECT(ids) format.
   @qaseid.PROJ1(1)
   @qaseid.PROJ2(2)
-  Scenario: test reported to two projects
+  Scenario: Homepage navigation reported to two projects
     Given I am on the homepage
     When I click on the first link
     Then I should see the first link
 
-  @qaseid.PROJ1(10,11)
-  @qaseid.PROJ2(20)
-  Scenario: test with multiple cases per project
+  @qaseid.PROJ1(3)
+  @qaseid.PROJ2(4)
+  Scenario: Homepage navigation with expected failure
+    Given I am on the homepage
+    When I should see the first link failed
+    Then I should see the first link
+
+  @qaseid.PROJ1(5,6)
+  @qaseid.PROJ2(7)
+  Scenario: Multiple case IDs across projects
     Given I am on the homepage
     When I click on the first link
     Then I should see the first link
