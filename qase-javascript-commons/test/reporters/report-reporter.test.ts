@@ -371,7 +371,7 @@ describe('ReportReporter', () => {
       expect(serializedChild.attachments).toBeUndefined();
     });
 
-    it('should preserve gherkin step data without transformation', async () => {
+    it('should convert gherkin step data to text format during serialization', async () => {
       const testResult = new TestResultType('Test with gherkin steps');
       testResult.id = 't11';
       testResult.execution.status = TestStatusEnum.passed;
@@ -387,11 +387,14 @@ describe('ReportReporter', () => {
       const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
       const serializedStep = serialized.steps[0];
 
-      // Gherkin data should be unchanged
-      expect(serializedStep.data.keyword).toBe('Given');
-      expect(serializedStep.data.name).toBe('I am on the home page');
-      expect(serializedStep.data.line).toBe(5);
-      expect(serializedStep.data.input_data).toBeUndefined();
+      // Gherkin data should be converted to text format (STEP-03)
+      expect(serializedStep.data.action).toBe('Given I am on the home page');
+      expect(serializedStep.data.expected_result).toBe(null);
+      expect(serializedStep.data.input_data).toBe(null);
+      // Gherkin-specific fields should not be present
+      expect(serializedStep.data.keyword).toBeUndefined();
+      expect(serializedStep.data.name).toBeUndefined();
+      expect(serializedStep.data.line).toBeUndefined();
     });
   });
 }); 
