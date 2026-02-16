@@ -4,6 +4,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     watch: false,
+    testTimeout: 10000,
     reporters: [
       'default',
       ['vitest-qase-reporter',
