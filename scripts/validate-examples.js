@@ -232,6 +232,9 @@ function checkQaseFeatures(exampleDir, framework) {
     // Also count qase(id, 'name') wrapper pattern as implicit title
     const wrapperMatches = content.match(/qase\(\d+,\s*['"][^'"]+['"]/g);
     if (wrapperMatches) featureCounts.title += wrapperMatches.length;
+    // Also count qase(id, it('name', ...)) wrapper pattern (Cypress) as implicit title
+    const cypressWrapperMatches = content.match(/qase\(\d+,\s*\n?\s*it\(/g);
+    if (cypressWrapperMatches) featureCounts.title += cypressWrapperMatches.length;
 
     // fields: qase.fields(, @QaseFields=, .fields(
     const fieldsMatches = content.match(/qase\.fields\(|@QaseFields=|\.fields\(/g);
