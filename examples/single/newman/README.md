@@ -1,13 +1,15 @@
 # Newman Collection Example
 
-This example demonstrates realistic API testing using a Postman collection with the Newman CLI runner and Qase Test Management integration. Tests exercise the JSONPlaceholder REST API with organized collection folders providing suite hierarchy.
+## Overview
+
+This example demonstrates realistic API testing using a Postman collection with the Newman CLI runner and Qase Test Management integration. Tests exercise the JSONPlaceholder REST API with organized collection folders providing suite hierarchy. All test cases are annotated using comment-based syntax, and the collection structure automatically provides suite organization.
 
 ## Prerequisites
 
 1. [Node.js](https://nodejs.org/) (version 18 or higher recommended)
 2. [npm](https://www.npmjs.com/)
 
-## Setup
+## Installation
 
 1. Clone the repository:
    ```bash
@@ -23,6 +25,52 @@ This example demonstrates realistic API testing using a Postman collection with 
 3. Configure Qase credentials in `qase.config.json`:
    - Set your API token in `testops.api.token`
    - Set your project code in `testops.project`
+
+## Configuration
+
+The Qase reporter can be configured using environment variables or configuration files.
+
+**Environment Variables:**
+- `QASE_MODE` - Set to `testops` to enable reporting, `off` to disable (default: off)
+- `QASE_TESTOPS_API_TOKEN` - Your Qase API token (required for testops mode)
+- `QASE_TESTOPS_PROJECT` - Your Qase project code (required for testops mode)
+
+Example `qase.config.json`:
+
+```json
+{
+  "debug": true,
+  "testops": {
+    "api": {
+      "token": "your_api_token_here"
+    },
+    "project": "YOUR_PROJECT_CODE",
+    "uploadAttachments": false,
+    "run": {
+      "complete": true,
+      "title": "Newman API Test Run"
+    }
+  }
+}
+```
+
+## Running Tests
+
+```bash
+# Run tests without Qase reporting (default)
+npm test
+
+# Run tests with Qase reporting
+QASE_MODE=testops npm test
+```
+
+### Run with parameterized data file
+
+```bash
+npm run test:data
+```
+
+This runs the collection 3 times (one per data row), with each iteration using different `userId` and `expectedName` values.
 
 ## Collection Structure
 
@@ -61,7 +109,26 @@ Advanced testing patterns:
 | Suite Hierarchy | Collection folder structure | `JSONPlaceholder API Tests > Users > Get all users` |
 | Data-driven Testing | `-d data.json` flag with iteration data | 3 iterations with different userId/expectedName |
 
-### Newman Limitations
+## Newman-Specific Patterns
+
+- **Comment-based annotations** -- Use `// qase: N` in exec array before pm.test() calls
+- **Each pm.test() is a separate result** -- No nesting or step hierarchy
+- **Folder = Suite** -- Collection folders automatically create suite hierarchy in Qase
+- **Pre-request scripts** -- Run before the main request; useful for chaining and setup
+- **Data-driven iterations** -- `-d data.json` runs collection once per data row
+- **Collection variables** -- Share data between pre-request and test scripts
+
+## Project Structure
+
+```
+newman/
+├── api-collection.json      # Postman collection with tests
+├── data.json                # Data file for parameterized tests
+├── qase.config.json         # Qase reporter configuration
+└── package.json
+```
+
+## Limitations
 
 Newman reporter has limited Qase feature support compared to other frameworks:
 
@@ -77,33 +144,7 @@ Newman reporter has limited Qase feature support compared to other frameworks:
 | Ignore | No | Cannot exclude specific tests |
 | Comments | No | No comment annotation support |
 
-## Running Tests
-
-Run tests locally (no Qase reporting):
-```bash
-QASE_MODE=off npm test
-```
-
-Run tests with Qase reporting:
-```bash
-npm test
-```
-
-Run with parameterized data file:
-```bash
-npm run test:data
-```
-
-This runs the collection 3 times (one per data row), with each iteration using different `userId` and `expectedName` values.
-
-## Newman-Specific Patterns
-
-- **Comment-based annotations** -- Use `// qase: N` in exec array before pm.test() calls
-- **Each pm.test() is a separate result** -- No nesting or step hierarchy
-- **Folder = Suite** -- Collection folders automatically create suite hierarchy in Qase
-- **Pre-request scripts** -- Run before the main request; useful for chaining and setup
-- **Data-driven iterations** -- `-d data.json` runs collection once per data row
-- **Collection variables** -- Share data between pre-request and test scripts
+This is the most limited Qase reporter in the JavaScript ecosystem, but still provides essential test case linking and parameterization for Newman/Postman workflows.
 
 ## API Notes
 

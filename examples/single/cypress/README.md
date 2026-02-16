@@ -1,6 +1,8 @@
 # Cypress Example - E-commerce Test Suite
 
-This is a realistic e-commerce test suite demonstrating how to write and execute end-to-end tests using Cypress with integration to Qase Test Management. The tests run against [saucedemo.com](https://www.saucedemo.com), a demo e-commerce site.
+## Overview
+
+This is a realistic e-commerce test suite demonstrating how to write and execute end-to-end tests using Cypress with integration to Qase Test Management. The tests run against [saucedemo.com](https://www.saucedemo.com), a demo e-commerce site, covering authentication, product browsing, shopping cart, and checkout flows using the Page Object Model pattern.
 
 ## Prerequisites
 
@@ -9,7 +11,7 @@ Ensure that the following tools are installed on your machine:
 1. [Node.js](https://nodejs.org/) (version 18 or higher is recommended)
 2. [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
 
-## Setup Instructions
+## Installation
 
 1. Clone this repository:
    ```bash
@@ -25,7 +27,77 @@ Ensure that the following tools are installed on your machine:
 3. Create a `qase.config.json` file in the root of the project. Follow the instructions
    on [how to configure the file](https://github.com/qase-tms/qase-javascript/tree/main/qase-javascript-commons#configuration).
 
+## Configuration
+
+The Qase reporter can be configured using environment variables or configuration files.
+
+**Environment Variables:**
+- `QASE_MODE` - Set to `testops` to enable reporting, `off` to disable (default: off)
+- `QASE_TESTOPS_API_TOKEN` - Your Qase API token (required for testops mode)
+- `QASE_TESTOPS_PROJECT` - Your Qase project code (required for testops mode)
+
+### Option 1: qase.config.json
+
+```json
+{
+  "mode": "testops",
+  "debug": false,
+  "testops": {
+    "api": {
+      "token": "your_api_token_here"
+    },
+    "project": "YOUR_PROJECT_CODE",
+    "run": {
+      "title": "Cypress E-commerce Test Run",
+      "complete": true
+    }
+  }
+}
+```
+
+### Option 2: cypress.config.js
+
+The configuration is already set up in `cypress.config.js` with the Qase reporter. You can customize it further:
+
+```javascript
+module.exports = defineConfig({
+  reporter: 'cypress-multi-reporters',
+  reporterOptions: {
+    reporterEnabled: 'cypress-qase-reporter',
+    cypressQaseReporterReporterOptions: {
+      debug: true,
+      testops: {
+        api: {
+          token: process.env.QASE_TESTOPS_API_TOKEN,
+        },
+        project: process.env.QASE_TESTOPS_PROJECT,
+        uploadAttachments: true,
+        run: {
+          complete: true,
+        },
+      },
+    },
+  },
+  e2e: {
+    baseUrl: 'https://www.saucedemo.com',
+    setupNodeEvents(on, config) {
+      require('cypress-qase-reporter/plugin')(on, config);
+      require('cypress-qase-reporter/metadata')(on);
+      // ... other event handlers
+    },
+  },
+});
+```
+
 ## Running Tests
+
+```bash
+# Run tests without Qase reporting (default)
+npm test
+
+# Run tests with Qase reporting
+QASE_MODE=testops npm test
+```
 
 ### Local Development (Without Qase Reporting)
 
@@ -74,19 +146,6 @@ This example demonstrates realistic e-commerce test scenarios across four test f
 
 **Total:** 13 test cases covering the complete e-commerce user journey.
 
-## Page Objects
-
-This example uses the Page Object Model pattern to organize test code:
-
-| Page Object | Purpose |
-|------------|---------|
-| `LoginPage.js` | Authentication page interactions |
-| `InventoryPage.js` | Product browsing and cart operations |
-| `CartPage.js` | Shopping cart management |
-| `CheckoutPage.js` | Checkout flow operations |
-
-Page objects are located in `cypress/support/pages/` and follow Cypress patterns (synchronous operations, returning `cy` chains).
-
 ## Qase Features Demonstrated
 
 This example demonstrates all Qase reporter features in realistic test scenarios:
@@ -133,7 +192,7 @@ qase(10,
 );
 ```
 
-## Important Cypress-Specific Notes
+## Cypress-Specific Patterns
 
 ### Synchronous Steps (CRITICAL)
 
@@ -195,68 +254,28 @@ qase.suite('E-commerce\tCheckout\tValidation');
 // Creates: E-commerce > Checkout > Validation
 ```
 
-## Configuration
+## Project Structure
 
-### Option 1: qase.config.json
-
-```json
-{
-  "mode": "testops",
-  "debug": false,
-  "testops": {
-    "api": {
-      "token": "your_api_token_here"
-    },
-    "project": "YOUR_PROJECT_CODE",
-    "run": {
-      "title": "Cypress E-commerce Test Run",
-      "complete": true
-    }
-  }
-}
+```
+cypress/
+├── e2e/
+│   ├── login.cy.js          # Authentication test scenarios
+│   ├── inventory.cy.js      # Product browsing test scenarios
+│   ├── cart.cy.js           # Shopping cart test scenarios
+│   └── checkout.cy.js       # Checkout test scenarios
+├── support/
+│   ├── pages/
+│   │   ├── LoginPage.js     # Authentication page interactions
+│   │   ├── InventoryPage.js # Product browsing and cart operations
+│   │   ├── CartPage.js      # Shopping cart management
+│   │   └── CheckoutPage.js  # Checkout flow operations
+│   ├── commands.js          # Custom commands (login helper)
+│   └── e2e.js               # Global configuration
+├── cypress.config.js        # Cypress configuration
+└── qase.config.json         # Qase reporter configuration
 ```
 
-### Option 2: cypress.config.js
-
-The configuration is already set up in `cypress.config.js` with the Qase reporter. You can customize it further:
-
-```javascript
-module.exports = defineConfig({
-  reporter: 'cypress-multi-reporters',
-  reporterOptions: {
-    reporterEnabled: 'cypress-qase-reporter',
-    cypressQaseReporterReporterOptions: {
-      debug: true,
-      testops: {
-        api: {
-          token: process.env.QASE_TESTOPS_API_TOKEN,
-        },
-        project: process.env.QASE_TESTOPS_PROJECT,
-        uploadAttachments: true,
-        run: {
-          complete: true,
-        },
-      },
-    },
-  },
-  e2e: {
-    baseUrl: 'https://www.saucedemo.com',
-    setupNodeEvents(on, config) {
-      require('cypress-qase-reporter/plugin')(on, config);
-      require('cypress-qase-reporter/metadata')(on);
-      // ... other event handlers
-    },
-  },
-});
-```
-
-### Environment Variables
-
-You can also configure via environment variables:
-
-- `QASE_MODE` - Set to `testops` to enable reporting, `off` to disable
-- `QASE_TESTOPS_API_TOKEN` - Your Qase API token
-- `QASE_TESTOPS_PROJECT` - Your Qase project code
+Page objects are located in `cypress/support/pages/` and follow Cypress patterns (synchronous operations, returning `cy` chains).
 
 ## Custom Commands
 

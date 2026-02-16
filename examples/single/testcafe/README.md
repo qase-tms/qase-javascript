@@ -1,17 +1,8 @@
 # TestCafe Example - E-commerce Test Suite
 
-This is a comprehensive example demonstrating realistic e-commerce testing scenarios using TestCafe with Qase Test Management integration. Tests are executed against [saucedemo.com](https://www.saucedemo.com), a demo e-commerce application.
-
 ## Overview
 
-This example showcases how to write end-to-end tests for a real-world e-commerce application, covering:
-
-- **Authentication** - Login scenarios with valid/invalid credentials
-- **Product Inventory** - Browsing, filtering, and viewing product details
-- **Shopping Cart** - Adding, removing, and managing cart items
-- **Checkout Flow** - Complete purchase process with form validation
-
-All tests demonstrate Qase reporter integration using TestCafe's unique builder pattern and API.
+This is a comprehensive example demonstrating realistic e-commerce testing scenarios using TestCafe with Qase Test Management integration. Tests are executed against [saucedemo.com](https://www.saucedemo.com), a demo e-commerce application, covering authentication, product inventory, shopping cart, and checkout flow. All tests demonstrate Qase reporter integration using TestCafe's unique builder pattern and API.
 
 ## Prerequisites
 
@@ -21,7 +12,7 @@ Ensure that the following tools are installed on your machine:
 2. [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
 3. Chrome browser (or modify package.json to use a different browser)
 
-## Setup Instructions
+## Installation
 
 1. Clone this repository:
    ```bash
@@ -52,51 +43,26 @@ Ensure that the following tools are installed on your machine:
 
    See [configuration guide](https://github.com/qase-tms/qase-javascript/tree/main/qase-javascript-commons#configuration) for all options.
 
-## Project Structure
+## Configuration
 
-```
-testcafe/
-├── tests/
-│   ├── pages/              # Page Object Model
-│   │   ├── LoginPage.js    # Login page selectors
-│   │   ├── InventoryPage.js # Product listing selectors
-│   │   ├── CartPage.js     # Shopping cart selectors
-│   │   └── CheckoutPage.js # Checkout form selectors
-│   ├── login.test.js       # Authentication scenarios
-│   ├── inventory.test.js   # Product browsing scenarios
-│   ├── cart.test.js        # Cart management scenarios
-│   └── checkout.test.js    # Checkout flow scenarios
-├── qase.config.json        # Qase reporter configuration
-├── package.json
-└── README.md
-```
+The Qase reporter can be configured using environment variables or configuration files.
 
-## Example Files
+**Environment Variables:**
+- `QASE_MODE` - Set to `testops` to enable reporting, `off` to disable (default: off)
+- `QASE_TESTOPS_API_TOKEN` - Your Qase API token (required for testops mode)
+- `QASE_TESTOPS_PROJECT` - Your Qase project code (required for testops mode)
 
-| File | Description | Test Count | Scenarios |
-|------|-------------|------------|-----------|
-| **login.test.js** | Authentication testing | 3 | Valid login, invalid password, locked user |
-| **inventory.test.js** | Product browsing and filtering | 3 | Browse products, sort by price, view details |
-| **cart.test.js** | Shopping cart operations | 3 | Add item, remove item, multiple items |
-| **checkout.test.js** | Purchase completion flow | 4 | Complete checkout, validation errors, cancel, ignored test |
-
-**Total:** 13 tests covering complete e-commerce user journey
+See the qase.config.json file for additional configuration options.
 
 ## Running Tests
 
-### Local execution (no reporting)
-
 ```bash
-QASE_MODE=off npm test
-```
-
-### With Qase reporting
-
-```bash
+# Run tests without Qase reporting (default)
 npm test
-```
 
-This runs all tests in Chrome with Qase reporter enabled.
+# Run tests with Qase reporting
+QASE_MODE=testops npm test
+```
 
 ### Run specific test file
 
@@ -110,30 +76,27 @@ QASE_MODE=testops npx testcafe chrome tests/login.test.js -r spec,qase
 QASE_MODE=testops npx testcafe firefox tests/*.test.js -r spec,qase
 ```
 
-## Page Object Pattern
+### Expected Behavior
 
-This example uses TestCafe's Selector-based page objects. All page objects:
+When tests run with Qase reporting enabled:
 
-- Import `Selector` from TestCafe
-- Define selectors as class properties in constructor
-- Export as singleton instances
-- Use data-test attributes for reliable element location
+1. **Test results** are uploaded to your Qase project in real-time
+2. **Attachments** (JSON, text files) are uploaded to Qase
+3. **Steps** appear hierarchically in test case results
+4. **Metadata** (fields, suites, parameters) is applied to test cases
+5. **Ignored tests** are executed locally but not reported to Qase
+6. **Screenshots** of failures are automatically captured and attached
 
-**Example:**
+## Test Scenarios
 
-```javascript
-import { Selector } from 'testcafe';
+| File | Description | Test Count | Scenarios |
+|------|-------------|------------|-----------|
+| **login.test.js** | Authentication testing | 3 | Valid login, invalid password, locked user |
+| **inventory.test.js** | Product browsing and filtering | 3 | Browse products, sort by price, view details |
+| **cart.test.js** | Shopping cart operations | 3 | Add item, remove item, multiple items |
+| **checkout.test.js** | Purchase completion flow | 4 | Complete checkout, validation errors, cancel, ignored test |
 
-class LoginPage {
-  constructor() {
-    this.usernameInput = Selector('[data-test="username"]');
-    this.passwordInput = Selector('[data-test="password"]');
-    this.loginButton = Selector('[data-test="login-button"]');
-  }
-}
-
-export default new LoginPage();
-```
+**Total:** 13 tests covering complete e-commerce user journey
 
 ## Qase Features Demonstrated
 
@@ -235,16 +198,49 @@ fixture`Suite Name`
   });
 ```
 
-## Expected Behavior
+## Project Structure
 
-When tests run with Qase reporting enabled:
+```
+testcafe/
+├── tests/
+│   ├── pages/              # Page Object Model
+│   │   ├── LoginPage.js    # Login page selectors
+│   │   ├── InventoryPage.js # Product listing selectors
+│   │   ├── CartPage.js     # Shopping cart selectors
+│   │   └── CheckoutPage.js # Checkout form selectors
+│   ├── login.test.js       # Authentication scenarios
+│   ├── inventory.test.js   # Product browsing scenarios
+│   ├── cart.test.js        # Cart management scenarios
+│   └── checkout.test.js    # Checkout flow scenarios
+├── qase.config.json        # Qase reporter configuration
+├── package.json
+└── README.md
+```
 
-1. **Test results** are uploaded to your Qase project in real-time
-2. **Attachments** (JSON, text files) are uploaded to Qase
-3. **Steps** appear hierarchically in test case results
-4. **Metadata** (fields, suites, parameters) is applied to test cases
-5. **Ignored tests** are executed locally but not reported to Qase
-6. **Screenshots** of failures are automatically captured and attached
+## Page Object Pattern
+
+This example uses TestCafe's Selector-based page objects. All page objects:
+
+- Import `Selector` from TestCafe
+- Define selectors as class properties in constructor
+- Export as singleton instances
+- Use data-test attributes for reliable element location
+
+**Example:**
+
+```javascript
+import { Selector } from 'testcafe';
+
+class LoginPage {
+  constructor() {
+    this.usernameInput = Selector('[data-test="username"]');
+    this.passwordInput = Selector('[data-test="password"]');
+    this.loginButton = Selector('[data-test="login-button"]');
+  }
+}
+
+export default new LoginPage();
+```
 
 ## Credentials
 
@@ -254,13 +250,6 @@ The example uses demo credentials from saucedemo.com:
 - **Locked user:** username: `locked_out_user`, password: `secret_sauce`
 
 These are publicly available demo credentials for testing purposes only.
-
-## Additional Resources
-
-- [Qase TestCafe Documentation](https://github.com/qase-tms/qase-javascript/tree/main/qase-testcafe)
-- [TestCafe Documentation](https://testcafe.io/documentation)
-- [Qase Test Management](https://qase.io)
-- [SauceDemo Test Site](https://www.saucedemo.com)
 
 ## Troubleshooting
 
@@ -284,6 +273,9 @@ Enable debug mode in `qase.config.json` to see detailed logging:
 }
 ```
 
-## License
+## Additional Resources
 
-This example is part of the [qase-javascript](https://github.com/qase-tms/qase-javascript) repository and follows the same license.
+- [Qase TestCafe Documentation](https://github.com/qase-tms/qase-javascript/tree/main/qase-testcafe)
+- [TestCafe Documentation](https://testcafe.io/documentation)
+- [Qase Test Management](https://qase.io)
+- [SauceDemo Test Site](https://www.saucedemo.com)
