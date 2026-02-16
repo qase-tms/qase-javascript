@@ -108,8 +108,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 10-01-PLAN.md — Fix report file naming, title, and stats model
-- [ ] 10-02-PLAN.md — Result/step serialization transformation for spec compliance
+- [x] 10-01-PLAN.md — Fix report file naming, title, and stats model
+- [x] 10-02-PLAN.md — Result/step serialization transformation for spec compliance
 
 #### Phase 11: Gherkin Format Conversion
 **Goal**: Gherkin-type steps converted to TEXT format before report serialization
@@ -118,10 +118,10 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Gherkin steps automatically convert to TEXT format during report serialization
   2. BDD framework examples (CucumberJS) produce spec-compliant report output with TEXT steps
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 11-01: TBD
+- [ ] 11-01-PLAN.md — Add Gherkin-to-TEXT conversion in serialization layer
 
 ## Progress
 
@@ -139,5 +139,5 @@ Phases execute in numeric order: 10 -> 11
 | 7. API Framework Examples | v1.1 | 3/3 | Complete | 2026-02-16 |
 | 8. BDD & Collection Examples | v1.1 | 2/2 | Complete | 2026-02-16 |
 | 9. Integration Validation | v1.1 | 1/1 | Complete | 2026-02-16 |
-| 10. Core Spec Alignment | v1.2 | 0/2 | Not started | - |
-| 11. Gherkin Format Conversion | v1.2 | 0/? | Not started | - |
+| 10. Core Spec Alignment | v1.2 | 2/2 | Complete | 2026-02-16 |
+| 11. Gherkin Format Conversion | v1.2 | 0/1 | Not started | - |
