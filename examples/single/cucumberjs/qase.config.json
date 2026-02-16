@@ -1,13 +1,11 @@
 {
   "debug": true,
-
   "testops": {
     "api": {
       "token": "api_key"
     },
     "project": "project_code",
     "uploadAttachments": true,
-    "showPublicReportLink": true,
     "run": {
       "complete": true
     }
