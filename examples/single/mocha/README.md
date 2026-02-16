@@ -1,16 +1,8 @@
 # Mocha Example - API Testing with Qase Integration
 
-This example demonstrates realistic API testing scenarios using Mocha with Qase TestOps integration. The tests validate a public REST API (JSONPlaceholder) while showcasing all Qase reporter features in practical contexts.
-
 ## Overview
 
-The example includes 4 test files demonstrating:
-- **CRUD operations** on users (GET, POST, DELETE)
-- **Post validation** and filtering
-- **Error handling** for 404 responses
-- **Advanced features** like nested steps, suite hierarchies, and parameterized tests
-
-All tests run against [JSONPlaceholder](https://jsonplaceholder.typicode.com/), a free fake REST API for testing and prototyping.
+This example demonstrates realistic API testing scenarios using Mocha with Qase TestOps integration. The tests validate a public REST API (JSONPlaceholder) while showcasing all Qase reporter features in practical contexts, including CRUD operations on users, post validation and filtering, error handling for 404 responses, and advanced features like nested steps, suite hierarchies, and parameterized tests.
 
 ## Prerequisites
 
@@ -24,6 +16,13 @@ npm install
 ```
 
 ## Configuration
+
+The Qase reporter can be configured using environment variables or configuration files.
+
+**Environment Variables:**
+- `QASE_MODE` - Set to `testops` to enable reporting, `off` to disable (default: off)
+- `QASE_TESTOPS_API_TOKEN` - Your Qase API token (required for testops mode)
+- `QASE_TESTOPS_PROJECT` - Your Qase project code (required for testops mode)
 
 Create a `qase.config.json` file in the root directory:
 
@@ -51,14 +50,14 @@ Create a `qase.config.json` file in the root directory:
 ## Running Tests
 
 ```bash
-# Run all tests with Qase reporting
+# Run tests without Qase reporting (default)
 npm test
 
-# Run without Qase reporting (local development)
-QASE_MODE=off npm test
+# Run tests with Qase reporting
+QASE_MODE=testops npm test
 ```
 
-## Test Files
+## Test Scenarios
 
 ### 1. `api-crud.spec.js` - User CRUD Operations
 Tests basic CRUD operations on the `/users` endpoint:
@@ -94,7 +93,7 @@ Demonstrates complex Qase capabilities:
 
 **Qase features:** `qase.id`, `qase.fields`, `qase.suite`, `qase.step`, `qase.parameters`, `qase.attach`, `qase.comment`, `qase.ignore`
 
-## Qase Features Reference
+## Qase Features Demonstrated
 
 All 9 Qase reporter features demonstrated in these tests:
 
@@ -170,6 +169,20 @@ it('test', function() {
 });
 ```
 
+## Project Structure
+
+```
+mocha/
+├── test/
+│   ├── api-crud.spec.js     # User CRUD operations
+│   ├── api-posts.spec.js    # Post validation and filtering
+│   ├── api-errors.spec.js   # Error handling scenarios
+│   └── api-advanced.spec.js # Advanced Qase features
+├── .mocharc.js              # Mocha configuration
+├── qase.config.json         # Qase reporter configuration
+└── package.json
+```
+
 ## JSONPlaceholder API
 
 These tests use [JSONPlaceholder](https://jsonplaceholder.typicode.com/), a free fake REST API:
@@ -220,53 +233,8 @@ JSONPlaceholder Advanced Qase Features
 [INFO] qase: Test run link: https://app.qase.io/run/YOUR_PROJECT/dashboard/RUN_ID
 ```
 
-## What You'll See in Qase
-
-After running tests with `QASE_MODE=testops`:
-
-1. **Test Run** created with title "Mocha API Test Run"
-2. **14 test results** (13 passed, 1 skipped)
-3. **Detailed steps** for each test showing API calls and validations
-4. **Attachments** including request bodies and response data (JSON files)
-5. **Test metadata** like fields (layer, severity, priority), parameters, and comments
-6. **Suite hierarchy** showing nested organization in the advanced tests
-
-## Troubleshooting
-
-### Tests fail with "fetch is not defined"
-Ensure you're using Node.js 18 or higher, which includes native fetch support. For older versions:
-```bash
-npm install node-fetch@2
-```
-Then update imports to use `node-fetch`.
-
-### Qase reporter not working
-1. Verify `QASE_MODE=testops` is set
-2. Check `qase.config.json` has valid token and project code
-3. Ensure `mocha-qase-reporter` is listed in `.mocharc.js` reporter configuration
-
-### Tests timeout
-API calls may take longer than default Mocha timeout. The `.mocharc.js` is configured with 10000ms timeout. Adjust if needed:
-```javascript
-module.exports = {
-  timeout: 15000  // 15 seconds
-};
-```
-
-## Learn More
+## Additional Resources
 
 - [Qase Mocha Reporter Documentation](https://github.com/qase-tms/qase-javascript/tree/main/qase-mocha)
 - [Mocha Documentation](https://mochajs.org/)
 - [JSONPlaceholder Guide](https://jsonplaceholder.typicode.com/guide/)
-
-## Benefits
-
-This example demonstrates:
-
-✅ **Realistic API testing patterns** - Real HTTP requests, not mocks
-✅ **All Qase features in context** - Not isolated demos, but practical usage
-✅ **Mocha-specific patterns** - Correct import paths, contentType, step handling
-✅ **Error handling** - How to test and document failure scenarios
-✅ **Best practices** - Nested steps, parameterization, attachments
-✅ **Zero infrastructure** - Uses free public API, no setup required
-✅ **Ready for CI/CD** - Can run in any environment with internet access

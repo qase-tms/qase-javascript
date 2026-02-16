@@ -1,6 +1,8 @@
 # Jest Example - API Testing with JSONPlaceholder
 
-This example project demonstrates how to write realistic API tests using the Jest framework with integration to Qase Test Management. The tests use [JSONPlaceholder](https://jsonplaceholder.typicode.com), a free fake REST API for testing and prototyping.
+## Overview
+
+This example project demonstrates how to write realistic API tests using the Jest framework with integration to Qase Test Management. The tests use [JSONPlaceholder](https://jsonplaceholder.typicode.com), a free fake REST API for testing and prototyping, covering CRUD operations, post validation, error handling, and advanced features like nested steps and suite hierarchies.
 
 ## Prerequisites
 
@@ -9,7 +11,7 @@ Ensure that the following tools are installed on your machine:
 1. [Node.js](https://nodejs.org/) (version 18 or higher is required for native fetch support)
 2. [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
 
-## Setup Instructions
+## Installation
 
 1. Clone this repository by running the following commands:
    ```bash
@@ -25,15 +27,104 @@ Ensure that the following tools are installed on your machine:
 3. Create a `qase.config.json` file in the root of the project. Follow the instructions
    on [how to configure the file](https://github.com/qase-tms/qase-javascript/tree/main/qase-javascript-commons#configuration).
 
-4. To run tests locally without Qase reporting:
-   ```bash
-   QASE_MODE=off npm test
-   ```
+## Configuration
 
-5. To run tests and upload the results to Qase Test Management:
-   ```bash
-   QASE_MODE=testops npm test
-   ```
+The Qase reporter can be configured using environment variables or configuration files.
+
+**Environment Variables:**
+- `QASE_MODE` - Set to `testops` to enable reporting, `off` to disable (default: off)
+- `QASE_TESTOPS_API_TOKEN` - Your Qase API token (required for testops mode)
+- `QASE_TESTOPS_PROJECT` - Your Qase project code (required for testops mode)
+
+Example `qase.config.json`:
+
+```json
+{
+  "mode": "testops",
+  "debug": false,
+  "testops": {
+    "api": {
+      "token": "your_api_token_here"
+    },
+    "project": "YOUR_PROJECT_CODE",
+    "run": {
+      "title": "Jest API Test Run",
+      "complete": true
+    }
+  }
+}
+```
+
+Or configure via `jest.config.js`:
+
+```javascript
+module.exports = {
+  testTimeout: 10000, // API requests may take longer
+  reporters: [
+    'default',
+    [
+      'jest-qase-reporter',
+      {
+        mode: 'testops',
+        testops: {
+          api: {
+            token: process.env.QASE_TESTOPS_API_TOKEN,
+          },
+          project: 'YOUR_PROJECT_CODE',
+          run: {
+            complete: true,
+          },
+        },
+      },
+    ],
+  ],
+};
+```
+
+## Running Tests
+
+```bash
+# Run tests without Qase reporting (default)
+npm test
+
+# Run tests with Qase reporting
+QASE_MODE=testops npm test
+```
+
+### Run specific test file
+
+```bash
+npm test -- api-crud.test.js
+```
+
+### Run tests with verbose output
+
+```bash
+npm test -- --verbose
+```
+
+### Expected Behavior
+
+**Running with QASE_MODE=off (Local Development)**
+
+When running tests with `QASE_MODE=off`, tests execute normally without Qase reporting:
+
+- Tests run and pass/fail as usual
+- Real HTTP requests are made to JSONPlaceholder API
+- No data is sent to Qase TestOps
+- No Qase API token required
+- Output shows standard Jest test results
+
+**Running with QASE_MODE=testops (CI/CD and Reporting)**
+
+When running tests with `QASE_MODE=testops`, test results are reported to Qase:
+
+- Tests execute with real API calls to JSONPlaceholder
+- Results are sent to Qase TestOps with all metadata
+- A new test run is created in your Qase project
+- Console output includes Qase test run link
+- All steps, attachments, fields, and comments are captured
+- Requires valid `QASE_TESTOPS_API_TOKEN` and `QASE_TESTOPS_PROJECT` configuration
 
 ## Test Scenarios
 
@@ -79,7 +170,7 @@ Tests demonstrating advanced Qase features:
 
 **Qase features demonstrated:** `qase.suite`, nested `qase.step`, `qase.parameters`, `qase.ignore`, `qase.comment`
 
-## Qase Features Reference
+## Qase Features Demonstrated
 
 All 9 Qase reporter features are demonstrated across the test files:
 
@@ -132,6 +223,20 @@ This example demonstrates Jest-specific Qase integration patterns:
    qase.suite('API Tests\tAdvanced\tRelationships');
    ```
 
+## Project Structure
+
+```
+jest/
+├── tests/
+│   ├── api-crud.test.js     # User CRUD operations
+│   ├── api-posts.test.js    # Post validation and filtering
+│   ├── api-errors.test.js   # Error handling scenarios
+│   └── api-advanced.test.js # Advanced Qase features
+├── jest.config.js           # Jest configuration
+├── qase.config.json         # Qase reporter configuration
+└── package.json
+```
+
 ## About JSONPlaceholder
 
 [JSONPlaceholder](https://jsonplaceholder.typicode.com) is a free fake REST API for testing and prototyping. It provides:
@@ -149,95 +254,6 @@ This example demonstrates Jest-specific Qase integration patterns:
 - `/albums` - 100 photo albums
 - `/photos` - 5000 photos in albums
 - `/todos` - 200 todo items
-
-## Running the Examples
-
-```bash
-# Install dependencies
-npm install
-
-# Run tests locally (no Qase reporting)
-QASE_MODE=off npm test
-
-# Run tests with Qase reporting
-QASE_MODE=testops npm test
-
-# Run specific test file
-npm test -- api-crud.test.js
-
-# Run tests with verbose output
-npm test -- --verbose
-```
-
-## Expected Behavior
-
-### Running with QASE_MODE=off (Local Development)
-
-When running tests with `QASE_MODE=off`, tests execute normally without Qase reporting:
-
-- Tests run and pass/fail as usual
-- Real HTTP requests are made to JSONPlaceholder API
-- No data is sent to Qase TestOps
-- No Qase API token required
-- Output shows standard Jest test results
-
-### Running with QASE_MODE=testops (CI/CD and Reporting)
-
-When running tests with `QASE_MODE=testops`, test results are reported to Qase:
-
-- Tests execute with real API calls to JSONPlaceholder
-- Results are sent to Qase TestOps with all metadata
-- A new test run is created in your Qase project
-- Console output includes Qase test run link
-- All steps, attachments, fields, and comments are captured
-- Requires valid `QASE_TESTOPS_API_TOKEN` and `QASE_TESTOPS_PROJECT` configuration
-
-## Configuration
-
-Example `qase.config.json`:
-
-```json
-{
-  "mode": "testops",
-  "debug": false,
-  "testops": {
-    "api": {
-      "token": "your_api_token_here"
-    },
-    "project": "YOUR_PROJECT_CODE",
-    "run": {
-      "title": "Jest API Test Run",
-      "complete": true
-    }
-  }
-}
-```
-
-Or configure via `jest.config.js`:
-
-```javascript
-module.exports = {
-  testTimeout: 10000, // API requests may take longer
-  reporters: [
-    'default',
-    [
-      'jest-qase-reporter',
-      {
-        mode: 'testops',
-        testops: {
-          api: {
-            token: process.env.QASE_TESTOPS_API_TOKEN,
-          },
-          project: 'YOUR_PROJECT_CODE',
-          run: {
-            complete: true,
-          },
-        },
-      },
-    ],
-  ],
-};
-```
 
 ## Additional Resources
 

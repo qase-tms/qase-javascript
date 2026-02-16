@@ -1,13 +1,15 @@
 # CucumberJS BDD Example
 
-This example demonstrates realistic BDD (Behavior-Driven Development) API testing using CucumberJS with Qase Test Management integration. Tests exercise the JSONPlaceholder REST API with Gherkin feature files expressing business behavior.
+## Overview
+
+This example demonstrates realistic BDD (Behavior-Driven Development) API testing using CucumberJS with Qase Test Management integration. Tests exercise the JSONPlaceholder REST API with Gherkin feature files expressing business behavior. All Qase metadata is configured using Gherkin tags only, with no programmatic imports required.
 
 ## Prerequisites
 
 1. [Node.js](https://nodejs.org/) (version 18 or higher required for native fetch)
 2. [npm](https://www.npmjs.com/)
 
-## Setup
+## Installation
 
 1. Clone the repository:
    ```bash
@@ -23,6 +25,44 @@ This example demonstrates realistic BDD (Behavior-Driven Development) API testin
 3. Configure Qase credentials in `qase.config.json`:
    - Set your API token in `testops.api.token`
    - Set your project code in `testops.project`
+
+## Configuration
+
+The Qase reporter can be configured using environment variables or configuration files.
+
+**Environment Variables:**
+- `QASE_MODE` - Set to `testops` to enable reporting, `off` to disable (default: off)
+- `QASE_TESTOPS_API_TOKEN` - Your Qase API token (required for testops mode)
+- `QASE_TESTOPS_PROJECT` - Your Qase project code (required for testops mode)
+
+Example `qase.config.json`:
+
+```json
+{
+  "debug": true,
+  "testops": {
+    "api": {
+      "token": "your_api_token_here"
+    },
+    "project": "YOUR_PROJECT_CODE",
+    "uploadAttachments": true,
+    "run": {
+      "complete": true,
+      "title": "CucumberJS BDD Test Run"
+    }
+  }
+}
+```
+
+## Running Tests
+
+```bash
+# Run tests without Qase reporting (default)
+npm test
+
+# Run tests with Qase reporting
+QASE_MODE=testops npm test
+```
 
 ## Test Scenarios
 
@@ -68,18 +108,6 @@ Advanced Qase integration patterns:
 | Attachments | `this.attach(content, mimeType)` in steps | JSON response data attached to results |
 | Parameterization | Scenario Outline with Examples table | Parameters auto-extracted from Examples |
 
-## Running Tests
-
-Run tests locally (no Qase reporting):
-```bash
-QASE_MODE=off npm test
-```
-
-Run tests with Qase reporting:
-```bash
-npm test
-```
-
 ## CucumberJS-Specific Patterns
 
 - **Tag-based metadata** -- All Qase configuration uses Gherkin tags, not programmatic imports
@@ -89,6 +117,25 @@ npm test
 - **`function()` not `=>` in steps** -- Arrow functions break Cucumber's World context
 - **No spaces in tags** -- Use underscores for titles, compact JSON without spaces for fields
 - **Profile-based config** -- `cucumber.js` file configures formatter and step definition paths
+
+## Project Structure
+
+```
+cucumberjs/
+├── features/
+│   ├── api-crud.feature      # User CRUD operations
+│   ├── api-posts.feature     # Post validation and filtering
+│   ├── api-errors.feature    # Error handling scenarios
+│   └── api-advanced.feature  # Advanced Qase features
+├── step_definitions/
+│   ├── api-crud.steps.js     # CRUD step implementations
+│   ├── api-posts.steps.js    # Post step implementations
+│   ├── api-errors.steps.js   # Error step implementations
+│   └── api-advanced.steps.js # Advanced step implementations
+├── cucumber.js              # Cucumber configuration
+├── qase.config.json         # Qase reporter configuration
+└── package.json
+```
 
 ## API Notes
 

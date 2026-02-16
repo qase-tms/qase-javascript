@@ -1,18 +1,10 @@
 # WDIO Example - E-commerce Test Suite
 
-This example demonstrates realistic e-commerce test scenarios on [saucedemo.com](https://www.saucedemo.com) using WebdriverIO with Qase TestOps integration.
-
-**Note:** This is a **single project** example. For multi-project usage patterns, see `examples/multiProject/wdio/`.
-
 ## Overview
 
-The test suite covers core e-commerce user flows:
-- User authentication (login scenarios)
-- Product catalog browsing and sorting
-- Shopping cart management
-- Complete checkout process
+This example demonstrates realistic e-commerce test scenarios on [saucedemo.com](https://www.saucedemo.com) using WebdriverIO with Qase TestOps integration. The test suite covers core e-commerce user flows: user authentication (login scenarios), product catalog browsing and sorting, shopping cart management, and complete checkout process. All tests demonstrate comprehensive Qase reporter features in realistic test contexts using the Page Object Model pattern.
 
-All tests demonstrate comprehensive Qase reporter features in realistic test contexts using the Page Object Model pattern.
+**Note:** This is a **single project** example. For multi-project usage patterns, see `examples/multiProject/wdio/`.
 
 ## Prerequisites
 
@@ -20,27 +12,79 @@ All tests demonstrate comprehensive Qase reporter features in realistic test con
 - npm
 - Chrome browser (tests run in headless mode)
 
-## Setup
+## Installation
 
 ```bash
 # Install dependencies
 npm install
 ```
 
-## Running Tests
+## Configuration
 
-### Local execution (no reporting)
-```bash
-QASE_MODE=off npm test
+The Qase reporter can be configured using environment variables or configuration files.
+
+**Environment Variables:**
+- `QASE_MODE` - Set to `testops` to enable reporting, `off` to disable (default: off)
+- `QASE_TESTOPS_API_TOKEN` - Your Qase API token (required for testops mode)
+- `QASE_TESTOPS_PROJECT` - Your Qase project code (required for testops mode)
+
+### qase.config.json
+
+Single project configuration:
+
+```json
+{
+  "debug": true,
+  "testops": {
+    "api": {
+      "token": "your_api_token"
+    },
+    "project": "your_project_code",
+    "uploadAttachments": true,
+    "run": {
+      "complete": true
+    }
+  }
+}
 ```
 
-### With Qase TestOps reporting
+### wdio.conf.js
+
+WebdriverIO configuration with Qase reporter:
+
+```javascript
+const WDIOQaseReporter = require('wdio-qase-reporter').default;
+const { afterRunHook, beforeRunHook } = require('wdio-qase-reporter');
+
+exports.config = {
+  reporters: [
+    [WDIOQaseReporter, {
+      disableWebdriverStepsReporting: true,
+      disableWebdriverScreenshotsReporting: true,
+      useCucumber: false,
+    }]
+  ],
+  // ... critical hooks
+  onPrepare: async function () {
+    await beforeRunHook();
+  },
+  onComplete: async function () {
+    await afterRunHook();
+  },
+};
+```
+
+## Running Tests
+
 ```bash
-# Configure your credentials in qase.config.json first
+# Run tests without Qase reporting (default)
+npm test
+
+# Run tests with Qase reporting
 QASE_MODE=testops npm test
 ```
 
-## Test Files
+## Test Scenarios
 
 | File | Scenarios | Features Demonstrated |
 |------|-----------|----------------------|
@@ -65,32 +109,7 @@ QASE_MODE=testops npm test
 | Comment | `qase.comment('text')` | All tests |
 | Ignore | `it(qase.ignore(), 'name', async () => {})` | `checkout.spec.js` |
 
-## Page Objects
-
-This example uses the **WDIO Page Object Pattern** with getter methods:
-
-```javascript
-class LoginPage {
-  get usernameInput() { return $('[data-test="username"]'); }
-  get passwordInput() { return $('[data-test="password"]'); }
-
-  async login(username, password) {
-    await this.usernameInput.setValue(username);
-    await this.passwordInput.setValue(password);
-    await this.loginButton.click();
-  }
-}
-
-module.exports = new LoginPage();
-```
-
-Page objects are located in `test/pageobjects/`:
-- `LoginPage.js` - Login page interactions
-- `InventoryPage.js` - Product catalog and sorting
-- `CartPage.js` - Shopping cart management
-- `CheckoutPage.js` - Checkout process
-
-## Important WDIO Patterns
+## WDIO-Specific Patterns
 
 ### CommonJS (not ES modules)
 ```javascript
@@ -143,60 +162,59 @@ exports.config = {
 };
 ```
 
-## Configuration
+## Project Structure
 
-### qase.config.json
-Single project configuration:
-
-```json
-{
-  "debug": true,
-  "testops": {
-    "api": {
-      "token": "your_api_token"
-    },
-    "project": "your_project_code",
-    "uploadAttachments": true,
-    "run": {
-      "complete": true
-    }
-  }
-}
+```
+wdio/
+├── test/
+│   ├── pageobjects/
+│   │   ├── LoginPage.js    # Login page interactions
+│   │   ├── InventoryPage.js # Product catalog and sorting
+│   │   ├── CartPage.js     # Shopping cart management
+│   │   └── CheckoutPage.js # Checkout process
+│   ├── specs/
+│   │   ├── login.spec.js   # Authentication test scenarios
+│   │   ├── inventory.spec.js # Product browsing test scenarios
+│   │   ├── cart.spec.js    # Shopping cart test scenarios
+│   │   └── checkout.spec.js # Checkout test scenarios
+├── wdio.conf.js           # WebdriverIO configuration
+├── qase.config.json       # Qase reporter configuration
+└── package.json
 ```
 
-### wdio.conf.js
-WebdriverIO configuration with Qase reporter:
+## Page Objects
+
+This example uses the **WDIO Page Object Pattern** with getter methods:
 
 ```javascript
-const WDIOQaseReporter = require('wdio-qase-reporter').default;
-const { afterRunHook, beforeRunHook } = require('wdio-qase-reporter');
+class LoginPage {
+  get usernameInput() { return $('[data-test="username"]'); }
+  get passwordInput() { return $('[data-test="password"]'); }
 
-exports.config = {
-  reporters: [
-    [WDIOQaseReporter, {
-      disableWebdriverStepsReporting: true,
-      disableWebdriverScreenshotsReporting: true,
-      useCucumber: false,
-    }]
-  ],
-  // ... critical hooks
-  onPrepare: async function () {
-    await beforeRunHook();
-  },
-  onComplete: async function () {
-    await afterRunHook();
-  },
-};
+  async login(username, password) {
+    await this.usernameInput.setValue(username);
+    await this.passwordInput.setValue(password);
+    await this.loginButton.click();
+  }
+}
+
+module.exports = new LoginPage();
 ```
 
-## Learn More
-
-- [Qase WDIO Reporter Documentation](https://github.com/qase-tms/qase-javascript/tree/main/qase-wdio)
-- [WebdriverIO Documentation](https://webdriver.io/)
-- [Saucedemo Test Site](https://www.saucedemo.com)
+Page objects are located in `test/pageobjects/`:
+- `LoginPage.js` - Login page interactions
+- `InventoryPage.js` - Product catalog and sorting
+- `CartPage.js` - Shopping cart management
+- `CheckoutPage.js` - Checkout process
 
 ## Credentials
 
 For testing on saucedemo.com, use these credentials:
 - **Standard User:** `standard_user` / `secret_sauce`
 - **Locked User:** `locked_out_user` / `secret_sauce` (for negative testing)
+
+## Additional Resources
+
+- [Qase WDIO Reporter Documentation](https://github.com/qase-tms/qase-javascript/tree/main/qase-wdio)
+- [WebdriverIO Documentation](https://webdriver.io/)
+- [Saucedemo Test Site](https://www.saucedemo.com)
