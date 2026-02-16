@@ -1,352 +1,272 @@
-# Mocha Example
+# Mocha Example - API Testing with Qase Integration
 
-This is a sample project demonstrating how to write and execute tests using the Mocha framework with integration to
-Qase Test Management.
+This example demonstrates realistic API testing scenarios using Mocha with Qase TestOps integration. The tests validate a public REST API (JSONPlaceholder) while showcasing all Qase reporter features in practical contexts.
+
+## Overview
+
+The example includes 4 test files demonstrating:
+- **CRUD operations** on users (GET, POST, DELETE)
+- **Post validation** and filtering
+- **Error handling** for 404 responses
+- **Advanced features** like nested steps, suite hierarchies, and parameterized tests
+
+All tests run against [JSONPlaceholder](https://jsonplaceholder.typicode.com/), a free fake REST API for testing and prototyping.
 
 ## Prerequisites
 
-Ensure that the following tools are installed on your machine:
+- Node.js 18 or higher (for native `fetch` support)
+- npm or yarn
 
-1. [Node.js](https://nodejs.org/) (version 18 or higher is recommended)
-2. [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
-
-## Setup Instructions
-
-1. Clone this repository by running the following commands:
-
-   ```bash
-   git clone https://github.com/qase-tms/qase-javascript.git
-   cd qase-javascript/examples/mocha
-   ```
-
-2. Install the project dependencies:
-
-   ```bash
-   npm install
-   ```
-
-3. Create a `qase.config.json` file in the root of the project. Follow the instructions
-   on [how to configure the file](https://github.com/qase-tms/qase-javascript/tree/main/qase-javascript-commons#configuration).
-
-4. To run tests and upload the results to Qase Test Management, use the following command:
-
-   ```bash
-   npm run test
-   ```
-
-## Features Demonstrated
-
-- **Qase Integration**: Shows various Qase features like test IDs, titles, suites, comments, fields, attachments, and steps
-- **Test Methods**: Demonstrates different ways to use Qase methods in tests
-- **Async Tests**: Shows how to handle asynchronous test execution
-- **Parametrized Tests**: Demonstrates parameterized test execution
-- **Attachment Handling**: Shows how to attach files and data to tests
-
-## Usage
-
-### Basic Test Execution
+## Installation
 
 ```bash
-npm run test
+npm install
 ```
 
-This runs all tests with the Qase reporter, sending results to Qase TestOps.
+## Configuration
 
-### Alternative: Direct Mocha Command
-
-```bash
-QASE_MODE=testops mocha
-```
-
-This runs Mocha directly with Qase integration.
-
-## Configuration Files
-
-### qase.config.json
+Create a `qase.config.json` file in the root directory:
 
 ```json
 {
   "debug": true,
   "testops": {
     "api": {
-      "token": "your_qase_token_here"
+      "token": "your_qase_api_token"
     },
-    "project": "your_project_code_here",
+    "project": "your_project_code",
     "uploadAttachments": true,
-    "showPublicReportLink": true,
     "run": {
       "complete": true,
-      "title": "Mocha test run"
+      "title": "Mocha API Test Run"
     }
   }
 }
 ```
 
-**Important**: Replace `your_qase_token_here` and `your_project_code_here` with your actual Qase token and project code for TestOps mode to work.
+**Getting your credentials:**
+- **API Token**: Qase profile settings → API Tokens section
+- **Project Code**: Found in your Qase project URL or settings
 
-### Getting Your Qase Credentials
+## Running Tests
 
-1. **API Token**:
-   - Go to your Qase profile settings
-   - Navigate to "API Tokens" section
-   - Create a new token or copy an existing one
+```bash
+# Run all tests with Qase reporting
+npm test
 
-2. **Project Code**:
-   - Go to your Qase project
-   - The project code is shown in the URL: `https://app.qase.io/project/YOUR_PROJECT_CODE`
-   - Or find it in project settings
-
-## Expected Behavior
-
-### Running with QASE_MODE=off (Local Development)
-
-When running tests with `QASE_MODE=off`, tests execute normally without Qase reporting:
-
-- Tests run and pass/fail as usual
-- No data is sent to Qase TestOps
-- No Qase API token required
-- Output shows standard Mocha test results
-
-This mode is useful for local development and debugging.
-
-### Running with QASE_MODE=testops (CI/CD and Reporting)
-
-When running tests with `QASE_MODE=testops`, test results are reported to Qase:
-
-- Tests execute and results are sent to Qase TestOps
-- A new test run is created in your Qase project
-- Test results include all metadata (steps, attachments, fields, etc.)
-- Console output includes Qase test run link
-- Requires valid Qase API token and project code in `qase.config.json`
-
-**Steps Example:**
-- Creates test result with multiple named steps using `this.step()`
-- Each step shows execution status, duration, and any errors
-- Nested steps appear hierarchically in Qase
-- Steps with callbacks can contain assertions and actions
-
-**Attachments Example:**
-- Files attached via `this.attach()` appear in test results
-- Content can be strings, buffers, or file paths
-- Attachments are visible in the test run details
-- Supports text, JSON, images, and binary files
-
-**Context Methods:**
-- Mocha provides Qase methods via test context (`this` keyword)
-- Must use `function()` syntax (not arrow functions) to access `this`
-- Available methods: `this.title()`, `this.suite()`, `this.fields()`, `this.comment()`, `this.parameters()`, `this.attach()`, `this.step()`
-
-## What You'll See
-
-### Test Execution Output
-
-When running tests with Qase integration, you'll see:
-
-1. **Qase Integration**: DEBUG logs showing data being sent to Qase TestOps
-2. **Test Run Creation**: Results are sent to Qase TestOps
-3. **Test Run Link**: URL to view results in Qase dashboard
-4. **Test Results**: Individual test results with Qase IDs
-
-Example output:
-
-```
-[DEBUG] qase: Starting test run
-[DEBUG] qase: Creating test run: {"title":"Mocha test run","description":"","is_autotest":true,"cases":[],"start_time":"2025-10-07 19:30:00","tags":[]}
-[DEBUG] qase: Test run created: {"status":true,"result":{"id":3743}}
-
-  Simple tests async
-    ✔ test without qase metadata success
-    1) test without qase metadata failed
-    - test with qase id success (Qase ID: 10)
-    2) test with qase id failed (Qase ID: 20)
-    ✔ test with title success
-    3) test with title failed
-    ✔ test with suite success
-    4) test with suite failed
-    ✔ test with comment success
-    5) test with comment failed
-    ✔ test with fields success
-    6) test with fields failed
-    ✔ ignored test success
-    7) ignored test failed
-
-  Attachment tests
-    ✔ successful test with string attachment
-    8) failing test with string attachment
-
-  Parametrized test
-    ✔ test with parameters success 1
-    9) test with parameters failed 1
-    ✔ test with parameters success 2
-    10) test with parameters failed 2
-    ✔ test with parameters success 3
-    11) test with parameters failed 3
-    ✔ test with parameters success 4
-    12) test with parameters failed 4
-    ✔ test with parameters success 5
-    13) test with parameters failed 5
-
-  Simple tests
-    ✔ test without qase metadata success
-    14) test without qase metadata failed
-    - test with qase id success (Qase ID: 1)
-    15) test with qase id failed (Qase ID: 2)
-    ✔ test with title success
-    16) test with title failed
-    ✔ test with suite success
-    17) test with suite failed
-    ✔ test with comment success
-    18) test with comment failed
-    ✔ test with fields success
-    19) test with fields failed
-    ✔ ignored test success
-    20) ignored test failed
-
-  Step tests
-    ✔ successful test with steps
-    21) failing test with steps
-
-  2 passing (11ms)
-  2 pending
-  38 failing
-
-[DEBUG] qase: Publishing test run results
-[DEBUG] qase: Results sent to Qase: 40
-[INFO] qase: Test run link: https://app.qase.io/run/DEVX/dashboard/3743
-[INFO] qase: Run 3743 completed
+# Run without Qase reporting (local development)
+QASE_MODE=off npm test
 ```
 
-## Benefits
+## Test Files
 
-This example demonstrates comprehensive Qase integration with Mocha:
+### 1. `api-crud.spec.js` - User CRUD Operations
+Tests basic CRUD operations on the `/users` endpoint:
+- **GET all users** - Verifies 10 users returned with proper structure
+- **GET single user** - Validates specific user details (Leanne Graham)
+- **POST create user** - Tests user creation with request/response attachments
+- **DELETE user** - Verifies deletion (faked by JSONPlaceholder)
 
-- **Full Qase Functionality**: All Qase methods (`this.title()`, `this.suite()`, etc.) are available
-- **TestOps Integration**: Results are sent to Qase TestOps for analysis
-- **Rich Test Metadata**: Support for titles, suites, comments, fields, attachments, and steps
-- **Async Support**: Proper handling of asynchronous test execution
-- **Parametrized Tests**: Support for parameterized test execution
-- **Attachment Support**: Ability to attach files and data to tests
-- **CI/CD Ready**: Perfect for automated testing pipelines
+**Qase features:** `qase.id`, `qase.fields`, `qase.step`, `qase.attach`, `qase.comment`, `qase.parameters`
 
-## Test Examples
+### 2. `api-posts.spec.js` - Post Validation
+Tests post retrieval and filtering:
+- **GET all posts** - Verifies 100 posts with correct structure
+- **GET posts by user** - Tests filtering with query parameters
+- **GET post with comments** - Validates relationships and nested data
 
-### Basic Test with Qase ID
+**Qase features:** `qase.id`, `qase.fields`, `qase.parameters`, `qase.step`, `qase.attach`
 
+### 3. `api-errors.spec.js` - Error Handling
+Tests error scenarios and 404 responses:
+- **Non-existent user** - Validates 404 handling for invalid user ID
+- **Non-existent post** - Attaches error response for documentation
+- **Invalid endpoint** - Verifies graceful handling of bad URLs
+
+**Qase features:** `qase.id`, `qase.comment`, `qase.step`, `qase.attach`
+
+### 4. `api-advanced.spec.js` - Advanced Features
+Demonstrates complex Qase capabilities:
+- **Complex nested steps** - Multi-level step hierarchy for related API calls
+- **Suite hierarchy** - Nested suite structure with `\t` separator
+- **Parameterized patterns** - Testing multiple resources with parameters
+- **Ignored test** - Placeholder for future authentication features
+
+**Qase features:** `qase.id`, `qase.fields`, `qase.suite`, `qase.step`, `qase.parameters`, `qase.attach`, `qase.comment`, `qase.ignore`
+
+## Qase Features Reference
+
+All 9 Qase reporter features demonstrated in these tests:
+
+| Feature | Usage | Example File |
+|---------|-------|--------------|
+| **Test ID** | `qase(id, 'name')` wrapper | All files |
+| **Title** | `qase.title('custom title')` | Not needed (using qase wrapper) |
+| **Fields** | `qase.fields({ layer, severity, priority })` | api-crud, api-posts, api-advanced |
+| **Suite** | `qase.suite('Parent\tChild\tGrandchild')` | api-advanced |
+| **Steps** | `await qase.step('name', async () => {})` | All files |
+| **Attachments** | `qase.attach({ name, content, contentType })` | api-crud, api-posts, api-errors, api-advanced |
+| **Comments** | `qase.comment('additional info')` | api-crud, api-errors, api-advanced |
+| **Parameters** | `qase.parameters({ key: 'value' })` | api-crud, api-posts, api-advanced |
+| **Ignore** | `qase.ignore()` with `it.skip()` | api-advanced |
+
+## Mocha-Specific Patterns
+
+### Import from Correct Path
 ```javascript
 const { qase } = require('mocha-qase-reporter/mocha');
+```
+**Important:** Must import from `mocha-qase-reporter/mocha` (not base package).
 
-it(qase(1, 'test with qase id'), function() {
-  assert.strictEqual(1, 1);
+### Test ID Wrapper Pattern
+```javascript
+it(qase(1, 'Test description'), async function() {
+  // Test code
+});
+```
+The `qase(id, name)` wrapper assigns Qase test case IDs.
+
+### Attachment contentType Parameter
+```javascript
+qase.attach({
+  name: 'data.json',
+  content: JSON.stringify(data),
+  contentType: 'application/json'  // Note: contentType, not type
+});
+```
+**Important:** Mocha uses `contentType` parameter (Vitest uses `type`).
+
+### Steps Can Be Sync or Async
+```javascript
+// Async steps (recommended for API calls)
+await qase.step('Fetch data', async () => {
+  const response = await fetch(url);
+});
+
+// Sync steps (for simple operations)
+qase.step('Validate data', () => {
+  assert.strictEqual(value, expected);
 });
 ```
 
-### Test with Custom Title
+### Suite Hierarchy with \t Separator
+```javascript
+qase.suite('API Tests\tAdvanced\tRelationships');
+// Creates: API Tests > Advanced > Relationships in Qase UI
+```
+
+### Function Context for `this` Access
+While modern API uses the `qase` object directly, traditional Mocha patterns use `function()` syntax (not arrow functions) to access `this` context:
 
 ```javascript
-it('test with title', function() {
-  this.title('Custom Test Title');
-  assert.strictEqual(1, 1);
+// Modern approach (used in these examples)
+it('test', function() {
+  qase.title('Custom title');
+});
+
+// Traditional approach (also valid)
+it('test', function() {
+  this.title('Custom title');
 });
 ```
 
-### Test with Suite
+## JSONPlaceholder API
 
-```javascript
-it('test with suite', function() {
-  this.suite('Custom Suite');
-  assert.strictEqual(1, 1);
-});
+These tests use [JSONPlaceholder](https://jsonplaceholder.typicode.com/), a free fake REST API:
+
+**Key endpoints:**
+- `/users` - 10 users
+- `/posts` - 100 posts
+- `/comments` - 500 comments
+- `/albums` - 100 albums
+- `/photos` - 5000 photos
+
+**Important notes:**
+- **No authentication required** - Perfect for testing examples
+- **Write operations are faked** - POST/PUT/PATCH/DELETE return success but don't persist data
+- **Stable and reliable** - Hosted by Vercel, widely used for testing
+- **CORS enabled** - Can be used from browser or Node.js
+
+## Expected Output
+
+When running with `QASE_MODE=testops`, you'll see:
+
+```
+JSONPlaceholder User CRUD Operations
+  ✓ GET all users - verify 10 users returned (Qase ID: 1)
+  ✓ GET single user by ID - verify user details (Qase ID: 2)
+  ✓ POST create user - verify 201 response and returned ID (Qase ID: 3)
+  ✓ DELETE user - verify 200 response (Qase ID: 4)
+
+JSONPlaceholder Post Validation
+  ✓ GET all posts - verify 100 posts returned (Qase ID: 5)
+  ✓ GET posts by user ID - verify filtered results (Qase ID: 6)
+  ✓ GET post with comments - verify comment structure (Qase ID: 7)
+
+JSONPlaceholder Error Handling
+  ✓ GET non-existent user - verify 404 response (Qase ID: 8)
+  ✓ GET non-existent post - attach error response (Qase ID: 9)
+  ✓ Invalid endpoint - verify graceful 404 handling (Qase ID: 10)
+
+JSONPlaceholder Advanced Qase Features
+  ✓ Complex nested steps - multi-resource retrieval (Qase ID: 11)
+  ✓ Suite hierarchy demonstration (Qase ID: 12)
+  ✓ Parameterized test pattern - multiple user IDs (Qase ID: 13)
+  - Future feature - API authentication (Qase ID: 14)
+
+13 passing
+1 pending
+
+[INFO] qase: Test run link: https://app.qase.io/run/YOUR_PROJECT/dashboard/RUN_ID
 ```
 
-### Test with Comment
+## What You'll See in Qase
 
-```javascript
-it('test with comment', function() {
-  this.comment('This is a test comment');
-  assert.strictEqual(1, 1);
-});
-```
+After running tests with `QASE_MODE=testops`:
 
-### Test with Fields
-
-```javascript
-it('test with fields', function() {
-  this.fields({ environment: 'test', priority: 'high' });
-  assert.strictEqual(1, 1);
-});
-```
-
-### Test with Attachment
-
-```javascript
-it('test with attachment', function() {
-  this.attach({ 
-    name: 'test-data.txt', 
-    content: 'Sample test data', 
-    contentType: 'text/plain' 
-  });
-  assert.strictEqual(1, 1);
-});
-```
-
-### Test with Steps
-
-```javascript
-it('test with steps', function() {
-  this.step('Step 1: Initialize', () => {
-    assert.strictEqual(1, 1);
-  });
-  
-  this.step('Step 2: Execute', () => {
-    assert.strictEqual(2, 2);
-  });
-  
-  this.step('Step 3: Verify', () => {
-    assert.strictEqual(3, 3);
-  });
-});
-```
-
-### Parametrized Test
-
-```javascript
-const parameters = [1, 2, 3, 4, 5];
-
-parameters.forEach((param, index) => {
-  it(`test with parameters success ${param}`, function() {
-    this.parameters({ value: param });
-    assert.strictEqual(param, param);
-  });
-});
-```
+1. **Test Run** created with title "Mocha API Test Run"
+2. **14 test results** (13 passed, 1 skipped)
+3. **Detailed steps** for each test showing API calls and validations
+4. **Attachments** including request bodies and response data (JSON files)
+5. **Test metadata** like fields (layer, severity, priority), parameters, and comments
+6. **Suite hierarchy** showing nested organization in the advanced tests
 
 ## Troubleshooting
 
-### TestOps Mode Failing
+### Tests fail with "fetch is not defined"
+Ensure you're using Node.js 18 or higher, which includes native fetch support. For older versions:
+```bash
+npm install node-fetch@2
+```
+Then update imports to use `node-fetch`.
 
-If TestOps mode fails with "Uncaught error outside test suite", make sure you have:
+### Qase reporter not working
+1. Verify `QASE_MODE=testops` is set
+2. Check `qase.config.json` has valid token and project code
+3. Ensure `mocha-qase-reporter` is listed in `.mocharc.js` reporter configuration
 
-1. **Valid Qase Token**: Replace `your_qase_token_here` in `qase.config.json` with your actual Qase API token
-2. **Valid Project Code**: Replace `your_project_code_here` in `qase.config.json` with your actual project code
-3. **Network Access**: Ensure you can reach Qase API from your environment
+### Tests timeout
+API calls may take longer than default Mocha timeout. The `.mocharc.js` is configured with 10000ms timeout. Adjust if needed:
+```javascript
+module.exports = {
+  timeout: 15000  // 15 seconds
+};
+```
 
-### Qase Methods Not Working
+## Learn More
 
-If Qase methods (`this.title()`, `this.suite()`, etc.) are not working:
+- [Qase Mocha Reporter Documentation](https://github.com/qase-tms/qase-javascript/tree/main/qase-mocha)
+- [Mocha Documentation](https://mochajs.org/)
+- [JSONPlaceholder Guide](https://jsonplaceholder.typicode.com/guide/)
 
-1. **Check Reporter**: Make sure you're using `mocha-qase-reporter`
-2. **Check Mode**: Ensure `QASE_MODE=testops` is set
-3. **Check Configuration**: Verify `qase.config.json` is properly configured
+## Benefits
 
-### Async Tests Not Working
+This example demonstrates:
 
-If async tests are not working properly:
-
-1. **Use Proper Async Syntax**: Use `async/await` or return promises
-2. **Check Timeouts**: Ensure timeout is sufficient for async operations
-3. **Handle Errors**: Properly handle and assert async errors
-
-## Additional Resources
-
-For more details on how to use this integration with Qase Test Management, visit
-the [Qase Mocha documentation](https://github.com/qase-tms/qase-javascript/tree/main/qase-mocha).
+✅ **Realistic API testing patterns** - Real HTTP requests, not mocks
+✅ **All Qase features in context** - Not isolated demos, but practical usage
+✅ **Mocha-specific patterns** - Correct import paths, contentType, step handling
+✅ **Error handling** - How to test and document failure scenarios
+✅ **Best practices** - Nested steps, parameterization, attachments
+✅ **Zero infrastructure** - Uses free public API, no setup required
+✅ **Ready for CI/CD** - Can run in any environment with internet access
