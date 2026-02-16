@@ -35,6 +35,7 @@ module.exports = cypress.defineConfig({
   video: true,
   screenshotOnRunFailure: true,
   e2e: {
+    baseUrl: 'https://www.saucedemo.com',
     setupNodeEvents(on, config) {
       require('cypress-qase-reporter/plugin')(on, config);
       require('cypress-qase-reporter/metadata')(on);
