@@ -9,7 +9,7 @@ describe('Product Inventory', () => {
 
   qase(4,
     it('User can browse all products', () => {
-      qase.fields({ severity: 'high', priority: 'high', layer: 'e2e' });
+      qase.fields({ severity: 'major', priority: 'high', layer: 'e2e' });
       qase.suite('E-commerce\tInventory\tBrowsing');
 
       let productCount = 0;
@@ -50,7 +50,7 @@ describe('Product Inventory', () => {
 
   qase(5,
     it('User can sort products by price', () => {
-      qase.fields({ severity: 'medium', priority: 'medium', layer: 'e2e' });
+      qase.fields({ severity: 'normal', priority: 'medium', layer: 'e2e' });
       qase.suite('E-commerce\tInventory\tSorting');
       qase.parameters({ sortOption: 'lohi' });
 
@@ -75,7 +75,7 @@ describe('Product Inventory', () => {
 
   qase(6,
     it('User can view product details', () => {
-      qase.fields({ severity: 'medium', priority: 'medium', layer: 'e2e' });
+      qase.fields({ severity: 'normal', priority: 'medium', layer: 'e2e' });
       qase.suite('E-commerce\tInventory\tProduct Details');
 
       qase.step('Click on first product name', () => {

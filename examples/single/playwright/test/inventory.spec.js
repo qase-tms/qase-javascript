@@ -17,7 +17,7 @@ test.describe('Product Inventory', () => {
   });
 
   test(qase(4, 'User can browse all products'), async ({ page }) => {
-    qase.fields({ severity: 'high', priority: 'high', layer: 'e2e' });
+    qase.fields({ severity: 'normal', priority: 'high', layer: 'e2e' });
     qase.suite('E-commerce\tInventory\tBrowsing');
 
     await test.step('Verify inventory page title', async () => {
@@ -42,7 +42,7 @@ test.describe('Product Inventory', () => {
   });
 
   test(qase(5, 'User can sort products by price'), async ({ page }) => {
-    qase.fields({ severity: 'medium', priority: 'medium', layer: 'e2e' });
+    qase.fields({ severity: 'minor', priority: 'medium', layer: 'e2e' });
     qase.suite('E-commerce\tInventory\tSorting');
     qase.parameters({ sortOption: 'lohi' });
 
@@ -63,7 +63,7 @@ test.describe('Product Inventory', () => {
   });
 
   test(qase(6, 'User can view product details'), async ({ page }) => {
-    qase.fields({ severity: 'medium', priority: 'low', layer: 'e2e' });
+    qase.fields({ severity: 'major', priority: 'low', layer: 'e2e' });
     qase.suite('E-commerce\tInventory\tProduct Details');
 
     await test.step('Click on first product', async () => {

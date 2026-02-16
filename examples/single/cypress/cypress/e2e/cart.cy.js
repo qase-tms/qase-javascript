@@ -56,7 +56,7 @@ describe('Cart Management', () => {
 
   qase(8,
     it('User can remove product from cart', () => {
-      qase.fields({ severity: 'high', priority: 'medium', layer: 'e2e' });
+      qase.fields({ severity: 'major', priority: 'medium', layer: 'e2e' });
       qase.suite('E-commerce\tShopping Cart\tRemove Items');
 
       qase.step('Add product to cart', () => {
@@ -87,7 +87,7 @@ describe('Cart Management', () => {
 
   qase(9,
     it('User can add multiple products to cart', () => {
-      qase.fields({ severity: 'high', priority: 'medium', layer: 'e2e' });
+      qase.fields({ severity: 'major', priority: 'medium', layer: 'e2e' });
       qase.suite('E-commerce\tShopping Cart\tMultiple Items');
 
       qase.step('Add first product to cart', () => {

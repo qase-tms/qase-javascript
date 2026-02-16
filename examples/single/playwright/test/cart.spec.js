@@ -50,7 +50,7 @@ test.describe('Shopping Cart', () => {
   });
 
   test(qase(8, 'User can remove product from cart'), async ({ page }) => {
-    qase.fields({ severity: 'medium', priority: 'medium', layer: 'e2e' });
+    qase.fields({ severity: 'normal', priority: 'medium', layer: 'e2e' });
     qase.suite('E-commerce\tShopping Cart\tRemove Items');
 
     await test.step('Add product to cart', async () => {
@@ -76,7 +76,7 @@ test.describe('Shopping Cart', () => {
   });
 
   test(qase(9, 'User can add multiple products to cart'), async ({ page }) => {
-    qase.fields({ severity: 'high', priority: 'high', layer: 'e2e' });
+    qase.fields({ severity: 'major', priority: 'high', layer: 'e2e' });
     qase.suite('E-commerce\tShopping Cart\tMultiple Items');
 
     await test.step('Add first product', async () => {
