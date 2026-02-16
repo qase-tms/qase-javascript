@@ -1,7 +1,10 @@
-# Playwright Example
+# Playwright Example - E-commerce Test Suite
 
-This is a sample project demonstrating how to write and execute tests using the Playwright framework with integration to
-Qase Test Management.
+This is a sample project demonstrating realistic e-commerce test scenarios using the Playwright framework with integration to Qase Test Management. The tests run against [saucedemo.com](https://www.saucedemo.com), a demo e-commerce application.
+
+## Overview
+
+This example showcases how to structure a real-world test suite with page objects and scenario-based tests that cover authentication, product browsing, cart management, and checkout flows. All tests demonstrate various Qase reporter features in a realistic context.
 
 ## Prerequisites
 
@@ -31,32 +34,105 @@ Ensure that the following tools are installed on your machine:
 4. Create a `qase.config.json` file in the root of the project. Follow the instructions
    on [how to configure the file](https://github.com/qase-tms/qase-javascript/tree/main/qase-javascript-commons#configuration).
 
-5. To run tests locally without Qase reporting:
-   ```bash
-   QASE_MODE=off npx playwright test
-   ```
+## Running Tests
 
-6. To run tests and upload the results to Qase Test Management:
-   ```bash
-   QASE_MODE=testops npx playwright test
-   ```
+To run tests locally without Qase reporting:
+```bash
+QASE_MODE=off npx playwright test
+```
 
-## Example Files
+To run tests and upload the results to Qase Test Management:
+```bash
+QASE_MODE=testops npx playwright test
+```
 
-This project contains several test files demonstrating different Qase features:
+## Test Scenarios
 
-| File | Feature | Description |
-|------|---------|-------------|
-| `id.spec.js` | Test case linking | Links test to Qase test case by ID using `qase(id, name)` wrapper or `qase.id()` method |
-| `title.spec.js` | Custom titles | Sets custom test result titles with `qase.title()` |
-| `fields.spec.js` | Custom fields | Sets severity, priority, description, and other metadata with `qase.fields()` |
-| `suite.spec.js` | Suite organization | Groups tests into suites and sub-suites with `qase.suite()` |
-| `steps.spec.js` | Test steps | Defines execution steps with `await test.step()` (Playwright native) |
-| `chain.spec.js` | Method chaining | Demonstrates chaining multiple Qase methods |
-| `attach.spec.js` | Attachments | Attaches files and content to test results with `qase.attach()` |
-| `comment.spec.js` | Comments | Adds comments to test results with `qase.comment()` |
-| `ignore.spec.js` | Ignoring tests | Excludes tests from Qase reporting with `qase.ignore()` |
-| `params.spec.js` | Parameters | Reports parameterized test data with `qase.parameters()` |
+This project contains four test files demonstrating different e-commerce user flows:
+
+| File | Scenario | Description |
+|------|----------|-------------|
+| `login.spec.js` | User Authentication | Tests successful login, invalid password handling, and locked user scenarios |
+| `inventory.spec.js` | Product Browsing | Tests product listing, sorting, and detail page navigation |
+| `cart.spec.js` | Shopping Cart | Tests adding/removing items and managing multiple products in cart |
+| `checkout.spec.js` | Checkout Process | Tests complete checkout flow, validation, and cancellation |
+
+## Qase Features Demonstrated
+
+This example demonstrates all key Qase reporter features in realistic test scenarios:
+
+| Feature | Files | Description |
+|---------|-------|-------------|
+| **Test Case Linking** (`qase(id, name)`) | All test files | Links tests to Qase test cases using the wrapper pattern |
+| **Test Fields** (`qase.fields()`) | All test files | Sets severity, priority, layer, and other metadata |
+| **Test Suites** (`qase.suite()`) | All test files | Organizes tests into hierarchical suites using tab separator |
+| **Test Steps** (`test.step()`) | All test files | Uses Playwright native steps for structured test execution |
+| **Attachments** (`qase.attach()`) | login.spec.js, inventory.spec.js, cart.spec.js, checkout.spec.js | Attaches screenshots, JSON data, and text files to test results |
+| **Comments** (`qase.comment()`) | login.spec.js, inventory.spec.js | Adds contextual comments to test results |
+| **Parameters** (`qase.parameters()`) | login.spec.js, cart.spec.js, checkout.spec.js | Reports parameterized test data |
+| **Ignore Tests** (`qase.ignore()`) | checkout.spec.js | Excludes specific tests from Qase reporting |
+
+## Page Object Pattern
+
+This example uses the Page Object pattern to organize test code:
+
+```
+test/
+├── pages/
+│   ├── LoginPage.js       # Login page interactions
+│   ├── InventoryPage.js   # Product listing page interactions
+│   ├── CartPage.js        # Shopping cart page interactions
+│   └── CheckoutPage.js    # Checkout flow interactions
+├── login.spec.js          # Authentication test scenarios
+├── inventory.spec.js      # Product browsing test scenarios
+├── cart.spec.js           # Shopping cart test scenarios
+└── checkout.spec.js       # Checkout test scenarios
+```
+
+Each page object encapsulates the selectors and methods for interacting with a specific page, making tests more maintainable and readable.
+
+## Configuration
+
+### Using qase.config.json
+
+Create a `qase.config.json` file in the project root:
+
+```json
+{
+  "mode": "testops",
+  "debug": false,
+  "testops": {
+    "api": {
+      "token": "your_api_token_here"
+    },
+    "project": "YOUR_PROJECT_CODE",
+    "run": {
+      "title": "Playwright E-commerce Test Run",
+      "complete": true
+    }
+  }
+}
+```
+
+### Using playwright.config.js
+
+The project includes a `playwright.config.js` with the Qase reporter configured:
+
+```javascript
+const config = {
+  timeout: 30000,
+  testDir: './test',
+  use: {
+    baseURL: 'https://www.saucedemo.com',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+  },
+  reporter: [
+    ['list'],
+    ['playwright-qase-reporter', { /* options */ }],
+  ],
+};
+```
 
 ## Expected Behavior
 
@@ -64,7 +140,7 @@ This project contains several test files demonstrating different Qase features:
 
 When running tests with `QASE_MODE=off`, tests execute normally without Qase reporting:
 
-- Tests run and pass/fail as usual
+- Tests run against saucedemo.com and pass/fail as usual
 - No data is sent to Qase TestOps
 - No Qase API token required
 - Output shows standard Playwright test results
@@ -81,72 +157,16 @@ When running tests with `QASE_MODE=testops`, test results are reported to Qase:
 - Test results include all metadata (steps, attachments, fields, etc.)
 - Console output includes Qase test run link
 - Requires valid `QASE_TESTOPS_API_TOKEN` and `QASE_TESTOPS_PROJECT` configuration
-- Playwright's native screenshots and traces can be attached automatically
+- Screenshots and other attachments are uploaded to Qase
 
-**Steps Example (`steps.spec.js`):**
-- Uses Playwright's native `test.step()` which is automatically reported to Qase
-- Each step shows execution status, duration, and any errors
-- Nested steps appear hierarchically in Qase
-- Steps are also visible in Playwright's trace viewer
+## Playwright-Specific Patterns
 
-**Attachments Example (`attach.spec.js`):**
-- Files attached via `paths` option appear in test results
-- Screenshots captured with `page.screenshot()` can be attached
-- Content attached via `content` option is uploaded to Qase
-- Attachments are visible in the test run details
-- Supports text, JSON, images, videos, and binary files
+This example uses Playwright-specific patterns for the Qase reporter:
 
-**Multi-Project Support:**
-- When configured for multi-project reporting, same test results are sent to multiple Qase projects
-- Each project can have different test case IDs for the same test
-
-## Configuration
-
-Example `qase.config.json`:
-
-```json
-{
-  "mode": "testops",
-  "debug": false,
-  "testops": {
-    "api": {
-      "token": "your_api_token_here"
-    },
-    "project": "YOUR_PROJECT_CODE",
-    "run": {
-      "title": "Playwright Automated Test Run",
-      "complete": true
-    }
-  }
-}
-```
-
-Or configure via `playwright.config.ts`:
-
-```typescript
-import { defineConfig } from '@playwright/test';
-
-export default defineConfig({
-  reporter: [
-    ['list'],
-    [
-      'playwright-qase-reporter',
-      {
-        mode: 'testops',
-        testops: {
-          api: {
-            token: process.env.QASE_TESTOPS_API_TOKEN,
-          },
-          project: 'YOUR_PROJECT_CODE',
-          run: {
-            complete: true,
-          },
-        },
-      },
-    ],
-  ],
-});
-```
+- **Native Steps**: Uses Playwright's native `test.step()` (not `qase.step()`)
+- **Attachment Content Type**: Uses `contentType` parameter (not `type`)
+- **Test ID Wrapper**: Uses `qase(id, 'name')` wrapper pattern (not mixing with `qase.id()`)
+- **Suite Hierarchy**: Uses tab character `\t` as separator in `qase.suite()`
 
 ## Additional Resources
 
