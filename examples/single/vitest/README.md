@@ -1,25 +1,22 @@
-# Vitest Example
+# Vitest API Testing Example with Qase Reporter
 
-This is a sample project demonstrating how to write and execute tests using the Vitest framework with integration to
-Qase Test Management.
+This example demonstrates realistic API testing scenarios using Vitest with full Qase TestOps integration. The tests make real HTTP requests to [JSONPlaceholder](https://jsonplaceholder.typicode.com/), a free fake REST API for testing and prototyping.
 
 ## Prerequisites
 
-Ensure that the following tools are installed on your machine:
-
-1. [Node.js](https://nodejs.org/) (version 18 or higher is recommended)
-2. [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
+- [Node.js](https://nodejs.org/) version 18 or higher (required for native `fetch` API)
+- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
 
 ## Setup Instructions
 
-1. Clone this repository by running the following commands:
+1. Clone this repository:
 
    ```bash
    git clone https://github.com/qase-tms/qase-javascript.git
    cd qase-javascript/examples/single/vitest
    ```
 
-2. Install the project dependencies:
+2. Install dependencies:
 
    ```bash
    npm install
@@ -27,140 +24,172 @@ Ensure that the following tools are installed on your machine:
 
 3. Configure your Qase project settings:
    - Update the API token in `vitest.config.ts` or create a `qase.config.json` file
-   - Set the correct project name
+   - Set the correct project code
    - Enable "Create test cases" option in your Qase project settings
 
-4. To run tests locally without Qase reporting:
+## Test Scenarios
 
-   ```bash
-   QASE_MODE=off npm test
-   ```
+This example includes realistic API testing scenarios demonstrating all Qase reporter features:
 
-5. To run tests and upload the results to Qase Test Management:
+### Test Files
 
-   ```bash
-   QASE_MODE=testops npm test
-   ```
+| File | Purpose | Qase Features |
+|------|---------|---------------|
+| **api-crud.test.ts** | User CRUD operations (GET all, GET by ID, POST create, DELETE) | `qase.title()`, `qase.fields()`, `qase.step()`, `qase.parameters()`, `qase.attach()`, `qase.comment()` |
+| **api-posts.test.ts** | Post validation and filtering (GET all, GET by user, GET with comments) | `qase.title()`, `qase.fields()`, `qase.parameters()`, `qase.step()`, `qase.attach()` |
+| **api-errors.test.ts** | Error handling (404 responses, invalid endpoints) | `qase.title()`, `qase.fields()`, `qase.parameters()`, `qase.comment()`, `qase.attach()`, `qase.step()` |
+| **api-advanced.test.ts** | Advanced features (nested steps, suite hierarchy, parameterized tests, ignored tests) | `qase.suite()`, `qase.step()` (nested), `qase.parameters()`, `qase.comment()`, `qase.ignore()` |
 
-## Example Files
+### Qase Features Coverage
 
-This project contains several test files demonstrating different Qase features:
+All 9 Qase reporter features are demonstrated in realistic API testing context:
 
-| File | Feature | Description |
-|------|---------|-------------|
-| `id.test.ts` | Test case linking | Links test to Qase test case by ID using `qase(id, name)` wrapper |
-| `title.test.ts` | Custom titles | Sets custom test result titles with `qase.title()` |
-| `fields.test.ts` | Custom fields | Sets severity, priority, description, and other metadata with `qase.fields()` |
-| `suite.test.ts` | Suite organization | Groups tests into suites and sub-suites with `qase.suite()` |
-| `steps.test.ts` | Test steps | Defines execution steps with `await qase.step()` using `withQase()` wrapper |
-| `attach.test.ts` | Attachments | Attaches files and content to test results with `qase.attach()` |
-| `comment.test.ts` | Comments | Adds comments to test results with `qase.comment()` |
-| `params.test.ts` | Parameters | Reports parameterized test data with `qase.parameters()` |
-| `api.test.ts` | API testing | Demonstrates API testing with Qase integration |
-| `e2e.test.ts` | E2E testing | End-to-end testing example with Qase reporting |
-| `for.test.ts` | Loop tests | Demonstrates using loops to generate multiple tests |
+| Feature | Methods/Patterns | Where Used | Notes |
+|---------|-----------------|------------|-------|
+| **Test linking** | Wrap with `withQase()` | All test files | Access to full Qase API |
+| **Custom titles** | `await qase.title()` | All tests | Descriptive test result titles |
+| **Custom fields** | `await qase.fields()` | All tests | Layer, severity, priority metadata |
+| **Suite hierarchy** | `await qase.suite()` | api-advanced.test.ts | Use `\t` separator for nesting |
+| **Test steps** | `await qase.step()` | All tests | Named execution steps, supports nesting |
+| **Attachments** | `await qase.attach()` | api-crud.test.ts, api-posts.test.ts, api-errors.test.ts | **CRITICAL: use `type` parameter, NOT `contentType`** |
+| **Comments** | `await qase.comment()` | api-crud.test.ts, api-errors.test.ts, api-advanced.test.ts | Additional context for test results |
+| **Parameters** | `await qase.parameters()` | All test files | Test input data and iterations |
+| **Ignore tests** | `qase.ignore()` | api-advanced.test.ts | Mark tests to be excluded (NOT async) |
 
-## Expected Behavior
+## Running the Examples
 
-### Running with QASE_MODE=off (Local Development)
+### Local Development (without Qase reporting)
 
-When running tests with `QASE_MODE=off`, tests execute normally without Qase reporting:
+```bash
+QASE_MODE=off npm test
+```
 
-- Tests run and pass/fail as usual
-- No data is sent to Qase TestOps
-- No Qase API token required
-- Output shows standard Vitest test results
-- Vitest UI and watch mode work normally
+Tests execute normally without sending data to Qase TestOps. Useful for local debugging.
 
-This mode is useful for local development and debugging.
+### With Qase Reporting
 
-### Running with QASE_MODE=testops (CI/CD and Reporting)
+```bash
+QASE_MODE=testops npm test
+```
 
-When running tests with `QASE_MODE=testops`, test results are reported to Qase:
+Test results are sent to Qase TestOps with all metadata (steps, attachments, fields, parameters).
 
-- Tests execute and results are sent to Qase TestOps
-- A new test run is created in your Qase project
-- Test results include all metadata (steps, attachments, fields, etc.)
-- Console output includes Qase test run link
-- Requires valid `QASE_TESTOPS_API_TOKEN` and `QASE_TESTOPS_PROJECT` configuration
+### Run Specific Test File
 
-**Steps Example (`steps.test.ts`):**
-- Uses `withQase(async ({ qase }) => { ... })` wrapper to access step functionality
-- Creates test result with multiple named steps using `await qase.step()`
-- Each step shows execution status, duration, and any errors
-- Nested steps appear hierarchically in Qase
-- Steps with expected results and data are captured
+```bash
+npm test api-crud.test.ts
+```
 
-**Attachments Example (`attach.test.ts`):**
-- Uses `withQase(async ({ qase }) => { ... })` wrapper to access attach functionality
-- Files attached via `paths` option appear in test results
-- Content attached via `content` option is uploaded to Qase
-- **Note:** Vitest uses `type:` parameter instead of `contentType:` for in-memory attachments
-- Attachments are visible in the test run details
-- Supports text, JSON, images, and binary files
+## Vitest-Specific Qase Patterns
 
-**Multi-Project Support:**
-- When configured for multi-project reporting, same test results are sent to multiple Qase projects
-- Each project can have different test case IDs for the same test
+**CRITICAL differences from other reporters:**
+
+1. **Import path:** `import { withQase } from 'vitest-qase-reporter/vitest'`
+   - NOT from base package like Jest/Mocha
+
+2. **Wrapper pattern:** `withQase(async ({ qase }) => { ... })`
+   - Wrap test callback to access Qase API
+   - Must be async function
+   - Example:
+     ```typescript
+     test("my test", withQase(async ({ qase }) => {
+       await qase.step("step 1", async () => { ... });
+     }));
+     ```
+
+3. **Attachment parameter:** Use `type:` NOT `contentType:`
+   - **Vitest:** `await qase.attach({ name: 'file.json', content: '...', type: 'application/json' })`
+   - **Jest/Mocha:** `await qase.attach({ name: 'file.json', content: '...', contentType: 'application/json' })`
+   - This is a key difference that will cause errors if wrong parameter is used
+
+4. **Async requirements:** MUST `await` ALL qase methods except `qase.ignore()`
+   - `await qase.title()`, `await qase.fields()`, `await qase.step()`, etc.
+   - `qase.ignore()` is the ONLY synchronous method
+
+5. **Suite hierarchy:** Use `\t` (tab character) as separator
+   - Example: `await qase.suite('API Tests\tAdvanced\tRelationships')`
+
+## JSONPlaceholder API
+
+This example uses [JSONPlaceholder](https://jsonplaceholder.typicode.com/) as the test API:
+
+- **Free fake REST API** for testing and prototyping
+- **No authentication required** - publicly accessible
+- **Realistic data structure** - users, posts, comments, albums, photos, todos
+- **Fake operations** - POST/PUT/PATCH/DELETE requests are faked (not persisted)
+- **Stable and reliable** - maintained for testing purposes
+
+### Available Resources
+
+- `/users` - 10 users with profile data
+- `/posts` - 100 posts across all users
+- `/comments` - 500 comments on posts
+- `/albums` - 100 albums
+- `/photos` - 5000 photos
+- `/todos` - 200 todo items
 
 ## Configuration
 
-Example `qase.config.json`:
-
-```json
-{
-  "mode": "testops",
-  "debug": false,
-  "testops": {
-    "api": {
-      "token": "your_api_token_here"
-    },
-    "project": "YOUR_PROJECT_CODE",
-    "run": {
-      "title": "Vitest Automated Test Run",
-      "complete": true
-    }
-  }
-}
-```
-
-Or configure via `vitest.config.ts`:
+Example `vitest.config.ts`:
 
 ```typescript
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
+    watch: false,
+    testTimeout: 10000, // API requests may take longer
     reporters: [
       'default',
-      [
-        'vitest-qase-reporter',
+      ['vitest-qase-reporter',
         {
           mode: 'testops',
+          debug: true,
           testops: {
             api: {
-              token: process.env.QASE_TESTOPS_API_TOKEN,
+              token: process.env.QASE_TESTOPS_API_TOKEN || "<token>",
             },
-            project: 'YOUR_PROJECT_CODE',
             run: {
               complete: true,
             },
+            project: process.env.QASE_TESTOPS_PROJECT || "<project_code>",
+            uploadAttachments: true,
+            showPublicReportLink: true,
           },
-        },
+          captureLogs: true,
+        }
       ],
     ],
   },
 });
 ```
 
+## Expected Behavior
+
+When running with `QASE_MODE=testops`:
+
+- **12+ realistic API tests** execute against JSONPlaceholder
+- **Real HTTP requests** are made (requires internet connection)
+- **Test results** are reported to Qase TestOps with:
+  - Named execution steps showing request/validation flow
+  - Request/response data attached as JSON
+  - Test parameters (user IDs, post IDs, etc.)
+  - Custom fields (layer, severity, priority)
+  - Comments explaining expected failures
+  - Suite hierarchy for organized reporting
+- **Test run link** is displayed in console output
+
 ## Important Notes
 
-- **withQase Wrapper:** For tests using steps or attachments, wrap your test callback with `withQase(async ({ qase }) => { ... })` to access the `qase` object
-- **Import Pattern:** Use `import { withQase } from 'vitest-qase-reporter/vitest';` for step/attach functionality
-- **Attachment Parameter:** Use `type:` instead of `contentType:` when attaching content from memory
-- **TypeScript Support:** Vitest examples use TypeScript (.ts files) with full type safety
+- **Node 18+ required** for native `fetch` API (no external HTTP library needed)
+- **Attachment parameter:** Always use `type:` NOT `contentType:` - this is critical for Vitest
+- **Async/await required:** All qase methods must be awaited except `qase.ignore()`
+- **Internet required:** Tests make real API calls to jsonplaceholder.typicode.com
+- **Faked writes:** POST/PUT/DELETE operations appear successful but don't persist data
+- **TypeScript:** All test files use TypeScript (.test.ts) with full type safety
 
 ## Additional Resources
 
-For more details on how to use this integration with Qase Test Management, visit
-the [Qase Vitest documentation](https://github.com/qase-tms/qase-javascript/tree/main/qase-vitest).
+- [Qase Vitest Documentation](https://github.com/qase-tms/qase-javascript/tree/main/qase-vitest)
+- [JSONPlaceholder Guide](https://jsonplaceholder.typicode.com/guide/)
+- [Vitest Documentation](https://vitest.dev/)
