@@ -1,3 +1,18 @@
+# qase-javascript-commons@2.5.2
+
+## What's new
+
+Aligned report output with the cross-language Qase Report specification:
+
+- Report file renamed from `report.json` to `run.json`, title changed to `"Test run"`.
+- Stats model: replaced `broken` field with `blocked` and `invalid`, fixed status enum mapping.
+- Result serialization: `testops_id` serializes as `testops_ids` (array), `group_params` as `param_groups` (array of arrays).
+- Step serialization: `data` field serializes as `input_data`, attachments moved to `execution.attachments`.
+- Gherkin-type steps automatically convert to TEXT format during serialization (`keyword + name` → `action`).
+- Attachment `size` and `content` fields excluded from serialized output.
+
+All changes are serialization-only — internal model interfaces are unchanged, no breaking changes for framework reporters.
+
 # qase-javascript-commons@2.5.1
 
 ## What's new
