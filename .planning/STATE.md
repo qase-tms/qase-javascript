@@ -9,26 +9,26 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 
 ## Current Position
 
-Phase: 8 of 9 (BDD and Collection Examples)
-Plan: 2 of 2 in current phase
-Status: Phase 8 complete
-Last activity: 2026-02-16 — Completed 08-02 Newman collection example
+Phase: 9 of 9 (Integration Validation and Infrastructure)
+Plan: 1 of 8 in current phase
+Status: Phase 9 in progress
+Last activity: 2026-02-16 — Completed 09-01 Self-containment and documentation standardization
 
-Progress: [████████░░] 79% (30/38 total plans across v1.0 + v1.1)
+Progress: [████████░░] 82% (31/38 total plans across v1.0 + v1.1)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 30 (21 from v1.0, 9 from v1.1)
-- Average duration: 221s (v1.1 Phase 6-8)
-- Total execution time: 2043s (v1.1)
+- Total plans completed: 31 (21 from v1.0, 10 from v1.1)
+- Average duration: 239s (v1.1 Phase 6-9)
+- Total execution time: 2491s (v1.1)
 
 **By Milestone:**
 
 | Milestone | Phases | Plans | Status |
 |-----------|--------|-------|--------|
 | v1.0 Documentation | 1-5 | 21/21 | Complete |
-| v1.1 Realistic Examples | 6-9 | 9/17 | In progress |
+| v1.1 Realistic Examples | 6-9 | 10/17 | In progress |
 
 **Recent Trend:**
 - v1.0 completed successfully 2026-02-13
@@ -36,6 +36,7 @@ Progress: [████████░░] 79% (30/38 total plans across v1.0 + 
 - Phase 6 completed: 4 plans (06-01, 06-02, 06-03, 06-04)
 - Phase 7 completed: 3 plans (07-01, 07-02, 07-03)
 - Phase 8 completed: 2 plans (08-01 CucumberJS, 08-02 Newman)
+- Phase 9 in progress: 1 plan (09-01 Self-containment and docs)
 
 **Phase 6 Metrics (E2E Frameworks):**
 
@@ -60,6 +61,12 @@ Progress: [████████░░] 79% (30/38 total plans across v1.0 + 
 |------|----------|-------|---------------|--------|
 | 08-01 | 166s | 2 | 13 | Complete |
 | 08-02 | 185s | 2 | 5 | Complete |
+
+**Phase 9 Metrics (Integration Validation and Infrastructure):**
+
+| Plan | Duration | Tasks | Files Changed | Status |
+|------|----------|-------|---------------|--------|
+| 09-01 | 448s | 2 | 17 | Complete |
 
 ## Accumulated Context
 
@@ -140,6 +147,15 @@ Recent decisions from PROJECT.md affecting v1.1:
 - Newman has NO fields, NO attachments, NO steps, NO ignore, NO title override -- most limited reporter
 - JSONPlaceholder /users/999 returns 200 with empty {} (not 404) -- consistent with 08-01 finding
 
+**From 09-01 execution (Self-containment and Documentation):**
+- Environment variable fallback pattern ${QASE_MODE:-off} provides self-containment without breaking workflows
+- Default npm test runs with QASE_MODE=off (no Qase API calls, no credentials needed)
+- Users override with QASE_MODE=testops npm test for actual reporting
+- Standard README structure across all 9 examples improves discoverability
+- Newman Limitations section documents reporter constraints transparently (no fields/attachments/steps/ignore/comments)
+- Vitest already had no QASE_MODE hardcoding, skipped in Task 1
+- 12 scripts updated across 8 examples (Mocha 4 scripts, Newman 2 scripts, others 1 each)
+
 ### Pending Todos
 
 None yet.
@@ -158,9 +174,9 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 08-02-PLAN.md (Newman collection example) -- Phase 8 complete
-Resume file: Phase 9 planning
+Stopped at: Completed 09-01-PLAN.md (Self-containment and documentation standardization) -- Phase 9 in progress
+Resume file: Continue Phase 9 (7 more plans remaining)
 
 ---
 
-*Last updated: 2026-02-16 after 08-02 execution*
+*Last updated: 2026-02-16 after 09-01 execution*
