@@ -101,7 +101,7 @@ This example includes realistic API testing scenarios demonstrating all Qase rep
 | **api-errors.test.ts** | Error handling (404 responses, invalid endpoints) | `qase.title()`, `qase.fields()`, `qase.parameters()`, `qase.comment()`, `qase.attach()`, `qase.step()` |
 | **api-advanced.test.ts** | Advanced features (nested steps, suite hierarchy, parameterized tests, ignored tests) | `qase.suite()`, `qase.step()` (nested), `qase.parameters()`, `qase.comment()`, `qase.ignore()` |
 
-### Qase Features Coverage
+## Qase Features Demonstrated
 
 All 9 Qase reporter features are demonstrated in realistic API testing context:
 
