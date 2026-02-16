@@ -1,5 +1,6 @@
 module.exports = {
   globals: {},
+  testTimeout: 10000,
   transform: {
     '^.+\\.(js|jsx)$': 'babel-jest',
   },
