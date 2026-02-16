@@ -133,19 +133,265 @@ describe('ReportReporter', () => {
     parentStep.id = 'parent';
     parentStep.data = { action: 'Parent', expected_result: null, data: null };
     parentStep.attachments = [{ file_name: 'parent.txt', mime_type: 'text/plain', file_path: null, content: 'parent', size: 6, id: 'p1' }];
-    
+
     const childStep = new TestStepType(StepType.TEXT);
     childStep.id = 'child';
     childStep.data = { action: 'Child', expected_result: null, data: null };
     childStep.attachments = [{ file_name: 'child.txt', mime_type: 'text/plain', file_path: null, content: 'child', size: 5, id: 'c1' }];
-    
+
     parentStep.steps = [childStep];
     const steps: TestStepType[] = [parentStep];
-    
+
     const result = reporter['copyStepAttachments'](steps);
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(writer.writeAttachment).toHaveBeenCalledTimes(2);
     expect(result[0]?.attachments[0]?.file_path).toBe('/mock/parent.txt');
     expect(result[0]?.steps[0]?.attachments[0]?.file_path).toBe('/mock/child.txt');
+  });
+
+  describe('serialization transformation', () => {
+    it('should serialize testops_id as testops_ids array when single number', async () => {
+      const testResult = new TestResultType('Test with single testops_id');
+      testResult.id = 't1';
+      testResult.testops_id = 42;
+      testResult.execution.status = TestStatusEnum.passed;
+      reporter['results'] = [testResult];
+
+      await reporter.sendResults();
+
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+      expect(serialized.testops_ids).toEqual([42]);
+      expect(serialized.testops_id).toBeUndefined();
+    });
+
+    it('should serialize testops_id as testops_ids when already array', async () => {
+      const testResult = new TestResultType('Test with array testops_id');
+      testResult.id = 't2';
+      testResult.testops_id = [1, 2, 3];
+      testResult.execution.status = TestStatusEnum.passed;
+      reporter['results'] = [testResult];
+
+      await reporter.sendResults();
+
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+      expect(serialized.testops_ids).toEqual([1, 2, 3]);
+      expect(serialized.testops_id).toBeUndefined();
+    });
+
+    it('should serialize testops_id as testops_ids null when null', async () => {
+      const testResult = new TestResultType('Test with null testops_id');
+      testResult.id = 't3';
+      testResult.testops_id = null;
+      testResult.execution.status = TestStatusEnum.passed;
+      reporter['results'] = [testResult];
+
+      await reporter.sendResults();
+
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+      expect(serialized.testops_ids).toBeNull();
+      expect(serialized.testops_id).toBeUndefined();
+    });
+
+    it('should serialize group_params as param_groups array of arrays', async () => {
+      const testResult = new TestResultType('Test with group params');
+      testResult.id = 't4';
+      testResult.group_params = { browser: 'chrome', os: 'linux' };
+      testResult.execution.status = TestStatusEnum.passed;
+      reporter['results'] = [testResult];
+
+      await reporter.sendResults();
+
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+      expect(serialized.param_groups).toEqual([['browser', 'os']]);
+      expect(serialized.group_params).toBeUndefined();
+    });
+
+    it('should serialize empty group_params as empty param_groups array', async () => {
+      const testResult = new TestResultType('Test with empty group params');
+      testResult.id = 't5';
+      testResult.group_params = {};
+      testResult.execution.status = TestStatusEnum.passed;
+      reporter['results'] = [testResult];
+
+      await reporter.sendResults();
+
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+      expect(serialized.param_groups).toEqual([]);
+      expect(serialized.group_params).toBeUndefined();
+    });
+
+    it('should serialize step data.data as data.input_data for text steps', async () => {
+      const testResult = new TestResultType('Test with step data');
+      testResult.id = 't6';
+      testResult.execution.status = TestStatusEnum.passed;
+
+      const step = new TestStepType(StepType.TEXT);
+      step.id = 's1';
+      step.data = { action: 'click button', expected_result: 'success', data: 'some input data' };
+      testResult.steps = [step];
+
+      reporter['results'] = [testResult];
+      await reporter.sendResults();
+
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+      const serializedStep = serialized.steps[0];
+      expect(serializedStep.data.input_data).toBe('some input data');
+      expect(serializedStep.data.data).toBeUndefined();
+      expect(serializedStep.data.action).toBe('click button');
+      expect(serializedStep.data.expected_result).toBe('success');
+    });
+
+    it('should move step attachments to execution.attachments', async () => {
+      const testResult = new TestResultType('Test with step attachments');
+      testResult.id = 't7';
+      testResult.execution.status = TestStatusEnum.passed;
+
+      const step = new TestStepType(StepType.TEXT);
+      step.id = 's1';
+      step.data = { action: 'step action', expected_result: null, data: null };
+      step.attachments = [
+        { file_name: 'step.txt', mime_type: 'text/plain', file_path: '/path/step.txt', content: 'abc', size: 123, id: 'a1' }
+      ];
+      testResult.steps = [step];
+
+      reporter['results'] = [testResult];
+      await reporter.sendResults();
+
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+      const serializedStep = serialized.steps[0];
+
+      // No top-level attachments field
+      expect(serializedStep.attachments).toBeUndefined();
+
+      // Attachments inside execution
+      expect(serializedStep.execution.attachments).toBeDefined();
+      expect(serializedStep.execution.attachments.length).toBe(1);
+      expect(serializedStep.execution.attachments[0].file_name).toBe('step.txt');
+    });
+
+    it('should exclude attachment size field from serialized output', async () => {
+      const testResult = new TestResultType('Test with attachments');
+      testResult.id = 't8';
+      testResult.execution.status = TestStatusEnum.passed;
+      testResult.attachments = [
+        { file_name: 'file.txt', mime_type: 'text/plain', file_path: '/path/file.txt', content: 'data', size: 1234, id: 'a1' }
+      ];
+
+      reporter['results'] = [testResult];
+      await reporter.sendResults();
+
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+      const attachment = serialized.attachments[0];
+
+      expect(attachment.id).toBe('a1');
+      expect(attachment.file_name).toBe('file.txt');
+      expect(attachment.mime_type).toBe('text/plain');
+      // file_path is modified by mock writer to add /mock/ prefix
+      expect(attachment.file_path).toBe('/mock/file.txt');
+      expect(attachment.size).toBeUndefined();
+      expect(attachment.content).toBeUndefined();
+    });
+
+    it('should exclude internal-only fields from serialized output', async () => {
+      const testResult = new TestResultType('Test with internal fields');
+      testResult.id = 't9';
+      testResult.execution.status = TestStatusEnum.passed;
+      testResult.run_id = 42;
+      testResult.author = 'test-author';
+      testResult.testops_project_mapping = { proj1: [1, 2] };
+      testResult.preparedAttachments = ['att1', 'att2'];
+
+      reporter['results'] = [testResult];
+      await reporter.sendResults();
+
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+
+      expect(serialized.run_id).toBeUndefined();
+      expect(serialized.author).toBeUndefined();
+      expect(serialized.testops_project_mapping).toBeUndefined();
+      expect(serialized.preparedAttachments).toBeUndefined();
+
+      // These fields should be present
+      expect(serialized.id).toBe('t9');
+      expect(serialized.title).toBeDefined();
+      expect(serialized.signature).toBeDefined();
+      expect(serialized.execution).toBeDefined();
+      expect(serialized.fields).toBeDefined();
+      expect(serialized.attachments).toBeDefined();
+      expect(serialized.steps).toBeDefined();
+      expect(serialized.params).toBeDefined();
+      expect(serialized.param_groups).toBeDefined();
+      expect(serialized.testops_ids).toBeDefined();
+      expect(serialized.relations).toBeDefined();
+      expect(serialized.muted).toBeDefined();
+      expect(serialized.message).toBeDefined();
+    });
+
+    it('should recursively serialize nested steps', async () => {
+      const testResult = new TestResultType('Test with nested steps');
+      testResult.id = 't10';
+      testResult.execution.status = TestStatusEnum.passed;
+
+      const parentStep = new TestStepType(StepType.TEXT);
+      parentStep.id = 'parent';
+      parentStep.data = { action: 'Parent step', expected_result: null, data: 'parent data' };
+      parentStep.attachments = [
+        { file_name: 'parent.txt', mime_type: 'text/plain', file_path: '/path/parent.txt', content: 'p', size: 100, id: 'p1' }
+      ];
+
+      const childStep = new TestStepType(StepType.TEXT);
+      childStep.id = 'child';
+      childStep.data = { action: 'Child step', expected_result: null, data: 'child data' };
+      childStep.attachments = [
+        { file_name: 'child.txt', mime_type: 'text/plain', file_path: '/path/child.txt', content: 'c', size: 50, id: 'c1' }
+      ];
+
+      parentStep.steps = [childStep];
+      testResult.steps = [parentStep];
+
+      reporter['results'] = [testResult];
+      await reporter.sendResults();
+
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+      const serializedParent = serialized.steps[0];
+      const serializedChild = serializedParent.steps[0];
+
+      // Parent step
+      expect(serializedParent.data.input_data).toBe('parent data');
+      expect(serializedParent.data.data).toBeUndefined();
+      expect(serializedParent.execution.attachments.length).toBe(1);
+      expect(serializedParent.execution.attachments[0].size).toBeUndefined();
+      expect(serializedParent.attachments).toBeUndefined();
+
+      // Child step
+      expect(serializedChild.data.input_data).toBe('child data');
+      expect(serializedChild.data.data).toBeUndefined();
+      expect(serializedChild.execution.attachments.length).toBe(1);
+      expect(serializedChild.execution.attachments[0].size).toBeUndefined();
+      expect(serializedChild.attachments).toBeUndefined();
+    });
+
+    it('should preserve gherkin step data without transformation', async () => {
+      const testResult = new TestResultType('Test with gherkin steps');
+      testResult.id = 't11';
+      testResult.execution.status = TestStatusEnum.passed;
+
+      const gherkinStep = new TestStepType(StepType.GHERKIN);
+      gherkinStep.id = 'g1';
+      gherkinStep.data = { keyword: 'Given', name: 'I am on the home page', line: 5 };
+      testResult.steps = [gherkinStep];
+
+      reporter['results'] = [testResult];
+      await reporter.sendResults();
+
+      const serialized = writer.writeTestResult.mock.calls[0]?.[0] as any;
+      const serializedStep = serialized.steps[0];
+
+      // Gherkin data should be unchanged
+      expect(serializedStep.data.keyword).toBe('Given');
+      expect(serializedStep.data.name).toBe('I am on the home page');
+      expect(serializedStep.data.line).toBe(5);
+      expect(serializedStep.data.input_data).toBeUndefined();
+    });
   });
 }); 
