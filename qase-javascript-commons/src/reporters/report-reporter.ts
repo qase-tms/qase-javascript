@@ -92,7 +92,7 @@ export class ReportReporter extends AbstractReporter {
 
   public async complete(): Promise<void> {
     const report: Report = {
-      title: 'Test report',
+      title: 'Test run',
       execution: {
         start_time: this.startTime,
         end_time: Date.now(),
@@ -104,7 +104,8 @@ export class ReportReporter extends AbstractReporter {
         passed: 0,
         failed: 0,
         skipped: 0,
-        broken: 0,
+        blocked: 0,
+        invalid: 0,
         muted: 0,
       },
       results: [],
@@ -127,10 +128,10 @@ export class ReportReporter extends AbstractReporter {
           report.stats.skipped++;
           break;
         case TestStatusEnum.invalid:
-          report.stats.broken++;
+          report.stats.invalid++;
           break;
         case TestStatusEnum.blocked:
-          report.stats.muted++;
+          report.stats.blocked++;
           break;
       }
 
