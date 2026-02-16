@@ -14,6 +14,10 @@ export interface AddSuiteEventArgs {
   suite: string;
 }
 
+export interface AddCommentEventArgs {
+  comment: string;
+}
+
 export interface AddAttachmentEventArgs {
   name?: string;
   type?: string;

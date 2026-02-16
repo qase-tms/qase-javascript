@@ -31,6 +31,7 @@ import { QaseReporterOptions } from './options';
 import { isEmpty, isScreenshotCommand } from './utils';
 import {
   AddAttachmentEventArgs,
+  AddCommentEventArgs,
   AddQaseIdEventArgs,
   AddRecordsEventArgs,
   AddSuiteEventArgs,
@@ -320,9 +321,17 @@ export default class WDIOQaseReporter extends WDIOReporter {
       null : err.stacktrace === undefined ?
         null : err.stacktrace;
 
-    testResult.message = err === null ?
+    const errorMessage = err === null ?
       null : err.message === undefined ?
         null : err.message;
+
+    if (this.storage.comment) {
+      testResult.message = errorMessage
+        ? `${this.storage.comment}\n\n${errorMessage}`
+        : this.storage.comment;
+    } else {
+      testResult.message = errorMessage;
+    }
 
     testResult.signature = generateSignature(
       Array.isArray(testResult.testops_id) ? testResult.testops_id : testResult.testops_id ? [testResult.testops_id] : null,
@@ -393,6 +402,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
     process.on(events.addSuite, this.addSuite.bind(this));
     process.on(events.addParameters, this.addParameters.bind(this));
     process.on(events.addGroupParameters, this.addGroupParameters.bind(this));
+    process.on(events.addComment, this.addComment.bind(this));
     process.on(events.addAttachment, this.addAttachment.bind(this));
     process.on(events.addIgnore, this.ignore.bind(this));
     process.on(events.addStep, this.addStep.bind(this));
@@ -414,6 +424,10 @@ export default class WDIOQaseReporter extends WDIOReporter {
     }
 
     curTest.title = title;
+  }
+
+  addComment({ comment }: AddCommentEventArgs) {
+    this.storage.comment = comment;
   }
 
   addSuite({ suite }: AddSuiteEventArgs) {

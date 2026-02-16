@@ -1,3 +1,14 @@
+# qase-testcafe@2.2.1
+
+## What's new
+
+- Added `qase.suite()` method to the builder API. You can now set a custom suite hierarchy for test cases using tab-separated values for nested suites.
+
+```ts
+const q = qase.suite('Parent\tChild').create();
+test.meta(q)('Test case title', async t => { ... });
+```
+
 # qase-testcafe@2.2.0
 
 ## What's new

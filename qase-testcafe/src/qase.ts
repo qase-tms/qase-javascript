@@ -12,6 +12,7 @@ export class qase {
   private static _qaseFields = '';
   private static _qaseParameters = '';
   private static _qaseGroupParameters = '';
+  private static _qaseSuite = '';
   private static _qaseIgnore = '';
   private static _qaseProjects = '';
 
@@ -57,6 +58,19 @@ export class qase {
    */
   public static title = (value: string) => {
     this._qaseTitle = value;
+    return this;
+  };
+
+  /**
+   * Set a suite for the test case
+   * Don't forget to call `create` method after setting all the necessary parameters
+   * @param {string} value
+   * @example
+   * const q = qase.suite('Suite\tSub-suite').create();
+   * test.meta(q)('Test case title', async t => { ... });
+   */
+  public static suite = (value: string) => {
+    this._qaseSuite = value;
     return this;
   };
 
@@ -205,6 +219,7 @@ export class qase {
     const meta = {
       QaseID: this._qaseID,
       QaseTitle: this._qaseTitle,
+      QaseSuite: this._qaseSuite,
       QaseFields: this._qaseFields,
       QaseParameters: this._qaseParameters,
       QaseGroupParameters: this._qaseGroupParameters,
@@ -214,6 +229,7 @@ export class qase {
 
     this._qaseID = '';
     this._qaseTitle = '';
+    this._qaseSuite = '';
     this._qaseFields = '';
     this._qaseParameters = '';
     this._qaseGroupParameters = '';

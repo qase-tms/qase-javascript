@@ -6,6 +6,7 @@ export const events = {
   addIgnore: 'qase:ignore',
   addParameters: 'qase:parameters',
   addGroupParameters: 'qase:groupParameters',
+  addComment: 'qase:comment',
   addAttachment: 'qase:attachment',
   startStep: 'qase:startStep',
   endStep: 'qase:endStep',

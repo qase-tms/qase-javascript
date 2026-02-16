@@ -141,6 +141,24 @@ describe('TestcafeQaseReporter', () => {
       expect(reporterMock.addTestResult).not.toHaveBeenCalled();
     });
 
+    it('should use suite metadata for relations when QaseSuite is provided', async () => {
+      const suitesMeta = { ...meta, QaseSuite: 'Parent\tChild' };
+      await reporter.reportTestDone('Test Title', testRunInfo, suitesMeta, formatError);
+      const call = reporterMock.addTestResult.mock.calls[0][0];
+      expect(call.relations.suite.data).toEqual([
+        { title: 'Parent', public_id: null },
+        { title: 'Child', public_id: null },
+      ]);
+    });
+
+    it('should fall back to fixture name when QaseSuite is not provided', async () => {
+      await reporter.reportTestDone('Test Title', testRunInfo, meta, formatError);
+      const call = reporterMock.addTestResult.mock.calls[0][0];
+      expect(call.relations.suite.data).toEqual([
+        { title: 'Fixture', public_id: null },
+      ]);
+    });
+
     it('should handle errors and attachments', async () => {
       const info = { ...testRunInfo, errs: [{
         userAgent: '',
@@ -183,6 +201,15 @@ describe('TestcafeQaseReporter', () => {
       expect(result.QaseParameters).toEqual({ p: 'v' });
       expect(result.QaseGroupParameters).toEqual({ g: 'v' });
       expect(result.QaseIgnore).toBe(true);
+    });
+    it('should parse QaseSuite from meta', () => {
+      const meta = { QaseSuite: 'Parent\tChild' };
+      const result = (reporter as any).getMeta(meta);
+      expect(result.QaseSuite).toBe('Parent\tChild');
+    });
+    it('should leave QaseSuite undefined when not provided', () => {
+      const result = (reporter as any).getMeta({});
+      expect(result.QaseSuite).toBeUndefined();
     });
     it('should handle empty meta', () => {
       const result = (reporter as any).getMeta({});
