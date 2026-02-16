@@ -27,7 +27,7 @@ test.describe('Checkout Process', () => {
   });
 
   test(qase(10, 'User can complete checkout with valid information'), async ({ page }) => {
-    qase.fields({ severity: 'critical', priority: 'critical', layer: 'e2e' });
+    qase.fields({ severity: 'critical', priority: 'low', layer: 'e2e' });
     qase.suite('E-commerce\tCheckout\tComplete Flow');
     qase.parameters({ firstName: 'John', lastName: 'Doe', postalCode: '12345' });
 
@@ -59,7 +59,7 @@ test.describe('Checkout Process', () => {
   });
 
   test(qase(11, 'Checkout fails without required information'), async ({ page }) => {
-    qase.fields({ severity: 'medium', priority: 'high', layer: 'e2e' });
+    qase.fields({ severity: 'normal', priority: 'high', layer: 'e2e' });
     qase.suite('E-commerce\tCheckout\tValidation');
     qase.parameters({ scenario: 'missing_first_name' });
 
@@ -74,7 +74,7 @@ test.describe('Checkout Process', () => {
   });
 
   test(qase(12, 'User can cancel checkout'), async ({ page }) => {
-    qase.fields({ severity: 'low', priority: 'medium', layer: 'e2e' });
+    qase.fields({ severity: 'major', priority: 'medium', layer: 'e2e' });
     qase.suite('E-commerce\tCheckout\tNavigation');
 
     await test.step('Click cancel button', async () => {
@@ -90,7 +90,7 @@ test.describe('Checkout Process', () => {
 
   test(qase(13, 'Guest checkout (not implemented)'), async ({ page }) => {
     qase.ignore();
-    qase.fields({ severity: 'high', priority: 'low', layer: 'e2e' });
+    qase.fields({ severity: 'major', priority: 'low', layer: 'e2e' });
     qase.suite('E-commerce\tCheckout\tGuest Flow');
     qase.comment('This test is ignored as guest checkout feature is not yet implemented in the demo app');
 

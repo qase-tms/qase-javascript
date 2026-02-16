@@ -71,7 +71,7 @@ Status: Complete`;
 
   qase(11,
     it('Checkout fails without required information', () => {
-      qase.fields({ severity: 'high', priority: 'medium', layer: 'e2e' });
+      qase.fields({ severity: 'major', priority: 'medium', layer: 'e2e' });
       qase.suite('E-commerce\tCheckout\tValidation');
       qase.parameters({ scenario: 'missing_first_name' });
 
@@ -104,7 +104,7 @@ Status: Complete`;
 
   qase(12,
     it('User can cancel checkout', () => {
-      qase.fields({ severity: 'medium', priority: 'low', layer: 'e2e' });
+      qase.fields({ severity: 'normal', priority: 'low', layer: 'e2e' });
       qase.suite('E-commerce\tCheckout\tNavigation');
 
       qase.step('Verify on checkout information page', () => {
@@ -131,7 +131,7 @@ Status: Complete`;
   qase(13,
     it('Demo test that will be ignored in reporting', () => {
       qase.ignore();
-      qase.fields({ severity: 'low', priority: 'low', layer: 'e2e' });
+      qase.fields({ severity: 'minor', priority: 'low', layer: 'e2e' });
       qase.suite('E-commerce\tCheckout\tDemo');
 
       // This test demonstrates qase.ignore() feature
