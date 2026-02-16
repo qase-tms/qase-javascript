@@ -118,8 +118,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 08-01-PLAN.md — CucumberJS BDD example (JSONPlaceholder API with Gherkin features)
-- [ ] 08-02-PLAN.md — Newman collection example (JSONPlaceholder API with Postman collection)
+- [x] 08-01-PLAN.md — CucumberJS BDD example (JSONPlaceholder API with Gherkin features)
+- [x] 08-02-PLAN.md — Newman collection example (JSONPlaceholder API with Postman collection)
 
 #### Phase 9: Integration Validation and Infrastructure
 **Goal**: All examples are production-ready, self-contained, and demonstrate complete Qase API surface with updated documentation
@@ -131,11 +131,11 @@ Plans:
   3. Every example project has updated qase.config.json and README with complete setup instructions
   4. All examples follow framework-standard directory patterns (page objects for E2E, proper test organization)
   5. All examples pass automated validation checks in CI/CD
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 09-01: TBD
-- [ ] 09-02: TBD
+- [ ] 09-01-PLAN.md — Audit and fix example self-containment and README consistency
+- [ ] 09-02-PLAN.md — Create validation scripts and CI/CD workflow
 
 ## Progress
 
@@ -153,9 +153,9 @@ Note: Phases 6 and 7 can run in parallel (different framework categories, no sha
 | 5. Quality Assurance | v1.0 | 2/2 | Complete | 2026-02-13 |
 | 6. E2E Framework Examples | v1.1 | 4/4 | Complete | 2026-02-16 |
 | 7. API Framework Examples | v1.1 | 3/3 | Complete | 2026-02-16 |
-| 8. BDD and Collection Examples | v1.1 | 0/2 | Planned | - |
-| 9. Integration Validation | v1.1 | 0/TBD | Not started | - |
+| 8. BDD and Collection Examples | v1.1 | 2/2 | Complete | 2026-02-16 |
+| 9. Integration Validation | v1.1 | 0/2 | Not started | - |
 
 ---
 
-*Last updated: 2026-02-16 - Phase 8 plans created*
+*Last updated: 2026-02-16 - Phase 9 planned*
