@@ -75,7 +75,7 @@ export class PlaywrightQaseReporter implements Reporter {
    * @private
    */
   private static transformSuiteTitle(test: TestCase): string[] {
-    return test.titlePath().filter(Boolean);
+    return test.titlePath().filter(Boolean).map(s => s.replace(/\\/g, '/'));
   }
 
   /**

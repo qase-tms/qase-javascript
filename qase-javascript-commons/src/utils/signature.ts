@@ -19,6 +19,7 @@ export const generateSignature = (
   if (suites.length > 0) {
     const processedSuites = suites
       .map(suite => suite.trim())
+      .map(suite => suite.replace(/\\/g, '/'))
       .flatMap(suite => suite.split('::'))
       .map(suite => suite.trim())
       .flatMap(suite => suite.split('\t'))
@@ -26,7 +27,7 @@ export const generateSignature = (
       .map(suite => suite.replace(/\s+/g, '_'))
       .map(suite => suite.toLowerCase())
       .filter(suite => suite.length > 0);
-    
+
     parts.push(processedSuites.join('::'));
   }
   
