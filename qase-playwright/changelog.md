@@ -1,3 +1,9 @@
+# playwright-qase-reporter@2.2.1
+
+## What's new
+
+- Fixed duplicate suites caused by inconsistent path separators on Windows. Tests with and without qaseId now produce identical suite paths regardless of OS.
+
 # playwright-qase-reporter@2.2.0
 
 ## What's new
