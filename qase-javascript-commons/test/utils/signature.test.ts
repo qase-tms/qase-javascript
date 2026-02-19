@@ -100,4 +100,19 @@ describe('generateSignature', () => {
     );
     expect(result).toBe("");
   });
+
+  it('should normalize backslashes in suite names to forward slashes', () => {
+    const result = generateSignature(
+      null,
+      ['e2e\\file.spec.ts', 'Suite1'],
+      {}
+    );
+    expect(result).toBe("e2e/file.spec.ts::suite1");
+  });
+
+  it('should produce identical signatures regardless of slash direction', () => {
+    const withBackslash = generateSignature(null, ['e2e\\nested\\file.spec.ts'], {});
+    const withForwardSlash = generateSignature(null, ['e2e/nested/file.spec.ts'], {});
+    expect(withBackslash).toBe(withForwardSlash);
+  });
 }); 

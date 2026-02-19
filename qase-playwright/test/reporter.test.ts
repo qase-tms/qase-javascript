@@ -118,6 +118,15 @@ describe('PlaywrightQaseReporter', () => {
       const result = PlaywrightQaseReporter['transformSuiteTitle'](testCaseMock as any);
       expect(result).toEqual(['Suite1', 'Suite2', 'Test (Qase ID: 123)']);
     });
+
+    it('should normalize backslashes in suite title path to forward slashes', () => {
+      const testCaseWithBackslash = {
+        ...testCaseMock,
+        titlePath: jest.fn(() => ['', 'e2e\\tests\\auth', 'Login Suite', 'should login']),
+      };
+      const result = PlaywrightQaseReporter['transformSuiteTitle'](testCaseWithBackslash as any);
+      expect(result).toEqual(['e2e/tests/auth', 'Login Suite', 'should login']);
+    });
   });
 
   describe('static transformError', () => {
