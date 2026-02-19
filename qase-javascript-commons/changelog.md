@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.5.3
+
+## What's new
+
+- Fixed path separator normalization in `generateSignature()` to ensure consistent signatures across Windows and Unix platforms.
+
 # qase-javascript-commons@2.5.2
 
 ## What's new
