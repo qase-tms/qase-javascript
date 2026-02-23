@@ -49,5 +49,11 @@ export interface SharedStepContentCreate {
      * @memberof SharedStepContentCreate
      */
     'attachments'?: Array<string>;
+    /**
+     * Nested steps will be here. The same structure is used for them.
+     * @type {Array<object>}
+     * @memberof SharedStepContentCreate
+     */
+    'steps'?: Array<object>;
 }
 
