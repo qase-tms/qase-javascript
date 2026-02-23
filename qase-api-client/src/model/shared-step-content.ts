@@ -51,5 +51,11 @@ export interface SharedStepContent {
      * @memberof SharedStepContent
      */
     'attachments'?: Array<AttachmentHash>;
+    /**
+     * Nested steps will be here. The same structure is used for them.
+     * @type {Array<object>}
+     * @memberof SharedStepContent
+     */
+    'steps'?: Array<object>;
 }
 

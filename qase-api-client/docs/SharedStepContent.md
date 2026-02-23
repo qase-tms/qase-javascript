@@ -10,6 +10,7 @@ Name | Type | Description | Notes
 **action** | **string** |  | [optional] [default to undefined]
 **expected_result** | **string** |  | [optional] [default to undefined]
 **attachments** | [**Array&lt;AttachmentHash&gt;**](AttachmentHash.md) |  | [optional] [default to undefined]
+**steps** | **Array&lt;object&gt;** | Nested steps will be here. The same structure is used for them. | [optional] [default to undefined]
 
 ## Example
 
@@ -22,6 +23,7 @@ const instance: SharedStepContent = {
     action,
     expected_result,
     attachments,
+    steps,
 };
 ```
 
