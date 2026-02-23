@@ -4,6 +4,7 @@ import { StepTextData, StepGherkinData } from '../models/step-data';
 import { WriterInterface } from '../writer';
 import { LoggerInterface } from '../utils/logger';
 import { getHostInfo } from '../utils/hostData';
+import { HostData } from '../models/host-data';
 
 /**
  * @class ReportReporter
@@ -14,6 +15,7 @@ export class ReportReporter extends AbstractReporter {
   private readonly environment: string | undefined;
   private readonly runId: number | undefined;
   private readonly rootSuite: string | undefined;
+  private readonly hostData: HostData | undefined;
   private startTime: number = Date.now();
 
   /**
@@ -24,6 +26,7 @@ export class ReportReporter extends AbstractReporter {
    * @param {string | undefined} environment
    * @param {string | undefined} rootSuite
    * @param {number | undefined} runId
+   * @param {HostData | undefined} hostData
    */
   constructor(
     logger: LoggerInterface,
@@ -33,11 +36,13 @@ export class ReportReporter extends AbstractReporter {
     environment?: string,
     rootSuite?: string,
     runId?: number,
+    hostData?: HostData,
   ) {
     super(logger);
     this.environment = environment;
     this.runId = runId;
     this.rootSuite = rootSuite;
+    this.hostData = hostData;
   }
 
   /**
@@ -115,7 +120,7 @@ export class ReportReporter extends AbstractReporter {
       threads: [],
       suites: [],
       environment: this.environment ?? '',
-      host_data: getHostInfo(this.frameworkName, this.reporterName),
+      host_data: this.hostData ?? getHostInfo(this.frameworkName, this.reporterName),
     };
 
     for (const result of this.results) {

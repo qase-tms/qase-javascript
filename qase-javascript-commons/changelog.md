@@ -1,3 +1,17 @@
+# qase-javascript-commons@2.5.5
+
+## What's new
+
+Significantly improved startup performance by optimizing host data collection:
+
+- Replaced slow `npm list --depth=10 --json` fallback with fast `require.resolve()`-based package version lookup.
+- Replaced `execSync('node --version')` with `process.version`.
+- Replaced `execSync('npm --version')` with `process.env.npm_config_user_agent` parsing (with execSync fallback).
+- Eliminated duplicate `getHostInfo()` call in `ReportReporter.complete()` by passing pre-collected host data from `QaseReporter`.
+- Included `report` mode in the `needsHostData` guard so host data is collected once during init.
+
+Worst-case startup time reduced from ~10-25 seconds to ~55 ms.
+
 # qase-javascript-commons@2.5.4
 
 ## What's new

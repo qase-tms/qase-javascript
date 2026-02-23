@@ -1,30 +1,8 @@
 import * as os from 'os';
 import * as cp from 'child_process';
 import * as fs from 'fs';
-import * as path from 'path';
 import { HostData } from '../models/host-data';
-import { execSync } from "child_process";
-
-interface PackageJson {
-  version: string;
-
-  [key: string]: unknown;
-}
-
-interface PackageInfo {
-  version?: string;
-  resolved?: string;
-  overridden?: boolean;
-  dependencies?: Record<string, PackageInfo>;
-
-  [key: string]: unknown;
-}
-
-interface NpmListResult {
-  version?: string;
-  name?: string;
-  dependencies?: Record<string, PackageInfo>;
-}
+import { getPackageVersion } from './get-package-version';
 
 /**
  * Gets detailed OS information based on the platform
@@ -60,116 +38,23 @@ function getDetailedOSInfo(): string {
 }
 
 /**
- * Executes a command and returns its trimmed output
- * @param {string} command Command to execute
- * @param {string} defaultValue Default value if command fails
- * @returns {string} Command output or default value
+ * Gets npm version from environment or by executing npm command
+ * @returns {string} npm version string
  */
-function execCommand(command: string, defaultValue = ''): string {
-  try {
-    return cp.execSync(command).toString().trim();
-  } catch (error) {
-    console.error(`Error executing command '${command}':`, error);
-    return defaultValue;
-  }
-}
-
-/**
- * Recursively searches for a package in dependencies tree
- * @param {Record<string, PackageInfo>} dependencies The dependencies object to search in
- * @param {string} packageName The name of the package to find
- * @returns {string | null} The package version or null if not found
- */
-function findPackageInDependencies(
-  dependencies: Record<string, PackageInfo> | undefined,
-  packageName: string,
-): string | null {
-  // If no dependencies, return null
-  if (!dependencies) return null;
-
-  // Check if the package exists at the current level
-  if (packageName in dependencies) {
-    return dependencies[packageName]?.version ?? null;
-  }
-
-  // Recursively search in nested dependencies
-  for (const dep of Object.values(dependencies)) {
-    if (dep.dependencies) {
-      const foundVersion = findPackageInDependencies(dep.dependencies, packageName);
-      if (foundVersion) {
-        return foundVersion;
-      }
+function getNpmVersion(): string {
+  const userAgent = process.env['npm_config_user_agent'];
+  if (userAgent) {
+    const match = userAgent.match(/^npm\/(\S+)/);
+    if (match?.[1]) {
+      return match[1];
     }
   }
-
-  return null;
-}
-
-/**
- * Gets the version of a Node.js package
- * @param {string} packageName The name of the package
- * @returns {string | null} The package version or null if not found
- */
-function getPackageVersion(packageName: string): string | null {
-  if (!packageName) return null;
 
   try {
-    // First try to get from node_modules
-    const packagePath = path.resolve(process.cwd(), 'node_modules', packageName, 'package.json');
-    if (fs.existsSync(packagePath)) {
-      const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8')) as PackageJson;
-      return packageJson.version;
-    }
-
-
-    // Try using npm list as fallback with recursive search
-    let output = null;
-    try {
-      output = execSync(`npm list --depth=10 --json`, { stdio: "pipe" }).toString();
-      if (!output) return null;
-    } catch (error) {
-      return null;
-    }
-
-    try {
-      const npmList = JSON.parse(output) as NpmListResult;
-
-      // Try direct dependency
-      const directVersion = npmList.dependencies?.[packageName]?.version;
-      if (directVersion) return directVersion;
-
-      // Try recursive search
-      return findPackageInDependencies(npmList.dependencies, packageName);
-    } catch (parseError) {
-      console.error('Error parsing npm list output:', parseError);
-      return null;
-    }
-  } catch (error) {
-    console.error(`Error getting version for package ${packageName}:`, error);
-    return null;
+    return cp.execSync('npm --version', { stdio: 'pipe' }).toString().trim();
+  } catch {
+    return '';
   }
-}
-
-/**
- * Returns minimal host data without slow operations (no npm list, no execSync for node/npm).
- * Use when reporter mode is "off" to avoid startup delay.
- * @returns {HostData} Minimal host information object
- */
-export function getMinimalHostData(): HostData {
-  return {
-    system: os.platform(),
-    machineName: os.hostname(),
-    release: os.release(),
-    version: '',
-    arch: os.arch(),
-    node: '',
-    npm: '',
-    framework: '',
-    reporter: '',
-    commons: '',
-    apiClientV1: '',
-    apiClientV2: '',
-  };
 }
 
 /**
@@ -186,8 +71,8 @@ export function getHostInfo(framework: string, reporterName: string): HostData {
       release: os.release(),
       version: getDetailedOSInfo(),
       arch: os.arch(),
-      node: execCommand('node --version'),
-      npm: execCommand('npm --version'),
+      node: process.version,
+      npm: getNpmVersion(),
       framework: getPackageVersion(framework) ?? '',
       reporter: getPackageVersion(reporterName) ?? '',
       commons: getPackageVersion('qase-javascript-commons') ?? '',

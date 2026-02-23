@@ -23,7 +23,7 @@ import { DisabledException } from './utils/disabled-exception';
 import { Logger, LoggerInterface } from './utils/logger';
 import { StateManager, StateModel } from './state/state';
 import { ConfigType } from './config';
-import { getHostInfo, getMinimalHostData } from './utils/hostData';
+import { getHostInfo } from './utils/hostData';
 import { ClientV2 } from './client/clientV2';
 import { TestOpsOptionsType } from './models/config/TestOpsOptionsType';
 import { applyStatusMapping } from './utils/status-mapping-utils';
@@ -153,14 +153,7 @@ export class QaseReporter implements ReporterInterface {
 
     const effectiveMode = (composedOptions.mode as ModeEnum) || ModeEnum.off;
     const effectiveFallback = (composedOptions.fallback as ModeEnum) || ModeEnum.off;
-    const needsHostData =
-      effectiveMode === ModeEnum.testops ||
-      effectiveMode === ModeEnum.testops_multi ||
-      effectiveFallback === ModeEnum.testops ||
-      effectiveFallback === ModeEnum.testops_multi;
-    this.hostData = needsHostData
-      ? getHostInfo(options.frameworkPackage, options.reporterName)
-      : getMinimalHostData();
+    this.hostData = getHostInfo(options.frameworkPackage, options.reporterName);
     this.logger.logDebug(`Host data: ${JSON.stringify(this.hostData)}`);
 
     this.captureLogs = composedOptions.captureLogs;
@@ -643,7 +636,8 @@ export class QaseReporter implements ReporterInterface {
           options.reporterName,
           options.environment,
           options.rootSuite,
-          options.testops?.run?.id);
+          options.testops?.run?.id,
+          this.hostData);
       }
 
       case ModeEnum.off:
