@@ -1,3 +1,11 @@
+# qase-vitest@1.1.1
+
+## What's new
+
+- Fixed an issue where `qase.config.json` configuration file was ignored by the reporter. The reporter now loads configuration using `ConfigLoader`, matching the behavior of Jest, Playwright, and other reporters.
+- Fixed an issue where non-string parameter values (e.g. numbers passed via `qase.parameters()`) caused API validation errors. Parameter values are now converted to strings before sending.
+- Updated `qase-javascript-commons` dependency to `~2.5.4`.
+
 # qase-vitest@1.1.0
 
 ## What's new
