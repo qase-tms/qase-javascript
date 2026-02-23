@@ -15,6 +15,7 @@ import {
   ConfigType,
   determineTestStatus,
   parseProjectMappingFromTitle,
+  ConfigLoader,
 } from 'qase-javascript-commons';
 
 export type VitestQaseOptionsType = ConfigType;
@@ -37,8 +38,12 @@ export class VitestQaseReporter implements Reporter {
   /** @deprecated Use parseProjectMappingFromTitle from qase-javascript-commons for multi-project support. */
   static qaseIdRegExp = /\(Qase ID: ([\d,]+)\)/;
 
-  constructor(options: VitestQaseOptionsType = {}) {
-    const composedOptions = composeOptions(options, {});
+  constructor(
+    options: VitestQaseOptionsType = {},
+    configLoader = new ConfigLoader(),
+  ) {
+    const config = configLoader.load();
+    const composedOptions = composeOptions(options, config);
 
     this.reporter = QaseReporter.getInstance({
       ...composedOptions,
@@ -253,10 +258,15 @@ export class VitestQaseReporter implements Reporter {
         case 'parameters': {
           const parametersData = annotation.message.replace('Qase Parameters: ', '');
           try {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            const parsed = JSON.parse(parametersData);
+            const parsed: unknown = JSON.parse(parametersData);
             if (typeof parsed === 'object' && parsed !== null) {
-              metadata.parameters = parsed as Record<string, string>;
+              const stringified: Record<string, string> = {};
+              for (const [k, v] of Object.entries(parsed as Record<string, unknown>)) {
+                if (v != null) {
+                  stringified[k] = String(v);
+                }
+              }
+              metadata.parameters = stringified;
             }
           } catch (e) {
             console.warn('Failed to parse qase parameters:', parametersData);
@@ -267,10 +277,15 @@ export class VitestQaseReporter implements Reporter {
         case 'group-parameters': {
           const groupParametersData = annotation.message.replace('Qase Group Parameters: ', '');
           try {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            const parsed = JSON.parse(groupParametersData);
+            const parsed: unknown = JSON.parse(groupParametersData);
             if (typeof parsed === 'object' && parsed !== null) {
-              metadata.groupParameters = parsed as Record<string, string>;
+              const stringified: Record<string, string> = {};
+              for (const [k, v] of Object.entries(parsed as Record<string, unknown>)) {
+                if (v != null) {
+                  stringified[k] = String(v);
+                }
+              }
+              metadata.groupParameters = stringified;
             }
           } catch (e) {
             console.warn('Failed to parse qase group parameters:', groupParametersData);

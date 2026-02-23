@@ -174,8 +174,8 @@ export class ClientV2 extends ClientV1 {
         const transformedParams: Record<string, string> = {};
 
         for (const [key, value] of Object.entries(params)) {
-            if (value) {
-                transformedParams[key] = value;
+            if (value != null) {
+                transformedParams[key] = String(value);
             }
         }
 

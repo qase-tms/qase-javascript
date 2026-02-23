@@ -7,6 +7,9 @@ jest.mock('qase-javascript-commons', () => {
   const actual = jest.requireActual('qase-javascript-commons') as typeof import('qase-javascript-commons');
   return {
     ...actual,
+    ConfigLoader: jest.fn().mockImplementation(() => ({
+      load: jest.fn().mockReturnValue(null),
+    })),
     QaseReporter: {
     getInstance: jest.fn().mockReturnValue({
       startTestRun: jest.fn(),
@@ -72,6 +75,39 @@ describe('VitestQaseReporter - Main scenarios', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+  });
+
+  describe('Config file loading', () => {
+    it('should accept custom configLoader and call load() on it', () => {
+      const mockConfigLoader = { load: jest.fn().mockReturnValue({ debug: true, mode: 'testops' }) };
+      const composeOptionsMock = jest.requireMock('qase-javascript-commons').composeOptions;
+
+      new VitestQaseReporter({}, mockConfigLoader);
+
+      expect(mockConfigLoader.load).toHaveBeenCalled();
+      expect(composeOptionsMock).toHaveBeenCalledWith({}, { debug: true, mode: 'testops' });
+    });
+
+    it('should pass config from loader to composeOptions', () => {
+      const mockConfig = { debug: true, mode: 'testops', environment: 'test' };
+      const mockConfigLoader = { load: jest.fn().mockReturnValue(mockConfig) };
+      const composeOptionsMock = jest.requireMock('qase-javascript-commons').composeOptions;
+
+      const constructorOptions = { mode: 'off' };
+      new VitestQaseReporter(constructorOptions, mockConfigLoader);
+
+      expect(composeOptionsMock).toHaveBeenCalledWith(constructorOptions, mockConfig);
+    });
+
+    it('should handle null config from loader', () => {
+      const mockConfigLoader = { load: jest.fn().mockReturnValue(null) };
+      const composeOptionsMock = jest.requireMock('qase-javascript-commons').composeOptions;
+
+      new VitestQaseReporter({}, mockConfigLoader);
+
+      expect(mockConfigLoader.load).toHaveBeenCalled();
+      expect(composeOptionsMock).toHaveBeenCalledWith({}, null);
+    });
   });
 
 

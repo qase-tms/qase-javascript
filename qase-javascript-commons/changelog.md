@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.5.4
+
+## What's new
+
+- Fixed an issue where non-string parameter values (e.g. numbers) were sent to the Qase API as-is, causing validation errors. The `transformParams` method now converts all parameter values to strings.
+
 # qase-javascript-commons@2.5.3
 
 ## What's new
