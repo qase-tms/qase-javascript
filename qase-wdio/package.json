@@ -34,7 +34,6 @@
   "dependencies": {
     "qase-javascript-commons": "~2.5.6",
     "uuid": "^9.0.1",
-    "@types/node": "^20.19.25",
     "@wdio/reporter": "^8.43.0",
     "@wdio/types": "^8.41.0",
     "csv-stringify": "^6.6.0",
