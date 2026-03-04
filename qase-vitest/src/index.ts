@@ -5,6 +5,7 @@ import type {
   TestSuite
 } from 'vitest/node';
 import {
+  NetworkProfiler,
   QaseReporter,
   TestResultType,
   TestStepType,
@@ -22,6 +23,8 @@ export type VitestQaseOptionsType = ConfigType;
 
 export class VitestQaseReporter implements Reporter {
   private reporter: ReporterInterface;
+  private profiler: NetworkProfiler | null = null;
+  private _profilerStepSnapshot = 0;
   private currentSuite: string | undefined = undefined;
   private testMetadata: Map<string, {
     title?: string;
@@ -51,6 +54,13 @@ export class VitestQaseReporter implements Reporter {
       frameworkName: 'vitest',
       reporterName: 'vitest-qase-reporter',
     });
+
+    if (composedOptions.profilers?.includes('network')) {
+      this.profiler = new NetworkProfiler({
+        skipDomains: composedOptions.networkProfiler?.skip_domains,
+        trackOnFail: composedOptions.networkProfiler?.track_on_fail,
+      });
+    }
   }
 
 
@@ -186,6 +196,14 @@ export class VitestQaseReporter implements Reporter {
       }
     }
 
+    // Merge profiler steps stored from setup.ts annotations
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    if (metadata && (metadata as any)._profilerSteps) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+      const profilerSteps = (metadata as any)._profilerSteps as TestStepType[];
+      testResult.steps = [...testResult.steps, ...profilerSteps];
+    }
+
     // Clean up metadata after processing
     this.testMetadata.delete(testId);
 
@@ -194,15 +212,41 @@ export class VitestQaseReporter implements Reporter {
 
   onTestRunStart?(): void {
     this.reporter.startTestRun();
+    // Enable profiler in main thread for single-fork/single-thread mode
+    this.profiler?.enable();
   }
 
   async onTestRunEnd?(): Promise<void> {
+    this.profiler?.restore();
     await this.reporter.publish();
   }
 
 
   async onTestCaseResult?(testCase: TestCase): Promise<void> {
     const testResult = this.createTestResult(testCase);
+
+    // Direct fallback accumulator — works in single-fork/single-thread mode
+    if (this.profiler) {
+      const allSteps = this.profiler.getAllSteps();
+      const newSteps = allSteps.slice(this._profilerStepSnapshot);
+      this._profilerStepSnapshot = allSteps.length;
+      if (newSteps.length > 0) {
+        testResult.steps = [...testResult.steps, ...newSteps];
+      }
+    }
+
+    // Merge profiler steps from worker via task.meta (set by setup.ts)
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+      const metaSteps = (testCase.meta() as any)?._qaseProfilerSteps as string | undefined;
+      if (metaSteps) {
+        const profilerSteps = JSON.parse(metaSteps) as TestStepType[];
+        testResult.steps = [...testResult.steps, ...profilerSteps];
+      }
+    } catch {
+      // Silent failure — corrupted profiler data should not affect test results
+    }
+
     await this.reporter.addTestResult(testResult);
   }
 
@@ -219,7 +263,21 @@ export class VitestQaseReporter implements Reporter {
     
     const metadata = this.testMetadata.get(testId);
     if (!metadata) return;
-    
+
+    // Check for profiler steps annotation from setup.ts (must be before the generic Qase check)
+    if (annotation.message && annotation.message.startsWith('Qase Profiler Steps: ')) {
+      try {
+        const stepsJson = annotation.message.replace('Qase Profiler Steps: ', '');
+        const profilerSteps = JSON.parse(stepsJson) as TestStepType[];
+        // Store profiler steps in metadata for merging in onTestCaseResult via createTestResult
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+        (metadata as any)._profilerSteps = profilerSteps;
+      } catch {
+        // Silent failure — corrupted profiler data should not affect test results
+      }
+      return; // Do not process further as a regular annotation
+    }
+
     // Process qase annotations
     // Check if this is a qase annotation by looking at the message pattern
     if (annotation.message && annotation.message.startsWith('Qase ')) {

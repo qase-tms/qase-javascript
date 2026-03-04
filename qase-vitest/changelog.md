@@ -1,3 +1,10 @@
+# qase-vitest@1.1.2
+
+## What's new
+
+- Added Network Profiler integration for automatic HTTP request capture during test execution.
+- Updated `qase-javascript-commons` dependency to `~2.5.6`.
+
 # qase-vitest@1.1.1
 
 ## What's new

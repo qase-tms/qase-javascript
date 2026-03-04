@@ -5,6 +5,7 @@ export default defineConfig({
   test: {
     watch: false,
     testTimeout: 10000,
+    setupFiles: ['./profiler-setup.ts'],
     reporters: [
       'default',
       ['vitest-qase-reporter',

@@ -308,5 +308,29 @@ export const configValidationSchema = {
         },
       },
     },
+
+    profilers: {
+      type: 'array',
+      items: {
+        type: 'string',
+      },
+      nullable: true,
+    },
+
+    networkProfiler: {
+      type: 'object',
+      nullable: true,
+      properties: {
+        skip_domains: {
+          type: 'array',
+          items: { type: 'string' },
+          nullable: true,
+        },
+        track_on_fail: {
+          type: 'boolean',
+          nullable: true,
+        },
+      },
+    },
   },
 };

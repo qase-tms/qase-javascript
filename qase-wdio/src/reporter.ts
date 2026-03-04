@@ -13,6 +13,7 @@ import {
   ConfigLoader,
   generateSignature,
   getMimeTypes,
+  NetworkProfiler,
   QaseReporter,
   Relation,
   ReporterInterface,
@@ -73,6 +74,24 @@ export default class WDIOQaseReporter extends WDIOReporter {
   private _options: QaseReporterOptions;
   private _isMultiremote?: boolean;
 
+  /**
+   * @type {NetworkProfiler | null}
+   * @private
+   */
+  private profiler: NetworkProfiler | null = null;
+
+  /**
+   * Snapshot of fallback accumulator length for per-test delta (same-process mode).
+   * @private
+   */
+  private _profilerStepSnapshot = 0;
+
+  /**
+   * Steps received from QaseWdioService via process.emit IPC.
+   * @private
+   */
+  private _pendingProfilerSteps: TestStepType[] = [];
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(options: any) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -80,13 +99,27 @@ export default class WDIOQaseReporter extends WDIOReporter {
     const configLoader = new ConfigLoader();
     const config = configLoader.load();
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment
+    const composedOptions = composeOptions(options, config);
+
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     this.reporter = QaseReporter.getInstance({
-      ...composeOptions(options, config),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      ...composedOptions,
       frameworkPackage: '@wdio/cli',
       frameworkName: 'wdio',
       reporterName: 'wdio-qase-reporter',
     });
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    if (composedOptions.profilers?.includes('network')) {
+      this.profiler = new NetworkProfiler({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        skipDomains: composedOptions.networkProfiler?.skip_domains,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        trackOnFail: composedOptions.networkProfiler?.track_on_fail,
+      });
+    }
 
     this.isSync = true;
     this.storage = new Storage();
@@ -194,6 +227,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
   }
 
   override async onRunnerEnd() {
+    this.profiler?.restore();
     await this.reporter.sendResults();
     this.isSync = true;
   }
@@ -204,6 +238,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
       return;
     }
 
+    this._profilerStepSnapshot = this.profiler?.getAllSteps().length ?? 0;
     this._startTest(test.title, test.cid, test.start.valueOf() / 1000);
   }
 
@@ -349,6 +384,22 @@ export default class WDIOQaseReporter extends WDIOReporter {
     }
     testResult.title = parsed.cleanedTitle || this.removeQaseIdsFromTitle(testResult.title);
 
+    // Merge profiler steps from direct fallback accumulator (same-process mode only)
+    if (this.profiler) {
+      const allSteps = this.profiler.getAllSteps();
+      const newSteps = allSteps.slice(this._profilerStepSnapshot);
+      this._profilerStepSnapshot = 0;
+      if (newSteps.length > 0) {
+        testResult.steps = [...testResult.steps, ...newSteps];
+      }
+    }
+
+    // Merge profiler steps received from QaseWdioService via process.emit IPC (same-process mode only)
+    if (this._pendingProfilerSteps.length > 0) {
+      testResult.steps = [...testResult.steps, ...this._pendingProfilerSteps];
+      this._pendingProfilerSteps = [];
+    }
+
     await this.reporter.addTestResult(testResult);
   }
 
@@ -406,6 +457,15 @@ export default class WDIOQaseReporter extends WDIOReporter {
     process.on(events.addAttachment, this.addAttachment.bind(this));
     process.on(events.addIgnore, this.ignore.bind(this));
     process.on(events.addStep, this.addStep.bind(this));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+    process.on(events.addProfilerSteps as any, (data: string) => {
+      try {
+        const steps = JSON.parse(data) as TestStepType[];
+        this._pendingProfilerSteps.push(...steps);
+      } catch {
+        // Silent failure — corrupted profiler data should not affect test results
+      }
+    });
   }
 
   addQaseId({ ids }: AddQaseIdEventArgs) {

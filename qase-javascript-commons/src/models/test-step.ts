@@ -1,4 +1,4 @@
-import { StepGherkinData, StepTextData } from './step-data';
+import { StepGherkinData, StepRequestData, StepTextData } from './step-data';
 import { StepExecution } from './step-execution';
 
 import { Attachment } from './attachment';
@@ -7,12 +7,13 @@ import { Attachment } from './attachment';
 export enum StepType {
   TEXT = 'text',
   GHERKIN = 'gherkin',
+  REQUEST = 'request',
 }
 
 export class TestStepType {
   id: string;
   step_type: StepType;
-  data: StepTextData | StepGherkinData;
+  data: StepTextData | StepGherkinData | StepRequestData;
   parent_id: string | null;
   execution: StepExecution;
   attachments: Attachment[];
@@ -31,11 +32,21 @@ export class TestStepType {
         expected_result: null,
         data: null,
       };
-    } else {
+    } else if (type === StepType.GHERKIN) {
       this.data = {
         keyword: '',
         name: '',
         line: 0,
+      };
+    } else {
+      this.data = {
+        request_method: '',
+        request_url: '',
+        request_headers: null,
+        request_body: null,
+        status_code: null,
+        response_body: null,
+        response_headers: null,
       };
     }
   }

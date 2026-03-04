@@ -1,3 +1,11 @@
+# qase-javascript-commons@2.5.6
+
+## What's new
+
+- Added Network Profiler framework for automatic HTTP/HTTPS request interception during test execution.
+- Added `StepType.REQUEST` step type for network request data in test results.
+- Added configurable profiler options in `qase.config.json` (`profilers` and `networkProfiler` fields).
+
 # qase-javascript-commons@2.5.5
 
 ## What's new

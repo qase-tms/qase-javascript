@@ -84,4 +84,11 @@ module.exports = function(on) {
       return null;
     },
   });
+
+  on('task', {
+    qaseNetworkRequest(data) {
+      MetadataManager.addNetworkRequest(data);
+      return null;
+    },
+  });
 };

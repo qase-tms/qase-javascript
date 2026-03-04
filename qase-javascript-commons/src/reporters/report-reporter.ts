@@ -320,6 +320,11 @@ export class ReportReporter extends AbstractReporter {
       };
     }
 
+    // For request steps, pass raw fields through (all 7 StepRequestData fields are preserved)
+    if (step.step_type === StepType.REQUEST && 'request_method' in data) {
+      return data as Record<string, unknown>;
+    }
+
     return data;
   }
 }

@@ -142,4 +142,58 @@ describe('configValidationSchema', () => {
       expect(isValid).toBe(true);
     });
   });
-}); 
+
+  describe('profilers and networkProfiler', () => {
+    it('should validate config with profilers array', () => {
+      const validConfig = { profilers: ['network'] };
+      const isValid = validate(validConfig);
+      expect(isValid).toBe(true);
+    });
+
+    it('should validate config with profilers and networkProfiler object', () => {
+      const validConfig = {
+        profilers: ['network'],
+        networkProfiler: {
+          skip_domains: ['internal.company.com'],
+          track_on_fail: true,
+        },
+      };
+      const isValid = validate(validConfig);
+      expect(isValid).toBe(true);
+    });
+
+    it('should validate networkProfiler without profilers (valid but unused)', () => {
+      const validConfig = {
+        networkProfiler: { skip_domains: ['a.com'] },
+      };
+      const isValid = validate(validConfig);
+      expect(isValid).toBe(true);
+    });
+
+    it('should reject profilers as a string (must be array)', () => {
+      const invalidConfig = { profilers: 'network' };
+      const isValid = validate(invalidConfig);
+      expect(isValid).toBe(false);
+      expect(validate.errors).toBeDefined();
+    });
+
+    it('should reject networkProfiler.skip_domains as a number (must be array)', () => {
+      const invalidConfig = { networkProfiler: { skip_domains: 123 } };
+      const isValid = validate(invalidConfig);
+      expect(isValid).toBe(false);
+      expect(validate.errors).toBeDefined();
+    });
+
+    it('should validate profilers as null (nullable)', () => {
+      const validConfig = { profilers: null };
+      const isValid = validate(validConfig);
+      expect(isValid).toBe(true);
+    });
+
+    it('should validate networkProfiler as null (nullable)', () => {
+      const validConfig = { networkProfiler: null };
+      const isValid = validate(validConfig);
+      expect(isValid).toBe(true);
+    });
+  });
+});

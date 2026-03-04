@@ -15,6 +15,7 @@ Qase Cypress Reporter enables seamless integration between your Cypress tests an
 - Flexible configuration (file, environment variables, Cypress config)
 - Cucumber/Gherkin integration support
 - Automatic screenshot and video attachments
+- Network Profiler for automatic HTTP request capture
 
 ## Installation
 
@@ -267,6 +268,39 @@ npx cypress open
 # Run with environment variables
 QASE_MODE=testops QASE_TESTOPS_PROJECT=DEMO npx cypress run
 ```
+
+## Network Profiler
+
+The Network Profiler automatically captures browser-originated HTTP requests made during test execution and reports them as REQUEST-type steps in Qase TestOps.
+
+**Additional setup:** Import the support file in your `cypress/support/e2e.ts` (or `e2e.js`):
+
+```typescript
+// cypress/support/e2e.ts
+import 'cypress-qase-reporter/support';
+```
+
+The support file registers a `beforeEach` hook that installs `cy.intercept('**')` to capture all application HTTP requests. No changes to spec files are needed.
+
+**Enable in `qase.config.json`:**
+
+```json
+{
+  "profilers": ["network"],
+  "networkProfiler": {
+    "skip_domains": ["analytics.example.com"],
+    "track_on_fail": true
+  }
+}
+```
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `profilers` | Array of profilers to enable. Use `["network"]` for HTTP capture | `[]` |
+| `networkProfiler.skip_domains` | Domains to exclude from profiling | `[]` |
+| `networkProfiler.track_on_fail` | Capture response body for failed requests (status >= 400) | `true` |
+
+> Requests to `qase.io` and Cypress internal requests (`/__cypress/`) are always excluded automatically.
 
 ## Requirements
 

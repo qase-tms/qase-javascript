@@ -81,3 +81,6 @@ tmp
 
 CLAUDE.md
 .planning/
+
+# Example package locks (managed by root workspace)
+examples/**/package-lock.json

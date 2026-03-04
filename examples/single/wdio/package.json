@@ -10,5 +10,8 @@
     "@wdio/mocha-framework": "^8.40.0",
     "wdio-chromedriver-service": "^8.0.0",
     "wdio-qase-reporter": "^1.1.4"
+  },
+  "dependencies": {
+    "qase-javascript-commons": "^2.0.0"
   }
 }

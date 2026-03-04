@@ -5,6 +5,7 @@ import {
   composeOptions,
   ConfigLoader,
   generateSignature,
+  NetworkProfiler,
   QaseReporter,
   ReporterInterface,
   StepStatusEnum,
@@ -45,6 +46,8 @@ export class MochaQaseReporter extends reporters.Base {
   private originalStderrWrite: typeof process.stderr.write;
   private testOutputs: Map<string, TestOutput>;
   // readonly #extraReporters: reporters.Base[] = [];
+  private profiler: NetworkProfiler | null = null;
+  private _profilerStepSnapshot = 0;
 
   /**
    * @type {Record<CypressState, TestStatusEnum>}
@@ -82,12 +85,21 @@ export class MochaQaseReporter extends reporters.Base {
     // Parse and validate extraReporters configuration
     const extraReportersConfig = parseExtraReporters(options, config || undefined);
 
+    const composedOptions = composeOptions(options, config);
     this.reporter = QaseReporter.getInstance({
-      ...composeOptions(options, config),
+      ...composedOptions,
       frameworkPackage: 'mocha',
       frameworkName: 'mocha',
       reporterName: 'mocha-qase-reporter',
     });
+
+    if (composedOptions.profilers?.includes('network')) {
+      this.profiler = new NetworkProfiler({
+        skipDomains: composedOptions.networkProfiler?.skip_domains,
+        trackOnFail: composedOptions.networkProfiler?.track_on_fail,
+      });
+      this.profiler.enable();
+    }
 
     // Create extra reporters in both modes, but validate compatibility for parallel mode
     if (extraReportersConfig) {
@@ -140,6 +152,7 @@ export class MochaQaseReporter extends reporters.Base {
   }
 
   private onEndRun() {
+    this.profiler?.restore();
     deasyncPromise(this.reporter.publish());
   }
 
@@ -185,6 +198,7 @@ export class MochaQaseReporter extends reporters.Base {
   private onStartTest() {
     this.currentType = 'test';
     this.testBeginTime = Date.now();
+    this._profilerStepSnapshot = this.profiler?.getAllSteps().length ?? 0;
   }
 
   private onEndTest(test: Mocha.Test) {
@@ -241,6 +255,13 @@ export class MochaQaseReporter extends reporters.Base {
       message += '\n\n' + test.err.message;
     }
 
+    let profilerSteps: TestStepType[] = [];
+    if (this.profiler) {
+      const allSteps = this.profiler.getAllSteps();
+      profilerSteps = allSteps.slice(this._profilerStepSnapshot);
+      this._profilerStepSnapshot = 0;
+    }
+
     const result: TestResultType = {
       attachments: this.metadata.attachments ?? [],
       author: null,
@@ -252,7 +273,7 @@ export class MochaQaseReporter extends reporters.Base {
       relations: relations,
       run_id: null,
       signature: this.getSignature(test, hasProjectMapping ? [] : ids, this.metadata.parameters ?? {}),
-      steps: this.currentTest.steps,
+      steps: [...this.currentTest.steps, ...profilerSteps],
       id: uuidv4(),
       execution: {
         status: determineTestStatus(test.err ?? null, test.state ?? 'failed'),

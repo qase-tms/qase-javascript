@@ -9,3 +9,13 @@ export interface StepGherkinData {
   name: string;
   line: number;
 }
+
+export interface StepRequestData {
+  request_method: string;
+  request_url: string;
+  request_headers: Record<string, string> | null;
+  request_body: string | null;
+  status_code: number | null;
+  response_body: string | null;
+  response_headers: Record<string, string> | null;
+}

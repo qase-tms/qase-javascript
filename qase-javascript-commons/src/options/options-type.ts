@@ -43,6 +43,11 @@ export type OptionsType = {
   /** Multi-project configuration (used when mode is testops_multi). */
   testops_multi?: TestOpsMultiConfigType | undefined;
   report?: RecursivePartial<AdditionalReportOptionsType> | undefined;
+  profilers?: string[] | undefined;
+  networkProfiler?: {
+    skip_domains?: string[] | undefined;
+    track_on_fail?: boolean | undefined;
+  } | undefined;
 };
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions

@@ -1,4 +1,4 @@
-import { Attach, Metadata, StepStart } from './models';
+import { Attach, Metadata, NetworkRequestData, StepStart } from './models';
 import { readFileSync, existsSync, unlinkSync, writeFileSync } from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
@@ -126,6 +126,16 @@ export class MetadataManager {
 
     this.setMetadata(metadata);
   }
+
+  public static addNetworkRequest(data: NetworkRequestData): void {
+    const metadata = this.getMetadata() ?? {};
+    if (!metadata.networkRequests) {
+      metadata.networkRequests = [];
+    }
+    metadata.networkRequests.push(data);
+    this.setMetadata(metadata);
+  }
+
 
   public static setSuite(suite: string): void {
     const metadata = this.getMetadata() ?? {};

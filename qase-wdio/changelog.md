@@ -1,3 +1,10 @@
+# qase-wdio@1.2.2
+
+## What's new
+
+- Added Network Profiler integration for automatic HTTP request capture during test execution.
+- Updated `qase-javascript-commons` dependency to `~2.5.6`.
+
 # qase-wdio@1.2.1
 
 ## What's new

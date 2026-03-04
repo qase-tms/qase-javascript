@@ -11,6 +11,7 @@ import {
   generateSignature,
   QaseReporter,
   ReporterInterface,
+  StepRequestData,
   StepStatusEnum,
   StepType,
   TestResultType,
@@ -431,6 +432,28 @@ export class CypressQaseReporter extends reporters.Base {
             projectMapping[code] = [...(projectMapping[code] ?? []), ...idsFromTag];
           }
         }
+      }
+    }
+
+    // Convert network profiler requests to REQUEST steps
+    if (metadata?.networkRequests && metadata.networkRequests.length > 0) {
+      for (const req of metadata.networkRequests) {
+        const step = new TestStepType(StepType.REQUEST);
+        step.id = uuidv4();
+        const data = step.data as StepRequestData;
+        data.request_method = req.method;
+        data.request_url = req.url;
+        data.request_headers = null;
+        data.request_body = null;
+        data.status_code = req.statusCode;
+        data.response_body = req.responseBody;
+        data.response_headers = null;
+        step.execution.status = req.statusCode !== null && req.statusCode >= 400
+          ? StepStatusEnum.failed
+          : StepStatusEnum.passed;
+        step.execution.start_time = req.startTime / 1000;
+        step.execution.duration = req.duration;
+        steps.push(step);
       }
     }
 

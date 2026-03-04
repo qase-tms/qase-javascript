@@ -1,3 +1,10 @@
+# playwright-qase-reporter@2.2.2
+
+## What's new
+
+- Added Network Profiler integration for automatic HTTP request capture during test execution.
+- Updated `qase-javascript-commons` dependency to `~2.5.6`.
+
 # playwright-qase-reporter@2.2.1
 
 ## What's new
