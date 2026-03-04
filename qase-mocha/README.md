@@ -15,6 +15,7 @@ Qase Mocha Reporter enables seamless integration between your Mocha tests and [Q
 - Flexible configuration (file, environment variables, Mocha config)
 - Parallel execution support
 - Extra reporters support (spec, json, etc.)
+- Network Profiler for automatic HTTP request capture
 
 ## Installation
 
@@ -256,6 +257,30 @@ QASE_MODE=testops npx mocha --reporter mocha-qase-reporter --reporter-options ex
 ```
 
 For detailed configuration options and examples, see the [Extra Reporters section](docs/usage.md#using-extra-reporters) in the usage guide.
+
+## Network Profiler
+
+The Network Profiler automatically captures outgoing HTTP requests made during test execution and reports them as REQUEST-type steps in Qase TestOps.
+
+**Enable in `qase.config.json`:**
+
+```json
+{
+  "profilers": ["network"],
+  "networkProfiler": {
+    "skip_domains": ["analytics.example.com"],
+    "track_on_fail": true
+  }
+}
+```
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `profilers` | Array of profilers to enable. Use `["network"]` for HTTP capture | `[]` |
+| `networkProfiler.skip_domains` | Domains to exclude from profiling | `[]` |
+| `networkProfiler.track_on_fail` | Capture response body for failed requests (status >= 400) | `true` |
+
+> Requests to `qase.io` are always excluded automatically.
 
 ## Requirements
 

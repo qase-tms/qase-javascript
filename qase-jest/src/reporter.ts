@@ -10,6 +10,7 @@ import {
   ConfigLoader,
   ConfigType,
   generateSignature,
+  NetworkProfiler,
   QaseReporter,
   Relation,
   ReporterInterface,
@@ -67,6 +68,18 @@ export class JestQaseReporter implements Reporter {
   private reporter: ReporterInterface;
 
   /**
+   * @type {NetworkProfiler | null}
+   * @private
+   */
+  private profiler: NetworkProfiler | null = null;
+
+  /**
+   * Snapshot of fallback accumulator length — used for per-test step delta in --runInBand mode.
+   * @private
+   */
+  private _profilerStepSnapshot = 0;
+
+  /**
    * @type {Metadata}
    * @private
    */
@@ -85,13 +98,21 @@ export class JestQaseReporter implements Reporter {
     configLoader = new ConfigLoader(),
   ) {
     const config = configLoader.load();
+    const composedOptions = composeOptions(options, config);
 
     this.reporter = QaseReporter.getInstance({
-      ...composeOptions(options, config),
+      ...composedOptions,
       frameworkPackage: 'jest',
       frameworkName: 'jest',
       reporterName: 'jest-qase-reporter',
     });
+
+    if (composedOptions.profilers?.includes('network')) {
+      this.profiler = new NetworkProfiler({
+        skipDomains: composedOptions.networkProfiler?.skip_domains,
+        trackOnFail: composedOptions.networkProfiler?.track_on_fail,
+      });
+    }
 
     // @ts-expect-error - global.Qase is dynamically added at runtime
     global.Qase = new Qase(this);
@@ -103,6 +124,8 @@ export class JestQaseReporter implements Reporter {
    */
   public onRunStart() {
     this.reporter.startTestRun();
+    // Enable profiler in main process for --runInBand mode
+    this.profiler?.enable();
   }
 
   public onTestCaseResult(
@@ -163,6 +186,17 @@ export class JestQaseReporter implements Reporter {
 
     this.cleanMetadata();
 
+    // Collect profiler steps for --runInBand mode (reporter and tests share same process)
+    // In multi-worker mode, the reporter's profiler has no captured steps (different process).
+    if (this.profiler) {
+      const allSteps = this.profiler.getAllSteps();
+      const newSteps = allSteps.slice(this._profilerStepSnapshot);
+      this._profilerStepSnapshot = allSteps.length;
+      if (newSteps.length > 0) {
+        result.steps = [...result.steps, ...newSteps];
+      }
+    }
+
     void this.reporter.addTestResult(result);
   }
 
@@ -194,6 +228,7 @@ export class JestQaseReporter implements Reporter {
    * @see {Reporter.onRunComplete}
    */
   public onRunComplete() {
+    this.profiler?.restore();
     void this.reporter.publish();
   }
 

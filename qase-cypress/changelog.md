@@ -1,3 +1,10 @@
+# cypress-qase-reporter@3.2.1
+
+## What's new
+
+- Added Network Profiler integration for automatic HTTP request capture during test execution.
+- Updated `qase-javascript-commons` dependency to `~2.5.6`.
+
 # cypress-qase-reporter@3.2.0
 
 ## What's new

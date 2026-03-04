@@ -1,5 +1,5 @@
 const WDIOQaseReporter = require('wdio-qase-reporter').default;
-const { afterRunHook, beforeRunHook } = require('wdio-qase-reporter');
+const { afterRunHook, beforeRunHook, QaseWdioService } = require('wdio-qase-reporter');
 
 exports.config = {
   runner: 'local',
@@ -27,6 +27,7 @@ exports.config = {
       },
     ],
   ],
+  services: [[QaseWdioService, {}]],
   framework: 'mocha',
   mochaOpts: {
     ui: 'bdd',

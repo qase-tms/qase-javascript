@@ -30,7 +30,8 @@
     "qase-mocha",
     "qase-wdio",
     "qase-vitest",
-    "./examples/*"
+    "./examples/single/*",
+    "./examples/multiProject/*"
   ],
   "devDependencies": {
     "@jest/globals": "^29.7.0",

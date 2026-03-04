@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   ConfigLoader,
   ConfigType,
+  NetworkProfiler,
   QaseReporter,
   ReporterInterface,
   TestStatusEnum,
@@ -148,6 +149,8 @@ export class TestcafeQaseReporter {
   private steps: TestStepType[] = [];
   private attachments: Attachment[] = [];
   private testBeginTime: number = Date.now();
+  private profiler: NetworkProfiler | null = null;
+  private _profilerStepSnapshot = 0;
 
   /**
    * @param {TestcafeQaseOptionsType} options
@@ -159,12 +162,21 @@ export class TestcafeQaseReporter {
   ) {
     const config = configLoader.load();
 
+    const composedOptions = composeOptions(options, config);
     this.reporter = QaseReporter.getInstance({
-      ...composeOptions(options, config),
+      ...composedOptions,
       frameworkPackage: 'testcafe',
       frameworkName: 'testcafe',
       reporterName: 'testcafe-reporter-qase',
     });
+
+    if (composedOptions.profilers?.includes('network')) {
+      this.profiler = new NetworkProfiler({
+        skipDomains: composedOptions.networkProfiler?.skip_domains,
+        trackOnFail: composedOptions.networkProfiler?.track_on_fail,
+      });
+      this.profiler.enable();
+    }
 
     // @ts-expect-error - global.Qase is dynamically added at runtime
     global.Qase = new Qase(this);
@@ -189,6 +201,7 @@ export class TestcafeQaseReporter {
     this.steps = [];
     this.attachments = [];
     this.testBeginTime = Date.now();
+    this._profilerStepSnapshot = this.profiler?.getAllSteps().length ?? 0;
   };
 
   /**
@@ -223,6 +236,13 @@ export class TestcafeQaseReporter {
 
     attachments.push(...this.attachments);
 
+    let profilerSteps: TestStepType[] = [];
+    if (this.profiler) {
+      const allSteps = this.profiler.getAllSteps();
+      profilerSteps = allSteps.slice(this._profilerStepSnapshot);
+      this._profilerStepSnapshot = 0;
+    }
+
     const projectMapping = metadata[metadataEnum.projects];
     const result = {
       author: null,
@@ -256,7 +276,7 @@ export class TestcafeQaseReporter {
       },
       run_id: null,
       signature: this.getSignature(testRunInfo.fixture, title, metadata[metadataEnum.id], metadata[metadataEnum.parameters]),
-      steps: this.steps,
+      steps: [...this.steps, ...profilerSteps],
       id: uuidv4(),
       testops_id: metadata[metadataEnum.id].length > 0 ? metadata[metadataEnum.id] : null,
       title: metadata[metadataEnum.title] != undefined ? metadata[metadataEnum.title] : title,
@@ -271,6 +291,7 @@ export class TestcafeQaseReporter {
    * @returns {Promise<void>}
    */
   public reportTaskDone = async (): Promise<void> => {
+    this.profiler?.restore();
     await this.reporter.publish();
   };
 

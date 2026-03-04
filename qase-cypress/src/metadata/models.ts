@@ -1,5 +1,15 @@
 import { Attachment } from 'qase-javascript-commons';
 
+export interface NetworkRequestData {
+  method: string;
+  url: string;
+  statusCode: number | null;
+  duration: number;
+  responseBody: string | null;
+  startTime: number;
+}
+
+
 export interface Metadata {
   title?: string | undefined;
   fields?: Record<string, string>;
@@ -14,6 +24,7 @@ export interface Metadata {
   firstStepName?: string | undefined;
   attachments?: Attachment[];
   stepAttachments?: Record<string, Attachment[]>;
+  networkRequests?: NetworkRequestData[];
 }
 
 export interface StepStart {

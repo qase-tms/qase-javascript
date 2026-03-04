@@ -6,6 +6,7 @@ export * from './models';
 export * from './options';
 export * from './reporters';
 export * from './writer';
+export * from './profilers';
 
 export * from './utils/get-package-version';
 export * from './utils/mimeTypes';

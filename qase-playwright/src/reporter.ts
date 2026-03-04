@@ -20,6 +20,8 @@ import {
   parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
 import { MetadataMessage, ReporterContentType } from './playwright';
+// Duplicated from fixture.ts to avoid importing @playwright/test in reporter context
+const PROFILER_CONTENT_TYPE = 'application/qase.profiler-steps+json';
 import { ReporterOptionsType } from './options';
 
 type ArrayItemType<T> = T extends (infer R)[] ? R : never;
@@ -157,6 +159,12 @@ export class PlaywrightQaseReporter implements Reporter {
           metadata.groupParams = message.groupParams;
         }
 
+        continue;
+      }
+
+      if (attachment.contentType === PROFILER_CONTENT_TYPE) {
+        // Profiler steps attachment — skip adding to test attachments
+        // Will be processed separately in onTestEnd
         continue;
       }
 
@@ -490,6 +498,19 @@ export class PlaywrightQaseReporter implements Reporter {
 
       if (result.stderr.length > 0) {
         testResult.attachments.push(this.convertLogsToAttachments(result.stderr, 'stderr.log'));
+      }
+    }
+
+    // Merge profiler steps from fixture attachment
+    const profilerAttachment = result.attachments.find(
+      (a) => a.contentType === PROFILER_CONTENT_TYPE
+    );
+    if (profilerAttachment?.body) {
+      try {
+        const profilerSteps = JSON.parse(profilerAttachment.body.toString()) as TestStepType[];
+        testResult.steps = [...testResult.steps, ...profilerSteps];
+      } catch {
+        // Silent failure — corrupted profiler data should not affect test results
       }
     }
 

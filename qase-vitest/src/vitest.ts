@@ -168,7 +168,7 @@ const createQaseWrapper = (annotate: AnnotateFunction): QaseWrapper => {
       try {
         const runningStep = new QaseStep(stepName);
         await runningStep.run(body, async (step) => {
-          const stepName = 'action' in step.data ? step.data.action : step.data.name;
+          const stepName = 'action' in step.data ? step.data.action : 'name' in step.data ? step.data.name : `${step.data.request_method} ${step.data.request_url}`;
           await annotate(`Qase Step: ${stepName}`, { type: 'qase-step', body: stepName });
         });
         await annotate(`Qase Step End: ${stepName}`, { type: 'qase-step-end', body: stepName });

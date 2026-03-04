@@ -13,6 +13,7 @@ Qase Jest Reporter enables seamless integration between your Jest tests and [Qas
 - Support for parameterized tests
 - Multi-project reporting support
 - Flexible configuration (file, environment variables, Jest config)
+- Network Profiler for automatic HTTP request capture
 
 ## Installation
 
@@ -208,6 +209,30 @@ QASE_MODE=testops npx jest --testPathPattern="auth"
 # Run with custom test run title
 QASE_MODE=testops QASE_TESTOPS_RUN_TITLE="Nightly Regression" npx jest
 ```
+
+## Network Profiler
+
+The Network Profiler automatically captures outgoing HTTP requests made during test execution and reports them as REQUEST-type steps in Qase TestOps.
+
+**Enable in `qase.config.json`:**
+
+```json
+{
+  "profilers": ["network"],
+  "networkProfiler": {
+    "skip_domains": ["analytics.example.com"],
+    "track_on_fail": true
+  }
+}
+```
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `profilers` | Array of profilers to enable. Use `["network"]` for HTTP capture | `[]` |
+| `networkProfiler.skip_domains` | Domains to exclude from profiling | `[]` |
+| `networkProfiler.track_on_fail` | Capture response body for failed requests (status >= 400) | `true` |
+
+> Requests to `qase.io` are always excluded automatically.
 
 ## Requirements
 

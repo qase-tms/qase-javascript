@@ -1,6 +1,6 @@
 {
   "name": "vitest-qase-reporter",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Qase TMS Vitest Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -36,11 +36,16 @@
     "test": "jest --passWithNoTests",
     "clean": "rm -rf dist"
   },
-  "keywords": ["vitest", "qase", "reporter", "testing"],
+  "keywords": [
+    "vitest",
+    "qase",
+    "reporter",
+    "testing"
+  ],
   "author": "Qase Team <support@qase.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "qase-javascript-commons": "~2.5.4"
+    "qase-javascript-commons": "~2.5.6"
   },
   "peerDependencies": {
     "vitest": ">=3.0.0"

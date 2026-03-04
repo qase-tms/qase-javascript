@@ -209,8 +209,10 @@ export class ClientV2 extends ClientV1 {
 
         if (step.step_type === StepType.TEXT) {
             this.processTextStep(step, resultStep, testTitle);
-        } else {
+        } else if (step.step_type === StepType.GHERKIN) {
             this.processGherkinStep(step, resultStep);
+        } else if (step.step_type === StepType.REQUEST) {
+            this.processRequestStep(step, resultStep);
         }
 
         if (step.steps.length > 0) {
@@ -261,6 +263,15 @@ export class ClientV2 extends ClientV1 {
         const stepData = step.data;
         resultStep.data.action = stepData.keyword;
     }
+
+    private processRequestStep(step: TestStepType, resultStep: ResultStep): void {
+        if (!('request_method' in step.data) || !resultStep.data) {
+            return;
+        }
+        const stepData = step.data;
+        resultStep.data.action = `${stepData.request_method} ${stepData.request_url}`;
+    }
+
 
     private getExecution(exec: TestExecution): ResultExecution {
         return {

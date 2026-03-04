@@ -12,6 +12,7 @@ import {
   Attachment,
   CompoundError,
   generateSignature,
+  NetworkProfiler,
   Relation,
   StepStatusEnum,
   StepType,
@@ -38,6 +39,22 @@ const qaseSuiteRegExp = /^@[Qq]ase[Ss]uite=(.+)$/;
 const qaseIgnoreRegExp = /^@[Qq]ase[Ii][Gg][Nn][Oo][Rr][Ee]$/;
 
 export class Storage {
+  /**
+   * @type {NetworkProfiler | null}
+   * @private
+   */
+  private profiler: NetworkProfiler | null;
+
+  /**
+   * @type {Record<string, number>}
+   * @private
+   */
+  private profilerStepSnapshots: Record<string, number> = {};
+
+  constructor(profiler: NetworkProfiler | null = null) {
+    this.profiler = profiler;
+  }
+
   /**
    * @type {Record<string, Pickle>}
    * @private
@@ -187,6 +204,9 @@ export class Storage {
       testCaseStarted;
     this.testCaseStartedResult[testCaseStarted.id] =
       TestStatusEnum.passed;
+    if (this.profiler) {
+      this.profilerStepSnapshots[testCaseStarted.id] = this.profiler.getAllSteps().length;
+    }
   }
 
   /**
@@ -304,6 +324,15 @@ export class Storage {
 
     const steps = this.convertSteps(pickle.steps, tc);
 
+    // Collect profiler steps since this test case started
+    let profilerSteps: TestStepType[] = [];
+    if (this.profiler) {
+      const snapshot = this.profilerStepSnapshots[testCase.testCaseStartedId] ?? 0;
+      const allSteps = this.profiler.getAllSteps();
+      profilerSteps = allSteps.slice(snapshot);
+      delete this.profilerStepSnapshots[testCase.testCaseStartedId];
+    }
+
     const hasProjectMapping = Object.keys(metadata.projectMapping).length > 0;
     const result = {
       attachments: this.attachments[testCase.testCaseStartedId] ?? [],
@@ -324,7 +353,7 @@ export class Storage {
       relations: relations,
       run_id: null,
       signature: this.getSignature(pickle, metadata.ids, params),
-      steps: steps,
+      steps: [...steps, ...profilerSteps],
       testops_id: metadata.ids.length > 0 ? metadata.ids : null,
       testops_project_mapping: hasProjectMapping ? metadata.projectMapping : null,
       id: tcs.id,
