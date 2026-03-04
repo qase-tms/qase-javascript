@@ -33,6 +33,10 @@
     "./examples/single/*",
     "./examples/multiProject/*"
   ],
+  "overrides": {
+    "rollup": "4.59.0",
+    "lodash": "4.17.23"
+  },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "@types/jest": "^29.5.14",

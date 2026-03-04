@@ -6,7 +6,7 @@
     "test:data": "QASE_MODE=${QASE_MODE:-off} newman run ./api-collection.json -r qase -d data.json"
   },
   "devDependencies": {
-    "newman": "^6.2.1",
+    "newman": "^6.2.2",
     "newman-reporter-qase": "^2.2.0"
   }
 }
