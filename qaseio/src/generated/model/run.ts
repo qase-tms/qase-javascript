@@ -33,6 +33,12 @@ export interface Run {
     'id'?: number;
     /**
      * 
+     * @type {number}
+     * @memberof Run
+     */
+    'run_id'?: number;
+    /**
+     * 
      * @type {string}
      * @memberof Run
      */
@@ -115,5 +121,11 @@ export interface Run {
      * @memberof Run
      */
     'cases'?: Array<number>;
+    /**
+     * 
+     * @type {number}
+     * @memberof Run
+     */
+    'plan_id'?: number | null;
 }
 

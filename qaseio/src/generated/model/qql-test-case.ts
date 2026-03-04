@@ -30,6 +30,12 @@ export interface QqlTestCase {
      * @type {number}
      * @memberof QqlTestCase
      */
+    'test_case_id': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QqlTestCase
+     */
     'id'?: number;
     /**
      * 

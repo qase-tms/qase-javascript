@@ -7,10 +7,10 @@ import { TestResultType, Attachment, Report } from '../models';
 import { FormatterInterface, JsonFormatter, JsonpFormatter } from '../formatter';
 import { FormatEnum } from './driver-enum';
 
-export type FsWriterOptionsType = {
+export interface FsWriterOptionsType {
   path?: string | undefined;
-  format?: `${FormatEnum}` | undefined;
-};
+  format?: FormatEnum | undefined;
+}
 
 /**
  * @class FsWriter
@@ -18,7 +18,7 @@ export type FsWriterOptionsType = {
  */
 export class FsWriter implements WriterInterface {
   private readonly path: string;
-  private readonly format: string;
+  private readonly format: FormatEnum;
   private formatter: FormatterInterface;
 
   /**
@@ -74,7 +74,7 @@ export class FsWriter implements WriterInterface {
         continue;
       }
 
-      writeFileSync(filePath, attachment.content);
+      writeFileSync(filePath, attachment.content as string | NodeJS.ArrayBufferView);
       attachment.file_path = filePath;
     }
 
@@ -92,7 +92,7 @@ export class FsWriter implements WriterInterface {
     } catch (error) {/* ignore */
     }
 
-    const filePath = path.join(this.path, `report.${this.format}`);
+    const filePath = path.join(this.path, `run.${this.format}`);
 
     writeFileSync(filePath, await this.formatter.format(results));
 

@@ -10,24 +10,51 @@ import {
 } from '@cucumber/messages';
 import {
   Attachment,
+  CompoundError,
+  generateSignature,
+  NetworkProfiler,
   Relation,
   StepStatusEnum,
   StepType,
   TestResultType,
   TestStatusEnum,
   TestStepType,
+  determineTestStatus,
+  parseProjectMappingFromTags,
 } from 'qase-javascript-commons';
 import { TestCase } from '@cucumber/messages/dist/esm/src/messages';
 import { Status } from '@cucumber/cucumber';
+import { v4 as uuidv4 } from 'uuid';
+import { ScenarioData, TestMetadata } from './models';
 
 type TestStepResultStatus = (typeof Status)[keyof typeof Status];
 
-const qaseIdRegExp = /^@[Qq]-?(\d+)$/g;
-const newQaseIdRegExp = /^@[Qq]ase[Ii][Dd]=(\d+)$/g;
-const qaseTitleRegExp = /^@[Qq]ase[Tt]itle=(.+)$/g;
-const qaseFieldsRegExp = /^@[Qq]ase[Ff]ields:(.+?)=(.+)$/g;
+const qaseIdRegExp = /^@[Qq]-?(\d+)$/;
+const newQaseIdRegExp = /^@[Qq]ase[Ii][Dd]=(\d+(?:,\s*\d+)*)$/;
+const qaseTitleRegExp = /^@[Qq]ase[Tt]itle=(.+)$/;
+const qaseFieldsRegExp = /^@[Qq]ase[Ff]ields=(.+)$/;
+const qaseParametersRegExp = /^@[Qq]ase[Pp]arameters=(.+)$/;
+const qaseGroupParametersRegExp = /^@[Qq]ase[Gg]roup[Pp]arameters=(.+)$/;
+const qaseSuiteRegExp = /^@[Qq]ase[Ss]uite=(.+)$/;
+const qaseIgnoreRegExp = /^@[Qq]ase[Ii][Gg][Nn][Oo][Rr][Ee]$/;
 
 export class Storage {
+  /**
+   * @type {NetworkProfiler | null}
+   * @private
+   */
+  private profiler: NetworkProfiler | null;
+
+  /**
+   * @type {Record<string, number>}
+   * @private
+   */
+  private profilerStepSnapshots: Record<string, number> = {};
+
+  constructor(profiler: NetworkProfiler | null = null) {
+    this.profiler = profiler;
+  }
+
   /**
    * @type {Record<string, Pickle>}
    * @private
@@ -68,7 +95,7 @@ export class Storage {
    * @type {Record<string, string>}
    * @private
    */
-  private scenarios: Record<string, string> = {};
+  private scenarios: Record<string, ScenarioData> = {};
 
   /**
    * @type {Record<string, string>}
@@ -94,7 +121,31 @@ export class Storage {
 
       children.forEach(({ scenario }) => {
         if (scenario) {
-          this.scenarios[scenario.id] = name;
+          const parameters: Record<string, Record<string, string>> = {};
+          
+          scenario.examples?.forEach((example) => {
+            if (example.tableHeader && example.tableBody) {
+              const columnNames = example.tableHeader.cells.map(cell => cell.value);
+              
+              example.tableBody.forEach((row) => {
+                const rowParams: Record<string, string> = {};
+                
+                row.cells.forEach((cell, index) => {
+                  const columnName = columnNames[index];
+                  if (columnName) {
+                    rowParams[columnName] = cell.value;
+                  }
+                });
+                
+                parameters[row.id] = rowParams;
+              });
+            }
+          });
+
+          this.scenarios[scenario.id] = {
+            name: name,
+            parameters: parameters,
+          };
         }
       });
     }
@@ -105,18 +156,33 @@ export class Storage {
    * @param {Attach} attachment
    */
   public addAttachment(attachment: Attach): void {
-    if (attachment.testCaseStartedId && attachment.fileName) {
+    if (attachment.testStepId) {
+      if (!this.attachments[attachment.testStepId]) {
+        this.attachments[attachment.testStepId] = [];
+      }
+
+      this.attachments[attachment.testStepId]?.push({
+        file_name: this.getFileNameFromMediaType(attachment.mediaType),
+        mime_type: attachment.mediaType,
+        file_path: null,
+        content: attachment.body,
+        size: 0,
+        id: uuidv4(),
+      });
+    }
+
+    if (attachment.testCaseStartedId) {
       if (!this.attachments[attachment.testCaseStartedId]) {
         this.attachments[attachment.testCaseStartedId] = [];
       }
 
       this.attachments[attachment.testCaseStartedId]?.push({
-        file_name: attachment.fileName,
+        file_name: this.getFileNameFromMediaType(attachment.mediaType),
         mime_type: attachment.mediaType,
         file_path: null,
         content: attachment.body,
         size: 0,
-        id: attachment.fileName,
+        id: uuidv4(),
       });
     }
   }
@@ -138,6 +204,9 @@ export class Storage {
       testCaseStarted;
     this.testCaseStartedResult[testCaseStarted.id] =
       TestStatusEnum.passed;
+    if (this.profiler) {
+      this.profilerStepSnapshots[testCaseStarted.id] = this.profiler.getAllSteps().length;
+    }
   }
 
   /**
@@ -146,7 +215,15 @@ export class Storage {
    */
   public addTestCaseStep(testCaseStep: TestStepFinished): void {
     const oldStatus = this.testCaseStartedResult[testCaseStep.testCaseStartedId];
-    const newStatus = Storage.statusMap[testCaseStep.testStepResult.status];
+    
+    // Create error object for status determination
+    let error: Error | null = null;
+    if (testCaseStep.testStepResult.message) {
+      error = new Error(testCaseStep.testStepResult.message);
+    }
+    
+    // Determine status based on error type
+    const newStatus = determineTestStatus(error, Storage.statusMap[testCaseStep.testStepResult.status]);
 
     this.testCaseSteps[testCaseStep.testStepId] = testCaseStep;
 
@@ -161,7 +238,7 @@ export class Storage {
       }
 
       if (oldStatus) {
-        if (oldStatus !== TestStatusEnum.failed) {
+        if (oldStatus !== TestStatusEnum.failed && oldStatus !== TestStatusEnum.invalid) {
           this.testCaseStartedResult[testCaseStep.testCaseStartedId] = newStatus;
         }
       } else {
@@ -195,19 +272,36 @@ export class Storage {
       return undefined;
     }
 
-    let error: Error | undefined;
+    const metadata = this.parseTags(pickle.tags);
 
-    if (this.testCaseStartedErrors[tcs.id]?.length) {
-      error = new Error(this.testCaseStartedErrors[tcs.id]?.join('\n\n'));
+    if (metadata.isIgnore) {
+      return undefined;
     }
+
+    const error = this.getError(tcs.id);
+
     let relations: Relation | null = null;
-    const nodeId = pickle.astNodeIds[pickle.astNodeIds.length - 1];
-    if (nodeId != undefined && this.scenarios[nodeId] != undefined) {
+    let params: Record<string, string> = {};
+    const nodeId = pickle.astNodeIds[0];
+    
+    // If suite is specified in metadata, use it (split by tab for sub-suites)
+    if (metadata.suite) {
+      const suiteParts = metadata.suite.split('\t').filter(part => part.trim().length > 0);
+      relations = {
+        suite: {
+          data: suiteParts.map((suite) => ({
+            title: suite.trim(),
+            public_id: null,
+          })),
+        },
+      };
+    } else if (nodeId != undefined && this.scenarios[nodeId] != undefined) {
+      // Otherwise, use feature name as suite
       relations = {
         suite: {
           data: [
             {
-              title: this.scenarios[nodeId] ?? '',
+              title: this.scenarios[nodeId]?.name ?? '',
               public_id: null,
             },
           ],
@@ -215,31 +309,57 @@ export class Storage {
       };
     }
 
-    const metadata = this.parseTags(pickle.tags);
+    // Extract parameters from Gherkin examples
+    if (nodeId != undefined && this.scenarios[nodeId] != undefined) {
+      for (const id of pickle.astNodeIds) {
+        if (this.scenarios[nodeId]?.parameters[id] != undefined) {
+          params = { ...params, ...this.scenarios[nodeId]?.parameters[id] };
+        }
+      }
+    }
 
-    return {
-      attachments: [],
+    // Merge parameters from tags with parameters from Gherkin examples
+    // Parameters from tags take precedence over Gherkin examples
+    params = { ...params, ...metadata.parameters };
+
+    const steps = this.convertSteps(pickle.steps, tc);
+
+    // Collect profiler steps since this test case started
+    let profilerSteps: TestStepType[] = [];
+    if (this.profiler) {
+      const snapshot = this.profilerStepSnapshots[testCase.testCaseStartedId] ?? 0;
+      const allSteps = this.profiler.getAllSteps();
+      profilerSteps = allSteps.slice(snapshot);
+      delete this.profilerStepSnapshots[testCase.testCaseStartedId];
+    }
+
+    const hasProjectMapping = Object.keys(metadata.projectMapping).length > 0;
+    const result = {
+      attachments: this.attachments[testCase.testCaseStartedId] ?? [],
       author: null,
       execution: {
         status: this.testCaseStartedResult[testCase.testCaseStartedId] ?? TestStatusEnum.passed,
-        start_time: null,
-        end_time: null,
-        duration: Math.abs(testCase.timestamp.seconds - tcs.timestamp.seconds),
-        stacktrace: error?.stack ?? null,
+        start_time: tcs.timestamp.seconds,
+        end_time: testCase.timestamp.seconds,
+        duration: Math.abs(testCase.timestamp.seconds - tcs.timestamp.seconds) * 1000,
+        stacktrace: error?.stacktrace ?? null,
         thread: null,
       },
       fields: metadata.fields,
-      message: null,
+      message: error?.message ?? null,
       muted: false,
-      params: {},
+      params: params,
+      group_params: metadata.group_params,
       relations: relations,
       run_id: null,
-      signature: '',
-      steps: this.convertSteps(pickle.steps, tc),
+      signature: this.getSignature(pickle, metadata.ids, params),
+      steps: [...steps, ...profilerSteps],
       testops_id: metadata.ids.length > 0 ? metadata.ids : null,
+      testops_project_mapping: hasProjectMapping ? metadata.projectMapping : null,
       id: tcs.id,
       title: metadata.title ?? pickle.name,
-    };
+    } as unknown as TestResultType;
+    return result;
   }
 
   /**
@@ -276,9 +396,9 @@ export class Storage {
             status: Storage.stepStatusMap[finished.testStepResult.status],
             start_time: null,
             end_time: null,
-            duration: finished.testStepResult.duration.seconds,
+            duration: finished.testStepResult.duration.seconds * 1000,
           },
-          attachments: [],
+          attachments: this.attachments[s.id] ?? [],
           steps: [],
           parent_id: null,
         }
@@ -297,7 +417,7 @@ export class Storage {
     [Status.PASSED]: TestStatusEnum.passed,
     [Status.FAILED]: TestStatusEnum.failed,
     [Status.SKIPPED]: TestStatusEnum.skipped,
-    [Status.AMBIGUOUS]: TestStatusEnum.failed,
+    [Status.AMBIGUOUS]: TestStatusEnum.invalid,
     [Status.PENDING]: TestStatusEnum.skipped,
     [Status.UNDEFINED]: TestStatusEnum.skipped,
     [Status.UNKNOWN]: TestStatusEnum.skipped,
@@ -317,10 +437,18 @@ export class Storage {
   };
 
   private parseTags(tags: readonly PickleTag[]): TestMetadata {
+    const tagNames = tags.map((t) => t.name);
+    const { legacyIds, projectMapping } = parseProjectMappingFromTags(tagNames);
+
     const metadata: TestMetadata = {
-      ids: [],
+      ids: [...legacyIds],
+      projectMapping: { ...projectMapping },
       fields: {},
       title: null,
+      isIgnore: false,
+      parameters: {},
+      group_params: {},
+      suite: null,
     };
 
     for (const tag of tags) {
@@ -330,7 +458,8 @@ export class Storage {
       }
 
       if (newQaseIdRegExp.test(tag.name)) {
-        metadata.ids.push(Number(tag.name.replace(/^@[Qq]ase[Ii][Dd]=/, '')));
+        const idsStr = tag.name.replace(/^@[Qq]ase[Ii][Dd]=/, '');
+        metadata.ids.push(...idsStr.split(',').map((s) => Number(s.trim())));
         continue;
       }
 
@@ -340,17 +469,117 @@ export class Storage {
       }
 
       if (qaseFieldsRegExp.test(tag.name)) {
-        const value = tag.name.replace(/^@[Qq]ase[Ff]ields:/, '');
+        const value = tag.name.replace(/^@[Qq]ase[Ff]ields=/, '');
         try {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const record: Record<string, string> = JSON.parse(value);
+          const record: Record<string, string> = JSON.parse(this.normalizeJsonString(value));
           metadata.fields = { ...metadata.fields, ...record };
         } catch (e) {
           // do nothing
         }
       }
+
+      if (qaseParametersRegExp.test(tag.name)) {
+        const value = tag.name.replace(/^@[Qq]ase[Pp]arameters=/, '');
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const record: Record<string, string> = JSON.parse(this.normalizeJsonString(value));
+          metadata.parameters = { ...metadata.parameters, ...record };
+        } catch (e) {
+          // do nothing
+        }
+      }
+
+      if (qaseGroupParametersRegExp.test(tag.name)) {
+        const value = tag.name.replace(/^@[Qq]ase[Gg]roup[Pp]arameters=/, '');
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const record: Record<string, string> = JSON.parse(this.normalizeJsonString(value));
+          metadata.group_params = { ...metadata.group_params, ...record };
+        } catch (e) {
+          // do nothing
+        }
+      }
+
+      if (qaseSuiteRegExp.test(tag.name)) {
+        metadata.suite = tag.name.replace(/^@[Qq]ase[Ss]uite=/, '');
+        continue;
+      }
+
+      if (qaseIgnoreRegExp.test(tag.name)) {
+        metadata.isIgnore = true;
+      }
     }
 
     return metadata;
+  }
+
+  /**
+   * @param {Pickle} pickle
+   * @param {number[]} ids
+   * @param {Record<string, string>} parameters
+   * @private
+   */
+  private getSignature(pickle: Pickle, ids: number[], parameters: Record<string, string> = {}): string {
+    return generateSignature(ids, [...pickle.uri.split('/'), pickle.name], parameters);
+  }
+
+  private getError(testCaseId: string): CompoundError | undefined {
+    const testErrors = this.testCaseStartedErrors[testCaseId];
+
+    if (!testErrors) {
+      return undefined;
+    }
+
+    const error = new CompoundError();
+    testErrors.forEach((message) => {
+      error.addMessage(message);
+      error.addStacktrace(message);
+    });
+
+    return error;
+  }
+
+  /**
+   * Normalize JSON string by converting single quotes to double quotes
+   * This allows parsing JSON-like strings with single quotes
+   * @param {string} jsonString
+   * @returns {string}
+   * @private
+   */
+  private normalizeJsonString(jsonString: string): string {
+    // If the string contains single quotes, convert them to double quotes
+    // This handles cases like {'key':'value'} which should be {"key":"value"}
+    if (jsonString.includes("'")) {
+      return jsonString.replace(/'/g, '"');
+    }
+    // If no single quotes, return as-is (already valid JSON or will fail with proper error)
+    return jsonString;
+  }
+
+  private getFileNameFromMediaType(mediaType: string): string {
+    const extensions: Record<string, string> = {
+      'text/plain': 'txt',
+      'application/json': 'json',
+      'image/png': 'png',
+      'image/jpeg': 'jpg',
+      'image/gif': 'gif',
+      'text/html': 'html',
+      'application/pdf': 'pdf',
+      'application/xml': 'xml',
+      'application/zip': 'zip',
+      'application/msword': 'doc',
+      'application/vnd.ms-excel': 'xls',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
+    };
+
+    const extension = extensions[mediaType];
+
+    if (extension) {
+      return `file.${extension}`;
+    } else {
+      return 'file';
+    }
   }
 }

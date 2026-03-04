@@ -8,6 +8,7 @@
     "noImplicitAny": true,
     "noEmit": true,
     "noEmitOnError": true,
+    "isolatedModules": true,
 
     "typeRoots": ["node_modules/@types"]
   },

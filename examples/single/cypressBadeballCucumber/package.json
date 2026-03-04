@@ -1,0 +1,20 @@
+{
+  "name": "cypress-badeball-cucumber",
+  "private": true,
+  "scripts": {
+    "test": "cypress run",
+    "test:testops": "QASE_MODE=testops cypress run"
+  },
+  "devDependencies": {
+    "@badeball/cypress-cucumber-preprocessor": "^23.2.1",
+    "@bahmutov/cypress-esbuild-preprocessor": "^2.2.7",
+    "cypress": "^15.6.0",
+    "cypress-multi-reporters": "^1.6.4",
+    "cypress-qase-reporter": "3.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "cypress-cucumber-preprocessor": "^4.3.1"
+  }
+}

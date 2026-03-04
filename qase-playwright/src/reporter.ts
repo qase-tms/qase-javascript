@@ -1,13 +1,14 @@
 import { Reporter, TestCase, TestError, TestResult, TestStatus, TestStep } from '@playwright/test/reporter';
 import { v4 as uuidv4 } from 'uuid';
-import chalk from 'chalk';
 import * as path from 'path';
 
 import {
   Attachment,
   composeOptions,
+  CompoundError,
   ConfigLoader,
   ConfigType,
+  generateSignature,
   QaseReporter,
   ReporterInterface,
   StepStatusEnum,
@@ -15,8 +16,13 @@ import {
   TestResultType,
   TestStatusEnum,
   TestStepType,
+  determineTestStatus,
+  parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
 import { MetadataMessage, ReporterContentType } from './playwright';
+// Duplicated from fixture.ts to avoid importing @playwright/test in reporter context
+const PROFILER_CONTENT_TYPE = 'application/qase.profiler-steps+json';
+import { ReporterOptionsType } from './options';
 
 type ArrayItemType<T> = T extends (infer R)[] ? R : never;
 
@@ -25,16 +31,23 @@ const logMimeType = 'text/plain';
 
 interface TestCaseMetadata {
   ids: number[];
+  /** Multi-project mapping: project code -> test case IDs. */
+  projectMapping?: Record<string, number[]>;
   title: string;
   fields: Record<string, string>;
   parameters: Record<string, string>;
+  groupParams: Record<string, string>;
   attachments: Attachment[];
   ignore: boolean;
   suite: string;
   comment: string;
 }
 
-export type PlaywrightQaseOptionsType = ConfigType;
+const defaultSteps: string[] = ['Before Hooks', 'After Hooks', 'Worker Cleanup'];
+
+export type PlaywrightQaseOptionsType = Omit<ConfigType, 'reporterOptions'> & {
+  framework: ReporterOptionsType;
+};
 
 /**
  * @class PlaywrightQaseReporter
@@ -59,18 +72,12 @@ export class PlaywrightQaseReporter implements Reporter {
   private static qaseIds: Map<string, number[]> = new Map<string, number[]>();
 
   /**
-   * @type {Map<string, number[]>}
-   * @private
-   */
-  private qaseTestWithOldAnnotation: Map<string, number[]> = new Map<string, number[]>();
-
-  /**
    * @param {TestCase} test
    * @returns {string[]}
    * @private
    */
   private static transformSuiteTitle(test: TestCase): string[] {
-    return test.titlePath().filter(Boolean);
+    return test.titlePath().filter(Boolean).map(s => s.replace(/\\/g, '/'));
   }
 
   /**
@@ -98,6 +105,7 @@ export class PlaywrightQaseReporter implements Reporter {
       title: '',
       fields: {},
       parameters: {},
+      groupParams: {},
       attachments: [],
       ignore: false,
       suite: '',
@@ -123,6 +131,10 @@ export class PlaywrightQaseReporter implements Reporter {
           metadata.ids = message.ids;
         }
 
+        if (message.projectMapping && typeof message.projectMapping === 'object') {
+          metadata.projectMapping = message.projectMapping as Record<string, number[]>;
+        }
+
         if (message.fields) {
           metadata.fields = message.fields;
         }
@@ -143,6 +155,16 @@ export class PlaywrightQaseReporter implements Reporter {
           metadata.comment = message.comment;
         }
 
+        if (message.groupParams) {
+          metadata.groupParams = message.groupParams;
+        }
+
+        continue;
+      }
+
+      if (attachment.contentType === PROFILER_CONTENT_TYPE) {
+        // Profiler steps attachment — skip adding to test attachments
+        // Will be processed separately in onTestEnd
         continue;
       }
 
@@ -210,16 +232,28 @@ export class PlaywrightQaseReporter implements Reporter {
   }
 
   /**
-   * @param {TestError} testError
+   * @param {TestError[]} testErrors
    * @returns {Error}
    * @private
    */
-  private static transformError(testError: TestError): Error {
-    const error = new Error(testError.message);
+  private static transformError(testErrors: TestError[]): CompoundError {
+    const compoundError = new CompoundError();
 
-    error.stack = testError.stack ?? '';
+    for (const error of testErrors) {
+      if (error.message == undefined) {
+        continue;
+      }
+      compoundError.addMessage(error.message);
+    }
 
-    return error;
+    for (const error of testErrors) {
+      if (error.stack == undefined) {
+        continue;
+      }
+      compoundError.addStacktrace(error.stack);
+    }
+
+    return compoundError;
   }
 
   /**
@@ -237,15 +271,22 @@ export class PlaywrightQaseReporter implements Reporter {
         continue;
       }
 
+      if (defaultSteps.includes(testStep.title) && this.checkChildrenSteps(testStep.steps)) {
+        continue;
+      }
+
       const attachments = this.stepAttachments.get(testStep);
+
+      const stepData = this.extractAndCleanStep(testStep.title);
 
       const id = uuidv4();
       const step: TestStepType = {
         id: id,
         step_type: StepType.TEXT,
         data: {
-          action: testStep.title,
-          expected_result: null,
+          action: stepData.cleanedString,
+          expected_result: stepData.expectedResult,
+          data: stepData.data,
         },
         parent_id: parentId,
         execution: {
@@ -270,6 +311,8 @@ export class PlaywrightQaseReporter implements Reporter {
    */
   private reporter: ReporterInterface;
 
+  private options: ReporterOptionsType;
+
   /**
    * @param {PlaywrightQaseOptionsType} options
    * @param {ConfigLoaderInterface} configLoader
@@ -279,9 +322,12 @@ export class PlaywrightQaseReporter implements Reporter {
     configLoader = new ConfigLoader(),
   ) {
     const config = configLoader.load();
+    const { framework, ...composedOptions } = composeOptions(options, config);
+
+    this.options = options.framework ?? {};
 
     this.reporter = QaseReporter.getInstance({
-      ...composeOptions(options, config),
+      ...composedOptions,
       frameworkPackage: '@playwright/test',
       frameworkName: 'playwright',
       reporterName: 'playwright-qase-reporter',
@@ -318,8 +364,12 @@ export class PlaywrightQaseReporter implements Reporter {
       return;
     }
 
-    const error = result.error ? PlaywrightQaseReporter.transformError(result.error) : null;
-    const suites = testCaseMetadata.suite != '' ? [testCaseMetadata.suite] : PlaywrightQaseReporter.transformSuiteTitle(test);
+    const error = result.error ? PlaywrightQaseReporter.transformError(result.errors) : null;
+
+    const extractedSuites = this.extractSuiteFromAnnotation(test.annotations);
+    let suites = extractedSuites.length > 0
+      ? extractedSuites
+      : (testCaseMetadata.suite ? [testCaseMetadata.suite] : PlaywrightQaseReporter.transformSuiteTitle(test));
 
     let message: string | null = null;
     if (testCaseMetadata.comment !== '') {
@@ -336,24 +386,91 @@ export class PlaywrightQaseReporter implements Reporter {
       message += error.message;
     }
 
-    const testResult: TestResultType = {
+    if (this.options.browser?.addAsParameter) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
+      const browser = (test as any)._projectId ?? null;
+      if (browser) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        testCaseMetadata.parameters[this.options.browser?.parameterName ?? 'browser'] = browser;
+        suites = suites.filter(suite => suite !== browser);
+      }
+    }
+
+    // if markAsFlaky is true and the test passed after retries, mark the test as flaky
+    if (this.options.markAsFlaky && result.status === 'passed' && result.retry > 0) {
+      testCaseMetadata.fields['is_flaky'] = 'true';
+    }
+
+    const titleParsed = parseProjectMappingFromTitle(test.title);
+    const testTitle = titleParsed.cleanedTitle || this.removeQaseIdsFromTitle(test.title);
+
+    const annotationProjectMapping = this.extractProjectMappingFromAnnotation(test.annotations);
+    const ids = this.extractQaseIdsFromAnnotation(test.annotations);
+
+    const hasMetadataProjectMapping = testCaseMetadata.projectMapping != null && Object.keys(testCaseMetadata.projectMapping).length > 0;
+    const hasAnnotationProjectMapping = annotationProjectMapping != null && Object.keys(annotationProjectMapping).length > 0;
+    const hasTitleProjectMapping = titleParsed.projectMapping != null && Object.keys(titleParsed.projectMapping).length > 0;
+
+    const projectMapping = hasMetadataProjectMapping
+      ? testCaseMetadata.projectMapping ?? null
+      : hasAnnotationProjectMapping
+        ? annotationProjectMapping
+        : hasTitleProjectMapping
+          ? titleParsed.projectMapping
+          : null;
+
+    const hasProjectMapping = projectMapping != null && Object.keys(projectMapping).length > 0;
+
+    let testops_id: number | number[] | null;
+    let testops_project_mapping: Record<string, number[]> | null;
+    if (hasProjectMapping) {
+      testops_project_mapping = projectMapping;
+      testops_id = null;
+    } else if (ids.length > 0) {
+      testops_id = ids.length === 1 ? ids[0]! : ids;
+      testops_project_mapping = null;
+    } else if (testCaseMetadata.ids.length > 0) {
+      testops_id = testCaseMetadata.ids.length === 1 ? testCaseMetadata.ids[0]! : testCaseMetadata.ids;
+      testops_project_mapping = null;
+    } else if (titleParsed.legacyIds.length > 0) {
+      testops_id = titleParsed.legacyIds.length === 1 ? titleParsed.legacyIds[0]! : titleParsed.legacyIds;
+      testops_project_mapping = null;
+    } else {
+      testops_id = PlaywrightQaseReporter.qaseIds.get(test.title) ?? null;
+      testops_project_mapping = null;
+    }
+
+    // Convert CompoundError to regular Error for status determination
+    let errorForStatus: Error | null = null;
+    if (error) {
+      errorForStatus = new Error(error.message || 'Test failed');
+      if (error.stacktrace) {
+        errorForStatus.stack = error.stacktrace;
+      }
+    }
+
+    const testStatus = determineTestStatus(errorForStatus, result.status);
+    const idsForSignature = testops_id == null ? null : (Array.isArray(testops_id) ? testops_id : [testops_id]);
+
+    const testResult = {
       attachments: testCaseMetadata.attachments,
       author: null,
       execution: {
-        status: PlaywrightQaseReporter.statusMap[result.status],
+        status: testStatus,
         start_time: result.startTime.valueOf() / 1000,
         end_time: null,
         duration: result.duration,
         stacktrace: error === null ?
-          null : error.stack === undefined ?
-            null : error.stack,
-        thread: result.parallelIndex.toString(),
+          null : error.stacktrace === undefined ?
+            null : error.stacktrace,
+        thread: process.ppid.toString() + '-' + result.parallelIndex.toString(),
       },
       fields: testCaseMetadata.fields,
       id: uuidv4(),
       message: message,
       muted: false,
       params: testCaseMetadata.parameters,
+      group_params: testCaseMetadata.groupParams,
       relations: {
         suite: {
           data: suites.filter((suite) => {
@@ -367,10 +484,11 @@ export class PlaywrightQaseReporter implements Reporter {
         },
       },
       run_id: null,
-      signature: suites.join(':'),
+      signature: generateSignature(idsForSignature, suites, testCaseMetadata.parameters),
       steps: this.transformSteps(result.steps, null),
-      testops_id: null,
-      title: testCaseMetadata.title === '' ? test.title : testCaseMetadata.title,
+      testops_id,
+      testops_project_mapping,
+      title: testCaseMetadata.title === '' ? testTitle : testCaseMetadata.title,
     };
 
     if (this.reporter.isCaptureLogs()) {
@@ -383,18 +501,20 @@ export class PlaywrightQaseReporter implements Reporter {
       }
     }
 
-    if (testCaseMetadata.ids.length > 0) {
-      testResult.testops_id = testCaseMetadata.ids;
-    } else {
-      const ids = PlaywrightQaseReporter.qaseIds.get(test.title) ?? null;
-      testResult.testops_id = ids;
-      if (ids) {
-        const path = `${test.location.file}:${test.location.line}:${test.location.column}`;
-        this.qaseTestWithOldAnnotation.set(path, ids);
+    // Merge profiler steps from fixture attachment
+    const profilerAttachment = result.attachments.find(
+      (a) => a.contentType === PROFILER_CONTENT_TYPE
+    );
+    if (profilerAttachment?.body) {
+      try {
+        const profilerSteps = JSON.parse(profilerAttachment.body.toString()) as TestStepType[];
+        testResult.steps = [...testResult.steps, ...profilerSteps];
+      } catch {
+        // Silent failure — corrupted profiler data should not affect test results
       }
     }
 
-    await this.reporter.addTestResult(testResult);
+    await this.reporter.addTestResult(testResult as unknown as TestResultType);
   }
 
   /**
@@ -402,14 +522,6 @@ export class PlaywrightQaseReporter implements Reporter {
    */
   public async onEnd(): Promise<void> {
     await this.reporter.publish();
-
-    if (this.qaseTestWithOldAnnotation.size > 0) {
-      console.log(chalk`{yellow qase: qase(caseId) is deprecated. Use qase.id() and qase.title() inside the test body}`);
-      console.log(chalk`{yellow The following tests are using the old annotation:}`);
-      for (const [key] of this.qaseTestWithOldAnnotation) {
-        console.log(`at ${key}`);
-      }
-    }
   }
 
   // add this method for supporting old version of qase
@@ -435,4 +547,124 @@ export class PlaywrightQaseReporter implements Reporter {
       content: content,
     } as Attachment;
   }
+
+  /**
+   * @param {string} title
+   * @returns {string}
+   * @private
+   */
+  private removeQaseIdsFromTitle(title: string): string {
+    const matches = title.match(/\(Qase ID: ([0-9,]+)\)$/i);
+    if (matches) {
+      return title.replace(matches[0], '').trimEnd();
+    }
+    return title;
+  }
+
+  /**
+   * @param annotation
+   * @returns {number[]}
+   * @private
+   */
+  private extractQaseIdsFromAnnotation(annotation: { type: string, description?: string }[]): number[] {
+    const ids: number[] = [];
+    for (const item of annotation) {
+      if (item.type.toLowerCase() === 'qaseid' && item.description) {
+        if (item.description.includes(',')) {
+          ids.push(...item.description.split(',').map((id) => parseInt(id)));
+          continue;
+        }
+
+        ids.push(parseInt(item.description));
+      }
+    }
+
+    return ids;
+  }
+
+  /**
+   * Extract multi-project mapping from annotation (type "QaseProjects", description JSON).
+   * @param annotation — e.g. [{ type: "QaseProjects", description: '{"PROJ1":[1],"PROJ2":[2]}' }]
+   */
+  private extractProjectMappingFromAnnotation(annotation: { type: string, description?: string }[]): Record<string, number[]> | null {
+    for (const item of annotation) {
+      if (item.type.toLowerCase() === 'qaseprojects' && item.description) {
+        try {
+          const parsed = JSON.parse(item.description) as Record<string, number[]>;
+          if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+            return parsed;
+          }
+        } catch {
+          // ignore invalid JSON
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * @param annotation
+   * @returns {string[]}
+   * @private
+   */
+  private extractSuiteFromAnnotation(annotation: { type: string, description?: string }[]): string[] {
+    const suites: string[] = [];
+    for (const item of annotation) {
+      if (item.type.toLowerCase() === 'qasesuite' && item.description) {
+        suites.push(item.description);
+      }
+    }
+
+    return suites;
+  }
+
+  /**
+   * @param {TestStep[]} steps
+   * @returns {boolean}
+   * @private
+   */
+  private checkChildrenSteps(steps: TestStep[]): boolean {
+    if (steps.length === 0) {
+      return true;
+    }
+
+    for (const step of steps) {
+      if (step.category === 'test.step' || step.category === 'hook') {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  private extractAndCleanStep(input: string): {
+    expectedResult: string | null;
+    data: string | null;
+    cleanedString: string
+  } {
+    let expectedResult: string | null = null;
+    let data: string | null = null;
+    let cleanedString = input;
+
+    const hasExpectedResult = input.includes('QaseExpRes:');
+    const hasData = input.includes('QaseData:');
+
+    if (hasExpectedResult || hasData) {
+      const regex = /QaseExpRes:\s*:?\s*(.*?)\s*(?=QaseData:|$)QaseData:\s*:?\s*(.*)?/;
+      const match = input.match(regex);
+
+      if (match) {
+        expectedResult = match[1]?.trim() ?? null;
+        data = match[2]?.trim() ?? null;
+
+        cleanedString = input
+          .replace(/QaseExpRes:\s*:?\s*.*?(?=QaseData:|$)/, '')
+          .replace(/QaseData:\s*:?\s*.*/, '')
+          .trim();
+      }
+    }
+
+    return { expectedResult, data, cleanedString };
+  }
+
 }

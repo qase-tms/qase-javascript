@@ -28,6 +28,12 @@ export interface DefectQuery {
      * @type {number}
      * @memberof DefectQuery
      */
+    'defect_id': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof DefectQuery
+     */
     'id'?: number;
     /**
      * 

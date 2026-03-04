@@ -1,152 +1,331 @@
-# Qase TMS Cypress reporter
+# [Qase TestOps](https://qase.io) Cypress Reporter
 
-Publish results simple and easy.
+[![License](https://lxgaming.github.io/badges/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![npm downloads](https://img.shields.io/npm/dm/cypress-qase-reporter.svg)](https://www.npmjs.com/package/cypress-qase-reporter)
 
-To install the latest version, run:
+Qase Cypress Reporter enables seamless integration between your Cypress tests and [Qase TestOps](https://qase.io), providing automatic test result reporting, test case management, and comprehensive test analytics.
+
+## Features
+
+- Link automated tests to Qase test cases by ID
+- Auto-create test cases from your test code
+- Report test results with rich metadata (fields, attachments, steps)
+- Support for parameterized tests
+- Multi-project reporting support
+- Flexible configuration (file, environment variables, Cypress config)
+- Cucumber/Gherkin integration support
+- Automatic screenshot and video attachments
+- Network Profiler for automatic HTTP request capture
+
+## Installation
 
 ```sh
-npm install -D cypress-qase-reporter
+npm install --save-dev cypress-qase-reporter
 ```
 
-## Updating from v1
+## Quick Start
 
-You can update a test project from using version 1 to version 2 in several steps:
+**1. Create `qase.config.json` in your project root:**
 
-1.  Change import paths:
+```json
+{
+  "mode": "testops",
+  "testops": {
+    "project": "YOUR_PROJECT_CODE",
+    "api": {
+      "token": "YOUR_API_TOKEN"
+    }
+  }
+}
+```
 
-    ```diff
-    - import { qase } from 'cypress-qase-reporter/dist/mocha'
-    + import { qase } from 'cypress-qase-reporter/mocha'
-    ```
+**2. Configure Cypress to use the reporter in `cypress.config.js`:**
 
-2.  Update reporter configuration in `cypress.config.js` and/or environment variables —
-    see the [configuration reference](#configuration) below.
+```javascript
+const { defineConfig } = require('cypress');
 
-## Getting started
-
-The Cypress reporter can auto-generate test cases
-and suites from your test data.
-Test results of subsequent test runs will match the same test cases
-as long as their names and file paths don't change.
-
-You can also annotate the tests with the IDs of existing test cases
-from Qase.io before executing tests. It's a more reliable way to bind
-autotests to test cases, that persists when you rename, move, or
-parameterize your tests.
-
-For example:
-
-```typescript
-import { qase } from 'cypress-qase-reporter/mocha';
-
-describe('My First Test', () => {
-  qase(1,
-          it('Several ids', () => {
-            expect(true).to.equal(true);
-          })
-  );
-  // a test can check multiple test cases
-  qase([2, 3],
-          it('Correct test', () => {
-            expect(true).to.equal(true);
-          })
-  );
-  qase(4,
-          it.skip('Skipped test', () => {
-            expect(true).to.equal(true);
-          })
-  );
+module.exports = defineConfig({
+  reporter: 'cypress-qase-reporter',
+  reporterOptions: {
+    mode: 'testops',
+  },
+  e2e: {
+    setupNodeEvents(on, config) {
+      require('cypress-qase-reporter/plugin')(on, config);
+      require('cypress-qase-reporter/metadata')(on);
+    },
+  },
 });
 ```
 
-To execute Cypress tests and report them to Qase.io, run the command:
+**3. Add Qase ID to your test:**
 
-```bash
-QASE_MODE=testops npx cypress run
+```javascript
+import { qase } from 'cypress-qase-reporter/mocha';
+
+describe('Login Suite', () => {
+  it(qase(1, 'User can login with valid credentials'), () => {
+    cy.visit('https://example.com/login');
+    cy.get('#email').type('user@example.com');
+    cy.get('#password').type('password123');
+    cy.get('button[type="submit"]').click();
+    cy.url().should('include', '/dashboard');
+  });
+});
 ```
 
-or
+**4. Run your tests:**
 
-```bash
-npm test
-```
-
-You can try it with the example project at [`examples/cypress`](../examples/cypress/).
-
-<p align="center">
-  <img width="65%" src="./screenshots/screenshot.png">
-</p>
-
-A test run will be performed and available at:
-
-```
-https://app.qase.io/run/QASE_PROJECT_CODE
+```sh
+npx cypress run
 ```
 
 ## Configuration
 
-Qase Cypress reporter can be configured in multiple ways:
-- by adding configuration block in `cypress.config.js`,
-- using a separate config file `qase.config.json`,
-- using environment variables (they override the values from the configuration files).
+The reporter is configured via (in order of priority):
 
-For a full list of configuration options, see the [Configuration reference](../qase-javascript-commons/README.md#configuration).
+1. **cypress.config.js** (Cypress-specific, highest priority)
+2. **Environment variables** (`QASE_*`)
+3. **Config file** (`qase.config.json`)
 
-Example `cypress.config.js` config:
+### Minimal Configuration
 
-```js
-import cypress from 'cypress';
+| Option | Environment Variable | Description |
+|--------|---------------------|-------------|
+| `mode` | `QASE_MODE` | Set to `testops` to enable reporting |
+| `testops.project` | `QASE_TESTOPS_PROJECT` | Your Qase project code |
+| `testops.api.token` | `QASE_TESTOPS_API_TOKEN` | Your Qase API token |
 
-import plugins from './cypress/plugins/index.js';
+### Example `cypress.config.js`
 
-module.exports = cypress.defineConfig({
-  reporter: 'cypress-multi-reporters',
+```javascript
+const { defineConfig } = require('cypress');
+
+module.exports = defineConfig({
+  reporter: 'cypress-qase-reporter',
   reporterOptions: {
-    reporterEnabled: 'cypress-mochawesome-reporter, cypress-qase-reporter',
-    cypressMochawesomeReporterReporterOptions: {
-      charts: true,
-    },
-    cypressQaseReporterReporterOptions: {
-      debug: true,
-
-      testops: {
-        api: {
-          token: 'api_key',
-        },
-
-        project: 'project_code',
-        uploadAttachments: true,
-
-        run: {
-          complete: true,
-        },
+    mode: 'testops',
+    debug: false,
+    testops: {
+      api: {
+        token: process.env.QASE_API_TOKEN,
       },
-
-      framework: {
-        cypress: {
-          screenshotsFolder: 'cypress/screenshots',
-        }
-      }
+      project: 'DEMO',
+      uploadAttachments: true,
+      run: {
+        title: 'Cypress Automated Run',
+        complete: true,
+      },
+      batch: {
+        size: 100,
+      },
+    },
+    framework: {
+      cypress: {
+        screenshotsFolder: 'cypress/screenshots',
+        videosFolder: 'cypress/videos',
+      },
     },
   },
-  video: false,
   e2e: {
     setupNodeEvents(on, config) {
-      return plugins(on, config);
+      require('cypress-qase-reporter/plugin')(on, config);
+      require('cypress-qase-reporter/metadata')(on);
     },
   },
 });
 ```
 
-Check out the example of configuration for multiple reporters in the
-[demo project](../examples/cypress/cypress.config.js).
+### Example `qase.config.json`
+
+```json
+{
+  "mode": "testops",
+  "fallback": "report",
+  "testops": {
+    "project": "YOUR_PROJECT_CODE",
+    "api": {
+      "token": "YOUR_API_TOKEN"
+    },
+    "run": {
+      "title": "Cypress Automated Run"
+    },
+    "batch": {
+      "size": 100
+    }
+  },
+  "report": {
+    "driver": "local",
+    "connection": {
+      "local": {
+        "path": "./build/qase-report",
+        "format": "json"
+      }
+    }
+  },
+  "framework": {
+    "cypress": {
+      "screenshotsFolder": "cypress/screenshots",
+      "videosFolder": "cypress/videos"
+    }
+  }
+}
+```
+
+> **Full configuration reference:** See [qase-javascript-commons](../qase-javascript-commons/README.md) for all available options including logging, status mapping, execution plans, and more.
+
+## Usage
+
+### Link Tests with Test Cases
+
+Associate your tests with Qase test cases using test case IDs:
+
+**Single ID:**
+
+```javascript
+import { qase } from 'cypress-qase-reporter/mocha';
+
+describe('Authentication', () => {
+  it(qase(1, 'Login with valid credentials'), () => {
+    cy.visit('/login');
+    cy.get('#email').type('user@example.com');
+    cy.get('button').click();
+  });
+});
+```
+
+**Multiple IDs:**
+
+```javascript
+describe('Authentication', () => {
+  it(qase([1, 2, 3], 'Login works across multiple browsers'), () => {
+    cy.visit('/login');
+    cy.get('#email').type('user@example.com');
+    cy.get('button').click();
+  });
+});
+```
+
+### Add Metadata
+
+Enhance your tests with additional information:
+
+```javascript
+it('User can login', () => {
+  qase.title('User successfully logs in with valid credentials');
+  qase.fields({
+    severity: 'critical',
+    priority: 'high',
+    layer: 'e2e',
+    description: 'Tests the core login flow',
+  });
+  qase.suite('Authentication / Login');
+
+  cy.visit('/login');
+  cy.get('#email').type('user@example.com');
+  cy.get('#password').type('password123');
+  cy.get('button').click();
+});
+```
+
+### Ignore Tests
+
+Exclude specific tests from Qase reporting (test still runs, but results are not sent):
+
+```javascript
+it('Test under development', () => {
+  qase.ignore();
+  cy.visit('/new-feature');
+  cy.get('.coming-soon').should('be.visible');
+});
+```
+
+### Test Result Statuses
+
+| Cypress Result | Qase Status |
+|----------------|-------------|
+| Passed | Passed |
+| Failed | Failed |
+| Pending | Skipped |
+| Skipped | Skipped |
+
+> For more usage examples, see the [Usage Guide](docs/usage.md).
+
+## Running Tests
+
+Run Cypress tests with Qase reporting:
+
+```bash
+# Run all tests
+npx cypress run
+
+# Run specific spec file
+npx cypress run --spec "cypress/e2e/login.cy.js"
+
+# Run in headed mode
+npx cypress open
+
+# Run with environment variables
+QASE_MODE=testops QASE_TESTOPS_PROJECT=DEMO npx cypress run
+```
+
+## Network Profiler
+
+The Network Profiler automatically captures browser-originated HTTP requests made during test execution and reports them as REQUEST-type steps in Qase TestOps.
+
+**Additional setup:** Import the support file in your `cypress/support/e2e.ts` (or `e2e.js`):
+
+```typescript
+// cypress/support/e2e.ts
+import 'cypress-qase-reporter/support';
+```
+
+The support file registers a `beforeEach` hook that installs `cy.intercept('**')` to capture all application HTTP requests. No changes to spec files are needed.
+
+**Enable in `qase.config.json`:**
+
+```json
+{
+  "profilers": ["network"],
+  "networkProfiler": {
+    "skip_domains": ["analytics.example.com"],
+    "track_on_fail": true
+  }
+}
+```
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `profilers` | Array of profilers to enable. Use `["network"]` for HTTP capture | `[]` |
+| `networkProfiler.skip_domains` | Domains to exclude from profiling | `[]` |
+| `networkProfiler.track_on_fail` | Capture response body for failed requests (status >= 400) | `true` |
+
+> Requests to `qase.io` and Cypress internal requests (`/__cypress/`) are always excluded automatically.
 
 ## Requirements
 
-We maintain the reporter on [LTS versions of Node](https://nodejs.org/en/about/releases/).
+- Node.js >= 14
+- Cypress >= 10.0.0
 
-`cypress >= 8.0.0`
+## Documentation
 
-<!-- references -->
+| Guide | Description |
+|-------|-------------|
+| [Usage Guide](docs/usage.md) | Complete usage reference with all methods and options |
+| [Cucumber Integration](docs/cucumber.md) | Gherkin/Cucumber support with preprocessors |
+| [Attachments](docs/ATTACHMENTS.md) | Adding screenshots, logs, and files to test results |
+| [Steps](docs/STEPS.md) | Defining test steps for detailed reporting |
+| [Multi-Project Support](docs/MULTI_PROJECT.md) | Reporting to multiple Qase projects |
+| [Upgrade Guide](docs/UPGRADE.md) | Migration guide for breaking changes |
 
-[auth]: https://developers.qase.io/#authentication
+## Examples
+
+See the [examples directory](../examples/) for complete working examples:
+
+- [Single project example](../examples/single/cypress/)
+- [Cucumber (badeball) example](../examples/single/cypressBadeballCucumber/)
+- [Cucumber (legacy) example](../examples/single/cypressCucumber/)
+
+## License
+
+Apache License 2.0. See [LICENSE](LICENSE) for details.

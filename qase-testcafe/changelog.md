@@ -1,3 +1,112 @@
+# testcafe-reporter-qase@2.2.2
+
+## What's new
+
+- Added Network Profiler integration for automatic HTTP request capture during test execution.
+- Updated `qase-javascript-commons` dependency to `~2.5.6`.
+
+# qase-testcafe@2.2.1
+
+## What's new
+
+- Added `qase.suite()` method to the builder API. You can now set a custom suite hierarchy for test cases using tab-separated values for nested suites.
+
+```ts
+const q = qase.suite('Parent\tChild').create();
+test.meta(q)('Test case title', async t => { ... });
+```
+
+# qase-testcafe@2.2.0
+
+## What's new
+
+- Added support for multi-project support.
+
+# qase-testcafe@2.1.3
+
+## What's new
+
+- Added support for status filter in the test run.
+- Improved error handling.
+
+# qase-testcafe@2.1.0
+
+## What's new
+
+- Updated to the latest minor version of the common package for improved compatibility and features.
+- Fixed all ESLint warnings across the project to ensure code quality and maintainability.
+
+# qase-testcafe@2.0.6
+
+## What's new
+
+Enhanced handling of start and end times for tests and steps, ensuring greater accuracy in reporting.
+
+# qase-testcafe@2.0.4
+
+## What's new
+
+Support `step` and `attach` methods for test cases. 
+
+```javascript
+import { qase } from 'testcafe-qase-reporter/qase';
+
+test('test', async (t) => {
+  qase.attach({ name: 'attachment.txt', content: 'Hello, world!', contentType: 'text/plain' });
+  
+  await qase.step('Step 1', async (s1) => {
+    await s1.step('Step 1.1', async (s11) => {
+      await s11.step('Step 1.1.1', async (s111) => {
+        s11.attach({ name: 'attachment.txt', content: 'Hello, world!', contentType: 'text/plain' });
+        await s111.expect(true).ok();
+      });
+    });
+    await t.expect(true).ok();
+  });
+  await t.expect(true).ok();
+});
+```
+
+# qase-testcafe@2.0.3
+
+## What's new
+
+Support `ignore` metadata for test cases. If the test case has the `ignore` tag, the reporter will not send the result to the Qase
+TMS.
+
+```ts
+const q = qase.ignore().create();
+test.meta({ ...q })(
+  'test',
+  async (t) => {
+    await t;
+  },
+);
+```
+
+# qase-testcafe@2.0.2
+
+## What's new
+
+Improved error collection. The error stack trace contains more useful debugging information: browser, code, etc.
+
+# qase-testcafe@2.0.1
+
+## What's new
+
+Support group parameters for test cases. You can specify the group parameters in the test case using the following
+format:
+
+```ts
+const q = qase.groupParameters({ 'param01': 'value01', 'param02': 'value02' }).create();
+test.meta({ ...q })(
+  'test',
+  async (t) => {
+    await t;
+  },
+);
+```
+
 # qase-testcafe@2.0.0
 
 ## What's new

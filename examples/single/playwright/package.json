@@ -1,0 +1,14 @@
+{
+  "name": "examples-playwright",
+  "private": true,
+  "scripts": {
+    "test": "QASE_MODE=testops npx playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "playwright-qase-reporter": "^2.0.0"
+  },
+  "dependencies": {
+    "qase-javascript-commons": "^2.0.0"
+  }
+}

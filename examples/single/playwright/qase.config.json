@@ -1,0 +1,11 @@
+{
+  "debug": true,
+  "mode": "report",
+  "profilers": ["network"],
+  "testops": {
+    "api": {
+      "token": "90ea6c06bbfb606d49aea16f1b5567e95c746f8b6e654a7896c560def911ce5a"
+    },
+    "project": "DEVX"
+  }
+}

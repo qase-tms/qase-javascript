@@ -1,24 +1,22 @@
-import { JSONSchemaType } from 'ajv';
-
 import { ModeEnum } from '../options';
 import { DriverEnum, FormatEnum } from '../writer';
-import { ConfigType } from './config-type';
+import { ExternalLinkType } from '../models/config/TestOpsOptionsType';
 
 /**
  * @type {JSONSchemaType<ConfigType>}
  */
-export const configValidationSchema: JSONSchemaType<ConfigType> = {
+export const configValidationSchema = {
   type: 'object',
 
   properties: {
     mode: {
       type: 'string',
-      enum: [ModeEnum.report, ModeEnum.testops, ModeEnum.off],
+      enum: [ModeEnum.report, ModeEnum.testops, ModeEnum.testops_multi, ModeEnum.off],
       nullable: true,
     },
     fallback: {
       type: 'string',
-      enum: [ModeEnum.report, ModeEnum.testops, ModeEnum.off],
+      enum: [ModeEnum.report, ModeEnum.testops, ModeEnum.testops_multi, ModeEnum.off],
       nullable: true,
     },
     debug: {
@@ -38,6 +36,30 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
       nullable: true,
     },
 
+    statusMapping: {
+      type: 'object',
+      nullable: true,
+      additionalProperties: {
+        type: 'string',
+      },
+    },
+
+    logging: {
+      type: 'object',
+      nullable: true,
+
+      properties: {
+        console: {
+          type: 'boolean',
+          nullable: true,
+        },
+        file: {
+          type: 'boolean',
+          nullable: true,
+        },
+      },
+    },
+
     testops: {
       type: 'object',
       nullable: true,
@@ -55,27 +77,6 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
 
             host: {
               type: 'string',
-              nullable: true,
-            },
-
-            headers: {
-              type: 'object',
-              nullable: true,
-              additionalProperties: false,
-              patternProperties: {
-                '^.*$': {
-                  type: 'string',
-                },
-              },
-            },
-
-            retries: {
-              type: 'number',
-              nullable: true,
-            },
-
-            retryDelay: {
-              type: 'number',
               nullable: true,
             },
           },
@@ -112,6 +113,27 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
               type: 'boolean',
               nullable: true,
             },
+            tags: {
+              type: 'array',
+              items: {
+                type: 'string',
+              },
+              nullable: true,
+            },
+            externalLink: {
+              type: 'object',
+              nullable: true,
+              properties: {
+                type: {
+                  type: 'string',
+                  enum: [ExternalLinkType.JIRA_CLOUD, ExternalLinkType.JIRA_SERVER],
+                },
+                link: {
+                  type: 'string',
+                },
+              },
+              required: ['type', 'link'],
+            },
           },
         },
 
@@ -144,11 +166,109 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
           nullable: true,
         },
 
-        useV2: {
-          type: 'boolean',
+        configurations: {
+          type: 'object',
+          nullable: true,
+
+          properties: {
+            values: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  name: {
+                    type: 'string',
+                    nullable: true,
+                  },
+                  value: {
+                    type: 'string',
+                    nullable: true,
+                  },
+                },
+                required: ['name', 'value'],
+              },
+            },
+            createIfNotExists: {
+              type: 'boolean',
+              nullable: true,
+            },
+          },
+          required: ['values'],
+        },
+
+        statusFilter: {
+          type: 'array',
+          items: {
+            type: 'string',
+          },
           nullable: true,
         },
       },
+    },
+
+    testops_multi: {
+      type: 'object',
+      nullable: true,
+
+      properties: {
+        default_project: {
+          type: 'string',
+          nullable: true,
+        },
+        projects: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              code: {
+                type: 'string',
+                nullable: true,
+              },
+              run: {
+                type: 'object',
+                nullable: true,
+                properties: {
+                  id: { type: 'number', nullable: true },
+                  title: { type: 'string', nullable: true },
+                  description: { type: 'string', nullable: true },
+                  complete: { type: 'boolean', nullable: true },
+                  tags: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    nullable: true,
+                  },
+                  externalLink: {
+                    type: 'object',
+                    nullable: true,
+                    properties: {
+                      type: {
+                        type: 'string',
+                        enum: [ExternalLinkType.JIRA_CLOUD, ExternalLinkType.JIRA_SERVER],
+                      },
+                      link: { type: 'string' },
+                    },
+                    required: ['type', 'link'],
+                  },
+                },
+              },
+              plan: {
+                type: 'object',
+                nullable: true,
+                properties: {
+                  id: { type: 'number', nullable: true },
+                },
+              },
+              environment: {
+                type: 'string',
+                nullable: true,
+              },
+            },
+            required: ['code'],
+          },
+          nullable: true,
+        },
+      },
+      required: ['projects'],
     },
 
     report: {
@@ -185,6 +305,30 @@ export const configValidationSchema: JSONSchemaType<ConfigType> = {
               },
             },
           },
+        },
+      },
+    },
+
+    profilers: {
+      type: 'array',
+      items: {
+        type: 'string',
+      },
+      nullable: true,
+    },
+
+    networkProfiler: {
+      type: 'object',
+      nullable: true,
+      properties: {
+        skip_domains: {
+          type: 'array',
+          items: { type: 'string' },
+          nullable: true,
+        },
+        track_on_fail: {
+          type: 'boolean',
+          nullable: true,
         },
       },
     },

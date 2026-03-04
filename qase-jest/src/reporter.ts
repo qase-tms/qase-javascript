@@ -1,17 +1,29 @@
 import has from 'lodash.has';
 import get from 'lodash.get';
 import { v4 as uuidv4 } from 'uuid';
-import { Reporter, Test, TestResult, Config } from '@jest/reporters';
-import { Status } from '@jest/test-result';
+import { Config, Reporter, Test, TestResult } from '@jest/reporters';
+import { AssertionResult, Status, TestCaseResult } from '@jest/test-result';
 
 import {
-  QaseReporter,
-  ConfigType,
-  ReporterInterface,
-  TestStatusEnum,
-  ConfigLoader,
+  Attachment,
   composeOptions,
+  ConfigLoader,
+  ConfigType,
+  generateSignature,
+  NetworkProfiler,
+  QaseReporter,
+  Relation,
+  ReporterInterface,
+  StepType,
+  Suite,
+  TestResultType,
+  TestStatusEnum,
+  TestStepType,
+  determineTestStatus,
+  parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
+import { Qase } from './global';
+import { Metadata } from './models';
 
 export type JestQaseOptionsType = ConfigType;
 
@@ -40,10 +52,10 @@ export class JestQaseReporter implements Reporter {
 
   /**
    * @param {string} title
-   * @returns {any}
+   * @returns {number[]}
    * @private
    */
-  private static getCaseId(title: string) {
+  private static getCaseId(title: string): number[] {
     const [, ids] = title.match(JestQaseReporter.qaseIdRegExp) ?? [];
 
     return ids ? ids.split(',').map((id) => Number(id)) : [];
@@ -54,6 +66,24 @@ export class JestQaseReporter implements Reporter {
    * @private
    */
   private reporter: ReporterInterface;
+
+  /**
+   * @type {NetworkProfiler | null}
+   * @private
+   */
+  private profiler: NetworkProfiler | null = null;
+
+  /**
+   * Snapshot of fallback accumulator length — used for per-test step delta in --runInBand mode.
+   * @private
+   */
+  private _profilerStepSnapshot = 0;
+
+  /**
+   * @type {Metadata}
+   * @private
+   */
+  private metadata: Metadata;
 
   /**
    * @param {Config.GlobalConfig} _
@@ -68,20 +98,106 @@ export class JestQaseReporter implements Reporter {
     configLoader = new ConfigLoader(),
   ) {
     const config = configLoader.load();
+    const composedOptions = composeOptions(options, config);
 
     this.reporter = QaseReporter.getInstance({
-      ...composeOptions(options, config),
+      ...composedOptions,
       frameworkPackage: 'jest',
       frameworkName: 'jest',
       reporterName: 'jest-qase-reporter',
     });
+
+    if (composedOptions.profilers?.includes('network')) {
+      this.profiler = new NetworkProfiler({
+        skipDomains: composedOptions.networkProfiler?.skip_domains,
+        trackOnFail: composedOptions.networkProfiler?.track_on_fail,
+      });
+    }
+
+    // @ts-expect-error - global.Qase is dynamically added at runtime
+    global.Qase = new Qase(this);
+    this.metadata = this.createEmptyMetadata();
   }
 
   /**
    * @see {Reporter.onRunStart}
    */
   public onRunStart() {
-    void this.reporter.startTestRun();
+    this.reporter.startTestRun();
+    // Enable profiler in main process for --runInBand mode
+    this.profiler?.enable();
+  }
+
+  public onTestCaseResult(
+    test: Test,
+    testCaseResult: TestCaseResult,
+  ) {
+    if (this.metadata.ignore) {
+      this.cleanMetadata();
+      return;
+    }
+
+    const result = this.convertToResult(testCaseResult, test.path);
+
+    if (this.metadata.title) {
+      result.title = this.metadata.title;
+    }
+
+    if (this.metadata.comment) {
+      result.message = this.metadata.comment;
+    }
+
+    if (this.metadata.suite) {
+      result.relations = {
+        suite: {
+          data: [
+            {
+              title: this.metadata.suite,
+              public_id: null,
+            },
+          ],
+        },
+      };
+    }
+
+    if (Object.keys(this.metadata.fields).length > 0) {
+      result.fields = this.metadata.fields;
+    }
+
+    if (Object.keys(this.metadata.parameters).length > 0) {
+      result.params = this.metadata.parameters;
+    }
+
+    if (Object.keys(this.metadata.groupParams).length > 0) {
+      result.group_params = this.metadata.groupParams;
+    }
+
+    if (this.metadata.steps.length > 0) {
+      result.steps = this.metadata.steps;
+    }
+
+    if (this.metadata.attachments.length > 0) {
+      result.attachments = this.metadata.attachments;
+    }
+
+    // Generate signature with parameters
+    const ids = JestQaseReporter.getCaseId(testCaseResult.title);
+    result.signature = this.getSignature(test.path, testCaseResult.fullName, ids, this.metadata.parameters);
+
+    this.cleanMetadata();
+
+    // Collect profiler steps for --runInBand mode (reporter and tests share same process)
+    // In multi-worker mode, the reporter's profiler has no captured steps (different process).
+    if (this.profiler) {
+      const allSteps = this.profiler.getAllSteps();
+      const newSteps = allSteps.slice(this._profilerStepSnapshot);
+      this._profilerStepSnapshot = allSteps.length;
+      if (newSteps.length > 0) {
+        result.steps = [...result.steps, ...newSteps];
+      }
+    }
+
+    void this.reporter.addTestResult(result);
   }
 
   /**
@@ -90,52 +206,14 @@ export class JestQaseReporter implements Reporter {
    */
   public onTestResult(_: Test, result: TestResult) {
     result.testResults.forEach(
-      ({
-         title,
-         status,
-         duration,
-         failureMessages,
-         failureDetails,
-       }) => {
-        let error;
+      (value) => {
 
-        if (status === 'failed') {
-          error = new Error(failureDetails.map((item) => {
-            if (has(item, 'matcherResult.message')) {
-              return String(get(item, 'matcherResult.message'));
-            }
-
-            return 'Runtime exception';
-          }).join('\n\n'));
-
-          error.stack = failureMessages.join('\n\n');
+        if (value.status !== 'pending') {
+          return;
         }
 
-        const ids = JestQaseReporter.getCaseId(title);
-        void this.reporter.addTestResult({
-          attachments: [],
-          author: null,
-          execution: {
-            status: JestQaseReporter.statusMap[status],
-            start_time: null,
-            end_time: null,
-            duration: duration ?? 0,
-            stacktrace: error?.stack ?? null,
-            thread: null,
-          },
-          fields: {},
-          message: error?.message ?? null,
-          muted: false,
-          params: {},
-          relations: {},
-          run_id: null,
-          signature: '',
-          steps: [],
-          testops_id: ids.length > 0 ? ids : null,
-          id: uuidv4(),
-          title: title,
-          // suiteTitle: ancestorTitles,
-        });
+        const model = this.convertToResult(value, result.testFilePath);
+        void this.reporter.addTestResult(model);
       },
     );
   }
@@ -150,6 +228,241 @@ export class JestQaseReporter implements Reporter {
    * @see {Reporter.onRunComplete}
    */
   public onRunComplete() {
+    this.profiler?.restore();
     void this.reporter.publish();
+  }
+
+  /**
+   * @param {string} filePath
+   * @param {string} fullName
+   * @param {number[]} ids
+   * @param {Record<string, string>} parameters
+   * @private
+   */
+  private getSignature(filePath: string, fullName: string, ids: number[], parameters: Record<string, string> = {}) {
+    const suites = filePath.split('/');
+
+    suites.push(fullName.toLowerCase().replace(/\s/g, '_'));
+
+    return generateSignature(ids, suites, parameters);
+  }
+
+  /**
+   * @param {string} filePath
+   * @param {string[]} suites
+   * @private
+   */
+  private getRelations(filePath: string, suites: string[]): Relation {
+    const suite: Suite = {
+      data: [],
+    };
+
+    for (const part of filePath.split('/')) {
+      suite.data.push({
+        title: part,
+        public_id: null,
+      });
+    }
+
+    for (const part of suites) {
+      suite.data.push({
+        title: part,
+        public_id: null,
+      });
+    }
+
+    return {
+      suite: suite,
+    };
+  }
+
+  /**
+   * @param {string} fullPath
+   * @private
+   */
+  private getCurrentTestPath(fullPath: string) {
+    const executionPath = process.cwd() + '/';
+
+    return fullPath.replace(executionPath, '');
+  }
+
+  public addTitle(title: string) {
+    this.metadata.title = title;
+  }
+
+  public addComment(comment: string) {
+    this.metadata.comment = comment;
+  }
+
+  public addSuite(suite: string) {
+    this.metadata.suite = suite;
+  }
+
+  public addFields(fields: Record<string, string>) {
+    this.metadata.fields = fields;
+  }
+
+  public addParameters(parameters: Record<string, string>) {
+    this.metadata.parameters = parameters;
+  }
+
+  public addGroupParams(groupParams: Record<string, string>) {
+    this.metadata.groupParams = groupParams;
+  }
+
+  public addIgnore() {
+    this.metadata.ignore = true;
+  }
+
+  public addStep(step: TestStepType) {
+    // Parse expectedResult and data from step name if present
+    // Only process text steps (not gherkin steps)
+    // Check if step is a text step (either explicitly TEXT type, undefined, or string 'text')
+    const isTextStep = (StepType && step.step_type === StepType.TEXT) || step.step_type === undefined || step.step_type === 'text';
+    if (isTextStep && step.data && 'action' in step.data) {
+      const stepTextData = step.data as { action: string; expected_result: string | null; data: string | null };
+      const stepData = this.extractAndCleanStep(stepTextData.action);
+      stepTextData.action = stepData.cleanedString;
+      stepTextData.expected_result = stepData.expectedResult;
+      stepTextData.data = stepData.data;
+    }
+    this.metadata.steps.push(step);
+  }
+
+  public addAttachment(attachment: Attachment) {
+    this.metadata.attachments.push(attachment);
+  }
+
+  private cleanMetadata() {
+    this.metadata = this.createEmptyMetadata();
+  }
+
+  /**
+   * @param {AssertionResult} value
+   * @param {string} path
+   * @private
+   * @returns {TestResultType}
+   */
+  private convertToResult(value: AssertionResult, path: string): TestResultType {
+    let error;
+    if (value.status === 'failed') {
+      error = new Error(value.failureDetails.map((item) => {
+        if (has(item, 'matcherResult.message')) {
+          return String(get(item, 'matcherResult.message'));
+        }
+
+        return 'Runtime exception';
+      }).join('\n\n'));
+
+      error.stack = value.failureMessages.join('\n\n');
+    }
+
+    const parsed = parseProjectMappingFromTitle(value.title);
+    const filePath = this.getCurrentTestPath(path);
+    const hasProjectMapping = Object.keys(parsed.projectMapping).length > 0;
+    const ids = hasProjectMapping ? [] : parsed.legacyIds;
+
+    // Determine status based on error type
+    const testStatus = determineTestStatus(error ?? null, value.status);
+
+    const result: TestResultType = {
+      attachments: [],
+      author: null,
+      execution: {
+        status: testStatus,
+        start_time: null,
+        end_time: null,
+        duration: value.duration ?? 0,
+        stacktrace: error?.stack ?? null,
+        thread: null,
+      },
+      fields: {},
+      message: error?.message ?? null,
+      muted: false,
+      params: {},
+      group_params: {},
+      relations: this.getRelations(filePath, value.ancestorTitles),
+      run_id: null,
+      signature: this.getSignature(filePath, value.fullName, ids, {}),
+      steps: [],
+      testops_id: parsed.legacyIds.length > 0 && !hasProjectMapping
+        ? (parsed.legacyIds.length === 1 ? parsed.legacyIds[0]! : parsed.legacyIds)
+        : null,
+      testops_project_mapping: hasProjectMapping ? parsed.projectMapping : null,
+      id: uuidv4(),
+      title: parsed.cleanedTitle || this.removeQaseIdsFromTitle(value.title),
+    } as unknown as TestResultType;
+    return result;
+  }
+
+  /**
+   * @returns {Metadata}
+   * @private
+   */
+  private createEmptyMetadata(): Metadata {
+    return {
+      title: undefined,
+      ignore: false,
+      comment: undefined,
+      suite: undefined,
+      fields: {},
+      parameters: {},
+      groupParams: {},
+      steps: [],
+      attachments: [],
+    };
+  }
+
+  /**
+   * @param {string} title
+   * @returns {string}
+   * @private
+   */
+  private removeQaseIdsFromTitle(title: string): string {
+    const matches = title.match(/\(Qase ID: ([0-9,]+)\)$/i);
+    if (matches) {
+      return title.replace(matches[0], '').trimEnd();
+    }
+    return title;
+  }
+
+  /**
+   * Extract expected result and data from step title and return cleaned string
+   * @param {string} input
+   * @returns {{expectedResult: string | null, data: string | null, cleanedString: string}}
+   * @private
+   */
+  private extractAndCleanStep(input: string): {
+    expectedResult: string | null;
+    data: string | null;
+    cleanedString: string
+  } {
+    let expectedResult: string | null = null;
+    let data: string | null = null;
+    let cleanedString = input;
+
+    const hasExpectedResult = input.includes('QaseExpRes:');
+    const hasData = input.includes('QaseData:');
+
+    if (hasExpectedResult || hasData) {
+      const regex = /QaseExpRes:\s*:?\s*(.*?)\s*(?=QaseData:|$)QaseData:\s*:?\s*(.*)?/;
+      const match = input.match(regex);
+
+      if (match) {
+        expectedResult = match[1]?.trim() ?? null;
+        data = match[2]?.trim() ?? null;
+
+        cleanedString = input
+          .replace(/QaseExpRes:\s*:?\s*.*?(?=QaseData:|$)/, '')
+          .replace(/QaseData:\s*:?\s*.*/, '')
+          .trim();
+      }
+    }
+
+    return { expectedResult, data, cleanedString };
+  }
+
+  async onRunnerEnd() {
+    await this.reporter.publish();
   }
 }

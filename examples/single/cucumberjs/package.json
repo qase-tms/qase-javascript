@@ -1,0 +1,11 @@
+{
+  "name": "examples-cucumberjs",
+  "private": true,
+  "scripts": {
+    "test": "QASE_MODE=${QASE_MODE:-off} cucumber-js"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^11.0.0",
+    "cucumberjs-qase-reporter": "^2.0.0"
+  }
+}

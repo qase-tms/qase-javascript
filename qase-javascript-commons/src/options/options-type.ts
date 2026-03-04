@@ -1,27 +1,30 @@
-import { QaseApiOptionsType } from 'qaseio/dist/qaseio';
-
 import { ModeEnum } from './mode-enum';
 
-import { TestOpsOptionsType } from '../reporters';
 import { DriverEnum, FsWriterOptionsType } from '../writer';
+import { TestOpsOptionsType, TestOpsMultiConfigType } from '../models/config/TestOpsOptionsType';
 
 type RecursivePartial<T> = {
   [K in keyof T]?: RecursivePartial<T[K]> | undefined;
 };
 
-export type AdditionalTestOpsOptionsType = {
-  api?: RecursivePartial<QaseApiOptionsType>;
-};
-
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type ConnectionsType = {
   [DriverEnum.local]?: FsWriterOptionsType;
 };
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type AdditionalReportOptionsType = {
   driver?: `${DriverEnum}`;
   connections?: ConnectionsType;
 };
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export type LoggingOptionsType = {
+  console?: boolean | undefined;
+  file?: boolean | undefined;
+};
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type OptionsType = {
   frameworkPackage: string;
   frameworkName: string;
@@ -32,12 +35,22 @@ export type OptionsType = {
   debug?: boolean | undefined;
   environment?: string | undefined;
   rootSuite?: string | undefined;
+  statusMapping?: Record<string, string> | undefined;
+  logging?: RecursivePartial<LoggingOptionsType> | undefined;
   testops?:
-    | (RecursivePartial<TestOpsOptionsType> & AdditionalTestOpsOptionsType)
+    | RecursivePartial<TestOpsOptionsType>
     | undefined;
+  /** Multi-project configuration (used when mode is testops_multi). */
+  testops_multi?: TestOpsMultiConfigType | undefined;
   report?: RecursivePartial<AdditionalReportOptionsType> | undefined;
+  profilers?: string[] | undefined;
+  networkProfiler?: {
+    skip_domains?: string[] | undefined;
+    track_on_fail?: boolean | undefined;
+  } | undefined;
 };
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type FrameworkOptionsType<F extends string, O> = {
   framework?: Partial<Record<F, O>>
 }

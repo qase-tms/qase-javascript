@@ -1,6 +1,6 @@
-export type ErrorOptionsType = {
+export interface ErrorOptionsType {
   cause?: unknown;
-};
+}
 
 export interface QaseErrorInterface extends Error {
   cause?: unknown;
@@ -15,7 +15,7 @@ export class QaseError extends Error implements QaseErrorInterface {
   /**
    * @type {unknown}
    */
-  public cause?: unknown;
+  public override cause?: unknown;
 
   constructor(message?: string, options?: ErrorOptionsType) {
     super(message);

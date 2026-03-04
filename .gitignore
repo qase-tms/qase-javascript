@@ -78,3 +78,9 @@ jspm_packages/
 # Temporary files and playground
 tmp
 *.tmp
+
+CLAUDE.md
+.planning/
+
+# Example package locks (managed by root workspace)
+examples/**/package-lock.json

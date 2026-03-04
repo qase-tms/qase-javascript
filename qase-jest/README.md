@@ -1,142 +1,109 @@
-# Qase TestOps Jest reporter
+# [Qase TestOps](https://qase.io) Jest Reporter
 
-Qase Jest reporter sends test results and metadata to Qase.io.
-It can work in different test automation scenarios:
+[![License](https://lxgaming.github.io/badges/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![npm downloads](https://img.shields.io/npm/dm/jest-qase-reporter.svg)](https://www.npmjs.com/package/jest-qase-reporter)
 
-* Create new test cases in Qase from existing autotests.
-* Report Jest test results to existing test cases in Qase.
+Qase Jest Reporter enables seamless integration between your Jest tests and [Qase TestOps](https://qase.io), providing automatic test result reporting, test case management, and comprehensive test analytics.
 
-Testing frameworks that use Jest as a test runner, such as Puppeteer, Appium, and Detox,
-can also be used with Jest reporter.
+## Features
 
-To install the latest version, run:
+- Link automated tests to Qase test cases by ID
+- Auto-create test cases from your test code
+- Report test results with rich metadata (fields, attachments, steps)
+- Support for parameterized tests
+- Multi-project reporting support
+- Flexible configuration (file, environment variables, Jest config)
+- Network Profiler for automatic HTTP request capture
 
-```shell
+## Installation
+
+```sh
 npm install --save-dev jest-qase-reporter
 ```
 
-# Contents
+## Quick Start
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**1. Create `qase.config.json` in your project root:**
 
-- [Getting started](#getting-started)
-- [Using Reporter](#using-reporter)
-- [Configuration](#configuration)
-- [Requirements](#requirements)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-## Getting started
-
-To report your tests results to Qase, install `jest-qase-reporter`,
-and add a reporter config in the `jest.config.ts` file.
-A minimal configuration needs just two things:
-
-* Qase project code, for example, in https://app.qase.io/project/DEMO the code is `DEMO`.
-* Qase API token, created on the [Apps page](https://app.qase.io/apps?app=jest-reporter).
-
-```js
-module.exports = {
-  reporters: [
-    'default',
-    [
-      'jest-qase-reporter',
-      {
-        mode: 'testops',
-        testops: {
-          api: {
-            token: 'api_token'
-          },
-          project: 'project_code',
-        },
-      },
-    ],
-  ],
-};
+```json
+{
+  "mode": "testops",
+  "testops": {
+    "project": "YOUR_PROJECT_CODE",
+    "api": {
+      "token": "YOUR_API_TOKEN"
+    }
+  }
+}
 ```
 
-Now, run the Jest tests as usual.
-Test results will be reported to a new test run in Qase.
+**2. Add Qase ID to your test:**
 
+```javascript
+const { qase } = require('jest-qase-reporter/jest');
 
-```console
-$ npx jest
-Determining test suites to run...
-...
-qase: Project DEMO exists
-qase: Using run 42 to publish test results
-...
-
-Ran all test suites.
-```
-
-## Using Reporter
-
-The Jest reporter has the ability to auto-generate test cases
-and suites from your test data.
-
-But if necessary, you can independently register the ID of already
-existing test cases from TMS before the executing tests. For example:
-
-```typescript
-const { qase } = require("jest-qase-reporter/jest");
-
-describe('My First Test', () => {
-    test(qase([1,2], 'Several ids'), () => {
-        expect(true).toBe(true);
-    })
-
-    test(qase(3, 'Correct test'), () => {
-        expect(true).toBe(true);
-    })
-
-    test.skip(qase("4", 'Skipped test'), () => {
-        expect(true).toBe(true);
-    })
-
-    test(qase(["5", "6"], 'Failed test'), () => {
-        expect(true).toBe(false);
-    })
+describe('User Authentication', () => {
+  test(qase(1, 'User can login with valid credentials'), () => {
+    expect(true).toBe(true);
+  });
 });
 ```
-To run tests and create a test run, execute the command (for example from folder examples):
-```bash
-QASE_MODE=testops npx jest
-```
-or
-```bash
-npm test
-```
 
-<p align="center">
-  <img width="65%" src="./screenshots/screenshot.png">
-</p>
+**3. Run your tests:**
 
-A test run will be performed and available at:
-
-```
-https://app.qase.io/run/QASE_PROJECT_CODE
+```sh
+npx jest
 ```
 
 ## Configuration
 
-Reporter options (* - required):
+The reporter is configured via (in order of priority):
 
-- `mode` - `testops`/`off` Enables reporter, default - `off`
-- `debug` - Enables debug logging, default - `false`
-- `environment` - To execute with the sending of the envinroment information 
-- *`testops.api.token` - Token for API access, you can find more information
-  [here](https://developers.qase.io/#authentication)
-- *`testops.project` - Qase project code, for example, in https://app.qase.io/project/DEMO the code is `DEMO`
-- `testops.run.id` - Qase test run ID, used when the test run was created earlier using CLI or API call.
-- `testops.run.title` - Set custom Run name, when new run is created
-- `testops.run.description` - Set custom Run description, when new run is created
-- `testops.run.complete` - Whether the run should be completed
+1. **jest.config.js** (Jest-specific, highest priority)
+2. **Environment variables** (`QASE_*`)
+3. **Config file** (`qase.config.json`)
 
-Example `jest.config.js` config:
+### Minimal Configuration
 
-```js
+| Option | Environment Variable | Description |
+|--------|---------------------|-------------|
+| `mode` | `QASE_MODE` | Set to `testops` to enable reporting |
+| `testops.project` | `QASE_TESTOPS_PROJECT` | Your Qase project code |
+| `testops.api.token` | `QASE_TESTOPS_API_TOKEN` | Your Qase API token |
+
+### Example `qase.config.json`
+
+```json
+{
+  "mode": "testops",
+  "fallback": "report",
+  "testops": {
+    "project": "YOUR_PROJECT_CODE",
+    "api": {
+      "token": "YOUR_API_TOKEN"
+    },
+    "run": {
+      "title": "Jest Automated Run"
+    },
+    "batch": {
+      "size": 100
+    }
+  },
+  "report": {
+    "driver": "local",
+    "connection": {
+      "local": {
+        "path": "./build/qase-report",
+        "format": "json"
+      }
+    }
+  }
+}
+```
+
+### Example `jest.config.js`
+
+```javascript
 module.exports = {
   reporters: [
     'default',
@@ -146,40 +113,148 @@ module.exports = {
         mode: 'testops',
         testops: {
           api: {
-            token: 'api_key'
+            token: process.env.QASE_API_TOKEN,
           },
-          project: 'project_code',
+          project: 'YOUR_PROJECT_CODE',
           run: {
             complete: true,
           },
         },
-        debug: true,
       },
     ],
   ],
-  ...
 };
 ```
 
-You can check example configuration with multiple reporters in [example project](../examples/jest/jest.config.js).
+> **Full configuration reference:** See [qase-javascript-commons](../qase-javascript-commons/README.md) for all available options including logging, status mapping, execution plans, and more.
 
-Supported ENV variables:
+## Usage
 
-- `QASE_MODE` - Same as `mode`
-- `QASE_DEBUG` - Same as `debug`
-- `QASE_ENVIRONMENT` - Same as `environment` 
-- `QASE_TESTOPS_API_TOKEN` - Same as `testops.api.token`
-- `QASE_TESTOPS_PROJECT` - Same as `testops.project`
-- `QASE_TESTOPS_RUN_ID` - Pass Run ID from ENV and override reporter option `testops.run.id`
-- `QASE_TESTOPS_RUN_TITLE` - Same as `testops.run.title`
-- `QASE_TESTOPS_RUN_DESCRIPTION` - Same as `testops.run.description`
+### Link Tests with Test Cases
+
+Associate your tests with Qase test cases using test case IDs:
+
+```javascript
+const { qase } = require('jest-qase-reporter/jest');
+
+describe('Test suite', () => {
+  // Single test case ID
+  test(qase(1, 'Test name'), () => {
+    expect(true).toBe(true);
+  });
+
+  // Multiple test case IDs
+  test(qase([1, 2, 3], 'Test covering multiple cases'), () => {
+    expect(true).toBe(true);
+  });
+});
+```
+
+### Add Metadata
+
+Enhance your tests with additional information:
+
+```javascript
+const { qase } = require('jest-qase-reporter/jest');
+
+test(qase(1, 'Test with metadata'), () => {
+  qase.title('User can successfully login');
+  qase.fields({
+    severity: 'critical',
+    priority: 'high',
+    layer: 'api',
+  });
+  qase.suite('Authentication / Login');
+
+  // Test logic
+  expect(true).toBe(true);
+});
+```
+
+### Ignore Tests
+
+Exclude specific tests from Qase reporting (test still runs, but results are not sent):
+
+```javascript
+const { qase } = require('jest-qase-reporter/jest');
+
+test('This test runs but is not reported to Qase', () => {
+  qase.ignore();
+  expect(true).toBe(true);
+});
+```
+
+### Test Result Statuses
+
+| Jest Result | Qase Status |
+|-------------|-------------|
+| passed      | passed      |
+| failed      | failed      |
+| skipped     | skipped     |
+
+> For more usage examples, see the [Usage Guide](docs/usage.md).
+
+## Running Tests
+
+```bash
+# Run all tests with Qase reporting
+QASE_MODE=testops npx jest
+
+# Run specific test file
+QASE_MODE=testops npx jest path/to/test.spec.js
+
+# Run tests matching pattern
+QASE_MODE=testops npx jest --testPathPattern="auth"
+
+# Run with custom test run title
+QASE_MODE=testops QASE_TESTOPS_RUN_TITLE="Nightly Regression" npx jest
+```
+
+## Network Profiler
+
+The Network Profiler automatically captures outgoing HTTP requests made during test execution and reports them as REQUEST-type steps in Qase TestOps.
+
+**Enable in `qase.config.json`:**
+
+```json
+{
+  "profilers": ["network"],
+  "networkProfiler": {
+    "skip_domains": ["analytics.example.com"],
+    "track_on_fail": true
+  }
+}
+```
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `profilers` | Array of profilers to enable. Use `["network"]` for HTTP capture | `[]` |
+| `networkProfiler.skip_domains` | Domains to exclude from profiling | `[]` |
+| `networkProfiler.track_on_fail` | Capture response body for failed requests (status >= 400) | `true` |
+
+> Requests to `qase.io` are always excluded automatically.
 
 ## Requirements
 
-We maintain the reporter on LTS versions of Node. You can find the current versions by following the [link](https://nodejs.org/en/about/releases/)
+- Node.js >= 14
+- Jest >= 27.0.0
 
-`jest >= 28.0.0`
+> **Note:** Testing frameworks that use Jest as a test runner, such as Puppeteer, Appium, and Detox, can also be used with Jest reporter.
 
-<!-- references -->
+## Documentation
 
-[auth]: https://developers.qase.io/#authentication
+| Guide | Description |
+|-------|-------------|
+| [Usage Guide](docs/usage.md) | Complete usage reference with all methods and options |
+| [Attachments](docs/ATTACHMENTS.md) | Adding screenshots, logs, and files to test results |
+| [Steps](docs/STEPS.md) | Defining test steps for detailed reporting |
+| [Multi-Project Support](docs/MULTI_PROJECT.md) | Reporting to multiple Qase projects |
+| [Upgrade Guide](docs/UPGRADE.md) | Migration guide for breaking changes |
+
+## Examples
+
+See the [examples directory](../examples/) for complete working examples.
+
+## License
+
+Apache License 2.0. See [LICENSE](LICENSE) for details.

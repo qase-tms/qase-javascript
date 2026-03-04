@@ -17,7 +17,7 @@ import { ResultCreateCase } from './result-create-case';
 import { TestStepResultCreate } from './test-step-result-create';
 
 /**
- * 
+ *
  * @export
  * @interface ResultCreate
  */
@@ -29,55 +29,55 @@ export interface ResultCreate {
      */
     'status': string;
     /**
-     * 
+     *
      * @type {number}
      * @memberof ResultCreate
      */
     'case_id'?: number;
     /**
-     * 
+     *
      * @type {ResultCreateCase}
      * @memberof ResultCreate
      */
     'case'?: ResultCreateCase;
     /**
-     * 
+     *
      * @type {number}
      * @memberof ResultCreate
      */
     'start_time'?: number | null;
     /**
-     * 
+     *
      * @type {number}
      * @memberof ResultCreate
      */
     'time'?: number | null;
     /**
-     * 
+     *
      * @type {number}
      * @memberof ResultCreate
      */
     'time_ms'?: number | null;
     /**
-     * 
+     *
      * @type {boolean}
      * @memberof ResultCreate
      */
     'defect'?: boolean | null;
     /**
-     * 
+     *
      * @type {Array<string>}
      * @memberof ResultCreate
      */
     'attachments'?: Array<string> | null;
     /**
-     * 
+     *
      * @type {string}
      * @memberof ResultCreate
      */
     'stacktrace'?: string | null;
     /**
-     * 
+     *
      * @type {string}
      * @memberof ResultCreate
      */
@@ -89,13 +89,19 @@ export interface ResultCreate {
      */
     'param'?: { [key: string]: string; } | null;
     /**
-     * 
+     * A list of parameter groups
+     * @type {Array<Array<string>>}
+     * @memberof ResultCreate
+     */
+    'param_groups'?: Array<Array<string>> | null;
+    /**
+     *
      * @type {Array<TestStepResultCreate>}
      * @memberof ResultCreate
      */
     'steps'?: Array<TestStepResultCreate> | null;
     /**
-     * 
+     *
      * @type {number}
      * @memberof ResultCreate
      */

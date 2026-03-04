@@ -1,4 +1,4 @@
-export type ExecutionSum = {
+export interface ExecutionSum {
   start_time: number
   end_time: number
   duration: number

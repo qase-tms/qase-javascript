@@ -1,195 +1,58 @@
-import { createReadStream } from 'fs';
-
 import chalk from 'chalk';
-import {
-  IdResponse,
-  QaseApiInterface,
-  ResultCreate,
-  ResultCreateV2,
-  ResultExecution,
-  ResultRelations,
-  ResultStep,
-  ResultStepStatus,
-  RunCreate,
-  TestStepResultCreate,
-  TestStepResultCreateStatusEnum,
-} from 'qaseio';
 
 import { AbstractReporter } from './abstract-reporter';
 
 import {
-  StepStatusEnum,
+  Attachment,
   TestResultType,
   TestStatusEnum,
-  TestStepType,
-  Attachment,
-  TestExecution,
-  Relation,
-  SuiteData,
-  StepType,
 } from '../models';
-
-import { QaseError } from '../utils/qase-error';
 import { LoggerInterface } from '../utils/logger';
+import { StateManager } from '../state/state';
+import { Mutex } from 'async-mutex';
+import { IClient } from '../client/interface';
 
 const defaultChunkSize = 200;
-
-export type TestOpsRunType = {
-  id?: number | undefined;
-  title: string;
-  description: string;
-  complete?: boolean | undefined;
-};
-
-export type TestOpsPlanType = {
-  id?: number | undefined;
-};
-
-export type TestOpsBatchType = {
-  size?: number | undefined;
-}
-
-export type TestOpsOptionsType = {
-  project: string;
-  uploadAttachments?: boolean | undefined;
-  run: TestOpsRunType;
-  plan: TestOpsPlanType;
-  batch?: TestOpsBatchType;
-  defect?: boolean | undefined;
-  useV2?: boolean | undefined;
-};
 
 /**
  * @class TestOpsReporter
  * @extends AbstractReporter
  */
 export class TestOpsReporter extends AbstractReporter {
-  /**
-   * @type {Record<TestStatusEnum, string>}
-   */
-  static statusMap: Record<TestStatusEnum, string> = {
-    [TestStatusEnum.passed]: 'passed',
-    [TestStatusEnum.failed]: 'failed',
-    [TestStatusEnum.skipped]: 'skipped',
-    [TestStatusEnum.disabled]: 'disabled',
-    [TestStatusEnum.blocked]: 'blocked',
-    [TestStatusEnum.invalid]: 'invalid',
-  };
-
-  /**
-   * @type {Record<StepStatusEnum, ResultStepStatus>}
-   */
-  static stepStatusMap: Record<StepStatusEnum, ResultStepStatus> = {
-    [StepStatusEnum.passed]: ResultStepStatus.PASSED,
-    [StepStatusEnum.failed]: ResultStepStatus.FAILED,
-    [StepStatusEnum.blocked]: ResultStepStatus.BLOCKED,
-    [StepStatusEnum.skipped]: ResultStepStatus.SKIPPED,
-  };
-
-  /**
-   * @type {Record<StepStatusEnum, ResultStepStatus>}
-   */
-  static stepStatusMapV1: Record<StepStatusEnum, TestStepResultCreateStatusEnum> = {
-    [StepStatusEnum.passed]: TestStepResultCreateStatusEnum.PASSED,
-    [StepStatusEnum.failed]: TestStepResultCreateStatusEnum.FAILED,
-    [StepStatusEnum.blocked]: TestStepResultCreateStatusEnum.BLOCKED,
-    [StepStatusEnum.skipped]: TestStepResultCreateStatusEnum.BLOCKED,
-  };
-
-  /**
-   * @type {string}
-   * @private
-   */
   private readonly baseUrl: string;
-  /**
-   * @type {string}
-   * @private
-   */
-  private readonly projectCode: string;
-  /**
-   * @type {boolean | undefined}
-   * @private
-   */
-  private readonly isUploadAttachments: boolean | undefined;
-  /**
-   * @type {TestOpsRunType}
-   * @private
-   */
-  private run: TestOpsRunType;
-  /**
-   * @type { number | undefined}
-   * @private
-   */
-  private readonly environment: string | undefined;
-  /**
-   * @type {TestResultType[]}
-   * @private
-   */
+
   private readonly batchSize: number;
 
-  /**
-   * @type {boolean | undefined}
-   * @private
-   */
-  private readonly useV2: boolean;
+  private runId: number | undefined;
 
-  /**
-   * @type {boolean | undefined}
-   * @private
-   */
-  private readonly defect: boolean;
-
-  /**
-   * @type {string | undefined}
-   * @private
-   */
-  private readonly rootSuite: string | undefined;
-
-  /**
-   * @type {number}
-   * @private
-   */
   private firstIndex = 0;
 
-  /**
-   * @type {boolean}
-   * @private
-   */
   private isTestRunReady = false;
+
+  private mutex = new Mutex();
 
   /**
    * @param {LoggerInterface} logger
-   * @param {ReporterOptionsType & TestOpsOptionsType} options
-   * @param {QaseApiInterface} api
-   * @param {string | undefined} environment
-   * @param {string | undefined} rootSuite
+   * @param {IClient} api
+   * @param {boolean} withState
+   * @param {string} projectCode
+   * @param {string | undefined} baseUrl
+   * @param {number | undefined} batchSize
    */
   constructor(
     logger: LoggerInterface,
-    options: TestOpsOptionsType,
-    private api: QaseApiInterface,
-    environment?: string,
-    rootSuite?: string,
+    private api: IClient,
+    private withState: boolean,
+    private projectCode: string,
+    baseUrl?: string,
+    batchSize?: number,
+    runId?: number,
+    private showPublicReportLink?: boolean,
   ) {
-    const {
-      project,
-      uploadAttachments,
-      run,
-    } = options;
-
     super(logger);
-
-    const baseUrl = 'https://app.qase.io';
-
-    this.baseUrl = baseUrl.replace(/\/$/, '');
-    this.projectCode = project;
-    this.isUploadAttachments = uploadAttachments;
-    this.run = { complete: true, ...run };
-    this.environment = environment;
-    this.batchSize = options.batch?.size ?? defaultChunkSize;
-    this.useV2 = options.useV2 ?? false;
-    this.defect = options.defect ?? false;
-    this.rootSuite = rootSuite;
+    this.baseUrl = this.getBaseUrl(baseUrl);
+    this.batchSize = batchSize ?? defaultChunkSize;
+    this.runId = runId;
   }
 
   /**
@@ -204,18 +67,33 @@ export class TestOpsReporter extends AbstractReporter {
    * @returns {Promise<void>}
    */
   public override async addTestResult(result: TestResultType): Promise<void> {
-    await super.addTestResult(result);
+    if (result.execution.status === TestStatusEnum.failed) {
 
-    if (!this.isTestRunReady) {
-      return;
+      const testOpsIds = Array.isArray(result.testops_id) ? result.testops_id : [result.testops_id];
+
+      for (const id of testOpsIds) {
+        this.showLink(id, result.title);
+      }
     }
 
-    const countOfResults = this.batchSize + this.firstIndex;
+    const release = await this.mutex.acquire();
+    try {
 
-    if (this.results.length >= countOfResults) {
-      const firstIndex = this.firstIndex;
-      this.firstIndex = countOfResults;
-      await this.publishResults(this.results.slice(firstIndex, countOfResults));
+      await super.addTestResult(result);
+
+      if (!this.isTestRunReady) {
+        return;
+      }
+
+      const countOfResults = this.batchSize + this.firstIndex;
+
+      if (this.results.length >= countOfResults) {
+        const firstIndex = this.firstIndex;
+        this.firstIndex = countOfResults;
+        await this.publishResults(this.results.slice(firstIndex, countOfResults));
+      }
+    } finally {
+      release();
     }
   }
 
@@ -223,43 +101,16 @@ export class TestOpsReporter extends AbstractReporter {
    * @returns {Promise<void>}
    */
   private async checkOrCreateTestRun(): Promise<void> {
-    if (this.run.id !== undefined) {
 
-      this.logger.logDebug('Check test run');
+    const runId = await this.api.createRun();
 
-      await this.checkRun(this.run.id);
+    this.runId = runId;
+    process.env['QASE_TESTOPS_RUN_ID'] = String(runId);
 
-      this.isTestRunReady = true;
-      return;
+    if (this.withState) {
+      StateManager.setRunId(runId);
     }
 
-    this.logger.logDebug('Create test run');
-    let environmentId: number | undefined;
-    if (this.environment != undefined) {
-      try {
-        const { data } = await this.api.environment.getEnvironments(this.projectCode, 100);
-        const env = data.result?.entities?.find((env) => env.slug === this.environment);
-        if (env) {
-          environmentId = env.id;
-        }
-      } catch (error) {
-        throw new QaseError('Cannot get environments', { cause: error });
-      }
-    }
-    const { result } = await this.createRun(
-      this.run.title,
-      this.run.description,
-      environmentId,
-    );
-
-    if (!result?.id) {
-      throw new Error('Cannot create run.');
-    }
-
-    this.logger.logDebug(`Test run created: ${result.id}`);
-
-    this.run.id = result.id;
-    process.env['QASE_TESTOPS_RUN_ID'] = String(result.id);
     this.isTestRunReady = true;
   }
 
@@ -269,30 +120,10 @@ export class TestOpsReporter extends AbstractReporter {
    * @private
    */
   private async publishResults(testResults: TestResultType[]): Promise<void> {
-    if (this.useV2) {
-      const results: ResultCreateV2[] = [];
-
-      for (const result of testResults) {
-        const resultCreateV2 = await this.transformTestResult(result);
-        results.push(resultCreateV2);
-      }
-
-      await this.api.result.createResultsV2(this.projectCode, this.run.id!, {
-        results: results,
-      });
-
-    } else {
-      const results: ResultCreate[] = [];
-
-      for (const result of testResults) {
-        const resultCreate = await this.transformTestResultV1(result);
-        results.push(resultCreate);
-      }
-
-      await this.api.results.createResultBulk(this.projectCode, this.run.id!, {
-        results: results,
-      });
+    if (!this.runId) {
+      throw new Error('Run ID is not set');
     }
+    await this.api.uploadResults(this.runId, testResults);
 
     this.logger.logDebug(`Results sent to Qase: ${testResults.length}`);
   }
@@ -301,362 +132,108 @@ export class TestOpsReporter extends AbstractReporter {
    * @returns {Promise<void>}
    */
   public async publish(): Promise<void> {
+    const release = await this.mutex.acquire();
+    try {
+      await this.sendResults();
+    } finally {
+      release();
+    }
+    await this.complete();
+  }
+
+  /**
+   * @returns {Promise<void>}
+   */
+  public async sendResults(): Promise<void> {
     if (this.results.length === 0) {
       this.logger.log(chalk`{yellow No results to send to Qase}`);
       return;
     }
 
+    const remainingResults = this.results.slice(this.firstIndex);
+
     if (this.firstIndex < this.results.length) {
-      await this.publishResults(this.results.slice(this.firstIndex));
-    }
-
-    if (!this.run.complete) {
-      return;
-    }
-
-    try {
-      await this.api.runs.completeRun(this.projectCode, this.run.id!);
-      this.logger.log(chalk`{green Run ${this.run.id!} completed}`);
-    } catch (error) {
-      throw new QaseError('Error on completing run', { cause: error });
-    }
-
-    const runUrl = `${this.baseUrl}/run/${this.projectCode}/dashboard/${this.run.id!}`;
-
-    this.logger.log(chalk`{blue Test run link: ${runUrl}}`);
-  }
-
-  /**
-   * @param {TestResultType} result
-   * @returns Promise<ResultCreateV2>
-   * @private
-   */
-  private async transformTestResult(result: TestResultType): Promise<ResultCreateV2> {
-    const attachments = await this.uploadAttachments(result.attachments);
-    const steps = await this.transformSteps(result.steps, result.title);
-
-    const model = {
-      title: result.title,
-      execution: this.getExecution(result.execution),
-      testops_id: Array.isArray(result.testops_id) ? null : result.testops_id,
-      attachments: attachments,
-      steps: steps,
-      params: result.params,
-      relations: this.getRelation(result.relations),
-      message: result.message,
-    };
-
-    this.logger.logDebug(`Transformed result: ${JSON.stringify(model)}`);
-
-    return model;
-  }
-
-  /**
-   * @param {TestResultType} result
-   * @returns Promise<ResultCreate>
-   * @private
-   */
-  private async transformTestResultV1(result: TestResultType): Promise<ResultCreate> {
-    const attachments = await this.uploadAttachments(result.attachments);
-    const steps = await this.transformStepsV1(result.steps, result.title);
-
-    const resultCreate: ResultCreate = {
-      attachments: attachments,
-      comment: result.message,
-      defect: this.defect,
-      param: result.params,
-      stacktrace: result.execution.stacktrace,
-      start_time: result.execution.start_time ? result.execution.start_time | 0 : null,
-      status: result.execution.status,
-      steps: steps,
-      time: result.execution.end_time,
-      time_ms: result.execution.duration,
-    };
-
-    const id = Array.isArray(result.testops_id) ? null : result.testops_id;
-    if (id) {
-      resultCreate.case_id = id;
-      return resultCreate;
-    }
-
-    const rootSuite = this.rootSuite ? `${this.rootSuite}\t` : '';
-    resultCreate.case = {
-      title: result.title,
-      suite_title: result.relations?.suite ? `${rootSuite}${result.relations?.suite?.data.map((suite) => suite.title).join('\t')}` : rootSuite,
-    };
-
-    this.logger.logDebug(`Transformed result: ${JSON.stringify(resultCreate)}`);
-
-    return resultCreate;
-  }
-
-  /**
-   * @returns {ResultExecution}
-   * @private
-   * @param {TestExecution} exec
-   */
-  private getExecution(exec: TestExecution): ResultExecution {
-    return {
-      status: TestOpsReporter.statusMap[exec.status],
-      start_time: exec.start_time,
-      end_time: exec.end_time,
-      duration: exec.duration,
-      stacktrace: exec.stacktrace,
-      thread: exec.thread,
-    };
-  }
-
-  /**
-   * @param {Relation | null} relation
-   * @returns {ResultRelations}
-   * @private
-   */
-  private getRelation(relation: Relation | null): ResultRelations {
-    if (!relation?.suite) {
-      if (this.rootSuite == undefined) {
-        return {};
+      if (remainingResults.length <= defaultChunkSize) {
+        await this.publishResults(remainingResults);
+        return;
       }
 
-      return {
-        suite: {
-          data: [
-            {
-              public_id: null,
-              title: this.rootSuite,
-            },
-          ],
-        },
-      };
+      for (let i = 0; i < remainingResults.length; i += defaultChunkSize) {
+        await this.publishResults(remainingResults.slice(i, i + defaultChunkSize));
+      }
     }
 
-    const suiteData: SuiteData[] = [];
-    if (this.rootSuite != undefined) {
-      suiteData.push({
-        public_id: null,
-        title: this.rootSuite,
-      });
-    }
-
-    for (const data of relation.suite.data) {
-      suiteData.push({
-        public_id: null,
-        title: data.title,
-      });
-    }
-
-    return {
-      suite: {
-        data: suiteData,
-      },
-    };
+    // Clear results because we don't need to send them again then we use Cypress reporter
+    this.results.length = 0;
   }
 
   /**
-   * @param {TestStepType[]} steps
-   * @param testTitle
-   * @returns Promise<ResultStep[]>
-   * @private
+   * @param {Attachment} attachment
+   * @returns {Promise<string>}
    */
-  private async transformSteps(steps: TestStepType[], testTitle: string): Promise<ResultStep[]> {
-    const resultsSteps: ResultStep[] = [];
-
-    for (const step of steps) {
-      const attachmentHashes: string[] = await this.uploadAttachments(step.attachments);
-
-      const resultStep: ResultStep = {
-        data: {
-          action: '',
-        },
-        execution: {
-          status: TestOpsReporter.stepStatusMap[step.execution.status],
-          attachments: attachmentHashes,
-        },
-      };
-
-      if (step.step_type === StepType.TEXT) {
-        if ('action' in step.data && resultStep.data != undefined) {
-          if (step.data.action === '') {
-            this.logEmptyStep(testTitle);
-            resultStep.data.action = 'Unnamed step';
-          } else {
-            resultStep.data.action = step.data.action;
-          }
-        }
-      }
-
-      if (step.step_type === StepType.GHERKIN) {
-        if ('keyword' in step.data && resultStep.data != undefined) {
-          resultStep.data.action = step.data.keyword;
-        }
-      }
-
-      if (step.steps.length > 0) {
-        resultStep.steps = await this.transformSteps(step.steps, testTitle);
-      }
-
-      resultsSteps.push(resultStep);
-    }
-
-    return resultsSteps;
-  }
-
-  /**
-   * @param {TestStepType[]} steps
-   * @param testTitle
-   * @returns Promise<TestStepResultCreate[]>
-   * @private
-   */
-  private async transformStepsV1(steps: TestStepType[], testTitle: string): Promise<TestStepResultCreate[]> {
-    const resultsSteps: TestStepResultCreate[] = [];
-
-    for (const step of steps) {
-      const attachmentHashes: string[] = await this.uploadAttachments(step.attachments);
-
-      const resultStep: TestStepResultCreate = {
-        status: TestOpsReporter.stepStatusMapV1[step.execution.status],
-        attachments: attachmentHashes,
-      };
-
-      if (step.step_type === StepType.TEXT) {
-        if ('action' in step.data) {
-          if (step.data.action === '') {
-            this.logEmptyStep(testTitle);
-            resultStep.action = 'Unnamed step';
-          } else {
-            resultStep.action = step.data.action;
-          }
-        }
-      }
-
-      if (step.step_type === StepType.GHERKIN) {
-        if ('keyword' in step.data) {
-          resultStep.action = step.data.keyword;
-        }
-      }
-
-      if (step.steps.length > 0) {
-        resultStep.steps = await this.transformStepsV1(step.steps, testTitle);
-      }
-
-      resultsSteps.push(resultStep);
-    }
-
-    return resultsSteps;
-  }
-
-  private logEmptyStep(testTitle: string): void {
-    this.logger.log(chalk`{magenta Test '${testTitle}' has empty action in step. The reporter will mark this step as unnamed step.}`);
-  }
-
-  /**
-   * @param {number} runId
-   * @returns {Promise<void>}
-   * @private
-   */
-  private async checkRun(runId: number): Promise<void> {
-    try {
-      const resp = await this.api.runs.getRun(this.projectCode, runId);
-
-      this.logger.log(
-        `Get run result on checking run "${String(resp.data.result?.id)}"`,
-      );
-    } catch (error) {
-      throw new QaseError('Error on checking run', { cause: error });
-    }
-  }
-
-  /**
-   * @param {string} title
-   * @param {string} description
-   * @param {number | undefined} environment
-   * @returns {Promise<IdResponse>}
-   * @private
-   */
-  private async createRun(
-    title: string,
-    description: string,
-    environment: number | undefined,
-  ): Promise<IdResponse> {
-    try {
-      const runObject: RunCreate = {
-        title,
-        description,
-        is_autotest: true,
-        cases: [],
-        start_time: this.getDate(),
-      };
-
-      if (environment !== undefined) {
-        runObject.environment_id = environment;
-      }
-
-      const { data } = await this.api.runs.createRun(
-        this.projectCode,
-        runObject,
-      );
-
-      return data;
-    } catch (error) {
-      throw new QaseError('Cannot create run', { cause: error });
-    }
-  }
-
-  /**
-   * @returns {string}
-   * @private
-   */
-  private getDate(): string {
-    const date = new Date();
-    date.setSeconds(-10);
-    const year = date.getUTCFullYear();
-    const month = ('0' + (date.getUTCMonth() + 1).toString()).slice(-2); // Months are zero indexed, so we add 1
-    const day = ('0' + date.getUTCDate().toString()).slice(-2);
-    const hours = ('0' + date.getUTCHours().toString()).slice(-2);
-    const minutes = ('0' + date.getUTCMinutes().toString()).slice(-2);
-    const seconds = ('0' + date.getUTCSeconds().toString()).slice(-2);
-
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  override async uploadAttachment(attachment: Attachment): Promise<string> {
+    return await this.api.uploadAttachment(attachment);
   }
 
   /**
    * @returns {Promise<void>}
-   * @private
    */
-  private async uploadAttachments(attachments: Attachment[]): Promise<string[]> {
-    if (!this.isUploadAttachments) {
-      return [];
+  public async complete(): Promise<void> {
+    if (!this.runId) {
+      throw new Error('Run ID is not set');
     }
+    await this.api.completeRun(this.runId);
 
-    const acc: string[] = [];
-    for (const attachment of attachments) {
-      this.logger.logDebug(`Uploading attachment: ${attachment.file_path ?? attachment.file_name}`);
-
+    if (this.showPublicReportLink) {
       try {
-        let data: unknown;
-        if (attachment.file_path) {
-
-          data = { name: attachment.file_name, value: createReadStream(attachment.file_path) };
-        } else {
-          if (typeof attachment.content === 'string') {
-            data = { name: attachment.file_name, value: Buffer.from(attachment.content) };
-          } else {
-            data = { name: attachment.file_name, value: attachment.content };
-          }
-        }
-
-        const response = await this.api.attachments.uploadAttachment(
-          this.projectCode,
-          [data],
-        );
-
-        if (response.data.result?.[0]?.hash != undefined) {
-          acc.push(response.data.result[0].hash);
-        }
-
+        await this.api.enablePublicReport(this.runId);
       } catch (error) {
-        this.logger.logError('Cannot upload attachment:', error);
+        // Error is already logged in enablePublicReport
       }
     }
-    return acc;
+
+    this.logger.log(chalk`{green Run ${this.runId} completed}`);
+  }
+
+  /**
+   * @param {string | undefined} url
+   * @return string
+   * @private
+   */
+  private getBaseUrl(url: string | undefined): string {
+    if (!url || url === 'qase.io') {
+      return 'https://app.qase.io';
+    }
+
+    return `https://${url.replace('api', 'app')}`;
+  }
+
+  /**
+   * @param {number | null} id
+   * @param {string} title
+   * @return string
+   * @private
+   */
+  private prepareFailedTestLink(id: number | null, title: string): string {
+    if (!this.runId) {
+      throw new Error('Run ID is not set');
+    }
+    const baseLink = `${this.baseUrl}/run/${this.projectCode}/dashboard/${this.runId}?source=logs&search=`;
+    if (id) {
+      return `${baseLink}${this.projectCode}-${id}`;
+    }
+
+    return `${baseLink}${encodeURI(title)}`;
+  }
+
+  /**
+   * Show link to failed test
+   * @param {number | null} id
+   * @param {string} title
+   * @private
+   */
+  private showLink(id: number | null, title: string): void {
+    const link = this.prepareFailedTestLink(id, title);
+    this.logger.log(chalk`{blue See why this test failed: ${link}}`);
   }
 }

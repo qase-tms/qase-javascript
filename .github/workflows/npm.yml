@@ -1,6 +1,14 @@
 name: Node package
 
-on: [push]
+on:
+  push:
+  pull_request:
+    branches:
+      - 'main'
+
+permissions:
+  id-token: write
+  contents: write
 
 jobs:
   test:
@@ -8,14 +16,15 @@ jobs:
     strategy:
       max-parallel: 5
       matrix:
-        node-version: [ '16', '18' ]
-        prefix: [ "qaseio", "qase-javascript-commons", "qase-cypress", "qase-cucumberjs", "qase-newman", "qase-testcafe", "qase-jest", "qase-playwright" ]
+        node-version: [ '22', '24' ]
+        prefix: [ "qase-api-client", "qase-api-v2-client", "qase-javascript-commons", "qase-cypress", "qase-cucumberjs", "qase-newman", "qase-testcafe", "qase-jest", "qase-playwright", "qase-mocha", "qase-wdio", "qase-vitest" ]
     name: Project ${{ matrix.prefix }} - Node ${{ matrix.node-version }}
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
+    - uses: actions/checkout@v6
+    - uses: actions/setup-node@v6
       with:
         node-version: ${{ matrix.node-version }}
+    - run: npm install npm@latest    
     - run: npm ci
     - run: npm run build -ws --if-present
     - run: npm run lint -w ${{ matrix.prefix }}
@@ -27,16 +36,20 @@ jobs:
     strategy:
       max-parallel: 5
       matrix:
-        prefix: [ "qaseio", "qase-javascript-commons", "qase-cypress", "qase-cucumberjs", "qase-newman", "qase-testcafe", "qase-jest", "qase-playwright" ]
+        prefix: [ "qase-api-client", "qase-api-v2-client", "qase-javascript-commons", "qase-cypress", "qase-cucumberjs", "qase-newman", "qase-testcafe", "qase-jest", "qase-playwright", "qase-mocha", "qase-wdio", "qase-vitest" ]
     if: startsWith(github.event.ref, 'refs/tags')
     name: Publish ${{ matrix.prefix }}
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
+    - uses: actions/checkout@v6
+    - uses: actions/setup-node@v6
       if: contains(github.event.ref, matrix.prefix)
       with:
-        node-version: '16'
+        node-version: '24'
         registry-url: 'https://registry.npmjs.org'
+    
+    - name: Update npm
+      if: contains(github.event.ref, matrix.prefix)
+      run: npm install npm@latest
 
     - name: Install dependencies
       if: contains(github.event.ref, matrix.prefix)
@@ -49,11 +62,17 @@ jobs:
     - name: Publish a release version
       if: contains(github.event.ref, matrix.prefix) && !contains(github.event.ref, 'beta')
       run: npm publish -w ${{ matrix.prefix }}
+
+    - name: Create GitHub Release
+      if: contains(github.event.ref, matrix.prefix) && !contains(github.event.ref, 'beta')
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: ${{ github.ref_name }}
+        generate_release_notes: true
       env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Publish a beta version
       if: contains(github.event.ref, matrix.prefix) && contains(github.event.ref, 'beta')
       run: npm publish -w ${{ matrix.prefix }} --tag beta
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

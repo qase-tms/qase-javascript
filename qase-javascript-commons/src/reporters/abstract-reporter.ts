@@ -1,4 +1,4 @@
-import { TestResultType } from '../models';
+import { Attachment, TestResultType } from '../models';
 import { v4 as uuidv4 } from 'uuid';
 import { LoggerInterface } from '../utils/logger';
 
@@ -12,6 +12,12 @@ export interface InternalReporterInterface {
   getTestResults(): TestResultType[];
 
   setTestResults(results: TestResultType[]): void;
+
+  sendResults(): Promise<void>;
+
+  complete(): Promise<void>;
+
+  uploadAttachment(attachments: Attachment): Promise<string>;
 }
 
 /**
@@ -43,6 +49,22 @@ export abstract class AbstractReporter implements InternalReporterInterface {
   abstract startTestRun(): Promise<void>;
 
   /**
+   * @returns {Promise<void>}
+   */
+  abstract complete(): Promise<void>;
+
+  /**
+   * @returns {Promise<void>}
+   */
+  abstract sendResults(): Promise<void>;
+
+  /**
+   * @param {Attachment} attachment
+   * @returns {Promise<string>}
+   */
+  abstract uploadAttachment(attachment: Attachment): Promise<string>;
+
+  /**
    * @protected
    * @param {LoggerInterface} logger
    */
@@ -54,7 +76,11 @@ export abstract class AbstractReporter implements InternalReporterInterface {
    * @returns {TestResultType[]}
    */
   public getTestResults(): TestResultType[] {
-    return this.results;
+    const results = this.results;
+
+    this.results = [];
+
+    return results;
   }
 
   /**
@@ -81,7 +107,7 @@ export abstract class AbstractReporter implements InternalReporterInterface {
     let firstCase = true;
 
     for (const id of result.testops_id) {
-      const testResultCopy = { ...result };
+      const testResultCopy = { ...result } as TestResultType;
       testResultCopy.testops_id = id;
       testResultCopy.id = uuidv4();
 
@@ -101,7 +127,7 @@ export abstract class AbstractReporter implements InternalReporterInterface {
     this.results = results;
   }
 
-  private removeAnsiEscapeCodes(str: string): string {
+  protected removeAnsiEscapeCodes(str: string): string {
     const ansiEscapeSequences = new RegExp([
       '\x1B[[(?);]{0,2}(;?\\d)*.',
     ].join('|'), 'g');

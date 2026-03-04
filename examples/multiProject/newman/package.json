@@ -1,0 +1,11 @@
+{
+  "name": "newman-multiproject-example",
+  "private": true,
+  "scripts": {
+    "test": "QASE_MODE=testops_multi newman run ./sample-collection.json -r qase"
+  },
+  "devDependencies": {
+    "newman": "^6.2.1",
+    "newman-reporter-qase": "^2.1.5"
+  }
+}

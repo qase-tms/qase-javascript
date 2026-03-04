@@ -8,6 +8,7 @@ export enum EnvEnum {
   environment = 'QASE_ENVIRONMENT',
   captureLogs = 'QASE_CAPTURE_LOGS',
   rootSuite = 'QASE_ROOT_SUITE',
+  statusMapping = 'QASE_STATUS_MAPPING',
 }
 
 /**
@@ -17,7 +18,8 @@ export enum EnvTestOpsEnum {
   project = 'QASE_TESTOPS_PROJECT',
   uploadAttachments = 'QASE_TESTOPS_UPLOAD_ATTACHMENTS',
   defect = 'QASE_TESTOPS_DEFECT',
-  useV2 = 'QASE_TESTOPS_API_V2',
+  statusFilter = 'QASE_TESTOPS_STATUS_FILTER',
+  showPublicReportLink = 'QASE_TESTOPS_SHOW_PUBLIC_REPORT_LINK',
 }
 
 /**
@@ -35,7 +37,9 @@ export enum EnvRunEnum {
   id = 'QASE_TESTOPS_RUN_ID',
   title = 'QASE_TESTOPS_RUN_TITLE',
   description = 'QASE_TESTOPS_RUN_DESCRIPTION',
-  complete = 'QASE_TESTOPS_RUN_COMPLETE'
+  complete = 'QASE_TESTOPS_RUN_COMPLETE',
+  tags = 'QASE_TESTOPS_RUN_TAGS',
+  externalLink = 'QASE_TESTOPS_RUN_EXTERNAL_LINK',
 }
 
 /**
@@ -55,7 +59,23 @@ export enum EnvBatchEnum {
 /**
  * @enum {string}
  */
+export enum EnvConfigurationsEnum {
+  values = 'QASE_TESTOPS_CONFIGURATIONS_VALUES',
+  createIfNotExists = 'QASE_TESTOPS_CONFIGURATIONS_CREATE_IF_NOT_EXISTS',
+}
+
+/**
+ * @enum {string}
+ */
 export enum EnvLocalEnum {
   path = 'QASE_REPORT_CONNECTION_PATH',
   format = 'QASE_REPORT_CONNECTION_FORMAT',
+}
+
+/**
+ * @enum {string}
+ */
+export enum EnvLoggingEnum {
+  console = 'QASE_LOGGING_CONSOLE',
+  file = 'QASE_LOGGING_FILE',
 }

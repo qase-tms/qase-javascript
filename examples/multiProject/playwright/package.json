@@ -1,0 +1,11 @@
+{
+  "name": "playwright-multiproject-example",
+  "private": true,
+  "scripts": {
+    "test": "QASE_MODE=testops_multi npx playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "playwright-qase-reporter": "^2.1.6"
+  }
+}

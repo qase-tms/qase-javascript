@@ -1,6 +1,12 @@
-export { type TestResultType, Relation, Suite, SuiteData } from './test-result';
+export { TestResultType } from './test-result';
+export type { Relation, Suite, SuiteData, TestopsProjectMapping } from './test-result';
 export { TestExecution, TestStatusEnum } from './test-execution';
-export { type TestStepType, StepType } from './test-step';
+export { TestStepType, StepType } from './test-step';
+export type { StepRequestData, StepTextData, StepGherkinData } from './step-data';
 export { StepStatusEnum } from './step-execution';
-export { Attachment } from './attachment';
-export { Report } from './report';
+export type { Attachment } from './attachment';
+export type { Report } from './report';
+export { CompoundError } from './error';
+export type { ConfigurationGroup, ConfigurationItem, ConfigurationGroupResponse } from './configuration';
+export { ExternalLinkType } from './config/TestOpsOptionsType';
+export type { TestOpsOptionsType, TestOpsApiType, TestOpsRunType, TestOpsPlanType, TestOpsBatchType, TestOpsConfigurationType, TestOpsConfigurationValueType, TestOpsExternalLinkType, TestOpsProjectConfigType, TestOpsMultiConfigType } from './config/TestOpsOptionsType';

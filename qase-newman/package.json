@@ -1,6 +1,6 @@
 {
   "name": "newman-reporter-qase",
-  "version": "2.0.0",
+  "version": "2.2.0",
   "description": "Qase TMS Newman Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -39,17 +39,18 @@
   "author": "Qase Team <support@qase.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "qase-javascript-commons": "^2.0.9",
-    "semver": "^7.5.1"
+    "qase-javascript-commons": "~2.5.0",
+    "semver": "^7.7.3"
   },
   "devDependencies": {
-    "@jest/globals": "^29.5.0",
-    "@types/jest": "^29.5.2",
-    "@types/newman": "^5.3.3",
-    "@types/postman-collection": "^3.5.7",
-    "jest": "^29.5.0",
-    "postman-collection": "^4.1.7",
-    "ts-jest": "^29.1.0"
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.14",
+    "@types/newman": "^5.3.6",
+    "@types/postman-collection": "^3.5.11",
+    "ajv": "^8.18.0",
+    "jest": "^29.7.0",
+    "postman-collection": "^4.5.0",
+    "ts-jest": "^29.4.5"
   },
   "peerDependencies": {
     "newman": ">=5.3.0"

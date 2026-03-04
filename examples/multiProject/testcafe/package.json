@@ -1,0 +1,11 @@
+{
+  "name": "testcafe-multiproject-example",
+  "private": true,
+  "scripts": {
+    "test": "QASE_MODE=testops_multi npx testcafe chrome multiProjectTests.js -r spec,qase -s path=screenshots,takeOnFails=true"
+  },
+  "devDependencies": {
+    "testcafe": "^3.7.2",
+    "testcafe-reporter-qase": "^2.1.3"
+  }
+}

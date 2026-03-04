@@ -1,4 +1,4 @@
-export type ShortResult = {
+export interface ShortResult {
   id: string
   title: string
   status: string

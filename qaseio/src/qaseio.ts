@@ -1,5 +1,5 @@
 import axios from 'axios';
-import * as axiosRetry from 'axios-retry';
+import axiosRetry from 'axios-retry';
 
 import {
   ProjectsApi,
@@ -15,16 +15,18 @@ import {
   DefectsApi,
   CustomFieldsApi,
   AuthorsApi,
-  Configuration, EnvironmentsApi,
+  Configuration,
+  EnvironmentsApi,
+  SearchApi,
 } from './generated';
 
-export type QaseApiOptionsType = {
+export interface QaseApiOptionsType {
   token: string;
   host?: string | undefined;
   headers?: Record<string, string | undefined> | undefined;
   retries?: number | undefined;
   retryDelay?: number | undefined;
-};
+}
 
 export interface QaseApiInterface {
   projects: ProjectsApi;
@@ -41,6 +43,7 @@ export interface QaseApiInterface {
   customFields: CustomFieldsApi;
   authors: AuthorsApi;
   environment: EnvironmentsApi;
+  search: SearchApi;
 }
 
 /**
@@ -62,6 +65,7 @@ export class QaseApi implements QaseApiInterface {
   public customFields: CustomFieldsApi;
   public authors: AuthorsApi;
   public environment: EnvironmentsApi;
+  public search: SearchApi;
 
   /**
    * @param {QaseApiOptionsType} options
@@ -97,11 +101,17 @@ export class QaseApi implements QaseApiInterface {
       formDataCtor,
     });
 
+    // default path is https://api.qase.io, defined in
+    // qaseio/src/generated/base.ts
     if (host != undefined) {
-      if (host == 'qase.io') {
-        configuration.basePath = `https://api.${host}`;
+      if (host == 'qase.io' || host == 'api.qase.io' || host == 'https://api.qase.io') {
+        configuration.basePath = `https://api.qase.io`;
+      } else if (host == 'http://api.qase.lo') {
+        // Qase on local machine, development mode
+        configuration.basePath = host
       } else {
-        configuration.basePath = host;
+        // Custom Qase host
+        configuration.basePath = `https://${host}`;
       }
     }
 
@@ -119,5 +129,6 @@ export class QaseApi implements QaseApiInterface {
     this.customFields = new CustomFieldsApi(configuration, host, transport);
     this.authors = new AuthorsApi(configuration, host, transport);
     this.environment = new EnvironmentsApi(configuration, host, transport);
+    this.search = new SearchApi(configuration, host, transport);
   }
 }

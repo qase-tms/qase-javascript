@@ -2,23 +2,29 @@ import test from '@playwright/test';
 import { v4 as uuidv4 } from 'uuid';
 import { PlaywrightQaseReporter } from './reporter';
 import * as path from 'path';
-import { getMimeTypes } from 'qase-javascript-commons';
+import { getMimeTypes, formatTitleWithProjectMapping } from 'qase-javascript-commons';
 
 export const ReporterContentType = 'application/qase.metadata+json';
 const defaultContentType = 'application/octet-stream';
 
+/** Project code -> test case IDs for multi-project (testops_multi) mode. */
+export type ProjectMapping = Record<string, number[]>;
+
 export interface MetadataMessage {
   ids?: number[];
+  /** Multi-project mapping: project code -> list of test case IDs. */
+  projectMapping?: ProjectMapping;
   title?: string;
   fields?: Record<string, string>;
   parameters?: Record<string, string>;
+  groupParams?: Record<string, string>;
   ignore?: boolean;
   suite?: string;
   comment?: string;
 }
 
 /**
- * Use `qase.id()` instead. This method is deprecated and kept for reverse compatibility.
+ * Set IDs for the test case
  *
  * @param caseId
  * @param name
@@ -51,13 +57,16 @@ export const qase = (
     console.log(`qase: qase ID ${id} should be a number`);
   }
 
-  PlaywrightQaseReporter.addIds(ids, name);
+  const newName = `${name} (Qase ID: ${caseIds.join(',')})`;
 
-  return `${name}`;
+  PlaywrightQaseReporter.addIds(ids, newName);
+
+  return newName;
 };
 
 /**
  * Set IDs for the test case
+ * Use `qase()` instead. This method is deprecated and kept for reverse compatibility.
  *
  * @param {number | number[]} value
  *
@@ -73,6 +82,44 @@ qase.id = function(value: number | number[]) {
     ids: Array.isArray(value) ? value : [value],
   });
   return this;
+};
+
+/**
+ * Set multi-project mapping: project code -> test case IDs (for testops_multi mode).
+ * @param mapping — e.g. { PROJ1: [1, 2], PROJ2: [3] }
+ * @example
+ * test('test', async ({ page }) => {
+ *   qase.projects({ PROJ1: [1, 2], PROJ2: [3] });
+ *   await page.goto('https://example.com');
+ * });
+ */
+qase.projects = function(mapping: ProjectMapping) {
+  const normalized: ProjectMapping = {};
+  for (const [code, ids] of Object.entries(mapping)) {
+    if (Array.isArray(ids) && ids.length > 0) {
+      normalized[code] = ids.map((id) => (typeof id === 'number' ? id : parseInt(String(id), 10))).filter((n) => !Number.isNaN(n));
+    }
+  }
+  if (Object.keys(normalized).length > 0) {
+    addMetadata({ projectMapping: normalized });
+  }
+  return this;
+};
+
+/**
+ * Return test title with multi-project markers (for testops_multi mode).
+ * Use as the test name: test(qase.projectsTitle('Test name', { PROJ1: [1], PROJ2: [2] }), () => { ... }).
+ * @param name — base test title
+ * @param mapping — project code → test case IDs, e.g. { PROJ1: [1], PROJ2: [2] }
+ */
+qase.projectsTitle = function(name: string, mapping: ProjectMapping): string {
+  const normalized: ProjectMapping = {};
+  for (const [code, ids] of Object.entries(mapping)) {
+    if (Array.isArray(ids) && ids.length > 0) {
+      normalized[code] = ids.map((id) => (typeof id === 'number' ? id : parseInt(String(id), 10))).filter((n) => !Number.isNaN(n));
+    }
+  }
+  return Object.keys(normalized).length > 0 ? formatTitleWithProjectMapping(name, normalized) : name;
 };
 
 /**
@@ -128,8 +175,33 @@ qase.parameters = function(values: Record<string, string>) {
   for (const [key, value] of Object.entries(values)) {
     stringRecord[String(key)] = String(value);
   }
+
   addMetadata({
     parameters: stringRecord,
+  });
+  return this;
+};
+
+/**
+ * Set group parameters for the test case.
+ * All parameters will be grouped as a single entity.
+ * @param {Record<string, string>[]} values
+ * @example
+ * for (const value of values) {
+ *    test('test', async ({ page }) => {
+ *      qase.groupParameters({ 'parameter': value });
+ *      await page.goto('https://example.com');
+ *    });
+ * )
+ */
+qase.groupParameters = function(values: Record<string, string>) {
+  const stringRecord: Record<string, string> = {};
+  for (const [key, value] of Object.entries(values)) {
+    stringRecord[String(key)] = String(value);
+  }
+
+  addMetadata({
+    groupParams: stringRecord,
   });
   return this;
 };
@@ -216,6 +288,23 @@ qase.comment = function(value: string) {
   return this;
 };
 
+/**
+ * Set a expected result and data for the test step
+ * @param action
+ * @param expectedResult
+ * @param data
+ * @example
+ * test('test', async ({ page }) => {
+ *    await test.step(qase.step('action', 'expected result', 'data'), async () => {
+ *      await page.goto('https://example.com');
+ *    });
+ * });
+ */
+qase.step = function(action: string, expectedResult: string | undefined, data: string | undefined): string {
+  return `${action} QaseExpRes:${expectedResult ? `: ${expectedResult}` : ''} QaseData:${data ? `: ${data}` : ''}`;
+};
+
+
 const addMetadata = (metadata: MetadataMessage): void => {
   test.info().attach('qase-metadata.json', {
     contentType: ReporterContentType,
@@ -244,3 +333,4 @@ const addAttachment = (name: string, contentType: string, filePath?: string, bod
   }).catch(() => {/**/
   });
 };
+

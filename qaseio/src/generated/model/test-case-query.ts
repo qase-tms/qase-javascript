@@ -30,6 +30,12 @@ export interface TestCaseQuery {
      * @type {number}
      * @memberof TestCaseQuery
      */
+    'test_case_id': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof TestCaseQuery
+     */
     'id'?: number;
     /**
      * 

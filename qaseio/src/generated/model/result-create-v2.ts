@@ -13,6 +13,7 @@
  */
 
 
+import { ResultCreateFields } from './result-create-fields';
 import { ResultExecution } from './result-execution';
 import { ResultRelations } from './result-relations';
 import { ResultStep } from './result-step';
@@ -55,11 +56,11 @@ export interface ResultCreateV2 {
      */
     'testops_id'?: number | null;
     /**
-     * 
-     * @type {{ [key: string]: string; }}
+     *
+     * @type {ResultCreateFields}
      * @memberof ResultCreateV2
      */
-    'fields'?: { [key: string]: string; };
+    'fields'?: ResultCreateFields;
     /**
      * 
      * @type {Array<string>}
@@ -85,11 +86,11 @@ export interface ResultCreateV2 {
      */
     'params'?: { [key: string]: string; };
     /**
-     * 
-     * @type {string}
+     * List parameter groups by name only. Add their values in the \'params\' field
+     * @type {Array<Array<string>>}
      * @memberof ResultCreateV2
      */
-    'author'?: string;
+    'param_groups'?: Array<Array<string>> | null;
     /**
      * 
      * @type {ResultRelations}
@@ -97,24 +98,16 @@ export interface ResultCreateV2 {
      */
     'relations'?: ResultRelations | null;
     /**
-     * 
-     * @type {boolean}
-     * @memberof ResultCreateV2
-     */
-    'muted'?: boolean;
-    /**
-     * 
+     *
      * @type {string}
      * @memberof ResultCreateV2
      */
     'message'?: string | null;
     /**
-     * 
-     * @type {number}
+     * If true and the result is failed, the defect associated with the result will be created
+     * @type {boolean}
      * @memberof ResultCreateV2
      */
-    'created_at'?: number | null;
+    'defect'?: boolean;
 }
-
-
 

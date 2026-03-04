@@ -1,0 +1,15 @@
+{
+  "name": "examples-testcafe",
+  "private": true,
+  "scripts": {
+    "test": "QASE_MODE=${QASE_MODE:-off} npx testcafe chrome tests/*.test.js -r spec,qase -s path=screenshots,takeOnFails=true"
+  },
+  "devDependencies": {
+    "eslint-plugin-testcafe": "^0.2.1",
+    "testcafe": "^3.7.2",
+    "testcafe-reporter-qase": "^2.0.0"
+  },
+  "dependencies": {
+    "qase-javascript-commons": "^2.0.0"
+  }
+}

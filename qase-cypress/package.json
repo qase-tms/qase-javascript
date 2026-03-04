@@ -1,6 +1,6 @@
 {
   "name": "cypress-qase-reporter",
-  "version": "2.0.2",
+  "version": "3.2.1",
   "description": "Qase Cypress Reporter",
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "sideEffects": false,
@@ -10,7 +10,12 @@
     ".": "./dist/index.js",
     "./mocha": "./dist/mocha.js",
     "./reporter": "./dist/reporter.js",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./plugin": "./dist/plugin.js",
+    "./metadata": "./dist/metadata.js",
+    "./hooks": "./dist/hooks.js",
+    "./cucumber": "./dist/cucumber.js",
+    "./support": "./dist/support.js"
   },
   "typesVersions": {
     "*": {
@@ -22,6 +27,9 @@
       ],
       "reporter": [
         "./dist/reporter.d.ts"
+      ],
+      "cucumber": [
+        "./dist/cucumber.d.ts"
       ]
     }
   },
@@ -44,19 +52,19 @@
   "author": "Qase Team <support@qase.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "qase-javascript-commons": "^2.0.0",
+    "qase-javascript-commons": "~2.5.6",
     "uuid": "^9.0.1"
   },
   "peerDependencies": {
     "cypress": ">=8.0.0"
   },
   "devDependencies": {
-    "@jest/globals": "^29.5.0",
-    "@types/jest": "^29.5.2",
-    "@types/mocha": "^10.0.1",
-    "ajv": "^8.12.0",
-    "jest": "^29.5.0",
-    "mocha": "^10.2.0",
-    "ts-jest": "^29.1.0"
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.14",
+    "@types/mocha": "^10.0.10",
+    "ajv": "^8.18.0",
+    "jest": "^29.7.0",
+    "mocha": "^10.8.2",
+    "ts-jest": "^29.4.5"
   }
 }

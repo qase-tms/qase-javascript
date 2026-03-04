@@ -1,0 +1,17 @@
+{
+  "debug": true,
+  "testops": {
+    "api": {
+      "token": "api_key"
+    },
+    "project": "project_code",
+    "run": {
+      "complete": true
+    }
+  },
+  "framework": {
+    "newman": {
+      "autoCollectParams": true
+    }
+  }
+}

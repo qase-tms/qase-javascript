@@ -1,0 +1,11 @@
+{
+  "debug": true,
+  "mode": "report",
+  "profilers": ["network"],
+  "testops": {
+    "api": {
+      "token": "token"
+    },
+    "project": "project_code"
+  }
+}

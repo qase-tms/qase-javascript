@@ -2,8 +2,10 @@
   "extends": "./tsconfig.json",
 
   "compilerOptions": {
-    "noEmit": false
+    "noEmit": false,
+    "skipLibCheck": true,
+    "types": []
   },
 
-  "include": ["./src/**/*.ts"]
+  "include": ["./src/**/*.ts", "./src/*.js"],
 }

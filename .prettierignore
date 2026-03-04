@@ -4,3 +4,5 @@ examples/cypress/cypress/reports/
 */dist
 */coverage
 qaseio/src/generated
+qase-api-client/src
+qase-api-v2-client/src

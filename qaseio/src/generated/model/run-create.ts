@@ -57,7 +57,13 @@ export interface RunCreate {
      */
     'environment_id'?: number;
     /**
-     * 
+     *
+     * @type {string}
+     * @memberof RunCreate
+     */
+    'environment_slug'?: string;
+    /**
+     *
      * @type {number}
      * @memberof RunCreate
      */

@@ -15,37 +15,49 @@
 
 
 /**
- * 
+ *
  * @export
  * @interface Author
  */
 export interface Author {
     /**
-     * 
+     *
      * @type {number}
      * @memberof Author
      */
     'id'?: number;
     /**
-     * 
+     *
+     * @type {number}
+     * @memberof Author
+     */
+    'author_id'?: number;
+    /**
+     *
      * @type {string}
      * @memberof Author
      */
     'entity_type'?: string;
     /**
-     * 
+     *
+     * @type {number}
+     * @memberof Author
+     */
+    'entity_id'?: number;
+    /**
+     *
      * @type {string}
      * @memberof Author
      */
     'email'?: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof Author
      */
     'name'?: string;
     /**
-     * 
+     *
      * @type {boolean}
      * @memberof Author
      */

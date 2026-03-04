@@ -17,11 +17,11 @@ import { Attachment } from './attachment';
 import { CustomFieldValue } from './custom-field-value';
 import { DefectQuery } from './defect-query';
 import { PlanQuery } from './plan-query';
-import { Requirement } from './requirement';
-import { Result } from './result';
-import { Run } from './run';
+import { RequirementQuery } from './requirement-query';
+import { ResultQuery } from './result-query';
 import { RunEnvironment } from './run-environment';
 import { RunMilestone } from './run-milestone';
+import { RunQuery } from './run-query';
 import { RunStats } from './run-stats';
 import { TagValue } from './tag-value';
 import { TestCaseParams } from './test-case-params';
@@ -32,6 +32,6 @@ import { TestStep } from './test-step';
  * @type SearchResponseAllOfResultEntities
  * @export
  */
-export type SearchResponseAllOfResultEntities = DefectQuery | PlanQuery | Requirement | Result | Run | TestCaseQuery;
+export type SearchResponseAllOfResultEntities = DefectQuery | PlanQuery | RequirementQuery | ResultQuery | RunQuery | TestCaseQuery;
 
 

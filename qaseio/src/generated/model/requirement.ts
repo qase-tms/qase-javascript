@@ -31,6 +31,12 @@ export interface Requirement {
      * @type {number}
      * @memberof Requirement
      */
+    'requirement_id'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Requirement
+     */
     'parent_id'?: number | null;
     /**
      * 

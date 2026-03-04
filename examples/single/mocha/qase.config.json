@@ -1,0 +1,21 @@
+{
+  "debug": true,
+  "mode": "report",
+
+  "profilers": ["network"],
+
+  "testops": {
+    "api": {
+      "token": "token"
+    },
+
+    "project": "project_code",
+    "uploadAttachments": true,
+    "showPublicReportLink": true,
+
+    "run": {
+      "complete": true,
+      "title": "Mocha test run"
+    }
+  }
+}

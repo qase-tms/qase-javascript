@@ -1,0 +1,14 @@
+{
+  "name": "examples-jest",
+  "private": true,
+  "scripts": {
+    "test": "QASE_MODE=${QASE_MODE:-off} jest --runInBand"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.28.5",
+    "@jest/globals": "^29.7.0",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
+    "jest-qase-reporter": "^2.0.0"
+  }
+}

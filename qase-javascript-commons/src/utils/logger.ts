@@ -3,7 +3,6 @@ import * as path from 'path';
 import { isAxiosError } from './is-axios-error';
 import { QaseError } from './qase-error';
 import { AxiosError } from 'axios';
-import get from 'lodash.get';
 
 export interface LoggerInterface {
   log(message: string): void;
@@ -13,15 +12,37 @@ export interface LoggerInterface {
   logDebug(message: string): void;
 }
 
+interface ApiErrorResponse {
+  errorMessage?: string;
+  error?: string;
+  errorFields?: {
+    field: string;
+    error: string;
+  }[];
+}
+
 export class Logger implements LoggerInterface {
   private readonly debug: boolean | undefined;
   private readonly filePath: string;
+  private readonly consoleEnabled: boolean;
+  private readonly fileEnabled: boolean;
 
-  constructor(options: { debug?: boolean | undefined, dir?: string }) {
+  constructor(options: { 
+    debug?: boolean | undefined, 
+    dir?: string,
+    consoleLogging?: boolean | undefined,
+    fileLogging?: boolean | undefined,
+  }) {
     this.debug = options.debug;
 
+    // Determine console logging: if explicitly set, use that value; otherwise default to true
+    this.consoleEnabled = options.consoleLogging !== undefined ? options.consoleLogging : true;
+    
+    // Determine file logging: if explicitly set, use that value; otherwise use debug setting
+    this.fileEnabled = options.fileLogging !== undefined ? options.fileLogging : (this.debug ?? false);
+
     const dir = options.dir ?? './logs';
-    if (!fs.existsSync(dir)) {
+    if (this.fileEnabled && !fs.existsSync(dir)) {
       fs.mkdirSync(dir);
     }
 
@@ -30,16 +51,20 @@ export class Logger implements LoggerInterface {
 
   public log(message: string): void {
     const logMessage = `[INFO] qase: ${message}`;
-    console.log(logMessage);
-    if (this.debug) {
+    if (this.consoleEnabled) {
+      console.log(logMessage);
+    }
+    if (this.fileEnabled) {
       this.logToFile(logMessage);
     }
   }
 
   public logError(message: string, error?: unknown): void {
     const logMessage = `[ERROR] qase: ${this.doLogError(message, error)}`;
-    console.error(logMessage);
-    if (this.debug) {
+    if (this.consoleEnabled) {
+      console.error(logMessage);
+    }
+    if (this.fileEnabled) {
       this.logToFile(logMessage);
     }
   }
@@ -47,8 +72,12 @@ export class Logger implements LoggerInterface {
   public logDebug(message: string): void {
     if (this.debug) {
       const logMessage = `[DEBUG] qase: ${message}`;
-      console.log(logMessage);
-      this.logToFile(logMessage);
+      if (this.consoleEnabled) {
+        console.log(logMessage);
+      }
+      if (this.fileEnabled) {
+        this.logToFile(logMessage);
+      }
     }
   }
 
@@ -67,7 +96,7 @@ export class Logger implements LoggerInterface {
         logMessage += this.doLogError('\n Caused by:', error.cause);
       }
 
-      logMessage += `\n ${error.stack || `${error.name}: ${error.message}`}`;
+      logMessage += `\n ${error.stack ?? `${error.name}: ${error.message}`}`;
     } else {
       logMessage += `\n ${String(error)}`;
     }
@@ -80,21 +109,23 @@ export class Logger implements LoggerInterface {
    * @private
    */
   private logApiError(error: AxiosError): string {
-    let logMessage = '\n';
+    if (!error.response?.data) {
+      return `\nMessage: ${error.message || 'Unknown error'}`;
+    }
 
-    const errorMessage: unknown = get(error, 'response.data.errorMessage')
-      ?? get(error, 'response.data.error')
-      ?? get(error, 'response.statusText')
-      ?? 'Unknown error';
+    const response = error.response.data as ApiErrorResponse;
+    const statusText = error.response.statusText;
+    
+    const errorMessage = response.errorMessage 
+      ?? response.error 
+      ?? statusText;
 
-    const errorFields = this.formatErrorFields(
-      get(error, 'response.data.errorFields'),
-    );
+    const errorFields = this.formatErrorFields(response.errorFields);
 
-    logMessage += `Message: ${String(errorMessage)}`;
-
+    let logMessage = `\nMessage: ${errorMessage}`;
+    
     if (errorFields) {
-      logMessage += `\n ${errorFields}`;
+      logMessage += `\n${errorFields}`;
     }
 
     return logMessage;
@@ -105,20 +136,13 @@ export class Logger implements LoggerInterface {
    * @returns {string | undefined}
    * @private
    */
-  private formatErrorFields(errorFields: unknown): string | undefined {
-    if (Array.isArray(errorFields)) {
-      return errorFields.reduce<string>((acc, item: unknown) => {
-        const field: unknown = get(item, 'field');
-        const error: unknown = get(item, 'error');
-
-        if (field && error) {
-          return acc + `${String(field)}: ${String(error)}\n`;
-        }
-
-        return acc;
-      }, '');
+  private formatErrorFields(errorFields?: ApiErrorResponse['errorFields']): string | undefined {
+    if (!errorFields?.length) {
+      return undefined;
     }
 
-    return undefined;
+    return errorFields
+      .map(({ field, error }) => `${field}: ${error}`)
+      .join('\n');
   }
 }

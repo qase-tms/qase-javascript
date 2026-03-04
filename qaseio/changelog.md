@@ -1,3 +1,53 @@
+# qaseio@2.4.3
+
+## What's new
+
+- New field in the search endpoint of the public API contract.
+- Extended API client functionality to accommodate the updated contract.
+
+# qaseio@2.4.2
+
+## What's new
+
+Updated axios dependency to address identified security vulnerabilities.
+
+# qaseio@2.4.0
+
+## What's new
+
+Updated API v2 models to support the latest changes in the Qase API.
+
+# qaseio@2.3.1
+
+## What's new
+
+Added a new `author_id` and `entity_id` fields to the `Author` model.
+
+# qaseio@2.3.0
+
+## What's new
+
+Added a new `param_groups` field to the `ResultCreate` model. 
+This field allows you to group parameters in the test results.
+
+# qaseio@2.2.0
+
+## What's new
+
+Added search for environments and creation of test runs with the addition of an environment slug.
+
+# qaseio@2.1.5
+
+## What's new
+
+Enable using 'http://api.qase.lo' as API host for Qase development.
+
+# qaseio@2.1.4
+
+## What's new
+
+Fix an issue with base url for enterprise customers.   
+
 # qaseio@2.1.3
 
 ## What's new

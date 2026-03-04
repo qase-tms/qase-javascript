@@ -10,11 +10,20 @@ export enum TestStatusEnum {
   invalid = 'invalid',
 }
 
-export interface TestExecution {
+export class TestExecution {
   start_time: number | null;
   status: TestStatusEnum;
   end_time: number | null;
   duration: number | null;
   stacktrace: string | null;
   thread: string | null;
+
+  constructor() {
+    this.status = TestStatusEnum.passed;
+    this.start_time = null;
+    this.end_time = null;
+    this.duration = null;
+    this.stacktrace = null;
+    this.thread = null;
+  }
 }

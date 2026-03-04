@@ -33,6 +33,12 @@ export interface Result {
      * @type {string}
      * @memberof Result
      */
+    'result_hash'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Result
+     */
     'comment'?: string | null;
     /**
      * 

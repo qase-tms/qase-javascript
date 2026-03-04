@@ -1,9 +1,35 @@
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
+import path from 'path';
+import { QaseStep, StepFunction, getMimeTypes } from 'qase-javascript-commons';
+import { v4 as uuidv4 } from 'uuid';
+
+import type { TestopsProjectMapping } from 'qase-javascript-commons';
+
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class qase {
   private static _qaseID = '';
   private static _qaseTitle = '';
   private static _qaseFields = '';
   private static _qaseParameters = '';
+  private static _qaseGroupParameters = '';
+  private static _qaseSuite = '';
+  private static _qaseIgnore = '';
+  private static _qaseProjects = '';
+
+  /**
+   * Set multi-project mapping (for testops_multi mode). Project code → test case IDs.
+   * Don't forget to call `create` after setting parameters.
+   * @param {TestopsProjectMapping} mapping — e.g. { PROJ1: [1, 2], PROJ2: [3] }
+   * @example
+   * const q = qase.projects({ PROJ1: [1], PROJ2: [2] }).create();
+   * test.meta(q)('Test reported to two projects', async t => { ... });
+   */
+  public static projects = (mapping: TestopsProjectMapping) => {
+    if (mapping && typeof mapping === 'object' && Object.keys(mapping).length > 0) {
+      this._qaseProjects = JSON.stringify(mapping);
+    }
+    return this;
+  };
 
   /**
    * Set a Qase ID for the test case
@@ -32,6 +58,19 @@ export class qase {
    */
   public static title = (value: string) => {
     this._qaseTitle = value;
+    return this;
+  };
+
+  /**
+   * Set a suite for the test case
+   * Don't forget to call `create` method after setting all the necessary parameters
+   * @param {string} value
+   * @example
+   * const q = qase.suite('Suite\tSub-suite').create();
+   * test.meta(q)('Test case title', async t => { ... });
+   */
+  public static suite = (value: string) => {
+    this._qaseSuite = value;
     return this;
   };
 
@@ -66,6 +105,108 @@ export class qase {
   };
 
   /**
+   * Set a group parameters for the test case
+   * Don't forget to call `create` method after setting all the necessary parameters
+   * @param {Record<string, string>} values
+   * @example
+   * const q = qase.groupParameters({ 'severity': 'high', 'priority': 'medium' }).create();
+   * test.meta(q)('Test case title', async t => { ... });
+   * or
+   * test.meta({userField: 123, ...q})('Test case title', async t => { ... });
+   */
+  public static groupParameters = (values: Record<string, string>) => {
+    this._qaseGroupParameters = this.toNormalizeRecord(values);
+    return this;
+  };
+
+  /**
+   * Set a ignore flag for the test case
+   * Don't forget to call `create` method after setting all the necessary parameters
+   * @example
+   * const q = qase.ignore().create();
+   * test.meta(q)('Test case title', async t => { ... });
+   * or
+   * test.meta({userField: 123, ...q})('Test case title', async t => { ... });
+   */
+  public static ignore = () => {
+    this._qaseIgnore = 'true';
+    return this;
+  };
+
+  /**
+   * Add a step to the test case
+   * @param name
+   * @param body
+   * @example
+   * test.meta({userField: 123, ...q})('Test case title', async t => {
+   *    await qase.step("Step", () => {
+   *      expect(true).toBe(true);
+   *    });
+   *     expect(true).toBe(true);
+   * });
+   */
+  public static step = async (name: string, body: StepFunction) => {
+    const runningStep = new QaseStep(name);
+    // eslint-disable-next-line @typescript-eslint/require-await
+    await runningStep.run(body, async (step) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
+      // @ts-expect-error - global.Qase is dynamically added at runtime
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      return global.Qase.step(step);
+    });
+  };
+
+
+  /**
+   * Add an attachment to the test case
+   * @param attach
+   * @example
+   * test.meta({userField: 123, ...q})('Test case title', async t => {
+   *   qase.attach({ name: 'attachment.txt', content: 'Hello, world!', type: 'text/plain' });
+   *   qase.attach({ paths: ['/path/to/file', '/path/to/another/file']});
+   *     expect(true).toBe(true);
+   * });
+   */
+  public static attach = (attach: {
+    name?: string;
+    type?: string;
+    content?: string;
+    paths?: string[];
+  }) => {
+    if (attach.paths) {
+      for (const file of attach.paths) {
+        const attachmentName = path.basename(file);
+        const contentType: string = getMimeTypes(file);
+
+        // @ts-expect-error - global.Qase is dynamically added at runtime
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        global.Qase.attachment({
+          file_path: file,
+          size: 0,
+          id: uuidv4(),
+          file_name: attachmentName,
+          mime_type: contentType,
+          content: '',
+        });
+      }
+      return;
+    }
+
+    if (attach.content) {
+      // @ts-expect-error - global.Qase is dynamically added at runtime
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      global.Qase.attachment({
+        file_path: null,
+        size: attach.content.length,
+        id: uuidv4(),
+        file_name: attach.name ?? 'attachment',
+        mime_type: attach.type ?? 'application/octet-stream',
+        content: attach.content,
+      });
+    }
+  };
+
+  /**
    * Create a Qase metadata
    * Call this method after setting all the necessary parameters
    * @example
@@ -78,14 +219,22 @@ export class qase {
     const meta = {
       QaseID: this._qaseID,
       QaseTitle: this._qaseTitle,
+      QaseSuite: this._qaseSuite,
       QaseFields: this._qaseFields,
       QaseParameters: this._qaseParameters,
+      QaseGroupParameters: this._qaseGroupParameters,
+      QaseIgnore: this._qaseIgnore,
+      QaseProjects: this._qaseProjects,
     };
 
     this._qaseID = '';
     this._qaseTitle = '';
+    this._qaseSuite = '';
     this._qaseFields = '';
     this._qaseParameters = '';
+    this._qaseGroupParameters = '';
+    this._qaseIgnore = '';
+    this._qaseProjects = '';
 
     return meta;
   };

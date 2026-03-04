@@ -3,12 +3,18 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   ConfigLoader,
   ConfigType,
+  NetworkProfiler,
   QaseReporter,
   ReporterInterface,
   TestStatusEnum,
   composeOptions,
   Attachment,
+  TestStepType,
+  generateSignature,
+  determineTestStatus,
+  TestResultType,
 } from 'qase-javascript-commons';
+import { Qase } from './global';
 
 interface CallsiteRecordType {
   filename?: string;
@@ -23,10 +29,11 @@ interface TestRunErrorFormattableAdapterType {
   screenshotPath: string;
   testRunId: string;
   testRunPhase: string;
+  type: string;
   code?: string;
   isTestCafeError?: boolean;
   callsite?: CallsiteRecordType;
-  errMsg?: string;
+  errMsg: string;
   diff?: boolean;
   id?: string;
 }
@@ -49,16 +56,24 @@ interface FixtureType {
 enum metadataEnum {
   id = 'QaseID',
   title = 'QaseTitle',
+  suite = 'QaseSuite',
   fields = 'QaseFields',
   parameters = 'QaseParameters',
+  groupParameters = 'QaseGroupParameters',
   oldID = 'CID',
+  ignore = 'QaseIgnore',
+  projects = 'QaseProjects',
 }
 
 interface MetadataType {
   [metadataEnum.id]: number[];
   [metadataEnum.title]: string | undefined;
+  [metadataEnum.suite]: string | undefined;
   [metadataEnum.fields]: Record<string, string>;
   [metadataEnum.parameters]: Record<string, string>;
+  [metadataEnum.groupParameters]: Record<string, string>;
+  [metadataEnum.ignore]: boolean;
+  [metadataEnum.projects]: Record<string, number[]>;
 }
 
 export interface TestRunInfoType {
@@ -88,36 +103,19 @@ export class TestcafeQaseReporter {
     if (testRunInfo.skipped) {
       return TestStatusEnum.skipped;
     } else if (testRunInfo.errs.length > 0) {
-      return TestStatusEnum.failed;
+      // Create error object for status determination
+      const firstError = testRunInfo.errs[0];
+      const error = new Error(firstError?.errMsg ?? 'Test failed');
+      if (firstError?.callsite) {
+        const filename = firstError.callsite.filename ?? 'unknown';
+        const lineNum = firstError.callsite.lineNum ?? 'unknown';
+        error.stack = `Error: ${firstError.errMsg}\n    at ${filename}:${lineNum}`;
+      }
+      
+      return determineTestStatus(error, 'failed');
     }
 
     return TestStatusEnum.passed;
-  }
-
-  /**
-   * @param {TestRunErrorFormattableAdapterType[]} errors
-   * @returns {Error}
-   * @private
-   */
-  private static transformErrors(errors: TestRunErrorFormattableAdapterType[]): Error {
-    const [errorMessages, errorStacks] = errors.reduce<[string[], string[]]>(
-      ([messages, stacks], error) => {
-        const stack =
-          error.callsite?.stackFrames?.map((line) => String(line)) ?? [];
-
-        messages.push(error.errMsg ?? 'Error');
-        stacks.push(stack.join('\n'));
-
-        return [messages, stacks];
-      },
-      [[], []],
-    );
-
-    const error = new Error(errorMessages.join('\n\n'));
-
-    error.stack = errorStacks.join('\n\n');
-
-    return error;
   }
 
   /**
@@ -148,6 +146,12 @@ export class TestcafeQaseReporter {
    */
   private reporter: ReporterInterface;
 
+  private steps: TestStepType[] = [];
+  private attachments: Attachment[] = [];
+  private testBeginTime: number = Date.now();
+  private profiler: NetworkProfiler | null = null;
+  private _profilerStepSnapshot: number = 0;
+
   /**
    * @param {TestcafeQaseOptionsType} options
    * @param {ConfigLoaderInterface} configLoader
@@ -158,73 +162,136 @@ export class TestcafeQaseReporter {
   ) {
     const config = configLoader.load();
 
+    const composedOptions = composeOptions(options, config);
     this.reporter = QaseReporter.getInstance({
-      ...composeOptions(options, config),
+      ...composedOptions,
       frameworkPackage: 'testcafe',
       frameworkName: 'testcafe',
       reporterName: 'testcafe-reporter-qase',
     });
+
+    if (composedOptions.profilers?.includes('network')) {
+      this.profiler = new NetworkProfiler({
+        skipDomains: composedOptions.networkProfiler?.skip_domains,
+        trackOnFail: composedOptions.networkProfiler?.track_on_fail,
+      });
+      this.profiler.enable();
+    }
+
+    // @ts-expect-error - global.Qase is dynamically added at runtime
+    global.Qase = new Qase(this);
+  }
+
+  public addStep(step: TestStepType) {
+    this.steps.push(step);
+  }
+
+  public addAttachment(attachment: Attachment) {
+    this.attachments.push(attachment);
   }
 
   /**
    * @returns {Promise<void>}
    */
   public startTestRun = (): void => {
-      this.reporter.startTestRun();
+    this.reporter.startTestRun();
+  };
+
+  public reportTestStart = () => {
+    this.steps = [];
+    this.attachments = [];
+    this.testBeginTime = Date.now();
+    this._profilerStepSnapshot = this.profiler?.getAllSteps().length ?? 0;
   };
 
   /**
    * @param {string} title
    * @param {TestRunInfoType} testRunInfo
    * @param {Record<string, string>} meta
+   * @param formatError
    */
   public reportTestDone = async (
     title: string,
     testRunInfo: TestRunInfoType,
     meta: Record<string, string>,
+    formatError: (error: unknown, prefix: string) => string,
   ) => {
-    const error = TestcafeQaseReporter.transformErrors(testRunInfo.errs);
     const metadata = this.getMeta(meta);
-    await this.reporter.addTestResult({
+
+    if (metadata[metadataEnum.ignore]) {
+      return;
+    }
+
+    const errorLog = testRunInfo.errs
+      .map((error, index) => formatError(error, `${index + 1} `).replace(
+        // eslint-disable-next-line no-control-regex
+        /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
+        '',
+      ))
+      .join('\n');
+
+    const attachments = TestcafeQaseReporter.transformAttachments(
+      testRunInfo.screenshots,
+    );
+
+    attachments.push(...this.attachments);
+
+    let profilerSteps: TestStepType[] = [];
+    if (this.profiler) {
+      const allSteps = this.profiler.getAllSteps();
+      profilerSteps = allSteps.slice(this._profilerStepSnapshot);
+      this._profilerStepSnapshot = 0;
+    }
+
+    const projectMapping = metadata[metadataEnum.projects];
+    const result = {
       author: null,
       execution: {
         status: TestcafeQaseReporter.getStatus(testRunInfo),
-        start_time: null,
-        end_time: null,
+        start_time: this.testBeginTime / 1000,
+        end_time: (this.testBeginTime + testRunInfo.durationMs) / 1000,
         duration: testRunInfo.durationMs,
-        stacktrace: error.stack ?? null,
+        stacktrace: errorLog,
         thread: null,
       },
       fields: metadata[metadataEnum.fields],
-      message: error.message,
+      message: errorLog ? errorLog.split('\n')[0] ?? '' : '',
       muted: false,
       params: metadata[metadataEnum.parameters],
+      group_params: metadata[metadataEnum.groupParameters],
       relations: {
         suite: {
-          data: [
-            {
-              title: testRunInfo.fixture.name,
-              public_id: null,
-            },
-          ],
+          data: metadata[metadataEnum.suite]
+            ? metadata[metadataEnum.suite].split('\t').map((s) => ({
+                title: s,
+                public_id: null,
+              }))
+            : [
+                {
+                  title: testRunInfo.fixture.name,
+                  public_id: null,
+                },
+              ],
         },
       },
       run_id: null,
-      signature: `${testRunInfo.fixture.name}::${title}`,
-      steps: [],
+      signature: this.getSignature(testRunInfo.fixture, title, metadata[metadataEnum.id], metadata[metadataEnum.parameters]),
+      steps: [...this.steps, ...profilerSteps],
       id: uuidv4(),
       testops_id: metadata[metadataEnum.id].length > 0 ? metadata[metadataEnum.id] : null,
       title: metadata[metadataEnum.title] != undefined ? metadata[metadataEnum.title] : title,
-      attachments: TestcafeQaseReporter.transformAttachments(
-        testRunInfo.screenshots,
-      ),
-    });
+      attachments: attachments,
+      testops_project_mapping: (projectMapping && Object.keys(projectMapping).length > 0) ? projectMapping : null,
+    } as unknown as TestResultType;
+
+    await this.reporter.addTestResult(result);
   };
 
   /**
    * @returns {Promise<void>}
    */
   public reportTaskDone = async (): Promise<void> => {
+    this.profiler?.restore();
     await this.reporter.publish();
   };
 
@@ -232,8 +299,12 @@ export class TestcafeQaseReporter {
     const metadata: MetadataType = {
       QaseID: [],
       QaseTitle: undefined,
+      QaseSuite: undefined,
       QaseFields: {},
       QaseParameters: {},
+      QaseGroupParameters: {},
+      QaseIgnore: false,
+      QaseProjects: {},
     };
 
     if (meta[metadataEnum.oldID] !== undefined && meta[metadataEnum.oldID] !== '') {
@@ -250,6 +321,10 @@ export class TestcafeQaseReporter {
       metadata.QaseTitle = meta[metadataEnum.title];
     }
 
+    if (meta[metadataEnum.suite] !== undefined && meta[metadataEnum.suite] !== '') {
+      metadata.QaseSuite = meta[metadataEnum.suite];
+    }
+
     if (meta[metadataEnum.fields] !== undefined && meta[metadataEnum.fields] !== '') {
       metadata.QaseFields = JSON.parse(meta[metadataEnum.fields]) as Record<string, string>;
     }
@@ -258,6 +333,47 @@ export class TestcafeQaseReporter {
       metadata.QaseParameters = JSON.parse(meta[metadataEnum.parameters]) as Record<string, string>;
     }
 
+    if (meta[metadataEnum.groupParameters] !== undefined && meta[metadataEnum.groupParameters] !== '') {
+      metadata.QaseGroupParameters = JSON.parse(meta[metadataEnum.groupParameters]) as Record<string, string>;
+    }
+
+    if (meta[metadataEnum.ignore] !== undefined && meta[metadataEnum.ignore] !== '') {
+      metadata.QaseIgnore = meta[metadataEnum.ignore] === 'true';
+    }
+
+    if (meta[metadataEnum.projects] !== undefined && meta[metadataEnum.projects] !== '') {
+      try {
+        const parsed = JSON.parse(meta[metadataEnum.projects]) as Record<string, number[]>;
+        if (parsed && typeof parsed === 'object') {
+          metadata.QaseProjects = parsed;
+        }
+      } catch {
+        // ignore invalid JSON
+      }
+    }
+
     return metadata;
+  }
+
+  /**
+   * @param {FixtureType} fixture
+   * @param {string} title
+   * @param {number[]} ids
+   * @param {Record<string, string>} parameters
+   * @private
+   */
+  private getSignature(fixture: FixtureType, title: string, ids: number[], parameters: Record<string, string>) {
+    const executionPath = process.cwd() + '/';
+    const path = fixture.path?.replace(executionPath, '') ?? '';
+    const suites = [];
+
+    if (path != '') {
+      suites.push(...path.split('/'));
+    }
+
+    suites.push(fixture.name.toLowerCase().replace(/\s/g, '_'));
+    suites.push(title.toLowerCase().replace(/\s/g, '_'));
+
+    return generateSignature(ids, suites, parameters);
   }
 }

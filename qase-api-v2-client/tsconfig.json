@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "outDir": "dist",
+    "declaration": true,
+    "skipLibCheck": true,
+    "noImplicitAny": true,
+    "noEmit": true,
+    "noEmitOnError": true,
+
+    "typeRoots": ["node_modules/@types"]
+  },
+
+  "exclude": ["dist", "node_modules"]
+}

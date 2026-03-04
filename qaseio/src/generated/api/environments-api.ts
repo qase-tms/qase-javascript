@@ -165,12 +165,14 @@ export const EnvironmentsApiAxiosParamCreator = function (configuration?: Config
          * This method allows to retrieve all environments stored in selected project. 
          * @summary Get all environments
          * @param {string} code Code of project, where to search entities.
+         * @param {string} [search] A search string. Will return all environments with titles containing provided string.
+         * @param {string} [slug] A search string.  Will return all environments with slugs equal to provided string.
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEnvironments: async (code: string, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getEnvironments: async (code: string, search?: string, slug?: string, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('getEnvironments', 'code', code)
             const localVarPath = `/v1/environment/{code}`
@@ -188,6 +190,14 @@ export const EnvironmentsApiAxiosParamCreator = function (configuration?: Config
 
             // authentication TokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Token", configuration)
+
+            if (search !== undefined) {
+                localVarQueryParameter['search'] = search;
+            }
+
+            if (slug !== undefined) {
+                localVarQueryParameter['slug'] = slug;
+            }
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -305,13 +315,15 @@ export const EnvironmentsApiFp = function(configuration?: Configuration) {
          * This method allows to retrieve all environments stored in selected project. 
          * @summary Get all environments
          * @param {string} code Code of project, where to search entities.
+         * @param {string} [search] A search string. Will return all environments with titles containing provided string.
+         * @param {string} [slug] A search string.  Will return all environments with slugs equal to provided string.
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getEnvironments(code: string, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EnvironmentListResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getEnvironments(code, limit, offset, options);
+        async getEnvironments(code: string, search?: string, slug?: string, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EnvironmentListResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getEnvironments(code, search, slug, limit, offset, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -374,13 +386,15 @@ export const EnvironmentsApiFactory = function (configuration?: Configuration, b
          * This method allows to retrieve all environments stored in selected project. 
          * @summary Get all environments
          * @param {string} code Code of project, where to search entities.
+         * @param {string} [search] A search string. Will return all environments with titles containing provided string.
+         * @param {string} [slug] A search string.  Will return all environments with slugs equal to provided string.
          * @param {number} [limit] A number of entities in result set.
          * @param {number} [offset] How many entities should be skipped.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEnvironments(code: string, limit?: number, offset?: number, options?: any): AxiosPromise<EnvironmentListResponse> {
-            return localVarFp.getEnvironments(code, limit, offset, options).then((request) => request(axios, basePath));
+        getEnvironments(code: string, search?: string, slug?: string, limit?: number, offset?: number, options?: any): AxiosPromise<EnvironmentListResponse> {
+            return localVarFp.getEnvironments(code, search, slug, limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
          * This method updates an environment. 
@@ -447,14 +461,16 @@ export class EnvironmentsApi extends BaseAPI {
      * This method allows to retrieve all environments stored in selected project. 
      * @summary Get all environments
      * @param {string} code Code of project, where to search entities.
+     * @param {string} [search] A search string. Will return all environments with titles containing provided string.
+     * @param {string} [slug] A search string.  Will return all environments with slugs equal to provided string.
      * @param {number} [limit] A number of entities in result set.
      * @param {number} [offset] How many entities should be skipped.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof EnvironmentsApi
      */
-    public getEnvironments(code: string, limit?: number, offset?: number, options?: AxiosRequestConfig) {
-        return EnvironmentsApiFp(this.configuration).getEnvironments(code, limit, offset, options).then((request) => request(this.axios, this.basePath));
+    public getEnvironments(code: string, search?: string, slug?: string, limit?: number, offset?: number, options?: AxiosRequestConfig) {
+        return EnvironmentsApiFp(this.configuration).getEnvironments(code, search, slug, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

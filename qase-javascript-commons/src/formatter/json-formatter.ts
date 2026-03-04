@@ -2,9 +2,9 @@ import stripAnsi from 'strip-ansi';
 
 import { FormatterInterface } from './formatter-interface';
 
-export type JsonFormatterOptionsType = {
+export interface JsonFormatterOptionsType {
   space?: number | undefined;
-};
+}
 
 /**
  * @class JsonFormatter

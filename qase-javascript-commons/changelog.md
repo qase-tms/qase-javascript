@@ -1,3 +1,359 @@
+# qase-javascript-commons@2.5.6
+
+## What's new
+
+- Added Network Profiler framework for automatic HTTP request capture during test execution.
+- Added `NetworkProfiler` class with configurable URL filtering, request/response body capture, and duration tracking.
+- Added `MetadataManager.addNetworkRequest()` for collecting network request metadata.
+- Added `NetworkRequestData` model for structured network request representation.
+- Added profiler configuration schema (`profiler.networkCapture`) with options for enabling, filtering, and body size limits.
+- Examples are now included as npm workspaces for streamlined local development.
+
+# qase-javascript-commons@2.5.5
+
+## What's new
+
+Significantly improved startup performance by optimizing host data collection:
+
+- Replaced slow `npm list --depth=10 --json` fallback with fast `require.resolve()`-based package version lookup.
+- Replaced `execSync('node --version')` with `process.version`.
+- Replaced `execSync('npm --version')` with `process.env.npm_config_user_agent` parsing (with execSync fallback).
+- Eliminated duplicate `getHostInfo()` call in `ReportReporter.complete()` by passing pre-collected host data from `QaseReporter`.
+- Included `report` mode in the `needsHostData` guard so host data is collected once during init.
+
+Worst-case startup time reduced from ~10-25 seconds to ~55 ms.
+
+# qase-javascript-commons@2.5.4
+
+## What's new
+
+- Fixed an issue where non-string parameter values (e.g. numbers) were sent to the Qase API as-is, causing validation errors. The `transformParams` method now converts all parameter values to strings.
+
+# qase-javascript-commons@2.5.3
+
+## What's new
+
+- Fixed path separator normalization in `generateSignature()` to ensure consistent signatures across Windows and Unix platforms.
+
+# qase-javascript-commons@2.5.2
+
+## What's new
+
+Aligned report output with the cross-language Qase Report specification:
+
+- Report file renamed from `report.json` to `run.json`, title changed to `"Test run"`.
+- Stats model: replaced `broken` field with `blocked` and `invalid`, fixed status enum mapping.
+- Result serialization: `testops_id` serializes as `testops_ids` (array), `group_params` as `param_groups` (array of arrays).
+- Step serialization: `data` field serializes as `input_data`, attachments moved to `execution.attachments`.
+- Gherkin-type steps automatically convert to TEXT format during serialization (`keyword + name` → `action`).
+- Attachment `size` and `content` fields excluded from serialized output.
+
+All changes are serialization-only — internal model interfaces are unchanged, no breaking changes for framework reporters.
+
+# qase-javascript-commons@2.5.1
+
+## What's new
+
+Fixed issue with incorrect test status determination.
+
+# qase-javascript-commons@2.5.0
+
+## What's new
+
+Added **multi-project support** (`testops_multi` mode):
+
+- New mode `testops_multi` sends results to multiple Qase projects in one run; each project gets its own run.
+- New field `testops_project_mapping` on `TestResultType`: project code → list of test case IDs. Helpers: `setTestopsProjectMapping()`, `getTestopsProjectMapping()`, `getTestopsIdsForProject()`, `getProjects()`.
+- New config: `testops_multi.default_project` and `testops_multi.projects[]` with `code`, `run`, `plan`, `environment` per project.
+- New reporter `TestOpsMultiReporter`; selected when `mode` is `testops_multi`. Single-project behavior is unchanged.
+
+# qase-javascript-commons@2.4.18
+
+## What's new
+
+Fixed issue with incorrect link to failed test in the console output.
+
+# qase-javascript-commons@2.4.17
+
+## What's new
+
+Eliminated startup delay when reporter mode is `off`.
+
+# qase-javascript-commons@2.4.16
+
+## What's new
+
+Fixed issue with incorrect 'disabled' status.
+
+# qase-javascript-commons@2.4.13
+
+## What's new
+
+Improved the upload mechanism for attachments.
+Now the reporter will upload attachments in batches of 20 files.
+
+# qase-javascript-commons@2.4.12
+
+## What's new
+
+Improved the retry mechanism for uploading attachments.
+
+# qase-javascript-commons@2.4.11
+
+## What's new
+
+Added retry mechanism for uploading attachments.
+
+# qase-javascript-commons@2.4.10
+
+## What's new
+
+Fixed an issue with report link for enterprise customers.
+
+# qase-javascript-commons@2.4.9
+
+## What's new
+
+Added support for public report link in the test run.
+You can now generate a public report link for the test run.
+
+# qase-javascript-commons@2.4.8
+
+## What's new
+
+Improved error handling for timeout errors.
+
+# qase-javascript-commons@2.4.7
+
+## Bug fixes
+
+Fixed issue where test results with unknown statuses were incorrectly marked as `skipped` instead of `passed` by default. Now status matching is case-insensitive for better compatibility with different test frameworks.
+
+# qase-javascript-commons@2.4.6
+
+## What's new
+
+Added ability to control logging to console and file using the `logging` configuration option.
+
+# qase-javascript-commons@2.4.5
+
+## What's new
+
+Added support for status mapping in the test run.
+You can now map test result statuses to different values.
+
+# qase-javascript-commons@2.4.4
+
+## What's new
+
+Updated the `qase-api-client` dependency to version `1.0.6`.
+
+# qase-javascript-commons@2.4.3
+
+## What's new
+
+Fixed an issue with the `report` mode not sending results.
+
+# qase-javascript-commons@2.4.2
+
+## What's new
+
+Added support for status filter in the test run.
+
+You can now filter out test results by status.
+The status filter is specified in the `testops.statusFilter` configuration option.
+The status filter is a comma-separated list of statuses to exclude from reporting.
+The statuses are: `passed`, `failed`, `skipped`, `invalid`.
+The status filter is applied to the test results before they are sent to Qase.
+
+# qase-javascript-commons@2.4.1
+
+## What's new
+
+Added support for external links in the test run.
+
+# qase-javascript-commons@2.3.6
+
+## What's new
+
+Added support for configurations in the test run.
+
+# qase-javascript-commons@2.3.5
+
+## What's new
+
+Fixed a link to failed test in the console output.
+
+# qase-javascript-commons@2.3.4
+
+## What's new
+
+Fixed an issue with parsing tags from the `QASE_TESTOPS_RUN_TAGS` environment variable. Now tags can be passed as a comma-separated string.
+
+# qase-javascript-commons@2.3.3
+
+## What's new
+
+Added support for tags in the test run.
+
+# qase-javascript-commons@2.3.2
+
+## What's new
+
+Fixed an issue with attachments content type.
+
+# qase-javascript-commons@2.3.0
+
+## What's new
+
+Migrated to the new API clients for v1 (`qase-api-client`) and v2 (`qase-api-v2-client`) from the `qaseio`.
+
+# qase-javascript-commons@2.2.18
+
+## What's new
+
+Resolved an issue where retrieving installed package versions failed if some dependencies were missing.
+
+# qase-javascript-commons@2.2.17
+
+## What's new
+
+- Logging of host system details to improve debugging and traceability.
+- Output of installed packages in logs for better environment visibility.
+
+# qase-javascript-commons@2.2.16
+
+## What's new
+
+Improved logging and exception management to provide clearer diagnostics
+
+# qase-javascript-commons@2.2.15
+
+## What's new
+
+Updated axios dependency to address identified security vulnerabilities.
+
+# qase-javascript-commons@2.2.13
+
+## What's new
+
+Enhanced error messages for 403 status code responses to provide clearer and more informative feedback.
+
+# qase-javascript-commons@2.2.12
+
+## What's new
+
+Added a mutex to ensure correct result submission when running tests in multiple threads, preventing potential
+duplication.
+
+# qase-javascript-commons@2.2.11
+
+## What's new
+
+- Improved state manager behavior to ensure correct handling.
+- Masked token in logs to enhance security.
+
+# qase-javascript-commons@2.2.10
+
+## What's new
+
+Resolved an issue with parallel execution of multiple reporters using a shared sync file. Each reporter now uses its own
+dedicated file for state synchronization.
+
+# qase-javascript-commons@2.2.7
+
+## What's new
+
+Fixed an issue then the reporter didn't create defects for failed tests.
+
+# qase-javascript-commons@2.2.6
+
+## What's new
+
+Added error handling for HTTP status 422 in API responses, returning a descriptive QaseError with relevant details.
+
+# qase-javascript-commons@2.2.5
+
+## What's new
+
+Use the API v2 client by default. If you want to use the API v1 client, specify the `useV2` option in the config file or
+the environment variable `QASE_TESTOPS_USEV2` as `False`.
+
+# qase-javascript-commons@2.2.3
+
+## What's new
+
+Fixed an issue when the reporter saves the state file in the wrong directory.
+
+# qase-javascript-commons@2.2.1
+
+## What's new
+
+Support `author` field in the test result data.
+You can specify author name or email in fields.
+
+# qase-javascript-commons@2.1.3
+
+## What's new
+
+Reporters will send all data on the results of the autotests. Including the data of the title, the description, etc.
+
+# qase-javascript-commons@2.1.1
+
+## What's new
+
+Fixed an issue where the state file was not deleted. This resulted in results being uploaded into the same test run.
+
+# qase-javascript-commons@2.1.0
+
+## What's new
+
+Minor release of the commons package
+
+# qase-javascript-commons@2.1.0-beta.1
+
+## What's new
+
+- update a `InternalReporterInterface`. Added a new methods `sendResults` and `complete` to send the results and
+  complete the test run.
+- add `StateManager` class to manage and share the state of the reporter between the different instances of the
+  reporter.
+
+# qase-javascript-commons@2.0.13
+
+## What's new
+
+- If a plan ID is specified then when creating a test run it also specifies the plan ID.
+- If a test run ID is specified then the reporter won't check for the existence of a test run.
+
+# qase-javascript-commons@2.0.12
+
+## What's new
+
+Support qaseio package version 2.2.0
+
+# qase-javascript-commons@2.0.11
+
+## What's new
+
+- Improved logging for better debugging and error reporting.
+
+- Show the link to the test run in the console output when the test is failed.
+
+```text
+[INFO] qase: See why this test failed: https://app.qase.io/run/DEMO/dashboard/123?status=%5B2%5D&search=5%20-%206%20=%20-2
+```
+
+# qase-javascript-commons@2.0.10
+
+## What's new
+
+Fixed an issue with sending test results duplicates when we use the `qase-cypress` reporter.
+Now the reporter will send the test results only once.
+
+The Cypress calls the `publish` method multiple times for the same test results because of the Cypress architecture.
+It calls the `publish` method for each test file.
+
 # qase-javascript-commons@2.0.9
 
 ## What's new
@@ -19,13 +375,15 @@ This option is available in the config file and the `QASE_ROOT_SUITE` env variab
 
 ## What's new
 
-Fixed an issue with creating a test run with environment when the reporter ignored the `environment` parameter in the configuration.
+Fixed an issue with creating a test run with environment when the reporter ignored the `environment` parameter in the
+configuration.
 
 # qase-javascript-commons@2.0.7
 
 ## What's new
 
-Fixed an issue with creating a defect for failed tests when the reporter ignored the `defect` parameter in the configuration.
+Fixed an issue with creating a defect for failed tests when the reporter ignored the `defect` parameter in the
+configuration.
 
 # qase-javascript-commons@2.0.6
 
@@ -80,7 +438,7 @@ Before this fix, the reporter added ANSI escape codes to the message and stack t
 ## What's new
 
 This is the first release version of the Qase JavaScript SDK.
-It is numbered `2.0.0` (and not `1.0.0`) to match the release series of 
+It is numbered `2.0.0` (and not `1.0.0`) to match the release series of
 test reporters for Playwright, Cypress, Jest, and other frameworks.
 
 ### Annotating test with field data
@@ -90,9 +448,9 @@ This feature is already implemented in the Playwright reporter:
 
 ```js
 test('Test with annotated fields', () => {
-    qase.id(1);
-    qase.fields({ 'severity': 'high', 'priority': 'medium' })
-    // ...
+  qase.id(1);
+  qase.fields({ 'severity': 'high', 'priority': 'medium' })
+  // ...
 });
 ```
 
@@ -119,7 +477,8 @@ It helps bring test results faster and enables acting on them long before the te
 Qase JavaScript SDK brings configuration with config files and environment variables
 to a common standard, used with Qase reporters in all languages and frameworks.
 
-For details, see the [Configuration](https://github.com/qase-tms/qase-javascript/tree/main/qase-javascript-commons#configuration)
+For details, see
+the [Configuration](https://github.com/qase-tms/qase-javascript/tree/main/qase-javascript-commons#configuration)
 section in the README.
 
 ### Latest API
@@ -140,10 +499,10 @@ log a warning message.
 
 ## What's new
 
-* The `useV2` option in the reporter's configuration will now enable using the experimental v2 API.
+- The `useV2` option in the reporter's configuration will now enable using the experimental v2 API.
   Before this fix, v1 API was used despite the configuration.
 
-* Attachments from test steps will now be uploaded to Qase.
+- Attachments from test steps will now be uploaded to Qase.
   Before this fix, the reporter uploaded only the attachments made outside of any step scope.
 
 # qase-javascript-commons@2.0.0-beta.10
@@ -158,17 +517,17 @@ Fixed an issue when the results published before the test run creation.
 
 Improved debug logging for better testing and reporting errors.
 
--   Separate `logger` class for use in reporters, supporting logging to console and files.
--   Extra debug logs in both reporter modes: TestOps and Local.
+- Separate `logger` class for use in reporters, supporting logging to console and files.
+- Extra debug logs in both reporter modes: TestOps and Local.
 
 Fixed an issue with duplicate test runs created when the testing framework
 (such as Cypress) uses more than one instance of the Qase reporter.
 Now reporter handles Qase test runs in the following way:
 
-1.  The first instance of the reporter creates a Qase test run and stores the run ID 
-    in the ENV variable `QASE_TESTOPS_RUN_ID`.
-2.  Other instances of the reporter read this variable and report test results 
-    to the existing test run.
+1. The first instance of the reporter creates a Qase test run and stores the run ID
+   in the ENV variable `QASE_TESTOPS_RUN_ID`.
+2. Other instances of the reporter read this variable and report test results
+   to the existing test run.
 
 Nothing has changed in cases when there is a single instance of a reporter or
 when it is using a test run, created with other tools, such as with an API request
@@ -231,16 +590,16 @@ where `10` is the size of the chunk in test result's count.
 Qase TestOps API has two endpoints for reporting test results:
 
 - Version 1, stable and used my most test reporters.
-  https://developers.qase.io/reference/create-result-bulk
+  <https://developers.qase.io/reference/create-result-bulk>
 - Version 2, currently in beta access, and currently supported only
   in the `playwright-qase-reporter`.
-  https://developers.qase.io/v2.0/reference/create-results-v2
+  <https://developers.qase.io/v2.0/reference/create-results-v2>
 
 This commit introduces a way to select the API version to use.
 It enables using all new features of v2 JS reporters with the stable v1 API,
 and elso experimenting with the new v2 API.
 
-**Warning**: v2 API is still in beta. 
+**Warning**: v2 API is still in beta.
 If you want to try the v2 JS reporters, you don't have to enable the new API.
 
 To enable using API v2, set an environment variable before running the tests:
@@ -249,37 +608,38 @@ To enable using API v2, set an environment variable before running the tests:
 QASE_TESTOPS_API_V2=true
 ```
 
-### Support adding test suite description to a test report.
+### Support adding test suite description to a test report
 
 Test reporters can now test suite description to test results.
 Such description can be collected from test's location and attributes
 or explicitly declared in the test.
 
 Add new data models:
+
 - Relation
 - Suite
 - SuiteData
-
 
 # qase-javascript-commons@2.0.0-beta.5
 
 ## What's new
 
-* Update the config of reporters. Added `captureLogs` field. If it is set to `true`, the reporter will capture logs from the test framework.
-* Added `getMimeType` function to the commons package. It returns the MIME type of the file by its extension.
+- Update the config of reporters. Added `captureLogs` field. If it is set to `true`, the reporter will capture logs from
+  the test framework.
+- Added `getMimeType` function to the commons package. It returns the MIME type of the file by its extension.
 
 # qase-javascript-commons@2.0.0-beta.4
 
 ## What's new
 
-* Added support for uploading attachments from strings and buffers in the testops reporter.
-* Changed data type of `content` in the attachment data from `any` to `string | Buffer`.
+- Added support for uploading attachments from strings and buffers in the testops reporter.
+- Changed data type of `content` in the attachment data from `any` to `string | Buffer`.
 
 # qase-javascript-commons@2.0.0-beta.3
 
 ## What's new
 
-* Changed data type of `fields` and `parameters` in the test result data
+- Changed data type of `fields` and `parameters` in the test result data
   from `Map<string, string>` to `Record<string, string>`.
 
 # qase-javascript-commons@2.0.0-beta.2
@@ -298,10 +658,10 @@ npm install playwright-qase-reporter@beta
 
 ## What's new
 
-* Set a fallback reporter when the primary reporter can't be used,
+- Set a fallback reporter when the primary reporter can't be used,
   such as when the `testops` reporter can't authenticate with the Qase API.
-* Rename some environment variables to keep naming consistent between reporters in all languages.
-* Add several environment variables for new config options.
-* Write outputs in JSONP format, which can be used with
+- Rename some environment variables to keep naming consistent between reporters in all languages.
+- Add several environment variables for new config options.
+- Write outputs in JSONP format, which can be used with
   [Qase Report](https://github.com/qase-tms/qase-report).
-* Logic for handling test with multiple case IDs moved to the commons package.
+- Logic for handling test with multiple case IDs moved to the commons package.
