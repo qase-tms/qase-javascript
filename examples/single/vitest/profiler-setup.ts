@@ -1,5 +1,6 @@
 import { beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
-import { ConfigLoader, composeOptions, NetworkProfiler } from 'qase-javascript-commons';
+import { ConfigLoader, composeOptions } from 'qase-javascript-commons';
+import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 
 let profiler: NetworkProfiler | null = null;
 let stepSnapshot = 0;

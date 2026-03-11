@@ -5,7 +5,6 @@ import type {
   TestSuite
 } from 'vitest/node';
 import {
-  NetworkProfiler,
   QaseReporter,
   TestResultType,
   TestStepType,
@@ -18,6 +17,7 @@ import {
   parseProjectMappingFromTitle,
   ConfigLoader,
 } from 'qase-javascript-commons';
+import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 
 export type VitestQaseOptionsType = ConfigType;
 

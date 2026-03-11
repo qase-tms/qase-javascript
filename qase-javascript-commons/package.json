@@ -4,6 +4,22 @@
   "description": "Qase JS Reporters",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./profilers": {
+      "types": "./dist/profilers/index.d.ts",
+      "default": "./dist/profilers/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "profilers": ["./dist/profilers/index.d.ts"]
+    }
+  },
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "bugs": {
     "url": "https://github.com/qase-tms/qase-javascript/issues"

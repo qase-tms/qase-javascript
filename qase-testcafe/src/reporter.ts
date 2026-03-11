@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   ConfigLoader,
   ConfigType,
-  NetworkProfiler,
   QaseReporter,
   ReporterInterface,
   TestStatusEnum,
@@ -14,6 +13,7 @@ import {
   determineTestStatus,
   TestResultType,
 } from 'qase-javascript-commons';
+import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 import { Qase } from './global';
 
 interface CallsiteRecordType {

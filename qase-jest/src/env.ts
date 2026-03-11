@@ -1,7 +1,8 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import NodeEnvironment from 'jest-environment-node';
 import type { JestEnvironmentConfig, EnvironmentContext } from '@jest/environment';
-import { ConfigLoader, composeOptions, NetworkProfiler } from 'qase-javascript-commons';
+import { ConfigLoader, composeOptions } from 'qase-javascript-commons';
+import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 
 /**
  * Custom Jest testEnvironment that runs in the same process as tests (worker process).
