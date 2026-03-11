@@ -1,3 +1,10 @@
+# wdio-qase-reporter@1.2.3
+
+## Bug fixes
+
+- Moved profiler import to separate sub-path (`qase-javascript-commons/profilers`) to avoid pulling `node:` modules into bundlers.
+- Updated `qase-javascript-commons` dependency to `~2.5.7`.
+
 # qase-wdio@1.2.2
 
 ## What's new

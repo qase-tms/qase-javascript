@@ -1,3 +1,10 @@
+# cypress-qase-reporter@3.2.2
+
+## Bug fixes
+
+- Fixed Webpack `UnhandledSchemeError: Reading from "node:async_hooks"` when using `cypress-qase-reporter/mocha`. Profiler modules are no longer loaded from the main entry point.
+- Updated `qase-javascript-commons` dependency to `~2.5.7`.
+
 # cypress-qase-reporter@3.2.1
 
 ## What's new

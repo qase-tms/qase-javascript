@@ -1,3 +1,10 @@
+# vitest-qase-reporter@1.1.3
+
+## Bug fixes
+
+- Moved profiler import to separate sub-path (`qase-javascript-commons/profilers`) to avoid pulling `node:` modules into bundlers.
+- Updated `qase-javascript-commons` dependency to `~2.5.7`.
+
 # qase-vitest@1.1.2
 
 ## What's new
