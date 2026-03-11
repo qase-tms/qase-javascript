@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.5.7
+
+## Bug fixes
+
+- Moved profiler modules to a separate sub-path export (`qase-javascript-commons/profilers`) to fix Webpack `UnhandledSchemeError` when using Cypress. The main entry point no longer pulls in `node:` URI imports (`async_hooks`, `http`, `https`, `diagnostics_channel`).
+
 # qase-javascript-commons@2.5.6
 
 ## What's new
