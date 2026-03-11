@@ -8,10 +8,10 @@ import {
   composeOptions,
   ConfigLoader,
   ConfigType,
-  NetworkProfiler,
   QaseReporter,
   ReporterInterface,
 } from 'qase-javascript-commons';
+import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 import { Storage } from './storage';
 
 export type CucumberQaseOptionsType = IFormatterOptions & {

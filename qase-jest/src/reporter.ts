@@ -10,7 +10,6 @@ import {
   ConfigLoader,
   ConfigType,
   generateSignature,
-  NetworkProfiler,
   QaseReporter,
   Relation,
   ReporterInterface,
@@ -22,6 +21,7 @@ import {
   determineTestStatus,
   parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
+import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 import { Qase } from './global';
 import { Metadata } from './models';
 

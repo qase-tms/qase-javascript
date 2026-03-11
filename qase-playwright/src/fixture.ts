@@ -2,8 +2,8 @@ import { test as base } from '@playwright/test';
 import {
   ConfigLoader,
   composeOptions,
-  NetworkProfiler,
 } from 'qase-javascript-commons';
+import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 
 export const PROFILER_ATTACHMENT_NAME = 'qase-profiler-steps.json';
 export const PROFILER_CONTENT_TYPE = 'application/qase.profiler-steps+json';

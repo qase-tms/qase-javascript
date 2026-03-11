@@ -5,7 +5,6 @@ import {
   composeOptions,
   ConfigLoader,
   generateSignature,
-  NetworkProfiler,
   QaseReporter,
   ReporterInterface,
   StepStatusEnum,
@@ -16,6 +15,7 @@ import {
   determineTestStatus,
   parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
+import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 import deasyncPromise from 'deasync-promise';
 import { extname, join } from 'node:path';
 import { v4 as uuidv4 } from 'uuid';

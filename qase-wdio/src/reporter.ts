@@ -13,7 +13,6 @@ import {
   ConfigLoader,
   generateSignature,
   getMimeTypes,
-  NetworkProfiler,
   QaseReporter,
   Relation,
   ReporterInterface,
@@ -25,6 +24,7 @@ import {
   determineTestStatus,
   parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
+import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 
 import { v4 as uuidv4 } from 'uuid';
 import { Storage } from './storage';

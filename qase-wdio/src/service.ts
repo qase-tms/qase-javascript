@@ -1,4 +1,5 @@
-import { ConfigLoader, composeOptions, NetworkProfiler } from 'qase-javascript-commons';
+import { ConfigLoader, composeOptions } from 'qase-javascript-commons';
+import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 import { events } from './events';
 
 /**

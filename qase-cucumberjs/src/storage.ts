@@ -12,7 +12,6 @@ import {
   Attachment,
   CompoundError,
   generateSignature,
-  NetworkProfiler,
   Relation,
   StepStatusEnum,
   StepType,
@@ -22,6 +21,7 @@ import {
   determineTestStatus,
   parseProjectMappingFromTags,
 } from 'qase-javascript-commons';
+import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 import { TestCase } from '@cucumber/messages/dist/esm/src/messages';
 import { Status } from '@cucumber/cucumber';
 import { v4 as uuidv4 } from 'uuid';
