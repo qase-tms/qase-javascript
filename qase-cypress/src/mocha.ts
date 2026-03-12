@@ -6,13 +6,18 @@ export type ProjectMapping = Record<string, number[]>;
 
 export const qase = (
   caseId: number | string | number[] | string[],
-  test: Test,
-) => {
+  test: Test | string,
+): Test | string => {
+  const caseIds = Array.isArray(caseId) ? caseId : [caseId];
+
+  if (typeof test === 'string') {
+    return `${test} (Qase ID: ${caseIds.join(',')})`;
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!test?.title) {
     return test;
   }
-  const caseIds = Array.isArray(caseId) ? caseId : [caseId];
 
   test.title = `${test.title} (Qase ID: ${caseIds.join(',')})`;
 
