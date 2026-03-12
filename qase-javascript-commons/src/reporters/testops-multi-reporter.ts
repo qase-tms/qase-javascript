@@ -114,6 +114,15 @@ export class TestOpsMultiReporter extends AbstractReporter {
   }
 
   public override async startTestRun(): Promise<void> {
+    this.runIds.clear();
+    this.isTestRunReady = false;
+    this.results = [];
+
+    for (const code of this.projectCodes) {
+      this.projectQueues.set(code, []);
+      this.firstIndexByProject.set(code, 0);
+    }
+
     await this.checkOrCreateTestRuns();
   }
 

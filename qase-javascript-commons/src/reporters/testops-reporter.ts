@@ -59,6 +59,11 @@ export class TestOpsReporter extends AbstractReporter {
    * @returns {Promise<void>}
    */
   public async startTestRun(): Promise<void> {
+    this.runId = undefined;
+    this.isTestRunReady = false;
+    this.firstIndex = 0;
+    this.results = [];
+
     await this.checkOrCreateTestRun();
   }
 
