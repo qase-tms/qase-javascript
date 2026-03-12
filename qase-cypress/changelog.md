@@ -1,3 +1,9 @@
+# cypress-qase-reporter@3.2.3
+
+## Bug fixes
+
+- Fixed `qase()` function not handling string arguments. Previously, `it(qase(1, 'Test title'), ...)` would lose the Qase ID, causing the reporter to create new test cases instead of linking to existing ones.
+
 # cypress-qase-reporter@3.2.2
 
 ## Bug fixes
