@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.5.8
+
+## Bug fixes
+
+- Fixed stale reporter state in long-lived Node.js processes (VS Code Playwright extension, Jest watch mode). The singleton `QaseReporter` now resets per-run state (`runId`, `firstIndex`, `results`, `disabled`, `useFallback`) in `startTestRun()`, so subsequent test runs within the same process work correctly.
+
 # qase-javascript-commons@2.5.7
 
 ## Bug fixes
