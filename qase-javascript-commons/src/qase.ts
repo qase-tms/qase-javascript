@@ -324,6 +324,9 @@ export class QaseReporter implements ReporterInterface {
       StateManager.clearState();
     }
 
+    this.disabled = false;
+    this.useFallback = false;
+
     if (!this.disabled) {
 
       this.logger.logDebug('Starting test run');

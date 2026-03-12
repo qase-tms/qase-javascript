@@ -130,6 +130,54 @@ describe('TestOpsReporter', () => {
     });
   });
 
+  describe('startTestRun resets stale state', () => {
+    it('should reset per-run state so second run works correctly', async () => {
+      // First run
+      mockApiClient.createRun.mockResolvedValue(100);
+      await reporter.startTestRun();
+
+      const result = new TestResultType('Test 1');
+      result.id = 'test-1';
+      result.testops_id = 1;
+      result.execution.status = TestStatusEnum.passed;
+      result.execution.duration = 100;
+      await reporter.addTestResult(result);
+      await reporter.publish();
+
+      // Verify first run completed
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockApiClient.uploadResults).toHaveBeenCalledWith(100, expect.anything());
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockApiClient.completeRun).toHaveBeenCalledWith(100);
+
+      jest.clearAllMocks();
+
+      // Second run — simulates long-lived process (VS Code, watch mode)
+      mockApiClient.createRun.mockResolvedValue(200);
+      await reporter.startTestRun();
+
+      expect(reporter['runId']).toBe(200);
+      expect(reporter['firstIndex']).toBe(0);
+      expect(reporter['isTestRunReady']).toBe(true);
+      expect(reporter['results']).toEqual([]);
+
+      const result2 = new TestResultType('Test 2');
+      result2.id = 'test-2';
+      result2.testops_id = 2;
+      result2.execution.status = TestStatusEnum.passed;
+      result2.execution.duration = 200;
+      await reporter.addTestResult(result2);
+      await reporter.publish();
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockApiClient.uploadResults).toHaveBeenCalledWith(200, expect.arrayContaining([
+        expect.objectContaining({ title: 'Test 2' }),
+      ]));
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockApiClient.completeRun).toHaveBeenCalledWith(200);
+    });
+  });
+
   describe('addTestResult', () => {
     beforeEach(async () => {
       mockApiClient.createRun.mockResolvedValue(123);
