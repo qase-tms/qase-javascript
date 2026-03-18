@@ -252,7 +252,7 @@ export class MochaQaseReporter extends reporters.Base {
 
     let message = this.metadata.comment;
     if (test.err?.message) {
-      message += '\n\n' + test.err.message;
+      message += message ? `\n\n${test.err.message}` : test.err.message;
     }
 
     let profilerSteps: TestStepType[] = [];

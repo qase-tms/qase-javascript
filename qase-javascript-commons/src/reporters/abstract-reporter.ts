@@ -107,7 +107,7 @@ export abstract class AbstractReporter implements InternalReporterInterface {
     let firstCase = true;
 
     for (const id of result.testops_id) {
-      const testResultCopy = { ...result } as TestResultType;
+      const testResultCopy = { ...result, execution: { ...result.execution } } as TestResultType;
       testResultCopy.testops_id = id;
       testResultCopy.id = uuidv4();
 
