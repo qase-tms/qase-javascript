@@ -1,3 +1,13 @@
+# qase-javascript-commons@2.5.10
+
+## What's new
+
+Unified HostData model to align field names across all Qase reporter languages:
+
+- Renamed `node` → `language` and `npm` → `packageManager` in the `HostData` interface.
+- Normalized `system` field: `win32` is now reported as `windows`.
+- X-Platform and X-Client headers continue to use language-specific keys (`node=`, `npm=`).
+
 # qase-javascript-commons@2.5.9
 
 ## Bug fixes

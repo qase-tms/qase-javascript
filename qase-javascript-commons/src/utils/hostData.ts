@@ -5,6 +5,16 @@ import { HostData } from '../models/host-data';
 import { getPackageVersion } from './get-package-version';
 
 /**
+ * Normalizes platform name to unified format
+ * @param {string} platform - process.platform value
+ * @returns {string} Normalized platform name
+ */
+function normalizePlatform(platform: string): string {
+  if (platform === 'win32') return 'windows';
+  return platform;
+}
+
+/**
  * Gets detailed OS information based on the platform
  * @returns {string} Detailed OS information
  */
@@ -66,13 +76,13 @@ function getNpmVersion(): string {
 export function getHostInfo(framework: string, reporterName: string): HostData {
   try {
     return {
-      system: process.platform,
+      system: normalizePlatform(process.platform),
       machineName: os.hostname(),
       release: os.release(),
       version: getDetailedOSInfo(),
       arch: os.arch(),
-      node: process.version,
-      npm: getNpmVersion(),
+      language: process.version,
+      packageManager: getNpmVersion(),
       framework: getPackageVersion(framework) ?? '',
       reporter: getPackageVersion(reporterName) ?? '',
       commons: getPackageVersion('qase-javascript-commons') ?? '',
@@ -81,13 +91,13 @@ export function getHostInfo(framework: string, reporterName: string): HostData {
     };
   } catch (error) {
     return {
-      system: process.platform,
+      system: normalizePlatform(process.platform),
       machineName: os.hostname() || '',
       release: os.release(),
       version: '',
       arch: os.arch(),
-      node: '',
-      npm: '',
+      language: '',
+      packageManager: '',
       framework: '',
       reporter: '',
       commons: '',

@@ -4,8 +4,8 @@ export interface HostData {
   release: string;
   version: string;
   arch: string;
-  node: string;
-  npm: string;
+  language: string;
+  packageManager: string;
   framework: string;
   reporter: string;
   commons: string;
