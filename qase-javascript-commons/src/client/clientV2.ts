@@ -111,11 +111,11 @@ export class ClientV2 extends ClientV1 {
         if (hostData.arch && hostData.arch.trim()) {
             platformParts.push(`arch=${hostData.arch}`);
         }
-        if (hostData.node && hostData.node.trim()) {
-            platformParts.push(`node=${hostData.node}`);
+        if (hostData.language && hostData.language.trim()) {
+            platformParts.push(`node=${hostData.language}`);
         }
-        if (hostData.npm && hostData.npm.trim()) {
-            platformParts.push(`npm=${hostData.npm}`);
+        if (hostData.packageManager && hostData.packageManager.trim()) {
+            platformParts.push(`npm=${hostData.packageManager}`);
         }
 
         if (platformParts.length > 0) {
