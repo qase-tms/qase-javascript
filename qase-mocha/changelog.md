@@ -1,3 +1,10 @@
+# mocha-qase-reporter@1.2.3
+
+## Bug fixes
+
+- Fixed leading `\n\n` in error messages when `metadata.comment` is empty.
+- Updated `qase-javascript-commons` dependency to `~2.5.9`.
+
 # mocha-qase-reporter@1.2.2
 
 ## Bug fixes

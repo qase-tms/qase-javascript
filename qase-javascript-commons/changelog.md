@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.5.9
+
+## Bug fixes
+
+- Fixed shallow copy bug in `addTestResult` when splitting multi-ID test results. The `execution` object is now deep-copied, preventing shared reference mutation that zeroed out `duration` for all copies.
+
 # qase-javascript-commons@2.5.8
 
 ## Bug fixes
