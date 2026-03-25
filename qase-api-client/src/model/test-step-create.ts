@@ -20,7 +20,7 @@
  */
 export interface TestStepCreate {
     /**
-     * 
+     * Step action text. Used for classic steps. For gherkin steps, use the \"value\" property instead.
      * @type {string}
      * @memberof TestStepCreate
      */
@@ -37,6 +37,12 @@ export interface TestStepCreate {
      * @memberof TestStepCreate
      */
     'data'?: string;
+    /**
+     * Gherkin scenario text. Used when steps_type is \"gherkin\". Example: \"Given a user exists\\nWhen they log in\\nThen they see the dashboard\"
+     * @type {string}
+     * @memberof TestStepCreate
+     */
+    'value'?: string;
     /**
      * 
      * @type {number}
