@@ -19,6 +19,7 @@ Name | Type | Description | Notes
 **milestone_id** | **number** |  | [optional] [default to undefined]
 **automation** | **number** |  | [optional] [default to undefined]
 **status** | **number** |  | [optional] [default to undefined]
+**steps_type** | **string** | Determines the format of the steps field. When \&quot;classic\&quot;, steps use the standard action/expected_result/data format. When \&quot;gherkin\&quot;, steps use the {value: \&quot;Given...\\nWhen...\\nThen...\&quot;} format. | [optional] [default to StepsTypeEnum_CLASSIC]
 **attachments** | **Array&lt;string&gt;** | A list of Attachment hashes. | [optional] [default to undefined]
 **steps** | [**Array&lt;TestStepCreate&gt;**](TestStepCreate.md) |  | [optional] [default to undefined]
 **tags** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
@@ -49,6 +50,7 @@ const instance: TestCasebulkCasesInner = {
     milestone_id,
     automation,
     status,
+    steps_type,
     attachments,
     steps,
     tags,

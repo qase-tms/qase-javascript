@@ -143,7 +143,7 @@ export interface TestCaseQuery {
      * @type {string}
      * @memberof TestCaseQuery
      */
-    'steps_type'?: string | null;
+    'steps_type'?: TestCaseQueryStepsTypeEnum;
     /**
      * 
      * @type {Array<TestStep>}
@@ -194,4 +194,14 @@ export interface TestCaseQuery {
      */
     'updated_by'?: number;
 }
+
+/**
+    * @export
+    * @enum {string}
+    */
+export enum TestCaseQueryStepsTypeEnum {
+    CLASSIC = 'classic',
+    GHERKIN = 'gherkin'
+}
+
 

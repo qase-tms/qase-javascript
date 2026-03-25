@@ -139,7 +139,7 @@ export interface TestCase {
      * @type {string}
      * @memberof TestCase
      */
-    'steps_type'?: string | null;
+    'steps_type'?: TestCaseStepsTypeEnum;
     /**
      * 
      * @type {Array<TestStep>}
@@ -218,4 +218,14 @@ export interface TestCase {
      */
     'external_issues'?: Array<ExternalIssue>;
 }
+
+/**
+    * @export
+    * @enum {string}
+    */
+export enum TestCaseStepsTypeEnum {
+    CLASSIC = 'classic',
+    GHERKIN = 'gherkin'
+}
+
 

@@ -106,6 +106,12 @@ export interface TestCaseUpdate {
      */
     'status'?: number;
     /**
+     * Determines the format of the steps field. When \"classic\", steps use the standard action/expected_result/data format. When \"gherkin\", steps use the {value: \"Given...\\nWhen...\\nThen...\"} format.
+     * @type {string}
+     * @memberof TestCaseUpdate
+     */
+    'steps_type'?: TestCaseUpdateStepsTypeEnum;
+    /**
      * A list of Attachment hashes.
      * @type {Array<string>}
      * @memberof TestCaseUpdate
@@ -143,4 +149,14 @@ export interface TestCaseUpdate {
      */
     'custom_field'?: { [key: string]: string; };
 }
+
+/**
+    * @export
+    * @enum {string}
+    */
+export enum TestCaseUpdateStepsTypeEnum {
+    CLASSIC = 'classic',
+    GHERKIN = 'gherkin'
+}
+
 
