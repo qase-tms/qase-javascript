@@ -18,7 +18,7 @@
   "scripts": {
     "build": "npm run clean && tsc --project tsconfig.build.json",
     "lint": "true",
-    "test": "true",
+    "test": "jest --passWithNoTests",
     "clean": "rm -rf dist"
   },
   "author": "Qase Team <support@qase.io>",
