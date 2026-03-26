@@ -3,7 +3,7 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { Configuration, RunsApi } from '../src';
 
-const packageJson = require('../../package.json');
+const packageJson = require('../package.json');
 
 describe('User-Agent header', () => {
   describe('Configuration', () => {
