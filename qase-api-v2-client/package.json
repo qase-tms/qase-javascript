@@ -1,6 +1,6 @@
 {
   "name": "qase-api-v2-client",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Qase TMS Javascript API V2 Client",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -18,7 +18,7 @@
   "scripts": {
     "build": "npm run clean && tsc --project tsconfig.build.json",
     "lint": "true",
-    "test": "true",
+    "test": "jest --passWithNoTests",
     "clean": "rm -rf dist"
   },
   "author": "Qase Team <support@qase.io>",

@@ -12,6 +12,9 @@
  * Do not edit the class manually.
  */
 
+// @ts-ignore
+const packageJson = require('../../package.json');
+
 export interface ConfigurationParameters {
     apiKey?: string | Promise<string> | ((name: string) => string) | ((name: string) => Promise<string>);
     username?: string;
@@ -81,6 +84,18 @@ export class Configuration {
         this.basePath = param.basePath;
         this.baseOptions = param.baseOptions;
         this.formDataCtor = param.formDataCtor;
+
+        // Set default User-Agent header
+        const userAgent = `qase-api-client-js/${packageJson.version}`;
+        if (!this.baseOptions) {
+            this.baseOptions = {};
+        }
+        if (!this.baseOptions.headers) {
+            this.baseOptions.headers = {};
+        }
+        if (!this.baseOptions.headers['User-Agent']) {
+            this.baseOptions.headers['User-Agent'] = userAgent;
+        }
     }
 
     /**
