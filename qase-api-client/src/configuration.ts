@@ -13,7 +13,7 @@
  */
 
 // @ts-ignore
-const packageJson = require('../../package.json');
+const packageJson = require('../package.json');
 
 export interface ConfigurationParameters {
     apiKey?: string | Promise<string> | ((name: string) => string) | ((name: string) => Promise<string>);
