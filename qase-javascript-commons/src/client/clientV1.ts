@@ -13,7 +13,6 @@ import {
 } from 'qase-api-client';
 import { Attachment, TestResultType, ConfigurationGroup } from '../models';
 import { TestOpsOptionsType } from '../models/config/TestOpsOptionsType';
-import { HostData } from '../models/host-data';
 import { isAxiosError } from '../utils/is-axios-error';
 import { QaseError } from '../utils/qase-error';
 import { IClient } from './interface';
@@ -65,7 +64,6 @@ export class ClientV1 implements IClient {
     protected readonly logger: LoggerInterface,
     protected readonly config: TestOpsOptionsType,
     private readonly environment: string | undefined,
-    private readonly hostData?: HostData,
   ) {
     const { apiConfig, appUrl } = this.createApiConfig();
     this.appUrl = appUrl;
@@ -81,28 +79,11 @@ export class ClientV1 implements IClient {
 
     if (this.config.api.host && this.config.api.host != DEFAULT_API_HOST) {
       apiConfig.basePath = `${API_BASE_URL}${this.config.api.host}${API_VERSION}`;
-    } else {
-      apiConfig.basePath = `https://api.${DEFAULT_API_HOST}${API_VERSION}`;
+      return { apiConfig, appUrl: `${APP_BASE_URL}${this.config.api.host}` };
     }
 
-    // Set User-Agent header
-    const version = this.hostData?.apiClientV2?.trim();
-    if (version) {
-      const existingHeaders = (apiConfig.baseOptions as { headers?: Record<string, string> } | undefined)?.headers || {};
-      apiConfig.baseOptions = {
-        ...(apiConfig.baseOptions as Record<string, unknown> || {}),
-        headers: {
-          ...existingHeaders,
-          'User-Agent': `qase-api-client-js/${version}`,
-        },
-      };
-    }
-
-    const appUrl = this.config.api.host && this.config.api.host != DEFAULT_API_HOST
-      ? `${APP_BASE_URL}${this.config.api.host}`
-      : `https://app.${DEFAULT_API_HOST}`;
-
-    return { apiConfig, appUrl };
+    apiConfig.basePath = `https://api.${DEFAULT_API_HOST}${API_VERSION}`;
+    return { apiConfig, appUrl: `https://app.${DEFAULT_API_HOST}` };
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

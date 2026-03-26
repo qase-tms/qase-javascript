@@ -41,7 +41,7 @@ export class ClientV2 extends ClientV1 {
         reporterName?: string,
         frameworkName?: string
     ) {
-        super(logger, config, environment, hostData);
+        super(logger, config, environment);
         const apiConfig = this.createApiConfigV2(hostData, reporterName, frameworkName);
         this.resultsClient = new ResultsApi(apiConfig);
     }
@@ -120,11 +120,6 @@ export class ClientV2 extends ClientV1 {
 
         if (platformParts.length > 0) {
             headers['X-Platform'] = platformParts.join(';');
-        }
-
-        // Build User-Agent header
-        if (hostData.apiClientV2 && hostData.apiClientV2.trim()) {
-            headers['User-Agent'] = `qase-api-client-js/${hostData.apiClientV2}`;
         }
 
         return headers;
