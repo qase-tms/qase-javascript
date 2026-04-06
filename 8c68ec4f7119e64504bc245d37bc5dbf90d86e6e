@@ -1,0 +1,23 @@
+examples/single/vitest/vitest.integration.config.ts
+  aaf4ebb871b2982d 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "8c68ec4f7119e64504bc245d37bc5dbf90d86e6e",
+  "prompts": {
+    "aaf4ebb871b2982d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d793f9aa-ebdd-4f59-9515-d6ff75638f2f",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
