@@ -81,6 +81,11 @@ tmp
 
 CLAUDE.md
 .planning/
+.mcp.json
 
 # Example package locks (managed by root workspace)
 examples/**/package-lock.json
+
+# Integration test report output
+build/
+**/build/report/

@@ -1,0 +1,458 @@
+run:
+  stats:
+    total: 12
+    passed: 12
+    failed: 0
+    skipped: 0
+    blocked: 0
+    invalid: 0
+    muted: 0
+results:
+- title: User can sort products by price
+  signature: 5::e-commerce::inventory::sorting::{'sortoption':'lohi'}
+  testops_ids:
+  - 5
+  status: passed
+  fields:
+    severity: minor
+    priority: medium
+    layer: e2e
+  params:
+    sortOption: lohi
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tInventory\tSorting"
+        public_id: null
+  steps:
+  - data:
+      action: Before Hooks
+    execution:
+      status: passed
+    steps:
+    - data:
+        action: beforeEach hook
+      execution:
+        status: passed
+  - data:
+      action: Select sort by price (low to high)
+    execution:
+      status: passed
+  - data:
+      action: Verify products are sorted correctly
+    execution:
+      status: passed
+- title: User can cancel checkout
+  signature: 12::e-commerce::checkout::navigation
+  testops_ids:
+  - 12
+  status: passed
+  fields:
+    severity: major
+    priority: medium
+    layer: e2e
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tCheckout\tNavigation"
+        public_id: null
+  steps:
+  - data:
+      action: Before Hooks
+    execution:
+      status: passed
+    steps:
+    - data:
+        action: beforeEach hook
+      execution:
+        status: passed
+  - data:
+      action: Click cancel button
+    execution:
+      status: passed
+  - data:
+      action: Verify return to cart page
+    execution:
+      status: passed
+- title: User can browse all products
+  signature: 4::e-commerce::inventory::browsing
+  testops_ids:
+  - 4
+  status: passed
+  fields:
+    severity: normal
+    priority: high
+    layer: e2e
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tInventory\tBrowsing"
+        public_id: null
+  steps:
+  - data:
+      action: Before Hooks
+    execution:
+      status: passed
+    steps:
+    - data:
+        action: beforeEach hook
+      execution:
+        status: passed
+  - data:
+      action: Verify inventory page title
+    execution:
+      status: passed
+  - data:
+      action: Count available products
+    execution:
+      status: passed
+  - data:
+      action: Verify product details are visible
+    execution:
+      status: passed
+      attachments:
+      - file_name: product-count.json
+        mime_type: application/json
+- title: User can view product details
+  signature: 6::e-commerce::inventory::product_details
+  testops_ids:
+  - 6
+  status: passed
+  fields:
+    severity: major
+    priority: low
+    layer: e2e
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tInventory\tProduct Details"
+        public_id: null
+  steps:
+  - data:
+      action: Before Hooks
+    execution:
+      status: passed
+    steps:
+    - data:
+        action: beforeEach hook
+      execution:
+        status: passed
+  - data:
+      action: Click on first product
+    execution:
+      status: passed
+  - data:
+      action: Verify product detail page is displayed
+    execution:
+      status: passed
+- title: User can remove product from cart
+  signature: 8::e-commerce::shopping_cart::remove_items
+  testops_ids:
+  - 8
+  status: passed
+  fields:
+    severity: normal
+    priority: medium
+    layer: e2e
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tShopping Cart\tRemove Items"
+        public_id: null
+  steps:
+  - data:
+      action: Before Hooks
+    execution:
+      status: passed
+    steps:
+    - data:
+        action: beforeEach hook
+      execution:
+        status: passed
+  - data:
+      action: Add product to cart
+    execution:
+      status: passed
+  - data:
+      action: Navigate to cart
+    execution:
+      status: passed
+  - data:
+      action: Remove product from cart
+    execution:
+      status: passed
+  - data:
+      action: Verify cart is empty
+    execution:
+      status: passed
+- title: User can add multiple products to cart
+  signature: 9::e-commerce::shopping_cart::multiple_items
+  testops_ids:
+  - 9
+  status: passed
+  fields:
+    severity: major
+    priority: high
+    layer: e2e
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tShopping Cart\tMultiple Items"
+        public_id: null
+  steps:
+  - data:
+      action: Before Hooks
+    execution:
+      status: passed
+    steps:
+    - data:
+        action: beforeEach hook
+      execution:
+        status: passed
+  - data:
+      action: Add first product
+    execution:
+      status: passed
+  - data:
+      action: Add second product
+    execution:
+      status: passed
+  - data:
+      action: Verify cart badge shows 2 items
+    execution:
+      status: passed
+- title: User can complete checkout with valid information
+  signature: 10::e-commerce::checkout::complete_flow::{'firstname':'john'}::{'lastname':'doe'}::{'postalcode':'12345'}
+  testops_ids:
+  - 10
+  status: passed
+  fields:
+    severity: critical
+    priority: low
+    layer: e2e
+  params:
+    firstName: John
+    lastName: Doe
+    postalCode: '12345'
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tCheckout\tComplete Flow"
+        public_id: null
+  steps:
+  - data:
+      action: Before Hooks
+    execution:
+      status: passed
+    steps:
+    - data:
+        action: beforeEach hook
+      execution:
+        status: passed
+  - data:
+      action: Fill checkout information
+    execution:
+      status: passed
+    steps:
+    - data:
+        action: Enter customer details
+      execution:
+        status: passed
+    - data:
+        action: Continue to overview
+      execution:
+        status: passed
+  - data:
+      action: Complete the order
+    execution:
+      status: passed
+  - data:
+      action: Verify order completion
+    execution:
+      status: passed
+      attachments:
+      - file_name: order-complete.txt
+        mime_type: text/plain
+- title: User cannot login with invalid password
+  signature: 2::e-commerce::authentication::login::{'username':'standard_user'}::{'password':'wrong_password'}
+  testops_ids:
+  - 2
+  status: passed
+  fields:
+    severity: minor
+    priority: high
+    layer: e2e
+  params:
+    username: standard_user
+    password: wrong_password
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tAuthentication\tLogin"
+        public_id: null
+  steps:
+  - data:
+      action: Before Hooks
+    execution:
+      status: passed
+    steps:
+    - data:
+        action: beforeEach hook
+      execution:
+        status: passed
+  - data:
+      action: Attempt login with invalid password
+    execution:
+      status: passed
+  - data:
+      action: Verify error message is displayed
+    execution:
+      status: passed
+- title: User can login with valid credentials
+  signature: 1::e-commerce::authentication::login
+  testops_ids:
+  - 1
+  status: passed
+  fields:
+    severity: critical
+    priority: high
+    layer: e2e
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tAuthentication\tLogin"
+        public_id: null
+  steps:
+  - data:
+      action: Before Hooks
+    execution:
+      status: passed
+    steps:
+    - data:
+        action: beforeEach hook
+      execution:
+        status: passed
+  - data:
+      action: Navigate to login page
+    execution:
+      status: passed
+  - data:
+      action: Fill in credentials and submit
+    execution:
+      status: passed
+  - data:
+      action: Verify successful login
+    execution:
+      status: passed
+      attachments:
+      - file_name: login-success.png
+        mime_type: image/png
+- title: Checkout fails without required information
+  signature: 11::e-commerce::checkout::validation::{'scenario':'missing_first_name'}
+  testops_ids:
+  - 11
+  status: passed
+  fields:
+    severity: normal
+    priority: high
+    layer: e2e
+  params:
+    scenario: missing_first_name
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tCheckout\tValidation"
+        public_id: null
+  steps:
+  - data:
+      action: Before Hooks
+    execution:
+      status: passed
+    steps:
+    - data:
+        action: beforeEach hook
+      execution:
+        status: passed
+  - data:
+      action: Attempt to continue without filling first name
+    execution:
+      status: passed
+  - data:
+      action: Verify error message is displayed
+    execution:
+      status: passed
+- title: User can add product to cart
+  signature: 7::e-commerce::shopping_cart::add_items::{'product':'sauce labs backpack'}
+  testops_ids:
+  - 7
+  status: passed
+  fields:
+    severity: critical
+    priority: high
+    layer: e2e
+  params:
+    product: Sauce Labs Backpack
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tShopping Cart\tAdd Items"
+        public_id: null
+  steps:
+  - data:
+      action: Before Hooks
+    execution:
+      status: passed
+    steps:
+    - data:
+        action: beforeEach hook
+      execution:
+        status: passed
+  - data:
+      action: Add product to cart
+    execution:
+      status: passed
+  - data:
+      action: Verify cart badge shows 1 item
+    execution:
+      status: passed
+  - data:
+      action: Navigate to cart and verify product
+    execution:
+      status: passed
+      attachments:
+      - file_name: cart-state.json
+        mime_type: application/json
+- title: Locked user cannot login
+  signature: 3::e-commerce::authentication::login::{'username':'locked_out_user'}
+  testops_ids:
+  - 3
+  status: passed
+  fields:
+    severity: major
+    priority: medium
+    layer: e2e
+  params:
+    username: locked_out_user
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tAuthentication\tLogin"
+        public_id: null
+  steps:
+  - data:
+      action: Before Hooks
+    execution:
+      status: passed
+    steps:
+    - data:
+        action: beforeEach hook
+      execution:
+        status: passed
+  - data:
+      action: Attempt login with locked user
+    execution:
+      status: passed
+  - data:
+      action: Verify locked-out error message
+    execution:
+      status: passed

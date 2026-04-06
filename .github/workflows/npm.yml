@@ -30,6 +30,111 @@ jobs:
     - run: npm run lint -w ${{ matrix.prefix }}
     - run: npm run test -w ${{ matrix.prefix }}
 
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: test
+    name: Integration tests
+    steps:
+    - uses: actions/checkout@v6
+    - uses: actions/setup-node@v6
+      with:
+        node-version: '22'
+    - run: npm install npm@latest
+    - run: npm ci
+    - run: npm run build -ws --if-present
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install reporters-validator
+      run: pip install git+https://github.com/qase-tms/reporters-validator.git
+
+    - name: Download report schemas
+      run: git clone --depth 1 https://github.com/qase-tms/specs.git /tmp/specs
+
+    - name: Validate Jest reporter
+      run: |
+        QASE_MODE=report \
+        QASE_REPORT_CONNECTION_PATH=${{ github.workspace }}/build/jest-report \
+        npm test -w examples-jest || true
+
+        python3 scripts/normalize_report.py ${{ github.workspace }}/build/jest-report
+
+        reporters-validator validate \
+          --report-dir ${{ github.workspace }}/build/jest-report \
+          --expected expected/jest-examples.yaml \
+          --schema-dir /tmp/specs/report/schemas
+
+    - name: Validate Mocha reporter
+      run: |
+        QASE_MODE=report \
+        QASE_REPORT_CONNECTION_PATH=${{ github.workspace }}/build/mocha-report \
+        npm test -w examples-mocha || true
+
+        python3 scripts/normalize_report.py ${{ github.workspace }}/build/mocha-report
+
+        reporters-validator validate \
+          --report-dir ${{ github.workspace }}/build/mocha-report \
+          --expected expected/mocha-examples.yaml \
+          --schema-dir /tmp/specs/report/schemas
+
+    - name: Validate Vitest reporter
+      run: |
+        QASE_MODE=report \
+        QASE_REPORT_CONNECTION_PATH=${{ github.workspace }}/build/vitest-report \
+        npx vitest run --config examples/single/vitest/vitest.integration.config.ts \
+          --root examples/single/vitest || true
+
+        # Handle report.json vs run.json naming difference
+        if [ ! -f "${{ github.workspace }}/build/vitest-report/run.json" ] && \
+           [ -f "${{ github.workspace }}/build/vitest-report/report.json" ]; then
+          cp "${{ github.workspace }}/build/vitest-report/report.json" \
+             "${{ github.workspace }}/build/vitest-report/run.json"
+        fi
+
+        python3 scripts/normalize_report.py ${{ github.workspace }}/build/vitest-report
+
+        reporters-validator validate \
+          --report-dir ${{ github.workspace }}/build/vitest-report \
+          --expected expected/vitest-examples.yaml \
+          --schema-dir /tmp/specs/report/schemas
+
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps chromium
+
+    - name: Validate Playwright reporter
+      run: |
+        cd ${{ github.workspace }}/examples/single/playwright
+        QASE_MODE=report \
+        QASE_REPORT_CONNECTION_PATH=${{ github.workspace }}/build/playwright-report \
+        npx playwright test \
+          test/login.spec.js test/inventory.spec.js \
+          test/cart.spec.js test/checkout.spec.js || true
+
+        python3 ${{ github.workspace }}/scripts/normalize_report.py \
+          ${{ github.workspace }}/build/playwright-report
+
+        reporters-validator validate \
+          --report-dir ${{ github.workspace }}/build/playwright-report \
+          --expected ${{ github.workspace }}/expected/playwright-examples.yaml \
+          --schema-dir /tmp/specs/report/schemas
+
+    - name: Validate Cypress reporter
+      run: |
+        cd ${{ github.workspace }}/examples/single/cypress
+        QASE_MODE=report \
+        QASE_REPORT_CONNECTION_PATH=${{ github.workspace }}/build/cypress-report \
+        npx cypress run || true
+
+        python3 ${{ github.workspace }}/scripts/normalize_report.py \
+          ${{ github.workspace }}/build/cypress-report
+
+        reporters-validator validate \
+          --report-dir ${{ github.workspace }}/build/cypress-report \
+          --expected ${{ github.workspace }}/expected/cypress-examples.yaml \
+          --schema-dir /tmp/specs/report/schemas
+
   build-n-publish:
     runs-on: ubuntu-latest
     needs: test

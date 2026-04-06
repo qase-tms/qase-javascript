@@ -1,0 +1,356 @@
+run:
+  stats:
+    total: 14
+    passed: 13
+    failed: 0
+    skipped: 1
+    broken: 0
+    muted: 0
+results:
+- title: Retrieve all users from JSONPlaceholder API
+  signature: 'User CRUD Operations > GET all users - verify 10 users returned (Qase
+    ID: 1)'
+  status: passed
+  fields:
+    layer: api
+    severity: normal
+  relations:
+    suite:
+      data:
+      - title: User CRUD Operations
+        public_id: null
+  steps:
+  - data:
+      action: Send GET request to /users endpoint
+    execution:
+      status: passed
+  - data:
+      action: Validate user data structure
+    execution:
+      status: passed
+- title: Retrieve specific user by ID
+  signature: 'User CRUD Operations > GET single user by ID - verify user 1 is Leanne
+    Graham (Qase ID: 2)'
+  status: passed
+  fields:
+    layer: api
+    severity: normal
+  params:
+    userId: '1'
+  relations:
+    suite:
+      data:
+      - title: User CRUD Operations
+        public_id: null
+  steps:
+  - data:
+      action: Send GET request to /users/1
+    execution:
+      status: passed
+  - data:
+      action: Validate user address structure
+    execution:
+      status: passed
+- title: Create new user via POST request
+  signature: 'User CRUD Operations > POST create user - verify 201 response and returned
+    ID (Qase ID: 3)'
+  status: passed
+  fields:
+    layer: api
+    severity: critical
+    priority: high
+  relations:
+    suite:
+      data:
+      - title: User CRUD Operations
+        public_id: null
+  steps:
+  - data:
+      action: Send POST request with new user data
+    execution:
+      status: passed
+  - data:
+      action: Attach request body for debugging
+    execution:
+      status: passed
+  attachments:
+  - file_name: new-user-payload.json
+    mime_type: application/octet-stream
+- title: Delete user by ID
+  signature: 'User CRUD Operations > DELETE user - verify 200 response (Qase ID: 4)'
+  status: passed
+  fields:
+    layer: api
+    severity: normal
+  params:
+    userId: '1'
+  relations:
+    suite:
+      data:
+      - title: User CRUD Operations
+        public_id: null
+  steps:
+  - data:
+      action: Send DELETE request to /users/1
+    execution:
+      status: passed
+  - data:
+      action: Verify delete operation succeeded
+    execution:
+      status: passed
+- title: Retrieve all posts from JSONPlaceholder API
+  signature: 'Post Validation > GET all posts - verify 100 posts returned (Qase ID:
+    5)'
+  status: passed
+  fields:
+    layer: api
+    priority: high
+    severity: normal
+  relations:
+    suite:
+      data:
+      - title: User CRUD Operations
+        public_id: null
+  steps:
+  - data:
+      action: Send GET request to /posts endpoint
+    execution:
+      status: passed
+  - data:
+      action: Validate post structure
+    execution:
+      status: passed
+- title: Retrieve posts for specific user
+  signature: 'Post Validation > GET posts by user ID - verify filtered results (Qase
+    ID: 6)'
+  status: passed
+  fields:
+    layer: api
+    severity: normal
+  params:
+    userId: '1'
+    expectedPosts: '10'
+  relations:
+    suite:
+      data:
+      - title: Post Validation
+        public_id: null
+  steps:
+  - data:
+      action: Send GET request with userId filter
+    execution:
+      status: passed
+  - data:
+      action: Verify all posts belong to user 1
+    execution:
+      status: passed
+  - data:
+      action: Validate post content is not empty
+    execution:
+      status: passed
+- title: Retrieve post comments and validate structure
+  signature: 'Post Validation > GET post with comments - verify comment structure
+    (Qase ID: 7)'
+  status: passed
+  fields:
+    layer: api
+    severity: normal
+  params:
+    postId: '1'
+  relations:
+    suite:
+      data:
+      - title: Post Validation
+        public_id: null
+  steps:
+  - data:
+      action: Fetch comments for post 1
+    execution:
+      status: passed
+  - data:
+      action: Validate comment structure
+    execution:
+      status: passed
+  - data:
+      action: Attach first comment for reference
+    execution:
+      status: passed
+  attachments:
+  - file_name: first-comment.json
+    mime_type: application/octet-stream
+- title: Demonstrate nested step execution
+  signature: 'Advanced Qase Features > Complex nested steps - multi-step user and
+    post retrieval (Qase ID: 11)'
+  status: passed
+  fields:
+    layer: api
+    severity: normal
+    priority: medium
+  params:
+    userId: '1'
+    userName: Leanne Graham
+    postCount: '10'
+  relations:
+    suite:
+      data:
+      - title: User CRUD Operations
+        public_id: null
+  steps:
+  - data:
+      action: 'Nested: Validate user data completeness'
+    execution:
+      status: passed
+  - data:
+      action: 'Nested: Validate posts belong to user'
+    execution:
+      status: passed
+  - data:
+      action: 'Step 3: Verify relationship consistency'
+    execution:
+      status: passed
+- title: Demonstrate suite hierarchy with tab separators
+  signature: 'Advanced Qase Features > Suite hierarchy - demonstrate nested suite
+    structure (Qase ID: 12)'
+  status: passed
+  fields:
+    layer: api
+    severity: normal
+  relations:
+    suite:
+      data:
+      - title: "API Tests\tAdvanced\tRelationships"
+        public_id: null
+  steps:
+  - data:
+      action: Fetch user and their albums
+    execution:
+      status: passed
+  - data:
+      action: Verify album structure
+    execution:
+      status: passed
+- title: Verify multiple users with different parameters
+  signature: 'Advanced Qase Features > Parameterized test pattern - demonstrate multiple
+    test parameters (Qase ID: 13)'
+  status: passed
+  fields:
+    layer: api
+    severity: normal
+  params:
+    userId: '3'
+    iteration: '3'
+    totalIterations: '3'
+  relations:
+    suite:
+      data:
+      - title: Advanced Qase Features
+        public_id: null
+  steps:
+  - data:
+      action: Test user 1
+    execution:
+      status: passed
+  - data:
+      action: Test user 2
+    execution:
+      status: passed
+  - data:
+      action: Test user 3
+    execution:
+      status: passed
+  - data:
+      action: Verify all users processed
+    execution:
+      status: passed
+- title: Authentication endpoint placeholder
+  signature: 'Advanced Qase Features > Authentication endpoint placeholder (Qase ID:
+    14)'
+  status: skipped
+  relations:
+    suite:
+      data:
+      - title: Advanced Qase Features
+        public_id: null
+- title: Verify API returns 404 for non-existent user
+  signature: 'Error Handling > GET non-existent user (404) - verify error status (Qase
+    ID: 8)'
+  status: passed
+  fields:
+    layer: api
+    severity: normal
+    priority: medium
+  params:
+    userId: '999'
+  relations:
+    suite:
+      data:
+      - title: User CRUD Operations
+        public_id: null
+  steps:
+  - data:
+      action: Send GET request to /users/999
+    execution:
+      status: passed
+  - data:
+      action: Verify empty response body
+    execution:
+      status: passed
+  - data:
+      action: Document expected 404 behavior
+    execution:
+      status: passed
+- title: Verify API returns 404 for non-existent post
+  signature: 'Error Handling > GET non-existent post (404) - attach error response
+    (Qase ID: 9)'
+  status: passed
+  fields:
+    layer: api
+    severity: normal
+  params:
+    postId: '9999'
+  relations:
+    suite:
+      data:
+      - title: User CRUD Operations
+        public_id: null
+  steps:
+  - data:
+      action: Send GET request to non-existent post
+    execution:
+      status: passed
+  - data:
+      action: Attach error response for debugging
+    execution:
+      status: passed
+  - data:
+      action: Verify error response structure
+    execution:
+      status: passed
+  attachments:
+  - file_name: 404-error-response.json
+    mime_type: application/octet-stream
+- title: Verify API handles invalid endpoints gracefully
+  signature: 'Error Handling > GET invalid endpoint (404) - verify graceful handling
+    (Qase ID: 10)'
+  status: passed
+  fields:
+    layer: api
+    severity: normal
+  relations:
+    suite:
+      data:
+      - title: User CRUD Operations
+        public_id: null
+  steps:
+  - data:
+      action: Send request to invalid endpoint
+    execution:
+      status: passed
+  - data:
+      action: Verify no server error
+    execution:
+      status: passed
+  - data:
+      action: Document graceful failure
+    execution:
+      status: passed

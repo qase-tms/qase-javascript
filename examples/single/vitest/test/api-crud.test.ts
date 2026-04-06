@@ -1,8 +1,8 @@
 import { describe, test, expect } from 'vitest';
-import { withQase } from 'vitest-qase-reporter/vitest';
+import { withQase, addQaseId } from 'vitest-qase-reporter/vitest';
 
 describe("User CRUD Operations", () => {
-  test("GET all users - verify 10 users returned", withQase(async ({ qase }) => {
+  test(addQaseId("GET all users - verify 10 users returned", [1]), withQase(async ({ qase }) => {
     await qase.title("Retrieve all users from JSONPlaceholder API");
     await qase.fields({ layer: 'api', severity: 'normal' });
 
@@ -26,10 +26,10 @@ describe("User CRUD Operations", () => {
     });
   }));
 
-  test("GET single user by ID - verify user 1 is Leanne Graham", withQase(async ({ qase }) => {
+  test(addQaseId("GET single user by ID - verify user 1 is Leanne Graham", [2]), withQase(async ({ qase }) => {
     await qase.title("Retrieve specific user by ID");
     await qase.fields({ layer: 'api', severity: 'normal' });
-    await qase.parameters({ userId: 1 });
+    await qase.parameters({ userId: '1' });
 
     await qase.step("Send GET request to /users/1", async () => {
       const response = await fetch('https://jsonplaceholder.typicode.com/users/1');
@@ -53,7 +53,7 @@ describe("User CRUD Operations", () => {
     });
   }));
 
-  test("POST create user - verify 201 response and returned ID", withQase(async ({ qase }) => {
+  test(addQaseId("POST create user - verify 201 response and returned ID", [3]), withQase(async ({ qase }) => {
     await qase.title("Create new user via POST request");
     await qase.fields({ layer: 'api', severity: 'critical', priority: 'high' });
 
@@ -88,10 +88,10 @@ describe("User CRUD Operations", () => {
     });
   }));
 
-  test("DELETE user - verify 200 response", withQase(async ({ qase }) => {
+  test(addQaseId("DELETE user - verify 200 response", [4]), withQase(async ({ qase }) => {
     await qase.title("Delete user by ID");
     await qase.fields({ layer: 'api', severity: 'normal' });
-    await qase.parameters({ userId: 1 });
+    await qase.parameters({ userId: '1' });
     await qase.comment("Note: JSONPlaceholder fakes DELETE requests - no actual data is removed");
 
     await qase.step("Send DELETE request to /users/1", async () => {
