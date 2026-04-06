@@ -1,0 +1,23 @@
+.github/workflows/npm.yml
+  aaf4ebb871b2982d 84,87,96-97,101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "90c9b31e417b9676beffde6450bfb8f29439ce4c",
+  "prompts": {
+    "aaf4ebb871b2982d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d793f9aa-ebdd-4f59-9515-d6ff75638f2f",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 5,
+      "total_deletions": 4,
+      "accepted_lines": 5,
+      "overriden_lines": 0
+    }
+  }
+}
