@@ -109,7 +109,7 @@ results:
   relations:
     suite:
       data:
-      - title: User CRUD Operations
+      - title: Post Validation
         public_id: null
   steps:
   - data:
@@ -193,7 +193,7 @@ results:
   relations:
     suite:
       data:
-      - title: User CRUD Operations
+      - title: Advanced Qase Features
         public_id: null
   steps:
   - data:
@@ -284,7 +284,7 @@ results:
   relations:
     suite:
       data:
-      - title: User CRUD Operations
+      - title: Error Handling
         public_id: null
   steps:
   - data:
@@ -311,7 +311,7 @@ results:
   relations:
     suite:
       data:
-      - title: User CRUD Operations
+      - title: Error Handling
         public_id: null
   steps:
   - data:
@@ -339,7 +339,7 @@ results:
   relations:
     suite:
       data:
-      - title: User CRUD Operations
+      - title: Error Handling
         public_id: null
   steps:
   - data:

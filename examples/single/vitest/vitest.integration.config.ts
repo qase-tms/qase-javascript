@@ -4,6 +4,7 @@ export default defineConfig({
   test: {
     watch: false,
     testTimeout: 10000,
+    fileParallelism: false,
     include: ['test/**/*.test.ts'],
     reporters: [
       'default',
