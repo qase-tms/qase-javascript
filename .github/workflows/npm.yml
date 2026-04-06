@@ -81,10 +81,10 @@ jobs:
 
     - name: Validate Vitest reporter
       run: |
+        cd ${{ github.workspace }}/examples/single/vitest
         QASE_MODE=report \
         QASE_REPORT_CONNECTION_PATH=${{ github.workspace }}/build/vitest-report \
-        npx vitest run --config examples/single/vitest/vitest.integration.config.ts \
-          --root examples/single/vitest || true
+        npx vitest run --config vitest.integration.config.ts || true
 
         # Handle report.json vs run.json naming difference
         if [ ! -f "${{ github.workspace }}/build/vitest-report/run.json" ] && \
@@ -93,11 +93,12 @@ jobs:
              "${{ github.workspace }}/build/vitest-report/run.json"
         fi
 
-        python3 scripts/normalize_report.py ${{ github.workspace }}/build/vitest-report
+        python3 ${{ github.workspace }}/scripts/normalize_report.py \
+          ${{ github.workspace }}/build/vitest-report
 
         reporters-validator validate \
           --report-dir ${{ github.workspace }}/build/vitest-report \
-          --expected expected/vitest-examples.yaml \
+          --expected ${{ github.workspace }}/expected/vitest-examples.yaml \
           --schema-dir /tmp/specs/report/schemas
 
     - name: Install Playwright browsers
