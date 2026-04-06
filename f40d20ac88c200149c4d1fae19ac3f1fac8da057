@@ -1,0 +1,41 @@
+examples/single/vitest/package.json
+  aaf4ebb871b2982d 10-11
+.gitignore
+  aaf4ebb871b2982d 88-91
+examples/single/vitest/test/api-advanced.test.ts
+  aaf4ebb871b2982d 2,5,41,43,50,76,85-87,104
+examples/single/vitest/test/api-posts.test.ts
+  aaf4ebb871b2982d 2,5,30,33,66,69
+scripts/clean_expected.py
+  aaf4ebb871b2982d 1-195
+examples/single/vitest/vitest.integration.config.ts
+  aaf4ebb871b2982d 1-29
+scripts/normalize_report.py
+  aaf4ebb871b2982d 1-75
+examples/single/vitest/test/api-crud.test.ts
+  aaf4ebb871b2982d 2,5,29,32,56,91,94
+examples/single/vitest/test/api-errors.test.ts
+  aaf4ebb871b2982d 2,5,8,29,32,57
+.github/workflows/npm.yml
+  aaf4ebb871b2982d 33-137
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "f40d20ac88c200149c4d1fae19ac3f1fac8da057",
+  "prompts": {
+    "aaf4ebb871b2982d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d793f9aa-ebdd-4f59-9515-d6ff75638f2f",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 443,
+      "total_deletions": 35,
+      "accepted_lines": 440,
+      "overriden_lines": 0
+    }
+  }
+}
