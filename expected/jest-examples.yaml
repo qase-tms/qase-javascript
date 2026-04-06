@@ -1,0 +1,429 @@
+run:
+  stats:
+    total: 16
+    passed: 12
+    failed: 3
+    skipped: 1
+    blocked: 0
+    invalid: 0
+    muted: 0
+results:
+- title: Suite hierarchy demonstration
+  signature: 13::test::api-advanced.test.js::jsonplaceholder_api_-_advanced_features_suite_hierarchy_demonstration_(qase_id:_13)
+  testops_ids:
+  - 13
+  status: passed
+  fields:
+    layer: api
+    severity: normal
+  relations:
+    suite:
+      data:
+      - title: "API Tests\tAdvanced\tData Validation"
+        public_id: null
+  steps:
+  - data:
+      action: Validate todos endpoint structure
+    execution:
+      status: passed
+- title: GET non-existent post returns empty object
+  signature: 9::test::api-errors.test.js::jsonplaceholder_api_-_error_handling_get_non-existent_post_returns_empty_object_(qase_id:_9)
+  testops_ids:
+  - 9
+  status: failed
+  fields:
+    layer: api
+    severity: normal
+  relations:
+    suite:
+      data:
+      - title: test
+        public_id: null
+      - title: api-errors.test.js
+        public_id: null
+      - title: JSONPlaceholder API - Error Handling
+        public_id: null
+  steps:
+  - data:
+      action: Request post with ID 999
+    execution:
+      status: failed
+- title: GET post with comments returns nested data
+  signature: 7::test::api-posts.test.js::jsonplaceholder_api_-_post_validation_get_post_with_comments_returns_nested_data_(qase_id:_7)
+  testops_ids:
+  - 7
+  status: passed
+  fields:
+    layer: api
+    severity: normal
+    priority: medium
+  relations:
+    suite:
+      data:
+      - title: test
+        public_id: null
+      - title: api-posts.test.js
+        public_id: null
+      - title: JSONPlaceholder API - Post Validation
+        public_id: null
+  steps:
+  - data:
+      action: Fetch post by ID
+    execution:
+      status: passed
+  - data:
+      action: Fetch comments for the post
+    execution:
+      status: passed
+  - data:
+      action: Verify comment structure
+    execution:
+      status: passed
+  attachments:
+  - file_name: post-with-comments.json
+    mime_type: application/octet-stream
+- title: GET non-existent user returns empty object
+  signature: 8::test::api-errors.test.js::jsonplaceholder_api_-_error_handling_get_non-existent_user_returns_empty_object_(qase_id:_8)
+  testops_ids:
+  - 8
+  status: failed
+  fields:
+    layer: api
+    severity: normal
+    priority: medium
+  relations:
+    suite:
+      data:
+      - title: test
+        public_id: null
+      - title: api-errors.test.js
+        public_id: null
+      - title: JSONPlaceholder API - Error Handling
+        public_id: null
+  steps:
+  - data:
+      action: Request user with ID 999
+    execution:
+      status: failed
+- title: GET single user by ID returns correct user
+  signature: 2::test::api-crud.test.js::jsonplaceholder_api_-_user_crud_operations_get_single_user_by_id_returns_correct_user_(qase_id:_2)::{'userid':'1'}
+  testops_ids:
+  - 2
+  status: passed
+  fields:
+    layer: api
+    severity: normal
+  params:
+    userId: '1'
+  relations:
+    suite:
+      data:
+      - title: test
+        public_id: null
+      - title: api-crud.test.js
+        public_id: null
+      - title: JSONPlaceholder API - User CRUD Operations
+        public_id: null
+  steps:
+  - data:
+      action: Send GET request to /users/1
+    execution:
+      status: passed
+  - data:
+      action: Verify user address and company information
+    execution:
+      status: passed
+- title: GET all posts returns 100 posts
+  signature: 5::test::api-posts.test.js::jsonplaceholder_api_-_post_validation_get_all_posts_returns_100_posts_(qase_id:_5)
+  testops_ids:
+  - 5
+  status: passed
+  fields:
+    layer: api
+    severity: normal
+    priority: high
+  relations:
+    suite:
+      data:
+      - title: test
+        public_id: null
+      - title: api-posts.test.js
+        public_id: null
+      - title: JSONPlaceholder API - Post Validation
+        public_id: null
+  steps:
+  - data:
+      action: Send GET request to /posts endpoint
+    execution:
+      status: passed
+  - data:
+      action: Verify post structure
+    execution:
+      status: passed
+- title: Albums endpoint with nested photos
+  signature: 15::test::api-advanced.test.js::jsonplaceholder_api_-_advanced_features_albums_endpoint_with_nested_photos_(qase_id:_15)
+  testops_ids:
+  - 15
+  status: passed
+  fields:
+    layer: api
+    severity: low
+    priority: low
+  relations:
+    suite:
+      data:
+      - title: test
+        public_id: null
+      - title: api-advanced.test.js
+        public_id: null
+      - title: JSONPlaceholder API - Advanced Features
+        public_id: null
+  steps:
+  - data:
+      action: Fetch album details
+    execution:
+      status: passed
+  - data:
+      action: Verify photo structure
+    execution:
+      status: passed
+  - data:
+      action: Fetch photos in album
+    execution:
+      status: passed
+- title: GET posts filtered by user ID returns correct results
+  signature: 6::test::api-posts.test.js::jsonplaceholder_api_-_post_validation_get_posts_filtered_by_user_id_returns_correct_results_(qase_id:_6)::{'userid':'1'}::{'filtertype':'query_parameter'}
+  testops_ids:
+  - 6
+  status: passed
+  fields:
+    layer: api
+    severity: normal
+  params:
+    userId: '1'
+    filterType: query_parameter
+  relations:
+    suite:
+      data:
+      - title: test
+        public_id: null
+      - title: api-posts.test.js
+        public_id: null
+      - title: JSONPlaceholder API - Post Validation
+        public_id: null
+  steps:
+  - data:
+      action: Send GET request with userId filter
+    execution:
+      status: passed
+  - data:
+      action: Verify all posts belong to user 1
+    execution:
+      status: passed
+- title: Invalid endpoint returns 404 with HTML
+  signature: 10::test::api-errors.test.js::jsonplaceholder_api_-_error_handling_invalid_endpoint_returns_404_with_html_(qase_id:_10)
+  testops_ids:
+  - 10
+  status: failed
+  fields:
+    layer: api
+    severity: low
+    priority: low
+  relations:
+    suite:
+      data:
+      - title: test
+        public_id: null
+      - title: api-errors.test.js
+        public_id: null
+      - title: JSONPlaceholder API - Error Handling
+        public_id: null
+  steps:
+  - data:
+      action: Request invalid endpoint
+    execution:
+      status: failed
+- title: DELETE user returns 200 status
+  signature: 4::test::api-crud.test.js::jsonplaceholder_api_-_user_crud_operations_delete_user_returns_200_status_(qase_id:_4)
+  testops_ids:
+  - 4
+  status: passed
+  fields:
+    layer: api
+    severity: normal
+  relations:
+    suite:
+      data:
+      - title: test
+        public_id: null
+      - title: api-crud.test.js
+        public_id: null
+      - title: JSONPlaceholder API - User CRUD Operations
+        public_id: null
+  steps:
+  - data:
+      action: Send DELETE request to /users/1
+    execution:
+      status: passed
+  - data:
+      action: Verify response is empty object
+    execution:
+      status: passed
+- title: POST with invalid JSON is gracefully handled
+  signature: 11::test::api-errors.test.js::jsonplaceholder_api_-_error_handling_post_with_invalid_json_is_gracefully_handled_(qase_id:_11)
+  testops_ids:
+  - 11
+  status: passed
+  fields:
+    layer: api
+    severity: normal
+  relations:
+    suite:
+      data:
+      - title: test
+        public_id: null
+      - title: api-errors.test.js
+        public_id: null
+      - title: JSONPlaceholder API - Error Handling
+        public_id: null
+  steps:
+  - data:
+      action: Send POST with minimal data
+    execution:
+      status: passed
+- title: POST create new user returns 201 with ID
+  signature: 3::test::api-crud.test.js::jsonplaceholder_api_-_user_crud_operations_post_create_new_user_returns_201_with_id_(qase_id:_3)
+  testops_ids:
+  - 3
+  status: passed
+  fields:
+    layer: api
+    severity: critical
+    priority: high
+  relations:
+    suite:
+      data:
+      - title: test
+        public_id: null
+      - title: api-crud.test.js
+        public_id: null
+      - title: JSONPlaceholder API - User CRUD Operations
+        public_id: null
+  steps:
+  - data:
+      action: Send POST request to create user
+    execution:
+      status: passed
+  attachments:
+  - file_name: request-body.json
+    mime_type: application/octet-stream
+- title: Parameterized test pattern - multiple user IDs
+  signature: 14::test::api-advanced.test.js::jsonplaceholder_api_-_advanced_features_parameterized_test_pattern_-_multiple_user_ids_(qase_id:_14)::{'testscope':'multiple_users'}::{'userids':'1,2,3'}::{'validationtype':'existence'}
+  testops_ids:
+  - 14
+  status: passed
+  fields:
+    layer: api
+    severity: normal
+  params:
+    testScope: multiple_users
+    userIds: 1,2,3
+    validationType: existence
+  relations:
+    suite:
+      data:
+      - title: test
+        public_id: null
+      - title: api-advanced.test.js
+        public_id: null
+      - title: JSONPlaceholder API - Advanced Features
+        public_id: null
+  steps:
+  - data:
+      action: Verify user 1 exists
+    execution:
+      status: passed
+  - data:
+      action: Verify user 2 exists
+    execution:
+      status: passed
+  - data:
+      action: Verify user 3 exists
+    execution:
+      status: passed
+- title: GET all users returns 10 users
+  signature: 1::test::api-crud.test.js::jsonplaceholder_api_-_user_crud_operations_get_all_users_returns_10_users_(qase_id:_1)
+  testops_ids:
+  - 1
+  status: passed
+  fields:
+    layer: api
+    severity: normal
+    priority: high
+  relations:
+    suite:
+      data:
+      - title: test
+        public_id: null
+      - title: api-crud.test.js
+        public_id: null
+      - title: JSONPlaceholder API - User CRUD Operations
+        public_id: null
+  steps:
+  - data:
+      action: Send GET request to /users endpoint
+    execution:
+      status: passed
+  - data:
+      action: Verify response contains valid user structure
+    execution:
+      status: passed
+- title: Authentication feature (not yet implemented)
+  signature: 16::test::api-advanced.test.js::jsonplaceholder_api_-_advanced_features_authentication_feature_(not_yet_implemented)_(qase_id:_16)
+  testops_ids:
+  - 16
+  status: skipped
+  relations:
+    suite:
+      data:
+      - title: test
+        public_id: null
+      - title: api-advanced.test.js
+        public_id: null
+      - title: JSONPlaceholder API - Advanced Features
+        public_id: null
+- title: Complex nested steps - fetch user and their posts
+  signature: 12::test::api-advanced.test.js::jsonplaceholder_api_-_advanced_features_complex_nested_steps_-_fetch_user_and_their_posts_(qase_id:_12)
+  testops_ids:
+  - 12
+  status: passed
+  fields:
+    layer: api
+    severity: normal
+    priority: medium
+  relations:
+    suite:
+      data:
+      - title: "API Tests\tAdvanced\tRelationships"
+        public_id: null
+  steps:
+  - data:
+      action: Validate user has company information
+    execution:
+      status: passed
+  - data:
+      action: Fetch user details
+    execution:
+      status: passed
+  - data:
+      action: Verify first post belongs to user
+    execution:
+      status: passed
+  - data:
+      action: Verify post titles are non-empty
+    execution:
+      status: passed
+  - data:
+      action: Fetch all posts by user
+    execution:
+      status: passed

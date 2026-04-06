@@ -1,11 +1,11 @@
 import { describe, test, expect } from 'vitest';
-import { withQase } from 'vitest-qase-reporter/vitest';
+import { withQase, addQaseId } from 'vitest-qase-reporter/vitest';
 
 describe("Error Handling", () => {
-  test("GET non-existent user (404) - verify error status", withQase(async ({ qase }) => {
+  test(addQaseId("GET non-existent user (404) - verify error status", [8]), withQase(async ({ qase }) => {
     await qase.title("Verify API returns 404 for non-existent user");
     await qase.fields({ layer: 'api', severity: 'normal', priority: 'medium' });
-    await qase.parameters({ userId: 999 });
+    await qase.parameters({ userId: '999' });
     await qase.comment("Expected failure: User ID 999 does not exist in JSONPlaceholder database");
 
     await qase.step("Send GET request to /users/999", async () => {
@@ -26,10 +26,10 @@ describe("Error Handling", () => {
     });
   }));
 
-  test("GET non-existent post (404) - attach error response", withQase(async ({ qase }) => {
+  test(addQaseId("GET non-existent post (404) - attach error response", [9]), withQase(async ({ qase }) => {
     await qase.title("Verify API returns 404 for non-existent post");
     await qase.fields({ layer: 'api', severity: 'normal' });
-    await qase.parameters({ postId: 9999 });
+    await qase.parameters({ postId: '9999' });
 
     let errorResponse: any;
 
@@ -54,7 +54,7 @@ describe("Error Handling", () => {
     });
   }));
 
-  test("GET invalid endpoint (404) - verify graceful handling", withQase(async ({ qase }) => {
+  test(addQaseId("GET invalid endpoint (404) - verify graceful handling", [10]), withQase(async ({ qase }) => {
     await qase.title("Verify API handles invalid endpoints gracefully");
     await qase.fields({ layer: 'api', severity: 'normal' });
 

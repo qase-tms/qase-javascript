@@ -1,0 +1,101 @@
+run:
+  stats:
+    total: 3
+    passed: 3
+    failed: 0
+    skipped: 0
+    blocked: 0
+    invalid: 0
+    muted: 0
+results:
+- title: User can login with valid credentials
+  signature: 1::cypress::e2e::login.cy.js::login_scenarios::user_can_login_with_valid_credentials_(qase_id:_1)
+  testops_ids:
+  - 1
+  status: passed
+  fields:
+    severity: critical
+    priority: high
+    layer: e2e
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tAuthentication\tLogin"
+        public_id: null
+  steps:
+  - data:
+      action: Fill in username
+    execution:
+      status: passed
+  - data:
+      action: Fill in password
+    execution:
+      status: passed
+  - data:
+      action: Submit login form
+    execution:
+      status: passed
+  - data:
+      action: Verify successful login
+    execution:
+      status: passed
+- title: User cannot login with invalid password
+  signature: 2::cypress::e2e::login.cy.js::login_scenarios::user_cannot_login_with_invalid_password_(qase_id:_2)::{'username':'standard_user'}::{'password':'wrong_password'}
+  testops_ids:
+  - 2
+  status: passed
+  fields:
+    severity: critical
+    priority: high
+    layer: e2e
+  params:
+    username: standard_user
+    password: wrong_password
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tAuthentication\tLogin"
+        public_id: null
+  steps:
+  - data:
+      action: Attempt login with invalid credentials
+    execution:
+      status: passed
+  - data:
+      action: Verify error message is shown
+    execution:
+      status: passed
+  - data:
+      action: Verify still on login page
+    execution:
+      status: passed
+- title: Locked user cannot login
+  signature: 3::cypress::e2e::login.cy.js::login_scenarios::locked_user_cannot_login_(qase_id:_3)::{'username':'locked_out_user'}::{'password':'secret_sauce'}
+  testops_ids:
+  - 3
+  status: passed
+  fields:
+    severity: critical
+    priority: high
+    layer: e2e
+  params:
+    username: locked_out_user
+    password: secret_sauce
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tAuthentication\tLogin"
+        public_id: null
+  steps:
+  - data:
+      action: Attempt login with locked user
+    execution:
+      status: passed
+  - data:
+      action: Verify locked out error message
+    execution:
+      status: passed
+  - data:
+      action: Verify cannot access inventory
+    execution:
+      status: passed

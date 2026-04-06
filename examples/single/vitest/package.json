@@ -7,8 +7,10 @@
     "test:run": "vitest run"
   },
   "devDependencies": {
-    "vitest": "^3.2.4",
+    "strip-literal": "^3.1.0",
+    "tinyspy": "^4.0.4",
     "typescript": "^5.9.3",
+    "vitest": "^3.2.4",
     "vitest-qase-reporter": "1.0.2"
   },
   "dependencies": {

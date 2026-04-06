@@ -1,8 +1,8 @@
 import { describe, test, expect } from 'vitest';
-import { withQase } from 'vitest-qase-reporter/vitest';
+import { withQase, addQaseId } from 'vitest-qase-reporter/vitest';
 
 describe("Advanced Qase Features", () => {
-  test("Complex nested steps - multi-step user and post retrieval", withQase(async ({ qase }) => {
+  test(addQaseId("Complex nested steps - multi-step user and post retrieval", [11]), withQase(async ({ qase }) => {
     await qase.title("Demonstrate nested step execution");
     await qase.fields({ layer: 'api', severity: 'normal', priority: 'medium' });
 
@@ -38,16 +38,16 @@ describe("Advanced Qase Features", () => {
 
     await qase.step("Step 3: Verify relationship consistency", async () => {
       await qase.parameters({
-        userId: userId,
+        userId: String(userId),
         userName: userName,
-        postCount: userPosts.length
+        postCount: String(userPosts.length)
       });
 
       expect(userPosts.length).toBe(10); // Each user has 10 posts
     });
   }));
 
-  test("Suite hierarchy - demonstrate nested suite structure", withQase(async ({ qase }) => {
+  test(addQaseId("Suite hierarchy - demonstrate nested suite structure", [12]), withQase(async ({ qase }) => {
     await qase.title("Demonstrate suite hierarchy with tab separators");
     await qase.suite('API Tests\tAdvanced\tRelationships');
     await qase.fields({ layer: 'api', severity: 'normal' });
@@ -73,7 +73,7 @@ describe("Advanced Qase Features", () => {
     });
   }));
 
-  test("Parameterized test pattern - demonstrate multiple test parameters", withQase(async ({ qase }) => {
+  test(addQaseId("Parameterized test pattern - demonstrate multiple test parameters", [13]), withQase(async ({ qase }) => {
     await qase.title("Verify multiple users with different parameters");
     await qase.fields({ layer: 'api', severity: 'normal' });
 
@@ -82,9 +82,9 @@ describe("Advanced Qase Features", () => {
     for (const userId of userIds) {
       await qase.step(`Test user ${userId}`, async () => {
         await qase.parameters({
-          userId: userId,
-          iteration: userIds.indexOf(userId) + 1,
-          totalIterations: userIds.length
+          userId: String(userId),
+          iteration: String(userIds.indexOf(userId) + 1),
+          totalIterations: String(userIds.length)
         });
 
         const response = await fetch(`https://jsonplaceholder.typicode.com/users/${userId}`);
@@ -101,7 +101,7 @@ describe("Advanced Qase Features", () => {
     });
   }));
 
-  test.skip("Authentication endpoint placeholder", () => {
+  test.skip(addQaseId("Authentication endpoint placeholder", [14]), () => {
     qase.ignore();
     // This test is intentionally skipped to demonstrate qase.ignore()
     // Future feature: test OAuth authentication flow

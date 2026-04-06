@@ -1,8 +1,8 @@
 import { describe, test, expect } from 'vitest';
-import { withQase } from 'vitest-qase-reporter/vitest';
+import { withQase, addQaseId } from 'vitest-qase-reporter/vitest';
 
 describe("Post Validation", () => {
-  test("GET all posts - verify 100 posts returned", withQase(async ({ qase }) => {
+  test(addQaseId("GET all posts - verify 100 posts returned", [5]), withQase(async ({ qase }) => {
     await qase.title("Retrieve all posts from JSONPlaceholder API");
     await qase.fields({ layer: 'api', priority: 'high', severity: 'normal' });
 
@@ -27,10 +27,10 @@ describe("Post Validation", () => {
     });
   }));
 
-  test("GET posts by user ID - verify filtered results", withQase(async ({ qase }) => {
+  test(addQaseId("GET posts by user ID - verify filtered results", [6]), withQase(async ({ qase }) => {
     await qase.title("Retrieve posts for specific user");
     await qase.fields({ layer: 'api', severity: 'normal' });
-    await qase.parameters({ userId: 1, expectedPosts: 10 });
+    await qase.parameters({ userId: '1', expectedPosts: '10' });
 
     await qase.step("Send GET request with userId filter", async () => {
       const response = await fetch('https://jsonplaceholder.typicode.com/posts?userId=1');
@@ -63,10 +63,10 @@ describe("Post Validation", () => {
     });
   }));
 
-  test("GET post with comments - verify comment structure", withQase(async ({ qase }) => {
+  test(addQaseId("GET post with comments - verify comment structure", [7]), withQase(async ({ qase }) => {
     await qase.title("Retrieve post comments and validate structure");
     await qase.fields({ layer: 'api', severity: 'normal' });
-    await qase.parameters({ postId: 1 });
+    await qase.parameters({ postId: '1' });
 
     let comments: any[] = [];
 

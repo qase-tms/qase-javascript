@@ -1,0 +1,174 @@
+run:
+  stats:
+    total: 17
+    passed: 3
+    failed: 0
+    skipped: 1
+    blocked: 0
+    invalid: 13
+    muted: 0
+results:
+- title: POST request should be intercepted by profiler
+  signature: test::profiler-test.spec.js::network_profiler_test::post_request_should_be_intercepted_by_profiler
+  status: passed
+  relations:
+    suite:
+      data:
+      - title: Network Profiler Test
+        public_id: null
+- title: GET request should be intercepted by profiler
+  signature: test::profiler-test.spec.js::network_profiler_test::get_request_should_be_intercepted_by_profiler
+  status: passed
+  relations:
+    suite:
+      data:
+      - title: Network Profiler Test
+        public_id: null
+- title: Multiple requests in one test
+  signature: test::profiler-test.spec.js::network_profiler_test::multiple_requests_in_one_test
+  status: passed
+  relations:
+    suite:
+      data:
+      - title: Network Profiler Test
+        public_id: null
+- title: GET all users - verify 10 users returned
+  signature: 1::test::api-crud.spec.js::jsonplaceholder_user_crud_operations::get_all_users_-_verify_10_users_returned_(qase_id:_1)
+  testops_ids:
+  - 1
+  status: invalid
+  relations:
+    suite:
+      data:
+      - title: JSONPlaceholder User CRUD Operations
+        public_id: null
+- title: GET post with comments - verify comment structure
+  signature: 7::test::api-posts.spec.js::jsonplaceholder_post_validation::get_post_with_comments_-_verify_comment_structure_(qase_id:_7)
+  testops_ids:
+  - 7
+  status: invalid
+  relations:
+    suite:
+      data:
+      - title: JSONPlaceholder Post Validation
+        public_id: null
+- title: GET non-existent user - verify 404 response
+  signature: 8::test::api-errors.spec.js::jsonplaceholder_error_handling::get_non-existent_user_-_verify_404_response_(qase_id:_8)
+  testops_ids:
+  - 8
+  status: invalid
+  relations:
+    suite:
+      data:
+      - title: JSONPlaceholder Error Handling
+        public_id: null
+- title: Complex nested steps - multi-resource retrieval
+  signature: 11::test::api-advanced.spec.js::jsonplaceholder_advanced_qase_features::complex_nested_steps_-_multi-resource_retrieval_(qase_id:_11)
+  testops_ids:
+  - 11
+  status: invalid
+  relations:
+    suite:
+      data:
+      - title: JSONPlaceholder Advanced Qase Features
+        public_id: null
+- title: GET all posts - verify 100 posts returned
+  signature: 5::test::api-posts.spec.js::jsonplaceholder_post_validation::get_all_posts_-_verify_100_posts_returned_(qase_id:_5)
+  testops_ids:
+  - 5
+  status: invalid
+  relations:
+    suite:
+      data:
+      - title: JSONPlaceholder Post Validation
+        public_id: null
+- title: GET posts by user ID - verify filtered results
+  signature: 6::test::api-posts.spec.js::jsonplaceholder_post_validation::get_posts_by_user_id_-_verify_filtered_results_(qase_id:_6)
+  testops_ids:
+  - 6
+  status: invalid
+  relations:
+    suite:
+      data:
+      - title: JSONPlaceholder Post Validation
+        public_id: null
+- title: Future feature - API authentication
+  signature: 14::test::api-advanced.spec.js::jsonplaceholder_advanced_qase_features::future_feature_-_api_authentication_(qase_id:_14)
+  testops_ids:
+  - 14
+  status: skipped
+  relations:
+    suite:
+      data:
+      - title: JSONPlaceholder Advanced Qase Features
+        public_id: null
+- title: GET non-existent post - attach error response
+  signature: 9::test::api-errors.spec.js::jsonplaceholder_error_handling::get_non-existent_post_-_attach_error_response_(qase_id:_9)
+  testops_ids:
+  - 9
+  status: invalid
+  relations:
+    suite:
+      data:
+      - title: JSONPlaceholder Error Handling
+        public_id: null
+- title: Parameterized test pattern - multiple user IDs
+  signature: 13::test::api-advanced.spec.js::jsonplaceholder_advanced_qase_features::parameterized_test_pattern_-_multiple_user_ids_(qase_id:_13)
+  testops_ids:
+  - 13
+  status: invalid
+  relations:
+    suite:
+      data:
+      - title: JSONPlaceholder Advanced Qase Features
+        public_id: null
+- title: Suite hierarchy demonstration
+  signature: 12::test::api-advanced.spec.js::jsonplaceholder_advanced_qase_features::suite_hierarchy_demonstration_(qase_id:_12)
+  testops_ids:
+  - 12
+  status: invalid
+  relations:
+    suite:
+      data:
+      - title: JSONPlaceholder Advanced Qase Features
+        public_id: null
+- title: GET single user by ID - verify user details
+  signature: 2::test::api-crud.spec.js::jsonplaceholder_user_crud_operations::get_single_user_by_id_-_verify_user_details_(qase_id:_2)
+  testops_ids:
+  - 2
+  status: invalid
+  relations:
+    suite:
+      data:
+      - title: JSONPlaceholder User CRUD Operations
+        public_id: null
+- title: DELETE user - verify 200 response
+  signature: 4::test::api-crud.spec.js::jsonplaceholder_user_crud_operations::delete_user_-_verify_200_response_(qase_id:_4)
+  testops_ids:
+  - 4
+  status: invalid
+  relations:
+    suite:
+      data:
+      - title: JSONPlaceholder User CRUD Operations
+        public_id: null
+- title: POST create user - verify 201 response and returned ID
+  signature: 3::test::api-crud.spec.js::jsonplaceholder_user_crud_operations::post_create_user_-_verify_201_response_and_returned_id_(qase_id:_3)
+  testops_ids:
+  - 3
+  status: invalid
+  relations:
+    suite:
+      data:
+      - title: JSONPlaceholder User CRUD Operations
+        public_id: null
+- title: Invalid endpoint - verify graceful 404 handling
+  signature: 10::test::api-errors.spec.js::jsonplaceholder_error_handling::invalid_endpoint_-_verify_graceful_404_handling_(qase_id:_10)
+  testops_ids:
+  - 10
+  status: invalid
+  relations:
+    suite:
+      data:
+      - title: JSONPlaceholder Error Handling
+        public_id: null
