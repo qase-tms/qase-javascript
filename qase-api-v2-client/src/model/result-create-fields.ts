@@ -88,6 +88,12 @@ export interface ResultCreateFields {
      */
     'is_flaky'?: string;
     /**
+     * Comma-separated list of tag titles to assign to the test case
+     * @type {string}
+     * @memberof ResultCreateFields
+     */
+    'tags'?: string;
+    /**
      * User who executed the test (member id, name or email)
      * @type {string}
      * @memberof ResultCreateFields

@@ -16,6 +16,7 @@ Name | Type | Description | Notes
 **type** | **string** |  | [optional] [default to undefined]
 **muted** | **string** |  | [optional] [default to undefined]
 **is_flaky** | **string** |  | [optional] [default to undefined]
+**tags** | **string** | Comma-separated list of tag titles to assign to the test case | [optional] [default to undefined]
 **executed_by** | **string** | User who executed the test (member id, name or email) | [optional] [default to undefined]
 
 ## Example
@@ -35,6 +36,7 @@ const instance: ResultCreateFields = {
     type,
     muted,
     is_flaky,
+    tags,
     executed_by,
 };
 ```
