@@ -1,0 +1,27 @@
+qase-jest/test/jest.test.ts
+  ab3cd360a6d1a8d0 15,112-118
+qase-playwright/test/playwright.test.ts
+  ab3cd360a6d1a8d0 134-143
+qase-jest/test/models.test.ts
+  ab3cd360a6d1a8d0 16-17,26-27,43,57,76,84
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "c26303e77763b5e3f10059b8404a414b4e650917",
+  "prompts": {
+    "ab3cd360a6d1a8d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9e24968-22f7-499f-8c47-a6db352bf4a8",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 57,
+      "total_deletions": 3,
+      "accepted_lines": 57,
+      "overriden_lines": 0
+    }
+  }
+}
