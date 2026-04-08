@@ -1,0 +1,25 @@
+qase-cucumberjs/src/storage.ts
+  ab3cd360a6d1a8d0 40,362,454,512-518
+qase-cucumberjs/src/models.ts
+  ab3cd360a6d1a8d0 13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "672dc77a8804ba1e44b570f9cff5e44162b3006d",
+  "prompts": {
+    "ab3cd360a6d1a8d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9e24968-22f7-499f-8c47-a6db352bf4a8",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 15,
+      "total_deletions": 4,
+      "accepted_lines": 14,
+      "overriden_lines": 0
+    }
+  }
+}
