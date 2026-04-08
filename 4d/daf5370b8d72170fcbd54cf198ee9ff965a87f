@@ -1,0 +1,25 @@
+qase-vitest/src/vitest.ts
+  ab3cd360a6d1a8d0 37,144-155
+qase-vitest/src/index.ts
+  ab3cd360a6d1a8d0 36,168-172,360-372
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "4ddaf5370b8d72170fcbd54cf198ee9ff965a87f",
+  "prompts": {
+    "ab3cd360a6d1a8d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9e24968-22f7-499f-8c47-a6db352bf4a8",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 82,
+      "overriden_lines": 0
+    }
+  }
+}
