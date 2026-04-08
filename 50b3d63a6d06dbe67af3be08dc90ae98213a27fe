@@ -1,0 +1,29 @@
+qase-mocha/package.json
+  ab3cd360a6d1a8d0 3,46
+qase-mocha/changelog.md
+  ab3cd360a6d1a8d0 1-15
+qase-testcafe/package.json
+  ab3cd360a6d1a8d0 3,43
+qase-testcafe/changelog.md
+  ab3cd360a6d1a8d0 1-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "50b3d63a6d06dbe67af3be08dc90ae98213a27fe",
+  "prompts": {
+    "ab3cd360a6d1a8d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9e24968-22f7-499f-8c47-a6db352bf4a8",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 32,
+      "total_deletions": 4,
+      "accepted_lines": 32,
+      "overriden_lines": 0
+    }
+  }
+}
