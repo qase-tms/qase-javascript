@@ -1,0 +1,49 @@
+qase-jest/changelog.md
+  ab3cd360a6d1a8d0 1-7
+qase-jest/package.json
+  ab3cd360a6d1a8d0 3,48
+qase-playwright/package.json
+  ab3cd360a6d1a8d0 3,47
+qase-cypress/package.json
+  ab3cd360a6d1a8d0 3,54
+qase-javascript-commons/package.json
+  ab3cd360a6d1a8d0 3
+qase-cucumberjs/changelog.md
+  ab3cd360a6d1a8d0 1-7
+qase-cypress/changelog.md
+  ab3cd360a6d1a8d0 1-7
+qase-cucumberjs/package.json
+  ab3cd360a6d1a8d0 3,43
+qase-vitest/package.json
+  ab3cd360a6d1a8d0 3,48
+qase-wdio/package.json
+  ab3cd360a6d1a8d0 3,35
+qase-javascript-commons/changelog.md
+  ab3cd360a6d1a8d0 1-8
+qase-wdio/changelog.md
+  ab3cd360a6d1a8d0 1-7
+qase-vitest/changelog.md
+  ab3cd360a6d1a8d0 1-7
+qase-playwright/changelog.md
+  ab3cd360a6d1a8d0 1-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "da06374c1a6aac2370d4e3b4c56d3ea150676775",
+  "prompts": {
+    "ab3cd360a6d1a8d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9e24968-22f7-499f-8c47-a6db352bf4a8",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 63,
+      "total_deletions": 13,
+      "accepted_lines": 63,
+      "overriden_lines": 0
+    }
+  }
+}
