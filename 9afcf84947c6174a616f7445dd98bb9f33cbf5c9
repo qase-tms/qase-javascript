@@ -1,0 +1,81 @@
+qase-jest/package.json
+  ab3cd360a6d1a8d0 3,48
+qase-playwright/docs/usage.md
+  ab3cd360a6d1a8d0 15,191-219
+qase-playwright/changelog.md
+  ab3cd360a6d1a8d0 1-7
+qase-wdio/src/wdio.ts
+  ab3cd360a6d1a8d0 170-182
+qase-vitest/package.json
+  ab3cd360a6d1a8d0 3,48
+qase-cucumberjs/package.json
+  ab3cd360a6d1a8d0 3,43
+qase-vitest/src/index.ts
+  ab3cd360a6d1a8d0 36,168-172,360-372
+qase-vitest/src/vitest.ts
+  ab3cd360a6d1a8d0 37,144-155
+qase-cypress/package.json
+  ab3cd360a6d1a8d0 3,54
+qase-vitest/docs/usage.md
+  ab3cd360a6d1a8d0 15,146-174
+qase-playwright/src/playwright.ts
+  ab3cd360a6d1a8d0 24,293-307
+qase-wdio/package.json
+  ab3cd360a6d1a8d0 3,35
+qase-cucumberjs/docs/usage.md
+  ab3cd360a6d1a8d0 15,148-173
+qase-javascript-commons/src/client/clientV2.ts
+  ab3cd360a6d1a8d0 168-174
+qase-javascript-commons/package.json
+  ab3cd360a6d1a8d0 3
+qase-jest/docs/usage.md
+  ab3cd360a6d1a8d0 15,146-174
+qase-wdio/docs/usage.md
+  ab3cd360a6d1a8d0 15,192-220
+qase-javascript-commons/src/models/test-result.ts
+  ab3cd360a6d1a8d0 33,53
+qase-playwright/src/reporter.ts
+  ab3cd360a6d1a8d0 44,114,164-167,480
+qase-wdio/src/models.ts
+  ab3cd360a6d1a8d0 27-30
+qase-jest/changelog.md
+  ab3cd360a6d1a8d0 1-7
+qase-cypress/docs/usage.md
+  ab3cd360a6d1a8d0 15,172-200
+qase-cucumberjs/changelog.md
+  ab3cd360a6d1a8d0 1-7
+qase-vitest/changelog.md
+  ab3cd360a6d1a8d0 1-7
+qase-playwright/package.json
+  ab3cd360a6d1a8d0 3,47
+qase-wdio/src/reporter.ts
+  ab3cd360a6d1a8d0 39,180-182,464,558-566
+qase-wdio/changelog.md
+  ab3cd360a6d1a8d0 1-7
+qase-javascript-commons/changelog.md
+  ab3cd360a6d1a8d0 1-8
+qase-cypress/changelog.md
+  ab3cd360a6d1a8d0 1-7
+qase-wdio/src/events.ts
+  ab3cd360a6d1a8d0 14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "9afcf84947c6174a616f7445dd98bb9f33cbf5c9",
+  "prompts": {
+    "ab3cd360a6d1a8d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9e24968-22f7-499f-8c47-a6db352bf4a8",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 336,
+      "overriden_lines": 0
+    }
+  }
+}
