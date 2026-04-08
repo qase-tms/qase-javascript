@@ -1,0 +1,29 @@
+qase-mocha/src/types.ts
+  ab3cd360a6d1a8d0 43-44,57,72-76,116
+qase-testcafe/src/qase.ts
+  ab3cd360a6d1a8d0 18,138-149,242,253
+qase-mocha/src/reporter.ts
+  ab3cd360a6d1a8d0 171,270,419-422
+qase-testcafe/src/reporter.ts
+  ab3cd360a6d1a8d0 66,78,260,311,348-351
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "d3230b4424d7a6ff456212c616ffdb082a543672",
+  "prompts": {
+    "ab3cd360a6d1a8d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9e24968-22f7-499f-8c47-a6db352bf4a8",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 39,
+      "total_deletions": 0,
+      "accepted_lines": 39,
+      "overriden_lines": 0
+    }
+  }
+}
