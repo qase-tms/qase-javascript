@@ -1,0 +1,63 @@
+qase-playwright/test/playwright.test.ts
+  ab3cd360a6d1a8d0 134-143
+examples/single/cucumberjs/features/api-advanced.feature
+  ab3cd360a6d1a8d0 25
+expected/vitest-examples.yaml
+  ab3cd360a6d1a8d0 17-19,65-67
+examples/single/jest/test/api-crud.test.js
+  ab3cd360a6d1a8d0 9,58
+qase-jest/test/models.test.ts
+  ab3cd360a6d1a8d0 16-17,26-27,43,57,76,84
+qase-testcafe/package.json
+  ab3cd360a6d1a8d0 3,43
+qase-mocha/package.json
+  ab3cd360a6d1a8d0 3,46
+qase-mocha/src/types.ts
+  ab3cd360a6d1a8d0 43-44,57,72-76,116
+qase-mocha/changelog.md
+  ab3cd360a6d1a8d0 1-15
+qase-testcafe/src/reporter.ts
+  ab3cd360a6d1a8d0 66,78,260,311,348-351
+qase-testcafe/changelog.md
+  ab3cd360a6d1a8d0 1-13
+qase-testcafe/src/qase.ts
+  ab3cd360a6d1a8d0 18,138-149,242,253
+qase-jest/test/jest.test.ts
+  ab3cd360a6d1a8d0 15,112-118
+examples/single/mocha/test/api-crud.spec.js
+  ab3cd360a6d1a8d0 73
+qase-mocha/src/reporter.ts
+  ab3cd360a6d1a8d0 171,270,419-422
+expected/jest-examples.yaml
+  ab3cd360a6d1a8d0 303-305,366-368
+examples/single/playwright/test/login.spec.js
+  ab3cd360a6d1a8d0 16
+examples/single/vitest/test/api-crud.test.ts
+  ab3cd360a6d1a8d0 8,60
+expected/playwright-examples.yaml
+  ab3cd360a6d1a8d0 320-322
+examples/single/cypress/cypress/e2e/login.cy.js
+  ab3cd360a6d1a8d0 14
+expected/cypress-examples.yaml
+  ab3cd360a6d1a8d0 20-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "5428b03bc92406aec696f237b2d4548c9e583154",
+  "prompts": {
+    "ab3cd360a6d1a8d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9e24968-22f7-499f-8c47-a6db352bf4a8",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 122,
+      "overriden_lines": 0
+    }
+  }
+}
