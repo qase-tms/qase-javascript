@@ -1,0 +1,31 @@
+qase-jest/src/models.ts
+  ab3cd360a6d1a8d0 11
+qase-jest/src/reporter.ts
+  ab3cd360a6d1a8d0 175-178,317-320,419
+qase-javascript-commons/src/models/test-result.ts
+  ab3cd360a6d1a8d0 29,49
+qase-jest/src/jest.ts
+  ab3cd360a6d1a8d0 132-145
+qase-jest/src/global.ts
+  ab3cd360a6d1a8d0 60-63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "6a7e3de5f7d230bb7cc04c0ed00ddf91fa130da7",
+  "prompts": {
+    "ab3cd360a6d1a8d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9e24968-22f7-499f-8c47-a6db352bf4a8",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 31,
+      "total_deletions": 0,
+      "accepted_lines": 31,
+      "overriden_lines": 0
+    }
+  }
+}
