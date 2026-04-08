@@ -1,0 +1,23 @@
+qase-javascript-commons/src/reporters/report-reporter.ts
+  ab3cd360a6d1a8d0 223
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "54635edc5fe66b7297c38415c9d0f42749f5c4d0",
+  "prompts": {
+    "ab3cd360a6d1a8d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9e24968-22f7-499f-8c47-a6db352bf4a8",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
