@@ -1,0 +1,33 @@
+qase-jest/docs/usage.md
+  ab3cd360a6d1a8d0 15,146-174
+qase-playwright/docs/usage.md
+  ab3cd360a6d1a8d0 15,191-219
+qase-vitest/docs/usage.md
+  ab3cd360a6d1a8d0 15,146-174
+qase-wdio/docs/usage.md
+  ab3cd360a6d1a8d0 15,192-220
+qase-cypress/docs/usage.md
+  ab3cd360a6d1a8d0 15,172-200
+qase-cucumberjs/docs/usage.md
+  ab3cd360a6d1a8d0 15,148-173
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "72a067b8dcee4868b33a5b34386dda706b1d2402",
+  "prompts": {
+    "ab3cd360a6d1a8d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9e24968-22f7-499f-8c47-a6db352bf4a8",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 352,
+      "total_deletions": 11,
+      "accepted_lines": 357,
+      "overriden_lines": 0
+    }
+  }
+}
