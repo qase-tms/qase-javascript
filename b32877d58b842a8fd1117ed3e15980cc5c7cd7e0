@@ -1,0 +1,29 @@
+qase-wdio/src/wdio.ts
+  ab3cd360a6d1a8d0 170-182
+qase-wdio/src/events.ts
+  ab3cd360a6d1a8d0 14
+qase-wdio/src/models.ts
+  ab3cd360a6d1a8d0 27-30
+qase-wdio/src/reporter.ts
+  ab3cd360a6d1a8d0 39,180-182,464,558-566
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "b32877d58b842a8fd1117ed3e15980cc5c7cd7e0",
+  "prompts": {
+    "ab3cd360a6d1a8d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9e24968-22f7-499f-8c47-a6db352bf4a8",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 49,
+      "overriden_lines": 0
+    }
+  }
+}
