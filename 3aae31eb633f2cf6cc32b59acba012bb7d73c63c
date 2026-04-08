@@ -1,0 +1,49 @@
+expected/vitest-examples.yaml
+  ab3cd360a6d1a8d0 17-19,65-67
+expected/playwright-examples.yaml
+  ab3cd360a6d1a8d0 320-322
+expected/cypress-examples.yaml
+  ab3cd360a6d1a8d0 20-22
+examples/single/playwright/test/login.spec.js
+  ab3cd360a6d1a8d0 16
+qase-playwright/test/playwright.test.ts
+  ab3cd360a6d1a8d0 134-143
+examples/single/mocha/test/api-crud.spec.js
+  ab3cd360a6d1a8d0 9,74-75
+expected/jest-examples.yaml
+  ab3cd360a6d1a8d0 303-305,366-368
+qase-jest/test/jest.test.ts
+  ab3cd360a6d1a8d0 15,112-118
+examples/single/jest/test/api-crud.test.js
+  ab3cd360a6d1a8d0 9,58
+qase-jest/test/models.test.ts
+  ab3cd360a6d1a8d0 16-17,26-27,43,57,76,84
+examples/single/cucumberjs/features/api-advanced.feature
+  ab3cd360a6d1a8d0 25
+examples/single/cypress/cypress/e2e/login.cy.js
+  ab3cd360a6d1a8d0 14
+examples/single/vitest/test/api-crud.test.ts
+  ab3cd360a6d1a8d0 8,60
+expected/mocha-examples.yaml
+  ab3cd360a6d1a8d0 40-42,163-165
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "3aae31eb633f2cf6cc32b59acba012bb7d73c63c",
+  "prompts": {
+    "ab3cd360a6d1a8d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9e24968-22f7-499f-8c47-a6db352bf4a8",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 60,
+      "overriden_lines": 0
+    }
+  }
+}
