@@ -18,6 +18,7 @@ export interface Metadata {
   ignore?: boolean;
   suite?: string | undefined;
   comment?: string | undefined;
+  tags?: string[];
   steps?: (StepStart | StepEnd)[];
   cucumberSteps?: StepStart[];
   currentStepId?: string | undefined;

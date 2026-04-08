@@ -173,6 +173,12 @@ export class MetadataManager {
     this.setMetadata(metadata);
   }
 
+  public static setTags(tags: string[]): void {
+    const metadata: Metadata = this.getMetadata() ?? {};
+    metadata.tags = [...(metadata.tags ?? []), ...tags];
+    this.setMetadata(metadata);
+  }
+
   private static setMetadata(metadata: Metadata): void {
     try {
       const data = JSON.stringify(metadata);

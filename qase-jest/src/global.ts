@@ -57,6 +57,10 @@ export class Qase {
     this.reporter.addGroupParams(stringRecord);
   }
 
+  tags(values: string[]): void {
+    this.reporter.addTags(values);
+  }
+
   step(step: TestStepType): void {
     this.reporter.addStep(step);
   }

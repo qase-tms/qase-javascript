@@ -6,6 +6,7 @@ const BASE_URL = 'https://jsonplaceholder.typicode.com';
 describe('JSONPlaceholder API - User CRUD Operations', () => {
   test(qase(1, 'GET all users returns 10 users'), async () => {
     qase.fields({ layer: 'api', severity: 'normal', priority: 'high' });
+    qase.tags('crud', 'api');
 
     await qase.step('Send GET request to /users endpoint', async () => {
       const response = await fetch(`${BASE_URL}/users`);
@@ -54,6 +55,7 @@ describe('JSONPlaceholder API - User CRUD Operations', () => {
 
   test(qase(3, 'POST create new user returns 201 with ID'), async () => {
     qase.fields({ layer: 'api', severity: 'critical', priority: 'high' });
+    qase.tags('crud', 'smoke');
 
     const newUser = {
       name: 'Test User',

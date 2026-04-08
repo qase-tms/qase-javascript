@@ -878,6 +878,61 @@ describe('Storage', () => {
 
       expect(result.parameters).toEqual({});
     });
+    it('should parse QaseTags tag with multiple tags', () => {
+      const tags = [
+        { name: '@QaseTags=smoke,regression' },
+      ];
+
+      const result = (storage as any).parseTags(tags);
+
+      expect(result.tags).toEqual(['smoke', 'regression']);
+    });
+
+    it('should parse QaseTags tag case-insensitively', () => {
+      const tags = [
+        { name: '@qasetags=Smoke' },
+      ];
+
+      const result = (storage as any).parseTags(tags);
+
+      expect(result.tags).toEqual(['Smoke']);
+    });
+
+    it('should trim whitespace from QaseTags values', () => {
+      const tags = [
+        { name: '@QaseTags= smoke , regression ' },
+      ];
+
+      const result = (storage as any).parseTags(tags);
+
+      expect(result.tags).toEqual(['smoke', 'regression']);
+    });
+
+    it('should accumulate multiple QaseTags', () => {
+      const tags = [
+        { name: '@QaseTags=smoke' },
+        { name: '@QaseTags=regression' },
+      ];
+
+      const result = (storage as any).parseTags(tags);
+
+      expect(result.tags).toEqual(['smoke', 'regression']);
+    });
+
+    it('should combine QaseTags with other metadata', () => {
+      const tags = [
+        { name: '@QaseID=1' },
+        { name: '@QaseTags=smoke' },
+        { name: '@QaseFields={"severity":"high"}' },
+      ];
+
+      const result = (storage as any).parseTags(tags);
+
+      expect(result.ids).toContain(1);
+      expect(result.tags).toEqual(['smoke']);
+      expect(result.fields).toEqual({ severity: 'high' });
+    });
+
 
     it('should handle invalid JSON in group parameters', () => {
       const tags = [

@@ -317,6 +317,9 @@ results:
     severity: critical
     priority: high
     layer: e2e
+  tags:
+  - smoke
+  - e2e
   relations:
     suite:
       data:

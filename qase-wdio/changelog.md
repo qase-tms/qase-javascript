@@ -1,3 +1,10 @@
+# wdio-qase-reporter@1.3.0
+
+## What's new
+
+- Added `qase.tags()` method and Cucumber `@tags=` tag to assign tag titles to test cases.
+- Updated `qase-javascript-commons` dependency to `~2.6.0`.
+
 # wdio-qase-reporter@1.2.3
 
 ## Bug fixes

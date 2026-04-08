@@ -165,6 +165,13 @@ export class ClientV2 extends ClientV1 {
             signature: result.signature,
         };
 
+        if (result.tags.length > 0) {
+            model.fields = {
+                ...model.fields,
+                tags: [...new Set(result.tags)].join(','),
+            };
+        }
+
         this.logger.logDebug(`Transformed result: ${JSON.stringify(model)}`);
 
         return model;

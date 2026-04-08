@@ -12,6 +12,7 @@ This guide provides comprehensive instructions for integrating Qase with Playwri
 - [Adding Title](#adding-title)
 - [Adding Fields](#adding-fields)
 - [Adding Suite](#adding-suite)
+- [Tags](#tags)
 - [Ignoring Tests](#ignoring-tests)
 - [Muting Tests](#muting-tests)
 - [Working with Attachments](#working-with-attachments)
@@ -183,6 +184,35 @@ test('Login test', async ({ page }) => {
   qase.suite('Authentication\tLogin\tPositive Cases');
   await page.goto('https://example.com/login');
 });
+```
+
+---
+
+## Tags
+
+Assign tags to test cases. Tags help categorize and filter tests in Qase.
+
+```typescript
+test(qase(1, 'Login test'), async ({ page }) => {
+  qase.tags('smoke', 'regression');
+  await page.goto('https://example.com/login');
+});
+```
+
+Multiple `qase.tags()` calls accumulate:
+
+```typescript
+test('test', async ({ page }) => {
+  qase.tags('smoke');
+  qase.tags('regression', 'e2e');
+  // Result: tags = ['smoke', 'regression', 'e2e']
+});
+```
+
+Alternative using fields:
+
+```typescript
+qase.fields({ tags: 'smoke,regression' });
 ```
 
 ---

@@ -11,6 +11,7 @@ describe('Login Scenarios', () => {
     it('User can login with valid credentials', () => {
       qase.fields({ severity: 'critical', priority: 'high', layer: 'e2e' });
       qase.suite('E-commerce\tAuthentication\tLogin');
+      cy.task('qaseTags', ['smoke', 'e2e']);
 
       qase.step('Fill in username', () => {
         LoginPage.fillUsername('standard_user');

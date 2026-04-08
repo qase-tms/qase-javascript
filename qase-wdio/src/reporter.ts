@@ -36,6 +36,7 @@ import {
   AddQaseIdEventArgs,
   AddRecordsEventArgs,
   AddSuiteEventArgs,
+  AddTagsEventArgs,
   AddTitleEventArgs,
 } from './models';
 import path from 'path';
@@ -175,6 +176,9 @@ export default class WDIOQaseReporter extends WDIOReporter {
             break;
           case '@suite':
             this.addSuite({ suite: tagData.value });
+            break;
+          case '@tags':
+            this.addTags({ tags: tagData.value.split(',').map((t) => t.trim()) });
             break;
         }
       }
@@ -457,6 +461,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
     process.on(events.addAttachment, this.addAttachment.bind(this));
     process.on(events.addIgnore, this.ignore.bind(this));
     process.on(events.addStep, this.addStep.bind(this));
+    process.on(events.addTags, this.addTags.bind(this));
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
     process.on(events.addProfilerSteps as any, (data: string) => {
       try {
@@ -548,6 +553,15 @@ export default class WDIOQaseReporter extends WDIOReporter {
     }
 
     curTest.fields = records;
+  }
+
+  addTags({ tags }: AddTagsEventArgs) {
+    const curTest = this.storage.getCurrentTest();
+    if (!curTest) {
+      return;
+    }
+
+    curTest.tags = [...curTest.tags, ...tags];
   }
 
   addAttachment({ name, type, content, paths }: AddAttachmentEventArgs) {

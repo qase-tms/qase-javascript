@@ -24,3 +24,7 @@ export interface AddAttachmentEventArgs {
   content?: string;
   paths?: string[];
 }
+
+export interface AddTagsEventArgs {
+  tags: string[];
+}

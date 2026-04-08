@@ -12,6 +12,7 @@ This guide provides comprehensive instructions for integrating Qase with Cypress
 - [Adding Title](#adding-title)
 - [Adding Fields](#adding-fields)
 - [Adding Suite](#adding-suite)
+- [Tags](#tags)
 - [Ignoring Tests](#ignoring-tests)
 - [Muting Tests](#muting-tests)
 - [Working with Attachments](#working-with-attachments)
@@ -164,6 +165,35 @@ describe('User Tests', () => {
     cy.get('button[type="submit"]').click();
   });
 });
+```
+
+---
+
+## Tags
+
+Assign tags to test cases. Tags help categorize and filter tests in Qase.
+
+```javascript
+it('Login test', () => {
+  cy.task('qaseTags', ['smoke', 'regression']);
+  cy.visit('https://example.com/login');
+});
+```
+
+Multiple `cy.task('qaseTags')` calls accumulate:
+
+```javascript
+it('test', () => {
+  cy.task('qaseTags', ['smoke']);
+  cy.task('qaseTags', ['regression', 'e2e']);
+  // Result: tags = ['smoke', 'regression', 'e2e']
+});
+```
+
+Alternative using fields:
+
+```javascript
+qase.fields({ tags: 'smoke,regression' });
 ```
 
 ---

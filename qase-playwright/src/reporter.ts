@@ -41,6 +41,7 @@ interface TestCaseMetadata {
   ignore: boolean;
   suite: string;
   comment: string;
+  tags: string[];
 }
 
 const defaultSteps: string[] = ['Before Hooks', 'After Hooks', 'Worker Cleanup'];
@@ -110,6 +111,7 @@ export class PlaywrightQaseReporter implements Reporter {
       ignore: false,
       suite: '',
       comment: '',
+      tags: [],
     };
     const attachments: Attachment[] = [];
 
@@ -157,6 +159,10 @@ export class PlaywrightQaseReporter implements Reporter {
 
         if (message.groupParams) {
           metadata.groupParams = message.groupParams;
+        }
+
+        if (message.tags) {
+          metadata.tags = [...(metadata.tags ?? []), ...message.tags];
         }
 
         continue;
@@ -471,6 +477,7 @@ export class PlaywrightQaseReporter implements Reporter {
       muted: false,
       params: testCaseMetadata.parameters,
       group_params: testCaseMetadata.groupParams,
+      tags: testCaseMetadata.tags ?? [],
       relations: {
         suite: {
           data: suites.filter((suite) => {

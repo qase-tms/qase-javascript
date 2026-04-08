@@ -22,6 +22,7 @@ Feature: Advanced Qase Features
   @QaseFields={"severity":"normal","layer":"api"}
   @QaseSuite=API\tAdvanced\tData_Validation
   @QaseGroupParameters={"environment":"production","region":"us-east"}
+  @QaseTags=advanced,api
   Scenario: Suite hierarchy and group parameters demonstration
     When I send a GET request to "/todos/1"
     Then the response status should be 200

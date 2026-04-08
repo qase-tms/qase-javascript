@@ -40,6 +40,8 @@ export interface Methods {
 
   comment(message: string): void;
 
+  tags(...values: string[]): void;
+
   step(title: string, func: () => void, expectedResult?: string, data?: string): void;
 }
 
@@ -52,6 +54,7 @@ export class Metadata {
   ignore?: boolean;
   suite?: string;
   comment?: string;
+  tags?: string[];
   attachments?: Attachment[];
 
   constructor() {
@@ -64,6 +67,11 @@ export class Metadata {
 
   addComment(message: string) {
     this.comment += message + '\n\n';
+  }
+
+  addTags(values: string[]) {
+    if (!this.tags) this.tags = [];
+    this.tags.push(...values);
   }
 
   addAttachment(attach: { name?: string, paths?: string | string[], content?: Buffer | string, contentType?: string }) {
@@ -105,6 +113,7 @@ export class Metadata {
     this.ignore = false;
     this.suite = '';
     this.comment = '';
+    this.tags = [];
     this.attachments = [];
   }
 }

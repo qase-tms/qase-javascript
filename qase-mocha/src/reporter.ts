@@ -168,6 +168,7 @@ export class MochaQaseReporter extends reporters.Base {
     ctx.ignore = this.ignore;
     ctx.attach = this.attach;
     ctx.comment = this.comment;
+    ctx.tags = this.tags;
     ctx.step = this.step;
   }
 
@@ -266,6 +267,7 @@ export class MochaQaseReporter extends reporters.Base {
       attachments: this.metadata.attachments ?? [],
       author: null,
       fields: this.metadata.fields ?? {},
+      tags: this.metadata.tags ?? [],
       message: message ?? null,
       muted: false,
       params: this.metadata.parameters ?? {},
@@ -412,6 +414,10 @@ export class MochaQaseReporter extends reporters.Base {
 
   comment = (message: string) => {
     this.metadata.addComment(message);
+  };
+
+  tags = (...values: string[]) => {
+    this.metadata.addTags(values);
   };
 
   step = (title: string, func: () => void, expectedResult?: string, data?: string) => {

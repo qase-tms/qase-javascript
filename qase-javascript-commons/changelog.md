@@ -1,3 +1,11 @@
+# qase-javascript-commons@2.6.0
+
+## What's new
+
+- Added `tags: string[]` field to `TestResultType` domain model for tag support.
+- Tags are mapped to `fields.tags` as a comma-separated string when sending results to API v2.
+- Tags are included in report serialization output.
+
 # qase-javascript-commons@2.5.10
 
 ## What's new

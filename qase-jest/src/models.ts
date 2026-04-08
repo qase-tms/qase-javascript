@@ -8,6 +8,7 @@ export interface Metadata {
   fields: Record<string, string>;
   parameters: Record<string, string>;
   groupParams: Record<string, string>;
+  tags: string[];
   steps: TestStepType[];
   attachments: Attachment[];
 }

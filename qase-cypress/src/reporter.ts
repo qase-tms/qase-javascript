@@ -462,6 +462,7 @@ export class CypressQaseReporter extends reporters.Base {
       attachments: attachments,
       author: null,
       fields: metadata?.fields ?? {},
+      tags: metadata?.tags ?? [],
       message: message,
       muted: false,
       params: metadata?.parameters ?? {},

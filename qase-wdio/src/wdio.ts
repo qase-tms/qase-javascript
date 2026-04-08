@@ -167,6 +167,20 @@ qase.suite = (value: string) => {
 };
 
 /**
+ * Set tags for the test case
+ * @param {...string} values
+ * @example
+ * it('should work', () => {
+ *   qase.tags('smoke', 'regression');
+ *   // test code
+ * });
+ */
+qase.tags = function(...values: string[]) {
+  sendEvent(events.addTags, { tags: values });
+  return this;
+};
+
+/**
  * Set a comment for the test case
  * @param {string} value
  * @example
