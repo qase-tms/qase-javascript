@@ -1,0 +1,43 @@
+expected/playwright-examples.yaml
+  ab3cd360a6d1a8d0 320-322
+examples/single/vitest/test/api-crud.test.ts
+  ab3cd360a6d1a8d0 8,60
+examples/single/playwright/test/login.spec.js
+  ab3cd360a6d1a8d0 16
+expected/jest-examples.yaml
+  ab3cd360a6d1a8d0 303-305,366-368
+examples/single/cypress/cypress/e2e/login.cy.js
+  ab3cd360a6d1a8d0 14
+examples/single/mocha/test/api-crud.spec.js
+  ab3cd360a6d1a8d0 9,74-75
+examples/single/jest/test/api-crud.test.js
+  ab3cd360a6d1a8d0 9,58
+examples/single/cucumberjs/features/api-advanced.feature
+  ab3cd360a6d1a8d0 25
+expected/mocha-examples.yaml
+  ab3cd360a6d1a8d0 40-42,163-165
+expected/cypress-examples.yaml
+  ab3cd360a6d1a8d0 20-22
+expected/vitest-examples.yaml
+  ab3cd360a6d1a8d0 17-19,65-67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "babd74afcba230848b980ec612e76e859eeaec69",
+  "prompts": {
+    "ab3cd360a6d1a8d0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9e24968-22f7-499f-8c47-a6db352bf4a8",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 3,
+      "total_deletions": 0,
+      "accepted_lines": 34,
+      "overriden_lines": 0
+    }
+  }
+}
