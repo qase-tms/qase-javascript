@@ -1,0 +1,35 @@
+examples/multiProject/wdio/package.json
+  9ebea46bee5aeec4 8-10
+package.json
+  9ebea46bee5aeec4 38-39
+qase-wdio/package.json
+  9ebea46bee5aeec4 35-36,42
+examples/single/wdio/package.json
+  9ebea46bee5aeec4 8-10
+qaseio/package.json
+  9ebea46bee5aeec4 31-32,35
+qase-wdio/src/reporter.ts
+  9ebea46bee5aeec4 439
+qaseio/jest.config.js
+  9ebea46bee5aeec4 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.6",
+  "base_commit_sha": "f5ff7cac2c3d7b69baaf953f504dea91ad5513b5",
+  "prompts": {
+    "9ebea46bee5aeec4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "29c094bd-133b-415d-8e86-1677be968c42",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 19,
+      "total_deletions": 22,
+      "accepted_lines": 17,
+      "overriden_lines": 0
+    }
+  }
+}
