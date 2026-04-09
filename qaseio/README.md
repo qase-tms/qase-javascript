@@ -1,5 +1,11 @@
 # [Qase TMS](https://qase.io) API JavaScript Client
 
+> **DEPRECATED**: This package is deprecated and will no longer receive updates.
+> Please use the new API clients instead:
+>
+> - [`qase-api-client`](https://github.com/qase-tms/qase-javascript/tree/main/qase-api-client#readme) — Qase API v1 client
+> - [`qase-api-v2-client`](https://github.com/qase-tms/qase-javascript/tree/main/qase-api-v2-client#readme) — Qase API v2 client
+
 [![License](https://lxgaming.github.io/badges/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
 The `qaseio` package implements a JavaScript client for Qase API.

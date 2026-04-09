@@ -8,7 +8,7 @@ module.exports = {
         skipLibCheck: true,
       },
     }],
-    '^.+\\.js$': 'babel-jest'
+    '^.+\\.js$': 'babel-jest',
   },
   transformIgnorePatterns: [
     '/node_modules/(?!(axios)/)'

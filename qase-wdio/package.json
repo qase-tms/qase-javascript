@@ -32,11 +32,11 @@
   "author": "Qase Team <support@qase.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "qase-javascript-commons": "~2.6.0",
-    "uuid": "^9.0.1",
     "@wdio/reporter": "^8.43.0",
     "@wdio/types": "^8.41.0",
     "csv-stringify": "^6.6.0",
-    "strip-ansi": "^7.1.2"
+    "qase-javascript-commons": "~2.6.0",
+    "strip-ansi": "^7.1.2",
+    "uuid": "^9.0.1"
   }
 }
