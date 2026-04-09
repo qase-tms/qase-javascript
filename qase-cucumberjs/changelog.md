@@ -1,3 +1,10 @@
+# cucumberjs-qase-reporter@2.3.0
+
+## What's new
+
+- Added `@QaseTags=tag1,tag2` Gherkin tag to assign tags from feature files.
+- Updated `qase-javascript-commons` dependency to `~2.6.0`.
+
 # cucumberjs-qase-reporter@2.2.2
 
 ## Bug fixes

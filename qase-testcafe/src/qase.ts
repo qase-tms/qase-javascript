@@ -15,6 +15,7 @@ export class qase {
   private static _qaseSuite = '';
   private static _qaseIgnore = '';
   private static _qaseProjects = '';
+  private static _qaseTags = '';
 
   /**
    * Set multi-project mapping (for testops_multi mode). Project code → test case IDs.
@@ -134,6 +135,19 @@ export class qase {
   };
 
   /**
+   * Set tags for the test case
+   * Don't forget to call `create` method after setting all the necessary parameters
+   * @param {...string} values
+   * @example
+   * const q = qase.id(1).tags('smoke', 'regression').create();
+   * test.meta(q)('Test case title', async t => { ... });
+   */
+  public static tags = (...values: string[]) => {
+    this._qaseTags = values.join(',');
+    return this;
+  };
+
+  /**
    * Add a step to the test case
    * @param name
    * @param body
@@ -225,6 +239,7 @@ export class qase {
       QaseGroupParameters: this._qaseGroupParameters,
       QaseIgnore: this._qaseIgnore,
       QaseProjects: this._qaseProjects,
+      QaseTags: this._qaseTags,
     };
 
     this._qaseID = '';
@@ -235,6 +250,7 @@ export class qase {
     this._qaseGroupParameters = '';
     this._qaseIgnore = '';
     this._qaseProjects = '';
+    this._qaseTags = '';
 
     return meta;
   };

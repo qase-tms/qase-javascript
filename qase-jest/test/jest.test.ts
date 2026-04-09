@@ -12,6 +12,7 @@ const qaseMock = {
   fields: jest.fn(),
   parameters: jest.fn(),
   groupParams: jest.fn(),
+  tags: jest.fn(),
   step: jest.fn(),
   attachment: jest.fn(),
 };
@@ -105,6 +106,13 @@ describe('qase', () => {
       const groupParams = { group1: 'value1', group2: 'value2' };
       qase.groupParameters(groupParams);
       expect(qaseMock.groupParams).toHaveBeenCalledWith(groupParams);
+    });
+  });
+
+  describe('qase.tags', () => {
+    it('should call global.Qase.tags', () => {
+      qase.tags('smoke', 'regression');
+      expect(qaseMock.tags).toHaveBeenCalledWith(['smoke', 'regression']);
     });
   });
 

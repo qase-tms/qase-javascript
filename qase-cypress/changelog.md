@@ -1,3 +1,10 @@
+# cypress-qase-reporter@3.3.0
+
+## What's new
+
+- Added `qaseTags` task to assign tag titles to test cases via `cy.task('qaseTags', ['smoke', 'regression'])`.
+- Updated `qase-javascript-commons` dependency to `~2.6.0`.
+
 # cypress-qase-reporter@3.2.3
 
 ## Bug fixes

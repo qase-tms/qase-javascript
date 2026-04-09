@@ -11,5 +11,6 @@ export const events = {
   startStep: 'qase:startStep',
   endStep: 'qase:endStep',
   addStep: 'qase:addStep',
+  addTags: 'qase:tags',
   addProfilerSteps: 'qase:addProfilerSteps',
 } as const

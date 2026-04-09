@@ -34,6 +34,7 @@ export interface QaseWrapper {
   fields(values: Record<string, string>): Promise<void>;
   parameters(values: Record<string, string>): Promise<void>;
   groupParameters(values: Record<string, string>): Promise<void>;
+  tags(...values: string[]): Promise<void>;
   step(name: string, body: StepFunction, expectedResult?: string, data?: string): Promise<void>;
   attach(attach: {
     name?: string;
@@ -137,6 +138,19 @@ const createQaseWrapper = (annotate: AnnotateFunction): QaseWrapper => {
      */
     async groupParameters(values: Record<string, string>): Promise<void> {
       return await annotate(`Qase Group Parameters: ${JSON.stringify(values)}`, { type: 'qase-group-parameters', body: JSON.stringify(values) });
+    },
+
+    /**
+     * Set tags for the test case
+     * @param {...string} values
+     * @example
+     * test('test', withQase(async ({ qase }) => {
+     *    await qase.tags('smoke', 'regression');
+     *     expect(true).toBe(true);
+     * }));
+     */
+    async tags(...values: string[]): Promise<void> {
+      return await annotate(`Qase Tags: ${values.join(',')}`, { type: 'qase-tags', body: JSON.stringify(values) });
     },
 
     /**

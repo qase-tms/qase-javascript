@@ -1,3 +1,18 @@
+# mocha-qase-reporter@1.3.0
+
+## What's new
+
+- Added `tags()` method to the test context API. You can now assign tags to test cases at runtime:
+
+```ts
+it('test', function() {
+  this.tags('smoke', 'regression');
+  expect(true).to.equal(true);
+});
+```
+
+- Updated `qase-javascript-commons` dependency to `~2.6.0`.
+
 # mocha-qase-reporter@1.2.3
 
 ## Bug fixes

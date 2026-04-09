@@ -21,6 +21,7 @@ export interface MetadataMessage {
   ignore?: boolean;
   suite?: string;
   comment?: string;
+  tags?: string[];
 }
 
 /**
@@ -284,6 +285,22 @@ qase.suite = function(value: string) {
 qase.comment = function(value: string) {
   addMetadata({
     comment: value,
+  });
+  return this;
+};
+
+/**
+ * Set tags for the test case
+ * @param {...string} values
+ * @example
+ * test('test', async ({ page }) => {
+ *    qase.tags('smoke', 'regression');
+ *    await page.goto('https://example.com');
+ * });
+ */
+qase.tags = function(...values: string[]) {
+  addMetadata({
+    tags: values,
   });
   return this;
 };

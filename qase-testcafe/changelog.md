@@ -1,3 +1,16 @@
+# testcafe-reporter-qase@2.3.0
+
+## What's new
+
+- Added `qase.tags()` method to the builder API. You can now assign tags to test cases:
+
+```ts
+const q = qase.id(1).tags('smoke', 'regression').create();
+test.meta(q)('Test case title', async t => { ... });
+```
+
+- Updated `qase-javascript-commons` dependency to `~2.6.0`.
+
 # testcafe-reporter-qase@2.2.3
 
 ## Bug fixes

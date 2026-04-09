@@ -220,6 +220,7 @@ export class ReportReporter extends AbstractReporter {
       relations: result.relations,
       muted: result.muted,
       message: result.message,
+      tags: result.tags,
     };
 
     // Internal-only fields are excluded: testops_id, group_params, run_id, author, testops_project_mapping, preparedAttachments

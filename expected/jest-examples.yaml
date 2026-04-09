@@ -300,6 +300,9 @@ results:
     layer: api
     severity: critical
     priority: high
+  tags:
+  - crud
+  - smoke
   relations:
     suite:
       data:
@@ -360,6 +363,9 @@ results:
     layer: api
     severity: normal
     priority: high
+  tags:
+  - crud
+  - api
   relations:
     suite:
       data:

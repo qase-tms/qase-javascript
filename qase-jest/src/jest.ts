@@ -129,6 +129,21 @@ qase.groupParameters = (values: Record<string, string>): void => {
 };
 
 /**
+ * Set tags for the test case
+ * @param {...string} values
+ * @example
+ * test('test', () => {
+ *    qase.tags('smoke', 'regression');
+ *     expect(true).toBe(true);
+ * });
+ */
+qase.tags = (...values: string[]): void => {
+  // @ts-expect-error - global.Qase is dynamically added at runtime
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  global.Qase.tags(values);
+};
+
+/**
  * Add a step to the test case
  * @param name
  * @param body

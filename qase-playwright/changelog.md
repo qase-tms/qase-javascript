@@ -1,3 +1,10 @@
+# playwright-qase-reporter@2.3.0
+
+## What's new
+
+- Added `qase.tags()` method to assign tag titles to test cases.
+- Updated `qase-javascript-commons` dependency to `~2.6.0`.
+
 # playwright-qase-reporter@2.2.3
 
 ## Bug fixes

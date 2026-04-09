@@ -12,6 +12,7 @@ This guide provides comprehensive instructions for integrating Qase with Cucumbe
 - [Adding Title](#adding-title)
 - [Adding Fields](#adding-fields)
 - [Adding Suite](#adding-suite)
+- [Tags](#tags)
 - [Ignoring Tests](#ignoring-tests)
 - [Muting Tests](#muting-tests)
 - [Working with Attachments](#working-with-attachments)
@@ -141,6 +142,32 @@ Feature: User Authentication
 ```
 
 > **Note:** Feature and Scenario Outline structure can also serve as natural suite hierarchy in Qase.
+
+---
+
+## Tags
+
+Assign tags to scenarios. Tags help categorize and filter tests in Qase.
+
+```gherkin
+@QaseID=1
+@QaseTags=smoke,regression
+Scenario: Login test
+  Given I am on the login page
+  When I enter valid credentials
+  Then I should be logged in
+```
+
+Multiple `@QaseTags` annotations accumulate:
+
+```gherkin
+@QaseTags=smoke
+@QaseTags=regression
+Scenario: Login test
+  Given I am on the login page
+  When I enter valid credentials
+  Then I should be logged in
+```
 
 ---
 

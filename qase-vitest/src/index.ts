@@ -33,6 +33,7 @@ export class VitestQaseReporter implements Reporter {
     fields?: Record<string, string>;
     parameters?: Record<string, string>;
     groupParameters?: Record<string, string>;
+    tags?: string[];
     currentStep?: string;
     steps: { name: string; status: 'start' | 'end' | 'failed' }[];
     attachments: { name: string; path?: string; content?: string; contentType?: string }[];
@@ -162,6 +163,11 @@ export class VitestQaseReporter implements Reporter {
       // Add group parameters if available
       if (metadata.groupParameters) {
         testResult.group_params = metadata.groupParameters;
+      }
+
+      // Add tags if available
+      if (metadata.tags && metadata.tags.length > 0) {
+        testResult.tags = metadata.tags;
       }
 
       // Add steps if available - create proper TestStepType objects
@@ -351,6 +357,19 @@ export class VitestQaseReporter implements Reporter {
           break;
         }
           
+        case 'tags': {
+          const tagsData = annotation.message.replace('Qase Tags: ', '');
+          try {
+            const parsed: unknown = JSON.parse(tagsData);
+            if (Array.isArray(parsed)) {
+              metadata.tags = [...(metadata.tags ?? []), ...parsed.map(String)];
+            }
+          } catch (e) {
+            metadata.tags = [...(metadata.tags ?? []), ...tagsData.split(',').map((t: string) => t.trim()).filter((t: string) => t.length > 0)];
+          }
+          break;
+        }
+
         case 'step-start': {
           const stepStartData = annotation.message.replace('Qase Step Start: ', '');
           metadata.currentStep = stepStartData;

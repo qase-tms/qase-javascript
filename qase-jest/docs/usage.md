@@ -12,6 +12,7 @@ This guide provides comprehensive instructions for integrating Qase with Jest.
 - [Adding Title](#adding-title)
 - [Adding Fields](#adding-fields)
 - [Adding Suite](#adding-suite)
+- [Tags](#tags)
 - [Ignoring Tests](#ignoring-tests)
 - [Muting Tests](#muting-tests)
 - [Working with Attachments](#working-with-attachments)
@@ -138,6 +139,35 @@ test('Login test', () => {
   qase.suite('Authentication\tLogin\tPositive Cases');
   expect(true).toBe(true);
 });
+```
+
+---
+
+## Tags
+
+Assign tags to test cases. Tags help categorize and filter tests in Qase.
+
+```typescript
+test(qase(1, 'Login test'), () => {
+  qase.tags('smoke', 'regression');
+  expect(true).toBe(true);
+});
+```
+
+Multiple `qase.tags()` calls accumulate:
+
+```typescript
+test('test', () => {
+  qase.tags('smoke');
+  qase.tags('regression', 'e2e');
+  // Result: tags = ['smoke', 'regression', 'e2e']
+});
+```
+
+Alternative using fields:
+
+```typescript
+qase.fields({ tags: 'smoke,regression' });
 ```
 
 ---

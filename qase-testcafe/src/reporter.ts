@@ -63,6 +63,7 @@ enum metadataEnum {
   oldID = 'CID',
   ignore = 'QaseIgnore',
   projects = 'QaseProjects',
+  tags = 'QaseTags',
 }
 
 interface MetadataType {
@@ -74,6 +75,7 @@ interface MetadataType {
   [metadataEnum.groupParameters]: Record<string, string>;
   [metadataEnum.ignore]: boolean;
   [metadataEnum.projects]: Record<string, number[]>;
+  [metadataEnum.tags]: string[];
 }
 
 export interface TestRunInfoType {
@@ -255,6 +257,7 @@ export class TestcafeQaseReporter {
         thread: null,
       },
       fields: metadata[metadataEnum.fields],
+      tags: metadata[metadataEnum.tags],
       message: errorLog ? errorLog.split('\n')[0] ?? '' : '',
       muted: false,
       params: metadata[metadataEnum.parameters],
@@ -305,6 +308,7 @@ export class TestcafeQaseReporter {
       QaseGroupParameters: {},
       QaseIgnore: false,
       QaseProjects: {},
+      QaseTags: [],
     };
 
     if (meta[metadataEnum.oldID] !== undefined && meta[metadataEnum.oldID] !== '') {
@@ -339,6 +343,10 @@ export class TestcafeQaseReporter {
 
     if (meta[metadataEnum.ignore] !== undefined && meta[metadataEnum.ignore] !== '') {
       metadata.QaseIgnore = meta[metadataEnum.ignore] === 'true';
+    }
+
+    if (meta[metadataEnum.tags] !== undefined && meta[metadataEnum.tags] !== '') {
+      metadata.QaseTags = meta[metadataEnum.tags].split(',').map((t: string) => t.trim()).filter((t: string) => t.length > 0);
     }
 
     if (meta[metadataEnum.projects] !== undefined && meta[metadataEnum.projects] !== '') {

@@ -12,6 +12,7 @@ This guide provides comprehensive instructions for integrating Qase with Vitest.
 - [Adding Title](#adding-title)
 - [Adding Fields](#adding-fields)
 - [Adding Suite](#adding-suite)
+- [Tags](#tags)
 - [Ignoring Tests](#ignoring-tests)
 - [Muting Tests](#muting-tests)
 - [Working with Attachments](#working-with-attachments)
@@ -138,6 +139,35 @@ test('Test in nested suites', () => {
   qase.suite('Application\tAuthentication\tLogin\tEdge Cases');
   expect(true).toBe(true);
 });
+```
+
+---
+
+## Tags
+
+Assign tags to test cases. Tags help categorize and filter tests in Qase.
+
+```typescript
+test('Login test', withQase(async ({ qase }) => {
+  await qase.tags('smoke', 'regression');
+  expect(true).toBe(true);
+}));
+```
+
+Multiple `qase.tags()` calls accumulate:
+
+```typescript
+test('test', withQase(async ({ qase }) => {
+  await qase.tags('smoke');
+  await qase.tags('regression', 'e2e');
+  // Result: tags = ['smoke', 'regression', 'e2e']
+}));
+```
+
+Alternative using fields:
+
+```typescript
+qase.fields({ tags: 'smoke,regression' });
 ```
 
 ---

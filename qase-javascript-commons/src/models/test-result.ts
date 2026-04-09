@@ -30,6 +30,7 @@ export class TestResultType {
   relations: Relation | null;
   muted: boolean;
   message: string | null;
+  tags: string[];
   preparedAttachments?: string[];
 
   constructor(title: string) {
@@ -49,6 +50,7 @@ export class TestResultType {
     this.relations = null;
     this.muted = false;
     this.message = null;
+    this.tags = [];
     this.preparedAttachments = [];
   }
 

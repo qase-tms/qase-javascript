@@ -13,7 +13,8 @@ describe('Metadata', () => {
       fields: { field1: 'value1' },
       parameters: { param1: 'value1' },
       groupParams: { group1: 'value1' },
-      steps: [{ 
+      tags: ['smoke', 'regression'],
+      steps: [{
         id: 'step1',
         step_type: StepType.TEXT,
         data: { action: 'Test action', expected_result: null, data: null },
@@ -22,8 +23,8 @@ describe('Metadata', () => {
         attachments: [],
         steps: []
       }],
-      attachments: [{ 
-        file_name: 'file.txt', 
+      attachments: [{
+        file_name: 'file.txt',
         content: 'content',
         mime_type: 'text/plain',
         file_path: null,
@@ -39,6 +40,7 @@ describe('Metadata', () => {
     expect(metadata.fields).toEqual({ field1: 'value1' });
     expect(metadata.parameters).toEqual({ param1: 'value1' });
     expect(metadata.groupParams).toEqual({ group1: 'value1' });
+    expect(metadata.tags).toEqual(['smoke', 'regression']);
     expect(metadata.steps).toHaveLength(1);
     expect(metadata.attachments).toHaveLength(1);
   });
@@ -52,6 +54,7 @@ describe('Metadata', () => {
       fields: {},
       parameters: {},
       groupParams: {},
+      tags: [],
       steps: [],
       attachments: [],
     };
@@ -70,6 +73,7 @@ describe('Metadata', () => {
       fields: {},
       parameters: {},
       groupParams: {},
+      tags: [],
       steps: [],
       attachments: [],
     };
@@ -77,6 +81,7 @@ describe('Metadata', () => {
     expect(metadata.fields).toEqual({});
     expect(metadata.parameters).toEqual({});
     expect(metadata.groupParams).toEqual({});
+    expect(metadata.tags).toEqual([]);
     expect(metadata.steps).toEqual([]);
     expect(metadata.attachments).toEqual([]);
   });

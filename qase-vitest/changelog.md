@@ -1,3 +1,10 @@
+# vitest-qase-reporter@1.2.0
+
+## What's new
+
+- Added `qase.tags()` method to assign tag titles to test cases.
+- Updated `qase-javascript-commons` dependency to `~2.6.0`.
+
 # vitest-qase-reporter@1.1.3
 
 ## Bug fixes

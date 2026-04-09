@@ -131,6 +131,16 @@ describe('qase API', () => {
     });
   });
 
+  describe('qase.tags', () => {
+    it('should call test.info().attach with tags metadata', () => {
+      qase.tags('smoke', 'regression');
+      expect(testInfoMock.attach).toHaveBeenCalledWith('qase-metadata.json', {
+        contentType: 'application/qase.metadata+json',
+        body: Buffer.from(JSON.stringify({ tags: ['smoke', 'regression'] }), 'utf8'),
+      });
+    });
+  });
+
   describe('qase.attach', () => {
     it('should call test.step and test.info().attach for content', () => {
       qase.attach({ name: 'file.txt', content: 'data', contentType: 'text/plain' });

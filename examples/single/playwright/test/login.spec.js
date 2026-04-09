@@ -13,6 +13,7 @@ test.describe('Authentication', () => {
   test(qase(1, 'User can login with valid credentials'), async ({ page }) => {
     qase.fields({ severity: 'critical', priority: 'high', layer: 'e2e' });
     qase.suite('E-commerce\tAuthentication\tLogin');
+    qase.tags('smoke', 'e2e');
 
     await test.step('Navigate to login page', async () => {
       await expect(page).toHaveURL('https://www.saucedemo.com/');

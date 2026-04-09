@@ -70,6 +70,7 @@ describe('JSONPlaceholder User CRUD Operations', function() {
   });
 
   it(qase(3, 'POST create user - verify 201 response and returned ID'), async function() {
+
     const newUser = {
       name: 'John Doe',
       username: 'johndoe',

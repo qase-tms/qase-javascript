@@ -37,6 +37,7 @@ const qaseParametersRegExp = /^@[Qq]ase[Pp]arameters=(.+)$/;
 const qaseGroupParametersRegExp = /^@[Qq]ase[Gg]roup[Pp]arameters=(.+)$/;
 const qaseSuiteRegExp = /^@[Qq]ase[Ss]uite=(.+)$/;
 const qaseIgnoreRegExp = /^@[Qq]ase[Ii][Gg][Nn][Oo][Rr][Ee]$/;
+const qaseTagsRegExp = /^@[Qq]ase[Tt]ags=(.+)$/;
 
 export class Storage {
   /**
@@ -358,6 +359,7 @@ export class Storage {
       testops_project_mapping: hasProjectMapping ? metadata.projectMapping : null,
       id: tcs.id,
       title: metadata.title ?? pickle.name,
+      tags: metadata.tags,
     } as unknown as TestResultType;
     return result;
   }
@@ -449,6 +451,7 @@ export class Storage {
       parameters: {},
       group_params: {},
       suite: null,
+      tags: [],
     };
 
     for (const tag of tags) {
@@ -503,6 +506,13 @@ export class Storage {
 
       if (qaseSuiteRegExp.test(tag.name)) {
         metadata.suite = tag.name.replace(/^@[Qq]ase[Ss]uite=/, '');
+        continue;
+      }
+
+      if (qaseTagsRegExp.test(tag.name)) {
+        const value = tag.name.replace(/^@[Qq]ase[Tt]ags=/, '');
+        const parsedTags = value.split(',').map(t => t.trim()).filter(t => t.length > 0);
+        metadata.tags.push(...parsedTags);
         continue;
       }
 

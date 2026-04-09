@@ -12,6 +12,7 @@ This guide provides comprehensive instructions for integrating Qase with Webdriv
 - [Adding Title](#adding-title)
 - [Adding Fields](#adding-fields)
 - [Adding Suite](#adding-suite)
+- [Tags](#tags)
 - [Ignoring Tests](#ignoring-tests)
 - [Muting Tests](#muting-tests)
 - [Adding Comments](#adding-comments)
@@ -184,6 +185,35 @@ it('Test with nested suite', () => {
 @Suite=Authentication
 Scenario: Login test
   Given I am on the login page
+```
+
+---
+
+## Tags
+
+Assign tags to test cases. Tags help categorize and filter tests in Qase.
+
+```javascript
+it('should work', () => {
+  qase.tags('smoke', 'regression');
+  // test code
+});
+```
+
+Multiple `qase.tags()` calls accumulate:
+
+```javascript
+it('test', () => {
+  qase.tags('smoke');
+  qase.tags('regression', 'e2e');
+  // Result: tags = ['smoke', 'regression', 'e2e']
+});
+```
+
+Alternative using fields:
+
+```javascript
+qase.fields({ tags: 'smoke,regression' });
 ```
 
 ---

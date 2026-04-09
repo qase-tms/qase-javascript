@@ -51,6 +51,13 @@ module.exports = function(on) {
   });
 
   on('task', {
+    qaseTags(value) {
+      MetadataManager.setTags(value);
+      return null;
+    },
+  });
+
+  on('task', {
     qaseStepStart(value) {
       MetadataManager.addStepStart(value);
       return null;

@@ -172,6 +172,10 @@ export class JestQaseReporter implements Reporter {
       result.group_params = this.metadata.groupParams;
     }
 
+    if (this.metadata.tags.length > 0) {
+      result.tags = this.metadata.tags;
+    }
+
     if (this.metadata.steps.length > 0) {
       result.steps = this.metadata.steps;
     }
@@ -310,6 +314,10 @@ export class JestQaseReporter implements Reporter {
     this.metadata.groupParams = groupParams;
   }
 
+  public addTags(tags: string[]) {
+    this.metadata.tags.push(...tags);
+  }
+
   public addIgnore() {
     this.metadata.ignore = true;
   }
@@ -408,6 +416,7 @@ export class JestQaseReporter implements Reporter {
       fields: {},
       parameters: {},
       groupParams: {},
+      tags: [],
       steps: [],
       attachments: [],
     };
