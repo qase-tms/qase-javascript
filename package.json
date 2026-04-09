@@ -35,7 +35,8 @@
   ],
   "overrides": {
     "rollup": "4.59.0",
-    "lodash": "4.17.23"
+    "lodash": "4.17.23",
+    "handlebars": "4.7.9"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
