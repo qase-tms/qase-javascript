@@ -1,0 +1,23 @@
+qaseio/README.md
+  9ebea46bee5aeec4 3-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.6",
+  "base_commit_sha": "0eb8623ae52b5f6246f5c46e7631e6c2b2480559",
+  "prompts": {
+    "9ebea46bee5aeec4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "29c094bd-133b-415d-8e86-1677be968c42",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 6,
+      "total_deletions": 0,
+      "accepted_lines": 6,
+      "overriden_lines": 0
+    }
+  }
+}
