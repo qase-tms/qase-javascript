@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.6.1
+
+## Bug fixes
+
+- Fixed Cypress test failures being classified as `invalid` instead of `failed`. Cypress uses retry-ability (`Timed out retrying after Nms: ...`) and command syntax (`cy.click() failed`, `cy.wait() timed out`) that don't contain the word `expect`, so genuine UI/command failures previously fell through to the timeout catch-all and were mislabeled as environment errors. `cy.request()` with infrastructure-level errors (e.g. `ECONNREFUSED`) continues to be classified as `invalid`.
+
 # qase-javascript-commons@2.6.0
 
 ## What's new

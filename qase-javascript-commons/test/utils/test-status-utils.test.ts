@@ -125,6 +125,54 @@ describe('determineTestStatus', () => {
     });
   });
 
+  describe('when Cypress-specific failure', () => {
+    it('should return failed for cy.click() on non-interactable element (0x0 dimensions)', () => {
+      const error = new Error(
+        'Timed out retrying after 4050ms: cy.click() failed because this element is not visible:\n' +
+        '<button>Submit</button>\n' +
+        'This element <button> is not visible because it has an effective width and height of: 0 x 0 pixels.'
+      );
+      const result = determineTestStatus(error, 'failed');
+      expect(result).toBe(TestStatusEnum.failed);
+    });
+
+    it('should return failed for cy.wait() on intercepted route that never fires', () => {
+      const error = new Error(
+        "Timed out retrying after 4000ms: cy.wait() timed out waiting 4000ms for the 1st request to the route: 'myRoute'. No request ever occurred."
+      );
+      const result = determineTestStatus(error, 'failed');
+      expect(result).toBe(TestStatusEnum.failed);
+    });
+
+    it('should return failed for Cypress retry-ability prefix with Expected...but never found', () => {
+      const error = new Error(
+        "Timed out retrying after 4000ms: Expected to find element: '.foo', but never found it."
+      );
+      const result = determineTestStatus(error, 'failed');
+      expect(result).toBe(TestStatusEnum.failed);
+    });
+
+    it('should return failed for Cypress .should() assertion timeout', () => {
+      const error = new Error(
+        "Timed out retrying after 4000ms: expected '<div>' to be visible"
+      );
+      const result = determineTestStatus(error, 'failed');
+      expect(result).toBe(TestStatusEnum.failed);
+    });
+
+    it('should still return invalid for cy.request() to unreachable server (real infrastructure failure)', () => {
+      const error = new Error(
+        'cy.request() failed trying to load:\n\n' +
+        'https://unreachable.example.com\n\n' +
+        'We attempted to make an http request to this URL but the request failed without a response.\n\n' +
+        'We received this error at the network level:\n\n' +
+        '  > Error: connect ECONNREFUSED 127.0.0.1:8080'
+      );
+      const result = determineTestStatus(error, 'failed');
+      expect(result).toBe(TestStatusEnum.invalid);
+    });
+  });
+
   describe('when non-assertion error', () => {
     it('should return invalid for network error', () => {
       const error = new Error('Network request failed');

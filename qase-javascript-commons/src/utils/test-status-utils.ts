@@ -102,6 +102,22 @@ function isAssertionError(error: Error, originalStatus: string): boolean {
     return false;
   }
 
+  // Cypress-specific failure detection.
+  // Cypress uses retry-ability and command-based error syntax that don't contain
+  // the word "expect" (unlike Jest/Playwright assertions). Without this branch,
+  // genuine UI/command failures fall through to the "timeout → invalid" catch-all
+  // below and get misclassified as environment errors.
+  //
+  // Why this order: the hasNonAssertionPattern check above already returned
+  // invalid for cy.request() failures (which contain "network"/"connection"),
+  // so reaching this point with a Cypress signature means the error has no
+  // infrastructure markers — the test app failed to behave as expected.
+  const isCypressRetryTimeout = /timed out retrying after \d+ms/.test(errorMessage);
+  const isCypressCommandFailure = /cy\.\w+\(\)\s+(failed|timed out)/.test(errorMessage);
+  if (isCypressRetryTimeout || isCypressCommandFailure) {
+    return true;
+  }
+
   // For timeout errors without expect, treat as invalid
   if (errorMessage.includes('timeout')) {
     return false;
