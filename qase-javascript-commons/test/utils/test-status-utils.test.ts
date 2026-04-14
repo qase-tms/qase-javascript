@@ -132,11 +132,16 @@ describe('determineTestStatus', () => {
       '    at cypressErr (https://localhost:3000/__cypress/runner/cypress_runner.js:180818:16)\n' +
       '    at Context.runnable.fn (https://localhost:3000/__cypress/runner/cypress_runner.js:190234:20)';
 
+    // Real Cypress messages use backticks around commands and include docs URLs.
+    // These tests use actual Cypress error message format captured from Cypress 15.x.
+
     it('should return failed for cy.click() on non-interactable element (0x0 dimensions)', () => {
       const error = new Error(
-        'Timed out retrying after 4050ms: cy.click() failed because this element is not visible:\n' +
-        '<button>Submit</button>\n' +
-        'This element <button> is not visible because it has an effective width and height of: 0 x 0 pixels.'
+        'Timed out retrying after 4000ms: `cy.click()` failed because this element is not visible:\n\n' +
+        '`<button id="zero-size" style="width:0;height:0;padding:0;border:0;overflow:hidden;">Hidden</button>`\n\n' +
+        'This element `<button#zero-size>` is not visible because it has an effective width and height of: `0 x 0` pixels.\n\n' +
+        'Fix this problem, or use `{force: true}` to disable error checking.\n\n' +
+        'https://on.cypress.io/element-cannot-be-interacted-with'
       );
       error.stack = cypressStack(error.message);
       const result = determineTestStatus(error, 'failed');
@@ -145,16 +150,18 @@ describe('determineTestStatus', () => {
 
     it('should return failed for cy.wait() on intercepted route that never fires', () => {
       const error = new Error(
-        "cy.wait() timed out waiting 5000ms for the 1st request to the route: 'myRoute'. No request ever occurred."
+        'Timed out retrying after 4000ms: `cy.wait()` timed out waiting `4000ms` for the 1st request to the route: `neverFires`. No request ever occurred.\n\n' +
+        'https://on.cypress.io/wait'
       );
       error.stack = cypressStack(error.message);
       const result = determineTestStatus(error, 'failed');
       expect(result).toBe(TestStatusEnum.failed);
     });
 
-    it('should return failed for cy.click() with retry-ability prefix and browser stack trace', () => {
+    it('should return failed for cy.click() on detached DOM element', () => {
       const error = new Error(
-        'Timed out retrying after 4000ms: cy.click() failed because this element is detached from the DOM.'
+        'Timed out retrying after 4000ms: `cy.click()` failed because this element is detached from the DOM.\n\n' +
+        'https://on.cypress.io/element-has-detached-from-dom'
       );
       error.stack = cypressStack(error.message);
       const result = determineTestStatus(error, 'failed');
@@ -163,7 +170,8 @@ describe('determineTestStatus', () => {
 
     it('should return failed for Cypress retry-ability prefix with Expected...but never found', () => {
       const error = new Error(
-        "Timed out retrying after 4000ms: Expected to find element: '.foo', but never found it."
+        "Timed out retrying after 4000ms: Expected to find element: '.foo', but never found it.\n\n" +
+        'https://on.cypress.io/element-not-found'
       );
       error.stack = cypressStack(error.message);
       const result = determineTestStatus(error, 'failed');
@@ -172,20 +180,36 @@ describe('determineTestStatus', () => {
 
     it('should return failed for Cypress .should() assertion timeout', () => {
       const error = new Error(
-        "Timed out retrying after 4000ms: expected '<div>' to be visible"
+        "Timed out retrying after 4000ms: expected '<div>' to be visible\n\n" +
+        'https://on.cypress.io/assertions'
       );
       error.stack = cypressStack(error.message);
       const result = determineTestStatus(error, 'failed');
       expect(result).toBe(TestStatusEnum.failed);
     });
 
-    it('should still return invalid for cy.request() to unreachable server (real infrastructure failure)', () => {
+    it('should still return invalid for cy.request() timeout (real infrastructure failure)', () => {
       const error = new Error(
-        'cy.request() failed trying to load:\n\n' +
+        '`cy.request()` timed out waiting `4000ms` for a response from your server.\n\n' +
+        'The request we sent was:\n\n' +
+        'Method: GET\n' +
+        'URL: http://192.0.2.1:1/\n\n' +
+        'No response was received within the timeout.\n\n' +
+        'https://on.cypress.io/request'
+      );
+      error.stack = cypressStack(error.message);
+      const result = determineTestStatus(error, 'failed');
+      expect(result).toBe(TestStatusEnum.invalid);
+    });
+
+    it('should still return invalid for cy.request() with ECONNREFUSED', () => {
+      const error = new Error(
+        '`cy.request()` failed trying to load:\n\n' +
         'https://unreachable.example.com\n\n' +
         'We attempted to make an http request to this URL but the request failed without a response.\n\n' +
         'We received this error at the network level:\n\n' +
-        '  > Error: connect ECONNREFUSED 127.0.0.1:8080'
+        '  > Error: connect ECONNREFUSED 127.0.0.1:8080\n\n' +
+        'https://on.cypress.io/request'
       );
       error.stack = cypressStack(error.message);
       const result = determineTestStatus(error, 'failed');
