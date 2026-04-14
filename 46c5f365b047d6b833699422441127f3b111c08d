@@ -1,0 +1,25 @@
+qase-javascript-commons/src/utils/test-status-utils.ts
+  50085345ed5991b2 91-94,109-116,122-123
+qase-javascript-commons/test/utils/test-status-utils.test.ts
+  50085345ed5991b2 135-137,140-144,153-154,161,163-164,173-174,183-184,191-202,205,207,211-212
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "46c5f365b047d6b833699422441127f3b111c08d",
+  "prompts": {
+    "50085345ed5991b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4bcabe85-e9aa-4da1-a5d4-decbdb847251",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 660,
+      "total_deletions": 155,
+      "accepted_lines": 125,
+      "overriden_lines": 11
+    }
+  }
+}
