@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.6.2
+
+## Bug fixes
+
+- Fixed Cypress failure classification in real browser environments. Cypress errors false-positive on the `"http"` non-assertion pattern because (a) browser stack traces contain URLs like `https://localhost/__cypress/runner/...` and (b) all error messages include docs links like `https://on.cypress.io/...`. The classifier now unconditionally trusts Cypress' retry-ability prefix (`Timed out retrying after Nms:`) as a genuine test failure signal, since this prefix is exclusive to DOM-interacting commands and never appears in infrastructure failures (`cy.request()`, `cy.task()`).
+
 # qase-javascript-commons@2.6.1
 
 ## Bug fixes
