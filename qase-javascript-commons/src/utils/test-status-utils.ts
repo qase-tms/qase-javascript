@@ -88,11 +88,11 @@ function isAssertionError(error: Error, originalStatus: string): boolean {
     errorMessage.includes(pattern) || errorStack.includes(pattern)
   );
 
-  // Cypress-specific failure patterns (computed early — needed in multiple branches).
-  // "Timed out retrying after Nms" is Cypress' retry-ability prefix for DOM commands.
-  // "cy.<cmd>() failed" / "cy.<cmd>() timed out" is Cypress' command failure syntax.
+  // Cypress retry-ability prefix: "Timed out retrying after Nms:" is added by
+  // Cypress' retry mechanism exclusively for DOM-interacting commands (cy.get,
+  // cy.click, cy.should, cy.wait with aliases). It never appears in infra
+  // failures (cy.request, cy.task). This is the most reliable Cypress signal.
   const isCypressRetryTimeout = /timed out retrying after \d+ms/.test(errorMessage);
-  const isCypressCommandFailure = /cy\.\w+\(\)\s+(failed|timed out)/.test(errorMessage);
 
   if (hasNonAssertionPattern) {
     const hasAssertionContext = assertionPatterns.some(pattern =>
@@ -106,26 +106,21 @@ function isAssertionError(error: Error, originalStatus: string): boolean {
       return true;
     }
 
-    // Cypress override: Cypress stack traces contain browser URLs
-    // (https://localhost/__cypress/runner/...) which false-positive on the "http"
-    // pattern above. When the error MESSAGE itself has a Cypress retry-ability
-    // prefix or command failure, and the message doesn't contain a real
-    // infrastructure marker (network, connection, etc.), this is a genuine
-    // application failure, not an environment issue.
-    if ((isCypressRetryTimeout || isCypressCommandFailure) && isRunnerFailed) {
-      const hasMessageInfraMarker = nonAssertionPatternsWithoutTimeout.some(pattern =>
-        errorMessage.includes(pattern)
-      );
-      if (!hasMessageInfraMarker) {
-        return true;
-      }
+    // Cypress override: the retry-ability prefix is a strong signal that the
+    // test was actively interacting with the application via a retryable command.
+    // Cypress errors false-positive on "http" because (a) browser stack traces
+    // contain URLs and (b) all error messages include docs links
+    // (https://on.cypress.io/...). The retry prefix itself is never
+    // infrastructure, so we trust it unconditionally.
+    if (isCypressRetryTimeout && isRunnerFailed) {
+      return true;
     }
 
     return false;
   }
 
-  // Cypress failure without any non-assertion pattern at all (clean stack trace)
-  if (isCypressRetryTimeout || isCypressCommandFailure) {
+  // Cypress failure without any non-assertion pattern (clean stack trace)
+  if (isCypressRetryTimeout) {
     return true;
   }
 
