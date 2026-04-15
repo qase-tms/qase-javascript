@@ -1,0 +1,42 @@
+qase-javascript-commons/test/formatter/report-serializer.test.ts
+  f9e5705c80ba613f 1-160
+qase-javascript-commons/src/formatter/report-serializer.ts
+  f9e5705c80ba613f 1-107
+qase-javascript-commons/src/formatter/index.ts
+  f9e5705c80ba613f 4
+qase-javascript-commons/src/reporters/report-reporter.ts
+  f9e5705c80ba613f 2,7,19,31,42,49,100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "ed5faee8e473eba920e21fee46857b8ac15983e3",
+  "prompts": {
+    "50085345ed5991b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4bcabe85-e9aa-4da1-a5d4-decbdb847251",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 73,
+      "overriden_lines": 0
+    },
+    "f9e5705c80ba613f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8fad36e2-f665-40ab-9ef4-5d3068ed4459",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 275,
+      "total_deletions": 149,
+      "accepted_lines": 3214,
+      "overriden_lines": 0
+    }
+  }
+}
