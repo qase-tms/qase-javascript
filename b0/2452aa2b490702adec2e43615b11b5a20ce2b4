@@ -1,0 +1,65 @@
+qase-javascript-commons/src/qase/options-resolver.ts
+  f9e5705c80ba613f 1-57
+qase-javascript-commons/test/formatter/report-serializer.test.ts
+  f9e5705c80ba613f 1-161
+qase-javascript-commons/src/qase/reporter-factory.ts
+  f9e5705c80ba613f 1-138
+qase-javascript-commons/test/reporters/shared/testops-url.test.ts
+  f9e5705c80ba613f 1-24
+qase-javascript-commons/src/reporters/shared/testops-constants.ts
+  f9e5705c80ba613f 1-5
+qase-javascript-commons/changelog.md
+  f9e5705c80ba613f 1-47
+qase-javascript-commons/src/qase.ts
+  f9e5705c80ba613f 3-4,6,11-12,14-17,53-55,61-65,73-99,101-104,106-107,109-110,112-113,116-117,119-124,126-133,135-147,150-153,157,160-162,164,169-172,176,179,183,185,188-194,196-202,204-205,208,222-227,230-236,238-244,246-247,249-250,252-258,260-271,274-276,279-281,285,288-291,293,296-299,302-303
+qase-javascript-commons/package.json
+  f9e5705c80ba613f 3
+qase-javascript-commons/src/qase/status-processor.ts
+  f9e5705c80ba613f 1-53
+qase-javascript-commons/src/formatter/index.ts
+  f9e5705c80ba613f 4
+qase-javascript-commons/src/reporters/testops-multi-reporter.ts
+  f9e5705c80ba613f 15-16,63-64
+qase-javascript-commons/src/reporters/shared/testops-url.ts
+  f9e5705c80ba613f 1-14
+qase-javascript-commons/src/formatter/report-serializer.ts
+  f9e5705c80ba613f 1-107
+qase-javascript-commons/src/reporters/testops-reporter.ts
+  f9e5705c80ba613f 14-15,53-54,161,166-167
+qase-javascript-commons/src/reporters/report-reporter.ts
+  f9e5705c80ba613f 2,7,19,31,42,49,100
+qase-javascript-commons/src/utils/token-masker.ts
+  f9e5705c80ba613f 1-24
+qase-javascript-commons/test/qase/options-resolver.test.ts
+  f9e5705c80ba613f 1-131
+qase-javascript-commons/test/qase/reporter-factory.test.ts
+  f9e5705c80ba613f 1-158
+qase-javascript-commons/test/qase/status-processor.test.ts
+  f9e5705c80ba613f 1-84
+qase-javascript-commons/test/reporters/shared/fallback-coordinator.test.ts
+  f9e5705c80ba613f 1-218
+qase-javascript-commons/src/reporters/shared/fallback-coordinator.ts
+  f9e5705c80ba613f 1-138
+qase-javascript-commons/test/utils/token-masker.test.ts
+  f9e5705c80ba613f 1-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "b02452aa2b490702adec2e43615b11b5a20ce2b4",
+  "prompts": {
+    "f9e5705c80ba613f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8fad36e2-f665-40ab-9ef4-5d3068ed4459",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 1605,
+      "total_deletions": 737,
+      "accepted_lines": 1610,
+      "overriden_lines": 0
+    }
+  }
+}
