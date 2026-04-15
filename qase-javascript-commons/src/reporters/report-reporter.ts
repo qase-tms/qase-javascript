@@ -1,10 +1,10 @@
 import { AbstractReporter } from './abstract-reporter';
-import { Attachment, Report, TestStatusEnum, TestStepType, StepType, TestResultType } from '../models';
-import { StepTextData, StepGherkinData } from '../models/step-data';
+import { Attachment, Report, TestStatusEnum, TestStepType, TestResultType } from '../models';
 import { WriterInterface } from '../writer';
 import { LoggerInterface } from '../utils/logger';
 import { getHostInfo } from '../utils/hostData';
 import { HostData } from '../models/host-data';
+import { ReportSerializer, ReportSerializerInterface } from '../formatter/report-serializer';
 
 /**
  * @class ReportReporter
@@ -16,6 +16,7 @@ export class ReportReporter extends AbstractReporter {
   private readonly runId: number | undefined;
   private readonly rootSuite: string | undefined;
   private readonly hostData: HostData | undefined;
+  private readonly serializer: ReportSerializerInterface;
   private startTime: number = Date.now();
 
   /**
@@ -27,6 +28,7 @@ export class ReportReporter extends AbstractReporter {
    * @param {string | undefined} rootSuite
    * @param {number | undefined} runId
    * @param {HostData | undefined} hostData
+   * @param {ReportSerializerInterface} serializer
    */
   constructor(
     logger: LoggerInterface,
@@ -37,12 +39,14 @@ export class ReportReporter extends AbstractReporter {
     rootSuite?: string,
     runId?: number,
     hostData?: HostData,
+    serializer: ReportSerializerInterface = new ReportSerializer(),
   ) {
     super(logger);
     this.environment = environment;
     this.runId = runId;
     this.rootSuite = rootSuite;
     this.hostData = hostData;
+    this.serializer = serializer;
   }
 
   /**
@@ -93,7 +97,7 @@ export class ReportReporter extends AbstractReporter {
       }
 
       // Serialize to spec-compliant format before writing
-      const serialized = this.serializeResultForReport(result);
+      const serialized = this.serializer.serializeResult(result);
       await this.writer.writeTestResult(serialized as unknown as TestResultType);
     }
   }
@@ -182,150 +186,4 @@ export class ReportReporter extends AbstractReporter {
     return steps;
   }
 
-  /**
-   * Serialize a test result to spec-compliant JSON format.
-   * Transforms internal model fields to match the Qase Report specification.
-   * @private
-   */
-  private serializeResultForReport(result: TestResultType): Record<string, unknown> {
-    // Transform testops_id -> testops_ids (RSLT-01)
-    let testopsIds: number[] | null = null;
-    if (result.testops_id !== null) {
-      testopsIds = Array.isArray(result.testops_id)
-        ? result.testops_id
-        : [result.testops_id];
-    }
-
-    // Transform group_params -> param_groups (RSLT-02)
-    const paramGroups = this.transformGroupParams(result.group_params);
-
-    // Serialize attachments (exclude size and content fields)
-    const attachments = result.attachments.map(att => this.serializeAttachment(att));
-
-    // Serialize steps (handle data.data -> data.input_data and attachments -> execution.attachments)
-    const steps = this.serializeSteps(result.steps);
-
-    // Build spec-compliant result object
-    const serialized: Record<string, unknown> = {
-      id: result.id,
-      title: result.title,
-      signature: result.signature,
-      execution: result.execution,
-      fields: result.fields,
-      attachments: attachments,
-      steps: steps,
-      params: result.params,
-      param_groups: paramGroups,
-      testops_ids: testopsIds,
-      relations: result.relations,
-      muted: result.muted,
-      message: result.message,
-      tags: result.tags,
-    };
-
-    // Internal-only fields are excluded: testops_id, group_params, run_id, author, testops_project_mapping, preparedAttachments
-    return serialized;
-  }
-
-  /**
-   * Transform group_params Record to param_groups array of arrays.
-   * Same logic as clientV2.ts transformGroupParams.
-   * @private
-   */
-  private transformGroupParams(groupParams: Record<string, string>): string[][] {
-    const keys = Object.keys(groupParams);
-    if (keys.length === 0) {
-      return [];
-    }
-    return [keys];
-  }
-
-  /**
-   * Serialize attachment for report output (exclude size and content fields).
-   * @private
-   */
-  private serializeAttachment(att: Attachment): Record<string, unknown> {
-    return {
-      id: att.id,
-      file_name: att.file_name,
-      mime_type: att.mime_type,
-      file_path: att.file_path,
-    };
-  }
-
-  /**
-   * Serialize steps recursively, transforming:
-   * - data.data -> data.input_data (STEP-01)
-   * - attachments -> execution.attachments (STEP-02)
-   * @private
-   */
-  private serializeSteps(steps: TestStepType[]): Record<string, unknown>[] {
-    return steps.map(step => this.serializeStep(step));
-  }
-
-  /**
-   * Serialize a single step to spec-compliant format.
-   * @private
-   */
-  private serializeStep(step: TestStepType): Record<string, unknown> {
-    // Transform step data (handle data.data -> data.input_data for text steps)
-    const data = this.serializeStepData(step);
-
-    // Serialize step attachments
-    const attachments = step.attachments.map(att => this.serializeAttachment(att));
-
-    // Move attachments into execution.attachments (STEP-02)
-    const execution = {
-      ...step.execution,
-      attachments: attachments,
-    };
-
-    // Recursively serialize nested steps
-    const nestedSteps = this.serializeSteps(step.steps);
-
-    return {
-      id: step.id,
-      step_type: step.step_type,
-      data: data,
-      parent_id: step.parent_id,
-      execution: execution,
-      steps: nestedSteps,
-      // Note: attachments field is NOT at top-level in serialized output
-    };
-  }
-
-  /**
-   * Serialize step data, transforming data.data -> data.input_data for text steps.
-   * @private
-   */
-  private serializeStepData(step: TestStepType): Record<string, unknown> {
-    const data = { ...step.data };
-
-    // For text steps, rename data.data to data.input_data (STEP-01)
-    if (step.step_type === StepType.TEXT && 'data' in data) {
-      const textData = data as StepTextData;
-      return {
-        action: textData.action,
-        expected_result: textData.expected_result,
-        input_data: textData.data, // Rename: data -> input_data
-      };
-    }
-
-    // For gherkin steps, convert to text format (STEP-03)
-    if (step.step_type === StepType.GHERKIN && 'keyword' in data && 'name' in data) {
-      const gherkinData = data as StepGherkinData;
-      return {
-        action: `${gherkinData.keyword} ${gherkinData.name}`,
-        expected_result: null,
-        input_data: null, // JS GherkinData has no data field
-      };
-    }
-
-    // For request steps, pass raw fields through (all 7 StepRequestData fields are preserved)
-    if (step.step_type === StepType.REQUEST && 'request_method' in data) {
-      return data as Record<string, unknown>;
-    }
-
-    return data;
-  }
 }

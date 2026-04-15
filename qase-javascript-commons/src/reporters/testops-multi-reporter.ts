@@ -12,8 +12,8 @@ import { LoggerInterface } from '../utils/logger';
 import { Mutex } from 'async-mutex';
 import { ClientV2 } from '../client/clientV2';
 import { HostData } from '../models/host-data';
-
-const defaultChunkSize = 200;
+import { DEFAULT_BATCH_SIZE } from './shared/testops-constants';
+import { resolveTestOpsBaseUrl } from './shared/testops-url';
 
 /**
  * Multi-project TestOps reporter. Sends test results to multiple Qase projects
@@ -60,8 +60,8 @@ export class TestOpsMultiReporter extends AbstractReporter {
     showPublicReportLink?: boolean,
   ) {
     super(logger);
-    this.baseUrl = this.getBaseUrl(baseUrl ?? testopsOptions.api?.host);
-    this.batchSize = batchSize ?? testopsOptions.batch?.size ?? defaultChunkSize;
+    this.baseUrl = resolveTestOpsBaseUrl(baseUrl ?? testopsOptions.api?.host);
+    this.batchSize = batchSize ?? testopsOptions.batch?.size ?? DEFAULT_BATCH_SIZE;
     this.showPublicReportLink = showPublicReportLink ?? testopsOptions.showPublicReportLink;
 
     this.defaultProject =
@@ -349,13 +349,6 @@ export class TestOpsMultiReporter extends AbstractReporter {
       return await client.uploadAttachment(attachment);
     }
     return '';
-  }
-
-  private getBaseUrl(url: string | undefined): string {
-    if (!url || url === 'qase.io') {
-      return 'https://app.qase.io';
-    }
-    return `https://${url.replace('api', 'app')}`;
   }
 
   private showLink(projectCode: string, id: number | null, title: string): void {

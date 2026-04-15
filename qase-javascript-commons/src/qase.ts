@@ -1,33 +1,20 @@
-import envSchema from 'env-schema';
 import chalk from 'chalk';
 
-import {
-  InternalReporterInterface,
-  TestOpsReporter,
-  TestOpsMultiReporter,
-  ReportReporter,
-} from './reporters';
-import { composeOptions, ModeEnum, OptionsType } from './options';
-import {
-  EnvApiEnum,
-  EnvEnum,
-  EnvRunEnum,
-  EnvTestOpsEnum,
-  envToConfig,
-  envValidationSchema,
-} from './env';
+import { InternalReporterInterface } from './reporters';
+import { ModeEnum, OptionsType } from './options';
 import { TestStatusEnum, TestResultType, Attachment } from './models';
-import { DriverEnum, FsWriter } from './writer';
+import { ConfigType } from './config';
 
 import { DisabledException } from './utils/disabled-exception';
 import { Logger, LoggerInterface } from './utils/logger';
-import { StateManager, StateModel } from './state/state';
-import { ConfigType } from './config';
 import { getHostInfo } from './utils/hostData';
-import { ClientV2 } from './client/clientV2';
-import { TestOpsOptionsType } from './models/config/TestOpsOptionsType';
-import { applyStatusMapping } from './utils/status-mapping-utils';
-import { HostData } from './models/host-data';
+import { sanitizeOptionsForLog } from './utils/token-masker';
+import { StateManager, StateModel } from './state/state';
+
+import { OptionsResolver, ResolvedOptions } from './qase/options-resolver';
+import { ReporterFactory } from './qase/reporter-factory';
+import { StatusProcessor } from './qase/status-processor';
+import { FallbackCoordinator } from './reporters/shared/fallback-coordinator';
 
 /**
  * @type {Record<TestStatusEnum, (test: TestResultType) => string>}
@@ -63,301 +50,225 @@ export interface ReporterInterface {
 
 /**
  * @class QaseReporter
- * @implements AbstractReporter
+ *
+ * Thin orchestrator: delegates to OptionsResolver, ReporterFactory,
+ * StatusProcessor, and FallbackCoordinator. Public API is preserved.
  */
 export class QaseReporter implements ReporterInterface {
   private static instance: QaseReporter | null;
 
-  /**
-   * @type {InternalReporterInterface}
-   * @private
-   */
-  private readonly upstreamReporter?: InternalReporterInterface;
-
-  /**
-   * @type {InternalReporterInterface}
-   * @private
-   */
-  private readonly fallbackReporter?: InternalReporterInterface;
-
-  /**
-   * @type {boolean | undefined}
-   * @private
-   */
-  private readonly captureLogs: boolean | undefined;
-
-  /**
-   * @type {boolean}
-   * @private
-   */
-  private disabled = false;
-
-  /**
-   * @type {boolean}
-   * @private
-   */
-  private useFallback = false;
-
   private readonly logger: LoggerInterface;
+  private readonly options: ConfigType & OptionsType;
+  private readonly withState: boolean;
+  private readonly captureLogs: boolean | undefined;
+  private readonly statusProcessor: StatusProcessor;
+  private readonly fallback: FallbackCoordinator;
 
   private startTestRunOperation?: Promise<void> | undefined;
-
-  private options: ConfigType & OptionsType;
-
-  private withState: boolean;
-
-  private readonly hostData: HostData;
 
   /**
    * @param {OptionsType} options
    */
   private constructor(options: OptionsType) {
-    this.withState = this.setWithState(options);
+    const resolved = new OptionsResolver().resolve(options);
+    this.options = resolved.composed;
+    this.withState = resolved.withState;
+    this.captureLogs = resolved.composed.captureLogs;
 
-    if (this.withState) {
-      if (StateManager.isStateExists()) {
-        const state = StateManager.getState();
-        if (state.IsModeChanged && state.Mode) {
-          process.env[EnvEnum.mode] = state.Mode.toString();
+    this.logger = this.buildLogger(resolved);
+    this.logger.logDebug(
+      `Config: ${JSON.stringify(sanitizeOptionsForLog(resolved.composed))}`,
+    );
+
+    const hostData = getHostInfo(options.frameworkPackage, options.reporterName);
+    this.logger.logDebug(`Host data: ${JSON.stringify(hostData)}`);
+
+    const factory = new ReporterFactory(this.logger, hostData);
+    const { upstream, fallback, disabled, useFallbackFromStart } =
+      this.buildReporters(factory, resolved);
+
+    this.statusProcessor = new StatusProcessor(
+      this.logger,
+      resolved.composed.statusMapping,
+      resolved.composed.testops?.statusFilter as string[] | undefined,
+    );
+
+    this.fallback = new FallbackCoordinator(this.logger, upstream, fallback, {
+      onFallbackActivated: () => {
+        if (this.withState) {
+          StateManager.setMode(resolved.composed.fallback as ModeEnum);
         }
-
-        if (state.RunId) {
-          process.env[EnvRunEnum.id] = state.RunId.toString();
+      },
+      onDisabled: () => {
+        if (this.withState) {
+          StateManager.setMode(ModeEnum.off);
         }
-      }
+      },
+    });
+
+    if (disabled) {
+      this.fallback.setDisabled(true);
+    }
+    if (useFallbackFromStart) {
+      this.fallback.setUseFallback(true);
     }
 
-    const env = envToConfig(envSchema({ schema: envValidationSchema }));
-    const composedOptions = composeOptions(options, env);
-    this.options = composedOptions;
+    this.persistInitialState(resolved, disabled, useFallbackFromStart);
+  }
 
-    // Process logging options with backward compatibility
-    const loggerOptions: {
-      debug?: boolean | undefined,
-      consoleLogging?: boolean | undefined,
-      fileLogging?: boolean | undefined,
-    } = {
-      debug: composedOptions.debug,
-    };
+  private buildLogger(resolved: ResolvedOptions): LoggerInterface {
+    const opts: {
+      debug?: boolean | undefined;
+      consoleLogging?: boolean | undefined;
+      fileLogging?: boolean | undefined;
+    } = { debug: resolved.composed.debug };
 
-    if (composedOptions.logging?.console !== undefined) {
-      loggerOptions.consoleLogging = composedOptions.logging.console;
+    if (resolved.composed.logging?.console !== undefined) {
+      opts.consoleLogging = resolved.composed.logging.console;
     }
-
-    if (composedOptions.logging?.file !== undefined) {
-      loggerOptions.fileLogging = composedOptions.logging.file;
+    if (resolved.composed.logging?.file !== undefined) {
+      opts.fileLogging = resolved.composed.logging.file;
     }
+    return new Logger(opts);
+  }
 
-    this.logger = new Logger(loggerOptions);
-    this.logger.logDebug(`Config: ${JSON.stringify(this.sanitizeOptions(composedOptions))}`);
-
-    const effectiveMode = (composedOptions.mode as ModeEnum) || ModeEnum.off;
-    const effectiveFallback = (composedOptions.fallback as ModeEnum) || ModeEnum.off;
-    this.hostData = getHostInfo(options.frameworkPackage, options.reporterName);
-    this.logger.logDebug(`Host data: ${JSON.stringify(this.hostData)}`);
-
-    this.captureLogs = composedOptions.captureLogs;
+  private buildReporters(
+    factory: ReporterFactory,
+    resolved: ResolvedOptions,
+  ): {
+    upstream: InternalReporterInterface | undefined;
+    fallback: InternalReporterInterface | undefined;
+    disabled: boolean;
+    useFallbackFromStart: boolean;
+  } {
+    let upstream: InternalReporterInterface | undefined;
+    let fallbackReporter: InternalReporterInterface | undefined;
+    let disabled = false;
+    let upstreamFailed = false;
 
     try {
-      this.upstreamReporter = this.createReporter(
-        effectiveMode,
-        composedOptions,
+      upstream = factory.create(
+        resolved.effectiveMode,
+        resolved.composed,
+        this.withState,
       );
     } catch (error) {
       if (error instanceof DisabledException) {
-        this.disabled = true;
+        disabled = true;
       } else {
         this.logger.logError('Unable to create upstream reporter:', error);
-
-        if (composedOptions.fallback != undefined) {
-          this.disabled = true;
-          return;
+        if (resolved.composed.fallback === undefined) {
+          disabled = true;
+          return { upstream, fallback: fallbackReporter, disabled, useFallbackFromStart: false };
         }
-
-        this.useFallback = true;
+        upstreamFailed = true;
       }
     }
 
     try {
-      this.fallbackReporter = this.createReporter(
-        effectiveFallback,
-        composedOptions,
+      fallbackReporter = factory.create(
+        resolved.effectiveFallback,
+        resolved.composed,
+        this.withState,
       );
     } catch (error) {
       if (error instanceof DisabledException) {
-        if (this.useFallback) {
-          this.disabled = true;
-        }
+        if (upstreamFailed) disabled = true;
       } else {
         this.logger.logError('Unable to create fallback reporter:', error);
-
-        if (this.useFallback && this.upstreamReporter === undefined) {
-          this.disabled = true;
-        }
+        if (upstreamFailed && upstream === undefined) disabled = true;
       }
     }
 
-    if (this.withState) {
-      if (!StateManager.isStateExists()) {
-        const state: StateModel = {
-          RunId: undefined,
-          Mode: this.useFallback ? composedOptions.fallback as ModeEnum : composedOptions.mode as ModeEnum,
-          IsModeChanged: undefined,
-        };
+    const useFallbackFromStart = upstreamFailed && fallbackReporter !== undefined;
 
-        if (this.disabled) {
-          state.Mode = ModeEnum.off;
-        }
-
-        StateManager.setState(state);
-      }
-    }
+    return { upstream, fallback: fallbackReporter, disabled, useFallbackFromStart };
   }
 
-  async uploadAttachment(attachment: Attachment): Promise<string> {
-    if (this.disabled) {
-      return '';
+  private persistInitialState(
+    resolved: ResolvedOptions,
+    disabled: boolean,
+    useFallbackFromStart: boolean,
+  ): void {
+    if (!this.withState) return;
+    if (StateManager.isStateExists()) return;
+
+    const state: StateModel = {
+      RunId: undefined,
+      Mode: useFallbackFromStart
+        ? (resolved.composed.fallback as ModeEnum)
+        : (resolved.composed.mode as ModeEnum),
+      IsModeChanged: undefined,
+    };
+
+    if (disabled) {
+      state.Mode = ModeEnum.off;
     }
 
-    if (this.useFallback) {
-      return await this.fallbackReporter?.uploadAttachment(attachment) ?? '';
-    }
-
-    return await this.upstreamReporter?.uploadAttachment(attachment) ?? '';
+    StateManager.setState(state);
   }
 
-  getResults(): TestResultType[] {
-    if (this.disabled) {
-      return [];
+  public static getInstance(options: OptionsType): QaseReporter {
+    if (!QaseReporter.instance) {
+      QaseReporter.instance = new QaseReporter(options);
     }
-
-    if (this.useFallback) {
-      return this.fallbackReporter?.getTestResults() ?? [];
-    }
-
-    return this.upstreamReporter?.getTestResults() ?? [];
+    return QaseReporter.instance;
   }
 
-  setTestResults(results: TestResultType[]): void {
-    if (this.disabled) {
-      return;
-    }
-
-    if (this.useFallback) {
-      this.fallbackReporter?.setTestResults(results);
-    } else {
-      this.upstreamReporter?.setTestResults(results);
-    }
+  public getStatusMapping(): Record<string, string> | undefined {
+    return this.options.statusMapping;
   }
 
-  async sendResults(): Promise<void> {
-    if (this.disabled) {
-      return;
-    }
-
-    try {
-      await this.upstreamReporter?.sendResults();
-    } catch (error) {
-      this.logger.logError('Unable to send the results to the upstream reporter:', error);
-
-      if (this.fallbackReporter == undefined) {
-        if (this.withState) {
-          StateManager.setMode(ModeEnum.off);
-        }
-        return;
-      }
-
-      if (!this.useFallback) {
-        this.fallbackReporter.setTestResults(this.upstreamReporter?.getTestResults() ?? []);
-        this.useFallback = true;
-      }
-
-      try {
-        await this.fallbackReporter.sendResults();
-        if (this.withState) {
-          StateManager.setMode(this.options.fallback as ModeEnum);
-        }
-      } catch (error) {
-        this.logger.logError('Unable to send the results to the fallback reporter:', error);
-        if (this.withState) {
-          StateManager.setMode(ModeEnum.off);
-        }
-      }
-    }
+  public async uploadAttachment(attachment: Attachment): Promise<string> {
+    const result = await this.fallback.run(
+      (r) => r.uploadAttachment(attachment),
+      'upload attachment',
+    );
+    return result ?? '';
   }
 
-  async complete(): Promise<void> {
-    if (this.withState) {
-      StateManager.clearState();
-    }
-    if (this.disabled) {
-      return;
-    }
-
-    try {
-      await this.upstreamReporter?.complete();
-    } catch (error) {
-      this.logger.logError('Unable to complete the run in the upstream reporter:', error);
-
-      if (this.fallbackReporter == undefined) {
-        return;
-      }
-
-      if (!this.useFallback) {
-        this.fallbackReporter.setTestResults(this.upstreamReporter?.getTestResults() ?? []);
-        this.useFallback = true;
-      }
-
-      try {
-        await this.fallbackReporter.complete();
-      } catch (error) {
-        this.logger.logError('Unable to complete the run in the fallback reporter:', error);
-      }
-    }
+  public getResults(): TestResultType[] {
+    if (this.fallback.isDisabled()) return [];
+    const active = this.fallback.isUsingFallback()
+      ? this.fallback.getFallback()
+      : this.fallback.getUpstream();
+    return active?.getTestResults() ?? [];
   }
 
-  /**
-   * @returns {void}
-   */
+  public setTestResults(results: TestResultType[]): void {
+    if (this.fallback.isDisabled()) return;
+    const active = this.fallback.isUsingFallback()
+      ? this.fallback.getFallback()
+      : this.fallback.getUpstream();
+    active?.setTestResults(results);
+  }
+
+  public async addTestResult(result: TestResultType): Promise<void> {
+    if (this.fallback.isDisabled()) return;
+
+    const processed = this.statusProcessor.process(result);
+    if (!processed) return;
+
+    await this.startTestRunOperation;
+    this.logger.log(resultLogMap[processed.execution.status](processed));
+    await this.fallback.run(
+      (r) => r.addTestResult(processed),
+      'add the result',
+    );
+  }
+
   public startTestRun(): void {
-    if (this.withState) {
-      StateManager.clearState();
-    }
+    if (this.withState) StateManager.clearState();
+    this.fallback.reset();
+    this.logger.logDebug('Starting test run');
 
-    this.disabled = false;
-    this.useFallback = false;
-
-    if (!this.disabled) {
-
-      this.logger.logDebug('Starting test run');
-
-      try {
-        this.startTestRunOperation = this.upstreamReporter?.startTestRun();
-      } catch (error) {
-        this.logger.logError('Unable to start test run in the upstream reporter: ', error);
-
-        if (this.fallbackReporter == undefined) {
-          this.disabled = true;
-          if (this.withState) {
-            StateManager.setMode(ModeEnum.off);
-          }
-          return;
-        }
-
-        try {
-          this.startTestRunOperation = this.fallbackReporter.startTestRun();
-          if (this.withState) {
-            StateManager.setMode(this.options.fallback as ModeEnum);
-          }
-        } catch (error) {
-          this.logger.logError('Unable to start test run in the fallback reporter: ', error);
-          this.disabled = true;
-          if (this.withState) {
-            StateManager.setMode(ModeEnum.off);
-          }
-        }
-      }
-    }
+    const runOp = this.fallback.run(
+      async (r) => {
+        await r.startTestRun();
+      },
+      'start test run',
+    );
+    this.startTestRunOperation = runOp.then(() => undefined);
   }
 
   public async startTestRunAsync(): Promise<void> {
@@ -365,318 +276,30 @@ export class QaseReporter implements ReporterInterface {
     await this.startTestRunOperation;
   }
 
-  /**
-   * @param {OptionsType} options
-   * @returns {QaseReporter}
-   */
-  public static getInstance(options: OptionsType): QaseReporter {
-    if (!QaseReporter.instance) {
-      QaseReporter.instance = new QaseReporter(options);
-    }
-
-    return QaseReporter.instance;
+  public async sendResults(): Promise<void> {
+    if (this.fallback.isDisabled()) return;
+    await this.fallback.run((r) => r.sendResults(), 'send the results');
   }
 
-  /**
-   * Get status mapping configuration
-   * @returns Status mapping configuration or undefined
-   */
-  public getStatusMapping(): Record<string, string> | undefined {
-    return this.options.statusMapping;
-  }
-
-  /**
-   * @param {TestResultType} result
-   */
-  public async addTestResult(result: TestResultType) {
-    if (!this.disabled) {
-      // Apply status mapping if configured
-      const statusMapping = this.getStatusMapping();
-      if (statusMapping) {
-        const originalStatus = result.execution.status;
-        const mappedStatus = applyStatusMapping(originalStatus, statusMapping);
-        if (mappedStatus !== originalStatus) {
-          this.logger.logDebug(`Status mapping applied: ${originalStatus} -> ${mappedStatus}`);
-          result.execution.status = mappedStatus;
-        }
-      }
-
-      // Check if result should be filtered out based on status
-      if (this.shouldFilterResult(result)) {
-        this.logger.logDebug(`Filtering out test result with status: ${result.execution.status}`);
-        return;
-      }
-
+  public async publish(): Promise<void> {
+    if (!this.fallback.isDisabled()) {
       await this.startTestRunOperation;
-
-      this.logTestItem(result);
-
-      if (this.useFallback) {
-        await this.addTestResultToFallback(result);
-        return;
-      }
-
-      try {
-        await this.upstreamReporter?.addTestResult(result);
-      } catch (error) {
-        this.logger.logError('Unable to add the result to the upstream reporter:', error);
-
-        if (this.fallbackReporter == undefined) {
-          this.disabled = true;
-          if (this.withState) {
-            StateManager.setMode(ModeEnum.off);
-          }
-          return;
-        }
-
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (!this.useFallback) {
-          this.fallbackReporter.setTestResults(this.upstreamReporter?.getTestResults() ?? []);
-          this.useFallback = true;
-        }
-
-        await this.addTestResultToFallback(result);
-      }
+      this.logger.logDebug('Publishing test run results');
+      await this.fallback.run(
+        (r) => r.publish(),
+        'publish the run results',
+      );
     }
+    if (this.withState) StateManager.clearState();
   }
 
-  /**
-   * @param {TestResultType} result
-   * @private
-   */
-  private shouldFilterResult(result: TestResultType): boolean {
-    const statusFilter = this.options.testops?.statusFilter;
-
-    if (!statusFilter || statusFilter.length === 0) {
-      return false;
-    }
-
-    // Convert TestStatusEnum to string for comparison
-    const statusString = result.execution.status.toString();
-
-    this.logger.logDebug(`Checking filter: status="${statusString}", filter=${JSON.stringify(statusFilter)}`);
-
-    // Check if the status is in the filter list
-    const shouldFilter = statusFilter.includes(statusString);
-
-    this.logger.logDebug(`Filter result: ${shouldFilter ? 'FILTERED' : 'NOT FILTERED'}`);
-
-    return shouldFilter;
+  public async complete(): Promise<void> {
+    if (this.withState) StateManager.clearState();
+    if (this.fallback.isDisabled()) return;
+    await this.fallback.run((r) => r.complete(), 'complete the run');
   }
 
-  /**
-   * @param {TestResultType} result
-   * @private
-   */
-  private async addTestResultToFallback(result: TestResultType): Promise<void> {
-    try {
-      await this.fallbackReporter?.addTestResult(result);
-      if (this.withState) {
-        StateManager.setMode(this.options.fallback as ModeEnum);
-      }
-    } catch (error) {
-      this.logger.logError('Unable to add the result to the fallback reporter:', error);
-      this.disabled = true;
-      StateManager.setMode(ModeEnum.off);
-    }
-  }
-
-  /**
-   * @returns {boolean}
-   */
   public isCaptureLogs(): boolean {
     return this.captureLogs ?? false;
-  }
-
-  /**
-   * @returns {Promise<void>}
-   */
-  public async publish(): Promise<void> {
-    if (!this.disabled) {
-
-      await this.startTestRunOperation;
-
-      this.logger.logDebug('Publishing test run results');
-
-      if (this.useFallback) {
-        await this.publishFallback();
-      }
-
-      try {
-        await this.upstreamReporter?.publish();
-      } catch (error) {
-        this.logger.logError('Unable to publish the run results to the upstream reporter:', error);
-
-        if (this.fallbackReporter == undefined) {
-          this.disabled = true;
-          if (this.withState) {
-            StateManager.setMode(ModeEnum.off);
-          }
-          return;
-        }
-
-        if (!this.useFallback) {
-          this.fallbackReporter.setTestResults(this.upstreamReporter?.getTestResults() ?? []);
-          this.useFallback = true;
-        }
-
-        await this.publishFallback();
-      }
-    }
-    if (this.withState) {
-      StateManager.clearState();
-    }
-  }
-
-  /**
-   * @returns {Promise<void>}
-   */
-  private async publishFallback(): Promise<void> {
-    try {
-      await this.fallbackReporter?.publish();
-      if (this.withState) {
-        StateManager.setMode(this.options.fallback as ModeEnum);
-      }
-    } catch (error) {
-      if (this.withState) {
-        StateManager.setMode(ModeEnum.off);
-      }
-      this.logger.logError('Unable to publish the run results to the fallback reporter:', error);
-      this.disabled = true;
-    }
-  }
-
-  /**
-   * @todo implement mode registry
-   * @param {ModeEnum} mode
-   * @param {OptionsType} options
-   * @returns {InternalReporterInterface}
-   * @private
-   */
-  private createReporter(
-    mode: ModeEnum,
-    options: OptionsType,
-  ): InternalReporterInterface {
-
-    switch (mode) {
-      case ModeEnum.testops: {
-        if (!options.testops?.api?.token) {
-          throw new Error(
-            `Either "testops.api.token" parameter or "${EnvApiEnum.token}" environment variable is required in "testops" mode`,
-          );
-        }
-
-        if (!options.testops.project) {
-          throw new Error(
-            `Either "testops.project" parameter or "${EnvTestOpsEnum.project}" environment variable is required in "testops" mode`,
-          );
-        }
-
-        const apiClient = new ClientV2(
-          this.logger,
-          options.testops as TestOpsOptionsType,
-          options.environment,
-          options.rootSuite,
-          this.hostData,
-          options.reporterName,
-          options.frameworkPackage
-        );
-
-        return new TestOpsReporter(
-          this.logger,
-          apiClient,
-          this.withState,
-          options.testops.project,
-          options.testops.api.host,
-          options.testops.batch?.size,
-          options.testops.run?.id,
-          options.testops.showPublicReportLink
-        );
-      }
-
-      case ModeEnum.testops_multi: {
-        if (!options.testops?.api?.token) {
-          throw new Error(
-            `Either "testops.api.token" parameter or "${EnvApiEnum.token}" environment variable is required in "testops_multi" mode`,
-          );
-        }
-
-        const multi = options.testops_multi;
-        if (!multi?.projects?.length) {
-          throw new Error(
-            '"testops_multi.projects" must contain at least one project with a "code" field',
-          );
-        }
-        for (const p of multi.projects) {
-          if (!p?.code) {
-            throw new Error('Each project in "testops_multi.projects" must have a "code" field');
-          }
-        }
-
-        return new TestOpsMultiReporter(
-          this.logger,
-          options.testops as TestOpsOptionsType,
-          multi,
-          this.withState,
-          this.hostData,
-          options.reporterName,
-          options.frameworkPackage,
-          options.environment,
-          options.testops.api?.host,
-          options.testops.batch?.size,
-          options.testops.showPublicReportLink
-        );
-      }
-
-      case ModeEnum.report: {
-        const localOptions = options.report?.connections?.[DriverEnum.local];
-        const writer = new FsWriter(localOptions);
-
-        return new ReportReporter(
-          this.logger,
-          writer,
-          options.frameworkPackage,
-          options.reporterName,
-          options.environment,
-          options.rootSuite,
-          options.testops?.run?.id,
-          this.hostData);
-      }
-
-      case ModeEnum.off:
-        throw new DisabledException();
-
-      default:
-        throw new Error(`Unknown mode type`);
-    }
-  }
-
-  /**
-   * @param {TestResultType} test
-   * @private
-   */
-  private logTestItem(test: TestResultType) {
-    this.logger.log(resultLogMap[test.execution.status](test));
-  }
-
-  private setWithState(options: OptionsType): boolean {
-    return options.frameworkName === 'cypress' || !options.frameworkName;
-  }
-
-  private maskToken(token: string): string {
-    if (token.length <= 7) {
-      return '*'.repeat(token.length);
-    }
-    return `${token.slice(0, 3)}****${token.slice(-4)}`;
-  }
-
-  private sanitizeOptions(options: ConfigType & OptionsType): ConfigType & OptionsType {
-    const sanitized = JSON.parse(JSON.stringify(options)) as ConfigType & OptionsType;
-
-    if (sanitized.testops?.api?.token) {
-      sanitized.testops.api.token = this.maskToken(sanitized.testops.api.token);
-    }
-
-    return sanitized;
   }
 }

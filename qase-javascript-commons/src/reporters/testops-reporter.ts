@@ -11,8 +11,8 @@ import { LoggerInterface } from '../utils/logger';
 import { StateManager } from '../state/state';
 import { Mutex } from 'async-mutex';
 import { IClient } from '../client/interface';
-
-const defaultChunkSize = 200;
+import { DEFAULT_BATCH_SIZE } from './shared/testops-constants';
+import { resolveTestOpsBaseUrl } from './shared/testops-url';
 
 /**
  * @class TestOpsReporter
@@ -50,8 +50,8 @@ export class TestOpsReporter extends AbstractReporter {
     private showPublicReportLink?: boolean,
   ) {
     super(logger);
-    this.baseUrl = this.getBaseUrl(baseUrl);
-    this.batchSize = batchSize ?? defaultChunkSize;
+    this.baseUrl = resolveTestOpsBaseUrl(baseUrl);
+    this.batchSize = batchSize ?? DEFAULT_BATCH_SIZE;
     this.runId = runId;
   }
 
@@ -158,13 +158,13 @@ export class TestOpsReporter extends AbstractReporter {
     const remainingResults = this.results.slice(this.firstIndex);
 
     if (this.firstIndex < this.results.length) {
-      if (remainingResults.length <= defaultChunkSize) {
+      if (remainingResults.length <= DEFAULT_BATCH_SIZE) {
         await this.publishResults(remainingResults);
         return;
       }
 
-      for (let i = 0; i < remainingResults.length; i += defaultChunkSize) {
-        await this.publishResults(remainingResults.slice(i, i + defaultChunkSize));
+      for (let i = 0; i < remainingResults.length; i += DEFAULT_BATCH_SIZE) {
+        await this.publishResults(remainingResults.slice(i, i + DEFAULT_BATCH_SIZE));
       }
     }
 
@@ -198,19 +198,6 @@ export class TestOpsReporter extends AbstractReporter {
     }
 
     this.logger.log(chalk`{green Run ${this.runId} completed}`);
-  }
-
-  /**
-   * @param {string | undefined} url
-   * @return string
-   * @private
-   */
-  private getBaseUrl(url: string | undefined): string {
-    if (!url || url === 'qase.io') {
-      return 'https://app.qase.io';
-    }
-
-    return `https://${url.replace('api', 'app')}`;
   }
 
   /**
