@@ -1,0 +1,40 @@
+qase-javascript-commons/src/reporters/testops-reporter.ts
+  f9e5705c80ba613f 14,53,160,165-166
+qase-javascript-commons/src/reporters/testops-multi-reporter.ts
+  f9e5705c80ba613f 15,63
+qase-javascript-commons/src/reporters/shared/testops-constants.ts
+  f9e5705c80ba613f 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "a224d6c3fbebc8bf8d1bb0119306490d663dc7d5",
+  "prompts": {
+    "50085345ed5991b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4bcabe85-e9aa-4da1-a5d4-decbdb847251",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 73,
+      "total_deletions": 0,
+      "accepted_lines": 73,
+      "overriden_lines": 0
+    },
+    "f9e5705c80ba613f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8fad36e2-f665-40ab-9ef4-5d3068ed4459",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 2947,
+      "total_deletions": 9,
+      "accepted_lines": 2947,
+      "overriden_lines": 0
+    }
+  }
+}
