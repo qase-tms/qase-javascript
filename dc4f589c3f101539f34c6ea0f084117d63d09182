@@ -1,0 +1,38 @@
+qase-javascript-commons/src/reporters/shared/fallback-coordinator.ts
+  f9e5705c80ba613f 8,19,53-61,80-86,95,104-109,126,134
+qase-javascript-commons/test/reporters/shared/fallback-coordinator.test.ts
+  f9e5705c80ba613f 131-216
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "dc4f589c3f101539f34c6ea0f084117d63d09182",
+  "prompts": {
+    "50085345ed5991b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4bcabe85-e9aa-4da1-a5d4-decbdb847251",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 73,
+      "overriden_lines": 0
+    },
+    "f9e5705c80ba613f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8fad36e2-f665-40ab-9ef4-5d3068ed4459",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 117,
+      "total_deletions": 4,
+      "accepted_lines": 3052,
+      "overriden_lines": 0
+    }
+  }
+}
