@@ -1,0 +1,33 @@
+qase-javascript-commons/test/reporters/shared/fallback-coordinator.test.ts
+  f9e5705c80ba613f 1
+qase-javascript-commons/test/qase/options-resolver.test.ts
+  f9e5705c80ba613f 1
+qase-javascript-commons/test/qase/status-processor.test.ts
+  f9e5705c80ba613f 1
+qase-javascript-commons/test/formatter/report-serializer.test.ts
+  f9e5705c80ba613f 1
+qase-javascript-commons/src/qase/options-resolver.ts
+  f9e5705c80ba613f 33
+qase-javascript-commons/test/qase/reporter-factory.test.ts
+  f9e5705c80ba613f 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "35d63654a10ac62d1e6d1ae191a8f941951d81ac",
+  "prompts": {
+    "f9e5705c80ba613f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8fad36e2-f665-40ab-9ef4-5d3068ed4459",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 21,
+      "total_deletions": 9,
+      "accepted_lines": 14,
+      "overriden_lines": 0
+    }
+  }
+}
