@@ -1,0 +1,36 @@
+qase-javascript-commons/src/qase.ts
+  f9e5705c80ba613f 3-4,6,11-12,14-17,53-55,61-65,73-99,101-104,106-107,109-110,112-113,116-117,119-124,126-133,135-147,150-153,157,160-162,164,169-172,176,179,183,185,188-194,196-202,204-205,208,222-227,230-236,238-244,246-247,249-250,252-258,260-271,274-276,279-281,285,288-291,293,296-299,302-303
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "5ff35d7a001ba93fae2e6cdba59413bc70058e69",
+  "prompts": {
+    "50085345ed5991b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4bcabe85-e9aa-4da1-a5d4-decbdb847251",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 73,
+      "overriden_lines": 0
+    },
+    "f9e5705c80ba613f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8fad36e2-f665-40ab-9ef4-5d3068ed4459",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 185,
+      "total_deletions": 558,
+      "accepted_lines": 3119,
+      "overriden_lines": 0
+    }
+  }
+}
