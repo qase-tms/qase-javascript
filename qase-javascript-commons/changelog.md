@@ -1,3 +1,50 @@
+# qase-javascript-commons@2.6.3
+
+## Internal refactoring
+
+The `QaseReporter` God class (~680 lines) has been split into focused components,
+and spec-compliant report serialization has been extracted into its own module.
+**The public API is unchanged** — all exports, method signatures, option shapes,
+environment variables, and the JSON report format are preserved verbatim. The
+report format is additionally verified in CI against the official Qase report
+schemas via `reporters-validator`.
+
+New internal components:
+
+- `src/qase/options-resolver.ts` — env + config composition, state restore,
+  `withState` detection.
+- `src/qase/reporter-factory.ts` — mode-based reporter instantiation with
+  option validation (replaces the inline `switch` that previously lived inside
+  `QaseReporter.createReporter`).
+- `src/qase/status-processor.ts` — status mapping + filtering.
+- `src/reporters/shared/fallback-coordinator.ts` — encapsulates the
+  upstream → fallback → disabled cascade that was previously repeated in five
+  lifecycle methods of `QaseReporter`.
+- `src/utils/token-masker.ts` — reusable `maskToken` / `sanitizeOptionsForLog`.
+- `src/formatter/report-serializer.ts` — pure spec-compliant serializer
+  (RSLT-01/02, STEP-01/02/03 rules), lifted out of `ReportReporter`.
+
+Shared utilities:
+
+- `DEFAULT_BATCH_SIZE` constant and `resolveTestOpsBaseUrl` helper now live
+  in `src/reporters/shared/` (previously duplicated between `TestOpsReporter`
+  and `TestOpsMultiReporter`).
+
+## Bug fixes
+
+- **Fallback activation on upstream creation failure.** Previously, if the
+  upstream reporter failed to construct (for example, misconfigured TestOps
+  client) and a `fallback` mode was configured, the reporter would disable
+  itself instead of switching to the fallback. Now the fallback is correctly
+  activated. **Note for users:** pipelines with a broken upstream
+  configuration and a `report` fallback will now start producing local report
+  artifacts where previously nothing was produced.
+- `publish()` no longer double-calls both reporters when already in fallback
+  mode — it now runs exactly one reporter.
+- `StateManager.setMode(off)` on fallback failure now respects the
+  `withState` flag, so frameworks that don't use persistent state no longer
+  write state during shutdown.
+
 # qase-javascript-commons@2.6.2
 
 ## Bug fixes
