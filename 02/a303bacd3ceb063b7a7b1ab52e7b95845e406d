@@ -1,0 +1,64 @@
+qase-javascript-commons/src/client/services/attachment-service.ts
+  da7af1196aaf6d9d 1-261
+qase-javascript-commons/test/client/services/result-transformer.test.ts
+  da7af1196aaf6d9d 1-201
+qase-javascript-commons/package.json
+  da7af1196aaf6d9d 3
+qase-javascript-commons/src/client/services/api-error-handler.ts
+  da7af1196aaf6d9d 1-52
+qase-javascript-commons/src/client/transport/api-config-builder.ts
+  da7af1196aaf6d9d 1-111
+qase-javascript-commons/test/client/services/attachment-service.test.ts
+  da7af1196aaf6d9d 1-152
+qase-javascript-commons/src/client/services/run-service.ts
+  da7af1196aaf6d9d 1-146
+qase-javascript-commons/test/client/transport/api-config-builder.test.ts
+  da7af1196aaf6d9d 1-155
+qase-javascript-commons/test/client/services/api-error-handler.test.ts
+  da7af1196aaf6d9d 1-97
+qase-javascript-commons/src/client/clientV1.ts
+  da7af1196aaf6d9d 3,7,10-14,17-18,23,25-26,28-31,33-39,41-44,53,57,61,65
+qase-javascript-commons/test/client/services/configuration-service.test.ts
+  da7af1196aaf6d9d 1-103
+qase-javascript-commons/src/client/services/configuration-service.ts
+  da7af1196aaf6d9d 1-115
+qase-javascript-commons/test/client/services/run-service.test.ts
+  da7af1196aaf6d9d 1-160
+qase-javascript-commons/src/client/clientV2.ts
+  da7af1196aaf6d9d 1-9,12-49
+qase-javascript-commons/src/client/services/result-transformer.ts
+  da7af1196aaf6d9d 1-242
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "02a303bacd3ceb063b7a7b1ab52e7b95845e406d",
+  "prompts": {
+    "da7af1196aaf6d9d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6cae8747-c4cf-4b12-8acf-934c83f547a5",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 2655,
+      "total_deletions": 1777,
+      "accepted_lines": 1919,
+      "overriden_lines": 0
+    },
+    "f9e5705c80ba613f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8fad36e2-f665-40ab-9ef4-5d3068ed4459",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 173,
+      "overriden_lines": 0
+    }
+  }
+}
