@@ -1,0 +1,42 @@
+qase-javascript-commons/src/client/services/configuration-service.ts
+  da7af1196aaf6d9d 3,15
+qase-javascript-commons/src/client/transport/api-config-builder.ts
+  da7af1196aaf6d9d 44,46,66,69,72,75,78,81,84,93,96,99,102
+qase-javascript-commons/src/client/services/attachment-service.ts
+  da7af1196aaf6d9d 170
+qase-javascript-commons/package.json
+  da7af1196aaf6d9d 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "b9c646b283580e5583f4d97f0b2b27650ded36e0",
+  "prompts": {
+    "da7af1196aaf6d9d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6cae8747-c4cf-4b12-8acf-934c83f547a5",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 17,
+      "total_deletions": 21,
+      "accepted_lines": 2519,
+      "overriden_lines": 0
+    },
+    "f9e5705c80ba613f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8fad36e2-f665-40ab-9ef4-5d3068ed4459",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 218,
+      "overriden_lines": 0
+    }
+  }
+}
