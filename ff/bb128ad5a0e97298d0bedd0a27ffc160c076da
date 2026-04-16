@@ -1,0 +1,44 @@
+docs/superpowers/plans/2026-04-15-qase-commons-refactor-plan-a.md
+  f9e5705c80ba613f 1-2359
+qase-javascript-commons/test/client/services/api-error-handler.test.ts
+  da7af1196aaf6d9d 1-97
+docs/superpowers/specs/2026-04-15-qase-commons-refactor-plan-a-design.md
+  f9e5705c80ba613f 1-396
+docs/superpowers/specs/2026-04-15-qase-commons-deferred-improvements.md
+  f9e5705c80ba613f 1-173
+qase-javascript-commons/src/client/services/api-error-handler.ts
+  da7af1196aaf6d9d 1-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "ffbb128ad5a0e97298d0bedd0a27ffc160c076da",
+  "prompts": {
+    "da7af1196aaf6d9d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6cae8747-c4cf-4b12-8acf-934c83f547a5",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 2651,
+      "total_deletions": 0,
+      "accepted_lines": 2651,
+      "overriden_lines": 0
+    },
+    "f9e5705c80ba613f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8fad36e2-f665-40ab-9ef4-5d3068ed4459",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 2979,
+      "total_deletions": 6,
+      "accepted_lines": 2973,
+      "overriden_lines": 0
+    }
+  }
+}
