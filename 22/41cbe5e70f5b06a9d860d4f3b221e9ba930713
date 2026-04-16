@@ -1,0 +1,36 @@
+docs/superpowers/specs/2026-04-15-qase-commons-deferred-improvements.md
+  f9e5705c80ba613f 1-168,170-173,176
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "2241cbe5e70f5b06a9d860d4f3b221e9ba930713",
+  "prompts": {
+    "da7af1196aaf6d9d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6cae8747-c4cf-4b12-8acf-934c83f547a5",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 2502,
+      "overriden_lines": 0
+    },
+    "f9e5705c80ba613f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8fad36e2-f665-40ab-9ef4-5d3068ed4459",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 173,
+      "overriden_lines": 4
+    }
+  }
+}
