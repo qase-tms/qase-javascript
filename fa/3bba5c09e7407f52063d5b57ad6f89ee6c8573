@@ -1,0 +1,27 @@
+examples/single/testcafe/tests/login.test.js
+  4aee363b50521cf4 40,67
+examples/single/testcafe/tests/checkout.test.js
+  4aee363b50521cf4 85
+examples/single/testcafe/tests/cart.test.js
+  4aee363b50521cf4 55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.2",
+  "base_commit_sha": "fa3bba5c09e7407f52063d5b57ad6f89ee6c8573",
+  "prompts": {
+    "4aee363b50521cf4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c396de41-e5e9-43f8-a75a-341172118cc1",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 4,
+      "total_deletions": 4,
+      "accepted_lines": 894,
+      "overriden_lines": 0
+    }
+  }
+}
