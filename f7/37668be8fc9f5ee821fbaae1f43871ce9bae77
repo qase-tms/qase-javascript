@@ -1,0 +1,49 @@
+qase-testcafe/src/options.ts
+  4aee363b50521cf4 1-7
+qase-testcafe/src/reporter.ts
+  4aee363b50521cf4 18-19,158-159,167,171-172,192-195,258-267,282,300,406-442
+qase-cypress/changelog.md
+  4aee363b50521cf4 1-6
+qase-cypress/package.json
+  4aee363b50521cf4 3
+qase-testcafe/src/factory.ts
+  4aee363b50521cf4 12-13
+qase-testcafe/README.md
+  4aee363b50521cf4 16,323-346
+qase-cypress/src/plugin.js
+  4aee363b50521cf4 21-25
+qase-cypress/src/options.ts
+  4aee363b50521cf4 6-9
+qase-cypress/src/configSchema.ts
+  4aee363b50521cf4 36-50
+qase-cypress/README.md
+  4aee363b50521cf4 18,128-131,174-178,281-304
+qase-testcafe/src/configSchema.ts
+  4aee363b50521cf4 1-42
+qase-cypress/src/hooks.ts
+  4aee363b50521cf4 60-71
+qase-testcafe/package.json
+  4aee363b50521cf4 3,52
+qase-testcafe/changelog.md
+  4aee363b50521cf4 1-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.2",
+  "base_commit_sha": "f737668be8fc9f5ee821fbaae1f43871ce9bae77",
+  "prompts": {
+    "4aee363b50521cf4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c396de41-e5e9-43f8-a75a-341172118cc1",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 1959,
+      "total_deletions": 308,
+      "accepted_lines": 1076,
+      "overriden_lines": 35
+    }
+  }
+}
