@@ -1,0 +1,42 @@
+qase-javascript-commons/test/client/services/result-transformer.test.ts
+  8bc11f0899e24759 86-92
+qase-javascript-commons/changelog.md
+  8bc11f0899e24759 1-6
+qase-javascript-commons/package.json
+  8bc11f0899e24759 3
+qase-javascript-commons/src/client/services/result-transformer.ts
+  8bc11f0899e24759 68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.2",
+  "base_commit_sha": "786192026929726e00e4e0c3993878aa6e1cd989",
+  "prompts": {
+    "4aee363b50521cf4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c396de41-e5e9-43f8-a75a-341172118cc1",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 855,
+      "total_deletions": 0,
+      "accepted_lines": 855,
+      "overriden_lines": 0
+    },
+    "8bc11f0899e24759": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "95c647fe-c380-4975-8c50-e3571da120ef",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 257,
+      "total_deletions": 2,
+      "accepted_lines": 15,
+      "overriden_lines": 0
+    }
+  }
+}
