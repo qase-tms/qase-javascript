@@ -37,7 +37,7 @@ test.meta(qase.id(1).title('User can login with valid credentials').fields({
 });
 
 test.meta(qase.id(2).title('Invalid password shows error').fields({
-  severity: 'high',
+  severity: 'major',
   priority: 'high',
   layer: 'e2e'
 }).suite('E-commerce\tAuthentication\tLogin').parameters({
@@ -64,7 +64,7 @@ test.meta(qase.id(2).title('Invalid password shows error').fields({
 });
 
 test.meta(qase.id(3).title('Locked user cannot login').fields({
-  severity: 'high',
+  severity: 'major',
   priority: 'medium',
   layer: 'e2e'
 }).suite('E-commerce\tAuthentication\tLogin').parameters({
