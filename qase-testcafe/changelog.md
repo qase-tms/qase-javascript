@@ -1,3 +1,9 @@
+# testcafe-reporter-qase@2.4.0
+
+## What's new
+
+- Added browser name as a test parameter. When enabled, the reporter automatically detects the browser from TestCafe's user agent and adds it as a parameter to each test result. Configure via `framework.testcafe.browser.addAsParameter` option.
+
 # testcafe-reporter-qase@2.3.0
 
 ## What's new

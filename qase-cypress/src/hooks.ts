@@ -57,6 +57,18 @@ async function afterSpecHook(spec: Spec, options: PluginConfigOptions) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const { ...composedOptions } = composeOptions(reporterOptions['cypressQaseReporterReporterOptions'], config);
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+    const browserConfig = composedOptions.framework?.cypress?.browser;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (browserConfig?.addAsParameter && options.browser) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+      const paramName: string = browserConfig.parameterName ?? 'browser';
+      const browserName = options.browser.name.toLowerCase();
+      for (const result of results) {
+        result.params = { ...result.params, [paramName]: browserName };
+      }
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const reporter = QaseReporter.getInstance({
       ...composedOptions,

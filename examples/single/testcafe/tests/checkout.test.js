@@ -82,7 +82,7 @@ test.meta(qase.id(10).title('Complete checkout successfully').fields({
 });
 
 test.meta(qase.id(11).title('Checkout validation error').fields({
-  severity: 'high',
+  severity: 'major',
   priority: 'high',
   layer: 'e2e'
 }).suite('E-commerce\tCheckout\tValidation').parameters({

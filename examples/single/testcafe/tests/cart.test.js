@@ -52,7 +52,7 @@ test.meta(qase.id(7).title('Add product to cart').fields({
 });
 
 test.meta(qase.id(8).title('Remove product from cart').fields({
-  severity: 'high',
+  severity: 'major',
   priority: 'high',
   layer: 'e2e'
 }).suite('E-commerce\tCart\tRemove Items').create())('Remove from cart', async t => {

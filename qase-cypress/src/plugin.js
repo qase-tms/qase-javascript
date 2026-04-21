@@ -18,6 +18,11 @@ module.exports = function (on, config) {
     // Silent — profiler config errors must not break test runs
   }
 
+  on('before:browser:launch', (browser, launchOptions) => {
+    config.browser = browser;
+    return launchOptions;
+  });
+
   on('before:run', async () => {
     await beforeRunHook(config);
   });

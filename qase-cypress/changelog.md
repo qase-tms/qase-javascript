@@ -1,3 +1,9 @@
+# cypress-qase-reporter@3.4.0
+
+## What's new
+
+- Added browser name as a test parameter. When enabled, the reporter automatically captures the browser used for the test run and adds it as a parameter to each test result. Configure via `framework.cypress.browser.addAsParameter` option.
+
 # cypress-qase-reporter@3.3.0
 
 ## What's new

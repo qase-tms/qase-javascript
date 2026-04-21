@@ -9,7 +9,8 @@ export const factory = (options: TestcafeQaseOptionsType) => {
 
   return {
     noColors: false,
-    reportTaskStart: () => {
+    reportTaskStart: (_startTime: number, userAgents: string[]) => {
+      reporter.setUserAgents(userAgents);
       reporter.startTestRun();
     },
     reportFixtureStart: () => {

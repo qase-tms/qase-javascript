@@ -15,6 +15,7 @@ Qase Cypress Reporter enables seamless integration between your Cypress tests an
 - Flexible configuration (file, environment variables, Cypress config)
 - Cucumber/Gherkin integration support
 - Automatic screenshot and video attachments
+- Browser name as a test parameter
 - Network Profiler for automatic HTTP request capture
 
 ## Installation
@@ -124,6 +125,10 @@ module.exports = defineConfig({
       cypress: {
         screenshotsFolder: 'cypress/screenshots',
         videosFolder: 'cypress/videos',
+        browser: {
+          addAsParameter: true,
+          parameterName: 'browser',
+        },
       },
     },
   },
@@ -166,7 +171,11 @@ module.exports = defineConfig({
   "framework": {
     "cypress": {
       "screenshotsFolder": "cypress/screenshots",
-      "videosFolder": "cypress/videos"
+      "videosFolder": "cypress/videos",
+      "browser": {
+        "addAsParameter": true,
+        "parameterName": "browser"
+      }
     }
   }
 }
@@ -268,6 +277,30 @@ npx cypress open
 # Run with environment variables
 QASE_MODE=testops QASE_TESTOPS_PROJECT=DEMO npx cypress run
 ```
+
+## Browser as Parameter
+
+When running tests with `--browser`, the reporter can automatically add the browser name as a test parameter. This is useful for distinguishing test results across different browsers.
+
+**Enable in `qase.config.json`:**
+
+```json
+{
+  "framework": {
+    "cypress": {
+      "browser": {
+        "addAsParameter": true,
+        "parameterName": "browser"
+      }
+    }
+  }
+}
+```
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `browser.addAsParameter` | Add browser name as a test parameter | `false` |
+| `browser.parameterName` | Name of the parameter | `browser` |
 
 ## Network Profiler
 
