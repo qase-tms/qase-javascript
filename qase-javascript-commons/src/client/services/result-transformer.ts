@@ -65,7 +65,7 @@ export class ResultTransformer {
       signature: result.signature,
     };
 
-    if (result.tags.length > 0) {
+    if (result.tags && result.tags.length > 0) {
       model.fields = {
         ...model.fields,
         tags: [...new Set(result.tags)].join(','),
