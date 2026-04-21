@@ -83,6 +83,13 @@ describe('ResultTransformer', () => {
       expect(model.testops_ids).toBeNull();
     });
 
+    it('should handle undefined tags', async () => {
+      const result = makeResult();
+      delete result.tags;
+      const model = await transformer.transform(result, mockUploader);
+      expect(model.fields.tags).toBeUndefined();
+    });
+
     it('should merge tags into fields', async () => {
       const model = await transformer.transform(
         makeResult({ tags: ['smoke', 'regression', 'smoke'] }),

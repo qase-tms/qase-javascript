@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.6.5
+
+## Bug fixes
+
+- Fixed `TypeError: Cannot read properties of undefined (reading 'length')` when publishing test results. The `ResultTransformer` now safely handles missing `tags` property on test results created as plain object literals by framework reporters (jest, cypress, playwright, cucumberjs, newman, testcafe, wdio).
+
 # qase-javascript-commons@2.6.3
 
 ## Internal refactoring
