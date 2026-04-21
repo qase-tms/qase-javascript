@@ -13,6 +13,7 @@ Qase TestCafe Reporter enables seamless integration between your TestCafe tests 
 - Support for parameterized tests
 - Multi-project reporting support
 - Flexible configuration (file, environment variables)
+- Browser name as a test parameter
 - Network Profiler for automatic HTTP request capture
 
 ## Installation
@@ -318,6 +319,30 @@ Then run:
 ```bash
 QASE_MODE=testops npx testcafe
 ```
+
+## Browser as Parameter
+
+When running tests, the reporter can automatically add the browser name as a test parameter. The browser is detected from TestCafe's user agent string (e.g., `"Chrome 97.0 / macOS 10.15"` → `"chrome"`).
+
+**Enable in `qase.config.json`:**
+
+```json
+{
+  "framework": {
+    "testcafe": {
+      "browser": {
+        "addAsParameter": true,
+        "parameterName": "browser"
+      }
+    }
+  }
+}
+```
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `browser.addAsParameter` | Add browser name as a test parameter | `false` |
+| `browser.parameterName` | Name of the parameter | `browser` |
 
 ## Network Profiler
 

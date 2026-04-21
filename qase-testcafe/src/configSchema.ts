@@ -4,7 +4,7 @@ import { FrameworkOptionsType } from 'qase-javascript-commons'
 
 import { ReporterOptionsType } from './options'
 
-export const configSchema: JSONSchemaType<FrameworkOptionsType<'cypress', ReporterOptionsType>> = {
+export const configSchema: JSONSchemaType<FrameworkOptionsType<'testcafe', ReporterOptionsType>> = {
   type: 'object',
   nullable: true,
 
@@ -14,25 +14,11 @@ export const configSchema: JSONSchemaType<FrameworkOptionsType<'cypress', Report
       nullable: true,
 
       properties: {
-        cypress: {
+        testcafe: {
           type: 'object',
           nullable: true,
 
           properties: {
-            screenshotsFolder: {
-              type: 'string',
-              nullable: true,
-            },
-            videosFolder: {
-              type: 'string',
-              nullable: true,
-            },
-            uploadDelay: {
-              type: 'number',
-              nullable: true,
-              minimum: 0,
-              maximum: 300,
-            },
             browser: {
               type: 'object',
               nullable: true,
@@ -53,4 +39,4 @@ export const configSchema: JSONSchemaType<FrameworkOptionsType<'cypress', Report
       }
     }
   }
-}
+};

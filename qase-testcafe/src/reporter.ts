@@ -15,6 +15,8 @@ import {
 } from 'qase-javascript-commons';
 import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 import { Qase } from './global';
+import { configSchema } from './configSchema';
+import { ReporterOptionsType } from './options';
 
 interface CallsiteRecordType {
   filename?: string;
@@ -153,6 +155,8 @@ export class TestcafeQaseReporter {
   private testBeginTime: number = Date.now();
   private profiler: NetworkProfiler | null = null;
   private _profilerStepSnapshot = 0;
+  private userAgents: string[] = [];
+  private browserOptions: ReporterOptionsType['browser'];
 
   /**
    * @param {TestcafeQaseOptionsType} options
@@ -160,11 +164,12 @@ export class TestcafeQaseReporter {
    */
   public constructor(
     options: TestcafeQaseOptionsType,
-    configLoader = new ConfigLoader(),
+    configLoader = new ConfigLoader(configSchema),
   ) {
     const config = configLoader.load();
 
-    const composedOptions = composeOptions(options, config);
+    const { framework, ...composedOptions } = composeOptions(options, config);
+    this.browserOptions = framework?.testcafe?.browser;
     this.reporter = QaseReporter.getInstance({
       ...composedOptions,
       frameworkPackage: 'testcafe',
@@ -182,6 +187,10 @@ export class TestcafeQaseReporter {
 
     // @ts-expect-error - global.Qase is dynamically added at runtime
     global.Qase = new Qase(this);
+  }
+
+  public setUserAgents(userAgents: string[]) {
+    this.userAgents = userAgents;
   }
 
   public addStep(step: TestStepType) {
@@ -246,6 +255,16 @@ export class TestcafeQaseReporter {
     }
 
     const projectMapping = metadata[metadataEnum.projects];
+
+    const params = { ...metadata[metadataEnum.parameters] };
+    if (this.browserOptions?.addAsParameter) {
+      const browserName = this.getBrowserName(testRunInfo);
+      if (browserName) {
+        const paramName = this.browserOptions.parameterName ?? 'browser';
+        params[paramName] = browserName;
+      }
+    }
+
     const result = {
       author: null,
       execution: {
@@ -260,7 +279,7 @@ export class TestcafeQaseReporter {
       tags: metadata[metadataEnum.tags],
       message: errorLog ? errorLog.split('\n')[0] ?? '' : '',
       muted: false,
-      params: metadata[metadataEnum.parameters],
+      params: params,
       group_params: metadata[metadataEnum.groupParameters],
       relations: {
         suite: {
@@ -278,7 +297,7 @@ export class TestcafeQaseReporter {
         },
       },
       run_id: null,
-      signature: this.getSignature(testRunInfo.fixture, title, metadata[metadataEnum.id], metadata[metadataEnum.parameters]),
+      signature: this.getSignature(testRunInfo.fixture, title, metadata[metadataEnum.id], params),
       steps: [...this.steps, ...profilerSteps],
       id: uuidv4(),
       testops_id: metadata[metadataEnum.id].length > 0 ? metadata[metadataEnum.id] : null,
@@ -383,5 +402,42 @@ export class TestcafeQaseReporter {
     suites.push(title.toLowerCase().replace(/\s/g, '_'));
 
     return generateSignature(ids, suites, parameters);
+  }
+
+  /**
+   * Extract browser name from testRunInfo or stored userAgents.
+   * TestCafe userAgent format: "Chrome 97.0.4692.71 / macOS 10.15.7"
+   */
+  private getBrowserName(testRunInfo: TestRunInfoType): string | null {
+    // Try to get userAgent from screenshots or errors (per-test browser)
+    const userAgent =
+      testRunInfo.screenshots[0]?.userAgent ??
+      testRunInfo.errs[0]?.userAgent ??
+      null;
+
+    if (userAgent) {
+      return TestcafeQaseReporter.parseBrowserName(userAgent);
+    }
+
+    // Fall back to stored userAgents (from reportTaskStart)
+    if (this.userAgents.length === 1 && this.userAgents[0]) {
+      return TestcafeQaseReporter.parseBrowserName(this.userAgents[0]);
+    }
+
+    return null;
+  }
+
+  /**
+   * Parse browser name from TestCafe userAgent string.
+   * "Chrome 97.0.4692.71 / macOS 10.15.7" → "Chrome"
+   * "Chrome_97.0.4692.71_macOS_10.15.7" → "Chrome"
+   * "Firefox 96.0 / Linux 0.0" → "Firefox"
+   */
+  private static parseBrowserName(userAgent: string): string {
+    // Take the part before " / " (OS info), then take the first word (browser name)
+    const browserPart = userAgent.split(' / ')[0] ?? userAgent;
+    // Split on space or underscore to handle both formats
+    const name = browserPart.split(/[\s_]/)[0];
+    return (name ?? browserPart).toLowerCase();
   }
 }
