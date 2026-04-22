@@ -383,7 +383,7 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
             }
 
             if (externalIssuesIds) {
-                localVarQueryParameter['external_issues[ids][]'] = externalIssuesIds.join(COLLECTION_FORMATS.csv);
+                localVarQueryParameter['external_issues[ids][]'] = externalIssuesIds;
             }
 
             if (include !== undefined) {
