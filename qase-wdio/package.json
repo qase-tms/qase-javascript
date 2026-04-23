@@ -37,6 +37,6 @@
     "csv-stringify": "^6.6.0",
     "qase-javascript-commons": "~2.6.0",
     "strip-ansi": "^7.1.2",
-    "uuid": "^9.0.1"
+    "uuid": "^14.0.0"
   }
 }

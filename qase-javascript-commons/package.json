@@ -52,7 +52,7 @@
     "qase-api-client": "~1.1.1",
     "qase-api-v2-client": "~1.0.4",
     "strip-ansi": "^6.0.1",
-    "uuid": "^9.0.1"
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
