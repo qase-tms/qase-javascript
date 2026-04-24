@@ -12,6 +12,14 @@ export function determineTestStatus(error: Error | null, originalStatus: string)
     return mapOriginalStatus(originalStatus);
   }
 
+  // When the test runner explicitly reports timeout or interruption,
+  // treat as failed regardless of error content.
+  // (e.g. Playwright's timedOut/interrupted statuses)
+  const normalizedStatus = originalStatus.toLowerCase();
+  if (normalizedStatus === 'timedout' || normalizedStatus === 'interrupted') {
+    return TestStatusEnum.failed;
+  }
+
   // Check if it's an assertion error
   if (isAssertionError(error, originalStatus)) {
     return TestStatusEnum.failed;
