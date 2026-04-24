@@ -217,6 +217,32 @@ describe('determineTestStatus', () => {
     });
   });
 
+  describe('when runner reports timedOut or interrupted status', () => {
+    it('should return failed for timedOut with timeout error (Playwright test timeout)', () => {
+      const error = new Error('Test timeout of 2000ms exceeded.');
+      const result = determineTestStatus(error, 'timedOut');
+      expect(result).toBe(TestStatusEnum.failed);
+    });
+
+    it('should return failed for timedOut with navigation timeout error', () => {
+      const error = new Error('page.waitForTimeout: Timeout 5000ms exceeded.');
+      const result = determineTestStatus(error, 'timedOut');
+      expect(result).toBe(TestStatusEnum.failed);
+    });
+
+    it('should return failed for interrupted with error', () => {
+      const error = new Error('Test was interrupted due to maxFailures limit');
+      const result = determineTestStatus(error, 'interrupted');
+      expect(result).toBe(TestStatusEnum.failed);
+    });
+
+    it('should handle case-insensitive timedOut status', () => {
+      const error = new Error('Test timeout of 2000ms exceeded.');
+      const result = determineTestStatus(error, 'TIMEDOUT');
+      expect(result).toBe(TestStatusEnum.failed);
+    });
+  });
+
   describe('when non-assertion error', () => {
     it('should return invalid for network error', () => {
       const error = new Error('Network request failed');

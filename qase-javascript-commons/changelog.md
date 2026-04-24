@@ -1,3 +1,9 @@
+# qase-javascript-commons@2.6.6
+
+## Bug fixes
+
+- Fixed Playwright timeout tests being reported as `invalid` instead of `failed`. When Playwright reports a test with `timedOut` or `interrupted` status, the `determineTestStatus` function now returns `failed` directly, bypassing the error-message heuristic that previously misclassified timeout errors as non-assertion (infrastructure) failures. Other reporters (Cypress, Jest, Mocha, TestCafe) are unaffected because they do not use these runner-specific status values.
+
 # qase-javascript-commons@2.6.5
 
 ## Bug fixes
