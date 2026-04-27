@@ -1,0 +1,27 @@
+qase-cypress/package.json
+  efd166bf1f77837a 3,54
+qase-cypress/src/reporter.ts
+  efd166bf1f77837a 24-37,181,300,337,439,501,517,525,529,539
+qase-cypress/changelog.md
+  efd166bf1f77837a 1-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "844f06a9a55c1d55811db670b928d95f4852cdff",
+  "prompts": {
+    "efd166bf1f77837a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "74bfed73-d2fb-44c6-9ae5-f589510d4a3f",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 33,
+      "total_deletions": 41,
+      "accepted_lines": 32,
+      "overriden_lines": 0
+    }
+  }
+}
