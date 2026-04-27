@@ -1,6 +1,7 @@
 /* eslint-disable */
 import { expect } from '@jest/globals';
 import { JestQaseReporter } from '../src/reporter';
+import { removeQaseIdsFromTitle } from 'qase-javascript-commons/internal';
 
 // Mocks
 const reporterMock = {
@@ -340,17 +341,17 @@ describe('JestQaseReporter', () => {
 
   describe('removeQaseIdsFromTitle', () => {
     it('should remove Qase ID from title', () => {
-      const result = (reporter as any).removeQaseIdsFromTitle('Test (Qase ID: 123)');
+      const result = removeQaseIdsFromTitle('Test (Qase ID: 123)');
       expect(result).toBe('Test');
     });
 
     it('should remove multiple Qase IDs from title', () => {
-      const result = (reporter as any).removeQaseIdsFromTitle('Test (Qase ID: 123,456)');
+      const result = removeQaseIdsFromTitle('Test (Qase ID: 123,456)');
       expect(result).toBe('Test');
     });
 
     it('should return original title if no Qase ID', () => {
-      const result = (reporter as any).removeQaseIdsFromTitle('Test without ID');
+      const result = removeQaseIdsFromTitle('Test without ID');
       expect(result).toBe('Test without ID');
     });
   });

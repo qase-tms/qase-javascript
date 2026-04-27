@@ -22,6 +22,11 @@ import {
   parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
 import { NetworkProfiler } from 'qase-javascript-commons/profilers';
+import {
+  removeQaseIdsFromTitle,
+  extractAndCleanStep,
+  normalizeSuitePart,
+} from 'qase-javascript-commons/internal';
 import { Qase } from './global';
 import { Metadata } from './models';
 
@@ -246,7 +251,7 @@ export class JestQaseReporter implements Reporter {
   private getSignature(filePath: string, fullName: string, ids: number[], parameters: Record<string, string> = {}) {
     const suites = filePath.split('/');
 
-    suites.push(fullName.toLowerCase().replace(/\s/g, '_'));
+    suites.push(normalizeSuitePart(fullName));
 
     return generateSignature(ids, suites, parameters);
   }
@@ -329,7 +334,7 @@ export class JestQaseReporter implements Reporter {
     const isTextStep = (StepType && step.step_type === StepType.TEXT) || step.step_type === undefined || step.step_type === 'text';
     if (isTextStep && step.data && 'action' in step.data) {
       const stepTextData = step.data as { action: string; expected_result: string | null; data: string | null };
-      const stepData = this.extractAndCleanStep(stepTextData.action);
+      const stepData = extractAndCleanStep(stepTextData.action);
       stepTextData.action = stepData.cleanedString;
       stepTextData.expected_result = stepData.expectedResult;
       stepTextData.data = stepData.data;
@@ -398,7 +403,7 @@ export class JestQaseReporter implements Reporter {
         : null,
       testops_project_mapping: hasProjectMapping ? parsed.projectMapping : null,
       id: uuidv4(),
-      title: parsed.cleanedTitle || this.removeQaseIdsFromTitle(value.title),
+      title: parsed.cleanedTitle || removeQaseIdsFromTitle(value.title),
     } as unknown as TestResultType;
     return result;
   }
@@ -420,55 +425,6 @@ export class JestQaseReporter implements Reporter {
       steps: [],
       attachments: [],
     };
-  }
-
-  /**
-   * @param {string} title
-   * @returns {string}
-   * @private
-   */
-  private removeQaseIdsFromTitle(title: string): string {
-    const matches = title.match(/\(Qase ID: ([0-9,]+)\)$/i);
-    if (matches) {
-      return title.replace(matches[0], '').trimEnd();
-    }
-    return title;
-  }
-
-  /**
-   * Extract expected result and data from step title and return cleaned string
-   * @param {string} input
-   * @returns {{expectedResult: string | null, data: string | null, cleanedString: string}}
-   * @private
-   */
-  private extractAndCleanStep(input: string): {
-    expectedResult: string | null;
-    data: string | null;
-    cleanedString: string
-  } {
-    let expectedResult: string | null = null;
-    let data: string | null = null;
-    let cleanedString = input;
-
-    const hasExpectedResult = input.includes('QaseExpRes:');
-    const hasData = input.includes('QaseData:');
-
-    if (hasExpectedResult || hasData) {
-      const regex = /QaseExpRes:\s*:?\s*(.*?)\s*(?=QaseData:|$)QaseData:\s*:?\s*(.*)?/;
-      const match = input.match(regex);
-
-      if (match) {
-        expectedResult = match[1]?.trim() ?? null;
-        data = match[2]?.trim() ?? null;
-
-        cleanedString = input
-          .replace(/QaseExpRes:\s*:?\s*.*?(?=QaseData:|$)/, '')
-          .replace(/QaseData:\s*:?\s*.*/, '')
-          .trim();
-      }
-    }
-
-    return { expectedResult, data, cleanedString };
   }
 
   async onRunnerEnd() {
