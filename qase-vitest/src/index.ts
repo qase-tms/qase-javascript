@@ -18,6 +18,7 @@ import {
   ConfigLoader,
 } from 'qase-javascript-commons';
 import { NetworkProfiler } from 'qase-javascript-commons/profilers';
+import { extractAndCleanStep } from 'qase-javascript-commons/internal';
 
 export type VitestQaseOptionsType = ConfigType;
 
@@ -175,7 +176,7 @@ export class VitestQaseReporter implements Reporter {
         testResult.steps = metadata.steps.map(step => {
           const stepObj = new TestStepType();
           stepObj.id = Math.random().toString(36).substr(2, 9);
-          const stepData = this.extractAndCleanStep(step.name);
+          const stepData = extractAndCleanStep(step.name);
           stepObj.data = {
             action: stepData.cleanedString,
             expected_result: stepData.expectedResult,
@@ -444,37 +445,6 @@ export class VitestQaseReporter implements Reporter {
     // The test will be assigned to the default suite
     return undefined;
   }
-
-  private extractAndCleanStep(input: string): {
-    expectedResult: string | null;
-    data: string | null;
-    cleanedString: string
-  } {
-    let expectedResult: string | null = null;
-    let data: string | null = null;
-    let cleanedString = input;
-
-    const hasExpectedResult = input.includes('QaseExpRes:');
-    const hasData = input.includes('QaseData:');
-
-    if (hasExpectedResult || hasData) {
-      const regex = /QaseExpRes:\s*:?\s*(.*?)\s*(?=QaseData:|$)QaseData:\s*:?\s*(.*)?/;
-      const match = input.match(regex);
-
-      if (match) {
-        expectedResult = match[1]?.trim() ?? null;
-        data = match[2]?.trim() ?? null;
-
-        cleanedString = input
-          .replace(/QaseExpRes:\s*:?\s*.*?(?=QaseData:|$)/, '')
-          .replace(/QaseData:\s*:?\s*.*/, '')
-          .trim();
-      }
-    }
-
-    return { expectedResult, data, cleanedString };
-  }
-
 
 }
 
