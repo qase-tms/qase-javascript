@@ -1,3 +1,10 @@
+# mocha-qase-reporter@1.4.0
+
+## Changed
+
+- Bumped `qase-javascript-commons` to `~2.7.0`.
+- Internal: replaced local copies of `removeQaseIdsFromTitle`, `extractAndCleanStep`, `getFile`, and the suite-part normalizer with imports from `qase-javascript-commons/internal`. Removed the deprecated static `qaseIdRegExp`. Note: `removeQaseIdsFromTitle` is now case-insensitive, requires the id segment at the end of the title, and accepts `(Qase ID 1)` without colon.
+
 # mocha-qase-reporter@1.3.0
 
 ## What's new

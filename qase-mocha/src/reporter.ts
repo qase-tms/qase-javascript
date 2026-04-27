@@ -15,6 +15,13 @@ import {
   determineTestStatus,
   parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
+import {
+  removeQaseIdsFromTitle,
+  extractAndCleanStep,
+  getFile as getFileFromNode,
+  FileSuiteNode,
+  normalizeSuitePart,
+} from 'qase-javascript-commons/internal';
 import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 import deasyncPromise from 'deasync-promise';
 import { extname, join } from 'node:path';
@@ -39,6 +46,14 @@ class currentTest {
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-return,@typescript-eslint/restrict-template-expressions
 const resolveParallelModeSetupFile = () => join(__dirname, `parallel${extname(__filename)}`);
+
+/**
+ * Adapter around the shared `getFile` helper to bridge the Mocha `Suite`
+ * type (whose `parent` is `Suite | undefined`) with `FileSuiteNode`
+ * (whose `parent` is optional under `exactOptionalPropertyTypes`).
+ */
+const getFile = (suite: Suite): string | undefined =>
+  getFileFromNode(suite as unknown as FileSuiteNode);
 
 export class MochaQaseReporter extends reporters.Base {
 
@@ -287,7 +302,7 @@ export class MochaQaseReporter extends reporters.Base {
       },
       testops_id: hasProjectMapping ? null : (ids.length > 0 ? ids : null),
       testops_project_mapping: hasProjectMapping ? fromTitle.projectMapping : null,
-      title: this.metadata.title && this.metadata.title != '' ? this.metadata.title : (fromTitle.cleanedTitle || this.removeQaseIdsFromTitle(test.title)),
+      title: this.metadata.title && this.metadata.title != '' ? this.metadata.title : (fromTitle.cleanedTitle || removeQaseIdsFromTitle(test.title)),
     } as TestResultType;
 
     void this.reporter.addTestResult(result);
@@ -303,7 +318,7 @@ export class MochaQaseReporter extends reporters.Base {
    */
   private getSignature(test: Mocha.Test, ids: number[], params: Record<string, string>) {
     const suites = [];
-    const file = test.parent ? this.getFile(test.parent) : undefined;
+    const file = test.parent ? getFile(test.parent) : undefined;
 
     if (file) {
       const executionPath = process.cwd() + '/';
@@ -313,29 +328,13 @@ export class MochaQaseReporter extends reporters.Base {
 
     if (test.parent) {
       for (const suite of test.parent.titlePath()) {
-        suites.push(suite.toLowerCase().replace(/\s/g, '_'));
+        suites.push(normalizeSuitePart(suite));
       }
     }
 
-    suites.push(test.title.toLowerCase().replace(/\s/g, '_'));
+    suites.push(normalizeSuitePart(test.title));
 
     return generateSignature(ids, suites, params);
-  }
-
-  /**
-   * @param {Suite} suite
-   * @private
-   */
-  private getFile(suite: Suite): string | undefined {
-    if (suite.file) {
-      return suite.file;
-    }
-
-    if (suite.parent) {
-      return this.getFile(suite.parent);
-    }
-
-    return undefined;
   }
 
   /**
@@ -430,7 +429,7 @@ export class MochaQaseReporter extends reporters.Base {
       ? `${title} QaseExpRes:${expectedResult ? `: ${expectedResult}` : ''} QaseData:${data ? `: ${data}` : ''}` 
       : title;
 
-    const stepData = this.extractAndCleanStep(stepTitle);
+    const stepData = extractAndCleanStep(stepTitle);
 
     const step: TestStepType = {
       step_type: StepType.TEXT,
@@ -463,59 +462,4 @@ export class MochaQaseReporter extends reporters.Base {
     this.currentTest.steps.push(step);
     this.currentType = previousType;
   };
-
-  /**
-   * @param {string} title
-   * @returns {string}
-   * @private
-   */
-  private removeQaseIdsFromTitle(title: string): string {
-    const matches = title.match(MochaQaseReporter.qaseIdRegExp);
-    if (matches) {
-      return title.replace(matches[0], '').trimEnd();
-    }
-    return title;
-  }
-
-  /**
-   * @type {RegExp}
-   */
-  /** @deprecated Use parseProjectMappingFromTitle from qase-javascript-commons for multi-project support. */
-  static qaseIdRegExp = /\(Qase ID: ([\d,]+)\)/;
-
-  /**
-   * Extract expected result and data from step title and return cleaned string
-   * @param {string} input
-   * @returns {{expectedResult: string | null, data: string | null, cleanedString: string}}
-   * @private
-   */
-  private extractAndCleanStep(input: string): {
-    expectedResult: string | null;
-    data: string | null;
-    cleanedString: string
-  } {
-    let expectedResult: string | null = null;
-    let data: string | null = null;
-    let cleanedString = input;
-
-    const hasExpectedResult = input.includes('QaseExpRes:');
-    const hasData = input.includes('QaseData:');
-
-    if (hasExpectedResult || hasData) {
-      const regex = /QaseExpRes:\s*:?\s*(.*?)\s*(?=QaseData:|$)QaseData:\s*:?\s*(.*)?/;
-      const match = input.match(regex);
-
-      if (match) {
-        expectedResult = match[1]?.trim() ?? null;
-        data = match[2]?.trim() ?? null;
-
-        cleanedString = input
-          .replace(/QaseExpRes:\s*:?\s*.*?(?=QaseData:|$)/, '')
-          .replace(/QaseData:\s*:?\s*.*/, '')
-          .trim();
-      }
-    }
-
-    return { expectedResult, data, cleanedString };
-  }
 }
