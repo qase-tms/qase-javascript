@@ -1,3 +1,10 @@
+# jest-qase-reporter@2.4.0
+
+## Changed
+
+- Bumped `qase-javascript-commons` to `~2.7.0`.
+- Internal: replaced local copies of `removeQaseIdsFromTitle`, `extractAndCleanStep`, and the suite-part normalizer with imports from `qase-javascript-commons/internal`. Note: `removeQaseIdsFromTitle` is now case-insensitive and also accepts `(Qase ID 1)` without colon (previously rejected).
+
 # jest-qase-reporter@2.3.0
 
 ## What's new
