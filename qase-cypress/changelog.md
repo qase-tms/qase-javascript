@@ -1,3 +1,10 @@
+# cypress-qase-reporter@3.5.0
+
+## Changed
+
+- Bumped `qase-javascript-commons` to `~2.7.0`.
+- Internal: replaced local copies of `removeQaseIdsFromTitle`, `getFile`, and the suite-part normalizer with imports from `qase-javascript-commons/internal`.
+
 # cypress-qase-reporter@3.4.0
 
 ## What's new

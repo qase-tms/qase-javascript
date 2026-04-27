@@ -21,6 +21,20 @@ import {
   parseProjectMappingFromTitle,
   parseProjectMappingFromTags,
 } from 'qase-javascript-commons';
+import {
+  removeQaseIdsFromTitle,
+  getFile as getFileFromNode,
+  normalizeSuitePart,
+  FileSuiteNode,
+} from 'qase-javascript-commons/internal';
+
+/**
+ * Adapter around the shared `getFile` helper to bridge the Mocha `Suite`
+ * type (whose `parent` is `Suite | undefined`) with `FileSuiteNode`
+ * (whose `parent` is optional under `exactOptionalPropertyTypes`).
+ */
+const getFile = (suite: Suite): string | undefined =>
+  getFileFromNode(suite as unknown as FileSuiteNode);
 
 import { configSchema } from './configSchema';
 import { ReporterOptionsType } from './options';
@@ -164,7 +178,7 @@ export class CypressQaseReporter extends reporters.Base {
    * @private
    */
   private getTestIdentifier(test: Test): string {
-    const file = test.parent ? this.getFile(test.parent) ?? '' : '';
+    const file = test.parent ? getFile(test.parent) ?? '' : '';
     const suitePath = test.parent ? test.parent.titlePath().join(' > ') : '';
     let testTitle = test.fullTitle();
     // Remove "before each" hook prefix and quotes if present (can be anywhere in the string)
@@ -283,7 +297,7 @@ export class CypressQaseReporter extends reporters.Base {
     // For skipped tests, we don't have metadata since the test never ran
     // But we can still check for cucumber tags if the test has a parent with a file
     if (test.parent) {
-      const file = this.getFile(test.parent);
+      const file = getFile(test.parent);
       if (file) {
         const tags = extractTags(file, test.title);
         const fromTags = parseProjectMappingFromTags(tags);
@@ -320,7 +334,7 @@ export class CypressQaseReporter extends reporters.Base {
         ? (legacyIds.length === 1 ? legacyIds[0]! : legacyIds)
         : null,
       testops_project_mapping: hasProjectMapping ? projectMapping : null,
-      title: fromTitle.cleanedTitle || this.removeQaseIdsFromTitle(test.title),
+      title: fromTitle.cleanedTitle || removeQaseIdsFromTitle(test.title),
       preparedAttachments: [],
     } as unknown as TestResultType;
 
@@ -422,7 +436,7 @@ export class CypressQaseReporter extends reporters.Base {
       steps.push(...this.convertCypressMessages(metadata.cucumberSteps, test.state ?? 'failed'));
 
       if (test.parent) {
-        const file = this.getFile(test.parent);
+        const file = getFile(test.parent);
 
         if (file) {
           const tags = extractTags(file, test.title);
@@ -484,7 +498,7 @@ export class CypressQaseReporter extends reporters.Base {
         ? (legacyIds.length === 1 ? legacyIds[0]! : legacyIds)
         : null,
       testops_project_mapping: hasProjectMapping ? projectMapping : null,
-      title: metadata?.title ?? (fromTitle.cleanedTitle || this.removeQaseIdsFromTitle(test.title)),
+      title: metadata?.title ?? (fromTitle.cleanedTitle || removeQaseIdsFromTitle(test.title)),
       preparedAttachments: [],
     } as unknown as TestResultType;
 
@@ -500,7 +514,7 @@ export class CypressQaseReporter extends reporters.Base {
    */
   private getSignature(test: Test, ids: number[], params: Record<string, string>) {
     const suites = [];
-    const file = test.parent ? this.getFile(test.parent) : undefined;
+    const file = test.parent ? getFile(test.parent) : undefined;
 
     if (file) {
       suites.push(file.split(path.sep).join('::'));
@@ -508,11 +522,11 @@ export class CypressQaseReporter extends reporters.Base {
 
     if (test.parent) {
       for (const suite of test.parent.titlePath()) {
-        suites.push(suite.toLowerCase().replace(/\s/g, '_'));
+        suites.push(normalizeSuitePart(suite));
       }
     }
 
-    suites.push(test.title.toLowerCase().replace(/\s/g, '_'));
+    suites.push(normalizeSuitePart(test.title));
 
     return generateSignature(ids, suites, params);
   }
@@ -522,7 +536,7 @@ export class CypressQaseReporter extends reporters.Base {
       return '';
     }
 
-    const file = this.getFile(test.parent);
+    const file = getFile(test.parent);
     if (!file) {
       return '';
     }
@@ -531,35 +545,6 @@ export class CypressQaseReporter extends reporters.Base {
     const fileName = pathParts[pathParts.length - 1];
 
     return fileName ? fileName : '';
-  }
-
-  /**
-   * @param {Suite} suite
-   * @private
-   */
-  private getFile(suite: Suite): string | undefined {
-    if (suite.file) {
-      return suite.file;
-    }
-
-    if (suite.parent) {
-      return this.getFile(suite.parent);
-    }
-
-    return undefined;
-  }
-
-  /**
-   * @param {string} title
-   * @returns {string}
-   * @private
-   */
-  private removeQaseIdsFromTitle(title: string): string {
-    const matches = title.match(/\(Qase ID: ([0-9,]+)\)$/i);
-    if (matches) {
-      return title.replace(matches[0], '').trimEnd();
-    }
-    return title;
   }
 
   private convertCypressMessages(messages: StepStart[], testStatus: string): TestStepType[] {
