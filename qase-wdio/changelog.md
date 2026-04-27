@@ -1,3 +1,11 @@
+# wdio-qase-reporter@1.4.0
+
+## Changed
+
+- Bumped `qase-javascript-commons` to `~2.7.0`.
+- Internal: replaced the local copy of `removeQaseIdsFromTitle` with the import from `qase-javascript-commons/internal`. Note: `removeQaseIdsFromTitle` is now case-insensitive, requires the id segment at the end of the title (anchored), and accepts `(Qase ID 1)` without colon.
+- Internal: `@qaseid` tag handling now delegates id-string parsing to `parseQaseIdsFromString` (tolerates whitespace; non-numeric entries are skipped).
+
 # wdio-qase-reporter@1.3.0
 
 ## What's new

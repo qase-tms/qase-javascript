@@ -25,6 +25,10 @@ import {
   parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
 import { NetworkProfiler } from 'qase-javascript-commons/profilers';
+import {
+  removeQaseIdsFromTitle,
+  parseQaseIdsFromString,
+} from 'qase-javascript-commons/internal';
 
 import { v4 as uuidv4 } from 'uuid';
 import { Storage } from './storage';
@@ -43,11 +47,6 @@ import path from 'path';
 import { events } from './events';
 
 export default class WDIOQaseReporter extends WDIOReporter {
-    /**
-   * @type {RegExp}
-   */
-    static qaseIdRegExp = /\(Qase ID:? ([\d,]+)\)/;
-
   /**
    * @type {Record<string, TestStatusEnum>}
    */
@@ -169,7 +168,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
 
         switch (tagData.key.toLowerCase()) {
           case '@qaseid':
-            this.addQaseId({ ids: tagData.value.split(',').map((id) => parseInt(id)) });
+            this.addQaseId({ ids: parseQaseIdsFromString(tagData.value) });
             break;
           case '@title':
             this.addTitle({ title: tagData.value });
@@ -386,7 +385,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
     } else if (parsed.legacyIds.length > 0) {
       testResult.testops_id = parsed.legacyIds.length === 1 ? parsed.legacyIds[0]! : parsed.legacyIds;
     }
-    testResult.title = parsed.cleanedTitle || this.removeQaseIdsFromTitle(testResult.title);
+    testResult.title = parsed.cleanedTitle || removeQaseIdsFromTitle(testResult.title);
 
     // Merge profiler steps from direct fallback accumulator (same-process mode only)
     if (this.profiler) {
@@ -703,17 +702,4 @@ export default class WDIOQaseReporter extends WDIOReporter {
 
     return { key, value };
   }
-
-    /**
-   * @param {string} title
-   * @returns {string}
-   * @private
-   */
-    private removeQaseIdsFromTitle(title: string): string {
-      const matches = title.match(WDIOQaseReporter.qaseIdRegExp);
-      if (matches) {
-        return title.replace(matches[0], '').trimEnd();
-      }
-      return title;
-    }
 }
