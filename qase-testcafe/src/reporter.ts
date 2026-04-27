@@ -14,6 +14,7 @@ import {
   TestResultType,
 } from 'qase-javascript-commons';
 import { NetworkProfiler } from 'qase-javascript-commons/profilers';
+import { normalizeSuitePart } from 'qase-javascript-commons/internal';
 import { Qase } from './global';
 import { configSchema } from './configSchema';
 import { ReporterOptionsType } from './options';
@@ -398,8 +399,8 @@ export class TestcafeQaseReporter {
       suites.push(...path.split('/'));
     }
 
-    suites.push(fixture.name.toLowerCase().replace(/\s/g, '_'));
-    suites.push(title.toLowerCase().replace(/\s/g, '_'));
+    suites.push(normalizeSuitePart(fixture.name));
+    suites.push(normalizeSuitePart(title));
 
     return generateSignature(ids, suites, parameters);
   }
