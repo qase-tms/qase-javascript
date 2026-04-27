@@ -2,6 +2,7 @@
 import { expect } from '@jest/globals';
 import { PlaywrightQaseReporter } from '../src/reporter';
 import { ReporterContentType } from '../src/playwright';
+import { removeQaseIdsFromTitle, extractAndCleanStep } from 'qase-javascript-commons/internal';
 
 // Mocks for Playwright types
 const testCaseMock = {
@@ -259,8 +260,7 @@ describe('PlaywrightQaseReporter', () => {
   describe('extractAndCleanStep', () => {
     it('should extract expected result and data from step title', () => {
       const input = 'Click button QaseExpRes:: Button should be clicked QaseData:: Button data';
-      // @ts-ignore
-      const result = reporter['extractAndCleanStep'](input);
+      const result = extractAndCleanStep(input);
       expect(result.expectedResult).toBe('Button should be clicked');
       expect(result.data).toBe('Button data');
       expect(result.cleanedString).toBe('Click button');
@@ -268,8 +268,7 @@ describe('PlaywrightQaseReporter', () => {
 
     it('should handle step with only expected result', () => {
       const input = 'Click button QaseExpRes:: Button should be clicked QaseData:';
-      // @ts-ignore
-      const result = reporter['extractAndCleanStep'](input);
+      const result = extractAndCleanStep(input);
       expect(result.expectedResult).toBe('Button should be clicked');
       expect(result.data).toBe(null);
       expect(result.cleanedString).toBe('Click button');
@@ -277,8 +276,7 @@ describe('PlaywrightQaseReporter', () => {
 
     it('should handle step with only data', () => {
       const input = 'Click button QaseExpRes: QaseData:: Button data';
-      // @ts-ignore
-      const result = reporter['extractAndCleanStep'](input);
+      const result = extractAndCleanStep(input);
       expect(result.expectedResult).toBe('');
       expect(result.data).toBe('Button data');
       expect(result.cleanedString).toBe('Click button');
@@ -286,8 +284,7 @@ describe('PlaywrightQaseReporter', () => {
 
     it('should return original string if no QaseExpRes or QaseData', () => {
       const input = 'Click button';
-      // @ts-ignore
-      const result = reporter['extractAndCleanStep'](input);
+      const result = extractAndCleanStep(input);
       expect(result.expectedResult).toBe(null);
       expect(result.data).toBe(null);
       expect(result.cleanedString).toBe('Click button');
@@ -296,18 +293,15 @@ describe('PlaywrightQaseReporter', () => {
 
   describe('removeQaseIdsFromTitle', () => {
     it('should remove Qase ID from title', () => {
-      // @ts-ignore
-      const result = reporter['removeQaseIdsFromTitle']('Test (Qase ID: 123)');
+      const result = removeQaseIdsFromTitle('Test (Qase ID: 123)');
       expect(result).toBe('Test');
     });
     it('should remove multiple Qase IDs from title', () => {
-      // @ts-ignore
-      const result = reporter['removeQaseIdsFromTitle']('Test (Qase ID: 123,456)');
+      const result = removeQaseIdsFromTitle('Test (Qase ID: 123,456)');
       expect(result).toBe('Test');
     });
     it('should return original title if no Qase ID', () => {
-      // @ts-ignore
-      const result = reporter['removeQaseIdsFromTitle']('Test without ID');
+      const result = removeQaseIdsFromTitle('Test without ID');
       expect(result).toBe('Test without ID');
     });
   });
