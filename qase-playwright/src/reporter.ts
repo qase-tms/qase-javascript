@@ -19,6 +19,11 @@ import {
   determineTestStatus,
   parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
+import {
+  removeQaseIdsFromTitle,
+  extractAndCleanStep,
+  parseQaseIdsFromString,
+} from 'qase-javascript-commons/internal';
 import { MetadataMessage, ReporterContentType } from './playwright';
 // Duplicated from fixture.ts to avoid importing @playwright/test in reporter context
 const PROFILER_CONTENT_TYPE = 'application/qase.profiler-steps+json';
@@ -283,7 +288,7 @@ export class PlaywrightQaseReporter implements Reporter {
 
       const attachments = this.stepAttachments.get(testStep);
 
-      const stepData = this.extractAndCleanStep(testStep.title);
+      const stepData = extractAndCleanStep(testStep.title);
 
       const id = uuidv4();
       const step: TestStepType = {
@@ -408,7 +413,7 @@ export class PlaywrightQaseReporter implements Reporter {
     }
 
     const titleParsed = parseProjectMappingFromTitle(test.title);
-    const testTitle = titleParsed.cleanedTitle || this.removeQaseIdsFromTitle(test.title);
+    const testTitle = titleParsed.cleanedTitle || removeQaseIdsFromTitle(test.title);
 
     const annotationProjectMapping = this.extractProjectMappingFromAnnotation(test.annotations);
     const ids = this.extractQaseIdsFromAnnotation(test.annotations);
@@ -556,19 +561,6 @@ export class PlaywrightQaseReporter implements Reporter {
   }
 
   /**
-   * @param {string} title
-   * @returns {string}
-   * @private
-   */
-  private removeQaseIdsFromTitle(title: string): string {
-    const matches = title.match(/\(Qase ID: ([0-9,]+)\)$/i);
-    if (matches) {
-      return title.replace(matches[0], '').trimEnd();
-    }
-    return title;
-  }
-
-  /**
    * @param annotation
    * @returns {number[]}
    * @private
@@ -577,15 +569,9 @@ export class PlaywrightQaseReporter implements Reporter {
     const ids: number[] = [];
     for (const item of annotation) {
       if (item.type.toLowerCase() === 'qaseid' && item.description) {
-        if (item.description.includes(',')) {
-          ids.push(...item.description.split(',').map((id) => parseInt(id)));
-          continue;
-        }
-
-        ids.push(parseInt(item.description));
+        ids.push(...parseQaseIdsFromString(item.description));
       }
     }
-
     return ids;
   }
 
@@ -642,36 +628,6 @@ export class PlaywrightQaseReporter implements Reporter {
     }
 
     return true;
-  }
-
-  private extractAndCleanStep(input: string): {
-    expectedResult: string | null;
-    data: string | null;
-    cleanedString: string
-  } {
-    let expectedResult: string | null = null;
-    let data: string | null = null;
-    let cleanedString = input;
-
-    const hasExpectedResult = input.includes('QaseExpRes:');
-    const hasData = input.includes('QaseData:');
-
-    if (hasExpectedResult || hasData) {
-      const regex = /QaseExpRes:\s*:?\s*(.*?)\s*(?=QaseData:|$)QaseData:\s*:?\s*(.*)?/;
-      const match = input.match(regex);
-
-      if (match) {
-        expectedResult = match[1]?.trim() ?? null;
-        data = match[2]?.trim() ?? null;
-
-        cleanedString = input
-          .replace(/QaseExpRes:\s*:?\s*.*?(?=QaseData:|$)/, '')
-          .replace(/QaseData:\s*:?\s*.*/, '')
-          .trim();
-      }
-    }
-
-    return { expectedResult, data, cleanedString };
   }
 
 }

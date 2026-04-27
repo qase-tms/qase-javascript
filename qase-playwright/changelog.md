@@ -1,3 +1,10 @@
+# playwright-qase-reporter@2.4.0
+
+## Changed
+
+- Bumped `qase-javascript-commons` to `~2.7.0`.
+- Internal: replaced local copies of `removeQaseIdsFromTitle` and `extractAndCleanStep` with imports from `qase-javascript-commons/internal`. `extractQaseIdsFromAnnotation` now delegates id-string parsing to `parseQaseIdsFromString` (also tolerates whitespace and skips non-numeric entries).
+
 # playwright-qase-reporter@2.3.0
 
 ## What's new
