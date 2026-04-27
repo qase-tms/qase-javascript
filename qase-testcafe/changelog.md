@@ -1,3 +1,10 @@
+# testcafe-reporter-qase@2.5.0
+
+## Changed
+
+- Bumped `qase-javascript-commons` to `~2.7.0`.
+- Internal: replaced inline suite-part normalization with `normalizeSuitePart` from `qase-javascript-commons/internal`.
+
 # testcafe-reporter-qase@2.4.0
 
 ## What's new
