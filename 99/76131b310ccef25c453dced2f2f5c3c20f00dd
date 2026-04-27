@@ -1,0 +1,27 @@
+qase-wdio/src/reporter.ts
+  efd166bf1f77837a 28-31,171,388
+qase-wdio/package.json
+  efd166bf1f77837a 3,38
+qase-wdio/changelog.md
+  efd166bf1f77837a 1-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "9976131b310ccef25c453dced2f2f5c3c20f00dd",
+  "prompts": {
+    "efd166bf1f77837a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "74bfed73-d2fb-44c6-9ae5-f589510d4a3f",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 16,
+      "total_deletions": 22,
+      "accepted_lines": 16,
+      "overriden_lines": 0
+    }
+  }
+}
