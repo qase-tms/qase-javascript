@@ -1,3 +1,11 @@
+## 2.7.0
+
+### Added
+- New internal subpath `qase-javascript-commons/internal` exposing helpers for use by Qase reporters in this monorepo: `removeQaseIdsFromTitle`, `extractAndCleanStep`, `getFile`, `parseQaseIdsFromString`, `normalizeSuitePart`. The `/internal` subpath is intended for Qase-owned reporter packages and may change without a major version bump.
+
+### Changed
+- `removeQaseIdsFromTitle` regex unified across reporters to `/\(Qase ID:? ([\d,]+)\)$/i`. This is more permissive than the previous mocha/wdio variants (case-insensitive; also accepts `(Qase ID 1)` without colon) and adds a trailing-position anchor (`$`).
+
 # qase-javascript-commons@2.6.6
 
 ## Bug fixes
