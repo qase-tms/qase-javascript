@@ -1,3 +1,10 @@
+# vitest-qase-reporter@1.3.0
+
+## Changed
+
+- Bumped `qase-javascript-commons` to `~2.7.0`.
+- Internal: replaced the local copy of `extractAndCleanStep` with the import from `qase-javascript-commons/internal`.
+
 # vitest-qase-reporter@1.2.0
 
 ## What's new
