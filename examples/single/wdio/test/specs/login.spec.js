@@ -32,7 +32,7 @@ describe('Login Scenarios', () => {
   });
 
   it(qase(2, 'User cannot login with invalid password'), async () => {
-    qase.fields({ severity: 'high', priority: 'high', layer: 'e2e' });
+    qase.fields({ severity: 'major', priority: 'high', layer: 'e2e' });
     qase.suite('E-commerce\tAuthentication\tLogin');
     qase.parameters({ username: 'standard_user', password: 'wrong_password' });
 
@@ -53,7 +53,7 @@ describe('Login Scenarios', () => {
   });
 
   it(qase(3, 'Locked user cannot login'), async () => {
-    qase.fields({ severity: 'high', priority: 'medium', layer: 'e2e' });
+    qase.fields({ severity: 'major', priority: 'medium', layer: 'e2e' });
     qase.suite('E-commerce\tAuthentication\tLogin');
     qase.parameters({ username: 'locked_out_user' });
 

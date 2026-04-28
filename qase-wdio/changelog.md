@@ -1,3 +1,14 @@
+# wdio-qase-reporter@1.5.0
+
+## Changed
+
+- Internal: decomposed `WDIOQaseReporter` into focused modules — `TestLifecycle`, `MetadataApplier`, `CucumberTagAdapter`, `IpcBridge`, `CommandTracker`, `ResultFinalizer`. The reporter class now acts as a composition root with thin facades. Public contract unchanged: the default-exported `WDIOQaseReporter` class, all `WDIOReporter` lifecycle overrides, and the 11 instance methods used for `process.on` IPC bindings continue to work identically.
+- Added 50+ new unit tests covering each extracted module.
+
+## Fixed
+
+- After WebDriver commands, `Response` payloads are now correctly attached to the surrounding step and the step's `end_time` is now set. Previously `TestStepType` instances were created as object literals (cast to type), which caused `Storage.getCurrentStep()` (an `instanceof` check) to never find the step — so the `onAfterCommand` guard `!getCurrentStep()` silently early-returned and skipped both the `Response` attachment and `endStep` calls. The decomposition surfaced this latent bug; `TestLifecycle` now constructs steps via `new TestStepType(...)`, restoring the intended behavior.
+
 # wdio-qase-reporter@1.4.0
 
 ## Changed

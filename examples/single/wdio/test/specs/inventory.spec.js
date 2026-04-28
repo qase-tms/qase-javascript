@@ -50,7 +50,7 @@ describe('Product Inventory', () => {
   });
 
   it(qase(5, 'User can sort products by price'), async () => {
-    qase.fields({ severity: 'medium', priority: 'medium', layer: 'e2e' });
+    qase.fields({ severity: 'normal', priority: 'medium', layer: 'e2e' });
     qase.suite('E-commerce\tProduct Catalog\tSorting');
     qase.parameters({ sortOption: 'lohi' });
 
@@ -72,7 +72,7 @@ describe('Product Inventory', () => {
   });
 
   it(qase([6, 7], 'User can view product details'), async () => {
-    qase.fields({ severity: 'medium', priority: 'medium', layer: 'e2e' });
+    qase.fields({ severity: 'normal', priority: 'medium', layer: 'e2e' });
     qase.suite('E-commerce\tProduct Catalog\tDetails');
 
     let productName;

@@ -7,33 +7,24 @@ import WDIOReporter, {
   Tag,
 } from '@wdio/reporter';
 import {
-  Attachment,
   composeOptions,
   CompoundError,
   ConfigLoader,
-  generateSignature,
-  getMimeTypes,
   QaseReporter,
-  Relation,
   ReporterInterface,
-  StepStatusEnum,
-  StepType,
-  TestResultType,
   TestStatusEnum,
   TestStepType,
-  determineTestStatus,
-  parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
 import { NetworkProfiler } from 'qase-javascript-commons/profilers';
-import {
-  removeQaseIdsFromTitle,
-  parseQaseIdsFromString,
-} from 'qase-javascript-commons/internal';
 
-import { v4 as uuidv4 } from 'uuid';
 import { Storage } from './storage';
+import { TestLifecycle } from './lifecycle';
+import { MetadataApplier } from './metadata';
+import { CucumberTagAdapter } from './cucumber-tags';
+import { IpcBridge } from './ipc';
+import { CommandTracker } from './command-tracker';
+import { ResultFinalizer } from './finalizer';
 import { QaseReporterOptions } from './options';
-import { isEmpty, isScreenshotCommand } from './utils';
 import {
   AddAttachmentEventArgs,
   AddCommentEventArgs,
@@ -43,8 +34,6 @@ import {
   AddTagsEventArgs,
   AddTitleEventArgs,
 } from './models';
-import path from 'path';
-import { events } from './events';
 
 export default class WDIOQaseReporter extends WDIOReporter {
   /**
@@ -65,6 +54,18 @@ export default class WDIOQaseReporter extends WDIOReporter {
 
   private storage: Storage;
 
+  private lifecycle: TestLifecycle;
+
+  private metadata: MetadataApplier;
+
+  private cucumberTags: CucumberTagAdapter;
+
+  private ipc: IpcBridge;
+
+  private commandTracker: CommandTracker;
+
+  private finalizer: ResultFinalizer;
+
   /**
    * @type {boolean}
    * @private
@@ -72,25 +73,12 @@ export default class WDIOQaseReporter extends WDIOReporter {
   private isSync: boolean;
 
   private _options: QaseReporterOptions;
-  private _isMultiremote?: boolean;
 
   /**
    * @type {NetworkProfiler | null}
    * @private
    */
   private profiler: NetworkProfiler | null = null;
-
-  /**
-   * Snapshot of fallback accumulator length for per-test delta (same-process mode).
-   * @private
-   */
-  private _profilerStepSnapshot = 0;
-
-  /**
-   * Steps received from QaseWdioService via process.emit IPC.
-   * @private
-   */
-  private _pendingProfilerSteps: TestStepType[] = [];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(options: any) {
@@ -123,8 +111,14 @@ export default class WDIOQaseReporter extends WDIOReporter {
 
     this.isSync = true;
     this.storage = new Storage();
+    this.lifecycle = new TestLifecycle(this.storage);
+    this.metadata = new MetadataApplier(this.storage);
+    this.cucumberTags = new CucumberTagAdapter(this.metadata);
+    this.ipc = new IpcBridge(this.metadata);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this._options = Object.assign(new QaseReporterOptions(), options);
+    this.commandTracker = new CommandTracker(this.lifecycle, this.storage, this._options, this.profiler);
+    this.finalizer = new ResultFinalizer(this.storage, this.reporter, this.commandTracker, this.ipc);
 
     this.registerListeners();
   }
@@ -138,7 +132,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
   }
 
   override onRunnerStart(runner: RunnerStats) {
-    this._isMultiremote = runner.isMultiremote;
+    this.commandTracker.setMultiremote(runner.isMultiremote);
     this.isSync = false;
   }
 
@@ -147,41 +141,9 @@ export default class WDIOQaseReporter extends WDIOReporter {
 
     if (this._options.useCucumber && suite.type === 'scenario') {
       this._startTest(suite.title, suite.cid ?? '');
-
-      if (suite.tags === undefined) {
-        return;
+      if (suite.tags) {
+        this.cucumberTags.applyTags(suite.tags as Tag[]);
       }
-
-      const tags = (suite.tags as Tag[]).map((tag) => {
-        return tag.name;
-      });
-
-      for (const tag of tags) {
-        if (!tag.includes('=')) {
-          continue;
-        }
-
-        const tagData = this.parseTag(tag);
-        if (tagData === null) {
-          continue;
-        }
-
-        switch (tagData.key.toLowerCase()) {
-          case '@qaseid':
-            this.addQaseId({ ids: parseQaseIdsFromString(tagData.value) });
-            break;
-          case '@title':
-            this.addTitle({ title: tagData.value });
-            break;
-          case '@suite':
-            this.addSuite({ suite: tagData.value });
-            break;
-          case '@tags':
-            this.addTags({ tags: tagData.value.split(',').map((t) => t.trim()) });
-            break;
-        }
-      }
-
       return;
     }
 
@@ -241,7 +203,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
       return;
     }
 
-    this._profilerStepSnapshot = this.profiler?.getAllSteps().length ?? 0;
+    this.commandTracker.takeProfilerSnapshot();
     this._startTest(test.title, test.cid, test.start.valueOf() / 1000);
   }
 
@@ -320,386 +282,74 @@ export default class WDIOQaseReporter extends WDIOReporter {
   }
 
   private async _endTest(status: TestStatusEnum, err: CompoundError | null, end_time: number = Date.now().valueOf() / 1000) {
-    const testResult = this.storage.getCurrentTest();
-    if (testResult === undefined || this.storage.ignore) {
-      return;
-    }
-
-    if (testResult.relations === null) {
-      const relations: Relation = {};
-      if (this.storage.suites.length > 0) {
-        relations.suite = {
-          data: this.storage.suites.map((suite) => {
-            return {
-              title: suite,
-              public_id: null,
-            };
-          }),
-        };
-      }
-
-      testResult.relations = relations;
-    }
-
-    testResult.execution.duration = testResult.execution.start_time ? Math.round(end_time - testResult.execution.start_time) : 0;
-    
-    // Convert CompoundError to regular Error for status determination
-    let error: Error | null = null;
-    if (err) {
-      error = new Error(err.message || 'Test failed');
-      if (err.stacktrace) {
-        error.stack = err.stacktrace;
-      }
-    }
-    
-    // Determine status based on error type
-    testResult.execution.status = determineTestStatus(error, status);
-    
-    testResult.execution.stacktrace = err === null ?
-      null : err.stacktrace === undefined ?
-        null : err.stacktrace;
-
-    const errorMessage = err === null ?
-      null : err.message === undefined ?
-        null : err.message;
-
-    if (this.storage.comment) {
-      testResult.message = errorMessage
-        ? `${this.storage.comment}\n\n${errorMessage}`
-        : this.storage.comment;
-    } else {
-      testResult.message = errorMessage;
-    }
-
-    testResult.signature = generateSignature(
-      Array.isArray(testResult.testops_id) ? testResult.testops_id : testResult.testops_id ? [testResult.testops_id] : null,
-      [...this.storage.suites, testResult.title],
-      testResult.params
-    );
-
-    const parsed = parseProjectMappingFromTitle(testResult.title);
-    const hasProjectMapping = Object.keys(parsed.projectMapping).length > 0;
-    if (hasProjectMapping) {
-      testResult.testops_project_mapping = parsed.projectMapping;
-      testResult.testops_id = null;
-    } else if (parsed.legacyIds.length > 0) {
-      testResult.testops_id = parsed.legacyIds.length === 1 ? parsed.legacyIds[0]! : parsed.legacyIds;
-    }
-    testResult.title = parsed.cleanedTitle || removeQaseIdsFromTitle(testResult.title);
-
-    // Merge profiler steps from direct fallback accumulator (same-process mode only)
-    if (this.profiler) {
-      const allSteps = this.profiler.getAllSteps();
-      const newSteps = allSteps.slice(this._profilerStepSnapshot);
-      this._profilerStepSnapshot = 0;
-      if (newSteps.length > 0) {
-        testResult.steps = [...testResult.steps, ...newSteps];
-      }
-    }
-
-    // Merge profiler steps received from QaseWdioService via process.emit IPC (same-process mode only)
-    if (this._pendingProfilerSteps.length > 0) {
-      testResult.steps = [...testResult.steps, ...this._pendingProfilerSteps];
-      this._pendingProfilerSteps = [];
-    }
-
-    await this.reporter.addTestResult(testResult);
+    await this.finalizer.finalize(status, err, end_time);
   }
 
   override onBeforeCommand(command: BeforeCommandArgs) {
-    if (!this.storage.getLastItem()) {
-      return;
-    }
-
-    const { disableWebdriverStepsReporting } = this._options;
-
-    if (disableWebdriverStepsReporting || this._isMultiremote) {
-      return;
-    }
-
-    const { method, endpoint } = command;
-
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    const stepName = command.command ? command.command : `${method} ${endpoint}`;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const payload = command.body || command.params;
-
-    this._startStep(stepName);
-
-    if (!isEmpty(payload)) {
-      this.attachJSON('Request', payload);
-    }
+    this.commandTracker.onBeforeCommand(command);
   }
 
   override onAfterCommand(command: AfterCommandArgs) {
-    const { disableWebdriverStepsReporting, disableWebdriverScreenshotsReporting } = this._options;
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-    const commandResult: string | undefined = command.result.value || undefined;
-    const isScreenshot = isScreenshotCommand(command);
-    if (!disableWebdriverScreenshotsReporting && isScreenshot && commandResult) {
-      this.attachFile('Screenshot.png', Buffer.from(commandResult, 'base64'), 'image/png');
-    }
-
-    if (disableWebdriverStepsReporting || this._isMultiremote || !this.storage.getCurrentStep()) {
-      return;
-    }
-
-    this.attachJSON('Response', commandResult);
-    this._endStep();
+    this.commandTracker.onAfterCommand(command);
   }
 
   registerListeners() {
-    process.on(events.addQaseID, this.addQaseId.bind(this));
-    process.on(events.addTitle, this.addTitle.bind(this));
-    process.on(events.addFields, this.addFields.bind(this));
-    process.on(events.addSuite, this.addSuite.bind(this));
-    process.on(events.addParameters, this.addParameters.bind(this));
-    process.on(events.addGroupParameters, this.addGroupParameters.bind(this));
-    process.on(events.addComment, this.addComment.bind(this));
-    process.on(events.addAttachment, this.addAttachment.bind(this));
-    process.on(events.addIgnore, this.ignore.bind(this));
-    process.on(events.addStep, this.addStep.bind(this));
-    process.on(events.addTags, this.addTags.bind(this));
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
-    process.on(events.addProfilerSteps as any, (data: string) => {
-      try {
-        const steps = JSON.parse(data) as TestStepType[];
-        this._pendingProfilerSteps.push(...steps);
-      } catch {
-        // Silent failure — corrupted profiler data should not affect test results
-      }
-    });
+    this.ipc.registerListeners();
   }
 
-  addQaseId({ ids }: AddQaseIdEventArgs) {
-    const curTest = this.storage.getCurrentTest();
-    if (!curTest) {
-      return;
-    }
-
-    curTest.testops_id = ids;
+  addQaseId(args: AddQaseIdEventArgs) {
+    this.metadata.addQaseId(args);
   }
 
-  addTitle({ title }: AddTitleEventArgs) {
-    const curTest = this.storage.getCurrentTest();
-    if (!curTest) {
-      return;
-    }
-
-    curTest.title = title;
+  addTitle(args: AddTitleEventArgs) {
+    this.metadata.addTitle(args);
   }
 
-  addComment({ comment }: AddCommentEventArgs) {
-    this.storage.comment = comment;
+  addComment(args: AddCommentEventArgs) {
+    this.metadata.addComment(args);
   }
 
-  addSuite({ suite }: AddSuiteEventArgs) {
-    const curTest = this.storage.getCurrentTest();
-    if (!curTest) {
-      return;
-    }
-
-    curTest.relations = {
-      suite: {
-        data: [
-          {
-            title: suite,
-            public_id: null,
-          },
-        ],
-      },
-    };
+  addSuite(args: AddSuiteEventArgs) {
+    this.metadata.addSuite(args);
   }
 
-  addParameters({ records }: AddRecordsEventArgs) {
-    const curTest = this.storage.getCurrentTest();
-    if (!curTest) {
-      return;
-    }
-
-    const stringRecord: Record<string, string> = {};
-    for (const [key, value] of Object.entries(records)) {
-      stringRecord[String(key)] = String(value);
-    }
-
-    curTest.params = stringRecord;
+  addParameters(args: AddRecordsEventArgs) {
+    this.metadata.addParameters(args);
   }
 
-  addGroupParameters({ records }: AddRecordsEventArgs) {
-    const curTest = this.storage.getCurrentTest();
-    if (!curTest) {
-      return;
-    }
-
-    const stringRecord: Record<string, string> = {};
-    for (const [key, value] of Object.entries(records)) {
-      stringRecord[String(key)] = String(value);
-    }
-
-    curTest.group_params = stringRecord;
+  addGroupParameters(args: AddRecordsEventArgs) {
+    this.metadata.addGroupParameters(args);
   }
 
-  addFields({ records }: AddRecordsEventArgs) {
-    const curTest = this.storage.getCurrentTest();
-    if (!curTest) {
-      return;
-    }
-
-    const stringRecord: Record<string, string> = {};
-    for (const [key, value] of Object.entries(records)) {
-      stringRecord[String(key)] = String(value);
-    }
-
-    curTest.fields = records;
+  addFields(args: AddRecordsEventArgs) {
+    this.metadata.addFields(args);
   }
 
-  addTags({ tags }: AddTagsEventArgs) {
-    const curTest = this.storage.getCurrentTest();
-    if (!curTest) {
-      return;
-    }
-
-    curTest.tags = [...curTest.tags, ...tags];
+  addTags(args: AddTagsEventArgs) {
+    this.metadata.addTags(args);
   }
 
-  addAttachment({ name, type, content, paths }: AddAttachmentEventArgs) {
-    const curTest = this.storage.getCurrentTest();
-    if (!curTest) {
-      return;
-    }
-
-    if (paths) {
-      for (const file of paths) {
-        const attachmentName = path.basename(file);
-        const contentType: string = getMimeTypes(file);
-
-        const attach: Attachment = {
-          file_path: file,
-          size: 0,
-          id: uuidv4(),
-          file_name: attachmentName,
-          mime_type: contentType,
-          content: '',
-        };
-
-        curTest.attachments.push(attach);
-      }
-      return;
-    }
-
-    if (content) {
-      const attachmentName = name ?? 'attachment';
-      const contentType = type ?? 'application/octet-stream';
-
-      const attach: Attachment = {
-        file_path: null,
-        size: content.length,
-        id: uuidv4(),
-        file_name: attachmentName,
-        mime_type: contentType,
-        content: content,
-      };
-
-      curTest.attachments.push(attach);
-    }
+  addAttachment(args: AddAttachmentEventArgs) {
+    this.metadata.addAttachment(args);
   }
 
   ignore() {
-    const curTest = this.storage.getCurrentTest();
-    if (!curTest) {
-      return;
-    }
-
-    this.storage.ignore = true;
+    this.metadata.ignore();
   }
 
   addStep(step: TestStepType) {
-    const curItem = this.storage.getLastItem();
-    if (!curItem) {
-      return;
-    }
-
-    curItem.steps.push(step);
+    this.metadata.addStep(step);
   }
 
   private _startTest(title: string, cid: string, start_time: number = Date.now().valueOf() / 1000) {
-    const result = new TestResultType(title);
-    result.execution.thread = cid;
-    result.execution.start_time = start_time;
-    result.id = uuidv4();
-
-    this.storage.push(result);
+    this.lifecycle.startTest(title, cid, start_time);
   }
 
   private _startStep(title: string) {
-    const step: TestStepType = {
-      id: uuidv4(),
-      step_type: StepType.TEXT,
-      data: {
-        action: title,
-        expected_result: null,
-        data: null,
-      },
-      parent_id: this.storage.getLastItem()?.id ?? null,
-      execution: {
-        start_time: Date.now().valueOf() / 1000,
-        end_time: null,
-        status: StepStatusEnum.passed,
-        duration: null,
-      },
-      steps: [],
-      attachments: [],
-    };
-
-    this.storage.getLastItem()?.steps.push(step);
-    this.storage.push(step);
-  }
-
-  private attachJSON(name: string, json: unknown) {
-    const isStr = typeof json === 'string';
-    const content = isStr ? json : JSON.stringify(json, null, 2);
-
-    this.attachFile(name, String(content), isStr ? 'application/json' : 'text/plain');
-  }
-
-  private attachFile(name: string, content: string | Buffer, contentType: string) {
-    if (!this.storage.getLastItem()) {
-      throw new Error('There isn\'t any active test!');
-    }
-
-    const attach: Attachment = {
-      file_path: null,
-      size: content.length,
-      id: uuidv4(),
-      file_name: name,
-      mime_type: contentType,
-      content: content,
-    };
-
-    this.storage.getLastItem()?.attachments.push(attach);
+    this.lifecycle.startStep(title);
   }
 
   private _endStep(status: TestStatusEnum = TestStatusEnum.passed) {
-    if (!this.storage.getLastItem()) {
-      return;
-    }
-
-    const step = this.storage.pop();
-    if (!step) {
-      return;
-    }
-
-    step.execution.end_time = Date.now().valueOf() / 1000;
-    step.execution.status = status;
-  }
-
-  private parseTag(tag: string): { key: string, value: string } | null {
-    const [key, value] = tag.split('=');
-    if (!key || !value) {
-      return null;
-    }
-
-    return { key, value };
+    this.lifecycle.endStep(status);
   }
 }
