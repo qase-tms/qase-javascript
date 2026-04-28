@@ -1,0 +1,29 @@
+examples/single/wdio/test/specs/checkout.spec.js
+  efd166bf1f77837a 25,73,92
+examples/single/wdio/test/specs/login.spec.js
+  efd166bf1f77837a 35,56
+examples/single/wdio/test/specs/inventory.spec.js
+  efd166bf1f77837a 53,75
+examples/single/wdio/test/specs/cart.spec.js
+  efd166bf1f77837a 57,82
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "21b53b048a35459bc78d65591487330c1aba821e",
+  "prompts": {
+    "efd166bf1f77837a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "74bfed73-d2fb-44c6-9ae5-f589510d4a3f",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 9,
+      "total_deletions": 9,
+      "accepted_lines": 2390,
+      "overriden_lines": 0
+    }
+  }
+}
