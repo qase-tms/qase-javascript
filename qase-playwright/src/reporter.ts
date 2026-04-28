@@ -22,13 +22,13 @@ import {
 import {
   removeQaseIdsFromTitle,
   extractAndCleanStep,
-  parseQaseIdsFromString,
 } from 'qase-javascript-commons/internal';
 import { MetadataMessage, ReporterContentType } from './playwright';
 // Duplicated from fixture.ts to avoid importing @playwright/test in reporter context
 const PROFILER_CONTENT_TYPE = 'application/qase.profiler-steps+json';
 import { ReporterOptionsType } from './options';
 import { StepIndex } from './step-index';
+import { AnnotationExtractor } from './annotation-extractor';
 
 type ArrayItemType<T> = T extends (infer R)[] ? R : never;
 
@@ -88,6 +88,8 @@ export class PlaywrightQaseReporter implements Reporter {
   }
 
   private stepIndex: StepIndex = new StepIndex();
+
+  private annotationExtractor: AnnotationExtractor = new AnnotationExtractor();
 
   /**
    * @param {ArrayItemType<TestResult['attachments']>[]} testAttachments
@@ -548,13 +550,7 @@ export class PlaywrightQaseReporter implements Reporter {
    * @private
    */
   private extractQaseIdsFromAnnotation(annotation: { type: string, description?: string }[]): number[] {
-    const ids: number[] = [];
-    for (const item of annotation) {
-      if (item.type.toLowerCase() === 'qaseid' && item.description) {
-        ids.push(...parseQaseIdsFromString(item.description));
-      }
-    }
-    return ids;
+    return this.annotationExtractor.extractQaseIds(annotation);
   }
 
   /**
@@ -562,19 +558,7 @@ export class PlaywrightQaseReporter implements Reporter {
    * @param annotation — e.g. [{ type: "QaseProjects", description: '{"PROJ1":[1],"PROJ2":[2]}' }]
    */
   private extractProjectMappingFromAnnotation(annotation: { type: string, description?: string }[]): Record<string, number[]> | null {
-    for (const item of annotation) {
-      if (item.type.toLowerCase() === 'qaseprojects' && item.description) {
-        try {
-          const parsed = JSON.parse(item.description) as Record<string, number[]>;
-          if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
-            return parsed;
-          }
-        } catch {
-          // ignore invalid JSON
-        }
-      }
-    }
-    return null;
+    return this.annotationExtractor.extractProjectMapping(annotation);
   }
 
   /**
@@ -583,14 +567,7 @@ export class PlaywrightQaseReporter implements Reporter {
    * @private
    */
   private extractSuiteFromAnnotation(annotation: { type: string, description?: string }[]): string[] {
-    const suites: string[] = [];
-    for (const item of annotation) {
-      if (item.type.toLowerCase() === 'qasesuite' && item.description) {
-        suites.push(item.description);
-      }
-    }
-
-    return suites;
+    return this.annotationExtractor.extractSuite(annotation);
   }
 
   /**
