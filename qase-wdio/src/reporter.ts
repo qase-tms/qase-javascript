@@ -22,12 +22,12 @@ import {
 import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 import {
   removeQaseIdsFromTitle,
-  parseQaseIdsFromString,
 } from 'qase-javascript-commons/internal';
 
 import { Storage } from './storage';
 import { TestLifecycle } from './lifecycle';
 import { MetadataApplier } from './metadata';
+import { CucumberTagAdapter } from './cucumber-tags';
 import { QaseReporterOptions } from './options';
 import { isEmpty, isScreenshotCommand } from './utils';
 import {
@@ -63,6 +63,8 @@ export default class WDIOQaseReporter extends WDIOReporter {
   private lifecycle: TestLifecycle;
 
   private metadata: MetadataApplier;
+
+  private cucumberTags: CucumberTagAdapter;
 
   /**
    * @type {boolean}
@@ -124,6 +126,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
     this.storage = new Storage();
     this.lifecycle = new TestLifecycle(this.storage);
     this.metadata = new MetadataApplier(this.storage);
+    this.cucumberTags = new CucumberTagAdapter(this.metadata);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this._options = Object.assign(new QaseReporterOptions(), options);
 
@@ -148,41 +151,9 @@ export default class WDIOQaseReporter extends WDIOReporter {
 
     if (this._options.useCucumber && suite.type === 'scenario') {
       this._startTest(suite.title, suite.cid ?? '');
-
-      if (suite.tags === undefined) {
-        return;
+      if (suite.tags) {
+        this.cucumberTags.applyTags(suite.tags as Tag[]);
       }
-
-      const tags = (suite.tags as Tag[]).map((tag) => {
-        return tag.name;
-      });
-
-      for (const tag of tags) {
-        if (!tag.includes('=')) {
-          continue;
-        }
-
-        const tagData = this.parseTag(tag);
-        if (tagData === null) {
-          continue;
-        }
-
-        switch (tagData.key.toLowerCase()) {
-          case '@qaseid':
-            this.addQaseId({ ids: parseQaseIdsFromString(tagData.value) });
-            break;
-          case '@title':
-            this.addTitle({ title: tagData.value });
-            break;
-          case '@suite':
-            this.addSuite({ suite: tagData.value });
-            break;
-          case '@tags':
-            this.addTags({ tags: tagData.value.split(',').map((t) => t.trim()) });
-            break;
-        }
-      }
-
       return;
     }
 
@@ -535,14 +506,5 @@ export default class WDIOQaseReporter extends WDIOReporter {
 
   private attachFile(name: string, content: string | Buffer, contentType: string) {
     this.lifecycle.attachFile(name, content, contentType);
-  }
-
-  private parseTag(tag: string): { key: string, value: string } | null {
-    const [key, value] = tag.split('=');
-    if (!key || !value) {
-      return null;
-    }
-
-    return { key, value };
   }
 }
