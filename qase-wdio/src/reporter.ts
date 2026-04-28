@@ -29,8 +29,8 @@ import { TestLifecycle } from './lifecycle';
 import { MetadataApplier } from './metadata';
 import { CucumberTagAdapter } from './cucumber-tags';
 import { IpcBridge } from './ipc';
+import { CommandTracker } from './command-tracker';
 import { QaseReporterOptions } from './options';
-import { isEmpty, isScreenshotCommand } from './utils';
 import {
   AddAttachmentEventArgs,
   AddCommentEventArgs,
@@ -68,6 +68,8 @@ export default class WDIOQaseReporter extends WDIOReporter {
 
   private ipc: IpcBridge;
 
+  private commandTracker: CommandTracker;
+
   /**
    * @type {boolean}
    * @private
@@ -75,6 +77,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
   private isSync: boolean;
 
   private _options: QaseReporterOptions;
+  // @ts-expect-error retained for backward compatibility; CommandTracker owns the live state. Task 8 will remove.
   private _isMultiremote?: boolean;
 
   /**
@@ -82,12 +85,6 @@ export default class WDIOQaseReporter extends WDIOReporter {
    * @private
    */
   private profiler: NetworkProfiler | null = null;
-
-  /**
-   * Snapshot of fallback accumulator length for per-test delta (same-process mode).
-   * @private
-   */
-  private _profilerStepSnapshot = 0;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(options: any) {
@@ -126,6 +123,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
     this.ipc = new IpcBridge(this.metadata);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this._options = Object.assign(new QaseReporterOptions(), options);
+    this.commandTracker = new CommandTracker(this.lifecycle, this.storage, this._options, this.profiler);
 
     this.registerListeners();
   }
@@ -140,6 +138,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
 
   override onRunnerStart(runner: RunnerStats) {
     this._isMultiremote = runner.isMultiremote;
+    this.commandTracker.setMultiremote(runner.isMultiremote);
     this.isSync = false;
   }
 
@@ -210,7 +209,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
       return;
     }
 
-    this._profilerStepSnapshot = this.profiler?.getAllSteps().length ?? 0;
+    this.commandTracker.takeProfilerSnapshot();
     this._startTest(test.title, test.cid, test.start.valueOf() / 1000);
   }
 
@@ -357,13 +356,9 @@ export default class WDIOQaseReporter extends WDIOReporter {
     testResult.title = parsed.cleanedTitle || removeQaseIdsFromTitle(testResult.title);
 
     // Merge profiler steps from direct fallback accumulator (same-process mode only)
-    if (this.profiler) {
-      const allSteps = this.profiler.getAllSteps();
-      const newSteps = allSteps.slice(this._profilerStepSnapshot);
-      this._profilerStepSnapshot = 0;
-      if (newSteps.length > 0) {
-        testResult.steps = [...testResult.steps, ...newSteps];
-      }
+    const newProfilerSteps = this.commandTracker.drainNewProfilerSteps();
+    if (newProfilerSteps.length > 0) {
+      testResult.steps = [...testResult.steps, ...newProfilerSteps];
     }
 
     // Merge profiler steps received from QaseWdioService via process.emit IPC (same-process mode only)
@@ -376,46 +371,11 @@ export default class WDIOQaseReporter extends WDIOReporter {
   }
 
   override onBeforeCommand(command: BeforeCommandArgs) {
-    if (!this.storage.getLastItem()) {
-      return;
-    }
-
-    const { disableWebdriverStepsReporting } = this._options;
-
-    if (disableWebdriverStepsReporting || this._isMultiremote) {
-      return;
-    }
-
-    const { method, endpoint } = command;
-
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    const stepName = command.command ? command.command : `${method} ${endpoint}`;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const payload = command.body || command.params;
-
-    this._startStep(stepName);
-
-    if (!isEmpty(payload)) {
-      this.attachJSON('Request', payload);
-    }
+    this.commandTracker.onBeforeCommand(command);
   }
 
   override onAfterCommand(command: AfterCommandArgs) {
-    const { disableWebdriverStepsReporting, disableWebdriverScreenshotsReporting } = this._options;
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-    const commandResult: string | undefined = command.result.value || undefined;
-    const isScreenshot = isScreenshotCommand(command);
-    if (!disableWebdriverScreenshotsReporting && isScreenshot && commandResult) {
-      this.attachFile('Screenshot.png', Buffer.from(commandResult, 'base64'), 'image/png');
-    }
-
-    if (disableWebdriverStepsReporting || this._isMultiremote || !this.storage.getCurrentStep()) {
-      return;
-    }
-
-    this.attachJSON('Response', commandResult);
-    this._endStep();
+    this.commandTracker.onAfterCommand(command);
   }
 
   registerListeners() {
@@ -476,13 +436,5 @@ export default class WDIOQaseReporter extends WDIOReporter {
 
   private _endStep(status: TestStatusEnum = TestStatusEnum.passed) {
     this.lifecycle.endStep(status);
-  }
-
-  private attachJSON(name: string, json: unknown) {
-    this.lifecycle.attachJSON(name, json);
-  }
-
-  private attachFile(name: string, content: string | Buffer, contentType: string) {
-    this.lifecycle.attachFile(name, content, contentType);
   }
 }
