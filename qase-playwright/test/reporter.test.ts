@@ -336,36 +336,36 @@ describe('PlaywrightQaseReporter', () => {
       const testCase = { ...testCaseMock };
       const step = { category: 'test.step', title: 'Step 1' };
       const result = { ...testResultMock };
-      
+
       reporter.onStepBegin(testCase as any, result as any, step as any);
-      
+
       // @ts-ignore
-      expect(reporter['stepCache'].has(step)).toBe(true);
+      expect(reporter['stepIndex'].hasStepCached(step)).toBe(true);
     });
 
     it('should not cache test step if category is not test.step', () => {
       const testCase = { ...testCaseMock };
       const step = { category: 'hook', title: 'Hook 1' };
       const result = { ...testResultMock };
-      
+
       reporter.onStepBegin(testCase as any, result as any, step as any);
-      
+
       // @ts-ignore
-      expect(reporter['stepCache'].has(step)).toBe(false);
+      expect(reporter['stepIndex'].hasStepCached(step)).toBe(false);
     });
 
     it('should not cache test step if already cached', () => {
       const testCase = { ...testCaseMock };
       const step = { category: 'test.step', title: 'Step 1' };
       const result = { ...testResultMock };
-      
+
       // @ts-ignore
-      reporter['stepCache'].set(step, testCase);
-      
+      reporter['stepIndex'].cacheStep(step, testCase);
+
       reporter.onStepBegin(testCase as any, result as any, step as any);
-      
+
       // @ts-ignore
-      expect(reporter['stepCache'].has(step)).toBe(true);
+      expect(reporter['stepIndex'].hasStepCached(step)).toBe(true);
     });
   });
 

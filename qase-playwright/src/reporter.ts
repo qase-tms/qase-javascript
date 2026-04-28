@@ -28,6 +28,7 @@ import { MetadataMessage, ReporterContentType } from './playwright';
 // Duplicated from fixture.ts to avoid importing @playwright/test in reporter context
 const PROFILER_CONTENT_TYPE = 'application/qase.profiler-steps+json';
 import { ReporterOptionsType } from './options';
+import { StepIndex } from './step-index';
 
 type ArrayItemType<T> = T extends (infer R)[] ? R : never;
 
@@ -86,17 +87,7 @@ export class PlaywrightQaseReporter implements Reporter {
     return test.titlePath().filter(Boolean).map(s => s.replace(/\\/g, '/'));
   }
 
-  /**
-   * @type {Map<TestStep, TestCase>}
-   * @private
-   */
-  private stepCache: Map<TestStep, TestCase> = new Map<TestStep, TestCase>();
-
-  /**
-   * @type {Map<string, TestStep>}
-   * @private
-   */
-  private stepAttachments: Map<TestStep, Attachment[]> = new Map<TestStep, Attachment[]>();
+  private stepIndex: StepIndex = new StepIndex();
 
   /**
    * @param {ArrayItemType<TestResult['attachments']>[]} testAttachments
@@ -181,10 +172,10 @@ export class PlaywrightQaseReporter implements Reporter {
 
       const matches = attachment.name.match(stepAttachRegexp);
       if (matches) {
-        const step = [...this.stepCache.keys()].find((step: TestStep) => step.title === attachment.name);
+        const step = this.stepIndex.findStepByTitle(attachment.name);
 
         if (step) {
-          this.stepCache.delete(step);
+          this.stepIndex.removeStep(step);
         }
 
         let attachmentModel: Attachment;
@@ -209,16 +200,7 @@ export class PlaywrightQaseReporter implements Reporter {
         }
 
         if (step?.parent) {
-          if (!this.stepAttachments.has(step.parent)) {
-            this.stepAttachments.set(step.parent, [attachmentModel]);
-            continue;
-          }
-
-          const stepAttachs = this.stepAttachments.get(step.parent);
-          if (stepAttachs) {
-            stepAttachs.push(attachmentModel);
-            this.stepAttachments.set(step.parent, stepAttachs);
-          }
+          this.stepIndex.addAttachmentToStep(step.parent, attachmentModel);
           continue;
         }
 
@@ -286,7 +268,7 @@ export class PlaywrightQaseReporter implements Reporter {
         continue;
       }
 
-      const attachments = this.stepAttachments.get(testStep);
+      const attachments = this.stepIndex.getStepAttachments(testStep);
 
       const stepData = extractAndCleanStep(testStep.title);
 
@@ -354,10 +336,10 @@ export class PlaywrightQaseReporter implements Reporter {
     if (step.category !== 'test.step') {
       return;
     }
-    if (this.stepCache.get(step)) {
+    if (this.stepIndex.hasStepCached(step)) {
       return;
     }
-    this.stepCache.set(step, test);
+    this.stepIndex.cacheStep(step, test);
   }
 
   public onBegin(): void {
