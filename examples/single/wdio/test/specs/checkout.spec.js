@@ -22,7 +22,7 @@ describe('Checkout Flow', () => {
   });
 
   it(qase(11, 'User can complete checkout with valid information'), async () => {
-    qase.fields({ severity: 'critical', priority: 'critical', layer: 'e2e' });
+    qase.fields({ severity: 'critical', priority: 'high', layer: 'e2e' });
     qase.suite('E-commerce\tCheckout\tComplete Purchase');
     qase.parameters({ firstName: 'John', lastName: 'Doe', postalCode: '12345' });
 
@@ -70,7 +70,7 @@ describe('Checkout Flow', () => {
   });
 
   it(qase(12, 'Checkout fails without required information'), async () => {
-    qase.fields({ severity: 'high', priority: 'high', layer: 'e2e' });
+    qase.fields({ severity: 'major', priority: 'high', layer: 'e2e' });
     qase.suite('E-commerce\tCheckout\tValidation');
     qase.parameters({ scenario: 'missing_first_name' });
 
@@ -89,7 +89,7 @@ describe('Checkout Flow', () => {
   });
 
   it(qase(13, 'User can cancel checkout'), async () => {
-    qase.fields({ severity: 'low', priority: 'medium', layer: 'e2e' });
+    qase.fields({ severity: 'minor', priority: 'medium', layer: 'e2e' });
     qase.suite('E-commerce\tCheckout\tCancel');
 
     await qase.step('Fill partial information', async () => {
