@@ -28,6 +28,7 @@ import { Storage } from './storage';
 import { TestLifecycle } from './lifecycle';
 import { MetadataApplier } from './metadata';
 import { CucumberTagAdapter } from './cucumber-tags';
+import { IpcBridge } from './ipc';
 import { QaseReporterOptions } from './options';
 import { isEmpty, isScreenshotCommand } from './utils';
 import {
@@ -39,7 +40,6 @@ import {
   AddTagsEventArgs,
   AddTitleEventArgs,
 } from './models';
-import { events } from './events';
 
 export default class WDIOQaseReporter extends WDIOReporter {
   /**
@@ -66,6 +66,8 @@ export default class WDIOQaseReporter extends WDIOReporter {
 
   private cucumberTags: CucumberTagAdapter;
 
+  private ipc: IpcBridge;
+
   /**
    * @type {boolean}
    * @private
@@ -86,12 +88,6 @@ export default class WDIOQaseReporter extends WDIOReporter {
    * @private
    */
   private _profilerStepSnapshot = 0;
-
-  /**
-   * Steps received from QaseWdioService via process.emit IPC.
-   * @private
-   */
-  private _pendingProfilerSteps: TestStepType[] = [];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(options: any) {
@@ -127,6 +123,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
     this.lifecycle = new TestLifecycle(this.storage);
     this.metadata = new MetadataApplier(this.storage);
     this.cucumberTags = new CucumberTagAdapter(this.metadata);
+    this.ipc = new IpcBridge(this.metadata);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this._options = Object.assign(new QaseReporterOptions(), options);
 
@@ -370,9 +367,9 @@ export default class WDIOQaseReporter extends WDIOReporter {
     }
 
     // Merge profiler steps received from QaseWdioService via process.emit IPC (same-process mode only)
-    if (this._pendingProfilerSteps.length > 0) {
-      testResult.steps = [...testResult.steps, ...this._pendingProfilerSteps];
-      this._pendingProfilerSteps = [];
+    const pendingFromIpc = this.ipc.drainProfilerSteps();
+    if (pendingFromIpc.length > 0) {
+      testResult.steps = [...testResult.steps, ...pendingFromIpc];
     }
 
     await this.reporter.addTestResult(testResult);
@@ -422,26 +419,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
   }
 
   registerListeners() {
-    process.on(events.addQaseID, this.addQaseId.bind(this));
-    process.on(events.addTitle, this.addTitle.bind(this));
-    process.on(events.addFields, this.addFields.bind(this));
-    process.on(events.addSuite, this.addSuite.bind(this));
-    process.on(events.addParameters, this.addParameters.bind(this));
-    process.on(events.addGroupParameters, this.addGroupParameters.bind(this));
-    process.on(events.addComment, this.addComment.bind(this));
-    process.on(events.addAttachment, this.addAttachment.bind(this));
-    process.on(events.addIgnore, this.ignore.bind(this));
-    process.on(events.addStep, this.addStep.bind(this));
-    process.on(events.addTags, this.addTags.bind(this));
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
-    process.on(events.addProfilerSteps as any, (data: string) => {
-      try {
-        const steps = JSON.parse(data) as TestStepType[];
-        this._pendingProfilerSteps.push(...steps);
-      } catch {
-        // Silent failure — corrupted profiler data should not affect test results
-      }
-    });
+    this.ipc.registerListeners();
   }
 
   addQaseId(args: AddQaseIdEventArgs) {
