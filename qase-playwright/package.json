@@ -1,6 +1,6 @@
 {
   "name": "playwright-qase-reporter",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "Qase TMS Playwright Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -8,6 +8,7 @@
     ".": "./dist/index.js",
     "./playwright": "./dist/playwright.js",
     "./reporter": "./dist/reporter.js",
+    "./fixture": "./dist/fixture.js",
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -20,6 +21,9 @@
       ],
       "reporter": [
         "./dist/reporter.d.ts"
+      ],
+      "fixture": [
+        "./dist/fixture.d.ts"
       ]
     }
   },

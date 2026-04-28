@@ -114,114 +114,6 @@ describe('PlaywrightQaseReporter', () => {
     });
   });
 
-  describe('static transformSuiteTitle', () => {
-    it('should return suite title path', () => {
-      const result = PlaywrightQaseReporter['transformSuiteTitle'](testCaseMock as any);
-      expect(result).toEqual(['Suite1', 'Suite2', 'Test (Qase ID: 123)']);
-    });
-
-    it('should normalize backslashes in suite title path to forward slashes', () => {
-      const testCaseWithBackslash = {
-        ...testCaseMock,
-        titlePath: jest.fn(() => ['', 'e2e\\tests\\auth', 'Login Suite', 'should login']),
-      };
-      const result = PlaywrightQaseReporter['transformSuiteTitle'](testCaseWithBackslash as any);
-      expect(result).toEqual(['e2e/tests/auth', 'Login Suite', 'should login']);
-    });
-  });
-
-  describe('static transformError', () => {
-    it('should transform test errors to compound error', () => {
-      const errors = [
-        { message: 'Error 1', stack: 'Stack 1' },
-        { message: 'Error 2', stack: 'Stack 2' },
-      ];
-      // @ts-ignore
-      const result = PlaywrightQaseReporter['transformError'](errors);
-      expect(result).toBeInstanceOf(Error);
-      expect(result.message).toBe('Error 2');
-      expect((result as any).stacktrace).toBe('Stack 2');
-    });
-
-    it('should handle errors without message or stack', () => {
-      const errors = [
-        { message: undefined, stack: undefined },
-        { message: 'Error 1', stack: undefined },
-        { message: undefined, stack: 'Stack 1' },
-      ];
-      // @ts-ignore
-      const result = PlaywrightQaseReporter['transformError'](errors);
-      expect(result).toBeInstanceOf(Error);
-    });
-  });
-
-  describe('extractQaseIdsFromAnnotation', () => {
-    it('should extract single id from qaseid annotation', () => {
-      const annotations = [
-        { type: 'qaseid', description: '123' },
-      ];
-      // @ts-ignore
-      const ids = reporter['extractQaseIdsFromAnnotation'](annotations);
-      expect(ids).toEqual([123]);
-    });
-
-    it('should extract multiple ids from qaseid annotation', () => {
-      const annotations = [
-        { type: 'qaseid', description: '123,456' },
-      ];
-      // @ts-ignore
-      const ids = reporter['extractQaseIdsFromAnnotation'](annotations);
-      expect(ids).toEqual([123, 456]);
-    });
-
-    it('should return empty array if no qaseid annotation', () => {
-      const annotations = [
-        { type: 'other', description: '789' },
-      ];
-      // @ts-ignore
-      const ids = reporter['extractQaseIdsFromAnnotation'](annotations);
-      expect(ids).toEqual([]);
-    });
-
-    it('should handle case insensitive type', () => {
-      const annotations = [
-        { type: 'QASEID', description: '123' },
-      ];
-      // @ts-ignore
-      const ids = reporter['extractQaseIdsFromAnnotation'](annotations);
-      expect(ids).toEqual([123]);
-    });
-  });
-
-  describe('extractSuiteFromAnnotation', () => {
-    it('should extract suite from qasesuite annotation', () => {
-      const annotations = [
-        { type: 'qasesuite', description: 'Test Suite' },
-      ];
-      // @ts-ignore
-      const suites = reporter['extractSuiteFromAnnotation'](annotations);
-      expect(suites).toEqual(['Test Suite']);
-    });
-
-    it('should return empty array if no qasesuite annotation', () => {
-      const annotations = [
-        { type: 'other', description: 'Test Suite' },
-      ];
-      // @ts-ignore
-      const suites = reporter['extractSuiteFromAnnotation'](annotations);
-      expect(suites).toEqual([]);
-    });
-
-    it('should handle case insensitive type', () => {
-      const annotations = [
-        { type: 'QASESUITE', description: 'Test Suite' },
-      ];
-      // @ts-ignore
-      const suites = reporter['extractSuiteFromAnnotation'](annotations);
-      expect(suites).toEqual(['Test Suite']);
-    });
-  });
-
   describe('checkChildrenSteps', () => {
     it('should return true for empty steps array', () => {
       // @ts-ignore
@@ -306,24 +198,6 @@ describe('PlaywrightQaseReporter', () => {
     });
   });
 
-  describe('convertLogsToAttachments', () => {
-    it('should convert string logs to attachment', () => {
-      // @ts-ignore
-      const result = reporter['convertLogsToAttachments'](['log1', 'log2'], 'log.txt');
-      expect(result.file_name).toBe('log.txt');
-      expect(result.content).toBe('log1log2');
-      expect(result.mime_type).toBe('text/plain');
-    });
-
-    it('should convert buffer logs to attachment', () => {
-      // @ts-ignore
-      const result = reporter['convertLogsToAttachments']([Buffer.from('log1'), Buffer.from('log2')], 'log.txt');
-      expect(result.file_name).toBe('log.txt');
-      expect(result.content).toBe('log1log2');
-      expect(result.mime_type).toBe('text/plain');
-    });
-  });
-
   describe('constructor', () => {
     it('should initialize reporter and options', () => {
       expect((reporter as any).reporter).toBe(reporterMock);
@@ -336,36 +210,36 @@ describe('PlaywrightQaseReporter', () => {
       const testCase = { ...testCaseMock };
       const step = { category: 'test.step', title: 'Step 1' };
       const result = { ...testResultMock };
-      
+
       reporter.onStepBegin(testCase as any, result as any, step as any);
-      
+
       // @ts-ignore
-      expect(reporter['stepCache'].has(step)).toBe(true);
+      expect(reporter['stepIndex'].hasStepCached(step)).toBe(true);
     });
 
     it('should not cache test step if category is not test.step', () => {
       const testCase = { ...testCaseMock };
       const step = { category: 'hook', title: 'Hook 1' };
       const result = { ...testResultMock };
-      
+
       reporter.onStepBegin(testCase as any, result as any, step as any);
-      
+
       // @ts-ignore
-      expect(reporter['stepCache'].has(step)).toBe(false);
+      expect(reporter['stepIndex'].hasStepCached(step)).toBe(false);
     });
 
     it('should not cache test step if already cached', () => {
       const testCase = { ...testCaseMock };
       const step = { category: 'test.step', title: 'Step 1' };
       const result = { ...testResultMock };
-      
+
       // @ts-ignore
-      reporter['stepCache'].set(step, testCase);
-      
+      reporter['stepIndex'].cacheStep(step, testCase);
+
       reporter.onStepBegin(testCase as any, result as any, step as any);
-      
+
       // @ts-ignore
-      expect(reporter['stepCache'].has(step)).toBe(true);
+      expect(reporter['stepIndex'].hasStepCached(step)).toBe(true);
     });
   });
 
@@ -477,110 +351,4 @@ describe('PlaywrightQaseReporter', () => {
     });
   });
 
-  describe('transformAttachments', () => {
-    it('should parse metadata from attachments', () => {
-      const meta = { ids: [1], title: 'T', fields: { a: 'b' }, parameters: { p: 'v' }, groupParams: { g: 'v' }, ignore: false, suite: 'S', comment: 'C' };
-      const attachments = [{ contentType: ReporterContentType, body: Buffer.from(JSON.stringify(meta)) }];
-      // @ts-ignore
-      const result = reporter['transformAttachments'](attachments);
-      expect(result.ids).toEqual([1]);
-      expect(result.title).toBe('T');
-      expect(result.fields).toEqual({ a: 'b' });
-      expect(result.parameters).toEqual({ p: 'v' });
-      expect(result.groupParams).toEqual({ g: 'v' });
-      expect(result.ignore).toBe(false);
-      expect(result.suite).toBe('S');
-      expect(result.comment).toBe('C');
-    });
-
-    it('should handle step attachments', () => {
-      const attachments = [{ name: 'step_attach_body_uuid', contentType: 'text/plain', body: Buffer.from('body') }];
-      // @ts-ignore
-      const result = reporter['transformAttachments'](attachments);
-      expect(result.attachments).toHaveLength(1);
-      expect(result.attachments?.[0]?.file_name).toBe('step_attach_body_uuid');
-    });
-
-    it('should handle regular attachments', () => {
-      const attachments = [{ name: 'file.txt', contentType: 'text/plain', body: Buffer.from('content'), path: '/path/to/file.txt' }];
-      // @ts-ignore
-      const result = reporter['transformAttachments'](attachments);
-      expect(result.attachments).toHaveLength(1);
-      expect(result.attachments?.[0]?.file_name).toBe('file.txt');
-      expect(result.attachments?.[0]?.file_path).toBe('/path/to/file.txt');
-    });
-
-    it('should handle attachments without path', () => {
-      const attachments = [{ name: 'file.txt', contentType: 'text/plain', body: Buffer.from('content') }];
-      // @ts-ignore
-      const result = reporter['transformAttachments'](attachments);
-      expect(result.attachments).toHaveLength(1);
-      expect(result.attachments?.[0]?.file_name).toBe('file.txt');
-      expect(result.attachments?.[0]?.file_path).toBe(null);
-    });
-  });
-
-  describe('transformSteps', () => {
-    it('should transform steps recursively', () => {
-      const steps = [
-        { 
-          title: 'Step 1', 
-          category: 'test.step',
-          steps: [], 
-          duration: 10, 
-          error: undefined, 
-          startTime: new Date(),
-          location: { file: 'file', line: 1, column: 1 } 
-        },
-        { 
-          title: 'Step 2', 
-          category: 'test.step',
-          steps: [], 
-          duration: 20, 
-          error: { message: 'fail' }, 
-          startTime: new Date(),
-          location: { file: 'file', line: 2, column: 2 } 
-        },
-      ];
-      // @ts-ignore
-      const result = reporter['transformSteps'](steps, null);
-      expect(result).toHaveLength(2);
-      expect((result?.[0]?.data as any)?.action).toBe('Step 1');
-      expect(result?.[1]?.execution.status).toBe('failed');
-    });
-
-    it('should skip steps with non-test.step category', () => {
-      const steps = [
-        { 
-          title: 'Step 1', 
-          category: 'other',
-          steps: [], 
-          duration: 10, 
-          error: undefined, 
-          startTime: new Date(),
-          location: { file: 'file', line: 1, column: 1 } 
-        },
-      ];
-      // @ts-ignore
-      const result = reporter['transformSteps'](steps, null);
-      expect(result).toHaveLength(0);
-    });
-
-    it('should skip default steps with children', () => {
-      const steps = [
-        { 
-          title: 'Before Hooks', 
-          category: 'test.step',
-          steps: [{ category: 'other', title: 'Child' }], 
-          duration: 10, 
-          error: undefined, 
-          startTime: new Date(),
-          location: { file: 'file', line: 1, column: 1 } 
-        },
-      ];
-      // @ts-ignore
-      const result = reporter['transformSteps'](steps, null);
-      expect(result).toHaveLength(0);
-    });
-  });
-}); 
+});

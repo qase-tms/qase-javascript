@@ -1,55 +1,19 @@
-import { Reporter, TestCase, TestError, TestResult, TestStatus, TestStep } from '@playwright/test/reporter';
-import { v4 as uuidv4 } from 'uuid';
-import * as path from 'path';
+import { Reporter, TestCase, TestResult, TestStatus, TestStep } from '@playwright/test/reporter';
 
 import {
-  Attachment,
   composeOptions,
-  CompoundError,
   ConfigLoader,
   ConfigType,
-  generateSignature,
   QaseReporter,
   ReporterInterface,
-  StepStatusEnum,
-  StepType,
-  TestResultType,
   TestStatusEnum,
-  TestStepType,
-  determineTestStatus,
-  parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
-import {
-  removeQaseIdsFromTitle,
-  extractAndCleanStep,
-  parseQaseIdsFromString,
-} from 'qase-javascript-commons/internal';
-import { MetadataMessage, ReporterContentType } from './playwright';
-// Duplicated from fixture.ts to avoid importing @playwright/test in reporter context
-const PROFILER_CONTENT_TYPE = 'application/qase.profiler-steps+json';
 import { ReporterOptionsType } from './options';
-
-type ArrayItemType<T> = T extends (infer R)[] ? R : never;
-
-const stepAttachRegexp = /^step_attach_(body|file)_(\w{8}-\w{4}-\w{4}-\w{4}-\w{12})_/i;
-const logMimeType = 'text/plain';
-
-interface TestCaseMetadata {
-  ids: number[];
-  /** Multi-project mapping: project code -> test case IDs. */
-  projectMapping?: Record<string, number[]>;
-  title: string;
-  fields: Record<string, string>;
-  parameters: Record<string, string>;
-  groupParams: Record<string, string>;
-  attachments: Attachment[];
-  ignore: boolean;
-  suite: string;
-  comment: string;
-  tags: string[];
-}
-
-const defaultSteps: string[] = ['Before Hooks', 'After Hooks', 'Worker Cleanup'];
+import { StepIndex } from './step-index';
+import { AnnotationExtractor } from './annotation-extractor';
+import { StepConverter } from './step-converter';
+import { MetadataExtractor } from './metadata-extractor';
+import { ResultBuilder } from './result-builder';
 
 export type PlaywrightQaseOptionsType = Omit<ConfigType, 'reporterOptions'> & {
   framework: ReporterOptionsType;
@@ -77,244 +41,15 @@ export class PlaywrightQaseReporter implements Reporter {
    */
   private static qaseIds: Map<string, number[]> = new Map<string, number[]>();
 
-  /**
-   * @param {TestCase} test
-   * @returns {string[]}
-   * @private
-   */
-  private static transformSuiteTitle(test: TestCase): string[] {
-    return test.titlePath().filter(Boolean).map(s => s.replace(/\\/g, '/'));
-  }
+  private stepIndex: StepIndex = new StepIndex();
 
-  /**
-   * @type {Map<TestStep, TestCase>}
-   * @private
-   */
-  private stepCache: Map<TestStep, TestCase> = new Map<TestStep, TestCase>();
+  private annotationExtractor: AnnotationExtractor = new AnnotationExtractor();
 
-  /**
-   * @type {Map<string, TestStep>}
-   * @private
-   */
-  private stepAttachments: Map<TestStep, Attachment[]> = new Map<TestStep, Attachment[]>();
+  private stepConverter: StepConverter = new StepConverter(this.stepIndex);
 
-  /**
-   * @param {ArrayItemType<TestResult['attachments']>[]} testAttachments
-   * @returns {TestCaseMetadata}
-   * @private
-   */
-  private transformAttachments(
-    testAttachments: ArrayItemType<TestResult['attachments']>[],
-  ): TestCaseMetadata {
-    const metadata: TestCaseMetadata = {
-      ids: [],
-      title: '',
-      fields: {},
-      parameters: {},
-      groupParams: {},
-      attachments: [],
-      ignore: false,
-      suite: '',
-      comment: '',
-      tags: [],
-    };
-    const attachments: Attachment[] = [];
+  private metadataExtractor: MetadataExtractor = new MetadataExtractor(this.stepIndex);
 
-    for (const attachment of testAttachments) {
-
-      if (attachment.contentType === ReporterContentType) {
-        if (attachment.body == undefined) {
-          continue;
-        }
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const message: MetadataMessage = JSON.parse(attachment.body.toString());
-
-        if (message.title) {
-          metadata.title = message.title;
-        }
-
-        if (message.ids) {
-          metadata.ids = message.ids;
-        }
-
-        if (message.projectMapping && typeof message.projectMapping === 'object') {
-          metadata.projectMapping = message.projectMapping as Record<string, number[]>;
-        }
-
-        if (message.fields) {
-          metadata.fields = message.fields;
-        }
-
-        if (message.parameters) {
-          metadata.parameters = message.parameters;
-        }
-
-        if (message.ignore) {
-          metadata.ignore = message.ignore;
-        }
-
-        if (message.suite) {
-          metadata.suite = message.suite;
-        }
-
-        if (message.comment) {
-          metadata.comment = message.comment;
-        }
-
-        if (message.groupParams) {
-          metadata.groupParams = message.groupParams;
-        }
-
-        if (message.tags) {
-          metadata.tags = [...(metadata.tags ?? []), ...message.tags];
-        }
-
-        continue;
-      }
-
-      if (attachment.contentType === PROFILER_CONTENT_TYPE) {
-        // Profiler steps attachment — skip adding to test attachments
-        // Will be processed separately in onTestEnd
-        continue;
-      }
-
-      const matches = attachment.name.match(stepAttachRegexp);
-      if (matches) {
-        const step = [...this.stepCache.keys()].find((step: TestStep) => step.title === attachment.name);
-
-        if (step) {
-          this.stepCache.delete(step);
-        }
-
-        let attachmentModel: Attachment;
-        if (attachment.name.match(/^step_attach_body_/i)) {
-          attachmentModel = {
-            content: attachment.body == undefined ? '' : attachment.body,
-            file_name: decodeURIComponent(attachment.name.substring(matches[0].length)),
-            file_path: null,
-            mime_type: attachment.contentType,
-            size: attachment.body == undefined ? 0 : Buffer.byteLength(attachment.body),
-            id: uuidv4(),
-          };
-        } else {
-          attachmentModel = {
-            content: '',
-            file_name: decodeURIComponent(attachment.name.substring(matches[0].length)),
-            file_path: attachment.body != undefined ? attachment.body.toString() : null,
-            mime_type: attachment.contentType,
-            size: 0,
-            id: uuidv4(),
-          };
-        }
-
-        if (step?.parent) {
-          if (!this.stepAttachments.has(step.parent)) {
-            this.stepAttachments.set(step.parent, [attachmentModel]);
-            continue;
-          }
-
-          const stepAttachs = this.stepAttachments.get(step.parent);
-          if (stepAttachs) {
-            stepAttachs.push(attachmentModel);
-            this.stepAttachments.set(step.parent, stepAttachs);
-          }
-          continue;
-        }
-
-        attachments.push(attachmentModel);
-        continue;
-      }
-
-      const attachmentModel: Attachment = {
-        content: attachment.body == undefined ? '' : attachment.body,
-        file_name: attachment.path == undefined ? attachment.name : path.basename(attachment.path),
-        file_path: attachment.path == undefined ? null : attachment.path,
-        mime_type: attachment.contentType,
-        size: 0,
-        id: uuidv4(),
-      };
-
-      attachments.push(attachmentModel);
-    }
-    metadata.attachments = attachments;
-
-    return metadata;
-  }
-
-  /**
-   * @param {TestError[]} testErrors
-   * @returns {Error}
-   * @private
-   */
-  private static transformError(testErrors: TestError[]): CompoundError {
-    const compoundError = new CompoundError();
-
-    for (const error of testErrors) {
-      if (error.message == undefined) {
-        continue;
-      }
-      compoundError.addMessage(error.message);
-    }
-
-    for (const error of testErrors) {
-      if (error.stack == undefined) {
-        continue;
-      }
-      compoundError.addStacktrace(error.stack);
-    }
-
-    return compoundError;
-  }
-
-  /**
-   * @param {TestStep[]} testSteps
-   * @param parentId
-   * @returns {TestStepType[]}
-   * @private
-   */
-  private transformSteps(testSteps: TestStep[], parentId: string | null): TestStepType[] {
-    const steps: TestStepType[] = [];
-
-    for (const testStep of testSteps) {
-      if ((testStep.category !== 'test.step' && testStep.category !== 'hook')
-        || testStep.title.match(stepAttachRegexp)) {
-        continue;
-      }
-
-      if (defaultSteps.includes(testStep.title) && this.checkChildrenSteps(testStep.steps)) {
-        continue;
-      }
-
-      const attachments = this.stepAttachments.get(testStep);
-
-      const stepData = extractAndCleanStep(testStep.title);
-
-      const id = uuidv4();
-      const step: TestStepType = {
-        id: id,
-        step_type: StepType.TEXT,
-        data: {
-          action: stepData.cleanedString,
-          expected_result: stepData.expectedResult,
-          data: stepData.data,
-        },
-        parent_id: parentId,
-        execution: {
-          status: testStep.error ? StepStatusEnum.failed : StepStatusEnum.passed,
-          start_time: testStep.startTime.valueOf() / 1000,
-          duration: testStep.duration,
-          end_time: null,
-        },
-        attachments: attachments ? attachments : [],
-        steps: this.transformSteps(testStep.steps, id),
-      };
-
-      steps.push(step);
-    }
-
-    return steps;
-  }
+  private resultBuilder: ResultBuilder = new ResultBuilder(this.stepConverter);
 
   /**
    * @type {ReporterInterface}
@@ -354,10 +89,10 @@ export class PlaywrightQaseReporter implements Reporter {
     if (step.category !== 'test.step') {
       return;
     }
-    if (this.stepCache.get(step)) {
+    if (this.stepIndex.hasStepCached(step)) {
       return;
     }
-    this.stepCache.set(step, test);
+    this.stepIndex.cacheStep(step, test);
   }
 
   public onBegin(): void {
@@ -369,164 +104,26 @@ export class PlaywrightQaseReporter implements Reporter {
    * @param {TestResult} result
    */
   public async onTestEnd(test: TestCase, result: TestResult) {
-    const testCaseMetadata = this.transformAttachments(result.attachments);
-
-    if (testCaseMetadata.ignore) {
-      return;
-    }
-
-    const error = result.error ? PlaywrightQaseReporter.transformError(result.errors) : null;
-
-    const extractedSuites = this.extractSuiteFromAnnotation(test.annotations);
-    let suites = extractedSuites.length > 0
-      ? extractedSuites
-      : (testCaseMetadata.suite ? [testCaseMetadata.suite] : PlaywrightQaseReporter.transformSuiteTitle(test));
-
-    let message: string | null = null;
-    if (testCaseMetadata.comment !== '') {
-      message = testCaseMetadata.comment;
-    }
-
-    if (error) {
-      if (message) {
-        message += '\n\n';
-      } else {
-        message = '';
-      }
-
-      message += error.message;
-    }
-
-    if (this.options.browser?.addAsParameter) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-      const browser = (test as any)._projectId ?? null;
-      if (browser) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        testCaseMetadata.parameters[this.options.browser?.parameterName ?? 'browser'] = browser;
-        suites = suites.filter(suite => suite !== browser);
-      }
-    }
-
-    // if markAsFlaky is true and the test passed after retries, mark the test as flaky
-    if (this.options.markAsFlaky && result.status === 'passed' && result.retry > 0) {
-      testCaseMetadata.fields['is_flaky'] = 'true';
-    }
-
-    const titleParsed = parseProjectMappingFromTitle(test.title);
-    const testTitle = titleParsed.cleanedTitle || removeQaseIdsFromTitle(test.title);
-
-    const annotationProjectMapping = this.extractProjectMappingFromAnnotation(test.annotations);
-    const ids = this.extractQaseIdsFromAnnotation(test.annotations);
-
-    const hasMetadataProjectMapping = testCaseMetadata.projectMapping != null && Object.keys(testCaseMetadata.projectMapping).length > 0;
-    const hasAnnotationProjectMapping = annotationProjectMapping != null && Object.keys(annotationProjectMapping).length > 0;
-    const hasTitleProjectMapping = titleParsed.projectMapping != null && Object.keys(titleParsed.projectMapping).length > 0;
-
-    const projectMapping = hasMetadataProjectMapping
-      ? testCaseMetadata.projectMapping ?? null
-      : hasAnnotationProjectMapping
-        ? annotationProjectMapping
-        : hasTitleProjectMapping
-          ? titleParsed.projectMapping
-          : null;
-
-    const hasProjectMapping = projectMapping != null && Object.keys(projectMapping).length > 0;
-
-    let testops_id: number | number[] | null;
-    let testops_project_mapping: Record<string, number[]> | null;
-    if (hasProjectMapping) {
-      testops_project_mapping = projectMapping;
-      testops_id = null;
-    } else if (ids.length > 0) {
-      testops_id = ids.length === 1 ? ids[0]! : ids;
-      testops_project_mapping = null;
-    } else if (testCaseMetadata.ids.length > 0) {
-      testops_id = testCaseMetadata.ids.length === 1 ? testCaseMetadata.ids[0]! : testCaseMetadata.ids;
-      testops_project_mapping = null;
-    } else if (titleParsed.legacyIds.length > 0) {
-      testops_id = titleParsed.legacyIds.length === 1 ? titleParsed.legacyIds[0]! : titleParsed.legacyIds;
-      testops_project_mapping = null;
-    } else {
-      testops_id = PlaywrightQaseReporter.qaseIds.get(test.title) ?? null;
-      testops_project_mapping = null;
-    }
-
-    // Convert CompoundError to regular Error for status determination
-    let errorForStatus: Error | null = null;
-    if (error) {
-      errorForStatus = new Error(error.message || 'Test failed');
-      if (error.stacktrace) {
-        errorForStatus.stack = error.stacktrace;
-      }
-    }
-
-    const testStatus = determineTestStatus(errorForStatus, result.status);
-    const idsForSignature = testops_id == null ? null : (Array.isArray(testops_id) ? testops_id : [testops_id]);
-
-    const testResult = {
-      attachments: testCaseMetadata.attachments,
-      author: null,
-      execution: {
-        status: testStatus,
-        start_time: result.startTime.valueOf() / 1000,
-        end_time: null,
-        duration: result.duration,
-        stacktrace: error === null ?
-          null : error.stacktrace === undefined ?
-            null : error.stacktrace,
-        thread: process.ppid.toString() + '-' + result.parallelIndex.toString(),
-      },
-      fields: testCaseMetadata.fields,
-      id: uuidv4(),
-      message: message,
-      muted: false,
-      params: testCaseMetadata.parameters,
-      group_params: testCaseMetadata.groupParams,
-      tags: testCaseMetadata.tags ?? [],
-      relations: {
-        suite: {
-          data: suites.filter((suite) => {
-            return suite != test.title;
-          }).map((suite) => {
-            return {
-              title: suite,
-              public_id: null,
-            };
-          }),
-        },
-      },
-      run_id: null,
-      signature: generateSignature(idsForSignature, suites, testCaseMetadata.parameters),
-      steps: this.transformSteps(result.steps, null),
-      testops_id,
-      testops_project_mapping,
-      title: testCaseMetadata.title === '' ? testTitle : testCaseMetadata.title,
+    const metadata = this.metadataExtractor.transform(result.attachments);
+    const annotations = {
+      ids: this.annotationExtractor.extractQaseIds(test.annotations),
+      projectMapping: this.annotationExtractor.extractProjectMapping(test.annotations),
+      suites: this.annotationExtractor.extractSuite(test.annotations),
     };
 
-    if (this.reporter.isCaptureLogs()) {
-      if (result.stdout.length > 0) {
-        testResult.attachments.push(this.convertLogsToAttachments(result.stdout, 'stdout.log'));
-      }
+    const testResult = this.resultBuilder.build({
+      test,
+      result,
+      metadata,
+      annotations,
+      options: this.options,
+      isCaptureLogs: this.reporter.isCaptureLogs(),
+      qaseIdsRegistry: PlaywrightQaseReporter.qaseIds,
+    });
 
-      if (result.stderr.length > 0) {
-        testResult.attachments.push(this.convertLogsToAttachments(result.stderr, 'stderr.log'));
-      }
+    if (testResult) {
+      await this.reporter.addTestResult(testResult);
     }
-
-    // Merge profiler steps from fixture attachment
-    const profilerAttachment = result.attachments.find(
-      (a) => a.contentType === PROFILER_CONTENT_TYPE
-    );
-    if (profilerAttachment?.body) {
-      try {
-        const profilerSteps = JSON.parse(profilerAttachment.body.toString()) as TestStepType[];
-        testResult.steps = [...testResult.steps, ...profilerSteps];
-      } catch {
-        // Silent failure — corrupted profiler data should not affect test results
-      }
-    }
-
-    await this.reporter.addTestResult(testResult as unknown as TestResultType);
   }
 
   /**
@@ -542,92 +139,11 @@ export class PlaywrightQaseReporter implements Reporter {
   }
 
   /**
-   * @param {(string | Buffer)[]} logs
-   * @param {string} name
-   * @returns {Attachment}
-   * @private
-   */
-  private convertLogsToAttachments(logs: (string | Buffer)[], name: string): Attachment {
-    let content = '';
-    for (const line of logs) {
-      content = content + line.toString();
-    }
-
-    return {
-      file_name: name,
-      mime_type: logMimeType,
-      content: content,
-    } as Attachment;
-  }
-
-  /**
-   * @param annotation
-   * @returns {number[]}
-   * @private
-   */
-  private extractQaseIdsFromAnnotation(annotation: { type: string, description?: string }[]): number[] {
-    const ids: number[] = [];
-    for (const item of annotation) {
-      if (item.type.toLowerCase() === 'qaseid' && item.description) {
-        ids.push(...parseQaseIdsFromString(item.description));
-      }
-    }
-    return ids;
-  }
-
-  /**
-   * Extract multi-project mapping from annotation (type "QaseProjects", description JSON).
-   * @param annotation — e.g. [{ type: "QaseProjects", description: '{"PROJ1":[1],"PROJ2":[2]}' }]
-   */
-  private extractProjectMappingFromAnnotation(annotation: { type: string, description?: string }[]): Record<string, number[]> | null {
-    for (const item of annotation) {
-      if (item.type.toLowerCase() === 'qaseprojects' && item.description) {
-        try {
-          const parsed = JSON.parse(item.description) as Record<string, number[]>;
-          if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
-            return parsed;
-          }
-        } catch {
-          // ignore invalid JSON
-        }
-      }
-    }
-    return null;
-  }
-
-  /**
-   * @param annotation
-   * @returns {string[]}
-   * @private
-   */
-  private extractSuiteFromAnnotation(annotation: { type: string, description?: string }[]): string[] {
-    const suites: string[] = [];
-    for (const item of annotation) {
-      if (item.type.toLowerCase() === 'qasesuite' && item.description) {
-        suites.push(item.description);
-      }
-    }
-
-    return suites;
-  }
-
-  /**
    * @param {TestStep[]} steps
    * @returns {boolean}
-   * @private
    */
-  private checkChildrenSteps(steps: TestStep[]): boolean {
-    if (steps.length === 0) {
-      return true;
-    }
-
-    for (const step of steps) {
-      if (step.category === 'test.step' || step.category === 'hook') {
-        return false;
-      }
-    }
-
-    return true;
+  checkChildrenSteps(steps: TestStep[]): boolean {
+    return this.stepConverter.hasOnlyLeafCategories(steps);
   }
 
 }
