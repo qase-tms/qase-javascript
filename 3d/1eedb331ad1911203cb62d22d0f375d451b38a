@@ -1,0 +1,27 @@
+qase-wdio/src/ipc.ts
+  efd166bf1f77837a 1-47
+qase-wdio/test/ipc.test.ts
+  efd166bf1f77837a 1-57
+qase-wdio/src/reporter.ts
+  efd166bf1f77837a 31,69-70,126,370-372,422
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "3d1eedb331ad1911203cb62d22d0f375d451b38a",
+  "prompts": {
+    "efd166bf1f77837a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "74bfed73-d2fb-44c6-9ae5-f589510d4a3f",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 133,
+      "total_deletions": 51,
+      "accepted_lines": 2493,
+      "overriden_lines": 0
+    }
+  }
+}
