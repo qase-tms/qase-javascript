@@ -73,8 +73,6 @@ export default class WDIOQaseReporter extends WDIOReporter {
   private isSync: boolean;
 
   private _options: QaseReporterOptions;
-  // @ts-expect-error retained for backward compatibility; CommandTracker owns the live state. Task 8 will remove.
-  private _isMultiremote?: boolean;
 
   /**
    * @type {NetworkProfiler | null}
@@ -134,7 +132,6 @@ export default class WDIOQaseReporter extends WDIOReporter {
   }
 
   override onRunnerStart(runner: RunnerStats) {
-    this._isMultiremote = runner.isMultiremote;
     this.commandTracker.setMultiremote(runner.isMultiremote);
     this.isSync = false;
   }
