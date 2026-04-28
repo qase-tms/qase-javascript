@@ -11,8 +11,6 @@ import {
   generateSignature,
   QaseReporter,
   ReporterInterface,
-  StepStatusEnum,
-  StepType,
   TestResultType,
   TestStatusEnum,
   TestStepType,
@@ -21,7 +19,6 @@ import {
 } from 'qase-javascript-commons';
 import {
   removeQaseIdsFromTitle,
-  extractAndCleanStep,
 } from 'qase-javascript-commons/internal';
 import { MetadataMessage, ReporterContentType } from './playwright';
 // Duplicated from fixture.ts to avoid importing @playwright/test in reporter context
@@ -29,6 +26,7 @@ const PROFILER_CONTENT_TYPE = 'application/qase.profiler-steps+json';
 import { ReporterOptionsType } from './options';
 import { StepIndex } from './step-index';
 import { AnnotationExtractor } from './annotation-extractor';
+import { StepConverter } from './step-converter';
 
 type ArrayItemType<T> = T extends (infer R)[] ? R : never;
 
@@ -49,8 +47,6 @@ interface TestCaseMetadata {
   comment: string;
   tags: string[];
 }
-
-const defaultSteps: string[] = ['Before Hooks', 'After Hooks', 'Worker Cleanup'];
 
 export type PlaywrightQaseOptionsType = Omit<ConfigType, 'reporterOptions'> & {
   framework: ReporterOptionsType;
@@ -90,6 +86,8 @@ export class PlaywrightQaseReporter implements Reporter {
   private stepIndex: StepIndex = new StepIndex();
 
   private annotationExtractor: AnnotationExtractor = new AnnotationExtractor();
+
+  private stepConverter: StepConverter = new StepConverter(this.stepIndex);
 
   /**
    * @param {ArrayItemType<TestResult['attachments']>[]} testAttachments
@@ -258,46 +256,7 @@ export class PlaywrightQaseReporter implements Reporter {
    * @private
    */
   private transformSteps(testSteps: TestStep[], parentId: string | null): TestStepType[] {
-    const steps: TestStepType[] = [];
-
-    for (const testStep of testSteps) {
-      if ((testStep.category !== 'test.step' && testStep.category !== 'hook')
-        || testStep.title.match(stepAttachRegexp)) {
-        continue;
-      }
-
-      if (defaultSteps.includes(testStep.title) && this.checkChildrenSteps(testStep.steps)) {
-        continue;
-      }
-
-      const attachments = this.stepIndex.getStepAttachments(testStep);
-
-      const stepData = extractAndCleanStep(testStep.title);
-
-      const id = uuidv4();
-      const step: TestStepType = {
-        id: id,
-        step_type: StepType.TEXT,
-        data: {
-          action: stepData.cleanedString,
-          expected_result: stepData.expectedResult,
-          data: stepData.data,
-        },
-        parent_id: parentId,
-        execution: {
-          status: testStep.error ? StepStatusEnum.failed : StepStatusEnum.passed,
-          start_time: testStep.startTime.valueOf() / 1000,
-          duration: testStep.duration,
-          end_time: null,
-        },
-        attachments: attachments ? attachments : [],
-        steps: this.transformSteps(testStep.steps, id),
-      };
-
-      steps.push(step);
-    }
-
-    return steps;
+    return this.stepConverter.transform(testSteps, parentId);
   }
 
   /**
@@ -573,20 +532,9 @@ export class PlaywrightQaseReporter implements Reporter {
   /**
    * @param {TestStep[]} steps
    * @returns {boolean}
-   * @private
    */
-  private checkChildrenSteps(steps: TestStep[]): boolean {
-    if (steps.length === 0) {
-      return true;
-    }
-
-    for (const step of steps) {
-      if (step.category === 'test.step' || step.category === 'hook') {
-        return false;
-      }
-    }
-
-    return true;
+  checkChildrenSteps(steps: TestStep[]): boolean {
+    return this.stepConverter.hasOnlyLeafCategories(steps);
   }
 
 }
