@@ -43,6 +43,7 @@ import { StepEnd, StepStart } from './metadata/models';
 import { FileSearcher } from './fileSearcher';
 import { extractTags } from './utils/tagParser';
 import { ResultsManager } from './metadata/resultsManager';
+import { TestTracker } from './test-tracker';
 
 const {
   EVENT_TEST_FAIL,
@@ -100,11 +101,11 @@ export class CypressQaseReporter extends reporters.Base {
   private testBeginTime: number = Date.now();
 
   /**
-   * Set to track processed tests to identify skipped tests when beforeEach fails
-   * @type {Set<string>}
+   * Tracks processed tests to identify ones skipped when beforeEach fails.
+   * @type {TestTracker}
    * @private
    */
-  private processedTests: Set<string> = new Set();
+  private tracker: TestTracker = new TestTracker();
 
   // private options: Omit<(FrameworkOptionsType<'cypress', ReporterOptionsType> & ConfigType & ReporterOptionsType & NonNullable<unknown>) | (null & ReporterOptionsType & NonNullable<unknown>), 'framework'>;
 
@@ -167,27 +168,7 @@ export class CypressQaseReporter extends reporters.Base {
     runner.once(EVENT_RUN_END, () => {
       const results = this.reporter.getResults();
       ResultsManager.setResults(results);
-      this.processedTests.clear();
     });
-  }
-
-  /**
-   * Generate a unique identifier for a test
-   * @param {Test} test
-   * @returns {string}
-   * @private
-   */
-  private getTestIdentifier(test: Test): string {
-    const file = test.parent ? getFile(test.parent) ?? '' : '';
-    const suitePath = test.parent ? test.parent.titlePath().join(' > ') : '';
-    let testTitle = test.fullTitle();
-    // Remove "before each" hook prefix and quotes if present (can be anywhere in the string)
-    testTitle = testTitle.replace(/"before each" hook for "/g, '');
-    // Remove trailing quote if present
-    if (testTitle.endsWith('"')) {
-      testTitle = testTitle.slice(0, -1);
-    }
-    return `${file}::${suitePath}::${testTitle}`;
   }
 
   /**
@@ -196,8 +177,7 @@ export class CypressQaseReporter extends reporters.Base {
    * @private
    */
   private markTestAsProcessed(test: Test): void {
-    const identifier = this.getTestIdentifier(test);
-    this.processedTests.add(identifier);
+    this.tracker.markProcessed(test);
   }
 
   /**
@@ -207,8 +187,7 @@ export class CypressQaseReporter extends reporters.Base {
    * @private
    */
   private isTestProcessed(test: Test): boolean {
-    const identifier = this.getTestIdentifier(test);
-    return this.processedTests.has(identifier);
+    return this.tracker.isProcessed(test);
   }
 
   /**
