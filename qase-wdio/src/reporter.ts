@@ -7,12 +7,10 @@ import WDIOReporter, {
   Tag,
 } from '@wdio/reporter';
 import {
-  Attachment,
   composeOptions,
   CompoundError,
   ConfigLoader,
   generateSignature,
-  getMimeTypes,
   QaseReporter,
   Relation,
   ReporterInterface,
@@ -27,9 +25,9 @@ import {
   parseQaseIdsFromString,
 } from 'qase-javascript-commons/internal';
 
-import { v4 as uuidv4 } from 'uuid';
 import { Storage } from './storage';
 import { TestLifecycle } from './lifecycle';
+import { MetadataApplier } from './metadata';
 import { QaseReporterOptions } from './options';
 import { isEmpty, isScreenshotCommand } from './utils';
 import {
@@ -41,7 +39,6 @@ import {
   AddTagsEventArgs,
   AddTitleEventArgs,
 } from './models';
-import path from 'path';
 import { events } from './events';
 
 export default class WDIOQaseReporter extends WDIOReporter {
@@ -64,6 +61,8 @@ export default class WDIOQaseReporter extends WDIOReporter {
   private storage: Storage;
 
   private lifecycle: TestLifecycle;
+
+  private metadata: MetadataApplier;
 
   /**
    * @type {boolean}
@@ -124,6 +123,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
     this.isSync = true;
     this.storage = new Storage();
     this.lifecycle = new TestLifecycle(this.storage);
+    this.metadata = new MetadataApplier(this.storage);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this._options = Object.assign(new QaseReporterOptions(), options);
 
@@ -473,155 +473,48 @@ export default class WDIOQaseReporter extends WDIOReporter {
     });
   }
 
-  addQaseId({ ids }: AddQaseIdEventArgs) {
-    const curTest = this.storage.getCurrentTest();
-    if (!curTest) {
-      return;
-    }
-
-    curTest.testops_id = ids;
+  addQaseId(args: AddQaseIdEventArgs) {
+    this.metadata.addQaseId(args);
   }
 
-  addTitle({ title }: AddTitleEventArgs) {
-    const curTest = this.storage.getCurrentTest();
-    if (!curTest) {
-      return;
-    }
-
-    curTest.title = title;
+  addTitle(args: AddTitleEventArgs) {
+    this.metadata.addTitle(args);
   }
 
-  addComment({ comment }: AddCommentEventArgs) {
-    this.storage.comment = comment;
+  addComment(args: AddCommentEventArgs) {
+    this.metadata.addComment(args);
   }
 
-  addSuite({ suite }: AddSuiteEventArgs) {
-    const curTest = this.storage.getCurrentTest();
-    if (!curTest) {
-      return;
-    }
-
-    curTest.relations = {
-      suite: {
-        data: [
-          {
-            title: suite,
-            public_id: null,
-          },
-        ],
-      },
-    };
+  addSuite(args: AddSuiteEventArgs) {
+    this.metadata.addSuite(args);
   }
 
-  addParameters({ records }: AddRecordsEventArgs) {
-    const curTest = this.storage.getCurrentTest();
-    if (!curTest) {
-      return;
-    }
-
-    const stringRecord: Record<string, string> = {};
-    for (const [key, value] of Object.entries(records)) {
-      stringRecord[String(key)] = String(value);
-    }
-
-    curTest.params = stringRecord;
+  addParameters(args: AddRecordsEventArgs) {
+    this.metadata.addParameters(args);
   }
 
-  addGroupParameters({ records }: AddRecordsEventArgs) {
-    const curTest = this.storage.getCurrentTest();
-    if (!curTest) {
-      return;
-    }
-
-    const stringRecord: Record<string, string> = {};
-    for (const [key, value] of Object.entries(records)) {
-      stringRecord[String(key)] = String(value);
-    }
-
-    curTest.group_params = stringRecord;
+  addGroupParameters(args: AddRecordsEventArgs) {
+    this.metadata.addGroupParameters(args);
   }
 
-  addFields({ records }: AddRecordsEventArgs) {
-    const curTest = this.storage.getCurrentTest();
-    if (!curTest) {
-      return;
-    }
-
-    const stringRecord: Record<string, string> = {};
-    for (const [key, value] of Object.entries(records)) {
-      stringRecord[String(key)] = String(value);
-    }
-
-    curTest.fields = records;
+  addFields(args: AddRecordsEventArgs) {
+    this.metadata.addFields(args);
   }
 
-  addTags({ tags }: AddTagsEventArgs) {
-    const curTest = this.storage.getCurrentTest();
-    if (!curTest) {
-      return;
-    }
-
-    curTest.tags = [...curTest.tags, ...tags];
+  addTags(args: AddTagsEventArgs) {
+    this.metadata.addTags(args);
   }
 
-  addAttachment({ name, type, content, paths }: AddAttachmentEventArgs) {
-    const curTest = this.storage.getCurrentTest();
-    if (!curTest) {
-      return;
-    }
-
-    if (paths) {
-      for (const file of paths) {
-        const attachmentName = path.basename(file);
-        const contentType: string = getMimeTypes(file);
-
-        const attach: Attachment = {
-          file_path: file,
-          size: 0,
-          id: uuidv4(),
-          file_name: attachmentName,
-          mime_type: contentType,
-          content: '',
-        };
-
-        curTest.attachments.push(attach);
-      }
-      return;
-    }
-
-    if (content) {
-      const attachmentName = name ?? 'attachment';
-      const contentType = type ?? 'application/octet-stream';
-
-      const attach: Attachment = {
-        file_path: null,
-        size: content.length,
-        id: uuidv4(),
-        file_name: attachmentName,
-        mime_type: contentType,
-        content: content,
-      };
-
-      curTest.attachments.push(attach);
-    }
+  addAttachment(args: AddAttachmentEventArgs) {
+    this.metadata.addAttachment(args);
   }
 
   ignore() {
-    const curTest = this.storage.getCurrentTest();
-    if (!curTest) {
-      return;
-    }
-
-    this.storage.ignore = true;
+    this.metadata.ignore();
   }
 
   addStep(step: TestStepType) {
-    const curItem = this.storage.getLastItem();
-    if (!curItem) {
-      return;
-    }
-
-    curItem.steps.push(step);
+    this.metadata.addStep(step);
   }
 
   private _startTest(title: string, cid: string, start_time: number = Date.now().valueOf() / 1000) {
