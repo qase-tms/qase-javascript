@@ -16,9 +16,6 @@ import {
   QaseReporter,
   Relation,
   ReporterInterface,
-  StepStatusEnum,
-  StepType,
-  TestResultType,
   TestStatusEnum,
   TestStepType,
   determineTestStatus,
@@ -32,6 +29,7 @@ import {
 
 import { v4 as uuidv4 } from 'uuid';
 import { Storage } from './storage';
+import { TestLifecycle } from './lifecycle';
 import { QaseReporterOptions } from './options';
 import { isEmpty, isScreenshotCommand } from './utils';
 import {
@@ -64,6 +62,8 @@ export default class WDIOQaseReporter extends WDIOReporter {
   private reporter: ReporterInterface;
 
   private storage: Storage;
+
+  private lifecycle: TestLifecycle;
 
   /**
    * @type {boolean}
@@ -123,6 +123,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
 
     this.isSync = true;
     this.storage = new Storage();
+    this.lifecycle = new TestLifecycle(this.storage);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this._options = Object.assign(new QaseReporterOptions(), options);
 
@@ -624,74 +625,23 @@ export default class WDIOQaseReporter extends WDIOReporter {
   }
 
   private _startTest(title: string, cid: string, start_time: number = Date.now().valueOf() / 1000) {
-    const result = new TestResultType(title);
-    result.execution.thread = cid;
-    result.execution.start_time = start_time;
-    result.id = uuidv4();
-
-    this.storage.push(result);
+    this.lifecycle.startTest(title, cid, start_time);
   }
 
   private _startStep(title: string) {
-    const step: TestStepType = {
-      id: uuidv4(),
-      step_type: StepType.TEXT,
-      data: {
-        action: title,
-        expected_result: null,
-        data: null,
-      },
-      parent_id: this.storage.getLastItem()?.id ?? null,
-      execution: {
-        start_time: Date.now().valueOf() / 1000,
-        end_time: null,
-        status: StepStatusEnum.passed,
-        duration: null,
-      },
-      steps: [],
-      attachments: [],
-    };
-
-    this.storage.getLastItem()?.steps.push(step);
-    this.storage.push(step);
-  }
-
-  private attachJSON(name: string, json: unknown) {
-    const isStr = typeof json === 'string';
-    const content = isStr ? json : JSON.stringify(json, null, 2);
-
-    this.attachFile(name, String(content), isStr ? 'application/json' : 'text/plain');
-  }
-
-  private attachFile(name: string, content: string | Buffer, contentType: string) {
-    if (!this.storage.getLastItem()) {
-      throw new Error('There isn\'t any active test!');
-    }
-
-    const attach: Attachment = {
-      file_path: null,
-      size: content.length,
-      id: uuidv4(),
-      file_name: name,
-      mime_type: contentType,
-      content: content,
-    };
-
-    this.storage.getLastItem()?.attachments.push(attach);
+    this.lifecycle.startStep(title);
   }
 
   private _endStep(status: TestStatusEnum = TestStatusEnum.passed) {
-    if (!this.storage.getLastItem()) {
-      return;
-    }
+    this.lifecycle.endStep(status);
+  }
 
-    const step = this.storage.pop();
-    if (!step) {
-      return;
-    }
+  private attachJSON(name: string, json: unknown) {
+    this.lifecycle.attachJSON(name, json);
+  }
 
-    step.execution.end_time = Date.now().valueOf() / 1000;
-    step.execution.status = status;
+  private attachFile(name: string, content: string | Buffer, contentType: string) {
+    this.lifecycle.attachFile(name, content, contentType);
   }
 
   private parseTag(tag: string): { key: string, value: string } | null {
