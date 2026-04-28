@@ -1,0 +1,29 @@
+qase-playwright/src/result-builder.ts
+  efd166bf1f77837a 1-212
+qase-playwright/src/reporter.ts
+  efd166bf1f77837a 1,15-16,52,107-111,114-122,124-125
+qase-playwright/test/reporter.test.ts
+  efd166bf1f77837a 354
+qase-playwright/test/result-builder.test.ts
+  efd166bf1f77837a 1-190
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "069875c3167c17303428df28c376f4aea66fd279",
+  "prompts": {
+    "efd166bf1f77837a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "74bfed73-d2fb-44c6-9ae5-f589510d4a3f",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 1279,
+      "total_deletions": 1409,
+      "accepted_lines": 5872,
+      "overriden_lines": 0
+    }
+  }
+}
