@@ -10,19 +10,12 @@ import {
   composeOptions,
   CompoundError,
   ConfigLoader,
-  generateSignature,
   QaseReporter,
-  Relation,
   ReporterInterface,
   TestStatusEnum,
   TestStepType,
-  determineTestStatus,
-  parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
 import { NetworkProfiler } from 'qase-javascript-commons/profilers';
-import {
-  removeQaseIdsFromTitle,
-} from 'qase-javascript-commons/internal';
 
 import { Storage } from './storage';
 import { TestLifecycle } from './lifecycle';
@@ -30,6 +23,7 @@ import { MetadataApplier } from './metadata';
 import { CucumberTagAdapter } from './cucumber-tags';
 import { IpcBridge } from './ipc';
 import { CommandTracker } from './command-tracker';
+import { ResultFinalizer } from './finalizer';
 import { QaseReporterOptions } from './options';
 import {
   AddAttachmentEventArgs,
@@ -69,6 +63,8 @@ export default class WDIOQaseReporter extends WDIOReporter {
   private ipc: IpcBridge;
 
   private commandTracker: CommandTracker;
+
+  private finalizer: ResultFinalizer;
 
   /**
    * @type {boolean}
@@ -124,6 +120,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this._options = Object.assign(new QaseReporterOptions(), options);
     this.commandTracker = new CommandTracker(this.lifecycle, this.storage, this._options, this.profiler);
+    this.finalizer = new ResultFinalizer(this.storage, this.reporter, this.commandTracker, this.ipc);
 
     this.registerListeners();
   }
@@ -288,86 +285,7 @@ export default class WDIOQaseReporter extends WDIOReporter {
   }
 
   private async _endTest(status: TestStatusEnum, err: CompoundError | null, end_time: number = Date.now().valueOf() / 1000) {
-    const testResult = this.storage.getCurrentTest();
-    if (testResult === undefined || this.storage.ignore) {
-      return;
-    }
-
-    if (testResult.relations === null) {
-      const relations: Relation = {};
-      if (this.storage.suites.length > 0) {
-        relations.suite = {
-          data: this.storage.suites.map((suite) => {
-            return {
-              title: suite,
-              public_id: null,
-            };
-          }),
-        };
-      }
-
-      testResult.relations = relations;
-    }
-
-    testResult.execution.duration = testResult.execution.start_time ? Math.round(end_time - testResult.execution.start_time) : 0;
-    
-    // Convert CompoundError to regular Error for status determination
-    let error: Error | null = null;
-    if (err) {
-      error = new Error(err.message || 'Test failed');
-      if (err.stacktrace) {
-        error.stack = err.stacktrace;
-      }
-    }
-    
-    // Determine status based on error type
-    testResult.execution.status = determineTestStatus(error, status);
-    
-    testResult.execution.stacktrace = err === null ?
-      null : err.stacktrace === undefined ?
-        null : err.stacktrace;
-
-    const errorMessage = err === null ?
-      null : err.message === undefined ?
-        null : err.message;
-
-    if (this.storage.comment) {
-      testResult.message = errorMessage
-        ? `${this.storage.comment}\n\n${errorMessage}`
-        : this.storage.comment;
-    } else {
-      testResult.message = errorMessage;
-    }
-
-    testResult.signature = generateSignature(
-      Array.isArray(testResult.testops_id) ? testResult.testops_id : testResult.testops_id ? [testResult.testops_id] : null,
-      [...this.storage.suites, testResult.title],
-      testResult.params
-    );
-
-    const parsed = parseProjectMappingFromTitle(testResult.title);
-    const hasProjectMapping = Object.keys(parsed.projectMapping).length > 0;
-    if (hasProjectMapping) {
-      testResult.testops_project_mapping = parsed.projectMapping;
-      testResult.testops_id = null;
-    } else if (parsed.legacyIds.length > 0) {
-      testResult.testops_id = parsed.legacyIds.length === 1 ? parsed.legacyIds[0]! : parsed.legacyIds;
-    }
-    testResult.title = parsed.cleanedTitle || removeQaseIdsFromTitle(testResult.title);
-
-    // Merge profiler steps from direct fallback accumulator (same-process mode only)
-    const newProfilerSteps = this.commandTracker.drainNewProfilerSteps();
-    if (newProfilerSteps.length > 0) {
-      testResult.steps = [...testResult.steps, ...newProfilerSteps];
-    }
-
-    // Merge profiler steps received from QaseWdioService via process.emit IPC (same-process mode only)
-    const pendingFromIpc = this.ipc.drainProfilerSteps();
-    if (pendingFromIpc.length > 0) {
-      testResult.steps = [...testResult.steps, ...pendingFromIpc];
-    }
-
-    await this.reporter.addTestResult(testResult);
+    await this.finalizer.finalize(status, err, end_time);
   }
 
   override onBeforeCommand(command: BeforeCommandArgs) {
