@@ -1,0 +1,27 @@
+qase-playwright/test/step-converter.test.ts
+  efd166bf1f77837a 1-81
+qase-playwright/src/reporter.ts
+  efd166bf1f77837a 29,90-91,259,536-537
+qase-playwright/src/step-converter.ts
+  efd166bf1f77837a 1-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "442bf157c57a744077ee0410fa760e2400792b6c",
+  "prompts": {
+    "efd166bf1f77837a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "74bfed73-d2fb-44c6-9ae5-f589510d4a3f",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 160,
+      "total_deletions": 61,
+      "accepted_lines": 4751,
+      "overriden_lines": 0
+    }
+  }
+}
