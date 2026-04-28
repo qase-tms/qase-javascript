@@ -1,3 +1,10 @@
+# playwright-qase-reporter@2.5.0
+
+## Changed
+
+- Internal: decomposed `PlaywrightQaseReporter` into focused modules — `StepIndex`, `MetadataExtractor`, `AnnotationExtractor`, `StepConverter`, `ResultBuilder`. The reporter class now acts as a composition root with thin lifecycle-hook orchestrators. Public contract unchanged: the named-exported `PlaywrightQaseReporter` class, its `Reporter` interface implementation, all four lifecycle hooks (`onBegin`, `onStepBegin`, `onTestEnd`, `onEnd`), the static API (`addIds`, `statusMap`), the constructor signature, and the `PlaywrightQaseOptionsType` type export all continue to work identically.
+- Added 47 new unit tests covering each extracted module.
+
 # playwright-qase-reporter@2.4.0
 
 ## Changed
