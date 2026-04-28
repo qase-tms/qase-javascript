@@ -1,33 +1,19 @@
-import { Reporter, TestCase, TestError, TestResult, TestStatus, TestStep } from '@playwright/test/reporter';
-import { v4 as uuidv4 } from 'uuid';
+import { Reporter, TestCase, TestResult, TestStatus, TestStep } from '@playwright/test/reporter';
 
 import {
-  Attachment,
   composeOptions,
-  CompoundError,
   ConfigLoader,
   ConfigType,
-  generateSignature,
   QaseReporter,
   ReporterInterface,
-  TestResultType,
   TestStatusEnum,
-  TestStepType,
-  determineTestStatus,
-  parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
-import {
-  removeQaseIdsFromTitle,
-} from 'qase-javascript-commons/internal';
-// Duplicated from fixture.ts to avoid importing @playwright/test in reporter context
-const PROFILER_CONTENT_TYPE = 'application/qase.profiler-steps+json';
 import { ReporterOptionsType } from './options';
 import { StepIndex } from './step-index';
 import { AnnotationExtractor } from './annotation-extractor';
 import { StepConverter } from './step-converter';
-import { MetadataExtractor, TestCaseMetadata } from './metadata-extractor';
-
-const logMimeType = 'text/plain';
+import { MetadataExtractor } from './metadata-extractor';
+import { ResultBuilder } from './result-builder';
 
 export type PlaywrightQaseOptionsType = Omit<ConfigType, 'reporterOptions'> & {
   framework: ReporterOptionsType;
@@ -55,15 +41,6 @@ export class PlaywrightQaseReporter implements Reporter {
    */
   private static qaseIds: Map<string, number[]> = new Map<string, number[]>();
 
-  /**
-   * @param {TestCase} test
-   * @returns {string[]}
-   * @private
-   */
-  private static transformSuiteTitle(test: TestCase): string[] {
-    return test.titlePath().filter(Boolean).map(s => s.replace(/\\/g, '/'));
-  }
-
   private stepIndex: StepIndex = new StepIndex();
 
   private annotationExtractor: AnnotationExtractor = new AnnotationExtractor();
@@ -72,51 +49,7 @@ export class PlaywrightQaseReporter implements Reporter {
 
   private metadataExtractor: MetadataExtractor = new MetadataExtractor(this.stepIndex);
 
-  /**
-   * @param {TestResult['attachments']} testAttachments
-   * @returns {TestCaseMetadata}
-   * @private
-   */
-  private transformAttachments(
-    testAttachments: TestResult['attachments'],
-  ): TestCaseMetadata {
-    return this.metadataExtractor.transform(testAttachments);
-  }
-
-  /**
-   * @param {TestError[]} testErrors
-   * @returns {Error}
-   * @private
-   */
-  private static transformError(testErrors: TestError[]): CompoundError {
-    const compoundError = new CompoundError();
-
-    for (const error of testErrors) {
-      if (error.message == undefined) {
-        continue;
-      }
-      compoundError.addMessage(error.message);
-    }
-
-    for (const error of testErrors) {
-      if (error.stack == undefined) {
-        continue;
-      }
-      compoundError.addStacktrace(error.stack);
-    }
-
-    return compoundError;
-  }
-
-  /**
-   * @param {TestStep[]} testSteps
-   * @param parentId
-   * @returns {TestStepType[]}
-   * @private
-   */
-  private transformSteps(testSteps: TestStep[], parentId: string | null): TestStepType[] {
-    return this.stepConverter.transform(testSteps, parentId);
-  }
+  private resultBuilder: ResultBuilder = new ResultBuilder(this.stepConverter);
 
   /**
    * @type {ReporterInterface}
@@ -171,164 +104,26 @@ export class PlaywrightQaseReporter implements Reporter {
    * @param {TestResult} result
    */
   public async onTestEnd(test: TestCase, result: TestResult) {
-    const testCaseMetadata = this.transformAttachments(result.attachments);
-
-    if (testCaseMetadata.ignore) {
-      return;
-    }
-
-    const error = result.error ? PlaywrightQaseReporter.transformError(result.errors) : null;
-
-    const extractedSuites = this.extractSuiteFromAnnotation(test.annotations);
-    let suites = extractedSuites.length > 0
-      ? extractedSuites
-      : (testCaseMetadata.suite ? [testCaseMetadata.suite] : PlaywrightQaseReporter.transformSuiteTitle(test));
-
-    let message: string | null = null;
-    if (testCaseMetadata.comment !== '') {
-      message = testCaseMetadata.comment;
-    }
-
-    if (error) {
-      if (message) {
-        message += '\n\n';
-      } else {
-        message = '';
-      }
-
-      message += error.message;
-    }
-
-    if (this.options.browser?.addAsParameter) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-      const browser = (test as any)._projectId ?? null;
-      if (browser) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        testCaseMetadata.parameters[this.options.browser?.parameterName ?? 'browser'] = browser;
-        suites = suites.filter(suite => suite !== browser);
-      }
-    }
-
-    // if markAsFlaky is true and the test passed after retries, mark the test as flaky
-    if (this.options.markAsFlaky && result.status === 'passed' && result.retry > 0) {
-      testCaseMetadata.fields['is_flaky'] = 'true';
-    }
-
-    const titleParsed = parseProjectMappingFromTitle(test.title);
-    const testTitle = titleParsed.cleanedTitle || removeQaseIdsFromTitle(test.title);
-
-    const annotationProjectMapping = this.extractProjectMappingFromAnnotation(test.annotations);
-    const ids = this.extractQaseIdsFromAnnotation(test.annotations);
-
-    const hasMetadataProjectMapping = testCaseMetadata.projectMapping != null && Object.keys(testCaseMetadata.projectMapping).length > 0;
-    const hasAnnotationProjectMapping = annotationProjectMapping != null && Object.keys(annotationProjectMapping).length > 0;
-    const hasTitleProjectMapping = titleParsed.projectMapping != null && Object.keys(titleParsed.projectMapping).length > 0;
-
-    const projectMapping = hasMetadataProjectMapping
-      ? testCaseMetadata.projectMapping ?? null
-      : hasAnnotationProjectMapping
-        ? annotationProjectMapping
-        : hasTitleProjectMapping
-          ? titleParsed.projectMapping
-          : null;
-
-    const hasProjectMapping = projectMapping != null && Object.keys(projectMapping).length > 0;
-
-    let testops_id: number | number[] | null;
-    let testops_project_mapping: Record<string, number[]> | null;
-    if (hasProjectMapping) {
-      testops_project_mapping = projectMapping;
-      testops_id = null;
-    } else if (ids.length > 0) {
-      testops_id = ids.length === 1 ? ids[0]! : ids;
-      testops_project_mapping = null;
-    } else if (testCaseMetadata.ids.length > 0) {
-      testops_id = testCaseMetadata.ids.length === 1 ? testCaseMetadata.ids[0]! : testCaseMetadata.ids;
-      testops_project_mapping = null;
-    } else if (titleParsed.legacyIds.length > 0) {
-      testops_id = titleParsed.legacyIds.length === 1 ? titleParsed.legacyIds[0]! : titleParsed.legacyIds;
-      testops_project_mapping = null;
-    } else {
-      testops_id = PlaywrightQaseReporter.qaseIds.get(test.title) ?? null;
-      testops_project_mapping = null;
-    }
-
-    // Convert CompoundError to regular Error for status determination
-    let errorForStatus: Error | null = null;
-    if (error) {
-      errorForStatus = new Error(error.message || 'Test failed');
-      if (error.stacktrace) {
-        errorForStatus.stack = error.stacktrace;
-      }
-    }
-
-    const testStatus = determineTestStatus(errorForStatus, result.status);
-    const idsForSignature = testops_id == null ? null : (Array.isArray(testops_id) ? testops_id : [testops_id]);
-
-    const testResult = {
-      attachments: testCaseMetadata.attachments,
-      author: null,
-      execution: {
-        status: testStatus,
-        start_time: result.startTime.valueOf() / 1000,
-        end_time: null,
-        duration: result.duration,
-        stacktrace: error === null ?
-          null : error.stacktrace === undefined ?
-            null : error.stacktrace,
-        thread: process.ppid.toString() + '-' + result.parallelIndex.toString(),
-      },
-      fields: testCaseMetadata.fields,
-      id: uuidv4(),
-      message: message,
-      muted: false,
-      params: testCaseMetadata.parameters,
-      group_params: testCaseMetadata.groupParams,
-      tags: testCaseMetadata.tags ?? [],
-      relations: {
-        suite: {
-          data: suites.filter((suite) => {
-            return suite != test.title;
-          }).map((suite) => {
-            return {
-              title: suite,
-              public_id: null,
-            };
-          }),
-        },
-      },
-      run_id: null,
-      signature: generateSignature(idsForSignature, suites, testCaseMetadata.parameters),
-      steps: this.transformSteps(result.steps, null),
-      testops_id,
-      testops_project_mapping,
-      title: testCaseMetadata.title === '' ? testTitle : testCaseMetadata.title,
+    const metadata = this.metadataExtractor.transform(result.attachments);
+    const annotations = {
+      ids: this.annotationExtractor.extractQaseIds(test.annotations),
+      projectMapping: this.annotationExtractor.extractProjectMapping(test.annotations),
+      suites: this.annotationExtractor.extractSuite(test.annotations),
     };
 
-    if (this.reporter.isCaptureLogs()) {
-      if (result.stdout.length > 0) {
-        testResult.attachments.push(this.convertLogsToAttachments(result.stdout, 'stdout.log'));
-      }
+    const testResult = this.resultBuilder.build({
+      test,
+      result,
+      metadata,
+      annotations,
+      options: this.options,
+      isCaptureLogs: this.reporter.isCaptureLogs(),
+      qaseIdsRegistry: PlaywrightQaseReporter.qaseIds,
+    });
 
-      if (result.stderr.length > 0) {
-        testResult.attachments.push(this.convertLogsToAttachments(result.stderr, 'stderr.log'));
-      }
+    if (testResult) {
+      await this.reporter.addTestResult(testResult);
     }
-
-    // Merge profiler steps from fixture attachment
-    const profilerAttachment = result.attachments.find(
-      (a) => a.contentType === PROFILER_CONTENT_TYPE
-    );
-    if (profilerAttachment?.body) {
-      try {
-        const profilerSteps = JSON.parse(profilerAttachment.body.toString()) as TestStepType[];
-        testResult.steps = [...testResult.steps, ...profilerSteps];
-      } catch {
-        // Silent failure — corrupted profiler data should not affect test results
-      }
-    }
-
-    await this.reporter.addTestResult(testResult as unknown as TestResultType);
   }
 
   /**
@@ -341,51 +136,6 @@ export class PlaywrightQaseReporter implements Reporter {
   // add this method for supporting old version of qase
   public static addIds(ids: number[], title: string): void {
     this.qaseIds.set(title, ids);
-  }
-
-  /**
-   * @param {(string | Buffer)[]} logs
-   * @param {string} name
-   * @returns {Attachment}
-   * @private
-   */
-  private convertLogsToAttachments(logs: (string | Buffer)[], name: string): Attachment {
-    let content = '';
-    for (const line of logs) {
-      content = content + line.toString();
-    }
-
-    return {
-      file_name: name,
-      mime_type: logMimeType,
-      content: content,
-    } as Attachment;
-  }
-
-  /**
-   * @param annotation
-   * @returns {number[]}
-   * @private
-   */
-  private extractQaseIdsFromAnnotation(annotation: { type: string, description?: string }[]): number[] {
-    return this.annotationExtractor.extractQaseIds(annotation);
-  }
-
-  /**
-   * Extract multi-project mapping from annotation (type "QaseProjects", description JSON).
-   * @param annotation — e.g. [{ type: "QaseProjects", description: '{"PROJ1":[1],"PROJ2":[2]}' }]
-   */
-  private extractProjectMappingFromAnnotation(annotation: { type: string, description?: string }[]): Record<string, number[]> | null {
-    return this.annotationExtractor.extractProjectMapping(annotation);
-  }
-
-  /**
-   * @param annotation
-   * @returns {string[]}
-   * @private
-   */
-  private extractSuiteFromAnnotation(annotation: { type: string, description?: string }[]): string[] {
-    return this.annotationExtractor.extractSuite(annotation);
   }
 
   /**
