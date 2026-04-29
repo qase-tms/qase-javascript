@@ -8,7 +8,6 @@ import {
   TestStepFinished,
 } from '@cucumber/messages';
 import {
-  Attachment,
   CompoundError,
   generateSignature,
   Relation,
@@ -21,10 +20,9 @@ import {
 } from 'qase-javascript-commons';
 import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 import { TestCase } from '@cucumber/messages/dist/esm/src/messages';
-import { v4 as uuidv4 } from 'uuid';
-import { ScenarioData } from './models';
 import { STATUS_MAP, STEP_STATUS_MAP, TestStepResultStatus } from './modules/statusMaps';
 import { TagParser } from './modules/tagParser';
+import { EventStorage } from './modules/eventStorage';
 
 export class Storage {
   /**
@@ -44,22 +42,10 @@ export class Storage {
   }
 
   /**
-   * @type {Record<string, Pickle>}
+   * @type {EventStorage}
    * @private
    */
-  private pickles: Record<string, Pickle> = {};
-
-  /**
-   * @type {Record<string, TestCaseStarted>}
-   * @private
-   */
-  private testCaseStarts: Record<string, TestCaseStarted> = {};
-
-  /**
-   * @type {Record<string, TestStepFinished>}
-   * @private
-   */
-  private testCaseSteps: Record<string, TestStepFinished> = {};
+  private events: EventStorage = new EventStorage();
 
   /**
    * @type {Record<string, TestStatusEnum>}
@@ -74,29 +60,11 @@ export class Storage {
   private testCaseStartedErrors: Record<string, string[]> = {};
 
   /**
-   * @type {Record<string, string>}
-   * @private
-   */
-  private testCases: Record<string, TestCase> = {};
-
-  /**
-   * @type {Record<string, string>}
-   * @private
-   */
-  private scenarios: Record<string, ScenarioData> = {};
-
-  /**
-   * @type {Record<string, string>}
-   * @private
-   */
-  private attachments: Record<string, Attachment[]> = {};
-
-  /**
    * Add pickle to storage
    * @param {Pickle} pickle
    */
   public addPickle(pickle: Pickle): void {
-    this.pickles[pickle.id] = pickle;
+    this.events.addPickle(pickle);
   }
 
   /**
@@ -104,39 +72,7 @@ export class Storage {
    * @param {GherkinDocument} document
    */
   public addScenario(document: GherkinDocument): void {
-    if (document.feature) {
-      const { children, name } = document.feature;
-
-      children.forEach(({ scenario }) => {
-        if (scenario) {
-          const parameters: Record<string, Record<string, string>> = {};
-          
-          scenario.examples?.forEach((example) => {
-            if (example.tableHeader && example.tableBody) {
-              const columnNames = example.tableHeader.cells.map(cell => cell.value);
-              
-              example.tableBody.forEach((row) => {
-                const rowParams: Record<string, string> = {};
-                
-                row.cells.forEach((cell, index) => {
-                  const columnName = columnNames[index];
-                  if (columnName) {
-                    rowParams[columnName] = cell.value;
-                  }
-                });
-                
-                parameters[row.id] = rowParams;
-              });
-            }
-          });
-
-          this.scenarios[scenario.id] = {
-            name: name,
-            parameters: parameters,
-          };
-        }
-      });
-    }
+    this.events.addScenario(document);
   }
 
   /**
@@ -144,35 +80,7 @@ export class Storage {
    * @param {Attach} attachment
    */
   public addAttachment(attachment: Attach): void {
-    if (attachment.testStepId) {
-      if (!this.attachments[attachment.testStepId]) {
-        this.attachments[attachment.testStepId] = [];
-      }
-
-      this.attachments[attachment.testStepId]?.push({
-        file_name: this.getFileNameFromMediaType(attachment.mediaType),
-        mime_type: attachment.mediaType,
-        file_path: null,
-        content: attachment.body,
-        size: 0,
-        id: uuidv4(),
-      });
-    }
-
-    if (attachment.testCaseStartedId) {
-      if (!this.attachments[attachment.testCaseStartedId]) {
-        this.attachments[attachment.testCaseStartedId] = [];
-      }
-
-      this.attachments[attachment.testCaseStartedId]?.push({
-        file_name: this.getFileNameFromMediaType(attachment.mediaType),
-        mime_type: attachment.mediaType,
-        file_path: null,
-        content: attachment.body,
-        size: 0,
-        id: uuidv4(),
-      });
-    }
+    this.events.addAttachment(attachment);
   }
 
   /**
@@ -180,7 +88,7 @@ export class Storage {
    * @param {TestCase} testCase
    */
   public addTestCase(testCase: TestCase): void {
-    this.testCases[testCase.id] = testCase;
+    this.events.addTestCase(testCase);
   }
 
   /**
@@ -188,10 +96,8 @@ export class Storage {
    * @param {TestCaseStarted} testCaseStarted
    */
   public addTestCaseStarted(testCaseStarted: TestCaseStarted): void {
-    this.testCaseStarts[testCaseStarted.id] =
-      testCaseStarted;
-    this.testCaseStartedResult[testCaseStarted.id] =
-      TestStatusEnum.passed;
+    this.events.addTestCaseStarted(testCaseStarted);
+    this.testCaseStartedResult[testCaseStarted.id] = TestStatusEnum.passed;
     if (this.profiler) {
       this.profilerStepSnapshots[testCaseStarted.id] = this.profiler.getAllSteps().length;
     }
@@ -213,7 +119,7 @@ export class Storage {
     // Determine status based on error type
     const newStatus = determineTestStatus(error, Storage.statusMap[testCaseStep.testStepResult.status]);
 
-    this.testCaseSteps[testCaseStep.testStepId] = testCaseStep;
+    this.events.addTestStepFinished(testCaseStep);
 
     if (newStatus !== TestStatusEnum.passed) {
       if (testCaseStep.testStepResult.message) {
@@ -241,20 +147,19 @@ export class Storage {
    * @returns {undefined | TestResultType}
    */
   public convertTestCase(testCase: TestCaseFinished): undefined | TestResultType {
-    const tcs =
-      this.testCaseStarts[testCase.testCaseStartedId];
+    const tcs = this.events.getTestCaseStarted(testCase.testCaseStartedId);
 
     if (!tcs) {
       return undefined;
     }
 
-    const tc = this.testCases[tcs.testCaseId];
+    const tc = this.events.getTestCase(tcs.testCaseId);
 
     if (!tc) {
       return undefined;
     }
 
-    const pickle = this.pickles[tc.pickleId];
+    const pickle = this.events.getPickle(tc.pickleId);
 
     if (!pickle) {
       return undefined;
@@ -271,7 +176,7 @@ export class Storage {
     let relations: Relation | null = null;
     let params: Record<string, string> = {};
     const nodeId = pickle.astNodeIds[0];
-    
+
     // If suite is specified in metadata, use it (split by tab for sub-suites)
     if (metadata.suite) {
       const suiteParts = metadata.suite.split('\t').filter(part => part.trim().length > 0);
@@ -283,13 +188,13 @@ export class Storage {
           })),
         },
       };
-    } else if (nodeId != undefined && this.scenarios[nodeId] != undefined) {
+    } else if (nodeId != undefined && this.events.getScenario(nodeId) != undefined) {
       // Otherwise, use feature name as suite
       relations = {
         suite: {
           data: [
             {
-              title: this.scenarios[nodeId]?.name ?? '',
+              title: this.events.getScenario(nodeId)?.name ?? '',
               public_id: null,
             },
           ],
@@ -298,10 +203,10 @@ export class Storage {
     }
 
     // Extract parameters from Gherkin examples
-    if (nodeId != undefined && this.scenarios[nodeId] != undefined) {
+    if (nodeId != undefined && this.events.getScenario(nodeId) != undefined) {
       for (const id of pickle.astNodeIds) {
-        if (this.scenarios[nodeId]?.parameters[id] != undefined) {
-          params = { ...params, ...this.scenarios[nodeId]?.parameters[id] };
+        if (this.events.getScenario(nodeId)?.parameters[id] != undefined) {
+          params = { ...params, ...this.events.getScenario(nodeId)?.parameters[id] };
         }
       }
     }
@@ -323,7 +228,7 @@ export class Storage {
 
     const hasProjectMapping = Object.keys(metadata.projectMapping).length > 0;
     const result = {
-      attachments: this.attachments[testCase.testCaseStartedId] ?? [],
+      attachments: this.events.getAttachments(testCase.testCaseStartedId),
       author: null,
       execution: {
         status: this.testCaseStartedResult[testCase.testCaseStartedId] ?? TestStatusEnum.passed,
@@ -362,7 +267,7 @@ export class Storage {
     const results: TestStepType[] = [];
 
     for (const s of testCase.testSteps) {
-      const finished = this.testCaseSteps[s.id];
+      const finished = this.events.getTestStepFinished(s.id);
       if (!finished) {
         continue;
       }
@@ -387,7 +292,7 @@ export class Storage {
             end_time: null,
             duration: finished.testStepResult.duration.seconds * 1000,
           },
-          attachments: this.attachments[s.id] ?? [],
+          attachments: this.events.getAttachments(s.id),
           steps: [],
           parent_id: null,
         }
@@ -429,29 +334,5 @@ export class Storage {
     return error;
   }
 
-  private getFileNameFromMediaType(mediaType: string): string {
-    const extensions: Record<string, string> = {
-      'text/plain': 'txt',
-      'application/json': 'json',
-      'image/png': 'png',
-      'image/jpeg': 'jpg',
-      'image/gif': 'gif',
-      'text/html': 'html',
-      'application/pdf': 'pdf',
-      'application/xml': 'xml',
-      'application/zip': 'zip',
-      'application/msword': 'doc',
-      'application/vnd.ms-excel': 'xls',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
-    };
-
-    const extension = extensions[mediaType];
-
-    if (extension) {
-      return `file.${extension}`;
-    } else {
-      return 'file';
-    }
-  }
 }
+

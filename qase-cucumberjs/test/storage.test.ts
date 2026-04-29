@@ -2,6 +2,7 @@
 import { expect } from '@jest/globals';
 import { Storage } from '../src/storage';
 import { TagParser } from '../src/modules/tagParser';
+import { EventStorage } from '../src/modules/eventStorage';
 import { Status } from '@cucumber/cucumber';
 import { TestStatusEnum } from 'qase-javascript-commons';
 import { Pickle, GherkinDocument, Attachment, TestCase, TestCaseStarted, TestStepFinished, TestCaseFinished, AttachmentContentEncoding } from '@cucumber/messages';
@@ -30,7 +31,7 @@ describe('Storage', () => {
         uri: 'test.feature'
       };
       storage.addPickle(pickle);
-      expect((storage as any).pickles['pickle-1']).toBe(pickle);
+      expect((storage as any).events.getPickle('pickle-1')).toBe(pickle);
     });
   });
 
@@ -86,7 +87,7 @@ describe('Storage', () => {
 
       storage.addScenario(document);
 
-      expect((storage as any).scenarios['scenario-1']).toEqual({
+      expect((storage as any).events.getScenario('scenario-1')).toEqual({
         name: 'Test Feature',
         parameters: {
           'row-1': { param1: 'value1', param2: 'value2' },
@@ -124,7 +125,7 @@ describe('Storage', () => {
 
       storage.addScenario(document);
 
-      expect((storage as any).scenarios['scenario-1']).toEqual({
+      expect((storage as any).events.getScenario('scenario-1')).toEqual({
         name: 'Test Feature',
         parameters: {},
       });
@@ -142,8 +143,8 @@ describe('Storage', () => {
 
       storage.addAttachment(attachment);
 
-      expect((storage as any).attachments['step-1']).toHaveLength(1);
-      expect((storage as any).attachments['step-1']?.[0]).toEqual({
+      expect((storage as any).events.getAttachments('step-1')).toHaveLength(1);
+      expect((storage as any).events.getAttachments('step-1')[0]).toEqual({
         file_name: 'file.txt',
         mime_type: 'text/plain',
         file_path: null,
@@ -163,8 +164,8 @@ describe('Storage', () => {
 
       storage.addAttachment(attachment);
 
-      expect((storage as any).attachments['case-1']).toHaveLength(1);
-      expect((storage as any).attachments['case-1']?.[0]).toEqual({
+      expect((storage as any).events.getAttachments('case-1')).toHaveLength(1);
+      expect((storage as any).events.getAttachments('case-1')[0]).toEqual({
         file_name: 'file.png',
         mime_type: 'image/png',
         file_path: null,
@@ -191,7 +192,7 @@ describe('Storage', () => {
       storage.addAttachment(attachment1);
       storage.addAttachment(attachment2);
 
-      expect((storage as any).attachments['step-1']).toHaveLength(2);
+      expect((storage as any).events.getAttachments('step-1')).toHaveLength(2);
     });
   });
 
@@ -203,7 +204,7 @@ describe('Storage', () => {
         pickleId: 'pickle-1'
       };
       storage.addTestCase(testCase);
-      expect((storage as any).testCases['case-1']).toBe(testCase);
+      expect((storage as any).events.getTestCase('case-1')).toBe(testCase);
     });
   });
 
@@ -217,7 +218,7 @@ describe('Storage', () => {
       };
       storage.addTestCaseStarted(testCaseStarted);
 
-      expect((storage as any).testCaseStarts['started-1']).toBe(testCaseStarted);
+      expect((storage as any).events.getTestCaseStarted('started-1')).toBe(testCaseStarted);
       expect((storage as any).testCaseStartedResult['started-1']).toBe(TestStatusEnum.passed);
     });
   });
@@ -245,7 +246,7 @@ describe('Storage', () => {
 
       storage.addTestCaseStep(testStepFinished);
 
-      expect((storage as any).testCaseSteps['step-1']).toBe(testStepFinished);
+      expect((storage as any).events.getTestStepFinished('step-1')).toBe(testStepFinished);
       expect((storage as any).testCaseStartedResult['started-1']).toBe(TestStatusEnum.failed);
       expect((storage as any).testCaseStartedErrors['started-1']).toContain('Test failed');
     });
@@ -957,16 +958,16 @@ describe('Storage', () => {
     });
 
     it('should get file name from media type', () => {
-      expect((storage as any).getFileNameFromMediaType('text/plain')).toBe('file.txt');
-      expect((storage as any).getFileNameFromMediaType('application/json')).toBe('file.json');
-      expect((storage as any).getFileNameFromMediaType('image/png')).toBe('file.png');
-      expect((storage as any).getFileNameFromMediaType('image/jpeg')).toBe('file.jpg');
-      expect((storage as any).getFileNameFromMediaType('text/html')).toBe('file.html');
-      expect((storage as any).getFileNameFromMediaType('application/pdf')).toBe('file.pdf');
+      expect(EventStorage.getFileNameFromMediaType('text/plain')).toBe('file.txt');
+      expect(EventStorage.getFileNameFromMediaType('application/json')).toBe('file.json');
+      expect(EventStorage.getFileNameFromMediaType('image/png')).toBe('file.png');
+      expect(EventStorage.getFileNameFromMediaType('image/jpeg')).toBe('file.jpg');
+      expect(EventStorage.getFileNameFromMediaType('text/html')).toBe('file.html');
+      expect(EventStorage.getFileNameFromMediaType('application/pdf')).toBe('file.pdf');
     });
 
     it('should return default file name for unknown media type', () => {
-      expect((storage as any).getFileNameFromMediaType('unknown/type')).toBe('file');
+      expect(EventStorage.getFileNameFromMediaType('unknown/type')).toBe('file');
     });
   });
 }); 
