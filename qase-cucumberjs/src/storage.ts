@@ -21,22 +21,17 @@ import { TagParser } from './modules/tagParser';
 import { EventStorage } from './modules/eventStorage';
 import { StatusTracker } from './modules/statusTracker';
 import { StepConverter } from './modules/stepConverter';
+import { ProfilerTracker } from './modules/profilerTracker';
 
 export class Storage {
   /**
-   * @type {NetworkProfiler | null}
+   * @type {ProfilerTracker}
    * @private
    */
-  private profiler: NetworkProfiler | null;
-
-  /**
-   * @type {Record<string, number>}
-   * @private
-   */
-  private profilerStepSnapshots: Record<string, number> = {};
+  private profilerTracker: ProfilerTracker;
 
   constructor(profiler: NetworkProfiler | null = null) {
-    this.profiler = profiler;
+    this.profilerTracker = new ProfilerTracker(profiler);
   }
 
   /**
@@ -90,9 +85,7 @@ export class Storage {
   public addTestCaseStarted(testCaseStarted: TestCaseStarted): void {
     this.events.addTestCaseStarted(testCaseStarted);
     this.statusTracker.onTestStarted(testCaseStarted.id);
-    if (this.profiler) {
-      this.profilerStepSnapshots[testCaseStarted.id] = this.profiler.getAllSteps().length;
-    }
+    this.profilerTracker.onTestStart(testCaseStarted.id);
   }
 
   /**
@@ -186,13 +179,8 @@ export class Storage {
     );
 
     // Collect profiler steps since this test case started
-    let profilerSteps: TestStepType[] = [];
-    if (this.profiler) {
-      const snapshot = this.profilerStepSnapshots[testCase.testCaseStartedId] ?? 0;
-      const allSteps = this.profiler.getAllSteps();
-      profilerSteps = allSteps.slice(snapshot);
-      delete this.profilerStepSnapshots[testCase.testCaseStartedId];
-    }
+    const profilerSteps: TestStepType[] = this.profilerTracker.getEvents(testCase.testCaseStartedId);
+    this.profilerTracker.reset(testCase.testCaseStartedId);
 
     const hasProjectMapping = Object.keys(metadata.projectMapping).length > 0;
     const result = {
@@ -236,6 +224,10 @@ export class Storage {
    */
   private getSignature(pickle: Pickle, ids: number[], parameters: Record<string, string> = {}): string {
     return generateSignature(ids, [...pickle.uri.split('/'), pickle.name], parameters);
+  }
+
+  public restore(): void {
+    this.profilerTracker.restore();
   }
 
 }

@@ -25,6 +25,7 @@ const storageMock = {
   addTestCaseStarted: jest.fn(),
   addTestCaseStep: jest.fn(),
   convertTestCase: jest.fn(() => ({ id: 'result-id' })) as jest.Mock,
+  restore: jest.fn(),
 };
 
 jest.mock('qase-javascript-commons', () => ({
