@@ -1,0 +1,27 @@
+qase-mocha/src/modules/stepRunner.ts
+  efd166bf1f77837a 1-57
+qase-mocha/src/reporter.ts
+  efd166bf1f77837a 26,69,176,199,251,269,383
+qase-mocha/test/stepRunner.test.ts
+  efd166bf1f77837a 1-73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "ba615ff751d0ba15075bc0c78a69310d5146b96b",
+  "prompts": {
+    "efd166bf1f77837a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "74bfed73-d2fb-44c6-9ae5-f589510d4a3f",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 137,
+      "total_deletions": 568,
+      "accepted_lines": 10117,
+      "overriden_lines": 0
+    }
+  }
+}
