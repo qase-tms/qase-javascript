@@ -40,12 +40,6 @@ export type CypressQaseOptionsType = Omit<MochaOptions, 'reporterOptions'> & {
  */
 export class CypressQaseReporter extends reporters.Base {
   /**
-   * @type {RegExp}
-   */
-  /** @deprecated Use parseProjectMappingFromTitle from qase-javascript-commons for multi-project support. */
-  static qaseIdRegExp = /\(Qase ID:? ([\d,]+)\)/;
-
-  /**
    * @type {Record<CypressState, TestStatusEnum>}
    */
   static statusMap: Record<CypressState, TestStatusEnum> = {

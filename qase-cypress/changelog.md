@@ -1,3 +1,14 @@
+# cypress-qase-reporter@3.6.0
+
+## Changed
+
+- Internal: decomposed `CypressQaseReporter` into focused modules — `TestTracker`, `StepConverter`, `ResultBuilder`, `SkippedTestHandler`. The reporter class now acts as a composition root with thin Mocha runner-event delegations. Public contract preserved: the named-exported `CypressQaseReporter` class extending `reporters.Base`, the constructor signature `(runner, options, configLoader?)`, the static `statusMap`, and the `CypressQaseOptionsType` type export are unchanged. Cross-process state (`MetadataManager`, `ResultsManager`) is untouched.
+- Added 34 new unit tests covering each extracted module.
+
+## Removed
+
+- `CypressQaseReporter.qaseIdRegExp` (static). The field was JSDoc-marked `@deprecated` since Phase 1 in favor of `parseProjectMappingFromTitle` from `qase-javascript-commons`. The same removal in `MochaQaseReporter` shipped in PR #946 without incident.
+
 # cypress-qase-reporter@3.5.0
 
 ## Changed
