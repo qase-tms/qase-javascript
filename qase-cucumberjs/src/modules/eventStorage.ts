@@ -103,6 +103,10 @@ export class EventStorage {
     return this.testStepFinished[id];
   }
 
+  getAllTestStepFinished(): Map<string, TestStepFinished> {
+    return new Map(Object.entries(this.testStepFinished));
+  }
+
   private appendAttachment(key: string, attachment: Attach): void {
     const list = this.attachments[key] ?? [];
     this.attachments[key] = list;

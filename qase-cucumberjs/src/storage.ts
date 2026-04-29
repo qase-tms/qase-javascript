@@ -2,7 +2,6 @@ import {
   Attachment as Attach,
   GherkinDocument,
   Pickle,
-  PickleStep,
   TestCaseFinished,
   TestCaseStarted,
   TestStepFinished,
@@ -11,7 +10,6 @@ import {
   generateSignature,
   Relation,
   StepStatusEnum,
-  StepType,
   TestResultType,
   TestStatusEnum,
   TestStepType,
@@ -22,6 +20,7 @@ import { STATUS_MAP, STEP_STATUS_MAP, TestStepResultStatus } from './modules/sta
 import { TagParser } from './modules/tagParser';
 import { EventStorage } from './modules/eventStorage';
 import { StatusTracker } from './modules/statusTracker';
+import { StepConverter } from './modules/stepConverter';
 
 export class Storage {
   /**
@@ -179,7 +178,12 @@ export class Storage {
     // Parameters from tags take precedence over Gherkin examples
     params = { ...params, ...metadata.parameters };
 
-    const steps = this.convertSteps(pickle.steps, tc);
+    const steps = StepConverter.convert(
+      pickle.steps,
+      tc,
+      this.events.getAllTestStepFinished(),
+      (stepId) => this.events.getAttachments(stepId),
+    );
 
     // Collect profiler steps since this test case started
     let profilerSteps: TestStepType[] = [];
@@ -218,54 +222,6 @@ export class Storage {
       tags: metadata.tags,
     } as unknown as TestResultType;
     return result;
-  }
-
-  /**
-   * Convert test steps to test result steps
-   * @param {readonly PickleStep[]} steps
-   * @param {TestCase} testCase
-   * @returns {TestStepType[]}
-   * @private
-   */
-  private convertSteps(steps: readonly PickleStep[], testCase: TestCase): TestStepType[] {
-    const results: TestStepType[] = [];
-
-    for (const s of testCase.testSteps) {
-      const finished = this.events.getTestStepFinished(s.id);
-      if (!finished) {
-        continue;
-      }
-
-      const step = steps.find((step) => step.id === s.pickleStepId);
-
-      if (!step) {
-        continue;
-      }
-
-      const result: TestStepType = {
-          id: s.id,
-          step_type: StepType.GHERKIN,
-          data: {
-            keyword: step.text,
-            name: step.text,
-            line: 0,
-          },
-          execution: {
-            status: Storage.stepStatusMap[finished.testStepResult.status],
-            start_time: null,
-            end_time: null,
-            duration: finished.testStepResult.duration.seconds * 1000,
-          },
-          attachments: this.events.getAttachments(s.id),
-          steps: [],
-          parent_id: null,
-        }
-      ;
-
-      results.push(result);
-    }
-
-    return results;
   }
 
   static statusMap: Record<TestStepResultStatus, TestStatusEnum> = STATUS_MAP;
