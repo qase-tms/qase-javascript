@@ -1,6 +1,7 @@
 /* eslint-disable */
 import { expect } from '@jest/globals';
 import { Storage } from '../src/storage';
+import { TagParser } from '../src/modules/tagParser';
 import { Status } from '@cucumber/cucumber';
 import { TestStatusEnum } from 'qase-javascript-commons';
 import { Pickle, GherkinDocument, Attachment, TestCase, TestCaseStarted, TestStepFinished, TestCaseFinished, AttachmentContentEncoding } from '@cucumber/messages';
@@ -769,7 +770,7 @@ describe('Storage', () => {
         { name: '@QaseIgnore' },
       ];
 
-      const result = (storage as any).parseTags(tags);
+      const result = TagParser.parse(tags);
 
       expect(result.ids).toEqual([123]);
       expect(result.title).toBe('Test Title');
@@ -782,7 +783,7 @@ describe('Storage', () => {
         { name: '@QaseID=123,456,789' },
       ];
 
-      const result = (storage as any).parseTags(tags);
+      const result = TagParser.parse(tags);
 
       expect(result.ids).toEqual([123, 456, 789]);
     });
@@ -792,7 +793,7 @@ describe('Storage', () => {
         { name: '@QaseFields=invalid json' },
       ];
 
-      const result = (storage as any).parseTags(tags);
+      const result = TagParser.parse(tags);
 
       expect(result.fields).toEqual({});
     });
@@ -802,7 +803,7 @@ describe('Storage', () => {
         { name: '@QaseParameters={"browser":"chrome","environment":"staging"}' },
       ];
 
-      const result = (storage as any).parseTags(tags);
+      const result = TagParser.parse(tags);
 
       expect(result.parameters).toEqual({ browser: 'chrome', environment: 'staging' });
     });
@@ -812,7 +813,7 @@ describe('Storage', () => {
         { name: '@QaseGroupParameters={"test_group":"authentication","test_type":"smoke"}' },
       ];
 
-      const result = (storage as any).parseTags(tags);
+      const result = TagParser.parse(tags);
 
       expect(result.group_params).toEqual({ test_group: 'authentication', test_type: 'smoke' });
     });
@@ -822,7 +823,7 @@ describe('Storage', () => {
         { name: "@QaseParameters={'browser':'chrome','environment':'staging'}" },
       ];
 
-      const result = (storage as any).parseTags(tags);
+      const result = TagParser.parse(tags);
 
       expect(result.parameters).toEqual({ browser: 'chrome', environment: 'staging' });
     });
@@ -832,7 +833,7 @@ describe('Storage', () => {
         { name: "@QaseGroupParameters={'group':'regression'}" },
       ];
 
-      const result = (storage as any).parseTags(tags);
+      const result = TagParser.parse(tags);
 
       expect(result.group_params).toEqual({ group: 'regression' });
     });
@@ -842,7 +843,7 @@ describe('Storage', () => {
         { name: '@QaseSuite=Authentication' },
       ];
 
-      const result = (storage as any).parseTags(tags);
+      const result = TagParser.parse(tags);
 
       expect(result.suite).toBe('Authentication');
     });
@@ -852,7 +853,7 @@ describe('Storage', () => {
         { name: '@QaseSuite=Authentication\tLogin\tEdge Cases' },
       ];
 
-      const result = (storage as any).parseTags(tags);
+      const result = TagParser.parse(tags);
 
       expect(result.suite).toBe('Authentication\tLogin\tEdge Cases');
     });
@@ -863,7 +864,7 @@ describe('Storage', () => {
         { name: '@QaseGroupParameters={"test_group":"authentication"}' },
       ];
 
-      const result = (storage as any).parseTags(tags);
+      const result = TagParser.parse(tags);
 
       expect(result.parameters).toEqual({ browser: 'chrome' });
       expect(result.group_params).toEqual({ test_group: 'authentication' });
@@ -874,7 +875,7 @@ describe('Storage', () => {
         { name: '@QaseParameters=invalid json' },
       ];
 
-      const result = (storage as any).parseTags(tags);
+      const result = TagParser.parse(tags);
 
       expect(result.parameters).toEqual({});
     });
@@ -883,7 +884,7 @@ describe('Storage', () => {
         { name: '@QaseTags=smoke,regression' },
       ];
 
-      const result = (storage as any).parseTags(tags);
+      const result = TagParser.parse(tags);
 
       expect(result.tags).toEqual(['smoke', 'regression']);
     });
@@ -893,7 +894,7 @@ describe('Storage', () => {
         { name: '@qasetags=Smoke' },
       ];
 
-      const result = (storage as any).parseTags(tags);
+      const result = TagParser.parse(tags);
 
       expect(result.tags).toEqual(['Smoke']);
     });
@@ -903,7 +904,7 @@ describe('Storage', () => {
         { name: '@QaseTags= smoke , regression ' },
       ];
 
-      const result = (storage as any).parseTags(tags);
+      const result = TagParser.parse(tags);
 
       expect(result.tags).toEqual(['smoke', 'regression']);
     });
@@ -914,7 +915,7 @@ describe('Storage', () => {
         { name: '@QaseTags=regression' },
       ];
 
-      const result = (storage as any).parseTags(tags);
+      const result = TagParser.parse(tags);
 
       expect(result.tags).toEqual(['smoke', 'regression']);
     });
@@ -926,7 +927,7 @@ describe('Storage', () => {
         { name: '@QaseFields={"severity":"high"}' },
       ];
 
-      const result = (storage as any).parseTags(tags);
+      const result = TagParser.parse(tags);
 
       expect(result.ids).toContain(1);
       expect(result.tags).toEqual(['smoke']);
@@ -939,7 +940,7 @@ describe('Storage', () => {
         { name: '@QaseGroupParameters=invalid json' },
       ];
 
-      const result = (storage as any).parseTags(tags);
+      const result = TagParser.parse(tags);
 
       expect(result.group_params).toEqual({});
     });
@@ -950,7 +951,7 @@ describe('Storage', () => {
         { name: '@QaseParameters={"environment":"staging"}' },
       ];
 
-      const result = (storage as any).parseTags(tags);
+      const result = TagParser.parse(tags);
 
       expect(result.parameters).toEqual({ browser: 'chrome', environment: 'staging' });
     });

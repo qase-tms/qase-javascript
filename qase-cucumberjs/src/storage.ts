@@ -3,7 +3,6 @@ import {
   GherkinDocument,
   Pickle,
   PickleStep,
-  PickleTag,
   TestCaseFinished,
   TestCaseStarted,
   TestStepFinished,
@@ -19,23 +18,13 @@ import {
   TestStatusEnum,
   TestStepType,
   determineTestStatus,
-  parseProjectMappingFromTags,
 } from 'qase-javascript-commons';
 import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 import { TestCase } from '@cucumber/messages/dist/esm/src/messages';
 import { v4 as uuidv4 } from 'uuid';
-import { ScenarioData, TestMetadata } from './models';
+import { ScenarioData } from './models';
 import { STATUS_MAP, STEP_STATUS_MAP, TestStepResultStatus } from './modules/statusMaps';
-
-const qaseIdRegExp = /^@[Qq]-?(\d+)$/;
-const newQaseIdRegExp = /^@[Qq]ase[Ii][Dd]=(\d+(?:,\s*\d+)*)$/;
-const qaseTitleRegExp = /^@[Qq]ase[Tt]itle=(.+)$/;
-const qaseFieldsRegExp = /^@[Qq]ase[Ff]ields=(.+)$/;
-const qaseParametersRegExp = /^@[Qq]ase[Pp]arameters=(.+)$/;
-const qaseGroupParametersRegExp = /^@[Qq]ase[Gg]roup[Pp]arameters=(.+)$/;
-const qaseSuiteRegExp = /^@[Qq]ase[Ss]uite=(.+)$/;
-const qaseIgnoreRegExp = /^@[Qq]ase[Ii][Gg][Nn][Oo][Rr][Ee]$/;
-const qaseTagsRegExp = /^@[Qq]ase[Tt]ags=(.+)$/;
+import { TagParser } from './modules/tagParser';
 
 export class Storage {
   /**
@@ -271,7 +260,7 @@ export class Storage {
       return undefined;
     }
 
-    const metadata = this.parseTags(pickle.tags);
+    const metadata = TagParser.parse(pickle.tags);
 
     if (metadata.isIgnore) {
       return undefined;
@@ -414,92 +403,6 @@ export class Storage {
 
   static stepStatusMap: Record<TestStepResultStatus, StepStatusEnum> = STEP_STATUS_MAP;
 
-  private parseTags(tags: readonly PickleTag[]): TestMetadata {
-    const tagNames = tags.map((t) => t.name);
-    const { legacyIds, projectMapping } = parseProjectMappingFromTags(tagNames);
-
-    const metadata: TestMetadata = {
-      ids: [...legacyIds],
-      projectMapping: { ...projectMapping },
-      fields: {},
-      title: null,
-      isIgnore: false,
-      parameters: {},
-      group_params: {},
-      suite: null,
-      tags: [],
-    };
-
-    for (const tag of tags) {
-      if (qaseIdRegExp.test(tag.name)) {
-        metadata.ids.push(Number(tag.name.replace(/^@[Qq]-?/, '')));
-        continue;
-      }
-
-      if (newQaseIdRegExp.test(tag.name)) {
-        const idsStr = tag.name.replace(/^@[Qq]ase[Ii][Dd]=/, '');
-        metadata.ids.push(...idsStr.split(',').map((s) => Number(s.trim())));
-        continue;
-      }
-
-      if (qaseTitleRegExp.test(tag.name)) {
-        metadata.title = tag.name.replace(/^@[Qq]ase[Tt]itle=/, '');
-        continue;
-      }
-
-      if (qaseFieldsRegExp.test(tag.name)) {
-        const value = tag.name.replace(/^@[Qq]ase[Ff]ields=/, '');
-        try {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const record: Record<string, string> = JSON.parse(this.normalizeJsonString(value));
-          metadata.fields = { ...metadata.fields, ...record };
-        } catch (e) {
-          // do nothing
-        }
-      }
-
-      if (qaseParametersRegExp.test(tag.name)) {
-        const value = tag.name.replace(/^@[Qq]ase[Pp]arameters=/, '');
-        try {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const record: Record<string, string> = JSON.parse(this.normalizeJsonString(value));
-          metadata.parameters = { ...metadata.parameters, ...record };
-        } catch (e) {
-          // do nothing
-        }
-      }
-
-      if (qaseGroupParametersRegExp.test(tag.name)) {
-        const value = tag.name.replace(/^@[Qq]ase[Gg]roup[Pp]arameters=/, '');
-        try {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const record: Record<string, string> = JSON.parse(this.normalizeJsonString(value));
-          metadata.group_params = { ...metadata.group_params, ...record };
-        } catch (e) {
-          // do nothing
-        }
-      }
-
-      if (qaseSuiteRegExp.test(tag.name)) {
-        metadata.suite = tag.name.replace(/^@[Qq]ase[Ss]uite=/, '');
-        continue;
-      }
-
-      if (qaseTagsRegExp.test(tag.name)) {
-        const value = tag.name.replace(/^@[Qq]ase[Tt]ags=/, '');
-        const parsedTags = value.split(',').map(t => t.trim()).filter(t => t.length > 0);
-        metadata.tags.push(...parsedTags);
-        continue;
-      }
-
-      if (qaseIgnoreRegExp.test(tag.name)) {
-        metadata.isIgnore = true;
-      }
-    }
-
-    return metadata;
-  }
-
   /**
    * @param {Pickle} pickle
    * @param {number[]} ids
@@ -524,23 +427,6 @@ export class Storage {
     });
 
     return error;
-  }
-
-  /**
-   * Normalize JSON string by converting single quotes to double quotes
-   * This allows parsing JSON-like strings with single quotes
-   * @param {string} jsonString
-   * @returns {string}
-   * @private
-   */
-  private normalizeJsonString(jsonString: string): string {
-    // If the string contains single quotes, convert them to double quotes
-    // This handles cases like {'key':'value'} which should be {"key":"value"}
-    if (jsonString.includes("'")) {
-      return jsonString.replace(/'/g, '"');
-    }
-    // If no single quotes, return as-is (already valid JSON or will fail with proper error)
-    return jsonString;
   }
 
   private getFileNameFromMediaType(mediaType: string): string {
