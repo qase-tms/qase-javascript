@@ -1,14 +1,11 @@
 import { Context, MochaOptions, reporters, Runner, Suite } from 'mocha';
 import { Hook, Metadata, Test } from './types';
 import {
-  Attachment,
   composeOptions,
   ConfigLoader,
   generateSignature,
   QaseReporter,
   ReporterInterface,
-  StepStatusEnum,
-  StepType,
   TestResultType,
   TestStatusEnum,
   TestStepType,
@@ -17,7 +14,6 @@ import {
 } from 'qase-javascript-commons';
 import {
   removeQaseIdsFromTitle,
-  extractAndCleanStep,
   getFile as getFileFromNode,
   FileSuiteNode,
   normalizeSuitePart,
@@ -27,6 +23,7 @@ import deasyncPromise from 'deasync-promise';
 import { extname, join } from 'node:path';
 import { v4 as uuidv4 } from 'uuid';
 import { OutputCapture } from './modules/outputCapture';
+import { StepRunner } from './modules/stepRunner';
 import {
   parseExtraReporters,
   createExtraReporters,
@@ -36,12 +33,6 @@ import { STATUS_MAP, MochaState } from './modules/statusMap';
 
 
 const Events = Runner.constants;
-
-class currentTest {
-  steps: TestStepType[] = [];
-  status: MochaState = 'passed';
-  attachments: Attachment[] = [];
-}
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-return,@typescript-eslint/restrict-template-expressions
 const resolveParallelModeSetupFile = () => join(__dirname, `parallel${extname(__filename)}`);
@@ -75,7 +66,7 @@ export class MochaQaseReporter extends reporters.Base {
    */
   private readonly metadata: Metadata = new Metadata();
 
-  private currentTest: currentTest = new currentTest();
+  private readonly stepRunner: StepRunner = new StepRunner();
   private testBeginTime: number = Date.now();
   private currentType: 'test' | 'step' = 'test';
 
@@ -182,6 +173,7 @@ export class MochaQaseReporter extends reporters.Base {
   private onStartTest() {
     this.outputCapture.reset();
     this.outputCapture.install();
+    this.stepRunner.reset();
     this.currentType = 'test';
     this.testBeginTime = Date.now();
     this._profilerStepSnapshot = this.profiler?.getAllSteps().length ?? 0;
@@ -204,7 +196,7 @@ export class MochaQaseReporter extends reporters.Base {
 
     if (this.metadata.ignore) {
       this.metadata.clear();
-      this.currentTest = new currentTest();
+      this.stepRunner.reset();
       return;
     }
 
@@ -256,7 +248,7 @@ export class MochaQaseReporter extends reporters.Base {
       relations: relations,
       run_id: null,
       signature: this.getSignature(test, hasProjectMapping ? [] : ids, this.metadata.parameters ?? {}),
-      steps: [...this.currentTest.steps, ...profilerSteps],
+      steps: [...this.stepRunner.getSteps(), ...profilerSteps],
       id: uuidv4(),
       execution: {
         status: determineTestStatus(test.err ?? null, test.state ?? 'failed'),
@@ -274,7 +266,7 @@ export class MochaQaseReporter extends reporters.Base {
     void this.reporter.addTestResult(result);
 
     this.metadata.clear();
-    this.currentTest = new currentTest();
+    this.stepRunner.reset();
   }
 
   /**
@@ -386,46 +378,9 @@ export class MochaQaseReporter extends reporters.Base {
   };
 
   step = (title: string, func: () => void, expectedResult?: string, data?: string) => {
-
     const previousType = this.currentType;
-
     this.currentType = 'step';
-
-    const stepTitle = expectedResult || data 
-      ? `${title} QaseExpRes:${expectedResult ? `: ${expectedResult}` : ''} QaseData:${data ? `: ${data}` : ''}` 
-      : title;
-
-    const stepData = extractAndCleanStep(stepTitle);
-
-    const step: TestStepType = {
-      step_type: StepType.TEXT,
-      data: {
-        action: stepData.cleanedString,
-        expected_result: stepData.expectedResult,
-        data: stepData.data,
-      },
-      execution: {
-        start_time: Date.now(),
-        status: StepStatusEnum.passed,
-        end_time: null,
-        duration: null,
-      },
-      id: '',
-      parent_id: null,
-      attachments: [],
-      steps: [],
-    };
-
-    try {
-      func();
-    } catch (err) {
-      step.execution.status = StepStatusEnum.failed;
-      this.currentTest.status = 'failed';
-    }
-
-    step.execution.end_time = Date.now();
-
-    this.currentTest.steps.push(step);
+    this.stepRunner.run(title, func, expectedResult, data);
     this.currentType = previousType;
   };
 }
