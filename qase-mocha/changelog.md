@@ -1,3 +1,13 @@
+# mocha-qase-reporter@1.5.0
+
+## Changed
+
+- Decomposed `reporter.ts` (465 LOC) into a thin orchestrator plus 5 focused modules under `src/modules/`: `MetadataApplier`, `OutputCapture`, `StepRunner`, `ProfilerTracker`, `ResultBuilder`. Public contract preserved: `MochaQaseReporter` named export, constructor signature, `static statusMap`, all 11 user-API methods bound to test context (`qaseId`, `title`, `parameters`, `groupParameters`, `fields`, `suite`, `ignore`, `attach`, `comment`, `tags`, `step`), Mocha lifecycle hooks, and parallel mode behavior.
+
+## Internal
+
+- Added Jest + ts-jest test infrastructure; introduced 43 unit tests across the new modules.
+
 # mocha-qase-reporter@1.4.0
 
 ## Changed
