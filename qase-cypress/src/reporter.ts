@@ -17,6 +17,7 @@ import { ResultsManager } from './metadata/resultsManager';
 import { TestTracker } from './test-tracker';
 import { StepConverter } from './step-converter';
 import { ResultBuilder } from './result-builder';
+import { SkippedTestHandler } from './skipped-test-handler';
 
 const {
   EVENT_TEST_FAIL,
@@ -84,6 +85,8 @@ export class CypressQaseReporter extends reporters.Base {
 
   private resultBuilder: ResultBuilder = new ResultBuilder(this.stepConverter);
 
+  private skippedHandler!: SkippedTestHandler;
+
   // private options: Omit<(FrameworkOptionsType<'cypress', ReporterOptionsType> & ConfigType & ReporterOptionsType & NonNullable<unknown>) | (null & ReporterOptionsType & NonNullable<unknown>), 'framework'>;
 
   /**
@@ -112,6 +115,16 @@ export class CypressQaseReporter extends reporters.Base {
       frameworkName: 'cypress',
       reporterName: 'cypress-qase-reporter',
     });
+
+    this.skippedHandler = new SkippedTestHandler(
+      this.tracker,
+      this.resultBuilder,
+      (result) => { void this.reporter.addTestResult(result); },
+      () => ({
+        screenshotsFolder: this.screenshotsFolder,
+        testBeginTime: this.testBeginTime,
+      }),
+    );
 
     this.addRunnerListeners(runner);
   }
@@ -158,66 +171,12 @@ export class CypressQaseReporter extends reporters.Base {
   }
 
   /**
-   * Check if a test was processed
-   * @param {Test} test
-   * @returns {boolean}
-   * @private
-   */
-  private isTestProcessed(test: Test): boolean {
-    return this.tracker.isProcessed(test);
-  }
-
-  /**
    * Handle skipped tests in a suite when beforeEach hook fails
    * @param {Suite} suite
    * @private
    */
-  /**
-   * Recursively collect all tests from a suite and its nested suites
-   * @param {Suite} suite
-   * @param {Test[]} tests
-   * @private
-   */
-  private collectAllTestsFromSuite(suite: Suite, tests: Test[]): void {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const suiteTests = suite.tests ?? [];
-    tests.push(...suiteTests);
-
-    // Recursively process nested suites
-    const nestedSuites = suite.suites ?? [];
-    for (const nestedSuite of nestedSuites) {
-      this.collectAllTestsFromSuite(nestedSuite, tests);
-    }
-  }
-
   private handleSkippedTestsInSuite(suite: Suite): void {
-    // Collect all tests from this suite and nested suites recursively
-    const allTests: Test[] = [];
-    this.collectAllTestsFromSuite(suite, allTests);
-
-    // Find tests that were not processed (skipped due to beforeEach failure)
-    for (const test of allTests) {     
-      // Skip if test was already processed (e.g., first test that got EVENT_TEST_FAIL)
-      if (!this.isTestProcessed(test)) {
-        // Test was skipped due to beforeEach failure, report it as skipped
-        this.addSkippedTestResult(test);
-      }
-    }
-  }
-
-  /**
-     * Add a test result for a skipped test (due to beforeEach failure)
-     * @param {Test} test
-     * @private
-     */
-  private addSkippedTestResult(test: Test): void {
-    const result = this.resultBuilder.buildSkipped({
-      test,
-      screenshotsFolder: this.screenshotsFolder,
-      testBeginTime: this.testBeginTime,
-    });
-    void this.reporter.addTestResult(result);
-    this.markTestAsProcessed(test);
+    this.skippedHandler.handleSuiteEnd(suite);
   }
 
   /**
