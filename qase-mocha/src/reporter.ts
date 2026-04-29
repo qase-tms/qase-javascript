@@ -1,91 +1,45 @@
-import { Context, MochaOptions, reporters, Runner, Suite } from 'mocha';
-import { Hook, Metadata, Test } from './types';
+import { Context, MochaOptions, reporters, Runner } from 'mocha';
+import { Hook, Test } from './types';
+import { MetadataApplier } from './modules/metadataApplier';
 import {
-  Attachment,
   composeOptions,
   ConfigLoader,
-  generateSignature,
   QaseReporter,
   ReporterInterface,
-  StepStatusEnum,
-  StepType,
-  TestResultType,
   TestStatusEnum,
-  TestStepType,
-  determineTestStatus,
-  parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
-import {
-  removeQaseIdsFromTitle,
-  extractAndCleanStep,
-  getFile as getFileFromNode,
-  FileSuiteNode,
-  normalizeSuitePart,
-} from 'qase-javascript-commons/internal';
 import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 import deasyncPromise from 'deasync-promise';
 import { extname, join } from 'node:path';
-import { v4 as uuidv4 } from 'uuid';
-import { StreamInterceptor, TestOutput } from './interceptor';
-import { 
-  parseExtraReporters, 
-  createExtraReporters, 
-  validateExtraReportersForParallel 
+import { OutputCapture } from './modules/outputCapture';
+import { StepRunner } from './modules/stepRunner';
+import { ProfilerTracker } from './modules/profilerTracker';
+import { ResultBuilder } from './modules/resultBuilder';
+import {
+  parseExtraReporters,
+  createExtraReporters,
+  validateExtraReportersForParallel
 } from './extraReporters';
+import { STATUS_MAP, MochaState } from './modules/statusMap';
 
 
 const Events = Runner.constants;
 
-type MochaState = 'failed' | 'passed' | 'pending';
-
-class currentTest {
-  steps: TestStepType[] = [];
-  status: MochaState = 'passed';
-  attachments: Attachment[] = [];
-}
-
 // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-return,@typescript-eslint/restrict-template-expressions
 const resolveParallelModeSetupFile = () => join(__dirname, `parallel${extname(__filename)}`);
 
-/**
- * Adapter around the shared `getFile` helper to bridge the Mocha `Suite`
- * type (whose `parent` is `Suite | undefined`) with `FileSuiteNode`
- * (whose `parent` is optional under `exactOptionalPropertyTypes`).
- */
-const getFile = (suite: Suite): string | undefined =>
-  getFileFromNode(suite as unknown as FileSuiteNode);
-
 export class MochaQaseReporter extends reporters.Base {
 
-  private originalStdoutWrite: typeof process.stdout.write;
-  private originalStderrWrite: typeof process.stderr.write;
-  private testOutputs: Map<string, TestOutput>;
-  // readonly #extraReporters: reporters.Base[] = [];
-  private profiler: NetworkProfiler | null = null;
-  private _profilerStepSnapshot = 0;
+  private readonly outputCapture: OutputCapture = new OutputCapture();
+  private profilerTracker: ProfilerTracker;
 
-  /**
-   * @type {Record<CypressState, TestStatusEnum>}
-   */
-  static statusMap: Record<MochaState, TestStatusEnum> = {
-    failed: TestStatusEnum.failed,
-    passed: TestStatusEnum.passed,
-    pending: TestStatusEnum.skipped,
-  };
+  static statusMap: Record<MochaState, TestStatusEnum> = STATUS_MAP;
 
-  /**
-   * @type {ReporterInterface}
-   * @private
-   */
   private reporter: ReporterInterface;
 
-  /**
-   * @type {Metadata}
-   * @private
-   */
-  private readonly metadata: Metadata = new Metadata();
+  private readonly metadataApplier: MetadataApplier = new MetadataApplier();
 
-  private currentTest: currentTest = new currentTest();
+  private readonly stepRunner: StepRunner = new StepRunner();
   private testBeginTime: number = Date.now();
   private currentType: 'test' | 'step' = 'test';
 
@@ -108,13 +62,15 @@ export class MochaQaseReporter extends reporters.Base {
       reporterName: 'mocha-qase-reporter',
     });
 
+    let profiler: NetworkProfiler | null = null;
     if (composedOptions.profilers?.includes('network')) {
-      this.profiler = new NetworkProfiler({
+      profiler = new NetworkProfiler({
         skipDomains: composedOptions.networkProfiler?.skip_domains,
         trackOnFail: composedOptions.networkProfiler?.track_on_fail,
       });
-      this.profiler.enable();
+      profiler.enable();
     }
+    this.profilerTracker = new ProfilerTracker(profiler);
 
     // Create extra reporters in both modes, but validate compatibility for parallel mode
     if (extraReportersConfig) {
@@ -145,9 +101,6 @@ export class MochaQaseReporter extends reporters.Base {
       this.applyListeners();
     }
 
-    this.originalStdoutWrite = process.stdout.write.bind(process.stdout);
-    this.originalStderrWrite = process.stderr.write.bind(process.stderr);
-    this.testOutputs = new Map();
   }
 
   private applyListeners = () => {
@@ -167,7 +120,7 @@ export class MochaQaseReporter extends reporters.Base {
   }
 
   private onEndRun() {
-    this.profiler?.restore();
+    this.profilerTracker.restore();
     deasyncPromise(this.reporter.publish());
   }
 
@@ -188,278 +141,92 @@ export class MochaQaseReporter extends reporters.Base {
   }
 
   private addMethods(test: Test) {
-    const stdoutInterceptor = new StreamInterceptor((data: string) => {
-      const output = this.testOutputs.get(test.title) ?? { stdout: '', stderr: '' };
-      output.stdout += data;
-      this.testOutputs.set(test.title, output);
-    });
-
-    const stderrInterceptor = new StreamInterceptor((data: string) => {
-      const output = this.testOutputs.get(test.title) ?? { stdout: '', stderr: '' };
-      output.stderr += data;
-      this.testOutputs.set(test.title, output);
-
-    });
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
-    process.stdout.write = stdoutInterceptor.write.bind(stdoutInterceptor);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
-    process.stderr.write = stderrInterceptor.write.bind(stderrInterceptor);
-
-    this.testOutputs.set(test.title, { stdout: '', stderr: '' });
-
+    this.outputCapture.install();
     this.addMethodsToContext(test.ctx);
   }
 
   private onStartTest() {
+    this.outputCapture.reset();
+    this.outputCapture.install();
+    this.stepRunner.reset();
     this.currentType = 'test';
     this.testBeginTime = Date.now();
-    this._profilerStepSnapshot = this.profiler?.getAllSteps().length ?? 0;
+    this.profilerTracker.onTestStart();
   }
 
   private onEndTest(test: Mocha.Test) {
-    const end_time = Date.now();
-    const duration = test.duration ?? end_time - this.testBeginTime;
+    const output = this.outputCapture.drain();
+    const metadata = this.metadataApplier.get();
 
-    process.stdout.write = this.originalStdoutWrite;
-    process.stderr.write = this.originalStderrWrite;
-
-    if (this.reporter.isCaptureLogs()) {
-      const output = this.testOutputs.get(test.title);
-
-      if (output?.stdout) {
-        this.attach({ name: 'stdout.txt', content: output.stdout, contentType: 'text/plain' });
-      }
-
-      if (output?.stderr) {
-        this.attach({ name: 'stderr.txt', content: output.stderr, contentType: 'text/plain' });
-      }
-    }
-
-    if (this.metadata.ignore) {
-      this.metadata.clear();
-      this.currentTest = new currentTest();
+    if (metadata.ignore) {
+      this.metadataApplier.reset();
+      this.stepRunner.reset();
+      this.profilerTracker.reset();
       return;
     }
 
-    const fromTitle = parseProjectMappingFromTitle(test.title);
-    const ids = this.getQaseId();
-    if (ids.length === 0) {
-      ids.push(...fromTitle.legacyIds);
-    }
-    const hasProjectMapping = Object.keys(fromTitle.projectMapping).length > 0;
-    const suites = this.getSuites(test);
-    let relations = {};
-    if (suites.length > 0) {
-      const data = [];
-      for (const suite of suites) {
-        data.push({
-          title: suite,
-          public_id: null,
-        });
-      }
-
-      relations = {
-        suite: {
-          data: data,
-        },
-      };
-    }
-
-    let message = this.metadata.comment;
-    if (test.err?.message) {
-      message += message ? `\n\n${test.err.message}` : test.err.message;
-    }
-
-    let profilerSteps: TestStepType[] = [];
-    if (this.profiler) {
-      const allSteps = this.profiler.getAllSteps();
-      profilerSteps = allSteps.slice(this._profilerStepSnapshot);
-      this._profilerStepSnapshot = 0;
-    }
-
-    const result: TestResultType = {
-      attachments: this.metadata.attachments ?? [],
-      author: null,
-      fields: this.metadata.fields ?? {},
-      tags: this.metadata.tags ?? [],
-      message: message ?? null,
-      muted: false,
-      params: this.metadata.parameters ?? {},
-      group_params: this.metadata.groupParameters ?? {},
-      relations: relations,
-      run_id: null,
-      signature: this.getSignature(test, hasProjectMapping ? [] : ids, this.metadata.parameters ?? {}),
-      steps: [...this.currentTest.steps, ...profilerSteps],
-      id: uuidv4(),
-      execution: {
-        status: determineTestStatus(test.err ?? null, test.state ?? 'failed'),
-        start_time: this.testBeginTime / 1000,
-        end_time: end_time / 1000,
-        duration: duration,
-        stacktrace: test.err?.stack ?? null,
-        thread: null,
-      },
-      testops_id: hasProjectMapping ? null : (ids.length > 0 ? ids : null),
-      testops_project_mapping: hasProjectMapping ? fromTitle.projectMapping : null,
-      title: this.metadata.title && this.metadata.title != '' ? this.metadata.title : (fromTitle.cleanedTitle || removeQaseIdsFromTitle(test.title)),
-    } as TestResultType;
+    const result = ResultBuilder.build({
+      test,
+      metadata,
+      steps: this.stepRunner.getSteps(),
+      profilerSteps: this.profilerTracker.getEvents(),
+      output,
+      testBeginTime: this.testBeginTime,
+      cwd: process.cwd(),
+      attachLogs: this.reporter.isCaptureLogs(),
+    });
 
     void this.reporter.addTestResult(result);
 
-    this.metadata.clear();
-    this.currentTest = new currentTest();
-  }
-
-  /**
-   * @param {Test} test
-   * @param {number[]} ids
-   * @private
-   */
-  private getSignature(test: Mocha.Test, ids: number[], params: Record<string, string>) {
-    const suites = [];
-    const file = test.parent ? getFile(test.parent) : undefined;
-
-    if (file) {
-      const executionPath = process.cwd() + '/';
-      const path = file.replace(executionPath, '');
-      suites.push(path.split('/').join('::'));
-    }
-
-    if (test.parent) {
-      for (const suite of test.parent.titlePath()) {
-        suites.push(normalizeSuitePart(suite));
-      }
-    }
-
-    suites.push(normalizeSuitePart(test.title));
-
-    return generateSignature(ids, suites, params);
-  }
-
-  /**
-   * @returns {number[]}
-   * @private
-   */
-  private getQaseId(): number[] {
-    if (this.metadata.ids) {
-      return this.metadata.ids;
-    }
-
-    return [];
-  }
-
-  /**
-   * @param {Mocha.Test} test
-   * @returns {string[]}
-   * @private
-   */
-  private getSuites(test: Mocha.Test): string[] {
-    if (this.metadata.suite) {
-      return [this.metadata.suite];
-    }
-
-    const suites = [];
-    if (test.parent) {
-      suites.push(...test.parent.titlePath().filter(Boolean));
-    }
-
-    return suites;
+    this.metadataApplier.reset();
+    this.stepRunner.reset();
+    this.profilerTracker.reset();
   }
 
   qaseId = (id: number | number[]) => {
-    this.metadata.addQaseId(id);
+    this.metadataApplier.applyQaseId(id);
   };
 
   title = (title: string) => {
-    this.metadata.title = title;
+    this.metadataApplier.applyTitle(title);
   };
 
   parameters = (values: Record<string, string>) => {
-    const stringRecord: Record<string, string> = {};
-    for (const [key, value] of Object.entries(values)) {
-      stringRecord[String(key)] = String(value);
-    }
-    this.metadata.parameters = stringRecord;
+    this.metadataApplier.applyParameters(values);
   };
 
   groupParameters = (values: Record<string, string>) => {
-    const stringRecord: Record<string, string> = {};
-    for (const [key, value] of Object.entries(values)) {
-      stringRecord[String(key)] = String(value);
-    }
-    this.metadata.groupParameters = stringRecord;
+    this.metadataApplier.applyGroupParameters(values);
   };
 
   fields = (values: Record<string, string>) => {
-    const stringRecord: Record<string, string> = {};
-    for (const [key, value] of Object.entries(values)) {
-      stringRecord[String(key)] = String(value);
-    }
-    this.metadata.fields = stringRecord;
+    this.metadataApplier.applyFields(values);
   };
 
   suite = (name: string) => {
-    this.metadata.suite = name;
+    this.metadataApplier.applySuite(name);
   };
 
   ignore = () => {
-    this.metadata.ignore = true;
+    this.metadataApplier.applyIgnore();
   };
 
   attach = (attach: { name?: string, paths?: string | string[], content?: Buffer | string, contentType?: string }) => {
-    this.metadata.addAttachment(attach);
+    this.metadataApplier.applyAttach(attach);
   };
 
   comment = (message: string) => {
-    this.metadata.addComment(message);
+    this.metadataApplier.applyComment(message);
   };
 
   tags = (...values: string[]) => {
-    this.metadata.addTags(values);
+    this.metadataApplier.applyTags(values);
   };
 
   step = (title: string, func: () => void, expectedResult?: string, data?: string) => {
-
     const previousType = this.currentType;
-
     this.currentType = 'step';
-
-    const stepTitle = expectedResult || data 
-      ? `${title} QaseExpRes:${expectedResult ? `: ${expectedResult}` : ''} QaseData:${data ? `: ${data}` : ''}` 
-      : title;
-
-    const stepData = extractAndCleanStep(stepTitle);
-
-    const step: TestStepType = {
-      step_type: StepType.TEXT,
-      data: {
-        action: stepData.cleanedString,
-        expected_result: stepData.expectedResult,
-        data: stepData.data,
-      },
-      execution: {
-        start_time: Date.now(),
-        status: StepStatusEnum.passed,
-        end_time: null,
-        duration: null,
-      },
-      id: '',
-      parent_id: null,
-      attachments: [],
-      steps: [],
-    };
-
-    try {
-      func();
-    } catch (err) {
-      step.execution.status = StepStatusEnum.failed;
-      this.currentTest.status = 'failed';
-    }
-
-    step.execution.end_time = Date.now();
-
-    this.currentTest.steps.push(step);
+    this.stepRunner.run(title, func, expectedResult, data);
     this.currentType = previousType;
   };
 }
