@@ -27,16 +27,15 @@ import deasyncPromise from 'deasync-promise';
 import { extname, join } from 'node:path';
 import { v4 as uuidv4 } from 'uuid';
 import { StreamInterceptor, TestOutput } from './interceptor';
-import { 
-  parseExtraReporters, 
-  createExtraReporters, 
-  validateExtraReportersForParallel 
+import {
+  parseExtraReporters,
+  createExtraReporters,
+  validateExtraReportersForParallel
 } from './extraReporters';
+import { STATUS_MAP, MochaState } from './modules/statusMap';
 
 
 const Events = Runner.constants;
-
-type MochaState = 'failed' | 'passed' | 'pending';
 
 class currentTest {
   steps: TestStepType[] = [];
@@ -64,14 +63,7 @@ export class MochaQaseReporter extends reporters.Base {
   private profiler: NetworkProfiler | null = null;
   private _profilerStepSnapshot = 0;
 
-  /**
-   * @type {Record<CypressState, TestStatusEnum>}
-   */
-  static statusMap: Record<MochaState, TestStatusEnum> = {
-    failed: TestStatusEnum.failed,
-    passed: TestStatusEnum.passed,
-    pending: TestStatusEnum.skipped,
-  };
+  static statusMap: Record<MochaState, TestStatusEnum> = STATUS_MAP;
 
   /**
    * @type {ReporterInterface}
