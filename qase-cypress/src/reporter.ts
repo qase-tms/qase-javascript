@@ -1,48 +1,23 @@
-import path from 'path';
-import { v4 as uuidv4 } from 'uuid';
 // import { spawnSync } from 'child_process';
 
 import { MochaOptions, reporters, Runner, Suite, Test } from 'mocha';
 
 import {
-  Attachment,
   composeOptions,
   ConfigLoader,
-  generateSignature,
   QaseReporter,
   ReporterInterface,
-  StepRequestData,
-  StepStatusEnum,
-  StepType,
-  TestResultType,
   TestStatusEnum,
-  TestStepType,
-  determineTestStatus,
-  parseProjectMappingFromTitle,
-  parseProjectMappingFromTags,
 } from 'qase-javascript-commons';
-import {
-  removeQaseIdsFromTitle,
-  getFile as getFileFromNode,
-  normalizeSuitePart,
-  FileSuiteNode,
-} from 'qase-javascript-commons/internal';
-
-/**
- * Adapter around the shared `getFile` helper to bridge the Mocha `Suite`
- * type (whose `parent` is `Suite | undefined`) with `FileSuiteNode`
- * (whose `parent` is optional under `exactOptionalPropertyTypes`).
- */
-const getFile = (suite: Suite): string | undefined =>
-  getFileFromNode(suite as unknown as FileSuiteNode);
 
 import { configSchema } from './configSchema';
 import { ReporterOptionsType } from './options';
 import { MetadataManager } from './metadata/manager';
-import { StepEnd, StepStart } from './metadata/models';
-import { FileSearcher } from './fileSearcher';
-import { extractTags } from './utils/tagParser';
 import { ResultsManager } from './metadata/resultsManager';
+import { TestTracker } from './test-tracker';
+import { StepConverter } from './step-converter';
+import { ResultBuilder } from './result-builder';
+import { SkippedTestHandler } from './skipped-test-handler';
 
 const {
   EVENT_TEST_FAIL,
@@ -64,12 +39,6 @@ export type CypressQaseOptionsType = Omit<MochaOptions, 'reporterOptions'> & {
  * @extends reporters.Base
  */
 export class CypressQaseReporter extends reporters.Base {
-  /**
-   * @type {RegExp}
-   */
-  /** @deprecated Use parseProjectMappingFromTitle from qase-javascript-commons for multi-project support. */
-  static qaseIdRegExp = /\(Qase ID:? ([\d,]+)\)/;
-
   /**
    * @type {Record<CypressState, TestStatusEnum>}
    */
@@ -100,11 +69,17 @@ export class CypressQaseReporter extends reporters.Base {
   private testBeginTime: number = Date.now();
 
   /**
-   * Set to track processed tests to identify skipped tests when beforeEach fails
-   * @type {Set<string>}
+   * Tracks processed tests to identify ones skipped when beforeEach fails.
+   * @type {TestTracker}
    * @private
    */
-  private processedTests: Set<string> = new Set();
+  private tracker: TestTracker = new TestTracker();
+
+  private stepConverter: StepConverter = new StepConverter();
+
+  private resultBuilder: ResultBuilder = new ResultBuilder(this.stepConverter);
+
+  private skippedHandler!: SkippedTestHandler;
 
   // private options: Omit<(FrameworkOptionsType<'cypress', ReporterOptionsType> & ConfigType & ReporterOptionsType & NonNullable<unknown>) | (null & ReporterOptionsType & NonNullable<unknown>), 'framework'>;
 
@@ -134,6 +109,16 @@ export class CypressQaseReporter extends reporters.Base {
       frameworkName: 'cypress',
       reporterName: 'cypress-qase-reporter',
     });
+
+    this.skippedHandler = new SkippedTestHandler(
+      this.tracker,
+      this.resultBuilder,
+      (result) => { void this.reporter.addTestResult(result); },
+      () => ({
+        screenshotsFolder: this.screenshotsFolder,
+        testBeginTime: this.testBeginTime,
+      }),
+    );
 
     this.addRunnerListeners(runner);
   }
@@ -167,27 +152,7 @@ export class CypressQaseReporter extends reporters.Base {
     runner.once(EVENT_RUN_END, () => {
       const results = this.reporter.getResults();
       ResultsManager.setResults(results);
-      this.processedTests.clear();
     });
-  }
-
-  /**
-   * Generate a unique identifier for a test
-   * @param {Test} test
-   * @returns {string}
-   * @private
-   */
-  private getTestIdentifier(test: Test): string {
-    const file = test.parent ? getFile(test.parent) ?? '' : '';
-    const suitePath = test.parent ? test.parent.titlePath().join(' > ') : '';
-    let testTitle = test.fullTitle();
-    // Remove "before each" hook prefix and quotes if present (can be anywhere in the string)
-    testTitle = testTitle.replace(/"before each" hook for "/g, '');
-    // Remove trailing quote if present
-    if (testTitle.endsWith('"')) {
-      testTitle = testTitle.slice(0, -1);
-    }
-    return `${file}::${suitePath}::${testTitle}`;
   }
 
   /**
@@ -196,19 +161,7 @@ export class CypressQaseReporter extends reporters.Base {
    * @private
    */
   private markTestAsProcessed(test: Test): void {
-    const identifier = this.getTestIdentifier(test);
-    this.processedTests.add(identifier);
-  }
-
-  /**
-   * Check if a test was processed
-   * @param {Test} test
-   * @returns {boolean}
-   * @private
-   */
-  private isTestProcessed(test: Test): boolean {
-    const identifier = this.getTestIdentifier(test);
-    return this.processedTests.has(identifier);
+    this.tracker.markProcessed(test);
   }
 
   /**
@@ -216,132 +169,8 @@ export class CypressQaseReporter extends reporters.Base {
    * @param {Suite} suite
    * @private
    */
-  /**
-   * Recursively collect all tests from a suite and its nested suites
-   * @param {Suite} suite
-   * @param {Test[]} tests
-   * @private
-   */
-  private collectAllTestsFromSuite(suite: Suite, tests: Test[]): void {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const suiteTests = suite.tests ?? [];
-    tests.push(...suiteTests);
-
-    // Recursively process nested suites
-    const nestedSuites = suite.suites ?? [];
-    for (const nestedSuite of nestedSuites) {
-      this.collectAllTestsFromSuite(nestedSuite, tests);
-    }
-  }
-
   private handleSkippedTestsInSuite(suite: Suite): void {
-    // Collect all tests from this suite and nested suites recursively
-    const allTests: Test[] = [];
-    this.collectAllTestsFromSuite(suite, allTests);
-
-    // Find tests that were not processed (skipped due to beforeEach failure)
-    for (const test of allTests) {     
-      // Skip if test was already processed (e.g., first test that got EVENT_TEST_FAIL)
-      if (!this.isTestProcessed(test)) {
-        // Test was skipped due to beforeEach failure, report it as skipped
-        this.addSkippedTestResult(test);
-      }
-    }
-  }
-
-  /**
-     * Add a test result for a skipped test (due to beforeEach failure)
-     * @param {Test} test
-     * @private
-     */
-  private addSkippedTestResult(test: Test): void {
-    const end_time = Date.now();
-    const duration = 0; // Skipped tests have no duration
-
-    const start_time = this.testBeginTime || Date.now();
-
-    const fromTitle = parseProjectMappingFromTitle(test.title);
-    const legacyIds = [...fromTitle.legacyIds];
-    const projectMapping: Record<string, number[]> = { ...fromTitle.projectMapping };
-    const testFileName = this.getTestFileName(test);
-    const files = this.screenshotsFolder ?
-      FileSearcher.findFilesBeforeTime(this.screenshotsFolder, testFileName, new Date(start_time))
-      : [];
-
-    const attachments = files.map((file) => ({
-      content: '',
-      id: uuidv4(),
-      mime_type: 'image/png',
-      size: 0,
-      file_name: path.basename(file),
-      file_path: file,
-    } as Attachment));
-
-    let relations = {};
-    if (test.parent !== undefined) {
-      const data = [];
-      for (const suite of test.parent.titlePath()) {
-        data.push({
-          title: suite,
-          public_id: null,
-        });
-      }
-
-      relations = {
-        suite: {
-          data: data,
-        },
-      };
-    }
-
-    // For skipped tests, we don't have metadata since the test never ran
-    // But we can still check for cucumber tags if the test has a parent with a file
-    if (test.parent) {
-      const file = getFile(test.parent);
-      if (file) {
-        const tags = extractTags(file, test.title);
-        const fromTags = parseProjectMappingFromTags(tags);
-        legacyIds.push(...fromTags.legacyIds);
-        for (const [code, idsFromTag] of Object.entries(fromTags.projectMapping)) {
-          projectMapping[code] = [...(projectMapping[code] ?? []), ...idsFromTag];
-        }
-      }
-    }
-
-    const hasProjectMapping = Object.keys(projectMapping).length > 0;
-    const result: TestResultType = {
-      attachments: attachments,
-      author: null,
-      fields: {},
-      message: null,
-      muted: false,
-      params: {},
-      group_params: {},
-      relations: relations,
-      run_id: null,
-      signature: this.getSignature(test, hasProjectMapping ? [] : legacyIds, {}),
-      steps: [],
-      id: uuidv4(),
-      execution: {
-        status: TestStatusEnum.skipped,
-        start_time: this.testBeginTime / 1000,
-        end_time: end_time / 1000,
-        duration: duration,
-        stacktrace: null,
-        thread: null,
-      },
-      testops_id: !hasProjectMapping && legacyIds.length > 0
-        ? (legacyIds.length === 1 ? legacyIds[0]! : legacyIds)
-        : null,
-      testops_project_mapping: hasProjectMapping ? projectMapping : null,
-      title: fromTitle.cleanedTitle || removeQaseIdsFromTitle(test.title),
-      preparedAttachments: [],
-    } as unknown as TestResultType;
-
-    void this.reporter.addTestResult(result);
-
-    // Mark as processed to avoid duplicate reporting
-    this.markTestAsProcessed(test);
+    this.skippedHandler.handleSuiteEnd(suite);
   }
 
   /**
@@ -349,271 +178,24 @@ export class CypressQaseReporter extends reporters.Base {
    * @private
    */
   private addTestResult(test: Test) {
-    const end_time = Date.now();
-    const duration = end_time - this.testBeginTime;
-
     const metadata = MetadataManager.getMetadata();
+    const isCucumber = (metadata?.cucumberSteps?.length ?? 0) > 0;
+    const result = this.resultBuilder.build({
+      test,
+      metadata,
+      screenshotsFolder: this.screenshotsFolder,
+      testBeginTime: this.testBeginTime,
+      isCucumber,
+      options: {} as ReporterOptionsType,
+    });
 
-    if (metadata?.ignore) {
-      // Mark as processed even if ignored to avoid duplicate reporting
+    if (result === null) {
       this.markTestAsProcessed(test);
       MetadataManager.clear();
       return;
     }
 
-    const fromTitle = parseProjectMappingFromTitle(test.title);
-    const legacyIds = [...fromTitle.legacyIds];
-    const projectMapping: Record<string, number[]> = { ...fromTitle.projectMapping };
-
-    const testFileName = this.getTestFileName(test);
-    const files = this.screenshotsFolder ?
-      FileSearcher.findFilesBeforeTime(this.screenshotsFolder, testFileName, new Date(this.testBeginTime))
-      : [];
-
-    // const videos = this.videosFolder ?
-    //   FileSearcher.findVideoFiles(this.videosFolder, testFileName)
-    //   : [];
-
-    const attachments = files.map((file) => ({
-      content: '',
-      id: uuidv4(),
-      mime_type: 'image/png',
-      size: 0,
-      file_name: path.basename(file),
-      file_path: file,
-    } as Attachment));
-
-    // const videoAttachments = videos.map((file) => ({
-    //   content: '',
-    //   id: uuidv4(),
-    //   mime_type: 'video/mp4',
-    //   size: 0,
-    //   file_name: path.basename(file),
-    //   file_path: file,
-    // } as Attachment));
-
-    attachments.push(...(metadata?.attachments ?? []));
-
-    let relations = {};
-    if (test.parent !== undefined) {
-      const data = [];
-      for (const suite of test.parent.titlePath()) {
-        data.push({
-          title: suite,
-          public_id: null,
-        });
-      }
-
-      relations = {
-        suite: {
-          data: data,
-        },
-      };
-    }
-
-    if (metadata?.suite) {
-      relations = {
-        suite: {
-          data: [
-            {
-              title: metadata.suite,
-              public_id: null,
-            },
-          ],
-        },
-      };
-    }
-
-    let message = metadata?.comment ?? '';
-    if (test.err?.message) {
-      message += message ? `\n\n${test.err.message}` : test.err.message;
-    }
-
-    const steps = metadata?.steps ? this.getSteps(metadata.steps, metadata.stepAttachments ?? {}) : [];
-
-    // support for cucumber steps and metadata
-    if (metadata?.cucumberSteps && metadata.cucumberSteps.length > 0) {
-      steps.push(...this.convertCypressMessages(metadata.cucumberSteps, test.state ?? 'failed'));
-
-      if (test.parent) {
-        const file = getFile(test.parent);
-
-        if (file) {
-          const tags = extractTags(file, test.title);
-          const fromTags = parseProjectMappingFromTags(tags);
-          legacyIds.push(...fromTags.legacyIds);
-          for (const [code, idsFromTag] of Object.entries(fromTags.projectMapping)) {
-            projectMapping[code] = [...(projectMapping[code] ?? []), ...idsFromTag];
-          }
-        }
-      }
-    }
-
-    // Convert network profiler requests to REQUEST steps
-    if (metadata?.networkRequests && metadata.networkRequests.length > 0) {
-      for (const req of metadata.networkRequests) {
-        const step = new TestStepType(StepType.REQUEST);
-        step.id = uuidv4();
-        const data = step.data as StepRequestData;
-        data.request_method = req.method;
-        data.request_url = req.url;
-        data.request_headers = null;
-        data.request_body = null;
-        data.status_code = req.statusCode;
-        data.response_body = req.responseBody;
-        data.response_headers = null;
-        step.execution.status = req.statusCode !== null && req.statusCode >= 400
-          ? StepStatusEnum.failed
-          : StepStatusEnum.passed;
-        step.execution.start_time = req.startTime / 1000;
-        step.execution.duration = req.duration;
-        steps.push(step);
-      }
-    }
-
-    const hasProjectMapping = Object.keys(projectMapping).length > 0;
-    const result: TestResultType = {
-      attachments: attachments,
-      author: null,
-      fields: metadata?.fields ?? {},
-      tags: metadata?.tags ?? [],
-      message: message,
-      muted: false,
-      params: metadata?.parameters ?? {},
-      group_params: metadata?.groupParams ?? {},
-      relations: relations,
-      run_id: null,
-      signature: this.getSignature(test, hasProjectMapping ? [] : legacyIds, metadata?.parameters ?? {}),
-      steps: steps,
-      id: uuidv4(),
-      execution: {
-        status: determineTestStatus(test.err ?? null, test.state ?? 'failed'),
-        start_time: this.testBeginTime / 1000,
-        end_time: end_time / 1000,
-        duration: duration,
-        stacktrace: test.err?.stack ?? null,
-        thread: null,
-      },
-      testops_id: !hasProjectMapping && legacyIds.length > 0
-        ? (legacyIds.length === 1 ? legacyIds[0]! : legacyIds)
-        : null,
-      testops_project_mapping: hasProjectMapping ? projectMapping : null,
-      title: metadata?.title ?? (fromTitle.cleanedTitle || removeQaseIdsFromTitle(test.title)),
-      preparedAttachments: [],
-    } as unknown as TestResultType;
-
     void this.reporter.addTestResult(result);
-
     MetadataManager.clear();
-  }
-
-  /**
-   * @param {Test} test
-   * @param {number[]} ids
-   * @private
-   */
-  private getSignature(test: Test, ids: number[], params: Record<string, string>) {
-    const suites = [];
-    const file = test.parent ? getFile(test.parent) : undefined;
-
-    if (file) {
-      suites.push(file.split(path.sep).join('::'));
-    }
-
-    if (test.parent) {
-      for (const suite of test.parent.titlePath()) {
-        suites.push(normalizeSuitePart(suite));
-      }
-    }
-
-    suites.push(normalizeSuitePart(test.title));
-
-    return generateSignature(ids, suites, params);
-  }
-
-  private getTestFileName(test: Test): string {
-    if (!test.parent) {
-      return '';
-    }
-
-    const file = getFile(test.parent);
-    if (!file) {
-      return '';
-    }
-
-    const pathParts = file.split(path.sep);
-    const fileName = pathParts[pathParts.length - 1];
-
-    return fileName ? fileName : '';
-  }
-
-  private convertCypressMessages(messages: StepStart[], testStatus: string): TestStepType[] {
-    const result: TestStepType[] = [];
-
-    const lastIndex = messages.length - 1;
-    for (const message of messages) {
-      const step = new TestStepType(StepType.TEXT);
-      step.id = message.id;
-      step.execution.status = StepStatusEnum.passed;
-      step.execution.start_time = message.timestamp;
-      step.data = {
-        action: message.name,
-        expected_result: null,
-        data: null,
-      };
-
-      if (lastIndex === messages.indexOf(message) && testStatus !== 'passed') {
-        step.execution.status = StepStatusEnum.failed;
-      }
-
-      result.push(step);
-    }
-
-    return result;
-  }
-
-  private getSteps(steps: (StepStart | StepEnd)[], attachments: Record<string, Attachment[]>): TestStepType[] {
-    const result: TestStepType[] = [];
-    const stepMap = new Map<string, TestStepType>();
-
-    for (const step of steps.sort((a, b) => a.timestamp - b.timestamp)) {
-      if (!('status' in step)) {
-        const newStep = new TestStepType();
-        newStep.id = step.id;
-        newStep.execution.status = StepStatusEnum.failed;
-        newStep.execution.start_time = step.timestamp;
-        newStep.execution.end_time = Date.now();
-        newStep.data = {
-          action: step.name,
-          expected_result: null,
-          data: null,
-        };
-
-        if (attachments[step.id]) {
-          newStep.attachments = attachments[step.id] ?? [];
-        }
-
-        const parentId = step.parentId;
-        if (parentId) {
-          newStep.parent_id = parentId;
-          const parent = stepMap.get(parentId);
-          if (parent) {
-            parent.steps.push(newStep);
-          }
-        } else {
-          result.push(newStep);
-        }
-
-        stepMap.set(step.id, newStep);
-      } else {
-        const stepType = stepMap.get(step.id);
-        if (stepType) {
-          stepType.execution.status = step.status as StepStatusEnum;
-          stepType.execution.end_time = step.timestamp;
-        }
-      }
-    }
-
-    return result;
   }
 }
