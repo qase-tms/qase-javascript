@@ -1,29 +1,19 @@
-import { Context, MochaOptions, reporters, Runner, Suite } from 'mocha';
+import { Context, MochaOptions, reporters, Runner } from 'mocha';
 import { Hook, Metadata, Test } from './types';
 import {
   composeOptions,
   ConfigLoader,
-  generateSignature,
   QaseReporter,
   ReporterInterface,
-  TestResultType,
   TestStatusEnum,
-  determineTestStatus,
-  parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
-import {
-  removeQaseIdsFromTitle,
-  getFile as getFileFromNode,
-  FileSuiteNode,
-  normalizeSuitePart,
-} from 'qase-javascript-commons/internal';
 import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 import deasyncPromise from 'deasync-promise';
 import { extname, join } from 'node:path';
-import { v4 as uuidv4 } from 'uuid';
 import { OutputCapture } from './modules/outputCapture';
 import { StepRunner } from './modules/stepRunner';
 import { ProfilerTracker } from './modules/profilerTracker';
+import { ResultBuilder } from './modules/resultBuilder';
 import {
   parseExtraReporters,
   createExtraReporters,
@@ -36,14 +26,6 @@ const Events = Runner.constants;
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-return,@typescript-eslint/restrict-template-expressions
 const resolveParallelModeSetupFile = () => join(__dirname, `parallel${extname(__filename)}`);
-
-/**
- * Adapter around the shared `getFile` helper to bridge the Mocha `Suite`
- * type (whose `parent` is `Suite | undefined`) with `FileSuiteNode`
- * (whose `parent` is optional under `exactOptionalPropertyTypes`).
- */
-const getFile = (suite: Suite): string | undefined =>
-  getFileFromNode(suite as unknown as FileSuiteNode);
 
 export class MochaQaseReporter extends reporters.Base {
 
@@ -181,145 +163,32 @@ export class MochaQaseReporter extends reporters.Base {
   }
 
   private onEndTest(test: Mocha.Test) {
-    const end_time = Date.now();
-    const duration = test.duration ?? end_time - this.testBeginTime;
-
     const output = this.outputCapture.drain();
+    const metadata = this.metadata;
 
-    if (this.reporter.isCaptureLogs()) {
-      if (output.stdout) {
-        this.attach({ name: 'stdout.txt', content: output.stdout, contentType: 'text/plain' });
-      }
-      if (output.stderr) {
-        this.attach({ name: 'stderr.txt', content: output.stderr, contentType: 'text/plain' });
-      }
-    }
-
-    if (this.metadata.ignore) {
+    if (metadata.ignore) {
       this.metadata.clear();
       this.stepRunner.reset();
+      this.profilerTracker.reset();
       return;
     }
 
-    const fromTitle = parseProjectMappingFromTitle(test.title);
-    const ids = this.getQaseId();
-    if (ids.length === 0) {
-      ids.push(...fromTitle.legacyIds);
-    }
-    const hasProjectMapping = Object.keys(fromTitle.projectMapping).length > 0;
-    const suites = this.getSuites(test);
-    let relations = {};
-    if (suites.length > 0) {
-      const data = [];
-      for (const suite of suites) {
-        data.push({
-          title: suite,
-          public_id: null,
-        });
-      }
-
-      relations = {
-        suite: {
-          data: data,
-        },
-      };
-    }
-
-    let message = this.metadata.comment;
-    if (test.err?.message) {
-      message += message ? `\n\n${test.err.message}` : test.err.message;
-    }
-
-    const profilerSteps = this.profilerTracker.getEvents();
-    this.profilerTracker.reset();
-
-    const result: TestResultType = {
-      attachments: this.metadata.attachments ?? [],
-      author: null,
-      fields: this.metadata.fields ?? {},
-      tags: this.metadata.tags ?? [],
-      message: message ?? null,
-      muted: false,
-      params: this.metadata.parameters ?? {},
-      group_params: this.metadata.groupParameters ?? {},
-      relations: relations,
-      run_id: null,
-      signature: this.getSignature(test, hasProjectMapping ? [] : ids, this.metadata.parameters ?? {}),
-      steps: [...this.stepRunner.getSteps(), ...profilerSteps],
-      id: uuidv4(),
-      execution: {
-        status: determineTestStatus(test.err ?? null, test.state ?? 'failed'),
-        start_time: this.testBeginTime / 1000,
-        end_time: end_time / 1000,
-        duration: duration,
-        stacktrace: test.err?.stack ?? null,
-        thread: null,
-      },
-      testops_id: hasProjectMapping ? null : (ids.length > 0 ? ids : null),
-      testops_project_mapping: hasProjectMapping ? fromTitle.projectMapping : null,
-      title: this.metadata.title && this.metadata.title != '' ? this.metadata.title : (fromTitle.cleanedTitle || removeQaseIdsFromTitle(test.title)),
-    } as TestResultType;
+    const result = ResultBuilder.build({
+      test,
+      metadata,
+      steps: this.stepRunner.getSteps(),
+      profilerSteps: this.profilerTracker.getEvents(),
+      output,
+      testBeginTime: this.testBeginTime,
+      cwd: process.cwd(),
+      attachLogs: this.reporter.isCaptureLogs(),
+    });
 
     void this.reporter.addTestResult(result);
 
     this.metadata.clear();
     this.stepRunner.reset();
-  }
-
-  /**
-   * @param {Test} test
-   * @param {number[]} ids
-   * @private
-   */
-  private getSignature(test: Mocha.Test, ids: number[], params: Record<string, string>) {
-    const suites = [];
-    const file = test.parent ? getFile(test.parent) : undefined;
-
-    if (file) {
-      const executionPath = process.cwd() + '/';
-      const path = file.replace(executionPath, '');
-      suites.push(path.split('/').join('::'));
-    }
-
-    if (test.parent) {
-      for (const suite of test.parent.titlePath()) {
-        suites.push(normalizeSuitePart(suite));
-      }
-    }
-
-    suites.push(normalizeSuitePart(test.title));
-
-    return generateSignature(ids, suites, params);
-  }
-
-  /**
-   * @returns {number[]}
-   * @private
-   */
-  private getQaseId(): number[] {
-    if (this.metadata.ids) {
-      return this.metadata.ids;
-    }
-
-    return [];
-  }
-
-  /**
-   * @param {Mocha.Test} test
-   * @returns {string[]}
-   * @private
-   */
-  private getSuites(test: Mocha.Test): string[] {
-    if (this.metadata.suite) {
-      return [this.metadata.suite];
-    }
-
-    const suites = [];
-    if (test.parent) {
-      suites.push(...test.parent.titlePath().filter(Boolean));
-    }
-
-    return suites;
+    this.profilerTracker.reset();
   }
 
   qaseId = (id: number | number[]) => {
