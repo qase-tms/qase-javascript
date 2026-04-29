@@ -1,6 +1,5 @@
 import { Context, MochaOptions, reporters, Runner, Suite } from 'mocha';
-import { Hook, Test } from './types';
-import { MetadataApplier } from './modules/metadataApplier';
+import { Hook, Metadata, Test } from './types';
 import {
   Attachment,
   composeOptions,
@@ -27,7 +26,7 @@ import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 import deasyncPromise from 'deasync-promise';
 import { extname, join } from 'node:path';
 import { v4 as uuidv4 } from 'uuid';
-import { StreamInterceptor, TestOutput } from './interceptor';
+import { OutputCapture } from './modules/outputCapture';
 import {
   parseExtraReporters,
   createExtraReporters,
@@ -57,9 +56,7 @@ const getFile = (suite: Suite): string | undefined =>
 
 export class MochaQaseReporter extends reporters.Base {
 
-  private originalStdoutWrite: typeof process.stdout.write;
-  private originalStderrWrite: typeof process.stderr.write;
-  private testOutputs: Map<string, TestOutput>;
+  private readonly outputCapture: OutputCapture = new OutputCapture();
   // readonly #extraReporters: reporters.Base[] = [];
   private profiler: NetworkProfiler | null = null;
   private _profilerStepSnapshot = 0;
@@ -72,7 +69,11 @@ export class MochaQaseReporter extends reporters.Base {
    */
   private reporter: ReporterInterface;
 
-  private readonly metadataApplier: MetadataApplier = new MetadataApplier();
+  /**
+   * @type {Metadata}
+   * @private
+   */
+  private readonly metadata: Metadata = new Metadata();
 
   private currentTest: currentTest = new currentTest();
   private testBeginTime: number = Date.now();
@@ -134,9 +135,6 @@ export class MochaQaseReporter extends reporters.Base {
       this.applyListeners();
     }
 
-    this.originalStdoutWrite = process.stdout.write.bind(process.stdout);
-    this.originalStderrWrite = process.stderr.write.bind(process.stderr);
-    this.testOutputs = new Map();
   }
 
   private applyListeners = () => {
@@ -177,30 +175,13 @@ export class MochaQaseReporter extends reporters.Base {
   }
 
   private addMethods(test: Test) {
-    const stdoutInterceptor = new StreamInterceptor((data: string) => {
-      const output = this.testOutputs.get(test.title) ?? { stdout: '', stderr: '' };
-      output.stdout += data;
-      this.testOutputs.set(test.title, output);
-    });
-
-    const stderrInterceptor = new StreamInterceptor((data: string) => {
-      const output = this.testOutputs.get(test.title) ?? { stdout: '', stderr: '' };
-      output.stderr += data;
-      this.testOutputs.set(test.title, output);
-
-    });
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
-    process.stdout.write = stdoutInterceptor.write.bind(stdoutInterceptor);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
-    process.stderr.write = stderrInterceptor.write.bind(stderrInterceptor);
-
-    this.testOutputs.set(test.title, { stdout: '', stderr: '' });
-
+    this.outputCapture.install();
     this.addMethodsToContext(test.ctx);
   }
 
   private onStartTest() {
+    this.outputCapture.reset();
+    this.outputCapture.install();
     this.currentType = 'test';
     this.testBeginTime = Date.now();
     this._profilerStepSnapshot = this.profiler?.getAllSteps().length ?? 0;
@@ -210,25 +191,19 @@ export class MochaQaseReporter extends reporters.Base {
     const end_time = Date.now();
     const duration = test.duration ?? end_time - this.testBeginTime;
 
-    process.stdout.write = this.originalStdoutWrite;
-    process.stderr.write = this.originalStderrWrite;
+    const output = this.outputCapture.drain();
 
     if (this.reporter.isCaptureLogs()) {
-      const output = this.testOutputs.get(test.title);
-
-      if (output?.stdout) {
+      if (output.stdout) {
         this.attach({ name: 'stdout.txt', content: output.stdout, contentType: 'text/plain' });
       }
-
-      if (output?.stderr) {
+      if (output.stderr) {
         this.attach({ name: 'stderr.txt', content: output.stderr, contentType: 'text/plain' });
       }
     }
 
-    const metadata = this.metadataApplier.get();
-
-    if (metadata.ignore) {
-      this.metadataApplier.reset();
+    if (this.metadata.ignore) {
+      this.metadata.clear();
       this.currentTest = new currentTest();
       return;
     }
@@ -257,7 +232,7 @@ export class MochaQaseReporter extends reporters.Base {
       };
     }
 
-    let message = metadata.comment;
+    let message = this.metadata.comment;
     if (test.err?.message) {
       message += message ? `\n\n${test.err.message}` : test.err.message;
     }
@@ -270,17 +245,17 @@ export class MochaQaseReporter extends reporters.Base {
     }
 
     const result: TestResultType = {
-      attachments: metadata.attachments ?? [],
+      attachments: this.metadata.attachments ?? [],
       author: null,
-      fields: metadata.fields ?? {},
-      tags: metadata.tags ?? [],
+      fields: this.metadata.fields ?? {},
+      tags: this.metadata.tags ?? [],
       message: message ?? null,
       muted: false,
-      params: metadata.parameters ?? {},
-      group_params: metadata.groupParameters ?? {},
+      params: this.metadata.parameters ?? {},
+      group_params: this.metadata.groupParameters ?? {},
       relations: relations,
       run_id: null,
-      signature: this.getSignature(test, hasProjectMapping ? [] : ids, metadata.parameters ?? {}),
+      signature: this.getSignature(test, hasProjectMapping ? [] : ids, this.metadata.parameters ?? {}),
       steps: [...this.currentTest.steps, ...profilerSteps],
       id: uuidv4(),
       execution: {
@@ -293,12 +268,12 @@ export class MochaQaseReporter extends reporters.Base {
       },
       testops_id: hasProjectMapping ? null : (ids.length > 0 ? ids : null),
       testops_project_mapping: hasProjectMapping ? fromTitle.projectMapping : null,
-      title: metadata.title && metadata.title != '' ? metadata.title : (fromTitle.cleanedTitle || removeQaseIdsFromTitle(test.title)),
+      title: this.metadata.title && this.metadata.title != '' ? this.metadata.title : (fromTitle.cleanedTitle || removeQaseIdsFromTitle(test.title)),
     } as TestResultType;
 
     void this.reporter.addTestResult(result);
 
-    this.metadataApplier.reset();
+    this.metadata.clear();
     this.currentTest = new currentTest();
   }
 
@@ -333,8 +308,8 @@ export class MochaQaseReporter extends reporters.Base {
    * @private
    */
   private getQaseId(): number[] {
-    if (this.metadataApplier.get().ids) {
-      return this.metadataApplier.get().ids ?? [];
+    if (this.metadata.ids) {
+      return this.metadata.ids;
     }
 
     return [];
@@ -346,8 +321,8 @@ export class MochaQaseReporter extends reporters.Base {
    * @private
    */
   private getSuites(test: Mocha.Test): string[] {
-    if (this.metadataApplier.get().suite) {
-      return [this.metadataApplier.get().suite ?? ''];
+    if (this.metadata.suite) {
+      return [this.metadata.suite];
     }
 
     const suites = [];
@@ -359,43 +334,55 @@ export class MochaQaseReporter extends reporters.Base {
   }
 
   qaseId = (id: number | number[]) => {
-    this.metadataApplier.applyQaseId(id);
+    this.metadata.addQaseId(id);
   };
 
   title = (title: string) => {
-    this.metadataApplier.applyTitle(title);
+    this.metadata.title = title;
   };
 
   parameters = (values: Record<string, string>) => {
-    this.metadataApplier.applyParameters(values);
+    const stringRecord: Record<string, string> = {};
+    for (const [key, value] of Object.entries(values)) {
+      stringRecord[String(key)] = String(value);
+    }
+    this.metadata.parameters = stringRecord;
   };
 
   groupParameters = (values: Record<string, string>) => {
-    this.metadataApplier.applyGroupParameters(values);
+    const stringRecord: Record<string, string> = {};
+    for (const [key, value] of Object.entries(values)) {
+      stringRecord[String(key)] = String(value);
+    }
+    this.metadata.groupParameters = stringRecord;
   };
 
   fields = (values: Record<string, string>) => {
-    this.metadataApplier.applyFields(values);
+    const stringRecord: Record<string, string> = {};
+    for (const [key, value] of Object.entries(values)) {
+      stringRecord[String(key)] = String(value);
+    }
+    this.metadata.fields = stringRecord;
   };
 
   suite = (name: string) => {
-    this.metadataApplier.applySuite(name);
+    this.metadata.suite = name;
   };
 
   ignore = () => {
-    this.metadataApplier.applyIgnore();
+    this.metadata.ignore = true;
   };
 
   attach = (attach: { name?: string, paths?: string | string[], content?: Buffer | string, contentType?: string }) => {
-    this.metadataApplier.applyAttach(attach);
+    this.metadata.addAttachment(attach);
   };
 
   comment = (message: string) => {
-    this.metadataApplier.applyComment(message);
+    this.metadata.addComment(message);
   };
 
   tags = (...values: string[]) => {
-    this.metadataApplier.applyTags(values);
+    this.metadata.addTags(values);
   };
 
   step = (title: string, func: () => void, expectedResult?: string, data?: string) => {
