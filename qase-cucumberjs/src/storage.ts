@@ -23,11 +23,9 @@ import {
 } from 'qase-javascript-commons';
 import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 import { TestCase } from '@cucumber/messages/dist/esm/src/messages';
-import { Status } from '@cucumber/cucumber';
 import { v4 as uuidv4 } from 'uuid';
 import { ScenarioData, TestMetadata } from './models';
-
-type TestStepResultStatus = (typeof Status)[keyof typeof Status];
+import { STATUS_MAP, STEP_STATUS_MAP, TestStepResultStatus } from './modules/statusMaps';
 
 const qaseIdRegExp = /^@[Qq]-?(\d+)$/;
 const newQaseIdRegExp = /^@[Qq]ase[Ii][Dd]=(\d+(?:,\s*\d+)*)$/;
@@ -412,31 +410,9 @@ export class Storage {
     return results;
   }
 
-  /**
-   * @type {Record<TestStepResultStatus, TestStatusEnum>}
-   */
-  static statusMap: Record<TestStepResultStatus, TestStatusEnum> = {
-    [Status.PASSED]: TestStatusEnum.passed,
-    [Status.FAILED]: TestStatusEnum.failed,
-    [Status.SKIPPED]: TestStatusEnum.skipped,
-    [Status.AMBIGUOUS]: TestStatusEnum.invalid,
-    [Status.PENDING]: TestStatusEnum.skipped,
-    [Status.UNDEFINED]: TestStatusEnum.skipped,
-    [Status.UNKNOWN]: TestStatusEnum.skipped,
-  };
+  static statusMap: Record<TestStepResultStatus, TestStatusEnum> = STATUS_MAP;
 
-  /**
-   * @type {Record<TestStepResultStatus, StepStatusEnum>}
-   */
-  static stepStatusMap: Record<TestStepResultStatus, StepStatusEnum> = {
-    [Status.PASSED]: StepStatusEnum.passed,
-    [Status.FAILED]: StepStatusEnum.failed,
-    [Status.SKIPPED]: StepStatusEnum.skipped,
-    [Status.AMBIGUOUS]: StepStatusEnum.failed,
-    [Status.PENDING]: StepStatusEnum.skipped,
-    [Status.UNDEFINED]: StepStatusEnum.skipped,
-    [Status.UNKNOWN]: StepStatusEnum.skipped,
-  };
+  static stepStatusMap: Record<TestStepResultStatus, StepStatusEnum> = STEP_STATUS_MAP;
 
   private parseTags(tags: readonly PickleTag[]): TestMetadata {
     const tagNames = tags.map((t) => t.name);
