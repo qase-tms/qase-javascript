@@ -1,0 +1,27 @@
+qase-mocha/test/resultBuilder.test.ts
+  efd166bf1f77837a 1-175
+qase-mocha/src/modules/resultBuilder.ts
+  efd166bf1f77837a 1-180
+qase-mocha/src/reporter.ts
+  efd166bf1f77837a 1,16,167,169,172,176-185,191
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "1faba94cbe958a6c18511cf726f1420ce1b2d18d",
+  "prompts": {
+    "efd166bf1f77837a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "74bfed73-d2fb-44c6-9ae5-f589510d4a3f",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 373,
+      "total_deletions": 149,
+      "accepted_lines": 10351,
+      "overriden_lines": 0
+    }
+  }
+}
