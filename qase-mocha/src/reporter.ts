@@ -1,5 +1,6 @@
 import { Context, MochaOptions, reporters, Runner, Suite } from 'mocha';
-import { Hook, Metadata, Test } from './types';
+import { Hook, Test } from './types';
+import { MetadataApplier } from './modules/metadataApplier';
 import {
   Attachment,
   composeOptions,
@@ -71,11 +72,7 @@ export class MochaQaseReporter extends reporters.Base {
    */
   private reporter: ReporterInterface;
 
-  /**
-   * @type {Metadata}
-   * @private
-   */
-  private readonly metadata: Metadata = new Metadata();
+  private readonly metadataApplier: MetadataApplier = new MetadataApplier();
 
   private currentTest: currentTest = new currentTest();
   private testBeginTime: number = Date.now();
@@ -228,8 +225,10 @@ export class MochaQaseReporter extends reporters.Base {
       }
     }
 
-    if (this.metadata.ignore) {
-      this.metadata.clear();
+    const metadata = this.metadataApplier.get();
+
+    if (metadata.ignore) {
+      this.metadataApplier.reset();
       this.currentTest = new currentTest();
       return;
     }
@@ -258,7 +257,7 @@ export class MochaQaseReporter extends reporters.Base {
       };
     }
 
-    let message = this.metadata.comment;
+    let message = metadata.comment;
     if (test.err?.message) {
       message += message ? `\n\n${test.err.message}` : test.err.message;
     }
@@ -271,17 +270,17 @@ export class MochaQaseReporter extends reporters.Base {
     }
 
     const result: TestResultType = {
-      attachments: this.metadata.attachments ?? [],
+      attachments: metadata.attachments ?? [],
       author: null,
-      fields: this.metadata.fields ?? {},
-      tags: this.metadata.tags ?? [],
+      fields: metadata.fields ?? {},
+      tags: metadata.tags ?? [],
       message: message ?? null,
       muted: false,
-      params: this.metadata.parameters ?? {},
-      group_params: this.metadata.groupParameters ?? {},
+      params: metadata.parameters ?? {},
+      group_params: metadata.groupParameters ?? {},
       relations: relations,
       run_id: null,
-      signature: this.getSignature(test, hasProjectMapping ? [] : ids, this.metadata.parameters ?? {}),
+      signature: this.getSignature(test, hasProjectMapping ? [] : ids, metadata.parameters ?? {}),
       steps: [...this.currentTest.steps, ...profilerSteps],
       id: uuidv4(),
       execution: {
@@ -294,12 +293,12 @@ export class MochaQaseReporter extends reporters.Base {
       },
       testops_id: hasProjectMapping ? null : (ids.length > 0 ? ids : null),
       testops_project_mapping: hasProjectMapping ? fromTitle.projectMapping : null,
-      title: this.metadata.title && this.metadata.title != '' ? this.metadata.title : (fromTitle.cleanedTitle || removeQaseIdsFromTitle(test.title)),
+      title: metadata.title && metadata.title != '' ? metadata.title : (fromTitle.cleanedTitle || removeQaseIdsFromTitle(test.title)),
     } as TestResultType;
 
     void this.reporter.addTestResult(result);
 
-    this.metadata.clear();
+    this.metadataApplier.reset();
     this.currentTest = new currentTest();
   }
 
@@ -334,8 +333,8 @@ export class MochaQaseReporter extends reporters.Base {
    * @private
    */
   private getQaseId(): number[] {
-    if (this.metadata.ids) {
-      return this.metadata.ids;
+    if (this.metadataApplier.get().ids) {
+      return this.metadataApplier.get().ids ?? [];
     }
 
     return [];
@@ -347,8 +346,8 @@ export class MochaQaseReporter extends reporters.Base {
    * @private
    */
   private getSuites(test: Mocha.Test): string[] {
-    if (this.metadata.suite) {
-      return [this.metadata.suite];
+    if (this.metadataApplier.get().suite) {
+      return [this.metadataApplier.get().suite ?? ''];
     }
 
     const suites = [];
@@ -360,55 +359,43 @@ export class MochaQaseReporter extends reporters.Base {
   }
 
   qaseId = (id: number | number[]) => {
-    this.metadata.addQaseId(id);
+    this.metadataApplier.applyQaseId(id);
   };
 
   title = (title: string) => {
-    this.metadata.title = title;
+    this.metadataApplier.applyTitle(title);
   };
 
   parameters = (values: Record<string, string>) => {
-    const stringRecord: Record<string, string> = {};
-    for (const [key, value] of Object.entries(values)) {
-      stringRecord[String(key)] = String(value);
-    }
-    this.metadata.parameters = stringRecord;
+    this.metadataApplier.applyParameters(values);
   };
 
   groupParameters = (values: Record<string, string>) => {
-    const stringRecord: Record<string, string> = {};
-    for (const [key, value] of Object.entries(values)) {
-      stringRecord[String(key)] = String(value);
-    }
-    this.metadata.groupParameters = stringRecord;
+    this.metadataApplier.applyGroupParameters(values);
   };
 
   fields = (values: Record<string, string>) => {
-    const stringRecord: Record<string, string> = {};
-    for (const [key, value] of Object.entries(values)) {
-      stringRecord[String(key)] = String(value);
-    }
-    this.metadata.fields = stringRecord;
+    this.metadataApplier.applyFields(values);
   };
 
   suite = (name: string) => {
-    this.metadata.suite = name;
+    this.metadataApplier.applySuite(name);
   };
 
   ignore = () => {
-    this.metadata.ignore = true;
+    this.metadataApplier.applyIgnore();
   };
 
   attach = (attach: { name?: string, paths?: string | string[], content?: Buffer | string, contentType?: string }) => {
-    this.metadata.addAttachment(attach);
+    this.metadataApplier.applyAttach(attach);
   };
 
   comment = (message: string) => {
-    this.metadata.addComment(message);
+    this.metadataApplier.applyComment(message);
   };
 
   tags = (...values: string[]) => {
-    this.metadata.addTags(values);
+    this.metadataApplier.applyTags(values);
   };
 
   step = (title: string, func: () => void, expectedResult?: string, data?: string) => {

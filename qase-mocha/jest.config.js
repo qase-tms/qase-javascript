@@ -6,6 +6,7 @@ module.exports = {
     '^.+\\.ts$': ['ts-jest', {
       tsconfig: {
         skipLibCheck: true,
+        isolatedModules: true,
       },
     }],
   },
