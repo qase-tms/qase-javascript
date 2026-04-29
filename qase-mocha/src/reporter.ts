@@ -1,5 +1,6 @@
 import { Context, MochaOptions, reporters, Runner } from 'mocha';
-import { Hook, Metadata, Test } from './types';
+import { Hook, Test } from './types';
+import { MetadataApplier } from './modules/metadataApplier';
 import {
   composeOptions,
   ConfigLoader,
@@ -30,22 +31,13 @@ const resolveParallelModeSetupFile = () => join(__dirname, `parallel${extname(__
 export class MochaQaseReporter extends reporters.Base {
 
   private readonly outputCapture: OutputCapture = new OutputCapture();
-  // readonly #extraReporters: reporters.Base[] = [];
   private profilerTracker: ProfilerTracker;
 
   static statusMap: Record<MochaState, TestStatusEnum> = STATUS_MAP;
 
-  /**
-   * @type {ReporterInterface}
-   * @private
-   */
   private reporter: ReporterInterface;
 
-  /**
-   * @type {Metadata}
-   * @private
-   */
-  private readonly metadata: Metadata = new Metadata();
+  private readonly metadataApplier: MetadataApplier = new MetadataApplier();
 
   private readonly stepRunner: StepRunner = new StepRunner();
   private testBeginTime: number = Date.now();
@@ -164,10 +156,10 @@ export class MochaQaseReporter extends reporters.Base {
 
   private onEndTest(test: Mocha.Test) {
     const output = this.outputCapture.drain();
-    const metadata = this.metadata;
+    const metadata = this.metadataApplier.get();
 
     if (metadata.ignore) {
-      this.metadata.clear();
+      this.metadataApplier.reset();
       this.stepRunner.reset();
       this.profilerTracker.reset();
       return;
@@ -186,61 +178,49 @@ export class MochaQaseReporter extends reporters.Base {
 
     void this.reporter.addTestResult(result);
 
-    this.metadata.clear();
+    this.metadataApplier.reset();
     this.stepRunner.reset();
     this.profilerTracker.reset();
   }
 
   qaseId = (id: number | number[]) => {
-    this.metadata.addQaseId(id);
+    this.metadataApplier.applyQaseId(id);
   };
 
   title = (title: string) => {
-    this.metadata.title = title;
+    this.metadataApplier.applyTitle(title);
   };
 
   parameters = (values: Record<string, string>) => {
-    const stringRecord: Record<string, string> = {};
-    for (const [key, value] of Object.entries(values)) {
-      stringRecord[String(key)] = String(value);
-    }
-    this.metadata.parameters = stringRecord;
+    this.metadataApplier.applyParameters(values);
   };
 
   groupParameters = (values: Record<string, string>) => {
-    const stringRecord: Record<string, string> = {};
-    for (const [key, value] of Object.entries(values)) {
-      stringRecord[String(key)] = String(value);
-    }
-    this.metadata.groupParameters = stringRecord;
+    this.metadataApplier.applyGroupParameters(values);
   };
 
   fields = (values: Record<string, string>) => {
-    const stringRecord: Record<string, string> = {};
-    for (const [key, value] of Object.entries(values)) {
-      stringRecord[String(key)] = String(value);
-    }
-    this.metadata.fields = stringRecord;
+    this.metadataApplier.applyFields(values);
   };
 
   suite = (name: string) => {
-    this.metadata.suite = name;
+    this.metadataApplier.applySuite(name);
   };
 
   ignore = () => {
-    this.metadata.ignore = true;
+    this.metadataApplier.applyIgnore();
   };
 
   attach = (attach: { name?: string, paths?: string | string[], content?: Buffer | string, contentType?: string }) => {
-    this.metadata.addAttachment(attach);
+    this.metadataApplier.applyAttach(attach);
   };
 
   comment = (message: string) => {
-    this.metadata.addComment(message);
+    this.metadataApplier.applyComment(message);
   };
 
   tags = (...values: string[]) => {
-    this.metadata.addTags(values);
+    this.metadataApplier.applyTags(values);
   };
 
   step = (title: string, func: () => void, expectedResult?: string, data?: string) => {
