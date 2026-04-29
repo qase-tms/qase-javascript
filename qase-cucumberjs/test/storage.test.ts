@@ -219,7 +219,7 @@ describe('Storage', () => {
       storage.addTestCaseStarted(testCaseStarted);
 
       expect((storage as any).events.getTestCaseStarted('started-1')).toBe(testCaseStarted);
-      expect((storage as any).testCaseStartedResult['started-1']).toBe(TestStatusEnum.passed);
+      expect((storage as any).statusTracker.getStatus('started-1')).toBe(TestStatusEnum.passed);
     });
   });
 
@@ -247,8 +247,8 @@ describe('Storage', () => {
       storage.addTestCaseStep(testStepFinished);
 
       expect((storage as any).events.getTestStepFinished('step-1')).toBe(testStepFinished);
-      expect((storage as any).testCaseStartedResult['started-1']).toBe(TestStatusEnum.failed);
-      expect((storage as any).testCaseStartedErrors['started-1']).toContain('Test failed');
+      expect((storage as any).statusTracker.getStatus('started-1')).toBe(TestStatusEnum.failed);
+      expect((storage as any).statusTracker.getErrors('started-1')?.message).toContain('Test failed');
     });
 
     it('should handle multiple failures for same test case', () => {
@@ -285,9 +285,9 @@ describe('Storage', () => {
       storage.addTestCaseStep(testStepFinished1);
       storage.addTestCaseStep(testStepFinished2);
 
-      expect((storage as any).testCaseStartedResult['started-1']).toBe(TestStatusEnum.invalid);
-      expect((storage as any).testCaseStartedErrors['started-1']).toContain('First failure');
-      expect((storage as any).testCaseStartedErrors['started-1']).toContain('Second failure');
+      expect((storage as any).statusTracker.getStatus('started-1')).toBe(TestStatusEnum.invalid);
+      expect((storage as any).statusTracker.getErrors('started-1')?.message).toContain('First failure');
+      expect((storage as any).statusTracker.getErrors('started-1')?.message).toContain('Second failure');
     });
   });
 

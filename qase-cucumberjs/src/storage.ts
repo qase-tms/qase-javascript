@@ -8,7 +8,6 @@ import {
   TestStepFinished,
 } from '@cucumber/messages';
 import {
-  CompoundError,
   generateSignature,
   Relation,
   StepStatusEnum,
@@ -16,13 +15,13 @@ import {
   TestResultType,
   TestStatusEnum,
   TestStepType,
-  determineTestStatus,
 } from 'qase-javascript-commons';
 import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 import { TestCase } from '@cucumber/messages/dist/esm/src/messages';
 import { STATUS_MAP, STEP_STATUS_MAP, TestStepResultStatus } from './modules/statusMaps';
 import { TagParser } from './modules/tagParser';
 import { EventStorage } from './modules/eventStorage';
+import { StatusTracker } from './modules/statusTracker';
 
 export class Storage {
   /**
@@ -48,16 +47,10 @@ export class Storage {
   private events: EventStorage = new EventStorage();
 
   /**
-   * @type {Record<string, TestStatusEnum>}
+   * @type {StatusTracker}
    * @private
    */
-  private testCaseStartedResult: Record<string, TestStatusEnum> = {};
-
-  /**
-   * @type {Record<string, string[]>}
-   * @private
-   */
-  private testCaseStartedErrors: Record<string, string[]> = {};
+  private statusTracker: StatusTracker = new StatusTracker();
 
   /**
    * Add pickle to storage
@@ -97,7 +90,7 @@ export class Storage {
    */
   public addTestCaseStarted(testCaseStarted: TestCaseStarted): void {
     this.events.addTestCaseStarted(testCaseStarted);
-    this.testCaseStartedResult[testCaseStarted.id] = TestStatusEnum.passed;
+    this.statusTracker.onTestStarted(testCaseStarted.id);
     if (this.profiler) {
       this.profilerStepSnapshots[testCaseStarted.id] = this.profiler.getAllSteps().length;
     }
@@ -108,37 +101,8 @@ export class Storage {
    * @param {TestStepFinished} testCaseStep
    */
   public addTestCaseStep(testCaseStep: TestStepFinished): void {
-    const oldStatus = this.testCaseStartedResult[testCaseStep.testCaseStartedId];
-    
-    // Create error object for status determination
-    let error: Error | null = null;
-    if (testCaseStep.testStepResult.message) {
-      error = new Error(testCaseStep.testStepResult.message);
-    }
-    
-    // Determine status based on error type
-    const newStatus = determineTestStatus(error, Storage.statusMap[testCaseStep.testStepResult.status]);
-
     this.events.addTestStepFinished(testCaseStep);
-
-    if (newStatus !== TestStatusEnum.passed) {
-      if (testCaseStep.testStepResult.message) {
-
-        if (!this.testCaseStartedErrors[testCaseStep.testCaseStartedId]) {
-          this.testCaseStartedErrors[testCaseStep.testCaseStartedId] = [];
-        }
-
-        this.testCaseStartedErrors[testCaseStep.testCaseStartedId]?.push(testCaseStep.testStepResult.message);
-      }
-
-      if (oldStatus) {
-        if (oldStatus !== TestStatusEnum.failed && oldStatus !== TestStatusEnum.invalid) {
-          this.testCaseStartedResult[testCaseStep.testCaseStartedId] = newStatus;
-        }
-      } else {
-        this.testCaseStartedResult[testCaseStep.testCaseStartedId] = newStatus;
-      }
-    }
+    this.statusTracker.applyStep(testCaseStep);
   }
 
   /**
@@ -171,7 +135,7 @@ export class Storage {
       return undefined;
     }
 
-    const error = this.getError(tcs.id);
+    const error = this.statusTracker.getErrors(tcs.id);
 
     let relations: Relation | null = null;
     let params: Record<string, string> = {};
@@ -231,7 +195,7 @@ export class Storage {
       attachments: this.events.getAttachments(testCase.testCaseStartedId),
       author: null,
       execution: {
-        status: this.testCaseStartedResult[testCase.testCaseStartedId] ?? TestStatusEnum.passed,
+        status: this.statusTracker.getStatus(testCase.testCaseStartedId),
         start_time: tcs.timestamp.seconds,
         end_time: testCase.timestamp.seconds,
         duration: Math.abs(testCase.timestamp.seconds - tcs.timestamp.seconds) * 1000,
@@ -318,21 +282,6 @@ export class Storage {
     return generateSignature(ids, [...pickle.uri.split('/'), pickle.name], parameters);
   }
 
-  private getError(testCaseId: string): CompoundError | undefined {
-    const testErrors = this.testCaseStartedErrors[testCaseId];
-
-    if (!testErrors) {
-      return undefined;
-    }
-
-    const error = new CompoundError();
-    testErrors.forEach((message) => {
-      error.addMessage(message);
-      error.addStacktrace(message);
-    });
-
-    return error;
-  }
-
 }
+
 
