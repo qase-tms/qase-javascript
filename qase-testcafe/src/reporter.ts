@@ -26,6 +26,7 @@ import {
 } from './types';
 import { MetadataParser } from './modules/metadataParser';
 import { ProfilerTracker } from './modules/profilerTracker';
+import { BrowserNameResolver } from './modules/browserNameResolver';
 
 export type { TestRunInfoType };
 
@@ -192,7 +193,7 @@ export class TestcafeQaseReporter {
 
     const params = { ...metadata[metadataEnum.parameters] };
     if (this.browserOptions?.addAsParameter) {
-      const browserName = this.getBrowserName(testRunInfo);
+      const browserName = BrowserNameResolver.resolve(testRunInfo, this.userAgents);
       if (browserName) {
         const paramName = this.browserOptions.parameterName ?? 'browser';
         params[paramName] = browserName;
@@ -273,40 +274,4 @@ export class TestcafeQaseReporter {
     return generateSignature(ids, suites, parameters);
   }
 
-  /**
-   * Extract browser name from testRunInfo or stored userAgents.
-   * TestCafe userAgent format: "Chrome 97.0.4692.71 / macOS 10.15.7"
-   */
-  private getBrowserName(testRunInfo: TestRunInfoType): string | null {
-    // Try to get userAgent from screenshots or errors (per-test browser)
-    const userAgent =
-      testRunInfo.screenshots[0]?.userAgent ??
-      testRunInfo.errs[0]?.userAgent ??
-      null;
-
-    if (userAgent) {
-      return TestcafeQaseReporter.parseBrowserName(userAgent);
-    }
-
-    // Fall back to stored userAgents (from reportTaskStart)
-    if (this.userAgents.length === 1 && this.userAgents[0]) {
-      return TestcafeQaseReporter.parseBrowserName(this.userAgents[0]);
-    }
-
-    return null;
-  }
-
-  /**
-   * Parse browser name from TestCafe userAgent string.
-   * "Chrome 97.0.4692.71 / macOS 10.15.7" → "Chrome"
-   * "Chrome_97.0.4692.71_macOS_10.15.7" → "Chrome"
-   * "Firefox 96.0 / Linux 0.0" → "Firefox"
-   */
-  private static parseBrowserName(userAgent: string): string {
-    // Take the part before " / " (OS info), then take the first word (browser name)
-    const browserPart = userAgent.split(' / ')[0] ?? userAgent;
-    // Split on space or underscore to handle both formats
-    const name = browserPart.split(/[\s_]/)[0];
-    return (name ?? browserPart).toLowerCase();
-  }
 }
