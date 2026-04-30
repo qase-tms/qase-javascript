@@ -1,0 +1,27 @@
+qase-testcafe/src/modules/browserNameResolver.ts
+  efd166bf1f77837a 1-26
+qase-testcafe/src/reporter.ts
+  efd166bf1f77837a 29,196
+qase-testcafe/test/browserNameResolver.test.ts
+  efd166bf1f77837a 1-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "133bcb6630dd4ff37cd36d817f5c0a76a93f0d6e",
+  "prompts": {
+    "efd166bf1f77837a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "74bfed73-d2fb-44c6-9ae5-f589510d4a3f",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 78,
+      "total_deletions": 37,
+      "accepted_lines": 1956,
+      "overriden_lines": 0
+    }
+  }
+}
