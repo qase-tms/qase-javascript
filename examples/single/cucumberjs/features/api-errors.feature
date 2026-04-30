@@ -23,7 +23,7 @@ Feature: Error Handling
     And the response should be an empty object
 
   @QaseID=10
-  @QaseFields={"severity":"low","layer":"api"}
+  @QaseFields={"severity":"minor","layer":"api"}
   @QaseSuite=API\tErrors\tInvalid_Endpoint
   Scenario: Invalid endpoint returns 404
     When I send a GET request to "/invalid-endpoint"

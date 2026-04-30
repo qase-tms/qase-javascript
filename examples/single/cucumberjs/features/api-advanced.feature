@@ -7,7 +7,7 @@ Feature: Advanced Qase Features
 
   @QaseID=12
   @QaseTitle=Fetch_user_and_their_posts_relationship
-  @QaseFields={"severity":"normal","priority":"medium","layer":"api"}
+  @QaseFields={"severity":"normal","priority":"high","layer":"api"}
   @QaseSuite=API\tAdvanced\tRelationships
   @QaseParameters={"testScope":"user_posts_relationship"}
   Scenario: Fetch user and their posts
@@ -22,7 +22,6 @@ Feature: Advanced Qase Features
   @QaseFields={"severity":"normal","layer":"api"}
   @QaseSuite=API\tAdvanced\tData_Validation
   @QaseGroupParameters={"environment":"production","region":"us-east"}
-  @QaseTags=advanced,api
   Scenario: Suite hierarchy and group parameters demonstration
     When I send a GET request to "/todos/1"
     Then the response status should be 200
