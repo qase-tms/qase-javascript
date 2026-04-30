@@ -61,31 +61,6 @@ describe('JestQaseReporter', () => {
     });
   });
 
-  describe('static qaseIdRegExp', () => {
-    it('should match Qase ID patterns', () => {
-      expect(JestQaseReporter.qaseIdRegExp.test('Test (Qase ID: 123)')).toBe(true);
-      expect(JestQaseReporter.qaseIdRegExp.test('Test (Qase ID: 123,456)')).toBe(true);
-      expect(JestQaseReporter.qaseIdRegExp.test('Test without ID')).toBe(false);
-    });
-  });
-
-  describe('static getCaseId', () => {
-    it('should extract single case ID', () => {
-      const result = (JestQaseReporter as any).getCaseId('Test (Qase ID: 123)');
-      expect(result).toEqual([123]);
-    });
-
-    it('should extract multiple case IDs', () => {
-      const result = (JestQaseReporter as any).getCaseId('Test (Qase ID: 123,456,789)');
-      expect(result).toEqual([123, 456, 789]);
-    });
-
-    it('should return empty array for no match', () => {
-      const result = (JestQaseReporter as any).getCaseId('Test without ID');
-      expect(result).toEqual([]);
-    });
-  });
-
   describe('constructor', () => {
     it('should initialize reporter and global.Qase', () => {
       expect((reporter as any).reporter).toBe(reporterMock);

@@ -32,6 +32,16 @@ import { Metadata } from './models';
 
 export type JestQaseOptionsType = ConfigType;
 
+const STATUS_MAP: Record<Status, TestStatusEnum> = {
+  passed: TestStatusEnum.passed,
+  failed: TestStatusEnum.failed,
+  skipped: TestStatusEnum.skipped,
+  disabled: TestStatusEnum.disabled,
+  pending: TestStatusEnum.skipped,
+  todo: TestStatusEnum.disabled,
+  focused: TestStatusEnum.passed,
+};
+
 /**
  * @class JestQaseReporter
  * @implements Reporter
@@ -40,31 +50,7 @@ export class JestQaseReporter implements Reporter {
   /**
    * @type {Record<Status, TestStatusEnum>}
    */
-  static statusMap: Record<Status, TestStatusEnum> = {
-    passed: TestStatusEnum.passed,
-    failed: TestStatusEnum.failed,
-    skipped: TestStatusEnum.skipped,
-    disabled: TestStatusEnum.disabled,
-    pending: TestStatusEnum.skipped,
-    todo: TestStatusEnum.disabled,
-    focused: TestStatusEnum.passed,
-  };
-
-  /**
-   * @type {RegExp}
-   */
-  static qaseIdRegExp = /\(Qase ID: ([\d,]+)\)/;
-
-  /**
-   * @param {string} title
-   * @returns {number[]}
-   * @private
-   */
-  private static getCaseId(title: string): number[] {
-    const [, ids] = title.match(JestQaseReporter.qaseIdRegExp) ?? [];
-
-    return ids ? ids.split(',').map((id) => Number(id)) : [];
-  }
+  static statusMap: Record<Status, TestStatusEnum> = STATUS_MAP;
 
   /**
    * @type {ReporterInterface}
@@ -190,7 +176,8 @@ export class JestQaseReporter implements Reporter {
     }
 
     // Generate signature with parameters
-    const ids = JestQaseReporter.getCaseId(testCaseResult.title);
+    const idMatch = testCaseResult.title.match(/\(Qase ID: ([\d,]+)\)/);
+    const ids = idMatch?.[1] ? idMatch[1].split(',').map((id) => Number(id)) : [];
     result.signature = this.getSignature(test.path, testCaseResult.fullName, ids, this.metadata.parameters);
 
     this.cleanMetadata();
