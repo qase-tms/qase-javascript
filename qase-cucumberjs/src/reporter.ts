@@ -37,11 +37,6 @@ export class CucumberQaseReporter extends Formatter {
   private reporter: ReporterInterface;
 
   /**
-   * @type {NetworkProfiler | null}
-   * @private
-   */
-  private profiler: NetworkProfiler | null = null;
-  /**
    * @type {EventEmitter}
    * @private
    */
@@ -68,16 +63,17 @@ export class CucumberQaseReporter extends Formatter {
       reporterName: 'cucumberjs-qase-reporter',
     });
 
+    let profiler: NetworkProfiler | null = null;
     if (composedOptions.profilers?.includes('network')) {
-      this.profiler = new NetworkProfiler({
+      profiler = new NetworkProfiler({
         skipDomains: composedOptions.networkProfiler?.skip_domains,
         trackOnFail: composedOptions.networkProfiler?.track_on_fail,
       });
-      this.profiler.enable();
+      profiler.enable();
     }
 
     this.eventBroadcaster = formatterOptions.eventBroadcaster;
-    this.storage = new Storage(this.profiler);
+    this.storage = new Storage(profiler);
     this.bindEventListeners();
   }
 
@@ -120,7 +116,7 @@ export class CucumberQaseReporter extends Formatter {
    * @private
    */
   private async publishResults(): Promise<void> {
-    this.profiler?.restore();
+    this.storage.restore();
     await this.reporter.publish();
   }
 
