@@ -1,3 +1,13 @@
+# testcafe-reporter-qase@2.6.0
+
+## Changed
+
+- Decomposed `reporter.ts` (444 LOC) into a thin orchestrator plus 4 focused modules under `src/modules/` (`MetadataParser`, `ProfilerTracker`, `BrowserNameResolver`, `ResultBuilder`) and `src/types.ts`. Public contract preserved: `TestcafeQaseReporter` named export, constructor signature, all 8 instance methods, `TestcafeQaseOptionsType` and `TestRunInfoType` re-exports.
+
+## Internal
+
+- Added 27 per-module unit tests on top of the existing 20 integration tests (47 total).
+
 # testcafe-reporter-qase@2.5.0
 
 ## Changed
