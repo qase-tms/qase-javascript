@@ -7,7 +7,7 @@ Feature: Advanced Qase Features
 
   @QaseID=12
   @QaseTitle=Fetch_user_and_their_posts_relationship
-  @QaseFields={"severity":"normal","priority":"medium","layer":"api"}
+  @QaseFields={"severity":"normal","priority":"high","layer":"api"}
   @QaseSuite=API\tAdvanced\tRelationships
   @QaseParameters={"testScope":"user_posts_relationship"}
   Scenario: Fetch user and their posts
