@@ -1,6 +1,7 @@
 /* eslint-disable */
 import { expect } from '@jest/globals';
 import { TestcafeQaseReporter } from '../src/reporter';
+import { MetadataParser } from '../src/modules/metadataParser';
 
 // Mocks
 const reporterMock = {
@@ -194,7 +195,7 @@ describe('TestcafeQaseReporter', () => {
         QaseIgnore: 'true',
         CID: '3',
       };
-      const result = (reporter as any).getMeta(meta);
+      const result = MetadataParser.parse(meta);
       expect(result.QaseID).toEqual([1, 2]);
       expect(result.QaseTitle).toBe('title');
       expect(result.QaseFields).toEqual({ a: 'b' });
@@ -204,15 +205,15 @@ describe('TestcafeQaseReporter', () => {
     });
     it('should parse QaseSuite from meta', () => {
       const meta = { QaseSuite: 'Parent\tChild' };
-      const result = (reporter as any).getMeta(meta);
+      const result = MetadataParser.parse(meta);
       expect(result.QaseSuite).toBe('Parent\tChild');
     });
     it('should leave QaseSuite undefined when not provided', () => {
-      const result = (reporter as any).getMeta({});
+      const result = MetadataParser.parse({});
       expect(result.QaseSuite).toBeUndefined();
     });
     it('should handle empty meta', () => {
-      const result = (reporter as any).getMeta({});
+      const result = MetadataParser.parse({});
       expect(result.QaseID).toEqual([]);
       expect(result.QaseTitle).toBeUndefined();
       expect(result.QaseFields).toEqual({});
