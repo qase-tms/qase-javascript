@@ -1,3 +1,17 @@
+# cucumberjs-qase-reporter@2.4.0
+
+## Changed
+
+- Decomposed `storage.ts` (595 LOC) into a thin facade plus 6 focused modules under `src/modules/`: `TagParser`, `EventStorage`, `StatusTracker`, `StepConverter`, `ProfilerTracker`, `ResultBuilder`, plus `STATUS_MAP` / `STEP_STATUS_MAP` constants. Public contract preserved: `Storage` named export, constructor signature, all 7 instance methods, static `statusMap` and `stepStatusMap`, all 9 user-facing tag patterns.
+
+## Bug fixes
+
+- Cross-reporter consistency: `testops_id` is now `null` when project mapping (`@qaseid.PROJ(ids)` tag) is set, matching the behavior of mocha / cypress / jest reporters. Previously cucumberjs emitted both `testops_id: ids` and `testops_project_mapping: mapping`, which could lead to ambiguous results in multi-project runs.
+
+## Internal
+
+- Added 38 per-module unit tests on top of the existing 44 facade integration tests (82 total).
+
 # cucumberjs-qase-reporter@2.3.0
 
 ## What's new
