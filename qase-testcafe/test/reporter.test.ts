@@ -1,6 +1,8 @@
 /* eslint-disable */
 import { expect } from '@jest/globals';
 import { TestcafeQaseReporter } from '../src/reporter';
+import { MetadataParser } from '../src/modules/metadataParser';
+import { ResultBuilder } from '../src/modules/resultBuilder';
 
 // Mocks
 const reporterMock = {
@@ -43,15 +45,15 @@ describe('TestcafeQaseReporter', () => {
   describe('static getStatus', () => {
     it('should return skipped if testRunInfo.skipped is true', () => {
       const info = { skipped: true, errs: [] } as any;
-      expect((TestcafeQaseReporter as any).getStatus(info)).toBe('skipped');
+      expect(ResultBuilder.getStatus(info)).toBe('skipped');
     });
     it('should return failed if there are errors', () => {
       const info = { skipped: false, errs: [{}] } as any;
-      expect((TestcafeQaseReporter as any).getStatus(info)).toBe('failed');
+      expect(ResultBuilder.getStatus(info)).toBe('failed');
     });
     it('should return passed if no errors and not skipped', () => {
       const info = { skipped: false, errs: [] } as any;
-      expect((TestcafeQaseReporter as any).getStatus(info)).toBe('passed');
+      expect(ResultBuilder.getStatus(info)).toBe('passed');
     });
   });
 
@@ -61,7 +63,7 @@ describe('TestcafeQaseReporter', () => {
         { screenshotPath: 'a.png', thumbnailPath: '', userAgent: '', quarantineAttempt: 0, takenOnFail: false },
         { screenshotPath: 'b.png', thumbnailPath: '', userAgent: '', quarantineAttempt: 0, takenOnFail: false },
       ];
-      const result = (TestcafeQaseReporter as any).transformAttachments(screenshots);
+      const result = ResultBuilder.transformAttachments(screenshots);
       expect(result).toHaveLength(2);
       expect(result[0].file_name).toBe('a.png');
       expect(result[1].file_name).toBe('b.png');
@@ -194,7 +196,7 @@ describe('TestcafeQaseReporter', () => {
         QaseIgnore: 'true',
         CID: '3',
       };
-      const result = (reporter as any).getMeta(meta);
+      const result = MetadataParser.parse(meta);
       expect(result.QaseID).toEqual([1, 2]);
       expect(result.QaseTitle).toBe('title');
       expect(result.QaseFields).toEqual({ a: 'b' });
@@ -204,15 +206,15 @@ describe('TestcafeQaseReporter', () => {
     });
     it('should parse QaseSuite from meta', () => {
       const meta = { QaseSuite: 'Parent\tChild' };
-      const result = (reporter as any).getMeta(meta);
+      const result = MetadataParser.parse(meta);
       expect(result.QaseSuite).toBe('Parent\tChild');
     });
     it('should leave QaseSuite undefined when not provided', () => {
-      const result = (reporter as any).getMeta({});
+      const result = MetadataParser.parse({});
       expect(result.QaseSuite).toBeUndefined();
     });
     it('should handle empty meta', () => {
-      const result = (reporter as any).getMeta({});
+      const result = MetadataParser.parse({});
       expect(result.QaseID).toEqual([]);
       expect(result.QaseTitle).toBeUndefined();
       expect(result.QaseFields).toEqual({});
@@ -227,7 +229,7 @@ describe('TestcafeQaseReporter', () => {
       const fixture = { name: 'Fix', path: '/a/b', id: 'id', meta: {} };
       const ids = [1, 2];
       const params = { p: 'v' };
-      const result = (reporter as any).getSignature(fixture, 'Test Title', ids, params);
+      const result = ResultBuilder.getSignature(fixture, 'Test Title', ids, params);
       const { generateSignature } = require('qase-javascript-commons');
       expect(generateSignature).toHaveBeenCalled();
       expect(result).toBe('mock-signature');

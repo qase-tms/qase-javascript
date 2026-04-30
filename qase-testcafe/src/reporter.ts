@@ -1,97 +1,26 @@
-import { v4 as uuidv4 } from 'uuid';
-
 import {
   ConfigLoader,
   ConfigType,
   QaseReporter,
   ReporterInterface,
-  TestStatusEnum,
   composeOptions,
   Attachment,
   TestStepType,
-  generateSignature,
-  determineTestStatus,
-  TestResultType,
 } from 'qase-javascript-commons';
 import { NetworkProfiler } from 'qase-javascript-commons/profilers';
-import { normalizeSuitePart } from 'qase-javascript-commons/internal';
 import { Qase } from './global';
 import { configSchema } from './configSchema';
 import { ReporterOptionsType } from './options';
+import {
+  metadataEnum,
+  TestRunInfoType,
+} from './types';
+import { MetadataParser } from './modules/metadataParser';
+import { ProfilerTracker } from './modules/profilerTracker';
+import { BrowserNameResolver } from './modules/browserNameResolver';
+import { ResultBuilder } from './modules/resultBuilder';
 
-interface CallsiteRecordType {
-  filename?: string;
-  lineNum?: number;
-  callsiteFrameIdx?: number;
-  stackFrames?: unknown[];
-  isV8Frames?: boolean;
-}
-
-interface TestRunErrorFormattableAdapterType {
-  userAgent: string;
-  screenshotPath: string;
-  testRunId: string;
-  testRunPhase: string;
-  type: string;
-  code?: string;
-  isTestCafeError?: boolean;
-  callsite?: CallsiteRecordType;
-  errMsg: string;
-  diff?: boolean;
-  id?: string;
-}
-
-interface ScreenshotType {
-  screenshotPath: string;
-  thumbnailPath: string;
-  userAgent: string;
-  quarantineAttempt: number;
-  takenOnFail: boolean;
-}
-
-interface FixtureType {
-  id: string;
-  name: string;
-  path?: string;
-  meta: Record<string, unknown>;
-}
-
-enum metadataEnum {
-  id = 'QaseID',
-  title = 'QaseTitle',
-  suite = 'QaseSuite',
-  fields = 'QaseFields',
-  parameters = 'QaseParameters',
-  groupParameters = 'QaseGroupParameters',
-  oldID = 'CID',
-  ignore = 'QaseIgnore',
-  projects = 'QaseProjects',
-  tags = 'QaseTags',
-}
-
-interface MetadataType {
-  [metadataEnum.id]: number[];
-  [metadataEnum.title]: string | undefined;
-  [metadataEnum.suite]: string | undefined;
-  [metadataEnum.fields]: Record<string, string>;
-  [metadataEnum.parameters]: Record<string, string>;
-  [metadataEnum.groupParameters]: Record<string, string>;
-  [metadataEnum.ignore]: boolean;
-  [metadataEnum.projects]: Record<string, number[]>;
-  [metadataEnum.tags]: string[];
-}
-
-export interface TestRunInfoType {
-  errs: TestRunErrorFormattableAdapterType[];
-  warnings: string[];
-  durationMs: number;
-  unstable: boolean;
-  screenshotPath: string;
-  screenshots: ScreenshotType[];
-  quarantine: Record<string, Record<'passed', boolean>>;
-  skipped: boolean;
-  fixture: FixtureType;
-}
+export type { TestRunInfoType };
 
 export type TestcafeQaseOptionsType = ConfigType;
 
@@ -99,52 +28,6 @@ export type TestcafeQaseOptionsType = ConfigType;
  * @class TestcafeQaseReporter
  */
 export class TestcafeQaseReporter {
-  /**
-   * @param {TestRunInfoType} testRunInfo
-   * @returns {TestStatusEnum}
-   * @private
-   */
-  private static getStatus(testRunInfo: TestRunInfoType): TestStatusEnum {
-    if (testRunInfo.skipped) {
-      return TestStatusEnum.skipped;
-    } else if (testRunInfo.errs.length > 0) {
-      // Create error object for status determination
-      const firstError = testRunInfo.errs[0];
-      const error = new Error(firstError?.errMsg ?? 'Test failed');
-      if (firstError?.callsite) {
-        const filename = firstError.callsite.filename ?? 'unknown';
-        const lineNum = firstError.callsite.lineNum ?? 'unknown';
-        error.stack = `Error: ${firstError.errMsg}\n    at ${filename}:${lineNum}`;
-      }
-      
-      return determineTestStatus(error, 'failed');
-    }
-
-    return TestStatusEnum.passed;
-  }
-
-  /**
-   * @param {ScreenshotType[]} screenshots
-   * @returns {Attachment[]}
-   * @private
-   */
-  private static transformAttachments(screenshots: ScreenshotType[]): Attachment[] {
-    const attachments: Attachment[] = [];
-
-    for (const screenshot of screenshots) {
-      attachments.push({
-        file_name: screenshot.screenshotPath,
-        file_path: screenshot.screenshotPath,
-        mime_type: '',
-        content: '',
-        size: 0,
-        id: uuidv4(),
-      });
-    }
-
-    return attachments;
-  }
-
   /**
    * @type {ReporterInterface}
    * @private
@@ -154,8 +37,7 @@ export class TestcafeQaseReporter {
   private steps: TestStepType[] = [];
   private attachments: Attachment[] = [];
   private testBeginTime: number = Date.now();
-  private profiler: NetworkProfiler | null = null;
-  private _profilerStepSnapshot = 0;
+  private profilerTracker: ProfilerTracker;
   private userAgents: string[] = [];
   private browserOptions: ReporterOptionsType['browser'];
 
@@ -178,13 +60,15 @@ export class TestcafeQaseReporter {
       reporterName: 'testcafe-reporter-qase',
     });
 
+    let profiler: NetworkProfiler | null = null;
     if (composedOptions.profilers?.includes('network')) {
-      this.profiler = new NetworkProfiler({
+      profiler = new NetworkProfiler({
         skipDomains: composedOptions.networkProfiler?.skip_domains,
         trackOnFail: composedOptions.networkProfiler?.track_on_fail,
       });
-      this.profiler.enable();
+      profiler.enable();
     }
+    this.profilerTracker = new ProfilerTracker(profiler);
 
     // @ts-expect-error - global.Qase is dynamically added at runtime
     global.Qase = new Qase(this);
@@ -213,7 +97,7 @@ export class TestcafeQaseReporter {
     this.steps = [];
     this.attachments = [];
     this.testBeginTime = Date.now();
-    this._profilerStepSnapshot = this.profiler?.getAllSteps().length ?? 0;
+    this.profilerTracker.onTestStart();
   };
 
   /**
@@ -228,84 +112,31 @@ export class TestcafeQaseReporter {
     meta: Record<string, string>,
     formatError: (error: unknown, prefix: string) => string,
   ) => {
-    const metadata = this.getMeta(meta);
+    const metadata = MetadataParser.parse(meta);
 
     if (metadata[metadataEnum.ignore]) {
       return;
     }
 
-    const errorLog = testRunInfo.errs
-      .map((error, index) => formatError(error, `${index + 1} `).replace(
-        // eslint-disable-next-line no-control-regex
-        /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
-        '',
-      ))
-      .join('\n');
+    const browserName = this.browserOptions?.addAsParameter
+      ? BrowserNameResolver.resolve(testRunInfo, this.userAgents)
+      : null;
 
-    const attachments = TestcafeQaseReporter.transformAttachments(
-      testRunInfo.screenshots,
-    );
+    const profilerSteps: TestStepType[] = this.profilerTracker.getEvents();
+    this.profilerTracker.reset();
 
-    attachments.push(...this.attachments);
-
-    let profilerSteps: TestStepType[] = [];
-    if (this.profiler) {
-      const allSteps = this.profiler.getAllSteps();
-      profilerSteps = allSteps.slice(this._profilerStepSnapshot);
-      this._profilerStepSnapshot = 0;
-    }
-
-    const projectMapping = metadata[metadataEnum.projects];
-
-    const params = { ...metadata[metadataEnum.parameters] };
-    if (this.browserOptions?.addAsParameter) {
-      const browserName = this.getBrowserName(testRunInfo);
-      if (browserName) {
-        const paramName = this.browserOptions.parameterName ?? 'browser';
-        params[paramName] = browserName;
-      }
-    }
-
-    const result = {
-      author: null,
-      execution: {
-        status: TestcafeQaseReporter.getStatus(testRunInfo),
-        start_time: this.testBeginTime / 1000,
-        end_time: (this.testBeginTime + testRunInfo.durationMs) / 1000,
-        duration: testRunInfo.durationMs,
-        stacktrace: errorLog,
-        thread: null,
-      },
-      fields: metadata[metadataEnum.fields],
-      tags: metadata[metadataEnum.tags],
-      message: errorLog ? errorLog.split('\n')[0] ?? '' : '',
-      muted: false,
-      params: params,
-      group_params: metadata[metadataEnum.groupParameters],
-      relations: {
-        suite: {
-          data: metadata[metadataEnum.suite]
-            ? metadata[metadataEnum.suite].split('\t').map((s) => ({
-                title: s,
-                public_id: null,
-              }))
-            : [
-                {
-                  title: testRunInfo.fixture.name,
-                  public_id: null,
-                },
-              ],
-        },
-      },
-      run_id: null,
-      signature: this.getSignature(testRunInfo.fixture, title, metadata[metadataEnum.id], params),
-      steps: [...this.steps, ...profilerSteps],
-      id: uuidv4(),
-      testops_id: metadata[metadataEnum.id].length > 0 ? metadata[metadataEnum.id] : null,
-      title: metadata[metadataEnum.title] != undefined ? metadata[metadataEnum.title] : title,
-      attachments: attachments,
-      testops_project_mapping: (projectMapping && Object.keys(projectMapping).length > 0) ? projectMapping : null,
-    } as unknown as TestResultType;
+    const result = ResultBuilder.build({
+      title,
+      testRunInfo,
+      metadata,
+      formatError,
+      steps: this.steps,
+      attachments: this.attachments,
+      profilerSteps,
+      testBeginTime: this.testBeginTime,
+      browserName,
+      browserOptions: this.browserOptions,
+    });
 
     await this.reporter.addTestResult(result);
   };
@@ -314,131 +145,9 @@ export class TestcafeQaseReporter {
    * @returns {Promise<void>}
    */
   public reportTaskDone = async (): Promise<void> => {
-    this.profiler?.restore();
+    this.profilerTracker.restore();
     await this.reporter.publish();
   };
 
-  private getMeta(meta: Record<string, string>) {
-    const metadata: MetadataType = {
-      QaseID: [],
-      QaseTitle: undefined,
-      QaseSuite: undefined,
-      QaseFields: {},
-      QaseParameters: {},
-      QaseGroupParameters: {},
-      QaseIgnore: false,
-      QaseProjects: {},
-      QaseTags: [],
-    };
-
-    if (meta[metadataEnum.oldID] !== undefined && meta[metadataEnum.oldID] !== '') {
-      const v = meta[metadataEnum.oldID].split(',');
-      metadata.QaseID = Array.isArray(v) ? v.map(Number) : [Number(v)];
-    }
-
-    if (meta[metadataEnum.id] !== undefined && meta[metadataEnum.id] !== '') {
-      const v = meta[metadataEnum.id].split(',');
-      metadata.QaseID = Array.isArray(v) ? v.map(Number) : [Number(v)];
-    }
-
-    if (meta[metadataEnum.title] !== undefined && meta[metadataEnum.title] !== '') {
-      metadata.QaseTitle = meta[metadataEnum.title];
-    }
-
-    if (meta[metadataEnum.suite] !== undefined && meta[metadataEnum.suite] !== '') {
-      metadata.QaseSuite = meta[metadataEnum.suite];
-    }
-
-    if (meta[metadataEnum.fields] !== undefined && meta[metadataEnum.fields] !== '') {
-      metadata.QaseFields = JSON.parse(meta[metadataEnum.fields]) as Record<string, string>;
-    }
-
-    if (meta[metadataEnum.parameters] !== undefined && meta[metadataEnum.parameters] !== '') {
-      metadata.QaseParameters = JSON.parse(meta[metadataEnum.parameters]) as Record<string, string>;
-    }
-
-    if (meta[metadataEnum.groupParameters] !== undefined && meta[metadataEnum.groupParameters] !== '') {
-      metadata.QaseGroupParameters = JSON.parse(meta[metadataEnum.groupParameters]) as Record<string, string>;
-    }
-
-    if (meta[metadataEnum.ignore] !== undefined && meta[metadataEnum.ignore] !== '') {
-      metadata.QaseIgnore = meta[metadataEnum.ignore] === 'true';
-    }
-
-    if (meta[metadataEnum.tags] !== undefined && meta[metadataEnum.tags] !== '') {
-      metadata.QaseTags = meta[metadataEnum.tags].split(',').map((t: string) => t.trim()).filter((t: string) => t.length > 0);
-    }
-
-    if (meta[metadataEnum.projects] !== undefined && meta[metadataEnum.projects] !== '') {
-      try {
-        const parsed = JSON.parse(meta[metadataEnum.projects]) as Record<string, number[]>;
-        if (parsed && typeof parsed === 'object') {
-          metadata.QaseProjects = parsed;
-        }
-      } catch {
-        // ignore invalid JSON
-      }
-    }
-
-    return metadata;
-  }
-
-  /**
-   * @param {FixtureType} fixture
-   * @param {string} title
-   * @param {number[]} ids
-   * @param {Record<string, string>} parameters
-   * @private
-   */
-  private getSignature(fixture: FixtureType, title: string, ids: number[], parameters: Record<string, string>) {
-    const executionPath = process.cwd() + '/';
-    const path = fixture.path?.replace(executionPath, '') ?? '';
-    const suites = [];
-
-    if (path != '') {
-      suites.push(...path.split('/'));
-    }
-
-    suites.push(normalizeSuitePart(fixture.name));
-    suites.push(normalizeSuitePart(title));
-
-    return generateSignature(ids, suites, parameters);
-  }
-
-  /**
-   * Extract browser name from testRunInfo or stored userAgents.
-   * TestCafe userAgent format: "Chrome 97.0.4692.71 / macOS 10.15.7"
-   */
-  private getBrowserName(testRunInfo: TestRunInfoType): string | null {
-    // Try to get userAgent from screenshots or errors (per-test browser)
-    const userAgent =
-      testRunInfo.screenshots[0]?.userAgent ??
-      testRunInfo.errs[0]?.userAgent ??
-      null;
-
-    if (userAgent) {
-      return TestcafeQaseReporter.parseBrowserName(userAgent);
-    }
-
-    // Fall back to stored userAgents (from reportTaskStart)
-    if (this.userAgents.length === 1 && this.userAgents[0]) {
-      return TestcafeQaseReporter.parseBrowserName(this.userAgents[0]);
-    }
-
-    return null;
-  }
-
-  /**
-   * Parse browser name from TestCafe userAgent string.
-   * "Chrome 97.0.4692.71 / macOS 10.15.7" → "Chrome"
-   * "Chrome_97.0.4692.71_macOS_10.15.7" → "Chrome"
-   * "Firefox 96.0 / Linux 0.0" → "Firefox"
-   */
-  private static parseBrowserName(userAgent: string): string {
-    // Take the part before " / " (OS info), then take the first word (browser name)
-    const browserPart = userAgent.split(' / ')[0] ?? userAgent;
-    // Split on space or underscore to handle both formats
-    const name = browserPart.split(/[\s_]/)[0];
-    return (name ?? browserPart).toLowerCase();
-  }
 }
+
