@@ -39,7 +39,6 @@ test.meta(qase.id(4).title('Browse all products').fields({
     });
   });
 
-  await qase.comment('All products successfully displayed with correct details');
 
   // Gather product data for attachment
   const productData = {
@@ -55,7 +54,7 @@ test.meta(qase.id(4).title('Browse all products').fields({
 });
 
 test.meta(qase.id(5).title('Sort products by price').fields({
-  severity: 'medium',
+  severity: 'normal',
   priority: 'medium',
   layer: 'e2e'
 }).suite('E-commerce\tInventory\tSort').parameters({
@@ -78,11 +77,10 @@ test.meta(qase.id(5).title('Sort products by price').fields({
     await t.expect(firstValue).lte(lastValue, 'First product should be cheaper than or equal to last');
   });
 
-  await qase.comment('Products correctly sorted by price ascending');
 });
 
 test.meta(qase.id(6).title('View product details').fields({
-  severity: 'medium',
+  severity: 'normal',
   priority: 'medium',
   layer: 'e2e'
 }).suite('E-commerce\tInventory\tDetails').create())('Product details', async t => {
@@ -100,5 +98,4 @@ test.meta(qase.id(6).title('View product details').fields({
     await t.expect(backButton).ok('Back button should be visible on detail page');
   });
 
-  await qase.comment('Product detail page successfully loaded with navigation');
 });

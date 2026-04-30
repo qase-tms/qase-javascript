@@ -28,7 +28,6 @@ test.meta(qase.id(1).title('User can login with valid credentials').fields({
     await t.expect(inventoryPage.pageTitle.innerText).eql('Products', 'Should redirect to inventory page');
   });
 
-  await qase.comment('User successfully logged in with standard credentials');
   await qase.attach({
     name: 'login-credentials.txt',
     content: 'Username: standard_user\nPassword: secret_sauce',
@@ -60,7 +59,6 @@ test.meta(qase.id(2).title('Invalid password shows error').fields({
     await t.expect(errorText).contains('Username and password do not match');
   });
 
-  await qase.comment('Invalid credentials correctly rejected');
 });
 
 test.meta(qase.id(3).title('Locked user cannot login').fields({
@@ -86,5 +84,4 @@ test.meta(qase.id(3).title('Locked user cannot login').fields({
     await t.expect(errorText).contains('Sorry, this user has been locked out');
   });
 
-  await qase.comment('Locked user correctly denied access');
 });

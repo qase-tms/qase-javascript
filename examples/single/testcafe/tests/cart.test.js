@@ -42,7 +42,6 @@ test.meta(qase.id(7).title('Add product to cart').fields({
     await t.expect(itemName).eql('Sauce Labs Backpack', 'Correct product in cart');
   });
 
-  await qase.comment('Product successfully added to cart and visible in cart page');
 
   await qase.attach({
     name: 'cart-state.txt',
@@ -75,7 +74,6 @@ test.meta(qase.id(8).title('Remove product from cart').fields({
     await t.expect(inventoryPage.cartBadge.exists).notOk('Cart badge should not be visible');
   });
 
-  await qase.comment('Product successfully removed from cart');
 });
 
 test.meta(qase.id(9).title('Add multiple products to cart').fields({
@@ -99,7 +97,6 @@ test.meta(qase.id(9).title('Add multiple products to cart').fields({
     await t.expect(itemCount).eql(2, 'Cart should contain 2 items');
   });
 
-  await qase.comment('Multiple products successfully added to cart');
 
   await qase.attach({
     name: 'multi-cart.json',

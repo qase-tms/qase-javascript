@@ -28,7 +28,7 @@ fixture`Checkout Flow`
 
 test.meta(qase.id(10).title('Complete checkout successfully').fields({
   severity: 'critical',
-  priority: 'critical',
+  priority: 'high',
   layer: 'e2e'
 }).suite('E-commerce\tCheckout\tComplete').parameters({
   firstName: 'John',
@@ -64,7 +64,6 @@ test.meta(qase.id(10).title('Complete checkout successfully').fields({
     await t.expect(confirmHeader).eql('Thank you for your order!', 'Should show confirmation message');
   });
 
-  await qase.comment('Order successfully completed with valid information');
 
   await qase.attach({
     name: 'order-details.json',
@@ -105,11 +104,10 @@ test.meta(qase.id(11).title('Checkout validation error').fields({
     await t.expect(errorText).contains('First Name is required', 'Error should mention first name');
   });
 
-  await qase.comment('Validation correctly prevents checkout with missing first name');
 });
 
 test.meta(qase.id(12).title('Cancel checkout').fields({
-  severity: 'medium',
+  severity: 'normal',
   priority: 'medium',
   layer: 'e2e'
 }).suite('E-commerce\tCheckout\tCancel').create())('Cancel checkout', async t => {
@@ -126,7 +124,6 @@ test.meta(qase.id(12).title('Cancel checkout').fields({
     await t.expect(itemCount).eql(1, 'Product should still be in cart');
   });
 
-  await qase.comment('Checkout cancelled and returned to cart successfully');
 });
 
 test.meta(qase.ignore().create())('Ignored checkout test', async t => {
@@ -134,5 +131,4 @@ test.meta(qase.ignore().create())('Ignored checkout test', async t => {
     await t.expect(true).ok('This will not be reported to Qase');
   });
 
-  await qase.comment('This test demonstrates the ignore functionality');
 });
