@@ -18,80 +18,15 @@ import { normalizeSuitePart } from 'qase-javascript-commons/internal';
 import { Qase } from './global';
 import { configSchema } from './configSchema';
 import { ReporterOptionsType } from './options';
+import {
+  ScreenshotType,
+  FixtureType,
+  metadataEnum,
+  MetadataType,
+  TestRunInfoType,
+} from './types';
 
-interface CallsiteRecordType {
-  filename?: string;
-  lineNum?: number;
-  callsiteFrameIdx?: number;
-  stackFrames?: unknown[];
-  isV8Frames?: boolean;
-}
-
-interface TestRunErrorFormattableAdapterType {
-  userAgent: string;
-  screenshotPath: string;
-  testRunId: string;
-  testRunPhase: string;
-  type: string;
-  code?: string;
-  isTestCafeError?: boolean;
-  callsite?: CallsiteRecordType;
-  errMsg: string;
-  diff?: boolean;
-  id?: string;
-}
-
-interface ScreenshotType {
-  screenshotPath: string;
-  thumbnailPath: string;
-  userAgent: string;
-  quarantineAttempt: number;
-  takenOnFail: boolean;
-}
-
-interface FixtureType {
-  id: string;
-  name: string;
-  path?: string;
-  meta: Record<string, unknown>;
-}
-
-enum metadataEnum {
-  id = 'QaseID',
-  title = 'QaseTitle',
-  suite = 'QaseSuite',
-  fields = 'QaseFields',
-  parameters = 'QaseParameters',
-  groupParameters = 'QaseGroupParameters',
-  oldID = 'CID',
-  ignore = 'QaseIgnore',
-  projects = 'QaseProjects',
-  tags = 'QaseTags',
-}
-
-interface MetadataType {
-  [metadataEnum.id]: number[];
-  [metadataEnum.title]: string | undefined;
-  [metadataEnum.suite]: string | undefined;
-  [metadataEnum.fields]: Record<string, string>;
-  [metadataEnum.parameters]: Record<string, string>;
-  [metadataEnum.groupParameters]: Record<string, string>;
-  [metadataEnum.ignore]: boolean;
-  [metadataEnum.projects]: Record<string, number[]>;
-  [metadataEnum.tags]: string[];
-}
-
-export interface TestRunInfoType {
-  errs: TestRunErrorFormattableAdapterType[];
-  warnings: string[];
-  durationMs: number;
-  unstable: boolean;
-  screenshotPath: string;
-  screenshots: ScreenshotType[];
-  quarantine: Record<string, Record<'passed', boolean>>;
-  skipped: boolean;
-  fixture: FixtureType;
-}
+export type { TestRunInfoType };
 
 export type TestcafeQaseOptionsType = ConfigType;
 
