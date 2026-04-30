@@ -25,6 +25,7 @@ import {
   TestRunInfoType,
 } from './types';
 import { MetadataParser } from './modules/metadataParser';
+import { ProfilerTracker } from './modules/profilerTracker';
 
 export type { TestRunInfoType };
 
@@ -89,8 +90,7 @@ export class TestcafeQaseReporter {
   private steps: TestStepType[] = [];
   private attachments: Attachment[] = [];
   private testBeginTime: number = Date.now();
-  private profiler: NetworkProfiler | null = null;
-  private _profilerStepSnapshot = 0;
+  private profilerTracker: ProfilerTracker;
   private userAgents: string[] = [];
   private browserOptions: ReporterOptionsType['browser'];
 
@@ -113,13 +113,15 @@ export class TestcafeQaseReporter {
       reporterName: 'testcafe-reporter-qase',
     });
 
+    let profiler: NetworkProfiler | null = null;
     if (composedOptions.profilers?.includes('network')) {
-      this.profiler = new NetworkProfiler({
+      profiler = new NetworkProfiler({
         skipDomains: composedOptions.networkProfiler?.skip_domains,
         trackOnFail: composedOptions.networkProfiler?.track_on_fail,
       });
-      this.profiler.enable();
+      profiler.enable();
     }
+    this.profilerTracker = new ProfilerTracker(profiler);
 
     // @ts-expect-error - global.Qase is dynamically added at runtime
     global.Qase = new Qase(this);
@@ -148,7 +150,7 @@ export class TestcafeQaseReporter {
     this.steps = [];
     this.attachments = [];
     this.testBeginTime = Date.now();
-    this._profilerStepSnapshot = this.profiler?.getAllSteps().length ?? 0;
+    this.profilerTracker.onTestStart();
   };
 
   /**
@@ -183,12 +185,8 @@ export class TestcafeQaseReporter {
 
     attachments.push(...this.attachments);
 
-    let profilerSteps: TestStepType[] = [];
-    if (this.profiler) {
-      const allSteps = this.profiler.getAllSteps();
-      profilerSteps = allSteps.slice(this._profilerStepSnapshot);
-      this._profilerStepSnapshot = 0;
-    }
+    const profilerSteps: TestStepType[] = this.profilerTracker.getEvents();
+    this.profilerTracker.reset();
 
     const projectMapping = metadata[metadataEnum.projects];
 
@@ -249,7 +247,7 @@ export class TestcafeQaseReporter {
    * @returns {Promise<void>}
    */
   public reportTaskDone = async (): Promise<void> => {
-    this.profiler?.restore();
+    this.profilerTracker.restore();
     await this.reporter.publish();
   };
 
