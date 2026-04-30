@@ -1,0 +1,27 @@
+qase-testcafe/src/modules/profilerTracker.ts
+  efd166bf1f77837a 1-25
+qase-testcafe/src/reporter.ts
+  efd166bf1f77837a 28,93,116,118,122,124,153,188-189,250
+qase-testcafe/test/profilerTracker.test.ts
+  efd166bf1f77837a 1-75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "852d051de53c22ad38cf6ae14c767c92add74633",
+  "prompts": {
+    "efd166bf1f77837a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "74bfed73-d2fb-44c6-9ae5-f589510d4a3f",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 110,
+      "total_deletions": 12,
+      "accepted_lines": 1988,
+      "overriden_lines": 0
+    }
+  }
+}
