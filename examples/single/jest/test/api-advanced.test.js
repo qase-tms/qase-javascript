@@ -86,7 +86,7 @@ describe('JSONPlaceholder API - Advanced Features', () => {
   });
 
   test(qase(15, 'Albums endpoint with nested photos'), async () => {
-    qase.fields({ layer: 'api', severity: 'low', priority: 'low' });
+    qase.fields({ layer: 'api', severity: 'minor', priority: 'low' });
 
     let albumId;
 
@@ -122,7 +122,7 @@ describe('JSONPlaceholder API - Advanced Features', () => {
   test.skip(qase(16, 'Authentication feature (not yet implemented)'), async () => {
     qase.ignore();
     qase.comment('This test will be implemented when JSONPlaceholder adds authentication support');
-    qase.fields({ layer: 'api', severity: 'high', priority: 'high' });
+    qase.fields({ layer: 'api', severity: 'major', priority: 'high' });
 
     // Placeholder for future authentication tests
     expect(true).toBe(true);

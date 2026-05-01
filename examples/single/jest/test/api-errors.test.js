@@ -42,7 +42,7 @@ describe('JSONPlaceholder API - Error Handling', () => {
   });
 
   test(qase(10, 'Invalid endpoint returns 404 with HTML'), async () => {
-    qase.fields({ layer: 'api', severity: 'low', priority: 'low' });
+    qase.fields({ layer: 'api', severity: 'minor', priority: 'low' });
     qase.comment('Invalid endpoints return 404 with HTML error page');
 
     await qase.step('Request invalid endpoint', async () => {

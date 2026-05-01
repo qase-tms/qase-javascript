@@ -1,101 +1,45 @@
-import has from 'lodash.has';
-import get from 'lodash.get';
-import { v4 as uuidv4 } from 'uuid';
 import { Config, Reporter, Test, TestResult } from '@jest/reporters';
-import { AssertionResult, Status, TestCaseResult } from '@jest/test-result';
+import { Status, TestCaseResult } from '@jest/test-result';
 
 import {
   Attachment,
   composeOptions,
   ConfigLoader,
   ConfigType,
-  generateSignature,
   QaseReporter,
-  Relation,
   ReporterInterface,
-  StepType,
-  Suite,
-  TestResultType,
   TestStatusEnum,
   TestStepType,
-  determineTestStatus,
-  parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
 import { NetworkProfiler } from 'qase-javascript-commons/profilers';
-import {
-  removeQaseIdsFromTitle,
-  extractAndCleanStep,
-  normalizeSuitePart,
-} from 'qase-javascript-commons/internal';
 import { Qase } from './global';
-import { Metadata } from './models';
+import { MetadataApplier } from './modules/metadataApplier';
+import { ProfilerTracker } from './modules/profilerTracker';
+import { ResultBuilder } from './modules/resultBuilder';
 
 export type JestQaseOptionsType = ConfigType;
+
+const STATUS_MAP: Record<Status, TestStatusEnum> = {
+  passed: TestStatusEnum.passed,
+  failed: TestStatusEnum.failed,
+  skipped: TestStatusEnum.skipped,
+  disabled: TestStatusEnum.disabled,
+  pending: TestStatusEnum.skipped,
+  todo: TestStatusEnum.disabled,
+  focused: TestStatusEnum.passed,
+};
 
 /**
  * @class JestQaseReporter
  * @implements Reporter
  */
 export class JestQaseReporter implements Reporter {
-  /**
-   * @type {Record<Status, TestStatusEnum>}
-   */
-  static statusMap: Record<Status, TestStatusEnum> = {
-    passed: TestStatusEnum.passed,
-    failed: TestStatusEnum.failed,
-    skipped: TestStatusEnum.skipped,
-    disabled: TestStatusEnum.disabled,
-    pending: TestStatusEnum.skipped,
-    todo: TestStatusEnum.disabled,
-    focused: TestStatusEnum.passed,
-  };
+  static statusMap: Record<Status, TestStatusEnum> = STATUS_MAP;
 
-  /**
-   * @type {RegExp}
-   */
-  static qaseIdRegExp = /\(Qase ID: ([\d,]+)\)/;
-
-  /**
-   * @param {string} title
-   * @returns {number[]}
-   * @private
-   */
-  private static getCaseId(title: string): number[] {
-    const [, ids] = title.match(JestQaseReporter.qaseIdRegExp) ?? [];
-
-    return ids ? ids.split(',').map((id) => Number(id)) : [];
-  }
-
-  /**
-   * @type {ReporterInterface}
-   * @private
-   */
   private reporter: ReporterInterface;
+  private profilerTracker: ProfilerTracker;
+  private metadataApplier: MetadataApplier;
 
-  /**
-   * @type {NetworkProfiler | null}
-   * @private
-   */
-  private profiler: NetworkProfiler | null = null;
-
-  /**
-   * Snapshot of fallback accumulator length — used for per-test step delta in --runInBand mode.
-   * @private
-   */
-  private _profilerStepSnapshot = 0;
-
-  /**
-   * @type {Metadata}
-   * @private
-   */
-  private metadata: Metadata;
-
-  /**
-   * @param {Config.GlobalConfig} _
-   * @param {JestQaseOptionsType} options
-   * @param {unknown} _state
-   * @param {ConfigLoaderInterface} configLoader
-   */
   public constructor(
     _: Config.GlobalConfig,
     options: JestQaseOptionsType,
@@ -112,322 +56,102 @@ export class JestQaseReporter implements Reporter {
       reporterName: 'jest-qase-reporter',
     });
 
-    if (composedOptions.profilers?.includes('network')) {
-      this.profiler = new NetworkProfiler({
-        skipDomains: composedOptions.networkProfiler?.skip_domains,
-        trackOnFail: composedOptions.networkProfiler?.track_on_fail,
-      });
-    }
+    const profiler = composedOptions.profilers?.includes('network')
+      ? new NetworkProfiler({
+          skipDomains: composedOptions.networkProfiler?.skip_domains,
+          trackOnFail: composedOptions.networkProfiler?.track_on_fail,
+        })
+      : null;
+    this.profilerTracker = new ProfilerTracker(profiler);
+    this.metadataApplier = new MetadataApplier();
 
     // @ts-expect-error - global.Qase is dynamically added at runtime
     global.Qase = new Qase(this);
-    this.metadata = this.createEmptyMetadata();
   }
 
-  /**
-   * @see {Reporter.onRunStart}
-   */
   public onRunStart() {
     this.reporter.startTestRun();
-    // Enable profiler in main process for --runInBand mode
-    this.profiler?.enable();
+    this.profilerTracker.enable();
   }
 
-  public onTestCaseResult(
-    test: Test,
-    testCaseResult: TestCaseResult,
-  ) {
-    if (this.metadata.ignore) {
-      this.cleanMetadata();
+  public onTestCaseResult(test: Test, testCaseResult: TestCaseResult) {
+    if (this.metadataApplier.get().ignore) {
+      this.metadataApplier.reset();
       return;
     }
 
-    const result = this.convertToResult(testCaseResult, test.path);
+    const result = ResultBuilder.build({
+      value: testCaseResult,
+      path: test.path,
+      metadata: this.metadataApplier.get(),
+      profilerSteps: this.profilerTracker.getNewSteps(),
+    });
 
-    if (this.metadata.title) {
-      result.title = this.metadata.title;
-    }
-
-    if (this.metadata.comment) {
-      result.message = this.metadata.comment;
-    }
-
-    if (this.metadata.suite) {
-      result.relations = {
-        suite: {
-          data: [
-            {
-              title: this.metadata.suite,
-              public_id: null,
-            },
-          ],
-        },
-      };
-    }
-
-    if (Object.keys(this.metadata.fields).length > 0) {
-      result.fields = this.metadata.fields;
-    }
-
-    if (Object.keys(this.metadata.parameters).length > 0) {
-      result.params = this.metadata.parameters;
-    }
-
-    if (Object.keys(this.metadata.groupParams).length > 0) {
-      result.group_params = this.metadata.groupParams;
-    }
-
-    if (this.metadata.tags.length > 0) {
-      result.tags = this.metadata.tags;
-    }
-
-    if (this.metadata.steps.length > 0) {
-      result.steps = this.metadata.steps;
-    }
-
-    if (this.metadata.attachments.length > 0) {
-      result.attachments = this.metadata.attachments;
-    }
-
-    // Generate signature with parameters
-    const ids = JestQaseReporter.getCaseId(testCaseResult.title);
-    result.signature = this.getSignature(test.path, testCaseResult.fullName, ids, this.metadata.parameters);
-
-    this.cleanMetadata();
-
-    // Collect profiler steps for --runInBand mode (reporter and tests share same process)
-    // In multi-worker mode, the reporter's profiler has no captured steps (different process).
-    if (this.profiler) {
-      const allSteps = this.profiler.getAllSteps();
-      const newSteps = allSteps.slice(this._profilerStepSnapshot);
-      this._profilerStepSnapshot = allSteps.length;
-      if (newSteps.length > 0) {
-        result.steps = [...result.steps, ...newSteps];
-      }
-    }
-
+    this.metadataApplier.reset();
     void this.reporter.addTestResult(result);
   }
 
-  /**
-   * @param {Test} _
-   * @param {TestResult} result
-   */
   public onTestResult(_: Test, result: TestResult) {
-    result.testResults.forEach(
-      (value) => {
-
-        if (value.status !== 'pending') {
-          return;
-        }
-
-        const model = this.convertToResult(value, result.testFilePath);
-        void this.reporter.addTestResult(model);
-      },
-    );
+    result.testResults.forEach((value) => {
+      if (value.status !== 'pending') return;
+      const model = ResultBuilder.build({
+        value,
+        path: result.testFilePath,
+        metadata: MetadataApplier.empty(),
+        profilerSteps: [],
+      });
+      void this.reporter.addTestResult(model);
+    });
   }
 
-  /**
-   * @see {Reporter.getLastError}
-   */
-  public getLastError() {/* empty */
-  }
+  public getLastError() {/* empty */}
 
-  /**
-   * @see {Reporter.onRunComplete}
-   */
   public onRunComplete() {
-    this.profiler?.restore();
+    this.profilerTracker.restore();
     void this.reporter.publish();
-  }
-
-  /**
-   * @param {string} filePath
-   * @param {string} fullName
-   * @param {number[]} ids
-   * @param {Record<string, string>} parameters
-   * @private
-   */
-  private getSignature(filePath: string, fullName: string, ids: number[], parameters: Record<string, string> = {}) {
-    const suites = filePath.split('/');
-
-    suites.push(normalizeSuitePart(fullName));
-
-    return generateSignature(ids, suites, parameters);
-  }
-
-  /**
-   * @param {string} filePath
-   * @param {string[]} suites
-   * @private
-   */
-  private getRelations(filePath: string, suites: string[]): Relation {
-    const suite: Suite = {
-      data: [],
-    };
-
-    for (const part of filePath.split('/')) {
-      suite.data.push({
-        title: part,
-        public_id: null,
-      });
-    }
-
-    for (const part of suites) {
-      suite.data.push({
-        title: part,
-        public_id: null,
-      });
-    }
-
-    return {
-      suite: suite,
-    };
-  }
-
-  /**
-   * @param {string} fullPath
-   * @private
-   */
-  private getCurrentTestPath(fullPath: string) {
-    const executionPath = process.cwd() + '/';
-
-    return fullPath.replace(executionPath, '');
-  }
-
-  public addTitle(title: string) {
-    this.metadata.title = title;
-  }
-
-  public addComment(comment: string) {
-    this.metadata.comment = comment;
-  }
-
-  public addSuite(suite: string) {
-    this.metadata.suite = suite;
-  }
-
-  public addFields(fields: Record<string, string>) {
-    this.metadata.fields = fields;
-  }
-
-  public addParameters(parameters: Record<string, string>) {
-    this.metadata.parameters = parameters;
-  }
-
-  public addGroupParams(groupParams: Record<string, string>) {
-    this.metadata.groupParams = groupParams;
-  }
-
-  public addTags(tags: string[]) {
-    this.metadata.tags.push(...tags);
-  }
-
-  public addIgnore() {
-    this.metadata.ignore = true;
-  }
-
-  public addStep(step: TestStepType) {
-    // Parse expectedResult and data from step name if present
-    // Only process text steps (not gherkin steps)
-    // Check if step is a text step (either explicitly TEXT type, undefined, or string 'text')
-    const isTextStep = (StepType && step.step_type === StepType.TEXT) || step.step_type === undefined || step.step_type === 'text';
-    if (isTextStep && step.data && 'action' in step.data) {
-      const stepTextData = step.data as { action: string; expected_result: string | null; data: string | null };
-      const stepData = extractAndCleanStep(stepTextData.action);
-      stepTextData.action = stepData.cleanedString;
-      stepTextData.expected_result = stepData.expectedResult;
-      stepTextData.data = stepData.data;
-    }
-    this.metadata.steps.push(step);
-  }
-
-  public addAttachment(attachment: Attachment) {
-    this.metadata.attachments.push(attachment);
-  }
-
-  private cleanMetadata() {
-    this.metadata = this.createEmptyMetadata();
-  }
-
-  /**
-   * @param {AssertionResult} value
-   * @param {string} path
-   * @private
-   * @returns {TestResultType}
-   */
-  private convertToResult(value: AssertionResult, path: string): TestResultType {
-    let error;
-    if (value.status === 'failed') {
-      error = new Error(value.failureDetails.map((item) => {
-        if (has(item, 'matcherResult.message')) {
-          return String(get(item, 'matcherResult.message'));
-        }
-
-        return 'Runtime exception';
-      }).join('\n\n'));
-
-      error.stack = value.failureMessages.join('\n\n');
-    }
-
-    const parsed = parseProjectMappingFromTitle(value.title);
-    const filePath = this.getCurrentTestPath(path);
-    const hasProjectMapping = Object.keys(parsed.projectMapping).length > 0;
-    const ids = hasProjectMapping ? [] : parsed.legacyIds;
-
-    // Determine status based on error type
-    const testStatus = determineTestStatus(error ?? null, value.status);
-
-    const result: TestResultType = {
-      attachments: [],
-      author: null,
-      execution: {
-        status: testStatus,
-        start_time: null,
-        end_time: null,
-        duration: value.duration ?? 0,
-        stacktrace: error?.stack ?? null,
-        thread: null,
-      },
-      fields: {},
-      message: error?.message ?? null,
-      muted: false,
-      params: {},
-      group_params: {},
-      relations: this.getRelations(filePath, value.ancestorTitles),
-      run_id: null,
-      signature: this.getSignature(filePath, value.fullName, ids, {}),
-      steps: [],
-      testops_id: parsed.legacyIds.length > 0 && !hasProjectMapping
-        ? (parsed.legacyIds.length === 1 ? parsed.legacyIds[0]! : parsed.legacyIds)
-        : null,
-      testops_project_mapping: hasProjectMapping ? parsed.projectMapping : null,
-      id: uuidv4(),
-      title: parsed.cleanedTitle || removeQaseIdsFromTitle(value.title),
-    } as unknown as TestResultType;
-    return result;
-  }
-
-  /**
-   * @returns {Metadata}
-   * @private
-   */
-  private createEmptyMetadata(): Metadata {
-    return {
-      title: undefined,
-      ignore: false,
-      comment: undefined,
-      suite: undefined,
-      fields: {},
-      parameters: {},
-      groupParams: {},
-      tags: [],
-      steps: [],
-      attachments: [],
-    };
   }
 
   async onRunnerEnd() {
     await this.reporter.publish();
+  }
+
+  public addTitle(title: string) {
+    this.metadataApplier.applyTitle(title);
+  }
+
+  public addComment(comment: string) {
+    this.metadataApplier.applyComment(comment);
+  }
+
+  public addSuite(suite: string) {
+    this.metadataApplier.applySuite(suite);
+  }
+
+  public addFields(fields: Record<string, string>) {
+    this.metadataApplier.applyFields(fields);
+  }
+
+  public addParameters(parameters: Record<string, string>) {
+    this.metadataApplier.applyParameters(parameters);
+  }
+
+  public addGroupParams(groupParams: Record<string, string>) {
+    this.metadataApplier.applyGroupParams(groupParams);
+  }
+
+  public addTags(tags: string[]) {
+    this.metadataApplier.applyTags(tags);
+  }
+
+  public addIgnore() {
+    this.metadataApplier.applyIgnore();
+  }
+
+  public addStep(step: TestStepType) {
+    this.metadataApplier.applyStep(step);
+  }
+
+  public addAttachment(attachment: Attachment) {
+    this.metadataApplier.applyAttachment(attachment);
   }
 }
