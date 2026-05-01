@@ -1,9 +1,8 @@
 /* eslint-disable */
 import { expect } from '@jest/globals';
 import { JestQaseReporter } from '../src/reporter';
-import { removeQaseIdsFromTitle } from 'qase-javascript-commons/internal';
+import { TestStepType } from 'qase-javascript-commons';
 
-// Mocks
 const reporterMock = {
   startTestRun: jest.fn(),
   addTestResult: jest.fn().mockResolvedValue(undefined),
@@ -32,6 +31,14 @@ jest.mock('qase-javascript-commons', () => {
       if (originalStatus === 'todo') return 'disabled';
       return 'failed';
     }),
+    parseProjectMappingFromTitle: jest.fn((title: string) => {
+      const idMatch = title.match(/\(Qase ID: ([\d,]+)\)/);
+      return {
+        projectMapping: {},
+        legacyIds: idMatch?.[1] ? idMatch[1].split(',').map(Number) : [],
+        cleanedTitle: '',
+      };
+    }),
     ConfigLoader: jest.fn().mockImplementation(() => ({
       load: jest.fn(() => ({})),
     })),
@@ -50,7 +57,7 @@ describe('JestQaseReporter', () => {
   });
 
   describe('static statusMap', () => {
-    it('should map Jest statuses to TestStatusEnum correctly', () => {
+    it('maps Jest statuses to TestStatusEnum correctly', () => {
       expect(JestQaseReporter.statusMap.passed).toBe('passed');
       expect(JestQaseReporter.statusMap.failed).toBe('failed');
       expect(JestQaseReporter.statusMap.skipped).toBe('skipped');
@@ -62,16 +69,17 @@ describe('JestQaseReporter', () => {
   });
 
   describe('constructor', () => {
-    it('should initialize reporter and global.Qase', () => {
+    it('initializes commons reporter and global.Qase', () => {
       expect((reporter as any).reporter).toBe(reporterMock);
       // @ts-expect-error - global.Qase is dynamically added at runtime
       expect(global.Qase).toBeDefined();
-      expect((reporter as any).metadata).toBeDefined();
+      expect((reporter as any).metadataApplier).toBeDefined();
+      expect((reporter as any).profilerTracker).toBeDefined();
     });
   });
 
   describe('onRunStart', () => {
-    it('should call reporter.startTestRun', () => {
+    it('calls reporter.startTestRun', () => {
       reporter.onRunStart();
       expect(reporterMock.startTestRun).toHaveBeenCalled();
     });
@@ -85,9 +93,11 @@ describe('JestQaseReporter', () => {
       status: 'passed',
       duration: 1000,
       ancestorTitles: ['Test Suite'],
+      failureDetails: [],
+      failureMessages: [],
     } as any;
 
-    it('should call addTestResult with correct data', () => {
+    it('forwards a built result to addTestResult', () => {
       reporter.onTestCaseResult(test, testCaseResult);
       expect(reporterMock.addTestResult).toHaveBeenCalled();
       const call = reporterMock.addTestResult.mock.calls[0][0];
@@ -96,21 +106,23 @@ describe('JestQaseReporter', () => {
       expect(call.execution.duration).toBe(1000);
     });
 
-    it('should not call addTestResult if ignore is true', () => {
-      (reporter as any).metadata.ignore = true;
+    it('skips addTestResult when ignore flag is set', () => {
+      reporter.addIgnore();
       reporter.onTestCaseResult(test, testCaseResult);
       expect(reporterMock.addTestResult).not.toHaveBeenCalled();
     });
 
-    it('should apply metadata if set', () => {
-      (reporter as any).metadata.title = 'Custom Title';
-      (reporter as any).metadata.comment = 'Custom Comment';
-      (reporter as any).metadata.suite = 'Custom Suite';
-      (reporter as any).metadata.fields = { field1: 'value1' };
-      (reporter as any).metadata.parameters = { param1: 'value1' };
-      (reporter as any).metadata.groupParams = { group1: 'value1' };
-      (reporter as any).metadata.steps = [{ id: 'step1' } as any];
-      (reporter as any).metadata.attachments = [{ file_name: 'file' } as any];
+    it('applies metadata overrides through MetadataApplier', () => {
+      reporter.addTitle('Custom Title');
+      reporter.addComment('Custom Comment');
+      reporter.addSuite('Custom Suite');
+      reporter.addFields({ field1: 'value1' });
+      reporter.addParameters({ param1: 'value1' });
+      reporter.addGroupParams({ group1: 'value1' });
+      const step = new TestStepType();
+      step.id = 'step1';
+      reporter.addStep(step);
+      reporter.addAttachment({ file_name: 'file' } as any);
 
       reporter.onTestCaseResult(test, testCaseResult);
       const call = reporterMock.addTestResult.mock.calls[0][0];
@@ -120,18 +132,33 @@ describe('JestQaseReporter', () => {
       expect(call.fields).toEqual({ field1: 'value1' });
       expect(call.params).toEqual({ param1: 'value1' });
       expect(call.group_params).toEqual({ group1: 'value1' });
-      expect(call.steps).toEqual([{ id: 'step1' }]);
+      expect(call.steps[0].id).toBe('step1');
       expect(call.attachments).toEqual([{ file_name: 'file' }]);
+    });
+
+    it('resets metadata after each test case', () => {
+      reporter.addTitle('First');
+      reporter.onTestCaseResult(test, testCaseResult);
+      reporter.onTestCaseResult(test, testCaseResult);
+      const second = reporterMock.addTestResult.mock.calls[1][0];
+      expect(second.title).toBe('Test'); // not 'First'
     });
   });
 
   describe('onTestResult', () => {
-    it('should process pending test results', () => {
+    it('forwards pending test results to addTestResult', () => {
       const test = {} as any;
       const result = {
         testFilePath: '/test/path',
         testResults: [
-          { status: 'pending', title: 'Test (Qase ID: 123)', fullName: 'Test', ancestorTitles: [] },
+          {
+            status: 'pending',
+            title: 'Test (Qase ID: 123)',
+            fullName: 'Test',
+            ancestorTitles: [],
+            failureDetails: [],
+            failureMessages: [],
+          },
         ],
       } as any;
 
@@ -139,12 +166,19 @@ describe('JestQaseReporter', () => {
       expect(reporterMock.addTestResult).toHaveBeenCalled();
     });
 
-    it('should skip non-pending test results', () => {
+    it('skips non-pending test results', () => {
       const test = {} as any;
       const result = {
         testFilePath: '/test/path',
         testResults: [
-          { status: 'passed', title: 'Test', fullName: 'Test', ancestorTitles: [] },
+          {
+            status: 'passed',
+            title: 'Test',
+            fullName: 'Test',
+            ancestorTitles: [],
+            failureDetails: [],
+            failureMessages: [],
+          },
         ],
       } as any;
 
@@ -154,180 +188,67 @@ describe('JestQaseReporter', () => {
   });
 
   describe('onRunComplete', () => {
-    it('should call reporter.publish', () => {
+    it('calls reporter.publish', () => {
       reporter.onRunComplete();
       expect(reporterMock.publish).toHaveBeenCalled();
     });
   });
 
   describe('onRunnerEnd', () => {
-    it('should call reporter.publish', async () => {
+    it('awaits reporter.publish', async () => {
       await reporter.onRunnerEnd();
       expect(reporterMock.publish).toHaveBeenCalled();
     });
   });
 
   describe('getLastError', () => {
-    it('should do nothing (empty method)', () => {
+    it('does nothing (no-op for Jest reporter contract)', () => {
       expect(() => reporter.getLastError()).not.toThrow();
     });
   });
 
-  describe('metadata methods', () => {
-    it('should add title', () => {
-      reporter.addTitle('Custom Title');
-      expect((reporter as any).metadata.title).toBe('Custom Title');
+  describe('add* mutators delegate to MetadataApplier', () => {
+    it('addTitle, addComment, addSuite update metadata', () => {
+      reporter.addTitle('T');
+      reporter.addComment('C');
+      reporter.addSuite('S');
+      const m = (reporter as any).metadataApplier.get();
+      expect(m.title).toBe('T');
+      expect(m.comment).toBe('C');
+      expect(m.suite).toBe('S');
     });
 
-    it('should add comment', () => {
-      reporter.addComment('Custom Comment');
-      expect((reporter as any).metadata.comment).toBe('Custom Comment');
+    it('addFields, addParameters, addGroupParams set maps', () => {
+      reporter.addFields({ f: '1' });
+      reporter.addParameters({ p: '1' });
+      reporter.addGroupParams({ g: '1' });
+      const m = (reporter as any).metadataApplier.get();
+      expect(m.fields).toEqual({ f: '1' });
+      expect(m.parameters).toEqual({ p: '1' });
+      expect(m.groupParams).toEqual({ g: '1' });
     });
 
-    it('should add suite', () => {
-      reporter.addSuite('Custom Suite');
-      expect((reporter as any).metadata.suite).toBe('Custom Suite');
+    it('addTags appends to tags array', () => {
+      reporter.addTags(['a']);
+      reporter.addTags(['b', 'c']);
+      const m = (reporter as any).metadataApplier.get();
+      expect(m.tags).toEqual(['a', 'b', 'c']);
     });
 
-    it('should add fields', () => {
-      const fields = { field1: 'value1', field2: 'value2' };
-      reporter.addFields(fields);
-      expect((reporter as any).metadata.fields).toEqual(fields);
-    });
-
-    it('should add parameters', () => {
-      const parameters = { param1: 'value1', param2: 'value2' };
-      reporter.addParameters(parameters);
-      expect((reporter as any).metadata.parameters).toEqual(parameters);
-    });
-
-    it('should add group parameters', () => {
-      const groupParams = { group1: 'value1', group2: 'value2' };
-      reporter.addGroupParams(groupParams);
-      expect((reporter as any).metadata.groupParams).toEqual(groupParams);
-    });
-
-    it('should add ignore flag', () => {
+    it('addIgnore sets the ignore flag', () => {
       reporter.addIgnore();
-      expect((reporter as any).metadata.ignore).toBe(true);
+      const m = (reporter as any).metadataApplier.get();
+      expect(m.ignore).toBe(true);
     });
 
-    it('should add step', () => {
-      const step = { id: 'step1' } as any;
+    it('addStep and addAttachment append', () => {
+      const step = new TestStepType();
+      step.id = 's';
       reporter.addStep(step);
-      expect((reporter as any).metadata.steps).toContain(step);
-    });
-
-    it('should add attachment', () => {
-      const attachment = { file_name: 'file' } as any;
-      reporter.addAttachment(attachment);
-      expect((reporter as any).metadata.attachments).toContain(attachment);
+      reporter.addAttachment({ file_name: 'a' } as any);
+      const m = (reporter as any).metadataApplier.get();
+      expect(m.steps[0].id).toBe('s');
+      expect(m.attachments).toEqual([{ file_name: 'a' }]);
     });
   });
-
-  describe('getSignature', () => {
-    it('should call generateSignature with correct parameters', () => {
-      const result = (reporter as any).getSignature('/path/to/file', 'Test Name', [123, 456], { param: 'value' });
-      const { generateSignature } = require('qase-javascript-commons');
-      expect(generateSignature).toHaveBeenCalledWith([123, 456], ['', 'path', 'to', 'file', 'test_name'], { param: 'value' });
-      expect(result).toBe('mock-signature');
-    });
-  });
-
-  describe('getRelations', () => {
-    it('should create relations from file path and suites', () => {
-      const result = (reporter as any).getRelations('/path/to/file', ['Suite1', 'Suite2']);
-      expect(result.suite.data).toHaveLength(6); // '', path, to, file, Suite1, Suite2
-      expect(result.suite.data[0].title).toBe('');
-      expect(result.suite.data[1].title).toBe('path');
-      expect(result.suite.data[4].title).toBe('Suite1');
-      expect(result.suite.data[5].title).toBe('Suite2');
-    });
-  });
-
-  describe('getCurrentTestPath', () => {
-    it('should remove execution path from full path', () => {
-      const result = (reporter as any).getCurrentTestPath(process.cwd() + '/test/file.js');
-      expect(result).toBe('test/file.js');
-    });
-  });
-
-  describe('cleanMetadata', () => {
-    it('should reset metadata to empty state', () => {
-      (reporter as any).metadata.title = 'Title';
-      (reporter as any).metadata.ignore = true;
-      (reporter as any).cleanMetadata();
-      expect((reporter as any).metadata.title).toBeUndefined();
-      expect((reporter as any).metadata.ignore).toBe(false);
-    });
-  });
-
-  describe('convertToResult', () => {
-    it('should convert passed test result', () => {
-      const value = {
-        title: 'Test (Qase ID: 123)',
-        fullName: 'Test Suite Test',
-        status: 'passed',
-        duration: 1000,
-        ancestorTitles: ['Test Suite'],
-        failureDetails: [],
-        failureMessages: [],
-      } as any;
-
-      const result = (reporter as any).convertToResult(value, '/test/path');
-      expect(result.title).toBe('Test');
-      expect(result.testops_id).toBe(123);
-      expect(result.execution.status).toBe('passed');
-      expect(result.execution.duration).toBe(1000);
-    });
-
-    it('should convert failed test result', () => {
-      const value = {
-        title: 'Test (Qase ID: 123)',
-        fullName: 'Test Suite Test',
-        status: 'failed',
-        duration: 1000,
-        ancestorTitles: ['Test Suite'],
-        failureDetails: [{ matcherResult: { message: 'Assertion failed' } }],
-        failureMessages: ['Error: Assertion failed'],
-      } as any;
-
-      const result = (reporter as any).convertToResult(value, '/test/path');
-      expect(result.execution.status).toBe('failed');
-      expect(result.message).toBe('Assertion failed');
-      expect(result.execution.stacktrace).toBe('Error: Assertion failed');
-    });
-  });
-
-  describe('createEmptyMetadata', () => {
-    it('should create empty metadata object', () => {
-      const result = (reporter as any).createEmptyMetadata();
-      expect(result.title).toBeUndefined();
-      expect(result.ignore).toBe(false);
-      expect(result.comment).toBeUndefined();
-      expect(result.suite).toBeUndefined();
-      expect(result.fields).toEqual({});
-      expect(result.parameters).toEqual({});
-      expect(result.groupParams).toEqual({});
-      expect(result.steps).toEqual([]);
-      expect(result.attachments).toEqual([]);
-    });
-  });
-
-  describe('removeQaseIdsFromTitle', () => {
-    it('should remove Qase ID from title', () => {
-      const result = removeQaseIdsFromTitle('Test (Qase ID: 123)');
-      expect(result).toBe('Test');
-    });
-
-    it('should remove multiple Qase IDs from title', () => {
-      const result = removeQaseIdsFromTitle('Test (Qase ID: 123,456)');
-      expect(result).toBe('Test');
-    });
-
-    it('should return original title if no Qase ID', () => {
-      const result = removeQaseIdsFromTitle('Test without ID');
-      expect(result).toBe('Test without ID');
-    });
-  });
-}); 
+});
