@@ -1,3 +1,18 @@
+# jest-qase-reporter@2.5.0
+
+## Changed
+
+- Decomposed `reporter.ts` (433 LOC) into a thin orchestrator plus 3 focused modules under `src/modules/` (`MetadataApplier`, `ProfilerTracker`, `ResultBuilder`). Public contract preserved: `JestQaseReporter` default export, `static statusMap`, all 5 lifecycle hooks (`onRunStart`, `onTestCaseResult`, `onTestResult`, `onRunComplete`, `onRunnerEnd`), `getLastError`, 10 `add*` mutators, `JestQaseOptionsType` re-export.
+
+## Removed
+
+- `static qaseIdRegExp` — deprecated since Phase 1; replaced by an internal helper inside `ResultBuilder`. Matches mocha 1.5.0 and cypress 3.6.0 precedent.
+
+## Internal
+
+- Extracted `STATUS_MAP` to a top-level `const`; `static statusMap` now references it. No change in behavior.
+- Added per-module unit tests for the three new modules (~32 new tests, 82 total).
+
 # jest-qase-reporter@2.4.0
 
 ## Changed
