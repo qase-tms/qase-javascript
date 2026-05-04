@@ -1,0 +1,25 @@
+qase-newman/src/modules/resultBuilder.ts
+  efd166bf1f77837a 1-55
+qase-newman/test/resultBuilder.test.ts
+  efd166bf1f77837a 1-120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "ed21911555ef17701b7953db39f0304d480d13fd",
+  "prompts": {
+    "efd166bf1f77837a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "74bfed73-d2fb-44c6-9ae5-f589510d4a3f",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 177,
+      "total_deletions": 2,
+      "accepted_lines": 2506,
+      "overriden_lines": 0
+    }
+  }
+}
