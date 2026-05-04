@@ -167,7 +167,7 @@ results:
   status: passed
   fields:
     layer: api
-    severity: low
+    severity: minor
     priority: low
   relations:
     suite:
@@ -227,7 +227,7 @@ results:
   status: failed
   fields:
     layer: api
-    severity: low
+    severity: minor
     priority: low
   relations:
     suite:
