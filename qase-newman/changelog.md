@@ -1,3 +1,14 @@
+# newman-reporter-qase@2.3.0
+
+## Changed
+
+- Decomposed `reporter.ts` (433 LOC) into a thin event-driven orchestrator plus 3 focused modules under `src/modules/` (`MetadataExtractor`, `IterationDataParser`, `ResultBuilder`). Public contract preserved 1:1: `NewmanQaseReporter` named export, all 3 static regexps (`qaseIdRegExp`, `qaseParamRegExp`, `qaseProjectRegExp`), all 4 static methods (`getCaseIds`, `getProjectMapping`, `getParameters`, `getParentTitles`), constructor signature, and `NewmanQaseOptionsType` re-export.
+- Bumped `qase-javascript-commons` peer dependency to `~2.7.0` (sync with monorepo; no helper migrations — newman doesn't import from `qase-javascript-commons/internal`).
+
+## Internal
+
+- Added per-module unit tests for the three new modules (37 new tests, 55 total).
+
 # qase-newman@2.2.0
 
 ## What's new

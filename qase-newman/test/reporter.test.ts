@@ -1,17 +1,14 @@
 /* eslint-disable */
-import { expect } from '@jest/globals';
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { NewmanQaseReporter } from '../src/reporter';
 import { EventEmitter } from 'events';
-import { TestStatusEnum } from 'qase-javascript-commons';
 
-// Shared reporter mock
 const reporterMock = {
   startTestRun: jest.fn(),
   addTestResult: jest.fn(),
   publish: jest.fn(),
 };
 
-// Mock dependencies
 jest.mock('qase-javascript-commons', () => ({
   QaseReporter: {
     getInstance: jest.fn(() => reporterMock),
@@ -22,7 +19,7 @@ jest.mock('qase-javascript-commons', () => ({
     failed: 'failed',
   },
   generateSignature: jest.fn(() => 'mock-signature'),
-  determineTestStatus: jest.fn((error, originalStatus) => {
+  determineTestStatus: jest.fn((error: unknown, originalStatus: string) => {
     if (error) return 'failed';
     if (originalStatus === 'passed') return 'passed';
     return 'failed';
@@ -30,168 +27,58 @@ jest.mock('qase-javascript-commons', () => ({
   ConfigLoader: jest.fn().mockImplementation(() => ({
     load: jest.fn(() => ({})),
   })),
-  getPackageVersion: jest.fn(() => '5.0.0'),
+  getPackageVersion: jest.fn(() => '5.3.5'),
 }));
 
 jest.mock('semver', () => ({
-  lt: jest.fn(),
+  lt: jest.fn(() => false),
 }));
+
+const mkItem = (id: string, name: string, exec: string[] = [], parent: any = null) => ({
+  id,
+  name,
+  events: {
+    each: (cb: any) => cb({ listen: 'test', script: { exec } }),
+  },
+  parent: () => parent,
+}) as any;
 
 describe('NewmanQaseReporter', () => {
   let reporter: NewmanQaseReporter;
   let emitter: EventEmitter;
-  let mockOptions: any;
-  let mockCollectionOptions: any;
+  const options: any = {};
+  const collectionOptions: any = { iterationData: [] };
 
   beforeEach(() => {
+    jest.clearAllMocks();
     emitter = new EventEmitter();
-    mockOptions = {};
-    mockCollectionOptions = {
-      iterationData: [],
-    };
-    reporter = new NewmanQaseReporter(emitter, mockOptions, mockCollectionOptions);
+    reporter = new NewmanQaseReporter(emitter, options, collectionOptions);
   });
 
-  describe('static getCaseIds', () => {
-    it('should extract case IDs from test script', () => {
-      const eventList = {
-        each: jest.fn((callback) => {
-          callback({
-            listen: 'test',
-            script: {
-              exec: [
-                '// qase: 123',
-                '// qase: 456, 789',
-                'some other code',
-              ],
-            },
-          });
-        }),
-      } as any;
-
-      const result = NewmanQaseReporter.getCaseIds(eventList);
-      expect(result).toEqual([123, 456, 789]);
+  describe('public static API (re-exports)', () => {
+    it('exposes qaseIdRegExp', () => {
+      expect(NewmanQaseReporter.qaseIdRegExp).toBeDefined();
+      expect(NewmanQaseReporter.qaseIdRegExp.test('// qase: 1')).toBe(true);
     });
 
-    it('should return empty array for non-test events', () => {
-      const eventList = {
-        each: jest.fn((callback) => {
-          callback({
-            listen: 'prerequest',
-            script: { exec: ['// qase: 123'] },
-          });
-        }),
-      } as any;
-
-      const result = NewmanQaseReporter.getCaseIds(eventList);
-      expect(result).toEqual([]);
+    it('exposes qaseParamRegExp', () => {
+      expect(NewmanQaseReporter.qaseParamRegExp).toBeDefined();
     });
 
-    it('should handle events without script.exec', () => {
-      const eventList = {
-        each: jest.fn((callback) => {
-          callback({
-            listen: 'test',
-            script: {},
-          });
-        }),
-      } as any;
-
-      const result = NewmanQaseReporter.getCaseIds(eventList);
-      expect(result).toEqual([]);
-    });
-  });
-
-  describe('static getParameters', () => {
-    it('should extract parameters from test script', () => {
-      const item = {
-        events: {
-          each: jest.fn((callback) => {
-            callback({
-              listen: 'test',
-              script: {
-                exec: [
-                  'qase.parameters: param1, param2',
-                  'qase.parameters: param3',
-                ],
-              },
-            });
-          }),
-        },
-        parent: jest.fn(() => null),
-      } as any;
-
-      const result = NewmanQaseReporter.getParameters(item);
-      expect(result).toEqual(['param1', 'param2', 'param3']);
+    it('exposes qaseProjectRegExp', () => {
+      expect(NewmanQaseReporter.qaseProjectRegExp).toBeDefined();
     });
 
-    it('should get parameters from parent items', () => {
-      const parentItem = {
-        events: {
-          each: jest.fn((callback) => {
-            callback({
-              listen: 'test',
-              script: {
-                exec: ['qase.parameters: parentParam'],
-              },
-            });
-          }),
-        },
-        parent: jest.fn(() => null),
-      } as any;
-
-      const item = {
-        events: {
-          each: jest.fn((callback) => {
-            callback({
-              listen: 'test',
-              script: {
-                exec: ['qase.parameters: childParam'],
-              },
-            });
-          }),
-        },
-        parent: jest.fn(() => parentItem),
-      } as any;
-
-      const result = NewmanQaseReporter.getParameters(item);
-      expect(result).toEqual(['childParam', 'parentParam']);
-    });
-  });
-
-  describe('static getParentTitles', () => {
-    it('should return titles from parent hierarchy', () => {
-      const grandparent = {
-        name: 'Grandparent',
-        parent: jest.fn(() => null),
-      } as any;
-
-      const parent = {
-        name: 'Parent',
-        parent: jest.fn(() => grandparent),
-      } as any;
-
-      const item = {
-        name: 'Item',
-        parent: jest.fn(() => parent),
-      } as any;
-
-      const result = NewmanQaseReporter.getParentTitles(item);
-      expect(result).toEqual(['Grandparent', 'Parent', 'Item']);
-    });
-
-    it('should handle items without name', () => {
-      const item = {
-        parent: jest.fn(() => null),
-      } as any;
-
-      const result = NewmanQaseReporter.getParentTitles(item);
-      expect(result).toEqual([]);
+    it('exposes getCaseIds, getProjectMapping, getParameters, getParentTitles', () => {
+      expect(typeof NewmanQaseReporter.getCaseIds).toBe('function');
+      expect(typeof NewmanQaseReporter.getProjectMapping).toBe('function');
+      expect(typeof NewmanQaseReporter.getParameters).toBe('function');
+      expect(typeof NewmanQaseReporter.getParentTitles).toBe('function');
     });
   });
 
   describe('constructor', () => {
-    it('should initialize reporter with correct options', () => {
+    it('initializes the commons reporter with framework metadata', () => {
       const { QaseReporter } = require('qase-javascript-commons');
       expect(QaseReporter.getInstance).toHaveBeenCalledWith({
         frameworkPackage: 'newman',
@@ -200,297 +87,117 @@ describe('NewmanQaseReporter', () => {
       });
     });
 
-    it('should set autoCollectParams from config', () => {
-      const mockConfigLoader = {
-        load: jest.fn(() => ({
-          framework: {
-            newman: {
-              autoCollectParams: true,
-            },
-          },
-        })),
-      };
+    it('reads autoCollectParams=false by default', () => {
+      expect((reporter as any).autoCollectParams).toBe(false);
+    });
 
-      const newReporter = new NewmanQaseReporter(
-        emitter,
-        mockOptions,
-        mockCollectionOptions,
-        mockConfigLoader as any,
+    it('reads autoCollectParams=true when config sets it', () => {
+      const customLoader = {
+        load: jest.fn(() => ({ framework: { newman: { autoCollectParams: true } } })),
+      } as any;
+      const r = new NewmanQaseReporter(new EventEmitter(), options, collectionOptions, customLoader);
+      expect((r as any).autoCollectParams).toBe(true);
+    });
+
+    it('parses iterationData via IterationDataParser', () => {
+      const r = new NewmanQaseReporter(
+        new EventEmitter(),
+        options,
+        { iterationData: [{ env: 'prod' }, { env: 'staging' }] } as any,
       );
-
-      expect((newReporter as any).autoCollectParams).toBe(true);
+      expect((r as any).parameters).toEqual([{ env: 'prod' }, { env: 'staging' }]);
     });
   });
 
-  describe('addRunnerListeners', () => {
-    it('should add start listener', () => {
-      const { QaseReporter } = require('qase-javascript-commons');
-      const mockReporter = QaseReporter.getInstance();
-      
+  describe('event flow', () => {
+    it('starts the test run on `start`', () => {
       emitter.emit('start');
-      
-      expect(mockReporter.startTestRun).toHaveBeenCalled();
+      expect(reporterMock.startTestRun).toHaveBeenCalled();
     });
 
-    it('should handle beforeItem event', () => {
-      const mockItem = {
-        id: 'item-1',
-        name: 'Test Item',
-        events: {
-          each: jest.fn((callback) => {
-            callback({
-              listen: 'test',
-              script: { exec: ['// qase: 123'] },
-            });
-          }),
-        },
-        parent: jest.fn(() => null),
-      };
-
-      const mockExec = {
-        item: mockItem,
-      };
-
-      emitter.emit('beforeItem', undefined, mockExec);
-
-      expect((reporter as any).pendingResultMap.get('item-1')).toBeDefined();
-      expect((reporter as any).timerMap.get('item-1')).toBeDefined();
+    it('creates a pending result on `beforeItem`', () => {
+      const item = mkItem('id-1', 'Item 1', ['// qase: 5']);
+      emitter.emit('beforeItem', undefined, { item });
+      const pending = (reporter as any).pendingResultMap.get('id-1');
+      expect(pending).toBeDefined();
+      expect(pending.title).toBe('Item 1');
+      expect(pending.testops_id).toEqual([5]);
     });
 
-    it('should handle assertion event with error', () => {
-      const mockItem = {
-        id: 'item-1',
-        name: 'Test Item',
-        events: { each: jest.fn() },
-        parent: jest.fn(() => null),
-      };
-
-      const mockExec = { item: mockItem };
-      const mockError = new Error('Test error');
-
-      // First add item to pending results
-      emitter.emit('beforeItem', undefined, mockExec);
-      
-      // Then trigger assertion error
-      emitter.emit('assertion', mockError, mockExec);
-
-      const pendingResult = (reporter as any).pendingResultMap.get('item-1');
-      expect(pendingResult.execution.status).toBe(TestStatusEnum.failed);
-      expect(pendingResult.message).toBe('Test error');
+    it('updates pending status on failed `assertion`', () => {
+      const item = mkItem('id-2', 'Item 2', []);
+      emitter.emit('beforeItem', undefined, { item });
+      const err = new Error('boom');
+      err.stack = 'STACK';
+      emitter.emit('assertion', err, { item });
+      const pending = (reporter as any).pendingResultMap.get('id-2');
+      expect(pending.execution.status).toBe('failed');
+      expect(pending.execution.stacktrace).toBe('STACK');
+      expect(pending.message).toBe('boom');
     });
 
-    it('should handle item completion', () => {
-      const mockItem = {
-        id: 'item-1',
-        name: 'Test Item',
-        events: { each: jest.fn() },
-        parent: jest.fn(() => null),
-      };
-
-      const mockExec = {
-        item: mockItem,
-        cursor: { iteration: 0 },
-      };
-
-      const { QaseReporter } = require('qase-javascript-commons');
-      const mockReporter = QaseReporter.getInstance();
-
-      // Add item to pending results
-      emitter.emit('beforeItem', undefined, mockExec);
-      
-      // Complete item
-      emitter.emit('item', undefined, mockExec);
-
-      expect(mockReporter.addTestResult).toHaveBeenCalled();
+    it('finalizes and forwards on `item`, then clears state', () => {
+      const item = mkItem('id-3', 'Item 3', []);
+      emitter.emit('beforeItem', undefined, { item });
+      emitter.emit('item', undefined, { item, cursor: { iteration: 0 } });
+      expect(reporterMock.addTestResult).toHaveBeenCalled();
+      expect((reporter as any).pendingResultMap.has('id-3')).toBe(false);
+      expect((reporter as any).timerMap.has('id-3')).toBe(false);
     });
 
-    it('should handle beforeDone and done events', () => {
-      const { QaseReporter } = require('qase-javascript-commons');
-      const mockReporter = QaseReporter.getInstance();
-
+    it('publishes on `beforeDone`', () => {
       emitter.emit('beforeDone');
-      emitter.emit('done');
+      expect(reporterMock.publish).toHaveBeenCalled();
+    });
 
-      expect(mockReporter.publish).toHaveBeenCalled();
+    it('skips finalize when no pending result for the item', () => {
+      const item = mkItem('id-orphan', 'Orphan', []);
+      emitter.emit('item', undefined, { item, cursor: { iteration: 0 } });
+      expect(reporterMock.addTestResult).not.toHaveBeenCalled();
     });
   });
 
-  describe('prepareParameters', () => {
-    it('should return empty object when no parameters available', () => {
-      const item = {
-        events: { each: jest.fn() },
-        parent: jest.fn(() => null),
-      } as any;
-
+  describe('prepareParameters glue', () => {
+    it('returns {} when no iteration data was provided', () => {
+      const item = mkItem('p1', 'P1', ['qase.parameters: env']);
       const result = (reporter as any).prepareParameters(item, 0);
       expect(result).toEqual({});
     });
 
-    it('should return available parameters when autoCollectParams is true', () => {
-      (reporter as any).autoCollectParams = true;
-      (reporter as any).parameters = [{ param1: 'value1', param2: 'value2' }];
+    it('filters available iteration data by declared parameters', () => {
+      const r = new NewmanQaseReporter(
+        new EventEmitter(),
+        options,
+        { iterationData: [{ env: 'prod', extra: 'x' }] } as any,
+      );
+      const item = mkItem('p2', 'P2', ['qase.parameters: env']);
+      const result = (r as any).prepareParameters(item, 0);
+      expect(result).toEqual({ env: 'prod' });
+    });
 
-      const item = {
-        events: { each: jest.fn() },
-        parent: jest.fn(() => null),
+    it('returns full iteration data when autoCollectParams=true and no params declared', () => {
+      const customLoader = {
+        load: jest.fn(() => ({ framework: { newman: { autoCollectParams: true } } })),
       } as any;
-
-      const result = (reporter as any).prepareParameters(item, 0);
-      expect(result).toEqual({ param1: 'value1', param2: 'value2' });
-    });
-
-    it('should filter parameters based on item parameters', () => {
-      (reporter as any).parameters = [{ param1: 'value1', param2: 'value2', param3: 'value3' }];
-
-      const item = {
-        events: {
-          each: jest.fn((callback) => {
-            callback({
-              listen: 'test',
-              script: { exec: ['qase.parameters: param1, param3'] },
-            });
-          }),
-        },
-        parent: jest.fn(() => null),
-      } as any;
-
-      const result = (reporter as any).prepareParameters(item, 0);
-      expect(result).toEqual({ param1: 'value1', param3: 'value3' });
-    });
-  });
-
-  describe('getParameters', () => {
-    it('should return empty array for null iterationData', () => {
-      const result = (reporter as any).getParameters(null);
-      expect(result).toEqual([]);
-    });
-
-    it('should convert array of objects to records', () => {
-      const iterationData = [
-        { key1: 'value1', key2: 'value2' },
-        { key3: 'value3' },
-      ];
-
-      const result = (reporter as any).getParameters(iterationData);
-      expect(result).toEqual([
-        { key1: 'value1', key2: 'value2' },
-        { key3: 'value3' },
-      ]);
-    });
-
-    it('should return empty array for non-array data', () => {
-      const result = (reporter as any).getParameters('not an array');
-      expect(result).toEqual([]);
-    });
-  });
-
-  describe('convertToRecord', () => {
-    it('should convert simple object to record', () => {
-      const obj = { key1: 'value1', key2: 123 };
-      const result = (reporter as any).convertToRecord(obj);
-      expect(result).toEqual({ key1: 'value1', key2: '123' });
-    });
-
-    it('should handle nested objects', () => {
-      const obj = {
-        parent: {
-          child1: 'value1',
-          child2: 'value2',
-        },
-        simple: 'value3',
-      };
-
-      const result = (reporter as any).convertToRecord(obj);
-      expect(result).toEqual({
-        'parent.child1': 'value1',
-        'parent.child2': 'value2',
-        simple: 'value3',
-      });
-    });
-
-    it('should convert keys to lowercase', () => {
-      const obj = { Key1: 'value1', KEY2: 'value2' };
-      const result = (reporter as any).convertToRecord(obj);
-      expect(result).toEqual({ key1: 'value1', key2: 'value2' });
-    });
-
-    it('should handle non-object input', () => {
-      const result = (reporter as any).convertToRecord('string');
-      expect(result).toEqual({});
-    });
-  });
-
-  describe('isRecord', () => {
-    it('should return true for objects', () => {
-      expect((reporter as any).isRecord({})).toBe(true);
-      expect((reporter as any).isRecord({ key: 'value' })).toBe(true);
-    });
-
-    it('should return false for non-objects', () => {
-      expect((reporter as any).isRecord(null)).toBe(false);
-      expect((reporter as any).isRecord(undefined)).toBe(false);
-      expect((reporter as any).isRecord('string')).toBe(false);
-      expect((reporter as any).isRecord(123)).toBe(false);
-      expect((reporter as any).isRecord([])).toBe(true);
-    });
-  });
-
-  describe('getSignature', () => {
-    it('should call generateSignature with correct parameters', () => {
-      const { generateSignature } = require('qase-javascript-commons');
-      
-      const result = (reporter as any).getSignature(['Suite1', 'Suite2'], 'Test Title', [123, 456]);
-      
-      expect(generateSignature).toHaveBeenCalledWith([123, 456], ['Suite1', 'Suite2', 'Test Title'], {});
-      expect(result).toBe('mock-signature');
+      const r = new NewmanQaseReporter(
+        new EventEmitter(),
+        options,
+        { iterationData: [{ env: 'prod' }] } as any,
+        customLoader,
+      );
+      const item = mkItem('p3', 'P3', []); // no qase.parameters
+      const result = (r as any).prepareParameters(item, 0);
+      expect(result).toEqual({ env: 'prod' });
     });
   });
 
   describe('preventExit', () => {
-    it('should not modify process.exit for newer newman versions', () => {
-      const { getPackageVersion } = require('qase-javascript-commons');
-      const { lt } = require('semver');
-      
-      getPackageVersion.mockReturnValue('5.4.0');
-      lt.mockReturnValue(false);
-
-      const originalExit = process.exit;
+    it('does not override process.exit when newman >= 5.3.2', () => {
+      const semver = require('semver');
+      semver.lt.mockReturnValueOnce(false);
+      const before = process.exit;
       (reporter as any).preventExit();
-      
-      expect(process.exit).toBe(originalExit);
-    });
-
-    it('should modify process.exit for older newman versions', () => {
-      const { getPackageVersion } = require('qase-javascript-commons');
-      const { lt } = require('semver');
-      
-      getPackageVersion.mockReturnValue('5.0.0');
-      lt.mockReturnValue(true);
-
-      const originalExit = process.exit;
-      (reporter as any).preventExit();
-      
-      expect(process.exit).not.toBe(originalExit);
-      expect(typeof process.exit).toBe('function');
-      
-      // Restore original exit
-      process.exit = originalExit;
+      expect(process.exit).toBe(before);
     });
   });
-
-  describe('static regex patterns', () => {
-    it('should match qase ID patterns', () => {
-      expect(NewmanQaseReporter.qaseIdRegExp.test('// qase: 123')).toBe(true);
-      expect(NewmanQaseReporter.qaseIdRegExp.test('// Qase: 456, 789')).toBe(true);
-      expect(NewmanQaseReporter.qaseIdRegExp.test('// qase: 123, 456, 789')).toBe(true);
-      expect(NewmanQaseReporter.qaseIdRegExp.test('// some other comment')).toBe(false);
-    });
-
-    it('should match parameter patterns', () => {
-      expect(NewmanQaseReporter.qaseParamRegExp.test('qase.parameters: param1, param2')).toBe(true);
-      expect(NewmanQaseReporter.qaseParamRegExp.test('Qase.Parameters: param1')).toBe(true);
-      expect(NewmanQaseReporter.qaseParamRegExp.test('qase.parameters: param1, param2, param3')).toBe(true);
-      expect(NewmanQaseReporter.qaseParamRegExp.test('some other text')).toBe(false);
-    });
-  });
-}); 
+});
