@@ -1,3 +1,17 @@
+# vitest-qase-reporter@1.4.0
+
+## Changed
+
+- Decomposed `index.ts` (451 LOC) into a thin orchestrator plus 3 focused modules under `src/modules/` (`MetadataAccumulator`, `ProfilerTracker`, `ResultBuilder`). Public contract preserved: default + named `VitestQaseReporter` export, all 6 lifecycle hooks (`onTestRunStart`, `onTestRunEnd`, `onTestCaseResult`, `onTestCaseAnnotate`, `onTestSuiteReady`, `onTestSuiteResult`), constructor signature, and `VitestQaseOptionsType` re-export.
+
+## Removed
+
+- `static qaseIdRegExp` — deprecated since Phase 1; replaced by `parseProjectMappingFromTitle` from `qase-javascript-commons` (matches mocha 1.5.0, cypress 3.6.0, jest 2.5.0 precedent).
+
+## Internal
+
+- Added per-module unit tests for the three new modules (~50 new tests, 76 total).
+
 # vitest-qase-reporter@1.3.0
 
 ## Changed
