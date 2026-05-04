@@ -40,9 +40,6 @@ export class VitestQaseReporter implements Reporter {
     attachments: { name: string; path?: string; content?: string; contentType?: string }[];
   }> = new Map();
 
-  /** @deprecated Use parseProjectMappingFromTitle from qase-javascript-commons for multi-project support. */
-  static qaseIdRegExp = /\(Qase ID: ([\d,]+)\)/;
-
   constructor(
     options: VitestQaseOptionsType = {},
     configLoader = new ConfigLoader(),
