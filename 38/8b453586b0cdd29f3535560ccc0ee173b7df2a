@@ -1,0 +1,23 @@
+qase-vitest/test/index.test.ts
+  efd166bf1f77837a 1-2,4-10,13,17,19-28,32-42,46,54-56,58,60-67,70-71,73,75,78-82,85-87,91-94,98-101,105-110,114-119,123-163
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "388b453586b0cdd29f3535560ccc0ee173b7df2a",
+  "prompts": {
+    "efd166bf1f77837a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "74bfed73-d2fb-44c6-9ae5-f589510d4a3f",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev",
+      "messages": [],
+      "total_additions": 119,
+      "total_deletions": 404,
+      "accepted_lines": 4436,
+      "overriden_lines": 0
+    }
+  }
+}
