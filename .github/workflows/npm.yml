@@ -13,6 +13,8 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      NPM_CONFIG_ENGINE_STRICT: 'false'
     strategy:
       max-parallel: 5
       matrix:
@@ -24,9 +26,7 @@ jobs:
     - uses: actions/setup-node@v6
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm install -g npm@latest
-      env:
-        npm_config_engine_strict: 'false'
+    - run: npm install npm@latest
     - run: npm ci
     - run: npm run build -ws --if-present
     - run: npm run lint -w ${{ matrix.prefix }}
@@ -35,15 +35,15 @@ jobs:
   integration-test:
     runs-on: ubuntu-latest
     needs: test
+    env:
+      NPM_CONFIG_ENGINE_STRICT: 'false'
     name: Integration tests
     steps:
     - uses: actions/checkout@v6
     - uses: actions/setup-node@v6
       with:
         node-version: '22'
-    - run: npm install -g npm@latest
-      env:
-        npm_config_engine_strict: 'false'
+    - run: npm install npm@latest
     - run: npm ci
     - run: npm run build -ws --if-present
 
@@ -143,6 +143,8 @@ jobs:
   build-n-publish:
     runs-on: ubuntu-latest
     needs: test
+    env:
+      NPM_CONFIG_ENGINE_STRICT: 'false'
     strategy:
       max-parallel: 5
       matrix:
@@ -159,9 +161,7 @@ jobs:
     
     - name: Update npm
       if: contains(github.event.ref, matrix.prefix)
-      run: npm install -g npm@latest
-      env:
-        npm_config_engine_strict: 'false'
+      run: npm install npm@latest
 
     - name: Install dependencies
       if: contains(github.event.ref, matrix.prefix)
