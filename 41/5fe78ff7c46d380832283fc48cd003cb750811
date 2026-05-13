@@ -1,0 +1,22 @@
+.github/workflows/npm.yml
+  s_62beb8650def6f::t_06ca9fcbbf26c6 16-17,29
+  s_62beb8650def6f::t_7ac4798f5a0c2a 38-39,46
+  s_62beb8650def6f::t_9014f99cda1f6c 164
+  s_62beb8650def6f::t_badf656dba4d44 146-147
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "415fe78ff7c46d380832283fc48cd003cb750811",
+  "prompts": {},
+  "sessions": {
+    "s_62beb8650def6f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "333e1dc9-9971-45b4-ba3b-1573c27fadc0",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
