@@ -1,0 +1,19 @@
+expected/jest-examples.yaml
+  s_62beb8650def6f::t_4ba44b0efb27ed 170,230
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "169203712bcbc9d2b6ca1192de0588aeed03e47b",
+  "prompts": {},
+  "sessions": {
+    "s_62beb8650def6f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "333e1dc9-9971-45b4-ba3b-1573c27fadc0",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
