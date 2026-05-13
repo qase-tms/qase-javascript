@@ -24,7 +24,9 @@ jobs:
     - uses: actions/setup-node@v6
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm install npm@latest    
+    - run: npm install npm@latest
+      env:
+        npm_config_engine_strict: 'false'
     - run: npm ci
     - run: npm run build -ws --if-present
     - run: npm run lint -w ${{ matrix.prefix }}
@@ -40,6 +42,8 @@ jobs:
       with:
         node-version: '22'
     - run: npm install npm@latest
+      env:
+        npm_config_engine_strict: 'false'
     - run: npm ci
     - run: npm run build -ws --if-present
 
@@ -156,6 +160,8 @@ jobs:
     - name: Update npm
       if: contains(github.event.ref, matrix.prefix)
       run: npm install npm@latest
+      env:
+        npm_config_engine_strict: 'false'
 
     - name: Install dependencies
       if: contains(github.event.ref, matrix.prefix)
