@@ -1,6 +1,6 @@
-import { afterRunHook, beforeRunHook } from './hooks';
-import { ConfigLoader, composeOptions } from 'qase-javascript-commons';
-import { configSchema } from './configSchema';
+const { afterRunHook, afterSpecHook, beforeRunHook } = require('./hooks');
+const { ConfigLoader, composeOptions } = require('qase-javascript-commons');
+const { configSchema } = require('./configSchema');
 
 module.exports = function (on, config) {
   try {
@@ -25,6 +25,14 @@ module.exports = function (on, config) {
 
   on('before:run', async () => {
     await beforeRunHook(config);
+  });
+
+  // Auto-register after:spec so results buffered by the browser-side Mocha reporter
+  // (via ResultsManager file bridge) are flushed to Qase without the user having to
+  // wire this hook manually. Previously users had to add an explicit
+  // `on('after:spec', ...)` in setupNodeEvents; forgetting it produced empty runs.
+  on('after:spec', async (spec) => {
+    await afterSpecHook(spec, config);
   });
 
   on('after:run', async () => {

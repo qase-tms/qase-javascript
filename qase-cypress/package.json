@@ -1,6 +1,6 @@
 {
   "name": "cypress-qase-reporter",
-  "version": "3.6.0",
+  "version": "3.6.1",
   "description": "Qase Cypress Reporter",
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "sideEffects": false,
@@ -55,7 +55,13 @@
     "uuid": "^9.0.1"
   },
   "peerDependencies": {
-    "cypress": ">=8.0.0"
+    "cypress": ">=8.0.0",
+    "mocha": ">=10.0.0"
+  },
+  "peerDependenciesMeta": {
+    "mocha": {
+      "optional": false
+    }
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
