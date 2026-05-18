@@ -1,3 +1,14 @@
+# cypress-qase-reporter@3.6.1
+
+## Bug fixes
+
+- The plugin now auto-registers an `after:spec` handler in `setupNodeEvents`. Previously users had to manually wire `on('after:spec', async (spec) => await afterSpecHook(spec, config))` — forgetting it produced runs that were created and "completed" on the Node side but contained `cases: []`, because the results buffered by the browser-side Mocha reporter (via the `ResultsManager` file bridge) were never read. Existing manual registrations remain safe: the second call is a no-op since the results buffer file is cleared after the first flush.
+- `beforeRunHook`, `afterRunHook`, and `afterSpecHook` no longer crash with `Cannot read properties of null (reading 'cypressQaseReporterReporterOptions')` when Cypress passes a `null`/`undefined` `reporterOptions`. Hooks now resolve user-provided reporter options defensively through a single helper that accepts the `cypressQaseReporterReporterOptions` wrapper (produced by `cypress-multi-reporters`), a raw options object, or a missing value.
+
+## Other
+
+- Declared `mocha` (`>=10`) as a peer dependency. It was previously a `devDependency` only and relied on `cypress` hoisting `mocha` into the host `node_modules`. Cypress 15 no longer hoists `mocha`, so the reporter must declare it explicitly for installs to resolve it.
+
 # cypress-qase-reporter@3.6.0
 
 ## Changed
