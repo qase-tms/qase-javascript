@@ -1,5 +1,6 @@
 import { Config, Reporter, Test, TestResult } from '@jest/reporters';
 import { Status, TestCaseResult } from '@jest/test-result';
+import type { Circus } from '@jest/types';
 
 import {
   Attachment,
@@ -39,6 +40,10 @@ export class JestQaseReporter implements Reporter {
   private reporter: ReporterInterface;
   private profilerTracker: ProfilerTracker;
   private metadataApplier: MetadataApplier;
+  // Map keyed by `${test.path}::${fullName}` → ms-since-epoch when the test
+  // actually started executing. Populated in `onTestCaseStart` (Jest 29+),
+  // consumed in `onTestCaseResult`, then evicted.
+  private testCaseStartTimes: Map<string, number> = new Map();
 
   public constructor(
     _: Config.GlobalConfig,
@@ -74,21 +79,38 @@ export class JestQaseReporter implements Reporter {
     this.profilerTracker.enable();
   }
 
+  public onTestCaseStart(test: Test, testCaseStartInfo: Circus.TestCaseStartInfo) {
+    const startedAt = testCaseStartInfo.startedAt ?? Date.now();
+    this.testCaseStartTimes.set(
+      JestQaseReporter.startTimeKey(test.path, testCaseStartInfo.fullName),
+      startedAt,
+    );
+  }
+
   public onTestCaseResult(test: Test, testCaseResult: TestCaseResult) {
     if (this.metadataApplier.get().ignore) {
       this.metadataApplier.reset();
       return;
     }
 
+    const key = JestQaseReporter.startTimeKey(test.path, testCaseResult.fullName);
+    const startTimeMs = this.testCaseStartTimes.get(key) ?? null;
+    this.testCaseStartTimes.delete(key);
+
     const result = ResultBuilder.build({
       value: testCaseResult,
       path: test.path,
       metadata: this.metadataApplier.get(),
       profilerSteps: this.profilerTracker.getNewSteps(),
+      startTimeMs,
     });
 
     this.metadataApplier.reset();
     void this.reporter.addTestResult(result);
+  }
+
+  private static startTimeKey(path: string, fullName: string): string {
+    return `${path}::${fullName}`;
   }
 
   public onTestResult(_: Test, result: TestResult) {

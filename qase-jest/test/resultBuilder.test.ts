@@ -55,17 +55,29 @@ describe('ResultBuilder.build', () => {
     });
     expect(result.execution.status).toBe('passed');
     expect(result.execution.duration).toBe(1000);
-    // start_time/end_time are derived from Date.now() at result moment; they should
-    // be Unix seconds (~1e9-1e10) and `end_time - start_time == duration / 1000`.
-    const start = result.execution.start_time as number;
-    const end = result.execution.end_time as number;
-    expect(start).toBeGreaterThan(1_600_000_000);
-    expect(end).toBeGreaterThan(1_600_000_000);
-    expect(Math.round((end - start) * 1000)).toBe(1000);
+    // Without startTimeMs the builder leaves start/end null (Jest didn't fire
+    // onTestCaseStart for this case, e.g. older Jest version or todo/pending).
+    expect(result.execution.start_time).toBeNull();
+    expect(result.execution.end_time).toBeNull();
     expect(result.testops_id).toBe(123);
     expect(result.title).toBe('Test');
     expect(result.signature).toBe('mock-signature');
     expect(result.steps).toEqual([]);
+  });
+
+  it('uses startTimeMs from onTestCaseStart to populate start/end', () => {
+    const meta = MetadataApplier.empty();
+    const result = ResultBuilder.build({
+      value: baseValue,
+      path: '/work/test/file.spec.ts',
+      metadata: meta,
+      profilerSteps: [],
+      startTimeMs: 1_700_000_000_000,
+    });
+    // start in Unix seconds, end = start + duration / 1000
+    expect(result.execution.start_time).toBe(1_700_000_000);
+    expect(result.execution.end_time).toBe(1_700_000_001);
+    expect(result.execution.duration).toBe(1000);
   });
 
   it('maps failureDetails to error message and stacktrace', () => {

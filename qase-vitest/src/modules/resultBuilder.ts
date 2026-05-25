@@ -52,15 +52,17 @@ export class ResultBuilder {
       });
     }
 
-    // Vitest's `testCase.diagnostic()` exposes only an elapsed `duration` (ms),
-    // not absolute test start/end timestamps. Anchor end_time to Date.now() at
-    // result-build moment and derive start_time backward; the only loss of
-    // precision is the gap between actual test end and the reporter callback.
+    // Vitest's `testCase.diagnostic()` exposes both the absolute `startTime`
+    // (ms since epoch) and elapsed `duration` (ms). end_time is derived as
+    // start + duration so there is no dependency on the reporter callback delay.
     const durationMs = Math.round(diagnostic?.duration ?? 0);
-    const endTimeMs = Date.now();
-    const startTimeMs = endTimeMs - durationMs;
-    testResult.execution.start_time = startTimeMs / 1000;
-    testResult.execution.end_time = endTimeMs / 1000;
+    if (diagnostic) {
+      testResult.execution.start_time = diagnostic.startTime / 1000;
+      testResult.execution.end_time = (diagnostic.startTime + durationMs) / 1000;
+    } else {
+      testResult.execution.start_time = null;
+      testResult.execution.end_time = null;
+    }
     testResult.execution.duration = durationMs;
 
     let error: Error | null = null;
