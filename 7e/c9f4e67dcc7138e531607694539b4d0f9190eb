@@ -1,0 +1,102 @@
+qase-javascript-commons/src/profilers/http-interceptor.ts
+  s_ff5ee2f77c5e3f::t_98064295b67a76 103-109,131-132
+qase-cucumberjs/src/modules/stepConverter.ts
+  s_ff5ee2f77c5e3f::t_268dc3aa30afd4 1,10,23-26,37-40,50-56
+qase-cypress/changelog.md
+  s_ff5ee2f77c5e3f::t_e524a10ea91679 1-10
+qase-vitest/src/modules/resultBuilder.ts
+  s_ff5ee2f77c5e3f::t_bbba754b1a7c1f 55-64
+qase-playwright/test/step-converter.test.ts
+  s_ff5ee2f77c5e3f::t_dfd3e7e54ce7c2 64
+qase-cucumberjs/src/modules/eventStorage.ts
+  s_ff5ee2f77c5e3f::t_c5174e70569174 7
+  s_ff5ee2f77c5e3f::t_a9815e2a8aa547 80-83
+  s_ff5ee2f77c5e3f::t_ef89a02f8122ec 17
+  s_ff5ee2f77c5e3f::t_513eca37b8cca0 116-119
+qase-mocha/test/stepRunner.test.ts
+  s_ff5ee2f77c5e3f::t_147da01f09d04d 26-32
+qase-cucumberjs/src/storage.ts
+  s_ff5ee2f77c5e3f::t_4ff2ba8a54ab96 63-66
+  s_ff5ee2f77c5e3f::t_678df6dce44da5 8
+  s_ff5ee2f77c5e3f::t_db013a201e7200 104
+qase-cucumberjs/src/reporter.ts
+  s_ff5ee2f77c5e3f::t_84f66340a6db8e 99-100
+qase-javascript-commons/changelog.md
+  s_ff5ee2f77c5e3f::t_8992dc20679edc 1-6
+qase-cypress/test/step-converter.test.ts
+  s_ff5ee2f77c5e3f::t_46a0c670492890 58-71
+  s_ff5ee2f77c5e3f::t_b766f0f2e5b89a 29-30
+qase-cucumberjs/test/stepConverter.test.ts
+  s_ff5ee2f77c5e3f::t_1b2e97b0b9e23a 4,13,19,21,25-34,43,51-79,90,104,116,127
+qase-javascript-commons/src/reporters/report-reporter.ts
+  s_ff5ee2f77c5e3f::t_5f969464520c6c 106,110-112
+qase-wdio/test/finalizer.test.ts
+  s_ff5ee2f77c5e3f::t_f58f253817d1ad 80,83-86
+qase-mocha/package.json
+  s_ff5ee2f77c5e3f::t_79d830b02d6e08 3
+qase-mocha/changelog.md
+  s_ff5ee2f77c5e3f::t_ce0e459222d16a 1-7
+qase-vitest/test/resultBuilder.test.ts
+  s_ff5ee2f77c5e3f::t_a86314a5803e75 42-48
+qase-cypress/src/step-converter.ts
+  s_ff5ee2f77c5e3f::t_ff58636374accd 18-20,40,46-48,50-55,80,85-89
+qase-wdio/src/finalizer.ts
+  s_ff5ee2f77c5e3f::t_27b1de8c1ddd47 43-44,46
+qase-javascript-commons/package.json
+  s_ff5ee2f77c5e3f::t_17b4290460c930 3
+qase-wdio/src/lifecycle.ts
+  s_ff5ee2f77c5e3f::t_e44b8ddcc0cfa7 49-50,52-55
+qase-cypress/src/result-builder.ts
+  s_ff5ee2f77c5e3f::t_fab5737603b607 130-132,134
+qase-vitest/package.json
+  s_ff5ee2f77c5e3f::t_573ef698f146ce 3
+qase-javascript-commons/test/profilers/http-interceptor.test.ts
+  s_ff5ee2f77c5e3f::t_fdd4be066be1c7 164-184
+qase-cucumberjs/changelog.md
+  s_ff5ee2f77c5e3f::t_abf40de12f6780 1-7
+qase-jest/package.json
+  s_ff5ee2f77c5e3f::t_2a92ab51cedbc0 3
+qase-cypress/package.json
+  s_ff5ee2f77c5e3f::t_9ec3936f54448b 3
+qase-jest/src/modules/resultBuilder.ts
+  s_ff5ee2f77c5e3f::t_2ffd5a73ebe551 55-62,68-70
+qase-vitest/changelog.md
+  s_ff5ee2f77c5e3f::t_8f22fec88a961d 1-7
+qase-playwright/package.json
+  s_ff5ee2f77c5e3f::t_d33a95394719dc 3
+qase-mocha/src/modules/stepRunner.ts
+  s_ff5ee2f77c5e3f::t_d668ab389981c3 28,37,55-57
+qase-jest/changelog.md
+  s_ff5ee2f77c5e3f::t_43336abf35472e 1-7
+qase-playwright/changelog.md
+  s_ff5ee2f77c5e3f::t_a83b2939cc2ea3 6
+  s_ff5ee2f77c5e3f::t_415a98412c744f 1-5,7
+qase-wdio/changelog.md
+  s_ff5ee2f77c5e3f::t_18feb4902ae620 1-9
+qase-wdio/package.json
+  s_ff5ee2f77c5e3f::t_27ad0175be1b3f 3
+qase-playwright/src/step-converter.ts
+  s_ff5ee2f77c5e3f::t_55c50dded42ada 47
+qase-playwright/src/result-builder.ts
+  s_ff5ee2f77c5e3f::t_d877ffddf1f1d3 129
+qase-cucumberjs/package.json
+  s_ff5ee2f77c5e3f::t_7324694c9b47ea 3
+qase-jest/test/resultBuilder.test.ts
+  s_ff5ee2f77c5e3f::t_26dae8dd034099 58-64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "7ec9f4e67dcc7138e531607694539b4d0f9190eb",
+  "prompts": {},
+  "sessions": {
+    "s_ff5ee2f77c5e3f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4c771a9b-0e28-4018-85e0-b18dbfa6d477",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
