@@ -65,7 +65,7 @@ export class QaseStep {
   }
 
   async run(body: StepFunction, messageEmitter: (step: TestStepType) => Promise<void>): Promise<void> {
-    const startDate = new Date().getTime();
+    const startMs = Date.now();
     const step = new TestStepType();
     step.data = {
       action: this.name,
@@ -73,27 +73,26 @@ export class QaseStep {
       data: null,
     };
 
+    // Per Qase API spec: start_time / end_time are Unix epoch seconds (with
+    // fractional ms); duration is milliseconds.
+    const buildExecution = (status: StepStatusEnum, endMs: number) => ({
+      start_time: startMs / 1000,
+      end_time: endMs / 1000,
+      status,
+      duration: endMs - startMs,
+    });
+
     try {
       await body.call(this, this);
 
-      step.execution = {
-        start_time: startDate,
-        end_time: new Date().getTime(),
-        status: StepStatusEnum.passed,
-        duration: null,
-      };
+      step.execution = buildExecution(StepStatusEnum.passed, Date.now());
 
       step.attachments = this.attachments;
       step.steps = this.steps;
 
       await messageEmitter(step);
     } catch (error: unknown) {
-      step.execution = {
-        start_time: startDate,
-        end_time: new Date().getTime(),
-        status: StepStatusEnum.failed,
-        duration: null,
-      };
+      step.execution = buildExecution(StepStatusEnum.failed, Date.now());
 
       step.attachments = this.attachments;
       step.steps = this.steps;
