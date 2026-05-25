@@ -1,0 +1,21 @@
+qase-javascript-commons/src/steps/step.ts
+  s_ff5ee2f77c5e3f::t_53cc2de9773b8b 68,76-84,88,95
+qase-javascript-commons/changelog.md
+  s_ff5ee2f77c5e3f::t_0c0234372bf4b1 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "c76ab313debee138640e7df8f83945ed9cd67916",
+  "prompts": {},
+  "sessions": {
+    "s_ff5ee2f77c5e3f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4c771a9b-0e28-4018-85e0-b18dbfa6d477",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
