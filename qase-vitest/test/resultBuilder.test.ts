@@ -21,7 +21,7 @@ const mkTestCase = (overrides: any = {}) => ({
   id: 'test-id',
   fullName: 'Suite > Test',
   result: jest.fn().mockReturnValue({ state: 'passed', errors: [] }),
-  diagnostic: jest.fn().mockReturnValue({ duration: 100 }),
+  diagnostic: jest.fn().mockReturnValue({ duration: 100, startTime: 1_700_000_000_000 }),
   ...overrides,
 }) as any;
 
@@ -39,8 +39,9 @@ describe('ResultBuilder.build', () => {
       profilerSteps: [],
     });
     expect(result.execution.status).toBe('passed');
-    expect(result.execution.start_time).toBeNull();
-    expect(result.execution.end_time).toBeNull();
+    // Vitest exposes the absolute startTime; reporter emits it as Unix seconds.
+    expect(result.execution.start_time).toBe(1_700_000_000);
+    expect(result.execution.end_time).toBe(1_700_000_000.1);
     expect(result.execution.duration).toBe(100);
     expect(result.id).toBe('test-id');
     expect(result.signature).toBe('Suite > Test');

@@ -23,6 +23,13 @@ describe('StepRunner', () => {
     expect(steps[0]?.data.action).toBe('login');
     expect(steps[0]?.execution.status).toBe(StepStatusEnum.passed);
     expect(steps[0]?.execution.end_time).not.toBeNull();
+    // start/end in Unix seconds, duration in ms per Qase API spec
+    const start = steps[0]!.execution.start_time as number;
+    const end = steps[0]!.execution.end_time as number;
+    expect(start).toBeGreaterThan(1_600_000_000);
+    expect(end).toBeGreaterThanOrEqual(start);
+    expect(steps[0]?.execution.duration).not.toBeNull();
+    expect(steps[0]!.execution.duration as number).toBeGreaterThanOrEqual(0);
   });
 
   it('run() with a throwing fn marks step failed, swallows the error, and exposes hasFailure()', () => {

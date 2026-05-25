@@ -61,6 +61,7 @@ describe('StepConverter', () => {
     expect(result[0]?.parent_id).toBe('parent-id');
     expect(result[0]?.execution.status).toBe(StepStatusEnum.passed);
     expect(result[0]?.execution.start_time).toBe(1);
+    expect(result[0]?.execution.end_time).toBe(1.005);
     expect(result[0]?.execution.duration).toBe(5);
     expect(result[0]?.data.action).toBe('click button');
   });

@@ -126,7 +126,7 @@ export class ResultBuilder {
       execution: {
         status: testStatus,
         start_time: result.startTime.valueOf() / 1000,
-        end_time: null,
+        end_time: (result.startTime.valueOf() + result.duration) / 1000,
         duration: result.duration,
         stacktrace: error === null
           ? null

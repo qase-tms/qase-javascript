@@ -40,8 +40,10 @@ export class ResultFinalizer {
       testResult.relations = relations;
     }
 
+    // start_time/end_time are Unix seconds; duration must be ms per Qase API spec.
+    testResult.execution.end_time = endTime;
     testResult.execution.duration = testResult.execution.start_time
-      ? Math.round(endTime - testResult.execution.start_time)
+      ? Math.round((endTime - testResult.execution.start_time) * 1000)
       : 0;
 
     let error: Error | null = null;

@@ -1,3 +1,12 @@
+# wdio-qase-reporter@1.5.1
+
+## Fixed
+
+- Test `execution.duration` is now reported in milliseconds (multiplied by 1000) instead of seconds, matching the Qase API spec. Previously a 10-second test was uploaded as `duration: 10` (ms), making it look like 10 milliseconds on timelines.
+- Test `execution.end_time` is now set in `ResultFinalizer.finalize` (previously it was always `null`).
+- Step `execution.duration` is now populated in `TestLifecycle.endStep` (previously it stayed `null` even though both `start_time` and `end_time` were available).
+- HTTP/fetch profiler steps (via `qase-javascript-commons@2.7.1`) now emit `start_time` / `end_time` in Unix seconds instead of milliseconds.
+
 # wdio-qase-reporter@1.5.0
 
 ## Changed

@@ -52,9 +52,18 @@ export class ResultBuilder {
       });
     }
 
-    testResult.execution.start_time = null;
-    testResult.execution.end_time = null;
-    testResult.execution.duration = Math.round(diagnostic?.duration ?? 0);
+    // Vitest's `testCase.diagnostic()` exposes both the absolute `startTime`
+    // (ms since epoch) and elapsed `duration` (ms). end_time is derived as
+    // start + duration so there is no dependency on the reporter callback delay.
+    const durationMs = Math.round(diagnostic?.duration ?? 0);
+    if (diagnostic) {
+      testResult.execution.start_time = diagnostic.startTime / 1000;
+      testResult.execution.end_time = (diagnostic.startTime + durationMs) / 1000;
+    } else {
+      testResult.execution.start_time = null;
+      testResult.execution.end_time = null;
+    }
+    testResult.execution.duration = durationMs;
 
     let error: Error | null = null;
     if (result.errors && result.errors.length > 0) {

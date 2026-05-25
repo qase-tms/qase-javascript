@@ -26,7 +26,8 @@ describe('StepConverter', () => {
       expect(result[0]?.id).toBe('s1');
       expect(result[0]?.data.action).toBe('click');
       expect(result[0]?.execution.status).toBe(StepStatusEnum.passed);
-      expect(result[0]?.execution.start_time).toBe(100);
+      // timestamps are stored as ms-since-epoch in metadata; converter emits Unix seconds.
+      expect(result[0]?.execution.start_time).toBe(0.1);
     });
 
     it('marks the LAST step failed when test status is not passed', () => {
@@ -54,7 +55,20 @@ describe('StepConverter', () => {
       expect(result).toHaveLength(1);
       expect(result[0]?.id).toBe('s1');
       expect(result[0]?.execution.status).toBe(StepStatusEnum.passed);
-      expect(result[0]?.execution.end_time).toBe(200);
+      // start/end emitted in Unix seconds; duration in ms (end_ms - start_ms).
+      expect(result[0]?.execution.start_time).toBe(0.1);
+      expect(result[0]?.execution.end_time).toBe(0.2);
+      expect(result[0]?.execution.duration).toBe(100);
+    });
+
+    it('leaves end_time null when no StepEnd arrives for a step', () => {
+      const messages: (StepStart | StepEnd)[] = [
+        { id: 's1', name: 'orphan-start', timestamp: 100 } as StepStart,
+      ];
+      const result = converter.getSteps(messages, {});
+      expect(result[0]?.execution.start_time).toBe(0.1);
+      expect(result[0]?.execution.end_time).toBeNull();
+      expect(result[0]?.execution.status).toBe(StepStatusEnum.failed);
     });
 
     it('nests a child under its parent via parentId', () => {

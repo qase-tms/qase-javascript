@@ -1,3 +1,10 @@
+# vitest-qase-reporter@1.4.1
+
+## Fixed
+
+- `execution.start_time` and `execution.end_time` are now populated for every test result, sourced from `testCase.diagnostic().startTime` (Vitest's absolute test-start timestamp in ms) plus `duration`. Previously both fields were emitted as `null`. Units: `start_time` / `end_time` in Unix seconds (with fractional ms), `duration` in milliseconds.
+- HTTP/fetch profiler steps (via `qase-javascript-commons@2.7.1`) now emit `start_time` / `end_time` in Unix seconds instead of milliseconds.
+
 # vitest-qase-reporter@1.4.0
 
 ## Changed

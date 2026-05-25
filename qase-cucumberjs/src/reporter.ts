@@ -96,6 +96,8 @@ export class CucumberQaseReporter extends Formatter {
         this.storage.addTestCase(envelope.testCase);
       } else if (envelope.testCaseStarted) {
         this.storage.addTestCaseStarted(envelope.testCaseStarted);
+      } else if (envelope.testStepStarted) {
+        this.storage.addTestCaseStepStarted(envelope.testStepStarted);
       } else if (envelope.testStepFinished) {
         this.storage.addTestCaseStep(envelope.testStepFinished);
       } else if (envelope.testCaseFinished) {

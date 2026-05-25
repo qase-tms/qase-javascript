@@ -25,6 +25,7 @@ export class StepRunner {
 
     const stepData = extractAndCleanStep(stepTitle);
 
+    const startMs = Date.now();
     const step: TestStepType = {
       step_type: StepType.TEXT,
       data: {
@@ -33,7 +34,7 @@ export class StepRunner {
         data: stepData.data,
       },
       execution: {
-        start_time: Date.now(),
+        start_time: startMs / 1000,
         status: StepStatusEnum.passed,
         end_time: null,
         duration: null,
@@ -51,7 +52,9 @@ export class StepRunner {
       this.failureFlag = true;
     }
 
-    step.execution.end_time = Date.now();
+    const endMs = Date.now();
+    step.execution.end_time = endMs / 1000;
+    step.execution.duration = endMs - startMs;
     this.steps.push(step);
   }
 }

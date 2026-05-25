@@ -161,6 +161,27 @@ describe('HttpInterceptor', () => {
     expect((step!.execution.duration as number) >= 0).toBe(true);
   });
 
+  it('emits start_time/end_time as Unix seconds and duration in ms', async () => {
+    interceptor.install();
+    const steps: TestStepType[] = [];
+    const nowSecBefore = Date.now() / 1000;
+    await store.run(steps, async () => {
+      await makeRequest('/ok');
+    });
+    const nowSecAfter = Date.now() / 1000;
+    expect(steps).toHaveLength(1);
+    const exec = steps[0]!.execution;
+    const start = exec.start_time as number;
+    const end = exec.end_time as number;
+    const duration = exec.duration as number;
+    // start/end must be Unix seconds (~1e9-1e10), not ms (~1e12)
+    expect(start).toBeGreaterThan(nowSecBefore - 1);
+    expect(end).toBeLessThan(nowSecAfter + 1);
+    expect(end).toBeGreaterThanOrEqual(start);
+    // duration is in ms (delta), bounded by elapsed wall time in ms
+    expect(duration).toBeLessThanOrEqual(Math.ceil((nowSecAfter - nowSecBefore) * 1000) + 1);
+  });
+
   it('response with status 200 has response_body: null', async () => {
     interceptor.install();
     const steps: TestStepType[] = [];

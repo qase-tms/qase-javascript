@@ -1,3 +1,10 @@
+# playwright-qase-reporter@2.5.1
+
+## Fixed
+
+- `execution.end_time` is now populated on both test results and steps (derived from Playwright's `startTime + duration`). Previously `end_time` was hardcoded to `null`, which broke timeline rendering on the Qase side. Units are unchanged: `start_time` / `end_time` in Unix seconds (with fractional ms), `duration` in milliseconds.
+- HTTP/fetch profiler steps (via `qase-javascript-commons@2.7.1`) now emit `start_time` / `end_time` in Unix seconds instead of milliseconds.
+
 # playwright-qase-reporter@2.5.0
 
 ## Added

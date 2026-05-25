@@ -106,6 +106,21 @@ describe('JestQaseReporter', () => {
       expect(call.execution.duration).toBe(1000);
     });
 
+    it('uses startedAt from onTestCaseStart to compute start/end_time', () => {
+      reporter.onTestCaseStart(test, {
+        ancestorTitles: ['Test Suite'],
+        fullName: 'Test Suite Test',
+        mode: undefined as any,
+        title: 'Test (Qase ID: 123)',
+        startedAt: 1_700_000_000_000,
+      } as any);
+      reporter.onTestCaseResult(test, testCaseResult);
+      const call = reporterMock.addTestResult.mock.calls[0][0];
+      expect(call.execution.start_time).toBe(1_700_000_000);
+      expect(call.execution.end_time).toBe(1_700_000_001);
+      expect(call.execution.duration).toBe(1000);
+    });
+
     it('skips addTestResult when ignore flag is set', () => {
       reporter.addIgnore();
       reporter.onTestCaseResult(test, testCaseResult);

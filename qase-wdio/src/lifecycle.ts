@@ -46,8 +46,13 @@ export class TestLifecycle {
     if (!step) {
       return;
     }
-    step.execution.end_time = Date.now() / 1000;
+    const endTimeSec = Date.now() / 1000;
+    step.execution.end_time = endTimeSec;
     step.execution.status = status;
+    // start_time/end_time are in seconds; duration must be in ms per Qase API spec.
+    if (step.execution.start_time !== null) {
+      step.execution.duration = Math.round((endTimeSec - step.execution.start_time) * 1000);
+    }
   }
 
   attachJSON(name: string, json: unknown): void {

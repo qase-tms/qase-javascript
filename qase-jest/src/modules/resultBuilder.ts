@@ -24,13 +24,19 @@ export interface ResultBuilderArgs {
   path: string;
   metadata: Metadata;
   profilerSteps: TestStepType[];
+  /**
+   * Test start time in ms since epoch, captured in the `onTestCaseStart`
+   * reporter hook (Jest 29+). `null` if the hook didn't fire — happens for
+   * pending/todo specs Jest reports only at file-completion time.
+   */
+  startTimeMs?: number | null;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class ResultBuilder {
 
   static build(args: ResultBuilderArgs): TestResultType {
-    const { value, path, metadata, profilerSteps } = args;
+    const { value, path, metadata, profilerSteps, startTimeMs = null } = args;
 
     let error: Error | undefined;
     if (value.status === 'failed') {
@@ -52,14 +58,22 @@ export class ResultBuilder {
 
     const testStatus = determineTestStatus(error ?? null, value.status);
 
+    // `startTimeMs` is captured in `onTestCaseStart` from Jest's
+    // `TestCaseStartInfo.startedAt`. When available, end_time is derived as
+    // start + duration. When missing (older Jest, todo/pending specs that
+    // skip the start hook), both fields are left null rather than guessed.
+    const durationMs = value.duration ?? 0;
+    const startTimeSec = startTimeMs !== null ? startTimeMs / 1000 : null;
+    const endTimeSec = startTimeMs !== null ? (startTimeMs + durationMs) / 1000 : null;
+
     const result: TestResultType = {
       attachments: [],
       author: null,
       execution: {
         status: testStatus,
-        start_time: null,
-        end_time: null,
-        duration: value.duration ?? 0,
+        start_time: startTimeSec,
+        end_time: endTimeSec,
+        duration: durationMs,
         stacktrace: error?.stack ?? null,
         thread: null,
       },

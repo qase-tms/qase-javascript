@@ -1,3 +1,13 @@
+# cypress-qase-reporter@3.6.2
+
+## Bug fixes
+
+- `qase.step()` steps no longer pre-fill `execution.end_time` with `Date.now()` at the moment the START event arrives; `end_time` now stays `null` until the matching END event is received. Previously a step that timed out or crashed before its END event was emitted ended up with a bogus `end_time` equal to the test start, schrinking the visible step on the Qase timeline to zero.
+- `qase.step()` steps now populate `execution.duration` (ms) on completion (previously left `null`).
+- Cypress and Cucumber step `execution.start_time` / `end_time` are now emitted in Unix seconds (with fractional ms) instead of raw `Date.now()` milliseconds. Previously these values were ~55 years in the future on Qase timelines.
+- Network-request steps captured via `cy.intercept` now set `execution.end_time` (derived from `start_time + duration`); previously only `start_time` and `duration` were populated.
+- HTTP/fetch profiler steps (via `qase-javascript-commons@2.7.1`) now emit `start_time` / `end_time` in Unix seconds instead of milliseconds.
+
 # cypress-qase-reporter@3.6.1
 
 ## Bug fixes

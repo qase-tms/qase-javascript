@@ -1,3 +1,10 @@
+## 2.7.1
+
+### Fixed
+- HTTP/fetch profiler steps now emit `execution.start_time` and `execution.end_time` as Unix epoch seconds (with fractional ms), matching the Qase API contract. Previously the interceptor wrote `Date.now()` milliseconds directly into both fields, placing every captured request step ~55 years in the future on the timeline. `execution.duration` remains in milliseconds.
+- `ReportReporter` test-run summary (`report.execution.start_time` / `end_time` in the generated JSON report) is now emitted in Unix seconds instead of milliseconds; this aligns the report-mode file with the v2 API spec consumed by `reporters-validator`.
+- `QaseStep.run` (the shared user-facing `qase.step()` API used by Jest, Vitest, WebdriverIO and TestCafe) now emits `execution.start_time` / `end_time` in Unix seconds instead of raw `Date.now()` milliseconds, and populates `execution.duration` (ms). Previously every `qase.step()` call landed ~55 years in the future on the timeline and reported `null` duration.
+
 ## 2.7.0
 
 ### Added
