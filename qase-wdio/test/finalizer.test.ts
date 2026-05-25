@@ -77,10 +77,13 @@ describe('ResultFinalizer', () => {
     expect(t.relations.suite?.data).toEqual([{ title: 'Pre', public_id: null }]);
   });
 
-  it('computes duration from start_time and endTime (rounded seconds)', async () => {
+  it('computes duration in ms and sets end_time when finalizing', async () => {
     const t = startTest('t', 100);
     await finalizer.finalize(TestStatusEnum.passed, null, 100.7);
-    expect(t.execution.duration).toBe(1);
+    expect(t.execution.start_time).toBe(100);
+    expect(t.execution.end_time).toBe(100.7);
+    // start/end in seconds (100 → 100.7), duration in ms (700)
+    expect(t.execution.duration).toBe(700);
   });
 
   it('forwards stacktrace from CompoundError', async () => {

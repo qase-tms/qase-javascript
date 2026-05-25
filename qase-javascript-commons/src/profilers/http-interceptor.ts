@@ -100,6 +100,13 @@ export function headersToRecord(
 
 // ─── Utility: buildRequestStep ───────────────────────────────────────────────
 
+/**
+ * Builds a REQUEST-type step from raw timing data.
+ *
+ * `startTime` / `endTime` are expected as `Date.now()` values (ms since epoch).
+ * They are normalized to Unix seconds (with fractional ms) for `step.execution.start_time` /
+ * `end_time` per Qase API spec; `duration` stays in ms.
+ */
 export function buildRequestStep(params: {
   method: string;
   url: string;
@@ -121,8 +128,8 @@ export function buildRequestStep(params: {
   data.response_body = params.responseBody;
   data.response_headers = params.responseHeaders;
 
-  step.execution.start_time = params.startTime;
-  step.execution.end_time = params.endTime;
+  step.execution.start_time = params.startTime / 1000;
+  step.execution.end_time = params.endTime / 1000;
   step.execution.duration = params.endTime - params.startTime;
   step.execution.status = params.statusCode >= 400 ? StepStatusEnum.failed : StepStatusEnum.passed;
 

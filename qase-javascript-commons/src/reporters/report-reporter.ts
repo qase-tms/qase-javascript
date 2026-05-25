@@ -103,12 +103,13 @@ export class ReportReporter extends AbstractReporter {
   }
 
   public async complete(): Promise<void> {
+    const endTime = Date.now();
     const report: Report = {
       title: 'Test run',
       execution: {
-        start_time: this.startTime,
-        end_time: Date.now(),
-        duration: Date.now() - this.startTime,
+        start_time: this.startTime / 1000,
+        end_time: endTime / 1000,
+        duration: endTime - this.startTime,
         cumulative_duration: 0,
       },
       stats: {

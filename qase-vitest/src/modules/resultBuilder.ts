@@ -52,9 +52,16 @@ export class ResultBuilder {
       });
     }
 
-    testResult.execution.start_time = null;
-    testResult.execution.end_time = null;
-    testResult.execution.duration = Math.round(diagnostic?.duration ?? 0);
+    // Vitest's `testCase.diagnostic()` exposes only an elapsed `duration` (ms),
+    // not absolute test start/end timestamps. Anchor end_time to Date.now() at
+    // result-build moment and derive start_time backward; the only loss of
+    // precision is the gap between actual test end and the reporter callback.
+    const durationMs = Math.round(diagnostic?.duration ?? 0);
+    const endTimeMs = Date.now();
+    const startTimeMs = endTimeMs - durationMs;
+    testResult.execution.start_time = startTimeMs / 1000;
+    testResult.execution.end_time = endTimeMs / 1000;
+    testResult.execution.duration = durationMs;
 
     let error: Error | null = null;
     if (result.errors && result.errors.length > 0) {

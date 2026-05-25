@@ -1,3 +1,10 @@
+# jest-qase-reporter@2.5.1
+
+## Fixed
+
+- `execution.start_time` and `execution.end_time` are now populated for every test result. Jest's `AssertionResult` only exposes an elapsed `duration`, so we anchor `end_time` to `Date.now()` at the moment of the `onTestCaseResult` callback and derive `start_time = end_time - duration`. Timeline rendering on the Qase side no longer falls back to ingestion timestamps. Units: `start_time` / `end_time` in Unix seconds (with fractional ms), `duration` in milliseconds.
+- HTTP/fetch profiler steps (via `qase-javascript-commons@2.7.1`) now emit `start_time` / `end_time` in Unix seconds instead of milliseconds.
+
 # jest-qase-reporter@2.5.0
 
 ## Changed

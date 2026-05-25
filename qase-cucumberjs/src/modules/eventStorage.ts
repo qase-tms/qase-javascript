@@ -4,6 +4,7 @@ import {
   Pickle,
   TestCaseStarted,
   TestStepFinished,
+  TestStepStarted,
 } from '@cucumber/messages';
 import { TestCase } from '@cucumber/messages/dist/esm/src/messages';
 import { Attachment } from 'qase-javascript-commons';
@@ -13,6 +14,7 @@ import { ScenarioData } from '../models';
 export class EventStorage {
   private pickles: Record<string, Pickle> = {};
   private testCaseStarts: Record<string, TestCaseStarted> = {};
+  private testStepStarted: Record<string, TestStepStarted> = {};
   private testStepFinished: Record<string, TestStepFinished> = {};
   private testCases: Record<string, TestCase> = {};
   private scenarios: Record<string, ScenarioData> = {};
@@ -75,6 +77,10 @@ export class EventStorage {
     this.testCaseStarts[testCaseStarted.id] = testCaseStarted;
   }
 
+  addTestStepStarted(step: TestStepStarted): void {
+    this.testStepStarted[step.testStepId] = step;
+  }
+
   addTestStepFinished(step: TestStepFinished): void {
     this.testStepFinished[step.testStepId] = step;
   }
@@ -105,6 +111,10 @@ export class EventStorage {
 
   getAllTestStepFinished(): Map<string, TestStepFinished> {
     return new Map(Object.entries(this.testStepFinished));
+  }
+
+  getAllTestStepStarted(): Map<string, TestStepStarted> {
+    return new Map(Object.entries(this.testStepStarted));
   }
 
   private appendAttachment(key: string, attachment: Attach): void {

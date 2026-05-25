@@ -1,3 +1,10 @@
+# vitest-qase-reporter@1.4.1
+
+## Fixed
+
+- `execution.start_time` and `execution.end_time` are now populated for every test result. Vitest's `testCase.diagnostic()` only exposes an elapsed `duration` (ms), so we anchor `end_time` to `Date.now()` at the moment of the `onTestCaseResult` callback and derive `start_time = end_time - duration`. Timeline rendering on the Qase side no longer falls back to ingestion timestamps. Units: `start_time` / `end_time` in Unix seconds (with fractional ms), `duration` in milliseconds.
+- HTTP/fetch profiler steps (via `qase-javascript-commons@2.7.1`) now emit `start_time` / `end_time` in Unix seconds instead of milliseconds.
+
 # vitest-qase-reporter@1.4.0
 
 ## Changed

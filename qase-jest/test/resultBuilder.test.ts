@@ -55,6 +55,13 @@ describe('ResultBuilder.build', () => {
     });
     expect(result.execution.status).toBe('passed');
     expect(result.execution.duration).toBe(1000);
+    // start_time/end_time are derived from Date.now() at result moment; they should
+    // be Unix seconds (~1e9-1e10) and `end_time - start_time == duration / 1000`.
+    const start = result.execution.start_time as number;
+    const end = result.execution.end_time as number;
+    expect(start).toBeGreaterThan(1_600_000_000);
+    expect(end).toBeGreaterThan(1_600_000_000);
+    expect(Math.round((end - start) * 1000)).toBe(1000);
     expect(result.testops_id).toBe(123);
     expect(result.title).toBe('Test');
     expect(result.signature).toBe('mock-signature');

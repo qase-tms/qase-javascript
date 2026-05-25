@@ -1,3 +1,10 @@
+# mocha-qase-reporter@1.5.1
+
+## Fixed
+
+- `StepRunner` now emits step `execution.start_time` / `end_time` in Unix seconds (with fractional ms) instead of raw `Date.now()` milliseconds, matching the parent test's units and the Qase API spec. Step `execution.duration` is also populated (was always `null` previously).
+- HTTP/fetch profiler steps (via `qase-javascript-commons@2.7.1`) now emit `start_time` / `end_time` in Unix seconds instead of milliseconds.
+
 # mocha-qase-reporter@1.5.0
 
 ## Changed

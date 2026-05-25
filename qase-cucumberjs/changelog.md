@@ -1,3 +1,10 @@
+# cucumberjs-qase-reporter@2.4.1
+
+## Fixed
+
+- Gherkin step `execution.start_time` and `execution.end_time` are now populated from the Cucumber `testStepStarted` / `testStepFinished` envelope timestamps (Unix seconds with fractional ms). Previously both fields were hardcoded to `null`, breaking timeline rendering on the Qase side.
+- Step `execution.duration` now includes the `nanos` part of the Cucumber duration. Previously only `seconds * 1000` was emitted, so any sub-second step was reported as 0 ms.
+
 # cucumberjs-qase-reporter@2.4.0
 
 ## Changed

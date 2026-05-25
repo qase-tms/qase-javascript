@@ -39,8 +39,13 @@ describe('ResultBuilder.build', () => {
       profilerSteps: [],
     });
     expect(result.execution.status).toBe('passed');
-    expect(result.execution.start_time).toBeNull();
-    expect(result.execution.end_time).toBeNull();
+    // start_time/end_time are derived from Date.now() at result moment;
+    // expect Unix seconds and end - start ≈ duration / 1000.
+    const start = result.execution.start_time as number;
+    const end = result.execution.end_time as number;
+    expect(start).toBeGreaterThan(1_600_000_000);
+    expect(end).toBeGreaterThan(1_600_000_000);
+    expect(Math.round((end - start) * 1000)).toBe(100);
     expect(result.execution.duration).toBe(100);
     expect(result.id).toBe('test-id');
     expect(result.signature).toBe('Suite > Test');

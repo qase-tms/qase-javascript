@@ -1,3 +1,9 @@
+## 2.7.1
+
+### Fixed
+- HTTP/fetch profiler steps now emit `execution.start_time` and `execution.end_time` as Unix epoch seconds (with fractional ms), matching the Qase API contract. Previously the interceptor wrote `Date.now()` milliseconds directly into both fields, placing every captured request step ~55 years in the future on the timeline. `execution.duration` remains in milliseconds.
+- `ReportReporter` test-run summary (`report.execution.start_time` / `end_time` in the generated JSON report) is now emitted in Unix seconds instead of milliseconds; this aligns the report-mode file with the v2 API spec consumed by `reporters-validator`.
+
 ## 2.7.0
 
 ### Added

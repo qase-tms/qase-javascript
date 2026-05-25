@@ -5,6 +5,7 @@ import {
   TestCaseFinished,
   TestCaseStarted,
   TestStepFinished,
+  TestStepStarted,
 } from '@cucumber/messages';
 import {
   StepStatusEnum,
@@ -59,6 +60,10 @@ export class Storage {
     this.profilerTracker.onTestStart(testCaseStarted.id);
   }
 
+  public addTestCaseStepStarted(testCaseStepStarted: TestStepStarted): void {
+    this.events.addTestStepStarted(testCaseStepStarted);
+  }
+
   public addTestCaseStep(testCaseStep: TestStepFinished): void {
     this.events.addTestStepFinished(testCaseStep);
     this.statusTracker.applyStep(testCaseStep);
@@ -96,6 +101,7 @@ export class Storage {
     const steps = StepConverter.convert(
       pickle.steps,
       tc,
+      this.events.getAllTestStepStarted(),
       this.events.getAllTestStepFinished(),
       (stepId) => this.events.getAttachments(stepId),
     );

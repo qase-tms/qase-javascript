@@ -52,14 +52,22 @@ export class ResultBuilder {
 
     const testStatus = determineTestStatus(error ?? null, value.status);
 
+    // Jest's AssertionResult does not expose absolute test start/end timestamps,
+    // only an elapsed `duration` (ms). Approximate the absolute window relative
+    // to the moment we observed the result; the reporter callback delay is the
+    // only loss of precision, typically negligible on a real test run.
+    const durationMs = value.duration ?? 0;
+    const endTimeMs = Date.now();
+    const startTimeMs = endTimeMs - durationMs;
+
     const result: TestResultType = {
       attachments: [],
       author: null,
       execution: {
         status: testStatus,
-        start_time: null,
-        end_time: null,
-        duration: value.duration ?? 0,
+        start_time: startTimeMs / 1000,
+        end_time: endTimeMs / 1000,
+        duration: durationMs,
         stacktrace: error?.stack ?? null,
         thread: null,
       },

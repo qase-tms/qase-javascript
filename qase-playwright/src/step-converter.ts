@@ -44,7 +44,7 @@ export class StepConverter {
           status: testStep.error ? StepStatusEnum.failed : StepStatusEnum.passed,
           start_time: testStep.startTime.valueOf() / 1000,
           duration: testStep.duration,
-          end_time: null,
+          end_time: (testStep.startTime.valueOf() + testStep.duration) / 1000,
         },
         attachments: attachments ? attachments : [],
         steps: this.transform(testStep.steps, id),

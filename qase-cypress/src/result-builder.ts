@@ -127,7 +127,11 @@ export class ResultBuilder {
         step.execution.status = req.statusCode !== null && req.statusCode >= 400
           ? StepStatusEnum.failed
           : StepStatusEnum.passed;
+        // req.startTime is ms-since-epoch, req.duration is elapsed ms.
+        // Qase API expects start_time/end_time in Unix seconds (with fractional ms)
+        // and duration in milliseconds.
         step.execution.start_time = req.startTime / 1000;
+        step.execution.end_time = (req.startTime + req.duration) / 1000;
         step.execution.duration = req.duration;
         steps.push(step);
       }
