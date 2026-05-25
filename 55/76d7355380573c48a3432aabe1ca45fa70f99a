@@ -1,0 +1,38 @@
+qase-vitest/src/modules/resultBuilder.ts
+  s_ff5ee2f77c5e3f::t_fd7e98233e7d93 55-57,59-65
+qase-jest/changelog.md
+  s_ff5ee2f77c5e3f::t_77668da8b2aa5b 5,8-10
+qase-vitest/test/resultBuilder.test.ts
+  s_ff5ee2f77c5e3f::t_5e9bc25567b071 42-44
+  s_ff5ee2f77c5e3f::t_a3a26c3051c3af 24
+qase-vitest/changelog.md
+  s_ff5ee2f77c5e3f::t_b753db7e6174f1 5
+qase-jest/test/resultBuilder.test.ts
+  s_ff5ee2f77c5e3f::t_fca0ce19d514b6 58-61,68-80
+qase-jest/src/modules/resultBuilder.ts
+  s_ff5ee2f77c5e3f::t_355f1689e0f608 39
+  s_ff5ee2f77c5e3f::t_87a84b9e729619 61-64,66-67,74-75
+  s_ff5ee2f77c5e3f::t_58545b8fed64e0 27-32
+qase-jest/src/reporter.ts
+  s_ff5ee2f77c5e3f::t_f133b4ac75d63d 3
+  s_ff5ee2f77c5e3f::t_0a789ca4ca7a35 43-46
+  s_ff5ee2f77c5e3f::t_b4723de45bcb7e 82-89,96-99,105,112-113
+qase-jest/test/reporter.test.ts
+  s_ff5ee2f77c5e3f::t_2afc6336ceb290 109-123
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "5576d7355380573c48a3432aabe1ca45fa70f99a",
+  "prompts": {},
+  "sessions": {
+    "s_ff5ee2f77c5e3f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4c771a9b-0e28-4018-85e0-b18dbfa6d477",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
