@@ -48,7 +48,7 @@
     "qase-javascript-commons": "~2.7.0"
   },
   "peerDependencies": {
-    "vitest": "4.1.0"
+    "vitest": ">=3.0.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
