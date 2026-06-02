@@ -11,7 +11,7 @@
     "tinyspy": "^4.0.4",
     "typescript": "^5.9.3",
     "vitest": "^4.1.0",
-    "vitest-qase-reporter": "*",
+    "vitest-qase-reporter": "^1.4.0",
     "qase-javascript-commons": "*"
   },
   "dependencies": {

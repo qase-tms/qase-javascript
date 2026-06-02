@@ -4,7 +4,8 @@ run:
     passed: 13
     failed: 0
     skipped: 1
-    broken: 0
+    blocked: 0
+    invalid: 0
     muted: 0
 results:
 - title: Retrieve all users from JSONPlaceholder API
