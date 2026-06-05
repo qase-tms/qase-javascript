@@ -1,6 +1,6 @@
 {
   "name": "cypress-qase-reporter",
-  "version": "3.6.2",
+  "version": "3.6.3",
   "description": "Qase Cypress Reporter",
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "sideEffects": false,
@@ -40,7 +40,7 @@
     "url": "git+https://github.com/qase-tms/qase-javascript.git"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "scripts": {
     "build": "npm run clean && tsc --project tsconfig.build.json",
@@ -51,8 +51,8 @@
   "author": "Qase Team <support@qase.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "qase-javascript-commons": "~2.7.0",
-    "uuid": "^9.0.1"
+    "qase-javascript-commons": "~2.7.2",
+    "uuid": "11.1.1"
   },
   "peerDependencies": {
     "cypress": ">=8.0.0",

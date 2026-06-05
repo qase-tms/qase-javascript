@@ -1,6 +1,6 @@
 {
   "name": "wdio-qase-reporter",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Qase WebDriverIO Reporter",
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "sideEffects": false,
@@ -21,7 +21,7 @@
     "url": "git+https://github.com/qase-tms/qase-javascript.git"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "scripts": {
     "build": "npm run clean && tsc --project tsconfig.build.json",
@@ -35,8 +35,8 @@
     "@wdio/reporter": "^8.43.0",
     "@wdio/types": "^8.41.0",
     "csv-stringify": "^6.6.0",
-    "qase-javascript-commons": "~2.7.0",
+    "qase-javascript-commons": "~2.7.2",
     "strip-ansi": "^7.1.2",
-    "uuid": "^9.0.1"
+    "uuid": "11.1.1"
   }
 }

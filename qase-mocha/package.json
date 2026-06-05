@@ -1,6 +1,6 @@
 {
   "name": "mocha-qase-reporter",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Mocha Cypress Reporter",
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "sideEffects": false,
@@ -30,7 +30,7 @@
     "url": "git+https://github.com/qase-tms/qase-javascript.git"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "scripts": {
     "build": "npm run clean && tsc --project tsconfig.build.json",
@@ -41,10 +41,10 @@
   "author": "Qase Team <support@qase.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "mocha": "^11.7.5",
     "deasync-promise": "^1.0.1",
-    "qase-javascript-commons": "~2.7.0",
-    "uuid": "^9.0.1"
+    "mocha": "^11.7.5",
+    "qase-javascript-commons": "~2.7.2",
+    "uuid": "11.1.1"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

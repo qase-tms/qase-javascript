@@ -1,3 +1,15 @@
+## 2.7.2
+
+### Security
+
+- Bumped `uuid` from `^9.0.1` to `^11.1.1` to close the GHSA-9p95-fxx9-6q3q advisory (Missing buffer bounds check in v3/v5/v6 when `buf` is provided). `v4` is the only uuid function used here, but downstream `cypress-qase-reporter`, `playwright-qase-reporter` and friends transitively exposed the alert through this package's lockfile. v14 was considered but dropped — it publishes an ESM-only `dist-node/index.js` that breaks `require('uuid')` in CJS consumers and in jest.
+- Dropped `@types/uuid` devDependency; uuid 11+ ships its own types.
+
+### Changed
+
+- `engines.node` raised from `>=14` to `>=18`. Node 14/16 are EOL and uuid 11+ requires Node ≥18.
+- Bumped pinned ranges of internal API clients: `qase-api-client` `~1.1.1` → `~1.1.8`, `qase-api-v2-client` `~1.0.4` → `~1.0.8`.
+
 ## 2.7.1
 
 ### Fixed
