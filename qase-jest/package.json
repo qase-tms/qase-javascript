@@ -32,7 +32,7 @@
     "url": "git+https://github.com/qase-tms/qase-javascript.git"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "scripts": {
     "build": "npm run clean && tsc --project tsconfig.build.json",
@@ -46,7 +46,7 @@
     "lodash.get": "^4.4.2",
     "lodash.has": "^4.5.2",
     "qase-javascript-commons": "~2.7.0",
-    "uuid": "^9.0.1"
+    "uuid": "11.1.1"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

@@ -28,7 +28,7 @@
     "url": "git+https://github.com/qase-tms/qase-javascript.git"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "scripts": {
     "build": "npm run clean && tsc --project tsconfig.build.json",

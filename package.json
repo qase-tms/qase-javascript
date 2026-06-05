@@ -8,7 +8,7 @@
     "url": "git+https://github.com/qase-tms/qase-javascript.git"
   },
   "engines": {
-    "node": ">=14",
+    "node": ">=18",
     "npm": ">=11.5.1"
   },
   "author": "",
@@ -37,7 +37,25 @@
   "overrides": {
     "rollup": "4.59.0",
     "lodash": "4.17.23",
-    "handlebars": "4.7.9"
+    "handlebars": "4.7.9",
+    "uuid": "^11.1.1",
+    "tmp": "^0.2.6",
+    "fast-uri": "^3.1.2",
+    "fast-xml-builder": "^1.1.7",
+    "fast-xml-parser": "^5.7.0",
+    "basic-ftp": "^6.0.1",
+    "node-forge": "^1.4.0",
+    "serialize-javascript": "^7.0.5",
+    "flatted": "^3.4.2",
+    "underscore": "^1.13.8",
+    "@babel/plugin-transform-modules-systemjs": "^7.29.4",
+    "systeminformation": "^5.31.6",
+    "qs": "^6.15.2",
+    "ip-address": "^10.1.1",
+    "postcss": "^8.5.10",
+    "@tootallnate/once": "^2.0.1",
+    "diff": "^8.0.3",
+    "jose": "^4.15.5"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
