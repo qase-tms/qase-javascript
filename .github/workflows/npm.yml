@@ -45,10 +45,10 @@ jobs:
         node-version: '22'
     - run: npm install npm@latest
     - run: npm ci
-    # vitest 4.x ships native bindings via optionalDependencies; the lockfile
-    # only pins entries for the platform it was generated on (npm/cli#4828),
-    # so we pull the rest for the current runner without touching lockfile.
-    - run: npm install --no-save --include=optional
+    # vitest 4.x loads native rolldown bindings via optionalDependencies;
+    # lockfile pins them only for the platform it was generated on
+    # (npm/cli#4828), so we pull the Linux binding directly for the runner.
+    - run: npm install --no-save --no-package-lock @rolldown/binding-linux-x64-gnu
     - run: npm run build -ws --if-present
 
     - uses: actions/setup-python@v5
