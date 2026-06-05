@@ -45,6 +45,10 @@ jobs:
         node-version: '22'
     - run: npm install npm@latest
     - run: npm ci
+    # vitest 4.x ships native bindings via optionalDependencies; the lockfile
+    # only pins entries for the platform it was generated on (npm/cli#4828),
+    # so we pull the rest for the current runner without touching lockfile.
+    - run: npm install --no-save --include=optional
     - run: npm run build -ws --if-present
 
     - uses: actions/setup-python@v5
