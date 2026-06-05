@@ -1,3 +1,14 @@
+# vitest-qase-reporter@1.4.2
+
+## Security
+
+- Bumped `vitest` devDependency to `^4.1.0`, closing the critical advisory on Vitest UI server arbitrary file read/execute (GHSA-9crc-q9x8-hgqq). The runtime `peerDependency` is unchanged (`>=3.0.0`) — users can keep running on vitest 3.x; the bump only affects this package's own dev setup.
+
+## Changed
+
+- `engines.node` raised from `>=14` to `>=18`; Node 14/16 are EOL and vitest 4+ requires Node ≥18.
+- Bumped `qase-javascript-commons` pin from `~2.7.0` to `~2.7.2`.
+
 # vitest-qase-reporter@1.4.1
 
 ## Fixed

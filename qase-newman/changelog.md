@@ -1,3 +1,10 @@
+# newman-reporter-qase@2.3.1
+
+## Changed
+
+- `engines.node` raised from `>=14` to `>=18`; Node 14/16 are EOL.
+- Bumped `qase-javascript-commons` pin from `~2.7.0` to `~2.7.2`.
+
 # newman-reporter-qase@2.3.0
 
 ## Changed

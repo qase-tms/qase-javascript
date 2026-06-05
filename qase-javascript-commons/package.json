@@ -1,6 +1,6 @@
 {
   "name": "qase-javascript-commons",
-  "version": "2.7.1",
+  "version": "2.7.2",
   "description": "Qase JS Reporters",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -58,8 +58,8 @@
     "lodash.merge": "^4.6.2",
     "lodash.mergewith": "^4.6.2",
     "mime-types": "^2.1.35",
-    "qase-api-client": "~1.1.1",
-    "qase-api-v2-client": "~1.0.4",
+    "qase-api-client": "~1.1.8",
+    "qase-api-v2-client": "~1.0.8",
     "strip-ansi": "^6.0.1",
     "uuid": "11.1.1"
   },

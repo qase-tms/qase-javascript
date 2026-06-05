@@ -1,3 +1,14 @@
+# wdio-qase-reporter@1.5.2
+
+## Security
+
+- Bumped `uuid` from `^9.0.1` to `^11.1.1`, closing the advisory on uuid `v3/v5/v6` missing buffer bounds check that downstream consumers (e.g. Dependabot on user repos) saw via this reporter. Only `v4` is used here, so the advisory was not exploitable through this code path, but the version pin matters for users running `npm audit` on their projects.
+
+## Changed
+
+- `engines.node` raised from `>=14` to `>=18` to match uuid 11+ requirements; Node 14/16 are EOL.
+- Bumped `qase-javascript-commons` pin from `~2.7.0` to `~2.7.2`.
+
 # wdio-qase-reporter@1.5.1
 
 ## Fixed
