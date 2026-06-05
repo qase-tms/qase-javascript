@@ -1,0 +1,73 @@
+qase-playwright/package.json
+  s_a304720665af47::t_964f2dd68bcfa6 51
+  s_a304720665af47::t_ac6201842c9233 3
+qase-playwright/changelog.md
+  s_a304720665af47::t_8d8dad50b44b87 1-11
+qase-testcafe/package.json
+  s_a304720665af47::t_026557d2142c0e 3
+  s_a304720665af47::t_a9f713f7a75fc8 43
+qase-vitest/package.json
+  s_a304720665af47::t_30eb0f62d6145a 3
+  s_a304720665af47::t_28048ba1580b58 48
+qase-api-v2-client/package.json
+  s_a304720665af47::t_139fa71a2d04a8 3
+qase-wdio/package.json
+  s_a304720665af47::t_cdaa784d370705 38
+  s_a304720665af47::t_c53bc9ad6396cc 3
+qase-javascript-commons/changelog.md
+  s_a304720665af47::t_8d8af6336eaf2a 1-12
+qase-mocha/changelog.md
+  s_a304720665af47::t_1c6dc61c51fd3a 1-11
+qase-cucumberjs/changelog.md
+  s_a304720665af47::t_2595974775c4e3 1-11
+qase-cucumberjs/package.json
+  s_a304720665af47::t_038612a776d8d5 3
+  s_a304720665af47::t_09ba778fae1d46 43
+qase-mocha/package.json
+  s_a304720665af47::t_8886572ed94e8e 3
+  s_a304720665af47::t_90ba8f173535f5 46
+qase-javascript-commons/package.json
+  s_a304720665af47::t_41aaca145241c2 3
+  s_a304720665af47::t_4381b0ed856d73 61-62
+qase-cypress/package.json
+  s_a304720665af47::t_afbfb1bbabe861 54
+  s_a304720665af47::t_3b8e504666b137 3
+qase-cypress/changelog.md
+  s_a304720665af47::t_009f30805d174a 1-11
+qase-wdio/changelog.md
+  s_a304720665af47::t_7b46603f7a6a9f 1-11
+package-lock.json
+  ai_agent 28129,28148,28168,28172,28224,28227,28253,28265-28266,28288,28293,28315,28320,28342,28345,28379,28383,28402,28405,28424,28427,28447,28453
+qase-jest/package.json
+  s_a304720665af47::t_204c10caca657f 48
+  s_a304720665af47::t_1d53ba188fe6c5 3
+qase-newman/package.json
+  s_a304720665af47::t_bca180ef078d17 3
+  s_a304720665af47::t_7c3c62d7e7aab0 42
+qase-testcafe/changelog.md
+  s_a304720665af47::t_1a78f6752daae4 1-11
+qase-vitest/changelog.md
+  s_a304720665af47::t_27b6d98ae0b23e 1-11
+qase-api-client/package.json
+  s_a304720665af47::t_5caf3068a991fa 3
+qase-jest/changelog.md
+  s_a304720665af47::t_f3591f2f449669 1-11
+qase-newman/changelog.md
+  s_a304720665af47::t_a6a719774367cc 1-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "541f92432be2a61643162d1b470c80cef3d4e175",
+  "prompts": {},
+  "sessions": {
+    "s_a304720665af47": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6a53e18-1db1-4a2d-bc7b-8dff11d21978",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
