@@ -1,6 +1,6 @@
 {
   "name": "qase-javascript-commons",
-  "version": "2.7.2",
+  "version": "2.7.3",
   "description": "Qase JS Reporters",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -35,7 +35,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qase-tms/qase-javascript.git"
+    "url": "git+https://github.com/qase-tms/qase-javascript.git",
+    "directory": "qase-javascript-commons"
   },
   "engines": {
     "node": ">=18"
@@ -58,8 +59,8 @@
     "lodash.merge": "^4.6.2",
     "lodash.mergewith": "^4.6.2",
     "mime-types": "^2.1.35",
-    "qase-api-client": "~1.1.8",
-    "qase-api-v2-client": "~1.0.8",
+    "qase-api-client": "~1.1.9",
+    "qase-api-v2-client": "~1.0.9",
     "strip-ansi": "^6.0.1",
     "uuid": "11.1.1"
   },

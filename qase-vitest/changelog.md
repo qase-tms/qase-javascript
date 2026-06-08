@@ -1,3 +1,9 @@
+# vitest-qase-reporter@1.4.3
+
+## Fixed
+
+- Added `repository.directory: "qase-vitest"` so npmjs.com correctly resolves relative links in the README. Bumped `qase-javascript-commons` pin to `~2.7.3`.
+
 # vitest-qase-reporter@1.4.2
 
 ## Security
