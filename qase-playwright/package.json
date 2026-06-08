@@ -1,6 +1,6 @@
 {
   "name": "playwright-qase-reporter",
-  "version": "2.5.2",
+  "version": "2.5.3",
   "description": "Qase TMS Playwright Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -33,7 +33,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qase-tms/qase-javascript.git"
+    "url": "git+https://github.com/qase-tms/qase-javascript.git",
+    "directory": "qase-playwright"
   },
   "engines": {
     "node": ">=18"
@@ -48,7 +49,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "chalk": "^4.1.2",
-    "qase-javascript-commons": "~2.7.2",
+    "qase-javascript-commons": "~2.7.3",
     "uuid": "11.1.1"
   },
   "peerDependencies": {

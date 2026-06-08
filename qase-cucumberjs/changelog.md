@@ -1,3 +1,9 @@
+# cucumberjs-qase-reporter@2.4.3
+
+## Fixed
+
+- Added `repository.directory: "qase-cucumberjs"` so npmjs.com correctly resolves relative links in the README. Bumped `qase-javascript-commons` pin to `~2.7.3`.
+
 # cucumberjs-qase-reporter@2.4.2
 
 ## Security

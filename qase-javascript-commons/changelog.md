@@ -1,3 +1,9 @@
+## 2.7.3
+
+### Fixed
+
+- Added `repository.directory: "qase-javascript-commons"` so npmjs.com correctly resolves relative links in this package's README (previously rendered as broken `github.com/.../blob/<path>` URLs without a branch).
+
 ## 2.7.2
 
 ### Security

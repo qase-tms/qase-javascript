@@ -1,3 +1,9 @@
+# wdio-qase-reporter@1.5.3
+
+## Fixed
+
+- Added `repository.directory: "qase-wdio"` so npmjs.com correctly resolves relative links in the README. Bumped `qase-javascript-commons` pin to `~2.7.3`.
+
 # wdio-qase-reporter@1.5.2
 
 ## Security

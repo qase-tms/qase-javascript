@@ -1,3 +1,9 @@
+# testcafe-reporter-qase@2.6.2
+
+## Fixed
+
+- Added `repository.directory: "qase-testcafe"` so npmjs.com correctly resolves relative links in the README. Bumped `qase-javascript-commons` pin to `~2.7.3`.
+
 # testcafe-reporter-qase@2.6.1
 
 ## Security

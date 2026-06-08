@@ -1,3 +1,9 @@
+# jest-qase-reporter@2.5.3
+
+## Fixed
+
+- Added `repository.directory: "qase-jest"` so npmjs.com correctly resolves relative links in the README. Bumped `qase-javascript-commons` pin to `~2.7.3`.
+
 # jest-qase-reporter@2.5.2
 
 ## Security

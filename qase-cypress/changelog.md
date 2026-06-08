@@ -1,3 +1,9 @@
+# cypress-qase-reporter@3.6.4
+
+## Fixed
+
+- Added `repository.directory: "qase-cypress"` so npmjs.com correctly resolves relative links in the README (links to `../examples/`, `docs/*.md`, etc. previously rendered as broken `github.com/.../blob/<path>` URLs without a branch). Bumped `qase-javascript-commons` pin to `~2.7.3`.
+
 # cypress-qase-reporter@3.6.3
 
 ## Security
