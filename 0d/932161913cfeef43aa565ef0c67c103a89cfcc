@@ -1,0 +1,85 @@
+qase-testcafe/changelog.md
+  s_a304720665af47::t_d889a4a79cd13d 1-6
+package-lock.json
+  s_a304720665af47::t_6ca676e4d1f457 28129,28148,28168,28172,28224,28227,28253,28265-28266,28288,28293,28315,28320,28342,28345,28379,28383,28402,28405,28424,28427,28447,28453
+qase-vitest/changelog.md
+  s_a304720665af47::t_5b9950173f129f 1-6
+qase-playwright/package.json
+  s_a304720665af47::t_63881f425e8e54 3
+  s_a304720665af47::t_f51b4c7b94e4bd 36-37
+  s_a304720665af47::t_4d6158c40a9af2 52
+qase-javascript-commons/package.json
+  s_a304720665af47::t_437ad141178823 3
+  s_a304720665af47::t_a0cad54d1edf72 38-39
+  s_a304720665af47::t_9c1e3bd0e8761e 62-63
+qase-testcafe/package.json
+  s_a304720665af47::t_cc64989a15178a 29-30
+  s_a304720665af47::t_2a1dd2d501a1c0 44
+  s_a304720665af47::t_86e14ab355eee7 3
+qase-vitest/package.json
+  s_a304720665af47::t_62ab6a9e131f1a 28-29
+  s_a304720665af47::t_6cc8c03aa16322 3
+  s_a304720665af47::t_6f5dd510a3f6e4 49
+qase-jest/changelog.md
+  s_a304720665af47::t_aba1f28cab2aa3 1-6
+qase-mocha/package.json
+  s_a304720665af47::t_e3f5131c05e0bb 3
+  s_a304720665af47::t_3aa031a1d357fc 47
+  s_a304720665af47::t_7caed79a6f5cde 30-31
+qase-mocha/changelog.md
+  s_a304720665af47::t_a8e2c2f1fc0021 1-6
+qase-api-client/package.json
+  s_a304720665af47::t_7cdfc68a0a2e0a 3
+  s_a304720665af47::t_47e0a717b97397 13-14
+qase-api-v2-client/package.json
+  s_a304720665af47::t_6f9daac01354c8 3
+  s_a304720665af47::t_14cbfab5489f4f 13-14
+qase-cypress/package.json
+  s_a304720665af47::t_d23642acd8beb7 40-41
+  s_a304720665af47::t_df5b06f43284bb 55
+  s_a304720665af47::t_0c7cf00255efc9 3
+qase-cucumberjs/changelog.md
+  s_a304720665af47::t_6b09466672a589 1-6
+qase-cucumberjs/package.json
+  s_a304720665af47::t_70a871c01aa55c 28-29
+  s_a304720665af47::t_0c1752a823f079 3
+  s_a304720665af47::t_2c215337bdca43 44
+qase-newman/package.json
+  s_a304720665af47::t_5858c792bc1320 43
+  s_a304720665af47::t_d5a33f2b89e319 28-29
+  s_a304720665af47::t_c95fe6edacc588 3
+qase-wdio/package.json
+  s_a304720665af47::t_b9abbcff24a105 3
+  s_a304720665af47::t_2392fc0a4a2708 21-22
+  s_a304720665af47::t_7eb155aed55208 39
+qase-javascript-commons/changelog.md
+  s_a304720665af47::t_b350319d9b5a05 1-6
+qase-wdio/changelog.md
+  s_a304720665af47::t_20f49ace885859 1-6
+qase-newman/changelog.md
+  s_a304720665af47::t_6b48afd30da378 1-6
+qase-jest/package.json
+  s_a304720665af47::t_ea1327c6712538 32-33
+  s_a304720665af47::t_96391f1546e24d 3
+  s_a304720665af47::t_9af4e09af4638b 49
+qase-cypress/changelog.md
+  s_a304720665af47::t_f2bf1a79a6bc61 1-6
+qase-playwright/changelog.md
+  s_a304720665af47::t_687c529572938f 1-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "0d932161913cfeef43aa565ef0c67c103a89cfcc",
+  "prompts": {},
+  "sessions": {
+    "s_a304720665af47": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6a53e18-1db1-4a2d-bc7b-8dff11d21978",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
