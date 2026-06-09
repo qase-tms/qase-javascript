@@ -1,5 +1,6 @@
 import { PickleTag } from '@cucumber/messages';
 import { parseProjectMappingFromTags } from 'qase-javascript-commons';
+import { filterPositiveIds } from 'qase-javascript-commons/internal';
 import { TestMetadata } from '../models';
 
 const qaseIdRegExp = /^@[Qq]-?(\d+)$/;
@@ -31,13 +32,17 @@ export class TagParser {
 
     for (const tag of tags) {
       if (qaseIdRegExp.test(tag.name)) {
-        metadata.ids.push(Number(tag.name.replace(/^@[Qq]-?/, '')));
+        metadata.ids.push(
+          ...filterPositiveIds([Number(tag.name.replace(/^@[Qq]-?/, ''))]),
+        );
         continue;
       }
 
       if (newQaseIdRegExp.test(tag.name)) {
         const idsStr = tag.name.replace(/^@[Qq]ase[Ii][Dd]=/, '');
-        metadata.ids.push(...idsStr.split(',').map((s) => Number(s.trim())));
+        metadata.ids.push(
+          ...filterPositiveIds(idsStr.split(',').map((s) => Number(s.trim()))),
+        );
         continue;
       }
 

@@ -1,3 +1,9 @@
+# jest-qase-reporter@2.5.4
+
+## Fixed
+
+- Qase test case IDs that are `<= 0` (e.g. an accidental `(Qase ID: 0)` in a test title) are now dropped with a warning instead of being sent to the API, which previously rejected the whole batch with HTTP 400. The signature derivation path also filters non-positive IDs to stay consistent with the reported IDs. Bumped `qase-javascript-commons` pin to `~2.7.4`.
+
 # jest-qase-reporter@2.5.3
 
 ## Fixed

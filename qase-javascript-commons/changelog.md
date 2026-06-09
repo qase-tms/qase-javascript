@@ -1,3 +1,9 @@
+## 2.7.4
+
+### Fixed
+
+- Qase test case IDs that are `<= 0` (e.g. an accidental `(Qase ID: 0)` in a test title or `@qaseid(0)` tag) no longer cause the API to reject the whole result batch with HTTP 400. The invalid ID is dropped with a warning and the result is sent without an ID, exactly as if no ID had been specified. Filtering happens in a new internal `filterPositiveIds()` helper applied by `parseQaseIdsFromString`, `parseProjectMappingFromTitle`, and `parseProjectMappingFromTags`. The warning routes through the provided `LoggerInterface` (logged at INFO level with a `Warning:` prefix in the message) or falls back to `console.warn` when no logger is available.
+
 ## 2.7.3
 
 ### Fixed

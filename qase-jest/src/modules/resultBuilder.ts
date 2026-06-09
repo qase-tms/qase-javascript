@@ -12,6 +12,7 @@ import {
   TestStepType,
 } from 'qase-javascript-commons';
 import {
+  filterPositiveIds,
   normalizeSuitePart,
   removeQaseIdsFromTitle,
 } from 'qase-javascript-commons/internal';
@@ -173,6 +174,9 @@ export class ResultBuilder {
 
   private static getCaseId(title: string): number[] {
     const m = title.match(QASE_ID_REGEXP);
-    return m?.[1] ? m[1].split(',').map((id) => Number(id)) : [];
+    if (!m?.[1]) {
+      return [];
+    }
+    return filterPositiveIds(m[1].split(',').map((id) => Number(id)));
   }
 }

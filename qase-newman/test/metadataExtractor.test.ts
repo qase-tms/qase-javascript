@@ -17,6 +17,14 @@ describe('MetadataExtractor.getCaseIds', () => {
     expect(MetadataExtractor.getCaseIds(eventListFromExec(['// qase: 1,2,3']))).toEqual([1, 2, 3]);
   });
 
+  it('filters out zero from `// qase: 1,0,2`', () => {
+    expect(MetadataExtractor.getCaseIds(eventListFromExec(['// qase: 1,0,2']))).toEqual([1, 2]);
+  });
+
+  it('returns [] for `// qase: 0`', () => {
+    expect(MetadataExtractor.getCaseIds(eventListFromExec(['// qase: 0']))).toEqual([]);
+  });
+
   it('returns [] for non-test event listeners', () => {
     expect(MetadataExtractor.getCaseIds(eventListFromExec(['// qase: 1'], 'prerequest'))).toEqual([]);
   });
@@ -60,6 +68,16 @@ describe('MetadataExtractor.getProjectMapping', () => {
         eventListFromExec(['// qase PROJ: 1', '// qase PROJ: 2,3']),
       ),
     ).toEqual({ PROJ: [1, 2, 3] });
+  });
+
+  it('filters zero: `// qase PROJ1: 0,5` returns { PROJ1: [5] }', () => {
+    expect(MetadataExtractor.getProjectMapping(eventListFromExec(['// qase PROJ1: 0,5'])))
+      .toEqual({ PROJ1: [5] });
+  });
+
+  it('drops project entirely when all ids are zero: `// qase PROJ1: 0` returns {}', () => {
+    expect(MetadataExtractor.getProjectMapping(eventListFromExec(['// qase PROJ1: 0'])))
+      .toEqual({});
   });
 });
 
