@@ -1,4 +1,6 @@
 import type { TestopsProjectMapping } from '../models';
+import { filterPositiveIds } from '../internal/filter-positive-ids';
+import { LoggerInterface } from './logger';
 
 /**
  * Result of parsing project/ID markers from a test title.
@@ -22,8 +24,8 @@ export interface ParsedTagsProjectMapping {
   projectMapping: TestopsProjectMapping;
 }
 
-/** Matches @qaseid(123) or @qaseid.PROJ1(123,124). */
-const QASEID_TAG_REGEXP = /@qaseid(?:\.([A-Za-z0-9_]+))?\(([\d,]+)\)/gi;
+/** Matches @qaseid(123) or @qaseid.PROJ1(123,124). Allows negative numbers. */
+const QASEID_TAG_REGEXP = /@qaseid(?:\.([A-Za-z0-9_]+))?\(([-\d,]+)\)/gi;
 
 /**
  * Parse @qaseid and @qaseid.PROJECT tags into legacy IDs and project mapping.
@@ -31,7 +33,10 @@ const QASEID_TAG_REGEXP = /@qaseid(?:\.([A-Za-z0-9_]+))?\(([\d,]+)\)/gi;
  * @param tags — e.g. ["@qaseid(1,2)", "@qaseid.PROJ2(3)"]
  * @returns legacyIds from @qaseid(...), projectMapping from @qaseid.PROJ(...)
  */
-export function parseProjectMappingFromTags(tags: string[]): ParsedTagsProjectMapping {
+export function parseProjectMappingFromTags(
+  tags: string[],
+  logger?: LoggerInterface,
+): ParsedTagsProjectMapping {
   const legacyIds: number[] = [];
   const projectMapping: TestopsProjectMapping = {};
 
@@ -41,7 +46,11 @@ export function parseProjectMappingFromTags(tags: string[]): ParsedTagsProjectMa
     while ((m = re.exec(tag)) !== null) {
       const projectCode = m[1]; // undefined for @qaseid(1)
       const idsStr = m[2] ?? '';
-      const ids = idsStr.split(',').map((s) => parseInt(s, 10)).filter((n) => !Number.isNaN(n));
+      const rawIds = idsStr
+        .split(',')
+        .map((s) => parseInt(s, 10))
+        .filter((n) => !Number.isNaN(n));
+      const ids = filterPositiveIds(rawIds, logger);
 
       if (!projectCode || projectCode.toUpperCase() === 'ID') {
         legacyIds.push(...ids);
@@ -55,8 +64,8 @@ export function parseProjectMappingFromTags(tags: string[]): ParsedTagsProjectMa
   return { legacyIds, projectMapping };
 }
 
-/** Matches "(Qase ID: 123)" or "(Qase PROJ1: 123,124)" — optional space after "Qase". */
-const QASE_MARKER_REGEXP = /\(Qase\s+([A-Za-z0-9_]+):\s*([\d,]+)\)/gi;
+/** Matches "(Qase ID: 123)" or "(Qase PROJ1: 123,124)" — optional space after "Qase". Allows negative numbers. */
+const QASE_MARKER_REGEXP = /\(Qase\s+([A-Za-z0-9_]+):\s*([-\d,]+)\)/gi;
 
 /**
  * Parse multi-project and legacy Qase ID markers from a test title.
@@ -66,7 +75,10 @@ const QASE_MARKER_REGEXP = /\(Qase\s+([A-Za-z0-9_]+):\s*([\d,]+)\)/gi;
  * @param title — test title that may contain "(Qase ID: …)" or "(Qase PROJECT_CODE: …)".
  * @returns legacyIds, projectMapping, and cleanedTitle with all markers stripped.
  */
-export function parseProjectMappingFromTitle(title: string): ParsedProjectMapping {
+export function parseProjectMappingFromTitle(
+  title: string,
+  logger?: LoggerInterface,
+): ParsedProjectMapping {
   const legacyIds: number[] = [];
   const projectMapping: TestopsProjectMapping = {};
   let cleanedTitle = title;
@@ -76,7 +88,11 @@ export function parseProjectMappingFromTitle(title: string): ParsedProjectMappin
   while ((m = re.exec(title)) !== null) {
     const projectCode = m[1] ?? '';
     const idsStr = m[2] ?? '';
-    const ids = idsStr.split(',').map((s) => parseInt(s, 10)).filter((n) => !Number.isNaN(n));
+    const rawIds = idsStr
+      .split(',')
+      .map((s) => parseInt(s, 10))
+      .filter((n) => !Number.isNaN(n));
+    const ids = filterPositiveIds(rawIds, logger);
 
     if (projectCode.toUpperCase() === 'ID') {
       legacyIds.push(...ids);

@@ -1,5 +1,6 @@
 import { EventList, Item, PropertyBase, PropertyBaseDefinition } from 'postman-collection';
 import { TestopsProjectMapping } from 'qase-javascript-commons';
+import { filterPositiveIds } from 'qase-javascript-commons/internal';
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class MetadataExtractor {
@@ -20,7 +21,7 @@ export class MetadataExtractor {
         });
       }
     });
-    return ids;
+    return filterPositiveIds(ids);
   }
 
   static getProjectMapping(eventList: EventList): TestopsProjectMapping {
@@ -33,7 +34,11 @@ export class MetadataExtractor {
           while ((m = re.exec(line)) !== null) {
             const projectCode = m[1]?.trim();
             const idsStr = (m[2] ?? '').replace(/\s/g, '');
-            const ids = idsStr.split(',').map((s) => parseInt(s, 10)).filter((n) => !Number.isNaN(n));
+            const rawIds = idsStr
+              .split(',')
+              .map((s) => parseInt(s, 10))
+              .filter((n) => !Number.isNaN(n));
+            const ids = filterPositiveIds(rawIds);
             if (projectCode && projectCode.toUpperCase() !== 'ID' && ids.length > 0) {
               const existing = projectMapping[projectCode] ?? [];
               projectMapping[projectCode] = [...existing, ...ids];

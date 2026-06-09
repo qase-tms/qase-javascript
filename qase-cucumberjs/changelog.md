@@ -1,3 +1,9 @@
+# cucumberjs-qase-reporter@2.4.4
+
+## Fixed
+
+- Qase test case IDs that are `<= 0` (e.g. `@Q0` or `@QaseID=0`) are now dropped with a warning instead of being sent to the API, which previously rejected the whole batch with HTTP 400. Bumped `qase-javascript-commons` pin to `~2.7.4`.
+
 # cucumberjs-qase-reporter@2.4.3
 
 ## Fixed

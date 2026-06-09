@@ -1,3 +1,9 @@
+# newman-reporter-qase@2.3.3
+
+## Fixed
+
+- Qase test case IDs that are `<= 0` (e.g. `// qase: 0` in a Postman test script) are now dropped with a warning instead of being sent to the API, which previously rejected the whole batch with HTTP 400. Bumped `qase-javascript-commons` pin to `~2.7.4`.
+
 # newman-reporter-qase@2.3.2
 
 ## Fixed
