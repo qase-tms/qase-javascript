@@ -1,0 +1,23 @@
+qase-javascript-commons/src/internal/filter-positive-ids.ts
+  s_016b217af28a6f::t_7a5341f9054ff3 1-39
+qase-javascript-commons/src/internal/index.ts
+  s_016b217af28a6f::t_8fae9cef3cb132 7
+qase-javascript-commons/test/internal/filter-positive-ids.test.ts
+  s_016b217af28a6f::t_3633d98ee347ff 1-67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "1d3b2e07a4aa976f83367e076db2f5feb83301f3",
+  "prompts": {},
+  "sessions": {
+    "s_016b217af28a6f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "36d1be6a-64cf-4315-9484-e78a3ee85b53",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
