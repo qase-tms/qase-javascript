@@ -1,0 +1,36 @@
+qase-newman/package.json
+  s_016b217af28a6f::t_0db5a984860fd7 43
+  s_016b217af28a6f::t_baab4706b6ff9b 3
+qase-jest/package.json
+  s_016b217af28a6f::t_8bea5d98f03f19 49
+  s_016b217af28a6f::t_a2e1ef6362e0a6 3
+qase-cucumberjs/changelog.md
+  s_016b217af28a6f::t_f0347f0dd2f131 1-6
+qase-cucumberjs/package.json
+  s_016b217af28a6f::t_891c1c641ad0ba 3
+  s_016b217af28a6f::t_b95475c493ea8d 44
+qase-javascript-commons/package.json
+  s_016b217af28a6f::t_9c871dd695d926 3
+qase-jest/changelog.md
+  s_016b217af28a6f::t_3bb8ec0d17bb1f 1-6
+qase-javascript-commons/changelog.md
+  s_016b217af28a6f::t_cc8093107740bb 1-6
+qase-newman/changelog.md
+  s_016b217af28a6f::t_bd52b16487310b 1-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "4998bda8b8e0b6d572c1b75288c3890fc2744010",
+  "prompts": {},
+  "sessions": {
+    "s_016b217af28a6f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "36d1be6a-64cf-4315-9484-e78a3ee85b53",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": null
+    }
+  }
+}
