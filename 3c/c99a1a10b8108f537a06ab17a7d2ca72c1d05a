@@ -1,0 +1,23 @@
+qase-cucumberjs/src/modules/tagParser.ts
+  s_016b217af28a6f::t_5be2f63fd5d4be 35-37,43-45
+  s_016b217af28a6f::t_fbac0d629fc25e 3
+qase-jest/src/modules/resultBuilder.ts
+  s_016b217af28a6f::t_3a42c8cd72194e 15
+  s_016b217af28a6f::t_e4227717449e1f 177-180
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "3cc99a1a10b8108f537a06ab17a7d2ca72c1d05a",
+  "prompts": {},
+  "sessions": {
+    "s_016b217af28a6f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "36d1be6a-64cf-4315-9484-e78a3ee85b53",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
