@@ -1,0 +1,24 @@
+qase-newman/test/metadataExtractor.test.ts
+  s_016b217af28a6f::t_7e9a98a0c864fb 72-81
+  s_016b217af28a6f::t_5290117f6160f3 20-27
+qase-newman/src/modules/metadataExtractor.ts
+  s_016b217af28a6f::t_eac97f605901e0 3
+  s_016b217af28a6f::t_0e8b37e977ccb6 24
+  s_016b217af28a6f::t_fc51ae76bdb819 37-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "17ac3bab21c984a5189e39ddab1707df5b6b8bd8",
+  "prompts": {},
+  "sessions": {
+    "s_016b217af28a6f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "36d1be6a-64cf-4315-9484-e78a3ee85b53",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
