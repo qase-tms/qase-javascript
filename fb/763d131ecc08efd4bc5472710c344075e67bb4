@@ -1,0 +1,30 @@
+qase-javascript-commons/src/internal/ids-parser.ts
+  s_016b217af28a6f::t_d21dde302ee1dc 1-3,7,11-14,18,22
+qase-javascript-commons/src/utils/project-mapping-utils.ts
+  s_016b217af28a6f::t_45df2a4ee87e63 27-28
+  s_016b217af28a6f::t_e373498bf5b497 36-39,49-53
+  s_016b217af28a6f::t_f56abb511294fc 78-81,91-95
+  s_016b217af28a6f::t_ff32650dfea22a 67-68
+  s_016b217af28a6f::t_31d0e3f05c5c1d 2-3
+qase-javascript-commons/test/utils/project-mapping-utils.test.ts
+  s_016b217af28a6f::t_cf091dad429628 1-93
+qase-javascript-commons/test/internal/ids-parser.test.ts
+  s_016b217af28a6f::t_69a009f0c243e2 1
+  s_016b217af28a6f::t_9d9f0b94ff6bd3 28-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "fb763d131ecc08efd4bc5472710c344075e67bb4",
+  "prompts": {},
+  "sessions": {
+    "s_016b217af28a6f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "36d1be6a-64cf-4315-9484-e78a3ee85b53",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
