@@ -1,0 +1,41 @@
+qase-playwright/changelog.md
+  s_016b217af28a6f::t_394872c3cf4985 1-6
+qase-wdio/src/wdio.ts
+  s_016b217af28a6f::t_02781b7898a82c 3
+  s_016b217af28a6f::t_98c78e363620b0 86-89
+qase-playwright/test/playwright.test.ts
+  s_016b217af28a6f::t_b803f5474075ec 208-268
+qase-wdio/test/wdio.test.ts
+  s_016b217af28a6f::t_53e50867146829 1-50
+package-lock.json
+  s_016b217af28a6f::t_580d32d4785b15 28379,28383,28447,28453
+qase-wdio/package.json
+  s_016b217af28a6f::t_cd6f6c9a59c37d 3
+  s_016b217af28a6f::t_db63d005ee6807 39
+qase-wdio/changelog.md
+  s_016b217af28a6f::t_68f11cfe2d9eb2 1-6
+qase-playwright/src/playwright.ts
+  s_016b217af28a6f::t_14032e06fee384 83-86
+  s_016b217af28a6f::t_e6d86d4ae2976b 103-109
+  s_016b217af28a6f::t_ac769c3c913bdd 6
+  s_016b217af28a6f::t_0fe063f7a68776 64
+qase-playwright/package.json
+  s_016b217af28a6f::t_0f499fed986fb0 3
+  s_016b217af28a6f::t_452cc7375d5076 52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "e7d420246f1c79e977a2e5eca5938f94e8e5a27e",
+  "prompts": {},
+  "sessions": {
+    "s_016b217af28a6f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "36d1be6a-64cf-4315-9484-e78a3ee85b53",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
