@@ -1,5 +1,6 @@
 import { events } from './events';
 import { QaseStep, StepFunction, formatTitleWithProjectMapping } from 'qase-javascript-commons';
+import { filterPositiveIds } from 'qase-javascript-commons/internal';
 
 /**
  * Send event to reporter
@@ -82,7 +83,10 @@ qase.projects = (mapping: ProjectMapping, name: string): string => {
  * });
  */
 qase.id = (value: number | number[]) => {
-  sendEvent(events.addQaseID, { ids: Array.isArray(value) ? value : [value] });
+  const ids = filterPositiveIds(Array.isArray(value) ? value : [value]);
+  if (ids.length > 0) {
+    sendEvent(events.addQaseID, { ids });
+  }
   return this;
 };
 

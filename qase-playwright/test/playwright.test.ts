@@ -205,4 +205,64 @@ describe('qase API', () => {
       expect(result).toBe('Click button QaseExpRes:: Button should be clicked QaseData:: Button data');
     });
   });
-}); 
+
+  describe('qase with non-positive ID (regression test)', () => {
+    it('drops zero before passing to PlaywrightQaseReporter.addIds, title is preserved for back-compat', () => {
+      const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+      const title = qase(0, 'Test Name');
+      expect(title).toBe('Test Name (Qase ID: 0)'); // unchanged
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('0'));
+      warn.mockRestore();
+    });
+
+    it('keeps positive IDs and drops zero from a mixed list, title uses original IDs', () => {
+      const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+      const title = qase([1, 0, 2], 'Test Name');
+      expect(title).toBe('Test Name (Qase ID: 1,0,2)');
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('0'));
+      warn.mockRestore();
+    });
+  });
+
+  describe('qase.id with non-positive ID (regression test)', () => {
+    it('does not attach metadata when ID is zero', () => {
+      const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+      testInfoMock.attach.mockClear();
+      qase.id(0);
+      expect(testInfoMock.attach).not.toHaveBeenCalled();
+      warn.mockRestore();
+    });
+
+    it('drops zero from a mixed list and attaches only positive IDs', () => {
+      const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+      testInfoMock.attach.mockClear();
+      qase.id([1, 0, 2]);
+      expect(testInfoMock.attach).toHaveBeenCalledWith('qase-metadata.json', {
+        contentType: 'application/qase.metadata+json',
+        body: Buffer.from(JSON.stringify({ ids: [1, 2] }), 'utf8'),
+      });
+      warn.mockRestore();
+    });
+  });
+
+  describe('qase.projects with non-positive ID (regression test)', () => {
+    it('omits a project entirely when all of its IDs are non-positive', () => {
+      const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+      testInfoMock.attach.mockClear();
+      qase.projects({ PROJ1: [0], PROJ2: [5] });
+      expect(testInfoMock.attach).toHaveBeenCalledWith('qase-metadata.json', {
+        contentType: 'application/qase.metadata+json',
+        body: Buffer.from(JSON.stringify({ projectMapping: { PROJ2: [5] } }), 'utf8'),
+      });
+      warn.mockRestore();
+    });
+
+    it('does not attach metadata when every project is empty after filtering', () => {
+      const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+      testInfoMock.attach.mockClear();
+      qase.projects({ PROJ1: [0], PROJ2: [-1] });
+      expect(testInfoMock.attach).not.toHaveBeenCalled();
+      warn.mockRestore();
+    });
+  });
+});

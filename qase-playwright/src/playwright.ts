@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { PlaywrightQaseReporter } from './reporter';
 import * as path from 'path';
 import { getMimeTypes, formatTitleWithProjectMapping } from 'qase-javascript-commons';
+import { filterPositiveIds } from 'qase-javascript-commons/internal';
 
 export const ReporterContentType = 'application/qase.metadata+json';
 const defaultContentType = 'application/octet-stream';
@@ -60,7 +61,7 @@ export const qase = (
 
   const newName = `${name} (Qase ID: ${caseIds.join(',')})`;
 
-  PlaywrightQaseReporter.addIds(ids, newName);
+  PlaywrightQaseReporter.addIds(filterPositiveIds(ids), newName);
 
   return newName;
 };
@@ -79,9 +80,10 @@ export const qase = (
  *
  */
 qase.id = function(value: number | number[]) {
-  addMetadata({
-    ids: Array.isArray(value) ? value : [value],
-  });
+  const ids = filterPositiveIds(Array.isArray(value) ? value : [value]);
+  if (ids.length > 0) {
+    addMetadata({ ids });
+  }
   return this;
 };
 
@@ -98,7 +100,13 @@ qase.projects = function(mapping: ProjectMapping) {
   const normalized: ProjectMapping = {};
   for (const [code, ids] of Object.entries(mapping)) {
     if (Array.isArray(ids) && ids.length > 0) {
-      normalized[code] = ids.map((id) => (typeof id === 'number' ? id : parseInt(String(id), 10))).filter((n) => !Number.isNaN(n));
+      const parsed = ids
+        .map((id) => (typeof id === 'number' ? id : parseInt(String(id), 10)))
+        .filter((n) => !Number.isNaN(n));
+      const filtered = filterPositiveIds(parsed);
+      if (filtered.length > 0) {
+        normalized[code] = filtered;
+      }
     }
   }
   if (Object.keys(normalized).length > 0) {
