@@ -94,11 +94,24 @@ export interface TestCaseCreate {
      */
     'milestone_id'?: number;
     /**
-     * 
+     * Deprecated, use `isManual` and `isToBeAutomated` instead. Encodes the test case automation state as a single integer: `0` = manual, `1` = manual planned to be automated, `2` = automated. If both `automation` and `isManual`/`isToBeAutomated` are provided, `isManual` and `isToBeAutomated` take precedence.
+     * @type {number}
+     * @memberof TestCaseCreate
+     * @deprecated
+     */
+    'automation'?: number;
+    /**
+     * `1` if the case is manual, `0` if it is automated. Combined with `isToBeAutomated`, replaces the deprecated `automation` field.
      * @type {number}
      * @memberof TestCaseCreate
      */
-    'automation'?: number;
+    'isManual'?: number;
+    /**
+     * `1` if a manual case is planned to be automated, `0` otherwise. Only meaningful when `isManual = 1`; ignored when `isManual = 0`.
+     * @type {number}
+     * @memberof TestCaseCreate
+     */
+    'isToBeAutomated'?: number;
     /**
      * 
      * @type {number}
@@ -143,7 +156,7 @@ export interface TestCaseCreate {
      */
     'parameters'?: Array<TestCaseParameterCreate> | null;
     /**
-     * A map of custom fields values (id => value)
+     * Custom field values keyed by the field\'s project-scoped `internal_id` (see `GET /custom_field`). Values are always **scalar strings**; arrays, objects or non-scalars are rejected.  | Field type           | Value format                              | Example                 | |----------------------|-------------------------------------------|-------------------------| | `string`, `text`     | Plain string                              | `\"hello\"`               | | `number`             | Numeric string                            | `\"42\"`                  | | `url`                | Valid URL                                 | `\"https://qase.io\"`     | | `datetime`           | Absolute date (ISO 8601 recommended)      | `\"2026-04-29T15:00:00Z\"`| | `selectbox`, `radio` | Option `id` as string                     | `\"1\"`                   | | `multiselect`        | Comma-separated option `id`s (no spaces)  | `\"1,2,3\"`               | | `checkbox`           | `\"1\"` to check, `\"\"` to uncheck           | `\"1\"`                   | | `user`               | Team member `internal_id` as string       | `\"42\"`                  |  Validation: all required fields without a default value must be present and non-empty; unknown `internal_id`s are rejected; option-based values must reference an existing option.  Note: a `required` checkbox without a default cannot be unchecked via the API — set a default or clear `required` in workspace settings. 
      * @type {{ [key: string]: string; }}
      * @memberof TestCaseCreate
      */
