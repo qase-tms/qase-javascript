@@ -17,7 +17,9 @@ Name | Type | Description | Notes
 **layer** | **number** |  | [optional] [default to undefined]
 **is_flaky** | **number** |  | [optional] [default to undefined]
 **behavior** | **number** |  | [optional] [default to undefined]
-**automation** | **number** |  | [optional] [default to undefined]
+**automation** | **number** | Deprecated, use &#x60;isManual&#x60; and &#x60;isToBeAutomated&#x60; instead. Encodes the test case automation state as a single integer: &#x60;0&#x60; &#x3D; manual, &#x60;1&#x60; &#x3D; manual planned to be automated, &#x60;2&#x60; &#x3D; automated. | [optional] [default to undefined]
+**isManual** | **number** | &#x60;1&#x60; if the case is manual, &#x60;0&#x60; if it is automated. Combined with &#x60;isToBeAutomated&#x60;, replaces the deprecated &#x60;automation&#x60; field. | [optional] [default to undefined]
+**isToBeAutomated** | **number** | &#x60;1&#x60; if a manual case is planned to be automated, &#x60;0&#x60; otherwise. Only meaningful when &#x60;isManual &#x3D; 1&#x60;; ignored when &#x60;isManual &#x3D; 0&#x60;. | [optional] [default to undefined]
 **status** | **number** |  | [optional] [default to undefined]
 **milestone_id** | **number** |  | [optional] [default to undefined]
 **suite_id** | **number** |  | [optional] [default to undefined]
@@ -56,6 +58,8 @@ const instance: TestCase = {
     is_flaky,
     behavior,
     automation,
+    isManual,
+    isToBeAutomated,
     status,
     milestone_id,
     suite_id,

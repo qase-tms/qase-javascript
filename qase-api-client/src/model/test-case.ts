@@ -99,11 +99,24 @@ export interface TestCase {
      */
     'behavior'?: number;
     /**
-     * 
+     * Deprecated, use `isManual` and `isToBeAutomated` instead. Encodes the test case automation state as a single integer: `0` = manual, `1` = manual planned to be automated, `2` = automated.
+     * @type {number}
+     * @memberof TestCase
+     * @deprecated
+     */
+    'automation'?: number;
+    /**
+     * `1` if the case is manual, `0` if it is automated. Combined with `isToBeAutomated`, replaces the deprecated `automation` field.
      * @type {number}
      * @memberof TestCase
      */
-    'automation'?: number;
+    'isManual'?: number;
+    /**
+     * `1` if a manual case is planned to be automated, `0` otherwise. Only meaningful when `isManual = 1`; ignored when `isManual = 0`.
+     * @type {number}
+     * @memberof TestCase
+     */
+    'isToBeAutomated'?: number;
     /**
      * 
      * @type {number}

@@ -50,7 +50,7 @@ export interface DefectUpdate {
      */
     'attachments'?: Array<string>;
     /**
-     * A map of custom fields values (id => value)
+     * Custom field values keyed by the field\'s project-scoped `internal_id` (see `GET /custom_field`). Values are always **scalar strings**; arrays, objects or non-scalars are rejected.  | Field type           | Value format                              | Example                 | |----------------------|-------------------------------------------|-------------------------| | `string`, `text`     | Plain string                              | `\"hello\"`               | | `number`             | Numeric string                            | `\"42\"`                  | | `url`                | Valid URL                                 | `\"https://qase.io\"`     | | `datetime`           | Absolute date (ISO 8601 recommended)      | `\"2026-04-29T15:00:00Z\"`| | `selectbox`, `radio` | Option `id` as string                     | `\"1\"`                   | | `multiselect`        | Comma-separated option `id`s (no spaces)  | `\"1,2,3\"`               | | `checkbox`           | `\"1\"` to check, `\"\"` to uncheck           | `\"1\"`                   | | `user`               | Team member `internal_id` as string       | `\"42\"`                  |  Partial update: only fields present in the payload are validated; required fields not included are not enforced. Send `\"\"` to clear a value. Unknown `internal_id`s are rejected; option-based values must reference an existing option.  Note: a `required` checkbox without a default cannot be unchecked via the API — set a default or clear `required` in workspace settings. 
      * @type {{ [key: string]: string; }}
      * @memberof DefectUpdate
      */
