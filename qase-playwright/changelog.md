@@ -1,3 +1,9 @@
+# playwright-qase-reporter@2.5.4
+
+## Fixed
+
+- Qase test case IDs that are `<= 0` passed via the runtime API (`qase(0, name)`, `qase.id(0)`, `qase.projects({ PROJ1: [0] })`) are now dropped with a warning instead of being written to the test metadata. Previously these calls bypassed the parser-level filter introduced in 2.5.3 and could still produce HTTP 400 from the API. Bumped `qase-javascript-commons` pin to `~2.7.4`.
+
 # playwright-qase-reporter@2.5.3
 
 ## Fixed

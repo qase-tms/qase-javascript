@@ -1,3 +1,9 @@
+# wdio-qase-reporter@1.5.4
+
+## Fixed
+
+- Qase test case IDs that are `<= 0` passed to `qase.id(0)` are now dropped with a warning instead of being emitted as a metadata event. Previously this call bypassed the parser-level filter introduced in 1.5.3 and could still produce HTTP 400 from the API. Bumped `qase-javascript-commons` pin to `~2.7.4`.
+
 # wdio-qase-reporter@1.5.3
 
 ## Fixed
