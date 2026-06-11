@@ -1,3 +1,9 @@
+# playwright-qase-reporter@2.5.5
+
+## Fixed
+
+- Calling `qase(0, name)` (and any case where every supplied ID gets filtered out) no longer leaks an empty array into the static registry, and the result-builder no longer returns an empty array for an empty registry entry. In 2.5.4, `qase(0, name)` would publish results with `"testops_ids": []`, which the API rejects with HTTP 400 (`"Each testops_ids item must be a positive integer."`). After this fix the result is published with `testops_ids: null` — i.e. with no ID — same as if no ID had been specified. Bumped `qase-javascript-commons` pin to `~2.7.5`.
+
 # playwright-qase-reporter@2.5.4
 
 ## Fixed

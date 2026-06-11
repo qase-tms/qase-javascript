@@ -52,7 +52,7 @@ export class ResultTransformer {
       title: result.title,
       execution: this.getExecution(result.execution),
       testops_ids: Array.isArray(result.testops_id)
-        ? result.testops_id
+        ? (result.testops_id.length > 0 ? result.testops_id : null)
         : result.testops_id !== null ? [result.testops_id] : null,
       attachments: attachments,
       steps: steps,

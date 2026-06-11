@@ -115,6 +115,13 @@ describe('ResultBuilder precedence chain', () => {
     const r = builder.build(args)!;
     expect(r.testops_id).toEqual([99]);
   });
+
+  it('returns null testops_id when registry entry is an empty array (regression: qase(0,...) used to leak [])', () => {
+    const registry = new Map<string, number[]>([['fallback test', []]]);
+    const args = defaultArgs({ test: makeTest('fallback test'), qaseIdsRegistry: registry });
+    const r = builder.build(args)!;
+    expect(r.testops_id).toBeNull();
+  });
 });
 
 describe('ResultBuilder feature flags and merging', () => {

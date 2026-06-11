@@ -61,7 +61,10 @@ export const qase = (
 
   const newName = `${name} (Qase ID: ${caseIds.join(',')})`;
 
-  PlaywrightQaseReporter.addIds(filterPositiveIds(ids), newName);
+  const filteredIds = filterPositiveIds(ids);
+  if (filteredIds.length > 0) {
+    PlaywrightQaseReporter.addIds(filteredIds, newName);
+  }
 
   return newName;
 };
