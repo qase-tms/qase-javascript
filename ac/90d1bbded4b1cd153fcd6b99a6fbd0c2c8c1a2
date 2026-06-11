@@ -1,0 +1,36 @@
+qase-playwright/changelog.md
+  s_016b217af28a6f::t_f13d0c36f8b272 1-6
+qase-javascript-commons/package.json
+  s_016b217af28a6f::t_033e278a740709 3
+qase-javascript-commons/src/client/services/result-transformer.ts
+  s_016b217af28a6f::t_a5306e8e4fdf42 55
+qase-playwright/test/result-builder.test.ts
+  s_016b217af28a6f::t_c6ab59ede6fa55 118-124
+qase-javascript-commons/test/client/services/result-transformer.test.ts
+  s_016b217af28a6f::t_47ea21c2878efb 86-90
+qase-playwright/package.json
+  s_016b217af28a6f::t_79beaca8cbd660 3
+  s_016b217af28a6f::t_0295118655dc50 52
+qase-javascript-commons/changelog.md
+  s_016b217af28a6f::t_25fa8179804b5a 1-6
+qase-playwright/src/playwright.ts
+  s_016b217af28a6f::t_ee533cef181209 64-67
+qase-playwright/src/result-builder.ts
+  s_016b217af28a6f::t_accc79abc2678a 109-110
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "ac90d1bbded4b1cd153fcd6b99a6fbd0c2c8c1a2",
+  "prompts": {},
+  "sessions": {
+    "s_016b217af28a6f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "36d1be6a-64cf-4315-9484-e78a3ee85b53",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
