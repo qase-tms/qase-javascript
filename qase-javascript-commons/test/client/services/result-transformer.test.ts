@@ -83,6 +83,11 @@ describe('ResultTransformer', () => {
       expect(model.testops_ids).toBeNull();
     });
 
+    it('should map empty-array testops_id to null (API rejects []) ', async () => {
+      const model = await transformer.transform(makeResult({ testops_id: [] }), mockUploader);
+      expect(model.testops_ids).toBeNull();
+    });
+
     it('should handle undefined tags', async () => {
       const result = makeResult();
       delete result.tags;

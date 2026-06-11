@@ -1,3 +1,9 @@
+## 2.7.5
+
+### Fixed
+
+- `ResultTransformer.transform()` now maps an empty-array `testops_id` to `null` in the outgoing payload (was leaking `testops_ids: []`, which the API rejects with HTTP 400 — `"Each testops_ids item must be a positive integer."`). This is a defensive guard: in 2.7.4 a `[]` could still slip out from reporter result-builders that fed the registry-lookup branch after all IDs got filtered.
+
 ## 2.7.4
 
 ### Fixed

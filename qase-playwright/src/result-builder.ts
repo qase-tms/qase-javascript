@@ -106,7 +106,8 @@ export class ResultBuilder {
       testops_id = titleParsed.legacyIds.length === 1 ? titleParsed.legacyIds[0]! : titleParsed.legacyIds;
       testops_project_mapping = null;
     } else {
-      testops_id = qaseIdsRegistry.get(test.title) ?? null;
+      const registryIds = qaseIdsRegistry.get(test.title);
+      testops_id = registryIds && registryIds.length > 0 ? registryIds : null;
       testops_project_mapping = null;
     }
 
