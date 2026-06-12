@@ -129,7 +129,7 @@ import { test, expect } from '@playwright/test';
 import { qase } from 'playwright-qase-reporter';
 
 test('Test with step attachments', async ({ page }) => {
-  await qase.step('Navigate to page', async () => {
+  await test.step('Navigate to page', async () => {
     await page.goto('https://example.com');
 
     qase.attach({
@@ -139,7 +139,7 @@ test('Test with step attachments', async ({ page }) => {
     });
   });
 
-  await qase.step('Capture screenshot', async () => {
+  await test.step('Capture screenshot', async () => {
     const screenshot = await page.screenshot();
 
     qase.attach({

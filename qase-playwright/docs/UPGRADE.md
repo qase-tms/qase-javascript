@@ -29,7 +29,7 @@ Version 2.2.0 includes:
 - Full support for Qase TestOps API with batch result upload
 - Dual test case linking patterns: wrapper function and method-based annotation
 - Rich metadata support: titles, fields, suites, parameters, comments
-- Native Playwright test steps and qase.step() for custom steps
+- Native Playwright test steps with optional `qase.step()` helper for expected result / data
 - Screenshot and file attachments with `qase.attach()`
 - Multi-project support for reporting to multiple Qase projects
 - Flexible configuration via `qase.config.json` or playwright.config.ts
@@ -153,40 +153,43 @@ test('Test with metadata', async ({ page }) => {
 
 ### Steps
 
-**Custom Steps with qase.step():**
+**Native Playwright Steps:**
+
+Use Playwright's native `test.step()` — the reporter listens to its events and reports each step to Qase.
 
 ```typescript
-test('Test with custom steps', async ({ page }) => {
-  await qase.step('Navigate to login page', async () => {
+test('Test with steps', async ({ page }) => {
+  await test.step('Navigate to login page', async () => {
     await page.goto('https://example.com/login');
   });
 
-  await qase.step('Enter credentials', async () => {
+  await test.step('Enter credentials', async () => {
     await page.fill('#username', 'user@example.com');
     await page.fill('#password', 'password123');
   });
 
-  await qase.step('Verify login success', async () => {
+  await test.step('Verify login success', async () => {
     await expect(page.locator('.dashboard')).toBeVisible();
   });
 });
 ```
 
-**Native Playwright Steps:**
+**Steps with Expected Result and Data via `qase.step()`:**
+
+`qase.step(action, expectedResult, data)` is a string helper that decorates the step title with markers for expected result and input data. Pass its return value as the step name to `test.step()`:
 
 ```typescript
-test('Test with native steps', async ({ page }) => {
-  await test.step('Navigate to page', async () => {
-    await page.goto('https://example.com');
-  });
-
-  await test.step('Verify page loaded', async () => {
-    await expect(page).toHaveTitle('Example');
-  });
+test('Test with expected results', async ({ page }) => {
+  await test.step(
+    qase.step('Click login button', 'Button should be clicked', 'Login button data'),
+    async () => {
+      await page.click('button[type="submit"]');
+    },
+  );
 });
 ```
 
-Both patterns are reported to Qase. You can mix them in the same test if needed.
+All three positional arguments are required — pass `undefined` for `expectedResult` or `data` when not needed.
 
 ### Attachments
 

@@ -328,46 +328,29 @@ Common MIME types are auto-detected. You can also specify explicitly:
 
 ## Working with Steps
 
-Define test steps for detailed reporting in Qase. Playwright supports **both** native `test.step()` and `qase.step()`.
+Define test steps for detailed reporting in Qase. Use Playwright's native `test.step()` API — the reporter listens to its events automatically.
 
-### Using qase.step (Async)
+### Using test.step
 
 ```typescript
 import { test, expect } from '@playwright/test';
-import { qase } from 'playwright-qase-reporter';
 
-test('Test with qase.step', async ({ page }) => {
-  await qase.step('Navigate to login page', async () => {
+test('Test with steps', async ({ page }) => {
+  await test.step('Navigate to login page', async () => {
     await page.goto('https://example.com/login');
   });
 
-  await qase.step('Fill login form', async () => {
+  await test.step('Fill login form', async () => {
     await page.fill('#email', 'user@example.com');
     await page.fill('#password', 'password123');
   });
 
-  await qase.step('Submit form', async () => {
+  await test.step('Submit form', async () => {
     await page.click('button[type="submit"]');
   });
 
-  await qase.step('Verify successful login', async () => {
+  await test.step('Verify successful login', async () => {
     await expect(page.locator('.dashboard')).toBeVisible();
-  });
-});
-```
-
-### Using Native test.step
-
-```typescript
-import { test, expect } from '@playwright/test';
-
-test('Test with native test.step', async ({ page }) => {
-  await test.step('Navigate to page', async () => {
-    await page.goto('https://example.com');
-  });
-
-  await test.step('Verify title', async () => {
-    await expect(page).toHaveTitle('Example Domain');
   });
 });
 ```
@@ -376,43 +359,44 @@ test('Test with native test.step', async ({ page }) => {
 
 ```typescript
 import { test } from '@playwright/test';
-import { qase } from 'playwright-qase-reporter';
 
 test('Test with nested steps', async ({ page }) => {
-  await qase.step('Authentication flow', async () => {
-    await qase.step('Open login page', async () => {
+  await test.step('Authentication flow', async () => {
+    await test.step('Open login page', async () => {
       await page.goto('https://example.com/login');
     });
 
-    await qase.step('Enter credentials', async () => {
+    await test.step('Enter credentials', async () => {
       await page.fill('#email', 'user@example.com');
       await page.fill('#password', 'password123');
     });
 
-    await qase.step('Click login button', async () => {
+    await test.step('Click login button', async () => {
       await page.click('button[type="submit"]');
     });
   });
 });
 ```
 
-### Steps with Expected Result
+### Steps with Expected Result and Data
+
+`qase.step()` is a string helper that decorates a step title with **expected result** and **data** markers. Pass its return value as the step name to `test.step()`:
 
 ```typescript
 import { test } from '@playwright/test';
 import { qase } from 'playwright-qase-reporter';
 
 test('Test with expected results', async ({ page }) => {
-  await qase.step(
-    'Click login button',
+  await test.step(
+    qase.step('Click login button', 'Button should be clicked', 'Login button data'),
     async () => {
       await page.click('button[type="submit"]');
     },
-    'Button should be clicked',
-    'Login button data'
   );
 });
 ```
+
+> All three positional arguments of `qase.step()` are required. Pass `undefined` for `expectedResult` or `data` when you don't need them.
 
 > For more details, see [Steps Guide](STEPS.md).
 
@@ -563,7 +547,7 @@ type MyFixtures = {
 
 const test = base.extend<MyFixtures>({
   authenticatedPage: async ({ page }, use) => {
-    await qase.step('Setup authenticated page', async () => {
+    await test.step('Setup authenticated page', async () => {
       await page.goto('https://example.com/login');
       await page.fill('#email', 'user@example.com');
       await page.fill('#password', 'password123');
@@ -572,7 +556,7 @@ const test = base.extend<MyFixtures>({
 
     await use(page);
 
-    await qase.step('Cleanup authenticated page', async () => {
+    await test.step('Cleanup authenticated page', async () => {
       await page.click('#logout');
     });
   },
@@ -594,18 +578,18 @@ class LoginPage {
   constructor(private page: Page) {}
 
   async navigate() {
-    await qase.step('Navigate to login page', async () => {
+    await test.step('Navigate to login page', async () => {
       await this.page.goto('https://example.com/login');
     });
   }
 
   async login(email: string, password: string) {
-    await qase.step('Enter credentials', async () => {
+    await test.step('Enter credentials', async () => {
       await this.page.fill('#email', email);
       await this.page.fill('#password', password);
     });
 
-    await qase.step('Click login button', async () => {
+    await test.step('Click login button', async () => {
       await this.page.click('button[type="submit"]');
     });
   }
@@ -811,7 +795,7 @@ test(qase(201, 'GET /users returns 200'), async () => {
   qase.suite('API Tests');
   qase.fields({ layer: 'api' });
 
-  await qase.step('Send GET request', async () => {
+  await test.step('Send GET request', async () => {
     const context = await request.newContext();
     const response = await context.get('https://api.example.com/users');
 
@@ -989,7 +973,7 @@ test(qase([1, 2], 'Comprehensive test with all features'), async ({ page, browse
   });
 
   // Execute test with steps
-  await qase.step('Navigate to registration page', async () => {
+  await test.step('Navigate to registration page', async () => {
     await page.goto('https://example.com/register');
 
     const screenshot = await page.screenshot();
@@ -1000,17 +984,17 @@ test(qase([1, 2], 'Comprehensive test with all features'), async ({ page, browse
     });
   });
 
-  await qase.step('Fill registration form', async () => {
+  await test.step('Fill registration form', async () => {
     await page.fill('#email', 'user@example.com');
     await page.fill('#password', 'password123');
     await page.fill('#confirmPassword', 'password123');
   });
 
-  await qase.step('Submit form', async () => {
+  await test.step('Submit form', async () => {
     await page.click('button[type="submit"]');
   });
 
-  await qase.step('Verify registration success', async () => {
+  await test.step('Verify registration success', async () => {
     await expect(page.locator('.success-message')).toBeVisible();
 
     const finalScreenshot = await page.screenshot();
