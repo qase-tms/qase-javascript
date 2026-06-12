@@ -1,0 +1,30 @@
+qase-playwright/docs/ATTACHMENTS.md
+  s_7c61ef6570975a::t_7625e2cb3fe721 132,142
+qase-playwright/docs/UPGRADE.md
+  s_7c61ef6570975a::t_c5e4138aac6ec4 156-158,161-162,166,171,177,179,181-188,192
+  s_7c61ef6570975a::t_ebc89c964f4210 32
+qase-playwright/docs/usage.md
+  s_7c61ef6570975a::t_fa43dc6343ebd8 976,987,993,997
+  s_7c61ef6570975a::t_ad79cc3fcf00e1 331,333,338-339,343,348,352,364-365,369,374,381-383,390-391,399
+  s_7c61ef6570975a::t_b5b8659f17b0af 550,559
+  s_7c61ef6570975a::t_77717456b28b32 581,587,592
+  s_7c61ef6570975a::t_543dfae9d03e8b 798
+qase-playwright/docs/STEPS.md
+  s_7c61ef6570975a::t_801eed4391d51f 21,23,25,30,55,61,71,76,98-109,116-117,123-124,130-131,139,145,152,162,210,215,224,229,247,251,255,276,280,284,299,303,311,317,330-332,336,341,348,352-353,359,362
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "209eeb390c8fc3ab3442feb0b3e5ab53612e378a",
+  "prompts": {},
+  "sessions": {
+    "s_7c61ef6570975a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f8b298c5-f542-4732-aa91-a1d5b00cffa9",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
