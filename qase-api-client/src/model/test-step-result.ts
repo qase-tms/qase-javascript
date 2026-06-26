@@ -34,16 +34,40 @@ export interface TestStepResult {
      */
     'position'?: number;
     /**
+     * Comment left for the step.
+     * @type {string}
+     * @memberof TestStepResult
+     */
+    'comment'?: string;
+    /**
+     * Unix timestamp of the step start time.
+     * @type {number}
+     * @memberof TestStepResult
+     */
+    'start_time'?: number | null;
+    /**
+     * Unix timestamp of the step end time.
+     * @type {number}
+     * @memberof TestStepResult
+     */
+    'end_time'?: number | null;
+    /**
+     * Step duration in milliseconds.
+     * @type {number}
+     * @memberof TestStepResult
+     */
+    'duration_ms'?: number | null;
+    /**
      * 
      * @type {Array<Attachment>}
      * @memberof TestStepResult
      */
     'attachments'?: Array<Attachment>;
     /**
-     * Nested steps results will be here. The same structure is used for them for them.
-     * @type {Array<object>}
+     * Nested steps results will be here. The same structure is used for them.
+     * @type {Array<TestStepResult>}
      * @memberof TestStepResult
      */
-    'steps'?: Array<object>;
+    'steps'?: Array<TestStepResult>;
 }
 
