@@ -1,0 +1,23 @@
+qase-api-client/docs/TestStepResult.md
+  s_85ddc622051aaf::t_150b7b1625da7c 10-13,15,25-28
+qase-api-client/package.json
+  s_85ddc622051aaf::t_8742bb2b49a7fc 3
+qase-api-client/src/model/test-step-result.ts
+  s_85ddc622051aaf::t_5d50016caf3cf8 36-59,67-68,71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.1",
+  "base_commit_sha": "428dceebb002c0c943243481e21411ff4948af8b",
+  "prompts": {},
+  "sessions": {
+    "s_85ddc622051aaf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "91eedfab-7e7a-4a7a-86cd-851199e64a9f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
