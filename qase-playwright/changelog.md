@@ -1,3 +1,9 @@
+# playwright-qase-reporter@2.5.6
+
+## Fixed
+
+- `qase.step` now types `expectedResult` and `data` as optional (`?`) instead of positionally required `string | undefined`. Previously the documented calls `qase.step('action')` and `qase.step('action', 'expected')` failed to compile with `ts(2554): Expected 3 arguments`, forcing callers to pass `undefined` explicitly to omit them. This is a type-only change — runtime behavior is unchanged and fully backward compatible. The docstring now also clarifies that `qase.step` is a title decorator meant to be passed to Playwright's `test.step()`, not a step runner. Fixes #981.
+
 # playwright-qase-reporter@2.5.5
 
 ## Fixed
