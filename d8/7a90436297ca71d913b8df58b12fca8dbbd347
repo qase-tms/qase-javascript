@@ -1,0 +1,22 @@
+qase-playwright/src/playwright.ts
+  s_5eb1b184fe1a55::t_5e584bab8179a8 320-327,330-332
+  s_5eb1b184fe1a55::t_9836169eea45b0 338
+qase-playwright/test/playwright.test.ts
+  s_5eb1b184fe1a55::t_903adb917826b6 207-216
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "d87a90436297ca71d913b8df58b12fca8dbbd347",
+  "prompts": {},
+  "sessions": {
+    "s_5eb1b184fe1a55": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "97476088-74ba-44b5-bde1-08ef98dfbf98",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
