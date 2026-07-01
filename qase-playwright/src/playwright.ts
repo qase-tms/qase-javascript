@@ -317,18 +317,25 @@ qase.tags = function(...values: string[]) {
 };
 
 /**
- * Set a expected result and data for the test step
- * @param action
- * @param expectedResult
- * @param data
+ * Build a step title with optional expected result and data markers.
+ *
+ * This is a title decorator, not a step runner: it returns a string meant to be
+ * passed to Playwright's `test.step()`. `expectedResult` and `data` are optional.
+ *
+ * @param action — step title
+ * @param expectedResult — optional expected result
+ * @param data — optional step data
  * @example
  * test('test', async ({ page }) => {
+ *    await test.step(qase.step('action'), async () => {
+ *      await page.goto('https://example.com');
+ *    });
  *    await test.step(qase.step('action', 'expected result', 'data'), async () => {
  *      await page.goto('https://example.com');
  *    });
  * });
  */
-qase.step = function(action: string, expectedResult: string | undefined, data: string | undefined): string {
+qase.step = function(action: string, expectedResult?: string, data?: string): string {
   return `${action} QaseExpRes:${expectedResult ? `: ${expectedResult}` : ''} QaseData:${data ? `: ${data}` : ''}`;
 };
 
