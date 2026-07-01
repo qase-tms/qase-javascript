@@ -1,0 +1,21 @@
+qase-playwright/changelog.md
+  s_5eb1b184fe1a55::t_0b5014e905d97c 1-6
+qase-playwright/package.json
+  s_5eb1b184fe1a55::t_40220d405d4cae 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "38bd22b27271c7fd3fb2601f8b69b4ee1bec4036",
+  "prompts": {},
+  "sessions": {
+    "s_5eb1b184fe1a55": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "97476088-74ba-44b5-bde1-08ef98dfbf98",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
