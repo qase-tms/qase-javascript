@@ -204,6 +204,16 @@ describe('qase API', () => {
       const result = qase.step('Click button', 'Button should be clicked', 'Button data');
       expect(result).toBe('Click button QaseExpRes:: Button should be clicked QaseData:: Button data');
     });
+
+    it('should accept a single action argument (optional params omitted)', () => {
+      const result = qase.step('Click button');
+      expect(result).toBe('Click button QaseExpRes: QaseData:');
+    });
+
+    it('should accept action and expected result without data', () => {
+      const result = qase.step('Click button', 'Button should be clicked');
+      expect(result).toBe('Click button QaseExpRes:: Button should be clicked QaseData:');
+    });
   });
 
   describe('qase with non-positive ID (regression test)', () => {
