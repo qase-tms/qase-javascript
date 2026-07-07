@@ -101,17 +101,17 @@ export interface TestCaseCreate {
      */
     'automation'?: number;
     /**
-     * `1` if the case is manual, `0` if it is automated. Combined with `isToBeAutomated`, replaces the deprecated `automation` field.
-     * @type {number}
+     * `true` if the case is manual, `false` if it is automated. Combined with `isToBeAutomated`, replaces the deprecated `automation` field.
+     * @type {boolean}
      * @memberof TestCaseCreate
      */
-    'isManual'?: number;
+    'isManual'?: boolean;
     /**
-     * `1` if a manual case is planned to be automated, `0` otherwise. Only meaningful when `isManual = 1`; ignored when `isManual = 0`.
-     * @type {number}
+     * `true` if a manual case is planned to be automated, `false` otherwise. Only meaningful when `isManual` is `true`; ignored when `isManual` is `false`.
+     * @type {boolean}
      * @memberof TestCaseCreate
      */
-    'isToBeAutomated'?: number;
+    'isToBeAutomated'?: boolean;
     /**
      * 
      * @type {number}
