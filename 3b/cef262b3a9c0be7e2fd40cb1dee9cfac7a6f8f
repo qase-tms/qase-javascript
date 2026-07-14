@@ -1,0 +1,19 @@
+package-lock.json
+  s_2174f0337a249a::t_f040db76d6cf9b 28116,28237,28354
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "3bcef262b3a9c0be7e2fd40cb1dee9cfac7a6f8f",
+  "prompts": {},
+  "sessions": {
+    "s_2174f0337a249a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0d35e050-ceba-4a0c-baa0-e049fc04032d",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
