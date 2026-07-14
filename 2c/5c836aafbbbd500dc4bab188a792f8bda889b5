@@ -1,0 +1,33 @@
+qase-javascript-commons/package.json
+  s_2174f0337a249a::t_49a58162582599 3
+qase-playwright/package.json
+  s_2174f0337a249a::t_3f131beae61de7 51
+  s_2174f0337a249a::t_d0acc7096b88a2 3
+qase-mocha/package.json
+  s_2174f0337a249a::t_f35f8e667a8372 3
+  s_2174f0337a249a::t_9af603df4db4dd 47
+qase-vitest/package.json
+  s_2174f0337a249a::t_3993878c2252a4 49
+  s_2174f0337a249a::t_2dbfdc0bd34540 3
+qase-wdio/package.json
+  s_2174f0337a249a::t_cef448267a7181 37
+  s_2174f0337a249a::t_102c15ddb574ea 3
+package-lock.json
+  s_2174f0337a249a::t_077164a77d7772 28186,28245,28250,28307,28310,28351,28354,28373,28377
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "2c5c836aafbbbd500dc4bab188a792f8bda889b5",
+  "prompts": {},
+  "sessions": {
+    "s_2174f0337a249a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0d35e050-ceba-4a0c-baa0-e049fc04032d",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
