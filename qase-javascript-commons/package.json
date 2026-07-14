@@ -55,7 +55,6 @@
     "chalk": "^4.1.2",
     "env-schema": "^5.2.1",
     "form-data": "^4.0.6",
-    "lodash.get": "^4.4.2",
     "lodash.merge": "^4.6.2",
     "lodash.mergewith": "^4.6.2",
     "mime-types": "^2.1.35",
@@ -67,7 +66,6 @@
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "@types/jest": "^29.5.14",
-    "@types/lodash.get": "^4.4.9",
     "@types/lodash.merge": "^4.6.9",
     "@types/lodash.mergewith": "^4.6.9",
     "@types/mime-types": "^2.1.4",
