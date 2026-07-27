@@ -26,6 +26,8 @@ export interface BuildArgs {
     projectMapping: Record<string, number[]> | null;
     suites: string[];
   };
+  /** Contents of Playwright's error-context.md, already truncated; null when there is none. */
+  errorContext?: string | null;
   options: ReporterOptionsType;
   isCaptureLogs: boolean;
   qaseIdsRegistry: ReadonlyMap<string, number[]>;
@@ -35,7 +37,16 @@ export class ResultBuilder {
   constructor(private readonly stepConverter: StepConverter) {}
 
   build(args: BuildArgs): TestResultType | null {
-    const { test, result, metadata, annotations, options, isCaptureLogs, qaseIdsRegistry } = args;
+    const {
+      test,
+      result,
+      metadata,
+      annotations,
+      errorContext,
+      options,
+      isCaptureLogs,
+      qaseIdsRegistry,
+    } = args;
 
     if (metadata.ignore) {
       return null;
@@ -43,9 +54,12 @@ export class ResultBuilder {
 
     const error = result.error ? transformError(result.errors) : null;
 
-    let suites = annotations.suites.length > 0
-      ? annotations.suites
-      : (metadata.suite ? [metadata.suite] : transformSuiteTitle(test));
+    let suites =
+      annotations.suites.length > 0
+        ? annotations.suites
+        : metadata.suite
+          ? [metadata.suite]
+          : transformSuiteTitle(test);
 
     let message: string | null = null;
     if (metadata.comment !== '') {
@@ -65,7 +79,8 @@ export class ResultBuilder {
       const browser = (test as any)._projectId ?? null;
       if (browser) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        metadata.parameters[options.browser?.parameterName ?? 'browser'] = browser;
+        metadata.parameters[options.browser?.parameterName ?? 'browser'] =
+          browser;
         suites = suites.filter((suite) => suite !== browser);
       }
     }
@@ -75,21 +90,29 @@ export class ResultBuilder {
     }
 
     const titleParsed = parseProjectMappingFromTitle(test.title);
-    const testTitle = titleParsed.cleanedTitle || removeQaseIdsFromTitle(test.title);
+    const testTitle =
+      titleParsed.cleanedTitle || removeQaseIdsFromTitle(test.title);
 
-    const hasMetadataProjectMapping = metadata.projectMapping != null && Object.keys(metadata.projectMapping).length > 0;
-    const hasAnnotationProjectMapping = annotations.projectMapping != null && Object.keys(annotations.projectMapping).length > 0;
-    const hasTitleProjectMapping = titleParsed.projectMapping != null && Object.keys(titleParsed.projectMapping).length > 0;
+    const hasMetadataProjectMapping =
+      metadata.projectMapping != null &&
+      Object.keys(metadata.projectMapping).length > 0;
+    const hasAnnotationProjectMapping =
+      annotations.projectMapping != null &&
+      Object.keys(annotations.projectMapping).length > 0;
+    const hasTitleProjectMapping =
+      titleParsed.projectMapping != null &&
+      Object.keys(titleParsed.projectMapping).length > 0;
 
     const projectMapping = hasMetadataProjectMapping
-      ? metadata.projectMapping ?? null
+      ? (metadata.projectMapping ?? null)
       : hasAnnotationProjectMapping
         ? annotations.projectMapping
         : hasTitleProjectMapping
           ? titleParsed.projectMapping
           : null;
 
-    const hasProjectMapping = projectMapping != null && Object.keys(projectMapping).length > 0;
+    const hasProjectMapping =
+      projectMapping != null && Object.keys(projectMapping).length > 0;
 
     let testops_id: number | number[] | null;
     let testops_project_mapping: Record<string, number[]> | null;
@@ -97,13 +120,17 @@ export class ResultBuilder {
       testops_project_mapping = projectMapping;
       testops_id = null;
     } else if (annotations.ids.length > 0) {
-      testops_id = annotations.ids.length === 1 ? annotations.ids[0]! : annotations.ids;
+      testops_id =
+        annotations.ids.length === 1 ? annotations.ids[0]! : annotations.ids;
       testops_project_mapping = null;
     } else if (metadata.ids.length > 0) {
       testops_id = metadata.ids.length === 1 ? metadata.ids[0]! : metadata.ids;
       testops_project_mapping = null;
     } else if (titleParsed.legacyIds.length > 0) {
-      testops_id = titleParsed.legacyIds.length === 1 ? titleParsed.legacyIds[0]! : titleParsed.legacyIds;
+      testops_id =
+        titleParsed.legacyIds.length === 1
+          ? titleParsed.legacyIds[0]!
+          : titleParsed.legacyIds;
       testops_project_mapping = null;
     } else {
       const registryIds = qaseIdsRegistry.get(test.title);
@@ -119,7 +146,12 @@ export class ResultBuilder {
       }
     }
     const testStatus = determineTestStatus(errorForStatus, result.status);
-    const idsForSignature = testops_id == null ? null : (Array.isArray(testops_id) ? testops_id : [testops_id]);
+    const idsForSignature =
+      testops_id == null
+        ? null
+        : Array.isArray(testops_id)
+          ? testops_id
+          : [testops_id];
 
     const testResult = {
       attachments: metadata.attachments,
@@ -129,11 +161,13 @@ export class ResultBuilder {
         start_time: result.startTime.valueOf() / 1000,
         end_time: (result.startTime.valueOf() + result.duration) / 1000,
         duration: result.duration,
-        stacktrace: error === null
-          ? null
-          : error.stacktrace === undefined
+        stacktrace:
+          error === null
             ? null
-            : error.stacktrace,
+            : error.stacktrace === undefined
+              ? null
+              : error.stacktrace,
+        error_context: errorContext ?? null,
         thread: process.ppid.toString() + '-' + result.parallelIndex.toString(),
       },
       fields: metadata.fields,
@@ -151,7 +185,11 @@ export class ResultBuilder {
         },
       },
       run_id: null,
-      signature: generateSignature(idsForSignature, suites, metadata.parameters),
+      signature: generateSignature(
+        idsForSignature,
+        suites,
+        metadata.parameters,
+      ),
       steps: this.stepConverter.transform(result.steps, null),
       testops_id,
       testops_project_mapping,
@@ -160,10 +198,14 @@ export class ResultBuilder {
 
     if (isCaptureLogs) {
       if (result.stdout.length > 0) {
-        testResult.attachments.push(convertLogsToAttachments(result.stdout, 'stdout.log'));
+        testResult.attachments.push(
+          convertLogsToAttachments(result.stdout, 'stdout.log'),
+        );
       }
       if (result.stderr.length > 0) {
-        testResult.attachments.push(convertLogsToAttachments(result.stderr, 'stderr.log'));
+        testResult.attachments.push(
+          convertLogsToAttachments(result.stderr, 'stderr.log'),
+        );
       }
     }
 
@@ -172,7 +214,9 @@ export class ResultBuilder {
     );
     if (profilerAttachment?.body) {
       try {
-        const profilerSteps = JSON.parse(profilerAttachment.body.toString()) as TestStepType[];
+        const profilerSteps = JSON.parse(
+          profilerAttachment.body.toString(),
+        ) as TestStepType[];
         testResult.steps = [...testResult.steps, ...profilerSteps];
       } catch {
         // Silent failure — corrupted profiler data must not affect test results
@@ -197,10 +241,16 @@ function transformError(testErrors: TestError[]): CompoundError {
 }
 
 function transformSuiteTitle(test: TestCase): string[] {
-  return test.titlePath().filter(Boolean).map((s) => s.replace(/\\/g, '/'));
+  return test
+    .titlePath()
+    .filter(Boolean)
+    .map((s) => s.replace(/\\/g, '/'));
 }
 
-function convertLogsToAttachments(logs: (string | Buffer)[], name: string): Attachment {
+function convertLogsToAttachments(
+  logs: (string | Buffer)[],
+  name: string,
+): Attachment {
   let content = '';
   for (const line of logs) {
     content = content + line.toString();

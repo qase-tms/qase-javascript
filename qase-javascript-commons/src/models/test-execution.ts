@@ -16,6 +16,12 @@ export class TestExecution {
   end_time: number | null;
   duration: number | null;
   stacktrace: string | null;
+  /**
+   * Free-form failure context captured by the framework — for Playwright, the contents of
+   * error-context.md. Optional so the reporters that don't produce one keep building `execution`
+   * object literals unchanged.
+   */
+  error_context?: string | null;
   thread: string | null;
 
   constructor() {
@@ -24,6 +30,7 @@ export class TestExecution {
     this.end_time = null;
     this.duration = null;
     this.stacktrace = null;
+    this.error_context = null;
     this.thread = null;
   }
 }

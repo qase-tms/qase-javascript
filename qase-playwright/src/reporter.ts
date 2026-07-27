@@ -1,4 +1,10 @@
-import { Reporter, TestCase, TestResult, TestStatus, TestStep } from '@playwright/test/reporter';
+import {
+  Reporter,
+  TestCase,
+  TestResult,
+  TestStatus,
+  TestStep,
+} from '@playwright/test/reporter';
 
 import {
   composeOptions,
@@ -14,6 +20,7 @@ import { AnnotationExtractor } from './annotation-extractor';
 import { StepConverter } from './step-converter';
 import { MetadataExtractor } from './metadata-extractor';
 import { ResultBuilder } from './result-builder';
+import { readErrorContext } from './error-context';
 
 export type PlaywrightQaseOptionsType = Omit<ConfigType, 'reporterOptions'> & {
   framework: ReporterOptionsType;
@@ -47,7 +54,9 @@ export class PlaywrightQaseReporter implements Reporter {
 
   private stepConverter: StepConverter = new StepConverter(this.stepIndex);
 
-  private metadataExtractor: MetadataExtractor = new MetadataExtractor(this.stepIndex);
+  private metadataExtractor: MetadataExtractor = new MetadataExtractor(
+    this.stepIndex,
+  );
 
   private resultBuilder: ResultBuilder = new ResultBuilder(this.stepConverter);
 
@@ -107,15 +116,21 @@ export class PlaywrightQaseReporter implements Reporter {
     const metadata = this.metadataExtractor.transform(result.attachments);
     const annotations = {
       ids: this.annotationExtractor.extractQaseIds(test.annotations),
-      projectMapping: this.annotationExtractor.extractProjectMapping(test.annotations),
+      projectMapping: this.annotationExtractor.extractProjectMapping(
+        test.annotations,
+      ),
       suites: this.annotationExtractor.extractSuite(test.annotations),
     };
+
+    // Read here, at the async boundary, so the metadata extractor and result builder stay pure.
+    const errorContext = await readErrorContext(result.attachments);
 
     const testResult = this.resultBuilder.build({
       test,
       result,
       metadata,
       annotations,
+      errorContext,
       options: this.options,
       isCaptureLogs: this.reporter.isCaptureLogs(),
       qaseIdsRegistry: PlaywrightQaseReporter.qaseIds,
@@ -145,5 +160,4 @@ export class PlaywrightQaseReporter implements Reporter {
   checkChildrenSteps(steps: TestStep[]): boolean {
     return this.stepConverter.hasOnlyLeafCategories(steps);
   }
-
 }

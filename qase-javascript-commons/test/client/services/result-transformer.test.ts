@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return */
 import { expect } from '@jest/globals';
 import { ResultTransformer } from '../../../src/client/services/result-transformer';
-import { StepStatusEnum, StepType, TestStatusEnum, TestStepType } from '../../../src/models';
+import {
+  StepStatusEnum,
+  StepType,
+  TestStatusEnum,
+  TestStepType,
+} from '../../../src/models';
 
 jest.mock('qase-api-v2-client', () => ({
   ResultStepStatus: {
@@ -74,17 +79,43 @@ describe('ResultTransformer', () => {
     });
 
     it('should handle array testops_id', async () => {
-      const model = await transformer.transform(makeResult({ testops_id: [1, 2, 3] }), mockUploader);
+      const model = await transformer.transform(
+        makeResult({ testops_id: [1, 2, 3] }),
+        mockUploader,
+      );
       expect(model.testops_ids).toEqual([1, 2, 3]);
     });
 
+    it('should carry execution.error_context through to the API model', async () => {
+      const content = '# Test info\n\n- Name: a >> b\n';
+      const result = makeResult({
+        execution: { ...makeResult().execution, error_context: content },
+      });
+
+      const model = await transformer.transform(result, mockUploader);
+
+      expect(model.execution.error_context).toBe(content);
+    });
+
+    it('should send a null error_context when the framework produced none', async () => {
+      const model = await transformer.transform(makeResult(), mockUploader);
+
+      expect(model.execution.error_context).toBeNull();
+    });
+
     it('should handle null testops_id', async () => {
-      const model = await transformer.transform(makeResult({ testops_id: null }), mockUploader);
+      const model = await transformer.transform(
+        makeResult({ testops_id: null }),
+        mockUploader,
+      );
       expect(model.testops_ids).toBeNull();
     });
 
     it('should map empty-array testops_id to null (API rejects []) ', async () => {
-      const model = await transformer.transform(makeResult({ testops_id: [] }), mockUploader);
+      const model = await transformer.transform(
+        makeResult({ testops_id: [] }),
+        mockUploader,
+      );
       expect(model.testops_ids).toBeNull();
     });
 
@@ -127,10 +158,12 @@ describe('ResultTransformer', () => {
 
     it('should transform GHERKIN step', async () => {
       const result = makeResult({
-        steps: [makeStep({
-          step_type: StepType.GHERKIN,
-          data: { keyword: 'Given user exists' },
-        })],
+        steps: [
+          makeStep({
+            step_type: StepType.GHERKIN,
+            data: { keyword: 'Given user exists' },
+          }),
+        ],
       });
       const model = await transformer.transform(result, mockUploader);
       expect(model.steps![0]!.data!.action).toBe('Given user exists');
@@ -138,10 +171,12 @@ describe('ResultTransformer', () => {
 
     it('should transform REQUEST step', async () => {
       const result = makeResult({
-        steps: [makeStep({
-          step_type: StepType.REQUEST,
-          data: { request_method: 'GET', request_url: '/api/test' },
-        })],
+        steps: [
+          makeStep({
+            step_type: StepType.REQUEST,
+            data: { request_method: 'GET', request_url: '/api/test' },
+          }),
+        ],
       });
       const model = await transformer.transform(result, mockUploader);
       expect(model.steps![0]!.data!.action).toBe('GET /api/test');
@@ -149,9 +184,11 @@ describe('ResultTransformer', () => {
 
     it('should handle nested steps', async () => {
       const result = makeResult({
-        steps: [makeStep({
-          steps: [makeStep({ data: { action: 'Nested action' } })],
-        })],
+        steps: [
+          makeStep({
+            steps: [makeStep({ data: { action: 'Nested action' } })],
+          }),
+        ],
       });
       const model = await transformer.transform(result, mockUploader);
       expect(model.steps![0]!.steps).toHaveLength(1);
@@ -178,7 +215,10 @@ describe('ResultTransformer', () => {
 
     it('should build param_groups from group_params', async () => {
       const model = await transformer.transform(
-        makeResult({ group_params: { browser: 'chrome', os: 'linux' }, params: {} }),
+        makeResult({
+          group_params: { browser: 'chrome', os: 'linux' },
+          params: {},
+        }),
         mockUploader,
       );
       expect(model.param_groups).toEqual([['browser', 'os']]);
@@ -190,7 +230,9 @@ describe('ResultTransformer', () => {
     it('should use default suite relation with rootSuite', async () => {
       transformer = new ResultTransformer(silentLogger(), 'Root Suite');
       const model = await transformer.transform(makeResult(), mockUploader);
-      expect(model.relations?.suite?.data).toEqual([{ public_id: null, title: 'Root Suite' }]);
+      expect(model.relations?.suite?.data).toEqual([
+        { public_id: null, title: 'Root Suite' },
+      ]);
     });
 
     it('should prepend rootSuite to existing suite relation', async () => {

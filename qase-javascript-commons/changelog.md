@@ -1,3 +1,9 @@
+## 2.8.0
+
+### Added
+
+- `TestExecution` gained an optional `error_context` field, mapped through `ResultTransformer` to `execution.error_context` on the v2 API payload. It carries free-form failure context captured by a framework — for Playwright, the contents of `error-context.md` — which Qase stores as text so it can be copied as a raw string. The field is optional, so reporters that do not produce one are unaffected and keep sending `null`. Bumped `qase-api-v2-client` pin to `~1.0.10`.
+
 ## 2.7.5
 
 ### Fixed
