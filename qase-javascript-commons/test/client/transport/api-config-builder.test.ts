@@ -32,6 +32,20 @@ describe('api-config-builder', () => {
       const result = createApiConfigV1(config);
       expect(result.basePath).toBe('https://api-custom.qase.io/v1');
     });
+
+    const fullUrlCases: [string, string][] = [
+      ['http://api.qase.lo', 'http://api.qase.lo/v1'],
+      ['https://api.self-hosted.example', 'https://api.self-hosted.example/v1'],
+      ['http://localhost:8080', 'http://localhost:8080/v1'],
+      ['https://qase.internal/tms/', 'https://qase.internal/tms/v1'],
+    ];
+
+    for (const [host, expected] of fullUrlCases) {
+      it(`should use the full base URL "${host}" verbatim`, () => {
+        const config = { api: { token: 'tok123', host } } as any;
+        expect(createApiConfigV1(config).basePath).toBe(expected);
+      });
+    }
   });
 
   describe('resolveAppUrl', () => {
@@ -44,6 +58,19 @@ describe('api-config-builder', () => {
       const config = { api: { token: 'tok', host: 'custom.qase.io' } } as any;
       expect(resolveAppUrl(config)).toBe('https://custom.qase.io');
     });
+
+    const schemeCases: [string, string][] = [
+      ['http://api.qase.lo', 'http://app.qase.lo'],
+      ['http://api.qase.lo:8080', 'http://app.qase.lo:8080'],
+      ['https://qase.internal/tms/', 'https://qase.internal/tms'],
+    ];
+
+    for (const [host, expected] of schemeCases) {
+      it(`should keep the scheme of "${host}"`, () => {
+        const config = { api: { token: 'tok', host } } as any;
+        expect(resolveAppUrl(config)).toBe(expected);
+      });
+    }
   });
 
   describe('createApiConfigV2', () => {
@@ -58,6 +85,20 @@ describe('api-config-builder', () => {
       const result = createApiConfigV2(config);
       expect(result.basePath).toBe('https://api-custom.qase.io/v2');
     });
+
+    const fullUrlCasesV2: [string, string][] = [
+      ['http://api.qase.lo', 'http://api.qase.lo/v2'],
+      ['https://api.self-hosted.example', 'https://api.self-hosted.example/v2'],
+      ['http://localhost:8080', 'http://localhost:8080/v2'],
+      ['https://qase.internal/tms/', 'https://qase.internal/tms/v2'],
+    ];
+
+    for (const [host, expected] of fullUrlCasesV2) {
+      it(`should use the full base URL "${host}" verbatim`, () => {
+        const config = { api: { token: 'tok123', host } } as any;
+        expect(createApiConfigV2(config).basePath).toBe(expected);
+      });
+    }
 
     it('should set X-Client and X-Platform headers when hostData provided', () => {
       const config = { api: { token: 'tok123' } } as any;

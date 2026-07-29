@@ -21,4 +21,28 @@ describe('resolveTestOpsBaseUrl', () => {
   it('handles empty string as undefined', () => {
     expect(resolveTestOpsBaseUrl('')).toBe('https://app.qase.io');
   });
+
+  // Regression: the rewrite used an unanchored substring replace, so any host merely containing
+  // the letters "api" was corrupted (capital.qase.io — capptal.qase.io).
+  for (const host of ['capital.qase.io', 'rapid.qase.io', 'therapist.example']) {
+    it(`does not corrupt "${host}", which only contains "api"`, () => {
+      expect(resolveTestOpsBaseUrl(host)).toBe(`https://${host}`);
+    });
+  }
+
+  describe('full base URL', () => {
+    const cases: [string, string][] = [
+      ['http://api.qase.lo', 'http://app.qase.lo'],
+      ['https://api.qase.io', 'https://app.qase.io'],
+      ['http://api.qase.lo:8080', 'http://app.qase.lo:8080'],
+      ['http://api.qase.lo/', 'http://app.qase.lo'],
+      ['https://qase.internal/tms', 'https://qase.internal/tms'],
+    ];
+
+    for (const [host, expected] of cases) {
+      it(`resolves "${host}" to "${expected}"`, () => {
+        expect(resolveTestOpsBaseUrl(host)).toBe(expected);
+      });
+    }
+  });
 });

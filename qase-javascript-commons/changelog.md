@@ -1,3 +1,13 @@
+## 2.7.7
+
+### Added
+
+- `testops.api.host` / `QASE_TESTOPS_API_HOST` now accepts a full base URL as well as a bare host name. A value carrying an `http://` or `https://` scheme is used verbatim, so self-hosted deployments and local development can specify a scheme, a port, or a path prefix (`https://qase.internal/tms`, `http://localhost:8080`, `http://api.qase.lo`). Bare host names keep their existing meaning and are still resolved as `https://api-<host>` — no previously working configuration changes behaviour.
+
+### Fixed
+
+- The API-to-app host rewrite used an unanchored substring replace, so any host merely containing the letters `api` was corrupted when building the test run link: `capital.qase.io` became `capptal.qase.io` and `rapid.qase.io` became `rappd.qase.io`. The rewrite is now anchored to the leading `api.` label.
+
 ## 2.7.5
 
 ### Fixed
