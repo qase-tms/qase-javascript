@@ -69,6 +69,13 @@ export class PlaywrightQaseReporter implements Reporter {
   private options: ReporterOptionsType;
 
   /**
+   * Mirrors `testops.uploadAttachments`. The error context carries page snapshots and source
+   * frames, so users who opted out of attachment upload must not receive it as a text field
+   * either.
+   */
+  private uploadAttachments = true;
+
+  /**
    * @param {PlaywrightQaseOptionsType} options
    * @param {ConfigLoaderInterface} configLoader
    */
@@ -80,6 +87,7 @@ export class PlaywrightQaseReporter implements Reporter {
     const { framework, ...composedOptions } = composeOptions(options, config);
 
     this.options = options.framework ?? {};
+    this.uploadAttachments = composedOptions.testops?.uploadAttachments ?? true;
 
     this.reporter = QaseReporter.getInstance({
       ...composedOptions,
@@ -123,7 +131,10 @@ export class PlaywrightQaseReporter implements Reporter {
     };
 
     // Read here, at the async boundary, so the metadata extractor and result builder stay pure.
-    const errorContext = await readErrorContext(result.attachments);
+    // Skipped entirely when attachment upload is off — same content, same opt-out.
+    const errorContext = this.uploadAttachments
+      ? await readErrorContext(result.attachments)
+      : null;
 
     const testResult = this.resultBuilder.build({
       test,

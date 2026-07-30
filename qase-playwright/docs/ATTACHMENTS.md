@@ -290,7 +290,7 @@ test('Test with browser console logs', async ({ page }) => {
 
 For every failed test, Playwright (>= 1.51) writes an `error-context.md` file containing the test's
 title path, location, error details, a page snapshot, and a source code frame. The reporter handles
-it in two ways, with no configuration required:
+it in two ways:
 
 - it is **uploaded as a file attachment**, exactly like any other attachment; and
 - its text is **also sent as `execution.error_context`**, so Qase can offer a
@@ -298,6 +298,9 @@ it in two ways, with no configuration required:
 
 Notes:
 
+- Both are governed by `testops.uploadAttachments` (default `true`). Setting it to `false` suppresses
+  the text field as well as the file — the error context contains a snapshot of your page, so
+  opting out of attachment upload opts out of both.
 - Only failed tests produce an error context; otherwise `null` is sent.
 - The text is capped at 262 144 characters. Anything longer is truncated with a
   `[truncated by qase reporter: N characters omitted]` marker appended — page snapshots on very
