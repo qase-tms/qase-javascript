@@ -49,7 +49,7 @@ export interface ResultExecution {
    */
   stacktrace?: string | null;
   /**
-   * Free-form failure context captured by the reporter. For Playwright this is the content of error-context.md (test info, error details, page snapshot). Stored verbatim so it can be copied as raw text. Truncated at 262144 characters.
+   * Free-form failure context captured by the reporter. For Playwright this is the content of error-context.md (test info, error details, page snapshot), so it may include rendered page content. Stored verbatim so it can be copied as raw text. Values longer than 262144 characters are silently truncated by Qase and the request still succeeds. Write-only — not returned by the result read endpoints.
    * @type {string}
    * @memberof ResultExecution
    */
