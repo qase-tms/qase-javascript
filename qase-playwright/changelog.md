@@ -1,3 +1,9 @@
+# playwright-qase-reporter@2.6.0
+
+## Added
+
+- Playwright's per-failure `error-context.md` (Playwright >= 1.51) is now also sent as `execution.error_context` on the v2 result payload, in addition to being uploaded as a file attachment as before. Qase stores it as text so it can be copied straight to the clipboard from the test result, instead of having to download the `.md`. Both the text field and the attachment are governed by `testops.uploadAttachments`, so setting it to `false` suppresses both — the error context contains a page snapshot. Only failed tests produce one; the text is truncated at 262144 characters with a `[truncated by qase reporter: N characters omitted]` marker, and a missing or unreadable file is ignored rather than failing the result submission. Bumped `qase-javascript-commons` pin to `~2.8.0`. See [docs/ATTACHMENTS.md](docs/ATTACHMENTS.md#playwright-error-context).
+
 # playwright-qase-reporter@2.5.6
 
 ## Fixed

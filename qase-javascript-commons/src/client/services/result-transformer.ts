@@ -1,4 +1,10 @@
-import { ResultCreate, ResultExecution, ResultRelations, ResultStep, ResultStepStatus } from 'qase-api-v2-client';
+import {
+  ResultCreate,
+  ResultExecution,
+  ResultRelations,
+  ResultStep,
+  ResultStepStatus,
+} from 'qase-api-v2-client';
 import {
   Attachment,
   Relation,
@@ -39,11 +45,18 @@ export class ResultTransformer {
     result: TestResultType,
     attachmentUploader: (attachment: Attachment) => Promise<string>,
   ): Promise<ResultCreate> {
-    const attachments = await this.uploadAttachments(result.attachments, attachmentUploader);
+    const attachments = await this.uploadAttachments(
+      result.attachments,
+      attachmentUploader,
+    );
     if (result.preparedAttachments) {
       attachments.push(...result.preparedAttachments);
     }
-    const steps = await this.transformSteps(result.steps, result.title, attachmentUploader);
+    const steps = await this.transformSteps(
+      result.steps,
+      result.title,
+      attachmentUploader,
+    );
     const params = this.transformParams(result.params);
     const groupParams = this.transformGroupParams(result.group_params, params);
     const relations = this.getRelation(result.relations);
@@ -52,8 +65,12 @@ export class ResultTransformer {
       title: result.title,
       execution: this.getExecution(result.execution),
       testops_ids: Array.isArray(result.testops_id)
-        ? (result.testops_id.length > 0 ? result.testops_id : null)
-        : result.testops_id !== null ? [result.testops_id] : null,
+        ? result.testops_id.length > 0
+          ? result.testops_id
+          : null
+        : result.testops_id !== null
+          ? [result.testops_id]
+          : null,
       attachments: attachments,
       steps: steps,
       params: params,
@@ -105,7 +122,9 @@ export class ResultTransformer {
     attachmentUploader: (attachment: Attachment) => Promise<string>,
   ): Promise<ResultStep[]> {
     return Promise.all(
-      steps.map(step => this.transformStep(step, testTitle, attachmentUploader)),
+      steps.map((step) =>
+        this.transformStep(step, testTitle, attachmentUploader),
+      ),
     );
   }
 
@@ -114,8 +133,14 @@ export class ResultTransformer {
     testTitle: string,
     attachmentUploader: (attachment: Attachment) => Promise<string>,
   ): Promise<ResultStep> {
-    const attachmentHashes = await this.uploadAttachments(step.attachments, attachmentUploader);
-    const resultStep = this.createBaseResultStep(attachmentHashes, step.execution.status);
+    const attachmentHashes = await this.uploadAttachments(
+      step.attachments,
+      attachmentUploader,
+    );
+    const resultStep = this.createBaseResultStep(
+      attachmentHashes,
+      step.execution.status,
+    );
 
     if (step.step_type === StepType.TEXT) {
       this.processTextStep(step, resultStep, testTitle);
@@ -126,13 +151,20 @@ export class ResultTransformer {
     }
 
     if (step.steps.length > 0) {
-      resultStep.steps = await this.transformSteps(step.steps, testTitle, attachmentUploader);
+      resultStep.steps = await this.transformSteps(
+        step.steps,
+        testTitle,
+        attachmentUploader,
+      );
     }
 
     return resultStep;
   }
 
-  private createBaseResultStep(attachmentHashes: string[], status: StepStatusEnum): ResultStep {
+  private createBaseResultStep(
+    attachmentHashes: string[],
+    status: StepStatusEnum,
+  ): ResultStep {
     return {
       data: { action: '' },
       execution: {
@@ -142,14 +174,20 @@ export class ResultTransformer {
     };
   }
 
-  private processTextStep(step: TestStepType, resultStep: ResultStep, testTitle: string): void {
+  private processTextStep(
+    step: TestStepType,
+    resultStep: ResultStep,
+    testTitle: string,
+  ): void {
     if (!('action' in step.data) || !resultStep.data) return;
 
     const stepData = step.data;
     resultStep.data.action = stepData.action || 'Unnamed step';
 
     if (stepData.action === '') {
-      this.logger.log(chalk`{magenta Test '${testTitle}' has empty action in step. The reporter will mark this step as unnamed step.}`);
+      this.logger.log(
+        chalk`{magenta Test '${testTitle}' has empty action in step. The reporter will mark this step as unnamed step.}`,
+      );
     }
 
     if (stepData.expected_result != null) {
@@ -179,11 +217,14 @@ export class ResultTransformer {
       end_time: exec.end_time,
       duration: exec.duration,
       stacktrace: exec.stacktrace,
+      error_context: exec.error_context ?? null,
       thread: exec.thread,
     };
   }
 
-  private transformParams(params: Record<string, string>): Record<string, string> {
+  private transformParams(
+    params: Record<string, string>,
+  ): Record<string, string> {
     const transformedParams: Record<string, string> = {};
     for (const [key, value] of Object.entries(params)) {
       if (value != null) {
@@ -236,7 +277,7 @@ export class ResultTransformer {
     }
 
     return result.concat(
-      suiteData.map(data => ({ public_id: null, title: data.title })),
+      suiteData.map((data) => ({ public_id: null, title: data.title })),
     );
   }
 }

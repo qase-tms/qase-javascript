@@ -1,3 +1,14 @@
+## 2.8.0
+
+### Added
+
+- `TestExecution` gained an optional `error_context` field, mapped through `ResultTransformer` to `execution.error_context` on the v2 API payload. It carries free-form failure context captured by a framework — for Playwright, the contents of `error-context.md` — which Qase stores as text so it can be copied as a raw string. The field is optional, so reporters that do not produce one are unaffected and keep sending `null`. Bumped `qase-api-v2-client` pin to `~1.0.10`.
+- `testops.api.host` / `QASE_TESTOPS_API_HOST` now accepts a full base URL as well as a bare host name. A value carrying an `http://` or `https://` scheme is used verbatim, so self-hosted deployments and local development can specify a scheme, a port, or a path prefix (`https://qase.internal/tms`, `http://localhost:8080`, `http://api.qase.lo`). Bare host names keep their existing meaning and are still resolved as `https://api-<host>` — no previously working configuration changes behaviour.
+
+### Fixed
+
+- The API-to-app host rewrite used an unanchored substring replace, so any host merely containing the letters `api` was corrupted when building the test run link: `capital.qase.io` became `capptal.qase.io` and `rapid.qase.io` became `rappd.qase.io`. The rewrite is now anchored to the leading `api.` label.
+
 ## 2.7.5
 
 ### Fixed

@@ -48,7 +48,13 @@ jobs:
     # vitest 4.x loads native rolldown bindings via optionalDependencies;
     # lockfile pins them only for the platform it was generated on
     # (npm/cli#4828), so we pull the Linux binding directly for the runner.
-    - run: npm install --no-save --no-package-lock @rolldown/binding-linux-x64-gnu
+    #
+    # Keep the lockfile in play: --no-package-lock makes npm rebuild the whole
+    # tree from the package.json files alone (223 added / 243 removed / 210
+    # changed), which drops the workspace symlinks and hoisted @types, so the
+    # next step fails with ~230 TS2307/TS2527 errors across every workspace.
+    # --no-save alone is enough to keep package.json untouched.
+    - run: npm install --no-save @rolldown/binding-linux-x64-gnu
     - run: npm run build -ws --if-present
 
     - uses: actions/setup-python@v5

@@ -7,7 +7,9 @@ import { ReporterContentType } from '../src/playwright';
 
 const PROFILER_CONTENT_TYPE = 'application/qase.profiler-steps+json';
 
-function makeMetadataAttachment(payload: object): TestResult['attachments'][number] {
+function makeMetadataAttachment(
+  payload: object,
+): TestResult['attachments'][number] {
   return {
     name: 'qase-metadata',
     contentType: ReporterContentType,
@@ -57,7 +59,12 @@ describe('MetadataExtractor', () => {
 
   it('parses ignore/suite/comment/groupParams', () => {
     const m = extractor.transform([
-      makeMetadataAttachment({ ignore: true, suite: 'mySuite', comment: 'note', groupParams: { region: 'eu' } }),
+      makeMetadataAttachment({
+        ignore: true,
+        suite: 'mySuite',
+        comment: 'note',
+        groupParams: { region: 'eu' },
+      }),
     ]);
     expect(m.ignore).toBe(true);
     expect(m.suite).toBe('mySuite');
@@ -81,7 +88,11 @@ describe('MetadataExtractor', () => {
 
   it('skips profiler-content attachments (handled separately by ResultBuilder)', () => {
     const m = extractor.transform([
-      { name: 'profiler.json', contentType: PROFILER_CONTENT_TYPE, body: Buffer.from('[]') } as any,
+      {
+        name: 'profiler.json',
+        contentType: PROFILER_CONTENT_TYPE,
+        body: Buffer.from('[]'),
+      } as any,
     ]);
     expect(m.attachments).toEqual([]);
   });
@@ -109,7 +120,8 @@ describe('MetadataExtractor', () => {
   it('routes step_attach_file_<uuid>_<name> attachments with file_path set', () => {
     const parentStep = { title: 'parent' } as any;
     const childStep = {
-      title: 'step_attach_file_12345678-1234-1234-1234-123456789012_screenshot.png',
+      title:
+        'step_attach_file_12345678-1234-1234-1234-123456789012_screenshot.png',
       parent: parentStep,
     } as any;
     stepIndex.cacheStep(childStep, {} as any);
@@ -127,7 +139,12 @@ describe('MetadataExtractor', () => {
 
   it('treats a regular attachment as a test-level attachment', () => {
     const m = extractor.transform([
-      { name: 'screenshot.png', contentType: 'image/png', path: '/tmp/x.png', body: undefined } as any,
+      {
+        name: 'screenshot.png',
+        contentType: 'image/png',
+        path: '/tmp/x.png',
+        body: undefined,
+      } as any,
     ]);
     expect(m.attachments).toHaveLength(1);
     expect(m.attachments[0]?.file_name).toBe('x.png');
@@ -136,9 +153,30 @@ describe('MetadataExtractor', () => {
 
   it('falls back to attachment.name when path is missing', () => {
     const m = extractor.transform([
-      { name: 'inline.txt', contentType: 'text/plain', body: Buffer.from('data') } as any,
+      {
+        name: 'inline.txt',
+        contentType: 'text/plain',
+        body: Buffer.from('data'),
+      } as any,
     ]);
     expect(m.attachments).toHaveLength(1);
     expect(m.attachments[0]?.file_name).toBe('inline.txt');
+  });
+
+  // The error-context markdown is sent as execution.error_context AND kept as a file attachment;
+  // this locks in the second half of that deliberately redundant behaviour.
+  it('still keeps the Playwright error-context attachment as a test-level attachment', () => {
+    const m = extractor.transform([
+      {
+        name: 'error-context',
+        contentType: 'text/markdown',
+        path: '/tmp/run/error-context.md',
+        body: undefined,
+      } as any,
+    ]);
+    expect(m.attachments).toHaveLength(1);
+    expect(m.attachments[0]?.file_name).toBe('error-context.md');
+    expect(m.attachments[0]?.file_path).toBe('/tmp/run/error-context.md');
+    expect(m.attachments[0]?.mime_type).toBe('text/markdown');
   });
 });

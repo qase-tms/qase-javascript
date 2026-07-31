@@ -3,6 +3,7 @@ import { Configuration as ConfigurationV2 } from 'qase-api-v2-client';
 import FormData from 'form-data';
 import { TestOpsOptionsType } from '../../models/config/TestOpsOptionsType';
 import { HostData } from '../../models/host-data';
+import { apiLabelToAppInUrl, isAbsoluteUrl, stripTrailingSlashes } from '../../utils/api-host';
 
 const DEFAULT_API_HOST = 'qase.io';
 const API_BASE_URL = 'https://api-';
@@ -11,6 +12,11 @@ const API_V1 = '/v1';
 const API_V2 = '/v2';
 
 function resolveBasePath(host: string | undefined, version: string): string {
+  // A host carrying a scheme is a complete base URL — the only shape that can express a custom
+  // scheme, port or path prefix — so use it as given instead of interpolating Qase's convention.
+  if (host && isAbsoluteUrl(host)) {
+    return `${stripTrailingSlashes(host)}${version}`;
+  }
   if (host && host !== DEFAULT_API_HOST) {
     return `${API_BASE_URL}${host}${version}`;
   }
@@ -18,6 +24,11 @@ function resolveBasePath(host: string | undefined, version: string): string {
 }
 
 export function resolveAppUrl(config: TestOpsOptionsType): string {
+  if (config.api.host && isAbsoluteUrl(config.api.host)) {
+    // The API base URL doubles as the app origin here, so swap the `api.` label when there is
+    // one. Bare host fragments keep their historical behaviour below (no swap).
+    return apiLabelToAppInUrl(stripTrailingSlashes(config.api.host));
+  }
   if (config.api.host && config.api.host !== DEFAULT_API_HOST) {
     return `${APP_BASE_URL}${config.api.host}`;
   }

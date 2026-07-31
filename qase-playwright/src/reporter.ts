@@ -1,4 +1,10 @@
-import { Reporter, TestCase, TestResult, TestStatus, TestStep } from '@playwright/test/reporter';
+import {
+  Reporter,
+  TestCase,
+  TestResult,
+  TestStatus,
+  TestStep,
+} from '@playwright/test/reporter';
 
 import {
   composeOptions,
@@ -14,6 +20,7 @@ import { AnnotationExtractor } from './annotation-extractor';
 import { StepConverter } from './step-converter';
 import { MetadataExtractor } from './metadata-extractor';
 import { ResultBuilder } from './result-builder';
+import { readErrorContext } from './error-context';
 
 export type PlaywrightQaseOptionsType = Omit<ConfigType, 'reporterOptions'> & {
   framework: ReporterOptionsType;
@@ -47,7 +54,9 @@ export class PlaywrightQaseReporter implements Reporter {
 
   private stepConverter: StepConverter = new StepConverter(this.stepIndex);
 
-  private metadataExtractor: MetadataExtractor = new MetadataExtractor(this.stepIndex);
+  private metadataExtractor: MetadataExtractor = new MetadataExtractor(
+    this.stepIndex,
+  );
 
   private resultBuilder: ResultBuilder = new ResultBuilder(this.stepConverter);
 
@@ -58,6 +67,13 @@ export class PlaywrightQaseReporter implements Reporter {
   private reporter: ReporterInterface;
 
   private options: ReporterOptionsType;
+
+  /**
+   * Mirrors `testops.uploadAttachments`. The error context carries page snapshots and source
+   * frames, so users who opted out of attachment upload must not receive it as a text field
+   * either.
+   */
+  private uploadAttachments = true;
 
   /**
    * @param {PlaywrightQaseOptionsType} options
@@ -71,6 +87,7 @@ export class PlaywrightQaseReporter implements Reporter {
     const { framework, ...composedOptions } = composeOptions(options, config);
 
     this.options = options.framework ?? {};
+    this.uploadAttachments = composedOptions.testops?.uploadAttachments ?? true;
 
     this.reporter = QaseReporter.getInstance({
       ...composedOptions,
@@ -107,15 +124,24 @@ export class PlaywrightQaseReporter implements Reporter {
     const metadata = this.metadataExtractor.transform(result.attachments);
     const annotations = {
       ids: this.annotationExtractor.extractQaseIds(test.annotations),
-      projectMapping: this.annotationExtractor.extractProjectMapping(test.annotations),
+      projectMapping: this.annotationExtractor.extractProjectMapping(
+        test.annotations,
+      ),
       suites: this.annotationExtractor.extractSuite(test.annotations),
     };
+
+    // Read here, at the async boundary, so the metadata extractor and result builder stay pure.
+    // Skipped entirely when attachment upload is off — same content, same opt-out.
+    const errorContext = this.uploadAttachments
+      ? await readErrorContext(result.attachments)
+      : null;
 
     const testResult = this.resultBuilder.build({
       test,
       result,
       metadata,
       annotations,
+      errorContext,
       options: this.options,
       isCaptureLogs: this.reporter.isCaptureLogs(),
       qaseIdsRegistry: PlaywrightQaseReporter.qaseIds,
@@ -145,5 +171,4 @@ export class PlaywrightQaseReporter implements Reporter {
   checkChildrenSteps(steps: TestStep[]): boolean {
     return this.stepConverter.hasOnlyLeafCategories(steps);
   }
-
 }

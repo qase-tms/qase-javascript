@@ -22,7 +22,10 @@ function emptyMetadata(): TestCaseMetadata {
   };
 }
 
-function makeTest(title: string, titlePath: string[] = ['file.spec.ts', title]): TestCase {
+function makeTest(
+  title: string,
+  titlePath: string[] = ['file.spec.ts', title],
+): TestCase {
   return {
     title,
     titlePath: () => titlePath,
@@ -30,7 +33,10 @@ function makeTest(title: string, titlePath: string[] = ['file.spec.ts', title]):
   } as unknown as TestCase;
 }
 
-function makeResult(status: TestStatus, opts: Partial<TestResult> = {}): TestResult {
+function makeResult(
+  status: TestStatus,
+  opts: Partial<TestResult> = {},
+): TestResult {
   return {
     status,
     startTime: new Date(0),
@@ -98,7 +104,9 @@ describe('ResultBuilder precedence chain', () => {
   });
 
   it('uses annotation ids when no projectMapping', () => {
-    const args = defaultArgs({ annotations: { ids: [42], projectMapping: null, suites: [] } });
+    const args = defaultArgs({
+      annotations: { ids: [42], projectMapping: null, suites: [] },
+    });
     const r = builder.build(args)!;
     expect(r.testops_id).toBe(42);
   });
@@ -111,14 +119,20 @@ describe('ResultBuilder precedence chain', () => {
 
   it('uses static qaseIds Map fallback when nothing else matches', () => {
     const registry = new Map<string, number[]>([['fallback test', [99]]]);
-    const args = defaultArgs({ test: makeTest('fallback test'), qaseIdsRegistry: registry });
+    const args = defaultArgs({
+      test: makeTest('fallback test'),
+      qaseIdsRegistry: registry,
+    });
     const r = builder.build(args)!;
     expect(r.testops_id).toEqual([99]);
   });
 
   it('returns null testops_id when registry entry is an empty array (regression: qase(0,...) used to leak [])', () => {
     const registry = new Map<string, number[]>([['fallback test', []]]);
-    const args = defaultArgs({ test: makeTest('fallback test'), qaseIdsRegistry: registry });
+    const args = defaultArgs({
+      test: makeTest('fallback test'),
+      qaseIdsRegistry: registry,
+    });
     const r = builder.build(args)!;
     expect(r.testops_id).toBeNull();
   });
@@ -133,25 +147,39 @@ describe('ResultBuilder feature flags and merging', () => {
   });
 
   it('returns null when metadata.ignore is true', () => {
-    const args = defaultArgs({ metadata: { ...emptyMetadata(), ignore: true } });
+    const args = defaultArgs({
+      metadata: { ...emptyMetadata(), ignore: true },
+    });
     expect(builder.build(args)).toBeNull();
   });
 
   it('adds browser parameter when options.browser.addAsParameter is true', () => {
-    const test = { title: 't', titlePath: () => ['t'], annotations: [], _projectId: 'chrome' } as unknown as TestCase;
-    const options = { browser: { addAsParameter: true, parameterName: 'browser' } } as unknown as ReporterOptionsType;
+    const test = {
+      title: 't',
+      titlePath: () => ['t'],
+      annotations: [],
+      _projectId: 'chrome',
+    } as unknown as TestCase;
+    const options = {
+      browser: { addAsParameter: true, parameterName: 'browser' },
+    } as unknown as ReporterOptionsType;
     const r = builder.build(defaultArgs({ test, options }))!;
     expect(r.params).toEqual(expect.objectContaining({ browser: 'chrome' }));
   });
 
   it('marks the test as flaky when retry>0 and status is passed', () => {
-    const args = defaultArgs({ result: makeResult('passed' as TestStatus, { retry: 1 }), options: { markAsFlaky: true } as ReporterOptionsType });
+    const args = defaultArgs({
+      result: makeResult('passed' as TestStatus, { retry: 1 }),
+      options: { markAsFlaky: true } as ReporterOptionsType,
+    });
     const r = builder.build(args)!;
     expect(r.fields['is_flaky']).toBe('true');
   });
 
   it('does not mark flaky when retry is 0', () => {
-    const args = defaultArgs({ options: { markAsFlaky: true } as ReporterOptionsType });
+    const args = defaultArgs({
+      options: { markAsFlaky: true } as ReporterOptionsType,
+    });
     const r = builder.build(args)!;
     expect(r.fields['is_flaky']).toBeUndefined();
   });
@@ -159,7 +187,9 @@ describe('ResultBuilder feature flags and merging', () => {
   it('filters test.title out of suites', () => {
     const test = makeTest('login', ['root', 'login']);
     const r = builder.build(defaultArgs({ test }))!;
-    expect(r.relations.suite.data.map((s: { title: string }) => s.title)).not.toContain('login');
+    expect(
+      r.relations.suite.data.map((s: { title: string }) => s.title),
+    ).not.toContain('login');
   });
 
   it('merges comment with error message into the message field', () => {
@@ -180,18 +210,40 @@ describe('ResultBuilder feature flags and merging', () => {
       body: Buffer.from(JSON.stringify([profilerStep])),
       name: 'profiler.json',
     } as any;
-    const args = defaultArgs({ result: makeResult('passed' as TestStatus, { attachments: [profilerAttachment] }) });
+    const args = defaultArgs({
+      result: makeResult('passed' as TestStatus, {
+        attachments: [profilerAttachment],
+      }),
+    });
     const r = builder.build(args)!;
     expect(r.steps[r.steps.length - 1]).toEqual(profilerStep);
   });
 
   it('attaches stdout/stderr as logs when isCaptureLogs is true', () => {
     const args = defaultArgs({
-      result: makeResult('passed' as TestStatus, { stdout: ['line1\n'], stderr: ['err1\n'] }),
+      result: makeResult('passed' as TestStatus, {
+        stdout: ['line1\n'],
+        stderr: ['err1\n'],
+      }),
       isCaptureLogs: true,
     });
     const r = builder.build(args)!;
-    expect(r.attachments.find((a: any) => a.file_name === 'stdout.log')).toBeDefined();
-    expect(r.attachments.find((a: any) => a.file_name === 'stderr.log')).toBeDefined();
+    expect(
+      r.attachments.find((a: any) => a.file_name === 'stdout.log'),
+    ).toBeDefined();
+    expect(
+      r.attachments.find((a: any) => a.file_name === 'stderr.log'),
+    ).toBeDefined();
+  });
+
+  it('maps errorContext onto execution.error_context', () => {
+    const content = '# Test info\n\n- Name: a >> b\n';
+    const r = builder.build(defaultArgs({ errorContext: content }))!;
+    expect(r.execution.error_context).toBe(content);
+  });
+
+  it('sets execution.error_context to null when there is no error context', () => {
+    const r = builder.build(defaultArgs())!;
+    expect(r.execution.error_context).toBeNull();
   });
 });

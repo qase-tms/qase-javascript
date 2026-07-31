@@ -342,6 +342,64 @@ describe('PlaywrightQaseReporter', () => {
       expect(call.attachments[0].file_name).toBe('stdout.log');
       expect(call.attachments[1].file_name).toBe('stderr.log');
     });
+
+    it('should send the error-context attachment text as execution.error_context', async () => {
+      const content = '# Test info\n\n- Name: Suite1 >> Test\n';
+      const result = {
+        ...testResultMock,
+        status: 'failed',
+        attachments: [
+          {
+            name: 'error-context',
+            contentType: 'text/markdown',
+            body: Buffer.from(content),
+          },
+        ],
+      };
+
+      await reporter.onTestEnd(testCaseMock as any, result as any);
+
+      const call = reporterMock.addTestResult.mock.calls[0][0];
+      expect(call.execution.error_context).toBe(content);
+    });
+
+    it('should send a null error_context when there is no error-context attachment', async () => {
+      await reporter.onTestEnd(testCaseMock as any, { ...testResultMock } as any);
+
+      const call = reporterMock.addTestResult.mock.calls[0][0];
+      expect(call.execution.error_context).toBeNull();
+    });
+
+    // The error context is the same page-snapshot/source-frame content as the file attachment,
+    // so opting out of attachment upload must suppress the text field too.
+    it('should not send error_context when testops.uploadAttachments is false', async () => {
+      const commons = jest.requireMock<typeof import('qase-javascript-commons')>(
+        'qase-javascript-commons',
+      );
+      (commons.composeOptions as jest.Mock).mockReturnValueOnce({
+        testops: { uploadAttachments: false },
+      });
+      const gatedReporter = new PlaywrightQaseReporter(options);
+
+      const result = {
+        ...testResultMock,
+        status: 'failed',
+        attachments: [
+          {
+            name: 'error-context',
+            contentType: 'text/markdown',
+            body: Buffer.from('# Test info\n'),
+          },
+        ],
+      };
+
+      await gatedReporter.onTestEnd(testCaseMock as any, result as any);
+
+      const call = reporterMock.addTestResult.mock.calls[0][0];
+      expect(call.execution.error_context).toBeNull();
+      // The attachment itself is still handed off; commons drops it at upload time.
+      expect(call.attachments).toHaveLength(1);
+    });
   });
 
   describe('onEnd', () => {
