@@ -40,7 +40,7 @@
     "handlebars": "4.7.9",
     "uuid": "^11.1.1",
     "tmp": "^0.2.6",
-    "fast-uri": "^3.1.4",
+    "fast-uri": "^3.1.5",
     "fast-xml-builder": "^1.1.7",
     "fast-xml-parser": "^5.7.0",
     "basic-ftp": "^6.0.1",
