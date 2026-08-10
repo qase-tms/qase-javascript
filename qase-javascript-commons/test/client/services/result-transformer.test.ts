@@ -61,7 +61,7 @@ function makeStep(overrides: Partial<TestStepType> = {}): TestStepType {
 }
 
 describe('ResultTransformer', () => {
-  const mockUploader = jest.fn().mockResolvedValue('hash123');
+  const mockUploader = jest.fn().mockReturnValue('hash123');
   let transformer: ResultTransformer;
 
   beforeEach(() => {
@@ -135,7 +135,7 @@ describe('ResultTransformer', () => {
     });
 
     it('should upload attachments and include prepared ones', async () => {
-      mockUploader.mockResolvedValue('uploaded-hash');
+      mockUploader.mockReturnValue('uploaded-hash');
       const result = makeResult({
         attachments: [{ file_name: 'a.png' }],
         preparedAttachments: ['existing-hash'],
@@ -250,6 +250,36 @@ describe('ResultTransformer', () => {
     it('should return empty relations when no rootSuite and no relation', async () => {
       const model = await transformer.transform(makeResult(), mockUploader);
       expect(model.relations).toEqual({});
+    });
+  });
+
+  describe('collectAttachments', () => {
+    it('should collect result-level attachments', () => {
+      const a1 = { file_name: 'a1.png' } as any;
+      const result = makeResult({ attachments: [a1] });
+      expect(transformer.collectAttachments(result)).toEqual([a1]);
+    });
+
+    it('should collect attachments from steps and nested steps', () => {
+      const a1 = { file_name: 'a1.png' } as any;
+      const sa = { file_name: 'step.png' } as any;
+      const na = { file_name: 'nested.png' } as any;
+      const result = makeResult({
+        attachments: [a1],
+        steps: [
+          makeStep({
+            attachments: [sa],
+            steps: [makeStep({ attachments: [na] })],
+          }),
+        ],
+      });
+      expect(transformer.collectAttachments(result)).toEqual([a1, sa, na]);
+    });
+
+    it('should not collect preparedAttachments (already hashes)', () => {
+      const a1 = { file_name: 'a1.png' } as any;
+      const result = makeResult({ attachments: [a1], preparedAttachments: ['existing-hash'] });
+      expect(transformer.collectAttachments(result)).toEqual([a1]);
     });
   });
 });

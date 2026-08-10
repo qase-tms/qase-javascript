@@ -41,21 +41,18 @@ export class ResultTransformer {
     private readonly rootSuite: string | undefined,
   ) {}
 
-  async transform(
+  transform(
     result: TestResultType,
-    attachmentUploader: (attachment: Attachment) => Promise<string>,
-  ): Promise<ResultCreate> {
-    const attachments = await this.uploadAttachments(
-      result.attachments,
-      attachmentUploader,
-    );
+    resolveHash: (attachment: Attachment) => string,
+  ): ResultCreate {
+    const attachments = this.resolveHashes(result.attachments, resolveHash);
     if (result.preparedAttachments) {
       attachments.push(...result.preparedAttachments);
     }
-    const steps = await this.transformSteps(
+    const steps = this.transformSteps(
       result.steps,
       result.title,
-      attachmentUploader,
+      resolveHash,
     );
     const params = this.transformParams(result.params);
     const groupParams = this.transformGroupParams(result.group_params, params);
@@ -94,49 +91,57 @@ export class ResultTransformer {
     return model;
   }
 
-  async transformWithDefect(
+  transformWithDefect(
     result: TestResultType,
-    attachmentUploader: (attachment: Attachment) => Promise<string>,
+    resolveHash: (attachment: Attachment) => string,
     defect: boolean,
-  ): Promise<ResultCreate> {
-    const model = await this.transform(result, attachmentUploader);
+  ): ResultCreate {
+    const model = this.transform(result, resolveHash);
     model.defect = defect;
     return model;
   }
 
-  private async uploadAttachments(
+  collectAttachments(result: TestResultType): Attachment[] {
+    const collected: Attachment[] = [...result.attachments];
+    this.collectStepAttachments(result.steps, collected);
+    return collected;
+  }
+
+  private collectStepAttachments(steps: TestStepType[], acc: Attachment[]): void {
+    for (const step of steps) {
+      acc.push(...step.attachments);
+      if (step.steps.length > 0) {
+        this.collectStepAttachments(step.steps, acc);
+      }
+    }
+  }
+
+  private resolveHashes(
     attachments: Attachment[],
-    uploader: (attachment: Attachment) => Promise<string>,
-  ): Promise<string[]> {
+    resolveHash: (attachment: Attachment) => string,
+  ): string[] {
     const hashes: string[] = [];
     for (const attachment of attachments) {
-      const hash = await uploader(attachment);
+      const hash = resolveHash(attachment);
       if (hash) hashes.push(hash);
     }
     return hashes;
   }
 
-  private async transformSteps(
+  private transformSteps(
     steps: TestStepType[],
     testTitle: string,
-    attachmentUploader: (attachment: Attachment) => Promise<string>,
-  ): Promise<ResultStep[]> {
-    return Promise.all(
-      steps.map((step) =>
-        this.transformStep(step, testTitle, attachmentUploader),
-      ),
-    );
+    resolveHash: (attachment: Attachment) => string,
+  ): ResultStep[] {
+    return steps.map((step) => this.transformStep(step, testTitle, resolveHash));
   }
 
-  private async transformStep(
+  private transformStep(
     step: TestStepType,
     testTitle: string,
-    attachmentUploader: (attachment: Attachment) => Promise<string>,
-  ): Promise<ResultStep> {
-    const attachmentHashes = await this.uploadAttachments(
-      step.attachments,
-      attachmentUploader,
-    );
+    resolveHash: (attachment: Attachment) => string,
+  ): ResultStep {
+    const attachmentHashes = this.resolveHashes(step.attachments, resolveHash);
     const resultStep = this.createBaseResultStep(
       attachmentHashes,
       step.execution.status,
@@ -151,10 +156,10 @@ export class ResultTransformer {
     }
 
     if (step.steps.length > 0) {
-      resultStep.steps = await this.transformSteps(
+      resultStep.steps = this.transformSteps(
         step.steps,
         testTitle,
-        attachmentUploader,
+        resolveHash,
       );
     }
 
