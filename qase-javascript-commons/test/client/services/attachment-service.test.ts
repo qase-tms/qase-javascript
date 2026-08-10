@@ -114,6 +114,33 @@ describe('AttachmentService', () => {
       expect(api.uploadAttachment).toHaveBeenCalledTimes(2);
     });
 
+    it('should retry on transient network errors (ECONNRESET) then succeed', async () => {
+      const netError: any = new Error('socket hang up');
+      netError.isAxiosError = true;
+      netError.code = 'ECONNRESET';
+      // no `response` -> this is a network-level failure
+
+      api.uploadAttachment
+        .mockRejectedValueOnce(netError)
+        .mockResolvedValueOnce({ data: { result: [{ hash: 'h1' }] } });
+
+      const result = await service.uploadAttachments('PROJ', [makeAttachment()], true);
+      expect(result).toEqual(['h1']);
+      expect(api.uploadAttachment).toHaveBeenCalledTimes(2);
+    });
+
+    it('should not retry axios errors that carry an HTTP response (e.g. 500)', async () => {
+      const httpError: any = new Error('Server Error');
+      httpError.isAxiosError = true;
+      httpError.response = { status: 500, headers: {}, data: {} };
+
+      api.uploadAttachment.mockRejectedValue(httpError);
+
+      const result = await service.uploadAttachments('PROJ', [makeAttachment()], true);
+      expect(result).toEqual([]);
+      expect(api.uploadAttachment).toHaveBeenCalledTimes(1);
+    });
+
     it('should continue with next batch if current batch fails with non-429 error', async () => {
       const nonRetryableError: any = new Error('Server Error');
       nonRetryableError.isAxiosError = true;
