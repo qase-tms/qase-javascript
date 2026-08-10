@@ -38,11 +38,21 @@ export class AttachmentService {
     attachments: Attachment[],
     uploadEnabled: boolean,
   ): Promise<string[]> {
+    const map = await this.uploadAttachmentsMapped(projectCode, attachments, uploadEnabled);
+    return [...map.values()];
+  }
+
+  async uploadAttachmentsMapped(
+    projectCode: string,
+    attachments: Attachment[],
+    uploadEnabled: boolean,
+  ): Promise<Map<Attachment, string>> {
+    const hashByAttachment = new Map<Attachment, string>();
+
     if (!uploadEnabled) {
-      return [];
+      return hashByAttachment;
     }
 
-    const uploadedHashes: string[] = [];
     const validAttachments: Attachment[] = [];
 
     for (const attachment of attachments) {
@@ -69,7 +79,7 @@ export class AttachmentService {
     }
 
     if (validAttachments.length === 0) {
-      return uploadedHashes;
+      return hashByAttachment;
     }
 
     const initialJitter = Math.random() * 500;
@@ -91,11 +101,25 @@ export class AttachmentService {
         const batchData = batch.map(a => this.prepareAttachmentData(a));
         const response = await this.uploadWithRetry(projectCode, batchData, batchNames);
 
-        if (response.data.result) {
-          for (const result of response.data.result) {
-            if (result.hash) {
-              uploadedHashes.push(result.hash);
-            }
+        const results = response.data.result;
+        if (!results) {
+          continue;
+        }
+
+        if (results.length !== batch.length) {
+          this.logger.logError(
+            `Attachment upload response size mismatch for batch ${i + 1}: ` +
+            `expected ${batch.length} result(s), got ${results.length}. ` +
+            `Skipping hash mapping for this batch to avoid mis-assigning attachments.`,
+          );
+          continue;
+        }
+
+        for (let j = 0; j < batch.length; j++) {
+          const hash = results[j]?.hash;
+          const attachment = batch[j];
+          if (hash && attachment) {
+            hashByAttachment.set(attachment, hash);
           }
         }
       } catch (error) {
@@ -109,7 +133,7 @@ export class AttachmentService {
       }
     }
 
-    return uploadedHashes;
+    return hashByAttachment;
   }
 
   private groupIntoBatches(attachments: Attachment[]): Attachment[][] {
