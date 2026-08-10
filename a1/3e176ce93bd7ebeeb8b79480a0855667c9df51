@@ -1,0 +1,39 @@
+qase-javascript-commons/test/client/services/result-transformer.test.ts
+  s_8fd61693836b65::t_e542778eeaf5f2 74,101,232,251
+  s_8fd61693836b65::t_044e56172e8d17 172
+  s_8fd61693836b65::t_cc9a55a515eb1a 238
+  s_8fd61693836b65::t_69f93eea1821eb 100
+  s_8fd61693836b65::t_98ddd500f3abee 137
+  s_8fd61693836b65::t_34c2b6430c62a8 185
+  s_8fd61693836b65::t_56a4d103748e5f 208
+  s_8fd61693836b65::t_badb1b2bb961b3 82,95,107,115,125,130,143,153,168,181,193,202,209,217,243
+  s_8fd61693836b65::t_c0a4a629fe3f37 106
+  s_8fd61693836b65::t_2d0b4b4a50e170 81
+  s_8fd61693836b65::t_fe09014ca3f5e9 73
+  s_8fd61693836b65::t_d17d44b531e492 159
+  s_8fd61693836b65::t_ea32bd2e01bef5 114
+  s_8fd61693836b65::t_d0b4460d1b69a4 198
+  s_8fd61693836b65::t_f41a7ac58df05e 230
+  s_8fd61693836b65::t_ca1cd7d3418ad7 89
+  s_8fd61693836b65::t_5a6beba93b5247 250
+  s_8fd61693836b65::t_553cac853d010a 216
+  s_8fd61693836b65::t_32de0e696fcf43 149
+  s_8fd61693836b65::t_a13c76dba3a868 129
+  s_8fd61693836b65::t_79db761d8e8cb5 122
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "a13e176ce93bd7ebeeb8b79480a0855667c9df51",
+  "prompts": {},
+  "sessions": {
+    "s_8fd61693836b65": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "56bffa3a-ab6e-4272-bb72-7f8a8c5f3d32",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
