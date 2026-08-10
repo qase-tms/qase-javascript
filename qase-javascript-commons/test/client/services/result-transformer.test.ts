@@ -61,17 +61,17 @@ function makeStep(overrides: Partial<TestStepType> = {}): TestStepType {
 }
 
 describe('ResultTransformer', () => {
-  const mockUploader = jest.fn().mockReturnValue('hash123');
+  const mockResolveHash = jest.fn().mockReturnValue('hash123');
   let transformer: ResultTransformer;
 
   beforeEach(() => {
-    mockUploader.mockClear();
+    mockResolveHash.mockClear();
     transformer = new ResultTransformer(silentLogger(), undefined);
   });
 
   describe('transform', () => {
     it('should transform a basic result', () => {
-      const model = transformer.transform(makeResult(), mockUploader);
+      const model = transformer.transform(makeResult(), mockResolveHash);
       expect(model.title).toBe('Test case');
       expect(model.execution.status).toBe('passed');
       expect(model.testops_ids).toEqual([1]);
@@ -81,7 +81,7 @@ describe('ResultTransformer', () => {
     it('should handle array testops_id', () => {
       const model = transformer.transform(
         makeResult({ testops_id: [1, 2, 3] }),
-        mockUploader,
+        mockResolveHash,
       );
       expect(model.testops_ids).toEqual([1, 2, 3]);
     });
@@ -92,13 +92,13 @@ describe('ResultTransformer', () => {
         execution: { ...makeResult().execution, error_context: content },
       });
 
-      const model = transformer.transform(result, mockUploader);
+      const model = transformer.transform(result, mockResolveHash);
 
       expect(model.execution.error_context).toBe(content);
     });
 
     it('should send a null error_context when the framework produced none', () => {
-      const model = transformer.transform(makeResult(), mockUploader);
+      const model = transformer.transform(makeResult(), mockResolveHash);
 
       expect(model.execution.error_context).toBeNull();
     });
@@ -106,7 +106,7 @@ describe('ResultTransformer', () => {
     it('should handle null testops_id', () => {
       const model = transformer.transform(
         makeResult({ testops_id: null }),
-        mockUploader,
+        mockResolveHash,
       );
       expect(model.testops_ids).toBeNull();
     });
@@ -114,7 +114,7 @@ describe('ResultTransformer', () => {
     it('should map empty-array testops_id to null (API rejects []) ', () => {
       const model = transformer.transform(
         makeResult({ testops_id: [] }),
-        mockUploader,
+        mockResolveHash,
       );
       expect(model.testops_ids).toBeNull();
     });
@@ -122,25 +122,25 @@ describe('ResultTransformer', () => {
     it('should handle undefined tags', () => {
       const result = makeResult();
       delete result.tags;
-      const model = transformer.transform(result, mockUploader);
+      const model = transformer.transform(result, mockResolveHash);
       expect(model.fields.tags).toBeUndefined();
     });
 
     it('should merge tags into fields', () => {
       const model = transformer.transform(
         makeResult({ tags: ['smoke', 'regression', 'smoke'] }),
-        mockUploader,
+        mockResolveHash,
       );
       expect(model.fields.tags).toBe('smoke,regression');
     });
 
     it('should upload attachments and include prepared ones', () => {
-      mockUploader.mockReturnValue('uploaded-hash');
+      mockResolveHash.mockReturnValue('uploaded-hash');
       const result = makeResult({
         attachments: [{ file_name: 'a.png' }],
         preparedAttachments: ['existing-hash'],
       });
-      const model = transformer.transform(result, mockUploader);
+      const model = transformer.transform(result, mockResolveHash);
       expect(model.attachments).toEqual(['uploaded-hash', 'existing-hash']);
     });
   });
@@ -150,7 +150,7 @@ describe('ResultTransformer', () => {
       const result = makeResult({
         steps: [makeStep()],
       });
-      const model = transformer.transform(result, mockUploader);
+      const model = transformer.transform(result, mockResolveHash);
       expect(model.steps).toHaveLength(1);
       expect(model.steps![0]!.data!.action).toBe('Click button');
       expect(model.steps![0]!.data!.expected_result).toBe('Button clicked');
@@ -165,7 +165,7 @@ describe('ResultTransformer', () => {
           }),
         ],
       });
-      const model = transformer.transform(result, mockUploader);
+      const model = transformer.transform(result, mockResolveHash);
       expect(model.steps![0]!.data!.action).toBe('Given user exists');
     });
 
@@ -178,7 +178,7 @@ describe('ResultTransformer', () => {
           }),
         ],
       });
-      const model = transformer.transform(result, mockUploader);
+      const model = transformer.transform(result, mockResolveHash);
       expect(model.steps![0]!.data!.action).toBe('GET /api/test');
     });
 
@@ -190,7 +190,7 @@ describe('ResultTransformer', () => {
           }),
         ],
       });
-      const model = transformer.transform(result, mockUploader);
+      const model = transformer.transform(result, mockResolveHash);
       expect(model.steps![0]!.steps).toHaveLength(1);
       expect(model.steps![0]!.steps![0]!.data!.action).toBe('Nested action');
     });
@@ -199,7 +199,7 @@ describe('ResultTransformer', () => {
       const result = makeResult({
         steps: [makeStep({ data: { action: '' } })],
       });
-      const model = transformer.transform(result, mockUploader);
+      const model = transformer.transform(result, mockResolveHash);
       expect(model.steps![0]!.data!.action).toBe('Unnamed step');
     });
   });
@@ -208,7 +208,7 @@ describe('ResultTransformer', () => {
     it('should transform params to strings', () => {
       const model = transformer.transform(
         makeResult({ params: { key: 'value', num: 42 as any } }),
-        mockUploader,
+        mockResolveHash,
       );
       expect(model.params).toEqual({ key: 'value', num: '42' });
     });
@@ -219,7 +219,7 @@ describe('ResultTransformer', () => {
           group_params: { browser: 'chrome', os: 'linux' },
           params: {},
         }),
-        mockUploader,
+        mockResolveHash,
       );
       expect(model.param_groups).toEqual([['browser', 'os']]);
       expect(model.params).toEqual({ browser: 'chrome', os: 'linux' });
@@ -229,7 +229,7 @@ describe('ResultTransformer', () => {
   describe('relations', () => {
     it('should use default suite relation with rootSuite', () => {
       transformer = new ResultTransformer(silentLogger(), 'Root Suite');
-      const model = transformer.transform(makeResult(), mockUploader);
+      const model = transformer.transform(makeResult(), mockResolveHash);
       expect(model.relations?.suite?.data).toEqual([
         { public_id: null, title: 'Root Suite' },
       ]);
@@ -240,7 +240,7 @@ describe('ResultTransformer', () => {
       const result = makeResult({
         relations: { suite: { data: [{ title: 'Child' }] } },
       });
-      const model = transformer.transform(result, mockUploader);
+      const model = transformer.transform(result, mockResolveHash);
       expect(model.relations?.suite?.data).toEqual([
         { public_id: null, title: 'Root' },
         { public_id: null, title: 'Child' },
@@ -248,7 +248,7 @@ describe('ResultTransformer', () => {
     });
 
     it('should return empty relations when no rootSuite and no relation', () => {
-      const model = transformer.transform(makeResult(), mockUploader);
+      const model = transformer.transform(makeResult(), mockResolveHash);
       expect(model.relations).toEqual({});
     });
   });

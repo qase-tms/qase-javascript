@@ -105,6 +105,8 @@ describe('ClientV2.uploadResults', () => {
     const result = makeResult({ attachments: [{ file_name: 'x.png' } as any] });
     await client.uploadResults(42, [result]);
 
+    expect(uploadAttachmentsMapped.mock.calls[0][2]).toBe(false);
+
     // uploadAttachmentsMapped is still called (it handles the disabled flag internally),
     // but returns an empty map, so no hashes are attached.
     const payload = createResultsV2.mock.calls[0][2];
