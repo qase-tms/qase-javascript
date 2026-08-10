@@ -1,0 +1,23 @@
+qase-javascript-commons/package.json
+  s_8fd61693836b65::t_5b6bf8c7c3174b 3
+package-lock.json
+  s_8fd61693836b65::t_bcd880e4b0176a 28810
+qase-javascript-commons/changelog.md
+  s_8fd61693836b65::t_65a6c6851cbc51 1-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "c0f95383bb1bd2c8a219b005f86b95511f667a12",
+  "prompts": {},
+  "sessions": {
+    "s_8fd61693836b65": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "56bffa3a-ab6e-4272-bb72-7f8a8c5f3d32",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
