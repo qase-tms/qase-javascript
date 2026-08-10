@@ -1,0 +1,21 @@
+qase-javascript-commons/src/client/services/attachment-service.ts
+  s_8fd61693836b65::t_fc7abc05c151e0 41-51,53,82,104-122,136
+qase-javascript-commons/test/client/services/attachment-service.test.ts
+  s_8fd61693836b65::t_e52497ec76756b 179-241
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "de86aba560daee84154a2314b65ac573467d72b6",
+  "prompts": {},
+  "sessions": {
+    "s_8fd61693836b65": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "56bffa3a-ab6e-4272-bb72-7f8a8c5f3d32",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
