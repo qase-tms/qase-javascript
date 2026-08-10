@@ -29,18 +29,31 @@ export class ClientV2 extends ClientV1 {
 
   override async uploadResults(runId: number, results: TestResultType[]): Promise<void> {
     try {
-      const models = await Promise.all(
-        results.map(result =>
-          this.resultTransformer.transformWithDefect(
-            result,
-            (a) => this.attachmentService.uploadAttachments(
-              this.config.project, [a], this.config.uploadAttachments ?? true,
-            ).then(hashes => hashes[0] ?? ''),
-            this.config.defect ?? false,
-          ),
+      const uploadEnabled = this.config.uploadAttachments ?? true;
+      const project = this.config.project;
+
+      // 1. Collect every attachment across the whole batch of results.
+      const allAttachments = results.flatMap((result) =>
+        this.resultTransformer.collectAttachments(result),
+      );
+
+      // 2. Upload them once, in real batches, sequentially (bounded concurrency).
+      const hashByAttachment = await this.attachmentService.uploadAttachmentsMapped(
+        project,
+        allAttachments,
+        uploadEnabled,
+      );
+
+      // 3. Transform each result, resolving already-uploaded hashes synchronously.
+      const models = results.map((result) =>
+        this.resultTransformer.transformWithDefect(
+          result,
+          (attachment) => hashByAttachment.get(attachment) ?? '',
+          this.config.defect ?? false,
         ),
       );
-      await this.resultsClient.createResultsV2(this.config.project, runId, {
+
+      await this.resultsClient.createResultsV2(project, runId, {
         results: models,
       });
     } catch (error) {
