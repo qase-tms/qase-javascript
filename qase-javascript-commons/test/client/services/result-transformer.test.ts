@@ -70,93 +70,93 @@ describe('ResultTransformer', () => {
   });
 
   describe('transform', () => {
-    it('should transform a basic result', async () => {
-      const model = await transformer.transform(makeResult(), mockUploader);
+    it('should transform a basic result', () => {
+      const model = transformer.transform(makeResult(), mockUploader);
       expect(model.title).toBe('Test case');
       expect(model.execution.status).toBe('passed');
       expect(model.testops_ids).toEqual([1]);
       expect(model.signature).toBe('sig-1');
     });
 
-    it('should handle array testops_id', async () => {
-      const model = await transformer.transform(
+    it('should handle array testops_id', () => {
+      const model = transformer.transform(
         makeResult({ testops_id: [1, 2, 3] }),
         mockUploader,
       );
       expect(model.testops_ids).toEqual([1, 2, 3]);
     });
 
-    it('should carry execution.error_context through to the API model', async () => {
+    it('should carry execution.error_context through to the API model', () => {
       const content = '# Test info\n\n- Name: a >> b\n';
       const result = makeResult({
         execution: { ...makeResult().execution, error_context: content },
       });
 
-      const model = await transformer.transform(result, mockUploader);
+      const model = transformer.transform(result, mockUploader);
 
       expect(model.execution.error_context).toBe(content);
     });
 
-    it('should send a null error_context when the framework produced none', async () => {
-      const model = await transformer.transform(makeResult(), mockUploader);
+    it('should send a null error_context when the framework produced none', () => {
+      const model = transformer.transform(makeResult(), mockUploader);
 
       expect(model.execution.error_context).toBeNull();
     });
 
-    it('should handle null testops_id', async () => {
-      const model = await transformer.transform(
+    it('should handle null testops_id', () => {
+      const model = transformer.transform(
         makeResult({ testops_id: null }),
         mockUploader,
       );
       expect(model.testops_ids).toBeNull();
     });
 
-    it('should map empty-array testops_id to null (API rejects []) ', async () => {
-      const model = await transformer.transform(
+    it('should map empty-array testops_id to null (API rejects []) ', () => {
+      const model = transformer.transform(
         makeResult({ testops_id: [] }),
         mockUploader,
       );
       expect(model.testops_ids).toBeNull();
     });
 
-    it('should handle undefined tags', async () => {
+    it('should handle undefined tags', () => {
       const result = makeResult();
       delete result.tags;
-      const model = await transformer.transform(result, mockUploader);
+      const model = transformer.transform(result, mockUploader);
       expect(model.fields.tags).toBeUndefined();
     });
 
-    it('should merge tags into fields', async () => {
-      const model = await transformer.transform(
+    it('should merge tags into fields', () => {
+      const model = transformer.transform(
         makeResult({ tags: ['smoke', 'regression', 'smoke'] }),
         mockUploader,
       );
       expect(model.fields.tags).toBe('smoke,regression');
     });
 
-    it('should upload attachments and include prepared ones', async () => {
+    it('should upload attachments and include prepared ones', () => {
       mockUploader.mockReturnValue('uploaded-hash');
       const result = makeResult({
         attachments: [{ file_name: 'a.png' }],
         preparedAttachments: ['existing-hash'],
       });
-      const model = await transformer.transform(result, mockUploader);
+      const model = transformer.transform(result, mockUploader);
       expect(model.attachments).toEqual(['uploaded-hash', 'existing-hash']);
     });
   });
 
   describe('steps', () => {
-    it('should transform TEXT step', async () => {
+    it('should transform TEXT step', () => {
       const result = makeResult({
         steps: [makeStep()],
       });
-      const model = await transformer.transform(result, mockUploader);
+      const model = transformer.transform(result, mockUploader);
       expect(model.steps).toHaveLength(1);
       expect(model.steps![0]!.data!.action).toBe('Click button');
       expect(model.steps![0]!.data!.expected_result).toBe('Button clicked');
     });
 
-    it('should transform GHERKIN step', async () => {
+    it('should transform GHERKIN step', () => {
       const result = makeResult({
         steps: [
           makeStep({
@@ -165,11 +165,11 @@ describe('ResultTransformer', () => {
           }),
         ],
       });
-      const model = await transformer.transform(result, mockUploader);
+      const model = transformer.transform(result, mockUploader);
       expect(model.steps![0]!.data!.action).toBe('Given user exists');
     });
 
-    it('should transform REQUEST step', async () => {
+    it('should transform REQUEST step', () => {
       const result = makeResult({
         steps: [
           makeStep({
@@ -178,11 +178,11 @@ describe('ResultTransformer', () => {
           }),
         ],
       });
-      const model = await transformer.transform(result, mockUploader);
+      const model = transformer.transform(result, mockUploader);
       expect(model.steps![0]!.data!.action).toBe('GET /api/test');
     });
 
-    it('should handle nested steps', async () => {
+    it('should handle nested steps', () => {
       const result = makeResult({
         steps: [
           makeStep({
@@ -190,31 +190,31 @@ describe('ResultTransformer', () => {
           }),
         ],
       });
-      const model = await transformer.transform(result, mockUploader);
+      const model = transformer.transform(result, mockUploader);
       expect(model.steps![0]!.steps).toHaveLength(1);
       expect(model.steps![0]!.steps![0]!.data!.action).toBe('Nested action');
     });
 
-    it('should mark empty action as "Unnamed step"', async () => {
+    it('should mark empty action as "Unnamed step"', () => {
       const result = makeResult({
         steps: [makeStep({ data: { action: '' } })],
       });
-      const model = await transformer.transform(result, mockUploader);
+      const model = transformer.transform(result, mockUploader);
       expect(model.steps![0]!.data!.action).toBe('Unnamed step');
     });
   });
 
   describe('params', () => {
-    it('should transform params to strings', async () => {
-      const model = await transformer.transform(
+    it('should transform params to strings', () => {
+      const model = transformer.transform(
         makeResult({ params: { key: 'value', num: 42 as any } }),
         mockUploader,
       );
       expect(model.params).toEqual({ key: 'value', num: '42' });
     });
 
-    it('should build param_groups from group_params', async () => {
-      const model = await transformer.transform(
+    it('should build param_groups from group_params', () => {
+      const model = transformer.transform(
         makeResult({
           group_params: { browser: 'chrome', os: 'linux' },
           params: {},
@@ -227,28 +227,28 @@ describe('ResultTransformer', () => {
   });
 
   describe('relations', () => {
-    it('should use default suite relation with rootSuite', async () => {
+    it('should use default suite relation with rootSuite', () => {
       transformer = new ResultTransformer(silentLogger(), 'Root Suite');
-      const model = await transformer.transform(makeResult(), mockUploader);
+      const model = transformer.transform(makeResult(), mockUploader);
       expect(model.relations?.suite?.data).toEqual([
         { public_id: null, title: 'Root Suite' },
       ]);
     });
 
-    it('should prepend rootSuite to existing suite relation', async () => {
+    it('should prepend rootSuite to existing suite relation', () => {
       transformer = new ResultTransformer(silentLogger(), 'Root');
       const result = makeResult({
         relations: { suite: { data: [{ title: 'Child' }] } },
       });
-      const model = await transformer.transform(result, mockUploader);
+      const model = transformer.transform(result, mockUploader);
       expect(model.relations?.suite?.data).toEqual([
         { public_id: null, title: 'Root' },
         { public_id: null, title: 'Child' },
       ]);
     });
 
-    it('should return empty relations when no rootSuite and no relation', async () => {
-      const model = await transformer.transform(makeResult(), mockUploader);
+    it('should return empty relations when no rootSuite and no relation', () => {
+      const model = transformer.transform(makeResult(), mockUploader);
       expect(model.relations).toEqual({});
     });
   });
