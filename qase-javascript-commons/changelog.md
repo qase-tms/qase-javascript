@@ -1,3 +1,10 @@
+## 2.8.1
+
+### Fixed
+
+- Attachment uploads no longer run with unbounded concurrency. Previously `ClientV2.uploadResults` transformed a whole batch of results with `Promise.all` and uploaded each attachment as its own single-file request, so the number of simultaneous upload requests scaled with `QASE_TESTOPS_BATCH_SIZE`. Large runs (hundreds of results with several attachments each) triggered `429 Too Many Requests` and `ECONNRESET` errors and silently lost attachments. Attachments for a whole batch are now collected and uploaded once, in real batches (up to 20 files / 128 MB per request) sent sequentially, which bounds concurrency independently of the batch size.
+- Transient network errors during attachment upload (`ECONNRESET`, `ETIMEDOUT`, `ECONNREFUSED`, `ECONNABORTED`, `EPIPE`) are now retried with the same exponential backoff already used for `429` responses, instead of being thrown away and dropping the attachment.
+
 ## 2.8.0
 
 ### Added
