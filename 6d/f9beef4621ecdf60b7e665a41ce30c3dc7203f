@@ -1,0 +1,25 @@
+qase-javascript-commons/test/client/services/attachment-service.test.ts
+  s_8fd61693836b65::t_1f567cf5576a6e 117-143
+qase-javascript-commons/src/client/services/attachment-service.ts
+  s_8fd61693836b65::t_5efa8eda6f95c1 13
+  s_8fd61693836b65::t_b52920c86e52e7 176
+  s_8fd61693836b65::t_6c6a101b1b6d35 218-228
+  s_8fd61693836b65::t_122b7b4519cbd4 197
+  s_8fd61693836b65::t_6aa71882dd6239 168-171,174-175,177-196
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "6df9beef4621ecdf60b7e665a41ce30c3dc7203f",
+  "prompts": {},
+  "sessions": {
+    "s_8fd61693836b65": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "56bffa3a-ab6e-4272-bb72-7f8a8c5f3d32",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": null
+    }
+  }
+}
