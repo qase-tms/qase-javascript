@@ -311,10 +311,10 @@ export const CasesApiAxiosParamCreator = function (configuration?: Configuration
          * @param {number} [suiteId] ID of test suite.
          * @param {string} [severity] A list of severity values separated by comma. Possible values: undefined, blocker, critical, major, normal, minor, trivial 
          * @param {string} [priority] A list of priority values separated by comma. Possible values: undefined, high, medium, low 
-         * @param {string} [type] A list of type values separated by comma. Possible values: other, functional smoke, regression, security, usability, performance, acceptance 
-         * @param {string} [behavior] A list of behavior values separated by comma. Possible values: undefined, positive negative, destructive 
-         * @param {string} [automation] A list of values separated by comma. Possible values: is-not-automated, automated to-be-automated 
-         * @param {string} [status] A list of values separated by comma. Possible values: actual, draft deprecated 
+         * @param {string} [type] A list of type values separated by comma. Possible values: other, functional, smoke, regression, security, usability, performance, acceptance 
+         * @param {string} [behavior] A list of behavior values separated by comma. Possible values: undefined, positive, negative, destructive 
+         * @param {string} [automation] A list of values separated by comma. Possible values: is-not-automated, automated, to-be-automated 
+         * @param {string} [status] A list of values separated by comma. Possible values: actual, draft, deprecated 
          * @param {'asana' | 'azure-devops' | 'clickup-app' | 'github-app' | 'gitlab-app' | 'jira-cloud' | 'jira-server' | 'linear' | 'monday' | 'redmine-app' | 'trello-app' | 'youtrack-app'} [externalIssuesType] An integration type. 
          * @param {Array<string>} [externalIssuesIds] A list of issue IDs.
          * @param {string} [include] A list of entities to include in response separated by comma. Possible values: external_issues. 
@@ -548,10 +548,10 @@ export const CasesApiFp = function(configuration?: Configuration) {
          * @param {number} [suiteId] ID of test suite.
          * @param {string} [severity] A list of severity values separated by comma. Possible values: undefined, blocker, critical, major, normal, minor, trivial 
          * @param {string} [priority] A list of priority values separated by comma. Possible values: undefined, high, medium, low 
-         * @param {string} [type] A list of type values separated by comma. Possible values: other, functional smoke, regression, security, usability, performance, acceptance 
-         * @param {string} [behavior] A list of behavior values separated by comma. Possible values: undefined, positive negative, destructive 
-         * @param {string} [automation] A list of values separated by comma. Possible values: is-not-automated, automated to-be-automated 
-         * @param {string} [status] A list of values separated by comma. Possible values: actual, draft deprecated 
+         * @param {string} [type] A list of type values separated by comma. Possible values: other, functional, smoke, regression, security, usability, performance, acceptance 
+         * @param {string} [behavior] A list of behavior values separated by comma. Possible values: undefined, positive, negative, destructive 
+         * @param {string} [automation] A list of values separated by comma. Possible values: is-not-automated, automated, to-be-automated 
+         * @param {string} [status] A list of values separated by comma. Possible values: actual, draft, deprecated 
          * @param {'asana' | 'azure-devops' | 'clickup-app' | 'github-app' | 'gitlab-app' | 'jira-cloud' | 'jira-server' | 'linear' | 'monday' | 'redmine-app' | 'trello-app' | 'youtrack-app'} [externalIssuesType] An integration type. 
          * @param {Array<string>} [externalIssuesIds] A list of issue IDs.
          * @param {string} [include] A list of entities to include in response separated by comma. Possible values: external_issues. 
@@ -663,10 +663,10 @@ export const CasesApiFactory = function (configuration?: Configuration, basePath
          * @param {number} [suiteId] ID of test suite.
          * @param {string} [severity] A list of severity values separated by comma. Possible values: undefined, blocker, critical, major, normal, minor, trivial 
          * @param {string} [priority] A list of priority values separated by comma. Possible values: undefined, high, medium, low 
-         * @param {string} [type] A list of type values separated by comma. Possible values: other, functional smoke, regression, security, usability, performance, acceptance 
-         * @param {string} [behavior] A list of behavior values separated by comma. Possible values: undefined, positive negative, destructive 
-         * @param {string} [automation] A list of values separated by comma. Possible values: is-not-automated, automated to-be-automated 
-         * @param {string} [status] A list of values separated by comma. Possible values: actual, draft deprecated 
+         * @param {string} [type] A list of type values separated by comma. Possible values: other, functional, smoke, regression, security, usability, performance, acceptance 
+         * @param {string} [behavior] A list of behavior values separated by comma. Possible values: undefined, positive, negative, destructive 
+         * @param {string} [automation] A list of values separated by comma. Possible values: is-not-automated, automated, to-be-automated 
+         * @param {string} [status] A list of values separated by comma. Possible values: actual, draft, deprecated 
          * @param {'asana' | 'azure-devops' | 'clickup-app' | 'github-app' | 'gitlab-app' | 'jira-cloud' | 'jira-server' | 'linear' | 'monday' | 'redmine-app' | 'trello-app' | 'youtrack-app'} [externalIssuesType] An integration type. 
          * @param {Array<string>} [externalIssuesIds] A list of issue IDs.
          * @param {string} [include] A list of entities to include in response separated by comma. Possible values: external_issues. 
@@ -788,10 +788,10 @@ export class CasesApi extends BaseAPI {
      * @param {number} [suiteId] ID of test suite.
      * @param {string} [severity] A list of severity values separated by comma. Possible values: undefined, blocker, critical, major, normal, minor, trivial 
      * @param {string} [priority] A list of priority values separated by comma. Possible values: undefined, high, medium, low 
-     * @param {string} [type] A list of type values separated by comma. Possible values: other, functional smoke, regression, security, usability, performance, acceptance 
-     * @param {string} [behavior] A list of behavior values separated by comma. Possible values: undefined, positive negative, destructive 
-     * @param {string} [automation] A list of values separated by comma. Possible values: is-not-automated, automated to-be-automated 
-     * @param {string} [status] A list of values separated by comma. Possible values: actual, draft deprecated 
+     * @param {string} [type] A list of type values separated by comma. Possible values: other, functional, smoke, regression, security, usability, performance, acceptance 
+     * @param {string} [behavior] A list of behavior values separated by comma. Possible values: undefined, positive, negative, destructive 
+     * @param {string} [automation] A list of values separated by comma. Possible values: is-not-automated, automated, to-be-automated 
+     * @param {string} [status] A list of values separated by comma. Possible values: actual, draft, deprecated 
      * @param {'asana' | 'azure-devops' | 'clickup-app' | 'github-app' | 'gitlab-app' | 'jira-cloud' | 'jira-server' | 'linear' | 'monday' | 'redmine-app' | 'trello-app' | 'youtrack-app'} [externalIssuesType] An integration type. 
      * @param {Array<string>} [externalIssuesIds] A list of issue IDs.
      * @param {string} [include] A list of entities to include in response separated by comma. Possible values: external_issues. 

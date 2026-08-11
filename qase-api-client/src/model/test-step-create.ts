@@ -26,6 +26,12 @@ export interface TestStepCreate {
      */
     'action'?: string;
     /**
+     * Hash of an existing shared step to insert at this position.
+     * @type {string}
+     * @memberof TestStepCreate
+     */
+    'shared'?: string;
+    /**
      * 
      * @type {string}
      * @memberof TestStepCreate

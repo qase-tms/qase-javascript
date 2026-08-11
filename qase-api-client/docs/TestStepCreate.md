@@ -6,6 +6,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **action** | **string** | Step action text. Used for classic steps. For gherkin steps, use the \&quot;value\&quot; property instead. | [optional] [default to undefined]
+**shared** | **string** | Hash of an existing shared step to insert at this position. | [optional] [default to undefined]
 **expected_result** | **string** |  | [optional] [default to undefined]
 **data** | **string** |  | [optional] [default to undefined]
 **value** | **string** | Gherkin scenario text. Used when steps_type is \&quot;gherkin\&quot;. Example: \&quot;Given a user exists\\nWhen they log in\\nThen they see the dashboard\&quot; | [optional] [default to undefined]
@@ -20,6 +21,7 @@ import { TestStepCreate } from 'qase-api-client';
 
 const instance: TestStepCreate = {
     action,
+    shared,
     expected_result,
     data,
     value,

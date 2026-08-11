@@ -402,10 +402,10 @@ let milestoneId: number; //ID of milestone. (optional) (default to undefined)
 let suiteId: number; //ID of test suite. (optional) (default to undefined)
 let severity: string; //A list of severity values separated by comma. Possible values: undefined, blocker, critical, major, normal, minor, trivial  (optional) (default to undefined)
 let priority: string; //A list of priority values separated by comma. Possible values: undefined, high, medium, low  (optional) (default to undefined)
-let type: string; //A list of type values separated by comma. Possible values: other, functional smoke, regression, security, usability, performance, acceptance  (optional) (default to undefined)
-let behavior: string; //A list of behavior values separated by comma. Possible values: undefined, positive negative, destructive  (optional) (default to undefined)
-let automation: string; //A list of values separated by comma. Possible values: is-not-automated, automated to-be-automated  (optional) (default to undefined)
-let status: string; //A list of values separated by comma. Possible values: actual, draft deprecated  (optional) (default to undefined)
+let type: string; //A list of type values separated by comma. Possible values: other, functional, smoke, regression, security, usability, performance, acceptance  (optional) (default to undefined)
+let behavior: string; //A list of behavior values separated by comma. Possible values: undefined, positive, negative, destructive  (optional) (default to undefined)
+let automation: string; //A list of values separated by comma. Possible values: is-not-automated, automated, to-be-automated  (optional) (default to undefined)
+let status: string; //A list of values separated by comma. Possible values: actual, draft, deprecated  (optional) (default to undefined)
 let externalIssuesType: 'asana' | 'azure-devops' | 'clickup-app' | 'github-app' | 'gitlab-app' | 'jira-cloud' | 'jira-server' | 'linear' | 'monday' | 'redmine-app' | 'trello-app' | 'youtrack-app'; //An integration type.  (optional) (default to undefined)
 let externalIssuesIds: Array<string>; //A list of issue IDs. (optional) (default to undefined)
 let include: string; //A list of entities to include in response separated by comma. Possible values: external_issues.  (optional) (default to undefined)
@@ -441,10 +441,10 @@ const { status, data } = await apiInstance.getCases(
 | **suiteId** | [**number**] | ID of test suite. | (optional) defaults to undefined|
 | **severity** | [**string**] | A list of severity values separated by comma. Possible values: undefined, blocker, critical, major, normal, minor, trivial  | (optional) defaults to undefined|
 | **priority** | [**string**] | A list of priority values separated by comma. Possible values: undefined, high, medium, low  | (optional) defaults to undefined|
-| **type** | [**string**] | A list of type values separated by comma. Possible values: other, functional smoke, regression, security, usability, performance, acceptance  | (optional) defaults to undefined|
-| **behavior** | [**string**] | A list of behavior values separated by comma. Possible values: undefined, positive negative, destructive  | (optional) defaults to undefined|
-| **automation** | [**string**] | A list of values separated by comma. Possible values: is-not-automated, automated to-be-automated  | (optional) defaults to undefined|
-| **status** | [**string**] | A list of values separated by comma. Possible values: actual, draft deprecated  | (optional) defaults to undefined|
+| **type** | [**string**] | A list of type values separated by comma. Possible values: other, functional, smoke, regression, security, usability, performance, acceptance  | (optional) defaults to undefined|
+| **behavior** | [**string**] | A list of behavior values separated by comma. Possible values: undefined, positive, negative, destructive  | (optional) defaults to undefined|
+| **automation** | [**string**] | A list of values separated by comma. Possible values: is-not-automated, automated, to-be-automated  | (optional) defaults to undefined|
+| **status** | [**string**] | A list of values separated by comma. Possible values: actual, draft, deprecated  | (optional) defaults to undefined|
 | **externalIssuesType** | [**&#39;asana&#39; | &#39;azure-devops&#39; | &#39;clickup-app&#39; | &#39;github-app&#39; | &#39;gitlab-app&#39; | &#39;jira-cloud&#39; | &#39;jira-server&#39; | &#39;linear&#39; | &#39;monday&#39; | &#39;redmine-app&#39; | &#39;trello-app&#39; | &#39;youtrack-app&#39;**]**Array<&#39;asana&#39; &#124; &#39;azure-devops&#39; &#124; &#39;clickup-app&#39; &#124; &#39;github-app&#39; &#124; &#39;gitlab-app&#39; &#124; &#39;jira-cloud&#39; &#124; &#39;jira-server&#39; &#124; &#39;linear&#39; &#124; &#39;monday&#39; &#124; &#39;redmine-app&#39; &#124; &#39;trello-app&#39; &#124; &#39;youtrack-app&#39;>** | An integration type.  | (optional) defaults to undefined|
 | **externalIssuesIds** | **Array&lt;string&gt;** | A list of issue IDs. | (optional) defaults to undefined|
 | **include** | [**string**] | A list of entities to include in response separated by comma. Possible values: external_issues.  | (optional) defaults to undefined|
