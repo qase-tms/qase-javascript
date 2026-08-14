@@ -32,11 +32,11 @@ export const AuthorsApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * This method allows to retrieve a specific author. 
          * @summary Get a specific author
-         * @param {number} id Identifier.
+         * @param {string} id Author UUID, or the deprecated integer author ID.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAuthor: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getAuthor: async (id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('getAuthor', 'id', id)
             const localVarPath = `/author/{id}`
@@ -132,11 +132,11 @@ export const AuthorsApiFp = function(configuration?: Configuration) {
         /**
          * This method allows to retrieve a specific author. 
          * @summary Get a specific author
-         * @param {number} id Identifier.
+         * @param {string} id Author UUID, or the deprecated integer author ID.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAuthor(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AuthorResponse>> {
+        async getAuthor(id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AuthorResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getAuthor(id, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -167,11 +167,11 @@ export const AuthorsApiFactory = function (configuration?: Configuration, basePa
         /**
          * This method allows to retrieve a specific author. 
          * @summary Get a specific author
-         * @param {number} id Identifier.
+         * @param {string} id Author UUID, or the deprecated integer author ID.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAuthor(id: number, options?: any): AxiosPromise<AuthorResponse> {
+        getAuthor(id: string, options?: any): AxiosPromise<AuthorResponse> {
             return localVarFp.getAuthor(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -200,12 +200,12 @@ export class AuthorsApi extends BaseAPI {
     /**
      * This method allows to retrieve a specific author. 
      * @summary Get a specific author
-     * @param {number} id Identifier.
+     * @param {string} id Author UUID, or the deprecated integer author ID.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AuthorsApi
      */
-    public getAuthor(id: number, options?: AxiosRequestConfig) {
+    public getAuthor(id: string, options?: AxiosRequestConfig) {
         return AuthorsApiFp(this.configuration).getAuthor(id, options).then((request) => request(this.axios, this.basePath));
     }
 

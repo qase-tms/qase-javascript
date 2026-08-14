@@ -14,58 +14,51 @@
 
 
 /**
- * When `steps_type` is `gherkin` only the scenario text is read from a step. A non-empty `expected_result`, `data`, `attachments`, `shared` or nested `steps` is rejected, and so is sending the scenario in `value` and `action` at once.
+ * A step of the proposed test case. When `steps_type` is `gherkin` the step carries the scenario in `value` and nothing else: a non-empty `action`, `expected_result`, `data`, `attachments`, `shared` or nested `steps` is rejected.
  * @export
- * @interface TestStepCreate
+ * @interface ReviewStepData
  */
-export interface TestStepCreate {
+export interface ReviewStepData {
     /**
-     * Step action text. Used for classic steps. For gherkin steps, use the \"value\" property instead.
+     * Step action text. Classic steps only.
      * @type {string}
-     * @memberof TestStepCreate
+     * @memberof ReviewStepData
      */
     'action'?: string;
     /**
      * Hash of an existing shared step to insert at this position.
      * @type {string}
-     * @memberof TestStepCreate
+     * @memberof ReviewStepData
      */
     'shared'?: string;
     /**
      * 
      * @type {string}
-     * @memberof TestStepCreate
+     * @memberof ReviewStepData
      */
     'expected_result'?: string;
     /**
      * 
      * @type {string}
-     * @memberof TestStepCreate
+     * @memberof ReviewStepData
      */
     'data'?: string;
     /**
      * Gherkin scenario text. Used when steps_type is \"gherkin\". Example: \"Given a user exists\\nWhen they log in\\nThen they see the dashboard\"
      * @type {string}
-     * @memberof TestStepCreate
+     * @memberof ReviewStepData
      */
     'value'?: string;
     /**
-     * 
-     * @type {number}
-     * @memberof TestStepCreate
-     * @deprecated
-     */
-    'position'?: number;
-    /**
      * A list of Attachment hashes.
      * @type {Array<string>}
-     * @memberof TestStepCreate
+     * @memberof ReviewStepData
      */
     'attachments'?: Array<string>;
     /**
      * Nested steps may be passed here. Use same structure for them.
      * @type {Array<object>}
-     * @memberof TestStepCreate
+     * @memberof ReviewStepData
      */
     'steps'?: Array<object>;
 }

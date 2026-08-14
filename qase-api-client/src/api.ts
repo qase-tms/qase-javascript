@@ -24,6 +24,7 @@ export * from './api/milestones-api';
 export * from './api/plans-api';
 export * from './api/projects-api';
 export * from './api/results-api';
+export * from './api/reviews-api';
 export * from './api/runs-api';
 export * from './api/search-api';
 export * from './api/shared-parameters-api';

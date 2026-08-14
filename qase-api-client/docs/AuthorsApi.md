@@ -23,7 +23,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new AuthorsApi(configuration);
 
-let id: number; //Identifier. (default to undefined)
+let id: string; //Author UUID, or the deprecated integer author ID. (default to undefined)
 
 const { status, data } = await apiInstance.getAuthor(
     id
@@ -34,7 +34,7 @@ const { status, data } = await apiInstance.getAuthor(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **id** | [**number**] | Identifier. | defaults to undefined|
+| **id** | [**string**] | Author UUID, or the deprecated integer author ID. | defaults to undefined|
 
 
 ### Return type

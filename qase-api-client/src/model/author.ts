@@ -26,9 +26,16 @@ export interface Author {
      */
     'id'?: number;
     /**
-     * 
+     * Author UUID. Use it to reference the author in other API methods.
+     * @type {string}
+     * @memberof Author
+     */
+    'uuid'?: string;
+    /**
+     * Deprecated, use `uuid` instead.
      * @type {number}
      * @memberof Author
+     * @deprecated
      */
     'author_id'?: number;
     /**

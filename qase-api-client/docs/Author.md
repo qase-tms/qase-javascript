@@ -6,7 +6,8 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **number** |  | [optional] [default to undefined]
-**author_id** | **number** |  | [optional] [default to undefined]
+**uuid** | **string** | Author UUID. Use it to reference the author in other API methods. | [optional] [default to undefined]
+**author_id** | **number** | Deprecated, use &#x60;uuid&#x60; instead. | [optional] [default to undefined]
 **entity_type** | **string** |  | [optional] [default to undefined]
 **entity_id** | **number** |  | [optional] [default to undefined]
 **email** | **string** |  | [optional] [default to undefined]
@@ -20,6 +21,7 @@ import { Author } from 'qase-api-client';
 
 const instance: Author = {
     id,
+    uuid,
     author_id,
     entity_type,
     entity_id,

@@ -1,32 +1,30 @@
-# TestStepCreate
+# ReviewStepData
 
-When `steps_type` is `gherkin` only the scenario text is read from a step. A non-empty `expected_result`, `data`, `attachments`, `shared` or nested `steps` is rejected, and so is sending the scenario in `value` and `action` at once.
+A step of the proposed test case. When `steps_type` is `gherkin` the step carries the scenario in `value` and nothing else: a non-empty `action`, `expected_result`, `data`, `attachments`, `shared` or nested `steps` is rejected.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**action** | **string** | Step action text. Used for classic steps. For gherkin steps, use the \&quot;value\&quot; property instead. | [optional] [default to undefined]
+**action** | **string** | Step action text. Classic steps only. | [optional] [default to undefined]
 **shared** | **string** | Hash of an existing shared step to insert at this position. | [optional] [default to undefined]
 **expected_result** | **string** |  | [optional] [default to undefined]
 **data** | **string** |  | [optional] [default to undefined]
 **value** | **string** | Gherkin scenario text. Used when steps_type is \&quot;gherkin\&quot;. Example: \&quot;Given a user exists\\nWhen they log in\\nThen they see the dashboard\&quot; | [optional] [default to undefined]
-**position** | **number** |  | [optional] [default to undefined]
 **attachments** | **Array&lt;string&gt;** | A list of Attachment hashes. | [optional] [default to undefined]
 **steps** | **Array&lt;object&gt;** | Nested steps may be passed here. Use same structure for them. | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { TestStepCreate } from 'qase-api-client';
+import { ReviewStepData } from 'qase-api-client';
 
-const instance: TestStepCreate = {
+const instance: ReviewStepData = {
     action,
     shared,
     expected_result,
     data,
     value,
-    position,
     attachments,
     steps,
 };
