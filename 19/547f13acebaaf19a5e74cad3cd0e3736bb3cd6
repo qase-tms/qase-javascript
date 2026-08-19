@@ -1,0 +1,83 @@
+qase-javascript-commons/test/env/env-to-config.test.ts
+  s_48ab164d5bf06f::t_be2d232fc6adff 4,7-25
+qase-javascript-commons/README.md
+  s_48ab164d5bf06f::t_7eb05db5c43c34 66-67
+  s_48ab164d5bf06f::t_e2f5bef2840067 134-137
+qase-javascript-commons/src/client/services/attachment-service.ts
+  s_48ab164d5bf06f::t_b3b12f235f0e32 19-22
+  s_48ab164d5bf06f::t_7891248ec02c16 321,326-330
+  s_48ab164d5bf06f::t_07e307ce2549e4 325,331-332
+  s_48ab164d5bf06f::t_cb34697aee81eb 161-163,165-169,172-173,177-179,183,185,228-270
+  s_48ab164d5bf06f::t_e41af9ab126d63 59-93
+  s_48ab164d5bf06f::t_963ea0fe61649c 1,4-5
+  s_48ab164d5bf06f::t_c1e9bdd784762b 180
+  s_48ab164d5bf06f::t_89678b5a4d8262 35-36
+  s_48ab164d5bf06f::t_63088de0b7cd99 54-58
+  s_48ab164d5bf06f::t_9c09382362154f 16-18,32-34,37-38,40,48,52-53,94
+  s_48ab164d5bf06f::t_f601c99101ece0 23-25
+  s_48ab164d5bf06f::t_b47541bd8850b1 45-47
+  s_48ab164d5bf06f::t_1341dd6b64b831 41-44
+  s_48ab164d5bf06f::t_97721ccb186564 99
+  s_48ab164d5bf06f::t_a757d9c745d589 190-227,271
+  s_48ab164d5bf06f::t_1a069e7f943743 312-314
+  s_48ab164d5bf06f::t_2fa09481d6e1f7 338
+  s_48ab164d5bf06f::t_89b111b7e16d0b 351-355
+  s_48ab164d5bf06f::t_1f3212934f90b7 272
+qase-javascript-commons/changelog.md
+  s_48ab164d5bf06f::t_7fda6e79e1cd4a 1-17
+qase-javascript-commons/src/reporters/testops-multi-reporter.ts
+  s_48ab164d5bf06f::t_90d5b2ac6f87c2 113-115
+qase-javascript-commons/src/env/env-validation-schema.ts
+  s_48ab164d5bf06f::t_6f4c1682be7317 6,11
+  s_48ab164d5bf06f::t_f88779c85daa07 122-130
+qase-javascript-commons/src/models/index.ts
+  s_48ab164d5bf06f::t_0dabf4db6112ce 12
+qase-javascript-commons/src/env/env-type.ts
+  s_48ab164d5bf06f::t_6b50115a2f1076 7-9
+  s_48ab164d5bf06f::t_e13f75da608302 46-48
+qase-javascript-commons/package.json
+  s_48ab164d5bf06f::t_12263d2c5c3e31 3
+qase-javascript-commons/src/config/config-validation-schema.ts
+  s_48ab164d5bf06f::t_6fdc0a63c31f9c 164-179
+qase-javascript-commons/test/client/services/attachment-service.test.ts
+  s_48ab164d5bf06f::t_c137e6ad1e990e 359-436
+  s_48ab164d5bf06f::t_6e9cc347322176 22-36
+  s_48ab164d5bf06f::t_8e29a026485dad 437-487
+  s_48ab164d5bf06f::t_7fc855f9babc52 3-5
+  s_48ab164d5bf06f::t_8913c724c35c51 37-58
+  s_48ab164d5bf06f::t_3803951fa7487b 271-293
+  s_48ab164d5bf06f::t_e8ef769b524937 294-358
+qase-javascript-commons/src/models/config/TestOpsOptionsType.ts
+  s_48ab164d5bf06f::t_f437e2bebdc7fc 72-81
+  s_48ab164d5bf06f::t_f6f20764367689 28
+qase-javascript-commons/src/client/clientV1.ts
+  s_48ab164d5bf06f::t_e47829004d1d22 44-47
+qase-javascript-commons/src/env/env-to-config.ts
+  s_48ab164d5bf06f::t_c5e7f1814aa2dc 84-87
+  s_48ab164d5bf06f::t_299ec33259a56e 8-10
+qase-javascript-commons/test/reporters/testops-multi-reporter.test.ts
+  s_48ab164d5bf06f::t_dbba3fec2648fd 1-52
+qase-javascript-commons/src/env/env-enum.ts
+  s_48ab164d5bf06f::t_2089c2dd0540fe 62-66
+  s_48ab164d5bf06f::t_4bf8fdf1b69ee5 59-61
+qase-javascript-commons/test/client/client-attachment-options.test.ts
+  s_48ab164d5bf06f::t_e8d4501ca26421 1-66
+package-lock.json
+  s_48ab164d5bf06f::t_416bfc62b3a482 28944
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "19547f13acebaaf19a5e74cad3cd0e3736bb3cd6",
+  "prompts": {},
+  "sessions": {
+    "s_48ab164d5bf06f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "68ea94e9-e09d-4f7a-a7bf-b70ed0ba49fe",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
