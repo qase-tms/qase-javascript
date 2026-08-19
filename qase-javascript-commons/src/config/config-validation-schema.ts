@@ -161,6 +161,22 @@ export const configValidationSchema = {
           },
         },
 
+        attachments: {
+          type: 'object',
+          nullable: true,
+
+          properties: {
+            concurrency: {
+              type: 'number',
+              nullable: true,
+            },
+            timeout: {
+              type: 'number',
+              nullable: true,
+            },
+          },
+        },
+
         defect: {
           type: 'boolean',
           nullable: true,

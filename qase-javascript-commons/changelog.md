@@ -1,3 +1,20 @@
+## 2.9.0
+
+### Added
+
+- Attachment uploads are now uploaded with bounded parallelism instead of strictly one batch at a time. The new `testops.attachments.concurrency` option (`QASE_TESTOPS_ATTACHMENTS_CONCURRENCY`, default `4`, clamped to `1`..`16`) controls how many batches are in flight. Runs with thousands of attachments — Playwright suites with traces, for example — spent minutes in the upload phase after 2.8.1 made uploads sequential; the default of 4 restores most of that throughput while keeping concurrency bounded.
+- New `testops.attachments.timeout` option (`QASE_TESTOPS_ATTACHMENTS_TIMEOUT`, default `120` seconds) sets a per-request timeout for attachment uploads, so a stalled request can no longer hang the upload phase indefinitely.
+
+### Changed
+
+- The fixed ~1s pause between attachment batches is now applied only while the API is actually rate limiting. As long as no `429` is returned, batches follow each other immediately; after a `429` the reporter waits out the `Retry-After` window and paces batches until five consecutive batches succeed. Runs that never hit a rate limit no longer pay the pacing cost.
+- Attachment uploads now go through a dedicated keep-alive HTTP agent whose socket pool is bounded by the configured concurrency, with idle sockets dropped after 30s.
+
+### Fixed
+
+- Retries of file-backed attachments (`file_path`, e.g. Playwright's `trace.zip`) re-sent the same already-consumed read stream on every attempt, so all retries after a failed upload were doomed regardless of the cause. Each attempt now opens fresh streams.
+- A retry after a connection-level failure (`ECONNRESET` and friends) is now sent over a brand new connection instead of reusing the pooled socket that had just been reset.
+
 ## 2.8.1
 
 ### Fixed

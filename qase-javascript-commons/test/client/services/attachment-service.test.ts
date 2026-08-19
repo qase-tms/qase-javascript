@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any, @typescript-eslint/unbound-method */
 import { expect } from '@jest/globals';
+import { mkdtempSync, writeFileSync } from 'fs';
+import { tmpdir } from 'os';
+import { join } from 'path';
 import { AttachmentService } from '../../../src/client/services/attachment-service';
 import { LoggerInterface } from '../../../src/utils/logger';
 import { Attachment } from '../../../src/models';
@@ -14,6 +17,43 @@ function mockAttachmentsApi() {
   return {
     uploadAttachment: jest.fn(),
   };
+}
+
+function makeTempFile(content: string): string {
+  const dir = mkdtempSync(join(tmpdir(), 'qase-attachment-'));
+  const filePath = join(dir, 'trace.zip');
+  writeFileSync(filePath, content);
+  return filePath;
+}
+
+function networkError(code = 'ECONNRESET'): Error {
+  const error: any = new Error('socket hang up');
+  error.isAxiosError = true;
+  error.code = code;
+  // no `response` -> this is a network-level failure
+  return error as Error;
+}
+
+function rateLimitError(retryAfterSeconds: string): Error {
+  const error: any = new Error('Too Many Requests');
+  error.isAxiosError = true;
+  error.response = { status: 429, headers: { 'retry-after': retryAfterSeconds }, data: {} };
+  return error as Error;
+}
+
+/**
+ * Replaces the service's sleep with a no-op that records how long it was asked to wait,
+ * so pacing can be asserted precisely without the tests actually sleeping.
+ */
+function spyOnDelay(service: AttachmentService): jest.SpyInstance {
+  return jest.spyOn(service as any, 'delay').mockResolvedValue(undefined);
+}
+
+/** Inter-batch pacing is 1000ms + up to 300ms of jitter; retry backoff waits are far longer. */
+function pacingDelays(spy: jest.SpyInstance): number[] {
+  return spy.mock.calls
+    .map(call => call[0] as number)
+    .filter(ms => ms >= 1000 && ms <= 1300);
 }
 
 function makeAttachment(overrides: Partial<Attachment> = {}): Attachment {
@@ -226,6 +266,223 @@ describe('AttachmentService', () => {
       expect(map.size).toBe(25);
       expect(map.get(attachments[0])).toBe('h0');
       expect(map.get(attachments[24])).toBe('h24');
+    });
+
+    it('should recreate file streams on every retry attempt', async () => {
+      // A read stream can only be consumed once, so a retry that reuses the first
+      // stream would upload nothing. Each attempt must get a fresh stream.
+      const attachment = makeAttachment({
+        file_name: 'trace.zip',
+        file_path: makeTempFile('trace-content'),
+        content: undefined,
+        size: 13,
+      });
+
+      api.uploadAttachment
+        .mockRejectedValueOnce(networkError())
+        .mockResolvedValueOnce({ data: { result: [{ hash: 'h1' }] } });
+
+      const map = await service.uploadAttachmentsMapped('PROJ', [attachment], true);
+
+      expect(api.uploadAttachment).toHaveBeenCalledTimes(2);
+      const firstStream = api.uploadAttachment.mock.calls[0][1][0].value;
+      const secondStream = api.uploadAttachment.mock.calls[1][1][0].value;
+      expect(secondStream).not.toBe(firstStream);
+      expect(map.get(attachment)).toBe('h1');
+    });
+
+    it('should keep no more than `concurrency` uploads in flight', async () => {
+      let inFlight = 0;
+      let maxInFlight = 0;
+      api.uploadAttachment.mockImplementation(async (_code: string, files: any[]) => {
+        inFlight++;
+        maxInFlight = Math.max(maxInFlight, inFlight);
+        await new Promise(resolve => setTimeout(resolve, 20));
+        inFlight--;
+        return { data: { result: files.map((_, i) => ({ hash: `h${i}` })) } };
+      });
+
+      // 100 attachments -> 5 batches of 20.
+      const attachments = Array.from({ length: 100 }, (_, i) =>
+        makeAttachment({ file_name: `file${i}.png`, size: 100 }),
+      );
+      service = new AttachmentService(logger, api as any, { concurrency: 3 });
+
+      const map = await service.uploadAttachmentsMapped('PROJ', attachments, true);
+
+      expect(api.uploadAttachment).toHaveBeenCalledTimes(5);
+      expect(maxInFlight).toBe(3);
+      expect(map.size).toBe(100);
+    });
+
+    it('should default to 4 concurrent uploads', async () => {
+      let inFlight = 0;
+      let maxInFlight = 0;
+      api.uploadAttachment.mockImplementation(async (_code: string, files: any[]) => {
+        inFlight++;
+        maxInFlight = Math.max(maxInFlight, inFlight);
+        await new Promise(resolve => setTimeout(resolve, 20));
+        inFlight--;
+        return { data: { result: files.map((_, i) => ({ hash: `h${i}` })) } };
+      });
+
+      const attachments = Array.from({ length: 200 }, (_, i) =>
+        makeAttachment({ file_name: `file${i}.png`, size: 100 }),
+      );
+
+      await service.uploadAttachmentsMapped('PROJ', attachments, true);
+
+      expect(maxInFlight).toBe(4);
+    });
+
+    it('should clamp concurrency to the supported range', async () => {
+      let inFlight = 0;
+      let maxInFlight = 0;
+      api.uploadAttachment.mockImplementation(async (_code: string, files: any[]) => {
+        inFlight++;
+        maxInFlight = Math.max(maxInFlight, inFlight);
+        await new Promise(resolve => setTimeout(resolve, 10));
+        inFlight--;
+        return { data: { result: files.map((_, i) => ({ hash: `h${i}` })) } };
+      });
+
+      const attachments = Array.from({ length: 100 }, (_, i) =>
+        makeAttachment({ file_name: `file${i}.png`, size: 100 }),
+      );
+      service = new AttachmentService(logger, api as any, { concurrency: 0 });
+
+      await service.uploadAttachmentsMapped('PROJ', attachments, true);
+
+      expect(maxInFlight).toBe(1);
+    });
+
+    it('should not pace batches while the API returns no 429', async () => {
+      api.uploadAttachment.mockImplementation((_code: string, files: any[]) =>
+        Promise.resolve({ data: { result: files.map((_, i) => ({ hash: `h${i}` })) } }),
+      );
+
+      // 100 attachments -> 5 batches, uploaded one at a time so pacing would be visible.
+      const attachments = Array.from({ length: 100 }, (_, i) =>
+        makeAttachment({ file_name: `file${i}.png`, size: 100 }),
+      );
+      service = new AttachmentService(logger, api as any, { concurrency: 1 });
+      const delaySpy = spyOnDelay(service);
+
+      const map = await service.uploadAttachmentsMapped('PROJ', attachments, true);
+
+      expect(map.size).toBe(100);
+      expect(pacingDelays(delaySpy)).toEqual([]);
+    });
+
+    it('should pace batches once the API returns a 429', async () => {
+      api.uploadAttachment
+        .mockRejectedValueOnce(rateLimitError('5'))
+        .mockImplementation((_code: string, files: any[]) =>
+          Promise.resolve({ data: { result: files.map((_, i) => ({ hash: `h${i}` })) } }),
+        );
+
+      const attachments = Array.from({ length: 60 }, (_, i) =>
+        makeAttachment({ file_name: `file${i}.png`, size: 100 }),
+      );
+      service = new AttachmentService(logger, api as any, { concurrency: 1 });
+      const delaySpy = spyOnDelay(service);
+
+      const map = await service.uploadAttachmentsMapped('PROJ', attachments, true);
+
+      expect(map.size).toBe(60);
+      // 3 batches: the first is rate limited, so the two gaps that follow are paced.
+      expect(pacingDelays(delaySpy)).toHaveLength(2);
+    });
+
+    it('should stop pacing after five consecutive successful batches', async () => {
+      api.uploadAttachment
+        .mockRejectedValueOnce(rateLimitError('5'))
+        .mockImplementation((_code: string, files: any[]) =>
+          Promise.resolve({ data: { result: files.map((_, i) => ({ hash: `h${i}` })) } }),
+        );
+
+      // 200 attachments -> 10 batches.
+      const attachments = Array.from({ length: 200 }, (_, i) =>
+        makeAttachment({ file_name: `file${i}.png`, size: 100 }),
+      );
+      service = new AttachmentService(logger, api as any, { concurrency: 1 });
+      const delaySpy = spyOnDelay(service);
+
+      await service.uploadAttachmentsMapped('PROJ', attachments, true);
+
+      // Batches 1..4 are followed by a paced gap; the fifth success clears the throttle.
+      expect(pacingDelays(delaySpy)).toHaveLength(4);
+    });
+
+    it('should wait out the Retry-After window before starting the next batch', async () => {
+      api.uploadAttachment
+        .mockRejectedValueOnce(rateLimitError('5'))
+        .mockImplementation((_code: string, files: any[]) =>
+          Promise.resolve({ data: { result: files.map((_, i) => ({ hash: `h${i}` })) } }),
+        );
+
+      const attachments = Array.from({ length: 40 }, (_, i) =>
+        makeAttachment({ file_name: `file${i}.png`, size: 100 }),
+      );
+      service = new AttachmentService(logger, api as any, { concurrency: 2 });
+      const delaySpy = spyOnDelay(service);
+
+      await service.uploadAttachmentsMapped('PROJ', attachments, true);
+
+      // Retry-After: 5 -> the retry backoff waits at least 5s (plus jitter).
+      const longWaits = delaySpy.mock.calls.map(call => call[0] as number).filter(ms => ms >= 5000);
+      expect(longWaits.length).toBeGreaterThan(0);
+    });
+
+    it('should send uploads through a keep-alive agent bounded by the concurrency', async () => {
+      api.uploadAttachment.mockResolvedValue({ data: { result: [{ hash: 'h1' }] } });
+      service = new AttachmentService(logger, api as any, { concurrency: 6, timeout: 30 });
+
+      await service.uploadAttachmentsMapped('PROJ', [makeAttachment()], true);
+
+      const options = api.uploadAttachment.mock.calls[0][2];
+      expect(options.timeout).toBe(30_000);
+      expect(options.httpsAgent.options.keepAlive).toBe(true);
+      expect(options.httpsAgent.options.maxSockets).toBe(6);
+      expect(options.httpAgent.options.keepAlive).toBe(true);
+    });
+
+    it('should default the request timeout to 120 seconds', async () => {
+      api.uploadAttachment.mockResolvedValue({ data: { result: [{ hash: 'h1' }] } });
+
+      await service.uploadAttachmentsMapped('PROJ', [makeAttachment()], true);
+
+      expect(api.uploadAttachment.mock.calls[0][2].timeout).toBe(120_000);
+    });
+
+    it('should retry network failures on a fresh connection', async () => {
+      // The socket that was just reset must not be reused, so the retry runs without keep-alive.
+      api.uploadAttachment
+        .mockRejectedValueOnce(networkError())
+        .mockResolvedValueOnce({ data: { result: [{ hash: 'h1' }] } });
+
+      await service.uploadAttachmentsMapped('PROJ', [makeAttachment()], true);
+
+      const firstAgent = api.uploadAttachment.mock.calls[0][2].httpsAgent;
+      const retryAgent = api.uploadAttachment.mock.calls[1][2].httpsAgent;
+      expect(firstAgent.options.keepAlive).toBe(true);
+      expect(retryAgent.options.keepAlive).toBe(false);
+      expect(retryAgent).not.toBe(firstAgent);
+    });
+
+    it('should keep using the pooled agent when retrying a 429', async () => {
+      // Rate limiting is not a connection problem — the pooled connection stays valid.
+      api.uploadAttachment
+        .mockRejectedValueOnce(rateLimitError('1'))
+        .mockResolvedValueOnce({ data: { result: [{ hash: 'h1' }] } });
+      const delaySpy = spyOnDelay(service);
+
+      await service.uploadAttachmentsMapped('PROJ', [makeAttachment()], true);
+
+      expect(delaySpy).toHaveBeenCalled();
+      const firstAgent = api.uploadAttachment.mock.calls[0][2].httpsAgent;
+      const retryAgent = api.uploadAttachment.mock.calls[1][2].httpsAgent;
+      expect(retryAgent).toBe(firstAgent);
     });
 
     it('uploadAttachments wrapper returns the mapped hashes as an array', async () => {

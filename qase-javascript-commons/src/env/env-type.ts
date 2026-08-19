@@ -4,8 +4,9 @@ import {
   EnvApiEnum,
   EnvRunEnum,
   EnvLocalEnum,
-  EnvPlanEnum, 
-  EnvBatchEnum, 
+  EnvPlanEnum,
+  EnvBatchEnum,
+  EnvAttachmentsEnum,
   EnvConfigurationsEnum,
   EnvLoggingEnum,
 } from './env-enum';
@@ -41,6 +42,9 @@ export interface EnvType {
   [EnvPlanEnum.id]?: number;
 
   [EnvBatchEnum.size]?: number;
+
+  [EnvAttachmentsEnum.concurrency]?: number;
+  [EnvAttachmentsEnum.timeout]?: number;
 
   [EnvConfigurationsEnum.values]?: string;
   [EnvConfigurationsEnum.createIfNotExists]?: boolean;

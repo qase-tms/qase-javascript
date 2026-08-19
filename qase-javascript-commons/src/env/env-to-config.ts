@@ -5,8 +5,9 @@ import {
   EnvApiEnum,
   EnvRunEnum,
   EnvLocalEnum,
-  EnvPlanEnum, 
-  EnvBatchEnum, 
+  EnvPlanEnum,
+  EnvBatchEnum,
+  EnvAttachmentsEnum,
   EnvConfigurationsEnum,
   EnvLoggingEnum,
 } from './env-enum';
@@ -80,6 +81,10 @@ export const envToConfig = (env: EnvType): ConfigType => ({
     batch: {
       size: env[EnvBatchEnum.size],
     },
+    attachments: (env[EnvAttachmentsEnum.concurrency] !== undefined || env[EnvAttachmentsEnum.timeout] !== undefined) ? {
+      concurrency: env[EnvAttachmentsEnum.concurrency],
+      timeout: env[EnvAttachmentsEnum.timeout],
+    } : undefined,
     defect: env[EnvTestOpsEnum.defect],
     configurations: env[EnvConfigurationsEnum.values] ? {
       values: env[EnvConfigurationsEnum.values].split(',').map(item => {

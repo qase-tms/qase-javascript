@@ -9,4 +9,4 @@ export type { Report } from './report';
 export { CompoundError } from './error';
 export type { ConfigurationGroup, ConfigurationItem, ConfigurationGroupResponse } from './configuration';
 export { ExternalLinkType } from './config/TestOpsOptionsType';
-export type { TestOpsOptionsType, TestOpsApiType, TestOpsRunType, TestOpsPlanType, TestOpsBatchType, TestOpsConfigurationType, TestOpsConfigurationValueType, TestOpsExternalLinkType, TestOpsProjectConfigType, TestOpsMultiConfigType } from './config/TestOpsOptionsType';
+export type { TestOpsOptionsType, TestOpsApiType, TestOpsRunType, TestOpsPlanType, TestOpsBatchType, TestOpsAttachmentsType, TestOpsConfigurationType, TestOpsConfigurationValueType, TestOpsExternalLinkType, TestOpsProjectConfigType, TestOpsMultiConfigType } from './config/TestOpsOptionsType';

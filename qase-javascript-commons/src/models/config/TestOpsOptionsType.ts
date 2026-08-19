@@ -25,6 +25,7 @@ export interface TestOpsOptionsType {
   run: TestOpsRunType;
   plan: TestOpsPlanType;
   batch?: TestOpsBatchType;
+  attachments?: TestOpsAttachmentsType | undefined;
   defect?: boolean | undefined;
   configurations?: TestOpsConfigurationType | undefined;
   statusFilter?: string[] | undefined;
@@ -66,6 +67,16 @@ export interface TestOpsPlanType {
 
 export interface TestOpsBatchType {
   size?: number | undefined;
+}
+
+/**
+ * Tuning for the attachment upload phase.
+ */
+export interface TestOpsAttachmentsType {
+  /** How many attachment batches are uploaded at the same time. Defaults to 4, clamped to 1..16. */
+  concurrency?: number | undefined;
+  /** Per-request timeout in seconds. Defaults to 120. */
+  timeout?: number | undefined;
 }
 
 export interface TestOpsApiType {

@@ -41,6 +41,10 @@ export class ClientV1 implements IClient {
     this.attachmentService = new AttachmentService(
       logger,
       new AttachmentsApi(apiConfig),
+      {
+        concurrency: config.attachments?.concurrency,
+        timeout: config.attachments?.timeout,
+      },
     );
   }
 

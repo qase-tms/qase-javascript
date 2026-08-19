@@ -3,11 +3,12 @@ import { JSONSchemaType } from 'env-schema';
 import { EnvType } from './env-type';
 import {
   EnvApiEnum, EnvBatchEnum,
+  EnvAttachmentsEnum,
   EnvEnum,
   EnvLocalEnum,
   EnvPlanEnum,
   EnvRunEnum,
-  EnvTestOpsEnum, 
+  EnvTestOpsEnum,
   EnvConfigurationsEnum,
   EnvLoggingEnum,
 } from './env-enum';
@@ -114,6 +115,15 @@ export const envValidationSchema: JSONSchemaType<EnvType> = {
     },
 
     [EnvBatchEnum.size]: {
+      type: 'number',
+      nullable: true,
+    },
+
+    [EnvAttachmentsEnum.concurrency]: {
+      type: 'number',
+      nullable: true,
+    },
+    [EnvAttachmentsEnum.timeout]: {
       type: 'number',
       nullable: true,
     },

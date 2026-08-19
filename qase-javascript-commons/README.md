@@ -63,6 +63,8 @@ All configuration options are listed in the table below:
 | Size of batch for sending test results                                                                                | `testops.batch.size`       | `QASE_TESTOPS_BATCH_SIZE`       | `200`                                   | No       | Any integer                |
 | Enable defects for failed test cases                                                                                  | `testops.defect`           | `QASE_TESTOPS_DEFECT`           | `False`                                 | No       | `True`, `False`            |
 | Enable/disable attachment uploads                                                                                     | `testops.uploadAttachments`        | `QASE_TESTOPS_UPLOAD_ATTACHMENTS`       | `true`                                  | No       | `True`, `False`            |
+| How many attachment batches are uploaded at the same time                                                             | `testops.attachments.concurrency`  | `QASE_TESTOPS_ATTACHMENTS_CONCURRENCY`  | `4`                                     | No       | Integer, clamped to `1`..`16` |
+| Timeout of a single attachment upload request, in seconds                                                             | `testops.attachments.timeout`      | `QASE_TESTOPS_ATTACHMENTS_TIMEOUT`      | `120`                                   | No       | Any positive integer       |
 | Filter test results by status (comma-separated list of statuses to exclude from reporting)                           | `testops.statusFilter`              | `QASE_TESTOPS_STATUS_FILTER`             | undefined                               | No       | Array of strings (`passed`, `failed`, `skipped`, `invalid`) |
 | Configuration values to create/find in groups (format: `group1=value1,group2=value2`)                                | `testops.configurations.values`     | `QASE_TESTOPS_CONFIGURATIONS_VALUES`     | undefined                               | No       | Comma-separated key=value pairs |
 | Create configuration groups if they don't exist                                                                       | `testops.configurations.createIfNotExists` | `QASE_TESTOPS_CONFIGURATIONS_CREATE_IF_NOT_EXISTS` | `false`                          | No       | `True`, `False`            |
@@ -128,6 +130,10 @@ All configuration options are listed in the table below:
     "statusFilter": ["passed", "skipped"],
     "batch": {
       "size": 100
+    },
+    "attachments": {
+      "concurrency": 4,
+      "timeout": 120
     },
     "configurations": {
       "values": [

@@ -59,6 +59,14 @@ export enum EnvBatchEnum {
 /**
  * @enum {string}
  */
+export enum EnvAttachmentsEnum {
+  concurrency = 'QASE_TESTOPS_ATTACHMENTS_CONCURRENCY',
+  timeout = 'QASE_TESTOPS_ATTACHMENTS_TIMEOUT',
+}
+
+/**
+ * @enum {string}
+ */
 export enum EnvConfigurationsEnum {
   values = 'QASE_TESTOPS_CONFIGURATIONS_VALUES',
   createIfNotExists = 'QASE_TESTOPS_CONFIGURATIONS_CREATE_IF_NOT_EXISTS',

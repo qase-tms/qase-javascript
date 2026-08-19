@@ -1,6 +1,8 @@
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosRequestConfig } from 'axios';
 import { AttachmentsApi } from 'qase-api-client';
 import { createReadStream, statSync } from 'fs';
+import { Agent as HttpAgent } from 'http';
+import { Agent as HttpsAgent } from 'https';
 import { Readable } from 'stream';
 import { Attachment } from '../../models';
 import { LoggerInterface } from '../../utils/logger';
@@ -11,22 +13,90 @@ const MAX_FILE_SIZE = 32 * 1024 * 1024; // 32 MB per file
 const MAX_REQUEST_SIZE = 128 * 1024 * 1024; // 128 MB per request
 const MAX_FILES_PER_REQUEST = 20; // 20 files per request
 const RETRYABLE_NETWORK_CODES = ['ECONNRESET', 'ETIMEDOUT', 'ECONNREFUSED', 'ECONNABORTED', 'EPIPE'];
+const DEFAULT_CONCURRENCY = 4;
+const MIN_CONCURRENCY = 1;
+const MAX_CONCURRENCY = 16;
+const PACING_DELAY = 1000;
+const PACING_JITTER = 300;
+// How many batches must succeed in a row before pacing is lifted again.
+const THROTTLE_RECOVERY_SUCCESSES = 5;
+const DEFAULT_TIMEOUT_SECONDS = 120;
+// Drop idle pooled sockets well before a load balancer can close them on us.
+const SOCKET_IDLE_TIMEOUT = 30_000;
 
 interface AttachmentData {
   name: string;
   value: Buffer | Readable;
 }
 
+export interface AttachmentUploadOptions {
+  /** How many batches may be uploaded at the same time. Defaults to 4, clamped to 1..16. */
+  concurrency?: number | undefined;
+  /** Per-request timeout in seconds. Defaults to 120. */
+  timeout?: number | undefined;
+}
+
 export class AttachmentService {
+  private readonly concurrency: number;
+  /** Pacing is off until the API actually pushes back with a 429. */
+  private rateLimited = false;
+  private consecutiveSuccesses = 0;
+  private cooldownUntil = 0;
+  private readonly timeout: number;
+  private readonly httpAgent: HttpAgent;
+  private readonly httpsAgent: HttpsAgent;
+
   constructor(
     private readonly logger: LoggerInterface,
     private readonly attachmentClient: AttachmentsApi,
-  ) {}
+    options: AttachmentUploadOptions = {},
+  ) {
+    const requested = options.concurrency;
+    const resolved = typeof requested === 'number' && Number.isFinite(requested)
+      ? Math.trunc(requested)
+      : DEFAULT_CONCURRENCY;
+    this.concurrency = Math.min(MAX_CONCURRENCY, Math.max(MIN_CONCURRENCY, resolved));
+
+    const timeoutSeconds = typeof options.timeout === 'number' && options.timeout > 0
+      ? options.timeout
+      : DEFAULT_TIMEOUT_SECONDS;
+    this.timeout = timeoutSeconds * 1000;
+
+    const agentOptions = {
+      keepAlive: true,
+      keepAliveMsecs: 1000,
+      maxSockets: this.concurrency,
+      maxFreeSockets: this.concurrency,
+      timeout: SOCKET_IDLE_TIMEOUT,
+    };
+    this.httpAgent = new HttpAgent(agentOptions);
+    this.httpsAgent = new HttpsAgent(agentOptions);
+  }
+
+  /**
+   * Axios options for one upload attempt. After a connection-level failure the pooled
+   * socket is suspect, so that attempt gets a throwaway agent instead.
+   */
+  private requestOptions(freshConnection = false): AxiosRequestConfig {
+    if (freshConnection) {
+      return {
+        timeout: this.timeout,
+        httpAgent: new HttpAgent({ keepAlive: false }),
+        httpsAgent: new HttpsAgent({ keepAlive: false }),
+      };
+    }
+
+    return {
+      timeout: this.timeout,
+      httpAgent: this.httpAgent,
+      httpsAgent: this.httpsAgent,
+    };
+  }
 
   async uploadAttachment(projectCode: string, attachment: Attachment): Promise<string> {
     try {
       const data = this.prepareAttachmentData(attachment);
-      const response = await this.attachmentClient.uploadAttachment(projectCode, [data]);
+      const response = await this.attachmentClient.uploadAttachment(projectCode, [data], this.requestOptions());
       return response.data.result?.[0]?.hash ?? '';
     } catch (error) {
       throw processError(error, 'Error on uploading attachment');
@@ -88,52 +158,116 @@ export class AttachmentService {
     const batches = this.groupIntoBatches(validAttachments);
     this.logger.logDebug(`Uploading ${validAttachments.length} attachments in ${batches.length} batch(es)`);
 
-    for (let i = 0; i < batches.length; i++) {
-      const batch = batches[i];
-      if (!batch || batch.length === 0) continue;
+    // Workers pull from a shared cursor, so a slow batch never blocks the others.
+    let nextBatchIndex = 0;
+    const workerCount = Math.min(this.concurrency, batches.length);
 
-      try {
-        const batchNames = batch.map(a => a.file_path ?? a.file_name).join(', ');
-        this.logger.logDebug(
-          `Uploading batch ${i + 1}/${batches.length} with ${batch.length} file(s): ${batchNames}`,
-        );
+    const worker = async (): Promise<void> => {
+      for (;;) {
+        const index = nextBatchIndex++;
+        if (index >= batches.length) {
+          return;
+        }
 
-        const batchData = batch.map(a => this.prepareAttachmentData(a));
-        const response = await this.uploadWithRetry(projectCode, batchData, batchNames);
-
-        const results = response.data.result;
-        if (!results) {
+        const batch = batches[index];
+        if (!batch || batch.length === 0) {
           continue;
         }
 
-        if (results.length !== batch.length) {
-          this.logger.logError(
-            `Attachment upload response size mismatch for batch ${i + 1}: ` +
-            `expected ${batch.length} result(s), got ${results.length}. ` +
-            `Skipping hash mapping for this batch to avoid mis-assigning attachments.`,
-          );
-          continue;
-        }
+        await this.uploadBatch(projectCode, batch, index, batches.length, hashByAttachment);
 
-        for (let j = 0; j < batch.length; j++) {
-          const hash = results[j]?.hash;
-          const attachment = batch[j];
-          if (hash && attachment) {
-            hashByAttachment.set(attachment, hash);
-          }
+        if (nextBatchIndex < batches.length) {
+          await this.pace();
         }
-      } catch (error) {
-        this.logger.logError(`Cannot upload batch ${i + 1}:`, error);
       }
+    };
 
-      if (i < batches.length - 1) {
-        const baseDelay = 1000;
-        const jitter = Math.random() * 300;
-        await this.delay(baseDelay + jitter);
-      }
-    }
+    await Promise.all(Array.from({ length: workerCount }, () => worker()));
 
     return hashByAttachment;
+  }
+
+  /**
+   * Sleeps between batches only while the API is rate limiting us. When no 429 has been
+   * seen, batches follow each other immediately — pacing costs real time in CI and buys
+   * nothing against connection resets.
+   */
+  private async pace(): Promise<void> {
+    if (!this.rateLimited) {
+      return;
+    }
+    await this.delay(PACING_DELAY + Math.random() * PACING_JITTER);
+  }
+
+  /** Blocks until the window requested by the last 429 (via Retry-After) has passed. */
+  private async awaitCooldown(): Promise<void> {
+    const remaining = this.cooldownUntil - Date.now();
+    if (remaining > 0) {
+      await this.delay(remaining);
+    }
+  }
+
+  private noteRateLimited(waitTime: number): void {
+    this.rateLimited = true;
+    this.consecutiveSuccesses = 0;
+    this.cooldownUntil = Math.max(this.cooldownUntil, Date.now() + waitTime);
+  }
+
+  private noteSuccess(): void {
+    if (!this.rateLimited) {
+      return;
+    }
+    this.consecutiveSuccesses++;
+    if (this.consecutiveSuccesses >= THROTTLE_RECOVERY_SUCCESSES) {
+      this.rateLimited = false;
+      this.consecutiveSuccesses = 0;
+      this.logger.logDebug('Attachment upload rate limiting has cleared, resuming full speed');
+    }
+  }
+
+  private async uploadBatch(
+    projectCode: string,
+    batch: Attachment[],
+    index: number,
+    totalBatches: number,
+    hashByAttachment: Map<Attachment, string>,
+  ): Promise<void> {
+    try {
+      const batchNames = batch.map(a => a.file_path ?? a.file_name).join(', ');
+      this.logger.logDebug(
+        `Uploading batch ${index + 1}/${totalBatches} with ${batch.length} file(s): ${batchNames}`,
+      );
+
+      const response = await this.uploadWithRetry(
+        projectCode,
+        () => batch.map(a => this.prepareAttachmentData(a)),
+        batchNames,
+      );
+
+      const results = response.data.result;
+      if (!results) {
+        return;
+      }
+
+      if (results.length !== batch.length) {
+        this.logger.logError(
+          `Attachment upload response size mismatch for batch ${index + 1}: ` +
+          `expected ${batch.length} result(s), got ${results.length}. ` +
+          `Skipping hash mapping for this batch to avoid mis-assigning attachments.`,
+        );
+        return;
+      }
+
+      for (let j = 0; j < batch.length; j++) {
+        const hash = results[j]?.hash;
+        const attachment = batch[j];
+        if (hash && attachment) {
+          hashByAttachment.set(attachment, hash);
+        }
+      }
+    } catch (error) {
+      this.logger.logError(`Cannot upload batch ${index + 1}:`, error);
+    }
   }
 
   private groupIntoBatches(attachments: Attachment[]): Attachment[][] {
@@ -175,22 +309,33 @@ export class AttachmentService {
 
   private async uploadWithRetry(
     projectCode: string,
-    data: AttachmentData[],
+    // A factory, not a ready array: file-backed attachments are read streams, and a
+    // stream can only be consumed once. Every attempt needs freshly opened streams.
+    createData: () => AttachmentData[],
     attachmentNames: string,
     maxRetries = 5,
     initialDelay = 1000,
   ): Promise<{ data: { result?: { hash?: string }[] } }> {
     let lastError: unknown;
     let delay = initialDelay;
+    let connectionSuspect = false;
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
-        return await this.attachmentClient.uploadAttachment(projectCode, data);
+        await this.awaitCooldown();
+        const response = await this.attachmentClient.uploadAttachment(
+          projectCode,
+          createData(),
+          this.requestOptions(connectionSuspect),
+        );
+        this.noteSuccess();
+        return response;
       } catch (error) {
         lastError = error;
 
         const is429 = isAxiosError(error) && error.response?.status === 429;
         const isNetwork = this.isRetryableNetworkError(error);
+        connectionSuspect = isNetwork;
 
         if (!is429 && !isNetwork) {
           throw error;
@@ -202,6 +347,11 @@ export class AttachmentService {
           const jitterPercent = 0.1 + Math.random() * 0.2;
           const jitter = baseWaitTime * jitterPercent;
           const waitTime = Math.floor(baseWaitTime + jitter);
+
+          if (is429) {
+            // Hold every worker back until the window the API asked for has passed.
+            this.noteRateLimited(waitTime);
+          }
 
           const reason = is429
             ? 'Rate limit exceeded (429)'

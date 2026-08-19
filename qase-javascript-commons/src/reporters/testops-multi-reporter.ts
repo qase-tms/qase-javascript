@@ -110,6 +110,9 @@ export class TestOpsMultiReporter extends AbstractReporter {
     if (global.batch !== undefined) {
       opts.batch = global.batch;
     }
+    if (global.attachments !== undefined) {
+      opts.attachments = global.attachments;
+    }
     return opts;
   }
 

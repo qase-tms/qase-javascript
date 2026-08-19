@@ -1,9 +1,28 @@
 import { expect } from '@jest/globals';
 import { envToConfig } from '../../src/env/env-to-config';
 import { EnvType } from '../../src/env/env-type';
-import { EnvConfigurationsEnum } from '../../src/env/env-enum';
+import { EnvAttachmentsEnum, EnvConfigurationsEnum } from '../../src/env/env-enum';
 
 describe('envToConfig', () => {
+  describe('attachments', () => {
+    it('should map attachment upload concurrency and timeout', () => {
+      const env: EnvType = {
+        [EnvAttachmentsEnum.concurrency]: 8,
+        [EnvAttachmentsEnum.timeout]: 60,
+      };
+
+      const result = envToConfig(env);
+
+      expect(result.testops?.attachments).toEqual({ concurrency: 8, timeout: 60 });
+    });
+
+    it('should leave attachments undefined when nothing is set', () => {
+      const result = envToConfig({});
+
+      expect(result.testops?.attachments).toBeUndefined();
+    });
+  });
+
   describe('configurations', () => {
     it('should parse configurations values from environment variable', () => {
       const env: EnvType = {
