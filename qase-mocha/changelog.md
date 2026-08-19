@@ -1,3 +1,9 @@
+# mocha-qase-reporter@1.6.0
+
+## Added
+
+- Attachment uploads are now parallelised and paced adaptively. `testops.attachments.concurrency` (`QASE_TESTOPS_ATTACHMENTS_CONCURRENCY`, default `4`, clamped to `1`..`16`) sets how many attachment batches are uploaded at once, and `testops.attachments.timeout` (`QASE_TESTOPS_ATTACHMENTS_TIMEOUT`, default `120` seconds) caps a single upload request. The fixed pause between batches now applies only while the API is rate limiting, so runs that never see a `429` no longer pay for it. Retries of file-backed attachments also open fresh read streams and, after a connection error, use a new connection. Bumped `qase-javascript-commons` pin to `~2.9.0`.
+
 # mocha-qase-reporter@1.5.3
 
 ## Fixed
