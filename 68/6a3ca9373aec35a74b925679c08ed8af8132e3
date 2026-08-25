@@ -1,0 +1,27 @@
+qase-api-client/docs/ResultsApi.md
+  s_e03abde9710ca8::t_b00266f73f9c18 81
+qase-api-client/package.json
+  s_e03abde9710ca8::t_37bf739226f339 3
+qase-api-client/src/api/results-api.ts
+  s_e03abde9710ca8::t_5b83d4973bbaeb 92,381,475,566
+qase-api-v2-client/docs/ResultsApi.md
+  s_e03abde9710ca8::t_b9a64d7d6f74af 132
+qase-api-v2-client/package.json
+  s_e03abde9710ca8::t_64bd174e1eb5a3 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "686a3ca9373aec35a74b925679c08ed8af8132e3",
+  "prompts": {},
+  "sessions": {
+    "s_e03abde9710ca8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f9577e82-6d1c-46be-8523-385d83fc66fe",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
