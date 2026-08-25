@@ -1,0 +1,27 @@
+qase-javascript-commons/test/internal/step-parser.test.ts
+  s_59aa6c01461e73::t_94b458e64a521c 27-67
+qase-javascript-commons/src/internal/step-parser.ts
+  s_59aa6c01461e73::t_d1813d0d9e847e 7-17,24-28,31-51
+qase-javascript-commons/package.json
+  s_59aa6c01461e73::t_b2c4972c89c7b3 3
+qase-playwright/test/reporter.test.ts
+  s_59aa6c01461e73::t_7b7323829e1d34 177-186
+qase-javascript-commons/changelog.md
+  s_59aa6c01461e73::t_b2c4972c89c7b3 1-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "c8db76f18019e8e15ec30c5788392a61cfe7e366",
+  "prompts": {},
+  "sessions": {
+    "s_59aa6c01461e73": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "96b0611c-5fe4-4fe7-b9ab-2064b1e3a2c5",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
