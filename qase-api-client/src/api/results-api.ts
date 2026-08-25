@@ -89,7 +89,7 @@ export const ResultsApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * This method allows to create a lot of test run result at once.  If you try to send more than 2,000 results in a single bulk request, you will receive an error with code 413 - Payload Too Large.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
+         * This method allows to create a lot of test run result at once.  If you try to send more than 200 results in a single bulk request, you will receive an error with code 413 - Payload Too Large.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
          * @summary Bulk create test run result
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
@@ -378,7 +378,7 @@ export const ResultsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * This method allows to create a lot of test run result at once.  If you try to send more than 2,000 results in a single bulk request, you will receive an error with code 413 - Payload Too Large.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
+         * This method allows to create a lot of test run result at once.  If you try to send more than 200 results in a single bulk request, you will receive an error with code 413 - Payload Too Large.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
          * @summary Bulk create test run result
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
@@ -472,7 +472,7 @@ export const ResultsApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.createResult(code, id, resultCreate, options).then((request) => request(axios, basePath));
         },
         /**
-         * This method allows to create a lot of test run result at once.  If you try to send more than 2,000 results in a single bulk request, you will receive an error with code 413 - Payload Too Large.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
+         * This method allows to create a lot of test run result at once.  If you try to send more than 200 results in a single bulk request, you will receive an error with code 413 - Payload Too Large.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
          * @summary Bulk create test run result
          * @param {string} code Code of project, where to search entities.
          * @param {number} id Identifier.
@@ -563,7 +563,7 @@ export class ResultsApi extends BaseAPI {
     }
 
     /**
-     * This method allows to create a lot of test run result at once.  If you try to send more than 2,000 results in a single bulk request, you will receive an error with code 413 - Payload Too Large.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
+     * This method allows to create a lot of test run result at once.  If you try to send more than 200 results in a single bulk request, you will receive an error with code 413 - Payload Too Large.  If there is no free space left in your team account, when attempting to upload an attachment, e.g., through reporters, you will receive an error with code 507 - Insufficient Storage. 
      * @summary Bulk create test run result
      * @param {string} code Code of project, where to search entities.
      * @param {number} id Identifier.
