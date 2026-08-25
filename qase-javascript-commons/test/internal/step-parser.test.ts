@@ -24,6 +24,47 @@ describe('extractAndCleanStep', () => {
     expect(result.cleanedString).toBe('step');
   });
 
+  it('extracts a multiline expected result and strips the markers', () => {
+    const input = 'Verify Booking response schema QaseExpRes:: Response body should contain:\n'
+      + '          - firstname: string\n'
+      + '          - lastname: string QaseData:';
+
+    const result = extractAndCleanStep(input);
+    expect(result.expectedResult).toBe('Response body should contain:\n'
+      + '          - firstname: string\n'
+      + '          - lastname: string');
+    expect(result.data).toBe(null);
+    expect(result.cleanedString).toBe('Verify Booking response schema');
+  });
+
+  it('extracts multiline expected result and multiline data', () => {
+    const result = extractAndCleanStep('send request QaseExpRes:: line1\nline2 QaseData:: key: 1\nkey2: 2');
+    expect(result.expectedResult).toBe('line1\nline2');
+    expect(result.data).toBe('key: 1\nkey2: 2');
+    expect(result.cleanedString).toBe('send request');
+  });
+
+  it('strips the markers when only the expected result marker is present', () => {
+    const result = extractAndCleanStep('step QaseExpRes:: multi\nline expected');
+    expect(result.expectedResult).toBe('multi\nline expected');
+    expect(result.data).toBe(null);
+    expect(result.cleanedString).toBe('step');
+  });
+
+  it('strips the markers when only the data marker is present', () => {
+    const result = extractAndCleanStep('step QaseData:: multi\nline data');
+    expect(result.expectedResult).toBe(null);
+    expect(result.data).toBe('multi\nline data');
+    expect(result.cleanedString).toBe('step');
+  });
+
+  it('keeps a multiline action intact', () => {
+    const result = extractAndCleanStep('given a\nmultiline action QaseExpRes:: ok QaseData:: d');
+    expect(result.expectedResult).toBe('ok');
+    expect(result.data).toBe('d');
+    expect(result.cleanedString).toBe('given a\nmultiline action');
+  });
+
   it('returns nulls for empty input', () => {
     expect(extractAndCleanStep('')).toEqual({
       expectedResult: null,

@@ -174,6 +174,16 @@ describe('PlaywrightQaseReporter', () => {
       expect(result.cleanedString).toBe('Click button');
     });
 
+    it('should handle a multiline expected result composed by qase.step', () => {
+      const expectedResult = 'Response body should contain:\n  - firstname: string\n  - lastname: string';
+      const input = `Verify Booking response schema QaseExpRes:: ${expectedResult} QaseData:`;
+
+      const result = extractAndCleanStep(input);
+      expect(result.expectedResult).toBe(expectedResult);
+      expect(result.data).toBe(null);
+      expect(result.cleanedString).toBe('Verify Booking response schema');
+    });
+
     it('should return original string if no QaseExpRes or QaseData', () => {
       const input = 'Click button';
       const result = extractAndCleanStep(input);

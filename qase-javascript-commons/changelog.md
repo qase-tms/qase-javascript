@@ -1,3 +1,9 @@
+## 2.9.1
+
+### Fixed
+
+- `qase.step()` now supports multiline expected results and data. `extractAndCleanStep` matched the marker values with `.` and no `s` (dotAll) flag, so a newline anywhere inside the `QaseExpRes:` or `QaseData:` value made the whole match fail: the expected result and data were silently dropped, and the raw `QaseExpRes:`/`QaseData:` markers leaked into the step title shown in Qase. Multiline expected results are common for API and schema validation tests with a bulleted list of expected fields. The markers are now located by index and their values taken as slices, so newlines are preserved verbatim. As part of the same fix, a step carrying only one of the two markers has it stripped from the title as well, instead of leaking it.
+
 ## 2.9.0
 
 ### Added
