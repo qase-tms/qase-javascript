@@ -1,0 +1,19 @@
+qase-javascript-commons/README.md
+  s_ae3dba0d307cfe::t_998dbc11572d8d 63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "73a916a7074ed51128902b4260de363d5d3bb8c4",
+  "prompts": {},
+  "sessions": {
+    "s_ae3dba0d307cfe": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c865193d-7019-4aa9-b702-dae72eb24448",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Manju R <cskmnrpt@gmail.com>"
+    }
+  }
+}
