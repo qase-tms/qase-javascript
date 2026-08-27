@@ -6,6 +6,11 @@ import { HostData } from '../../models/host-data';
 import { apiLabelToAppInUrl, isAbsoluteUrl, stripTrailingSlashes } from '../../utils/api-host';
 
 const DEFAULT_API_HOST = 'qase.io';
+/**
+ * Without a timeout a connection that stalls instead of failing hangs the process at teardown,
+ * because the reporter awaits the upload before it can finish.
+ */
+const DEFAULT_REQUEST_TIMEOUT_SECONDS = 30;
 const API_BASE_URL = 'https://api-';
 const APP_BASE_URL = 'https://';
 const API_V1 = '/v1';
@@ -50,6 +55,11 @@ export function createApiConfigV2(
   const apiConfig = new ConfigurationV2({ apiKey: config.api.token, formDataCtor: FormData });
   apiConfig.basePath = resolveBasePath(config.api.host, API_V2);
 
+  apiConfig.baseOptions = {
+    ...(apiConfig.baseOptions as Record<string, unknown> ?? {}),
+    timeout: resolveRequestTimeout(config),
+  };
+
   if (hostData) {
     const headers = buildHeaders(hostData, reporterName, frameworkName);
     const existingHeaders = (apiConfig.baseOptions as { headers?: Record<string, string> } | undefined)?.headers ?? {};
@@ -64,6 +74,18 @@ export function createApiConfigV2(
   }
 
   return apiConfig;
+}
+
+/**
+ * @param {TestOpsOptionsType} config
+ * @returns {number} per-request timeout in milliseconds
+ */
+export function resolveRequestTimeout(config: TestOpsOptionsType): number {
+  const configured = config.api.timeout;
+  const seconds = typeof configured === 'number' && Number.isFinite(configured) && configured > 0
+    ? configured
+    : DEFAULT_REQUEST_TIMEOUT_SECONDS;
+  return seconds * 1000;
 }
 
 export function buildHeaders(

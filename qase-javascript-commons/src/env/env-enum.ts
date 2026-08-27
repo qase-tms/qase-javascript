@@ -28,6 +28,9 @@ export enum EnvTestOpsEnum {
 export enum EnvApiEnum {
   token = 'QASE_TESTOPS_API_TOKEN',
   host = 'QASE_TESTOPS_API_HOST',
+  timeout = 'QASE_TESTOPS_API_TIMEOUT',
+  retries = 'QASE_TESTOPS_API_RETRIES',
+  retryBackoff = 'QASE_TESTOPS_API_RETRY_BACKOFF',
 }
 
 /**

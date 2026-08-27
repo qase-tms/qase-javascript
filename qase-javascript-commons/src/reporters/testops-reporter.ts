@@ -25,7 +25,16 @@ export class TestOpsReporter extends AbstractReporter {
 
   private runId: number | undefined;
 
+  /** First result that has not been confirmed as accepted by Qase. */
   private firstIndex = 0;
+
+  /**
+   * First result that no sender has taken responsibility for yet. Kept apart from
+   * `firstIndex` so a batch is claimed before the request and only marked sent after the
+   * response: a concurrent `sendResults()` cannot ship the same batch twice, and a batch
+   * that failed is released back for the next attempt instead of being skipped.
+   */
+  private claimedIndex = 0;
 
   private isTestRunReady = false;
 
@@ -62,6 +71,7 @@ export class TestOpsReporter extends AbstractReporter {
     this.runId = undefined;
     this.isTestRunReady = false;
     this.firstIndex = 0;
+    this.claimedIndex = 0;
     this.results = [];
 
     await this.checkOrCreateTestRun();
@@ -90,12 +100,10 @@ export class TestOpsReporter extends AbstractReporter {
         return;
       }
 
-      const countOfResults = this.batchSize + this.firstIndex;
+      const countOfResults = this.batchSize + this.claimedIndex;
 
       if (this.results.length >= countOfResults) {
-        const firstIndex = this.firstIndex;
-        this.firstIndex = countOfResults;
-        await this.publishResults(this.results.slice(firstIndex, countOfResults));
+        await this.publishClaimed(this.claimedIndex, countOfResults);
       }
     } finally {
       release();
@@ -155,21 +163,63 @@ export class TestOpsReporter extends AbstractReporter {
       return;
     }
 
-    const remainingResults = this.results.slice(this.firstIndex);
-
-    if (this.firstIndex < this.results.length) {
-      if (remainingResults.length <= DEFAULT_BATCH_SIZE) {
-        await this.publishResults(remainingResults);
-        return;
-      }
-
-      for (let i = 0; i < remainingResults.length; i += DEFAULT_BATCH_SIZE) {
-        await this.publishResults(remainingResults.slice(i, i + DEFAULT_BATCH_SIZE));
-      }
+    while (this.claimedIndex < this.results.length) {
+      const from = this.claimedIndex;
+      const to = Math.min(from + DEFAULT_BATCH_SIZE, this.results.length);
+      await this.publishClaimed(from, to);
     }
 
-    // Clear results because we don't need to send them again then we use Cypress reporter
-    this.results.length = 0;
+    // Clear results because we don't need to send them again then we use Cypress reporter.
+    // Only once every result is confirmed — a batch still in flight (claimed but not yet
+    // acknowledged) must stay in the array so a failure can release it back for another try.
+    if (this.firstIndex >= this.results.length) {
+      this.results.length = 0;
+      this.firstIndex = 0;
+      this.claimedIndex = 0;
+    }
+  }
+
+  /**
+   * Sends `results[from, to)`, claiming the range up front so no other sender picks it up and
+   * releasing the claim if the upload fails, so the next `sendResults()` retries it.
+   *
+   * @param {number} from
+   * @param {number} to
+   * @returns {Promise<void>}
+   * @private
+   */
+  private async publishClaimed(from: number, to: number): Promise<void> {
+    this.claimedIndex = to;
+
+    try {
+      await this.publishResults(this.results.slice(from, to));
+      this.firstIndex = to;
+    } catch (error) {
+      this.claimedIndex = from;
+      this.reportUnrecoverableBatch(to - from);
+      throw error;
+    }
+  }
+
+  /**
+   * @param {number} count
+   * @private
+   */
+  private reportUnrecoverableBatch(count: number): void {
+    this.logger.logError(
+      chalk`{red Unable to send ${count} result(s) to Qase after retries. ` +
+      `${this.unsentResultsCount()} result(s) are still missing from run ${this.runId ?? 'unknown'}.}`,
+    );
+  }
+
+  /**
+   * Results accumulated but never confirmed as accepted by Qase.
+   *
+   * @returns {number}
+   * @private
+   */
+  private unsentResultsCount(): number {
+    return Math.max(0, this.results.length - this.firstIndex);
   }
 
   /**
@@ -187,6 +237,17 @@ export class TestOpsReporter extends AbstractReporter {
     if (!this.runId) {
       throw new Error('Run ID is not set');
     }
+
+    const unsent = this.unsentResultsCount();
+    if (unsent > 0) {
+      // A completed run over partial data looks trustworthy and is not. Leave it open so the
+      // gap is visible in Qase instead of being signed off automatically.
+      this.logger.log(
+        chalk`{yellow Run ${this.runId} is left incomplete: ${unsent} result(s) could not be sent to Qase}`,
+      );
+      return;
+    }
+
     await this.api.completeRun(this.runId);
 
     if (this.showPublicReportLink) {

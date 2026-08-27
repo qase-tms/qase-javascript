@@ -78,6 +78,37 @@ describe('ResultTransformer', () => {
       expect(model.signature).toBe('sig-1');
     });
 
+    it('should send the result id as the API idempotency key', () => {
+      const model = transformer.transform(
+        makeResult({ id: 'a1b2c3d4-0000-4000-8000-000000000001' }),
+        mockResolveHash,
+      );
+      expect(model.id).toBe('a1b2c3d4-0000-4000-8000-000000000001');
+    });
+
+    it('should give two results distinct idempotency keys', () => {
+      const first = transformer.transform(makeResult({ id: 'id-1' }), mockResolveHash);
+      const second = transformer.transform(makeResult({ id: 'id-2' }), mockResolveHash);
+      expect(first.id).toBe('id-1');
+      expect(second.id).toBe('id-2');
+      expect(first.id).not.toBe(second.id);
+    });
+
+    it('should omit id when the result carries none, rather than sending an empty key', () => {
+      expect(transformer.transform(makeResult({ id: '' }), mockResolveHash).id).toBeUndefined();
+      expect(transformer.transform(makeResult(), mockResolveHash).id).toBeUndefined();
+    });
+
+    it('should keep the idempotency key when adding a defect flag', () => {
+      const model = transformer.transformWithDefect(
+        makeResult({ id: 'id-defect' }),
+        mockResolveHash,
+        true,
+      );
+      expect(model.id).toBe('id-defect');
+      expect(model.defect).toBe(true);
+    });
+
     it('should handle array testops_id', () => {
       const model = transformer.transform(
         makeResult({ testops_id: [1, 2, 3] }),

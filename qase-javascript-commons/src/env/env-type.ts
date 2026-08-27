@@ -31,6 +31,9 @@ export interface EnvType {
 
   [EnvApiEnum.token]?: string;
   [EnvApiEnum.host]?: string;
+  [EnvApiEnum.timeout]?: number;
+  [EnvApiEnum.retries]?: number;
+  [EnvApiEnum.retryBackoff]?: number;
 
   [EnvRunEnum.id]?: number;
   [EnvRunEnum.title]?: string;

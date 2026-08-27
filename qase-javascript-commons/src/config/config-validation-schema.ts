@@ -79,6 +79,21 @@ export const configValidationSchema = {
               type: 'string',
               nullable: true,
             },
+
+            timeout: {
+              type: 'number',
+              nullable: true,
+            },
+
+            retries: {
+              type: 'number',
+              nullable: true,
+            },
+
+            retryBackoff: {
+              type: 'number',
+              nullable: true,
+            },
           },
         },
 

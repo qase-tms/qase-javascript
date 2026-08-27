@@ -39,6 +39,16 @@ export abstract class AbstractReporter implements InternalReporterInterface {
   protected results: TestResultType[] = [];
 
   /**
+   * Every result id handed out so far. The id doubles as the idempotency key of the v2 results
+   * API, so a framework that reuses its own identifiers (Newman replays the same item id on
+   * every iteration) must not be allowed to collapse two distinct results into one.
+   *
+   * @type {Set<string>}
+   * @private
+   */
+  private readonly seenResultIds = new Set<string>();
+
+  /**
    * @returns {Promise<void>}
    */
   abstract publish(): Promise<void>;
@@ -99,6 +109,7 @@ export abstract class AbstractReporter implements InternalReporterInterface {
     }
 
     if (result.testops_id === null || !Array.isArray(result.testops_id)) {
+      this.ensureUniqueId(result);
       this.results.push(result);
       return;
     }
@@ -110,6 +121,7 @@ export abstract class AbstractReporter implements InternalReporterInterface {
       const testResultCopy = { ...result, execution: { ...result.execution } } as TestResultType;
       testResultCopy.testops_id = id;
       testResultCopy.id = uuidv4();
+      this.seenResultIds.add(testResultCopy.id);
 
       if (!firstCase) {
         testResultCopy.execution.duration = 0;
@@ -124,7 +136,32 @@ export abstract class AbstractReporter implements InternalReporterInterface {
    * @param {TestResultType[]} results
    */
   public setTestResults(results: TestResultType[]): void {
+    // Results built in another process (Cypress) already carry their own ids. Only fill in the
+    // missing ones — reassigning an existing id would change the idempotency key of a result
+    // that may already have reached Qase.
+    for (const result of results) {
+      if (!result.id) {
+        result.id = uuidv4();
+      }
+      this.seenResultIds.add(result.id);
+    }
+
     this.results = results;
+  }
+
+  /**
+   * Guarantees `result.id` is set and unique within this reporter. A missing or reused id would
+   * either let the backend invent a fresh idempotency key on every attempt (duplicates on
+   * retry) or merge two distinct results into one (silent loss).
+   *
+   * @param {TestResultType} result
+   * @private
+   */
+  private ensureUniqueId(result: TestResultType): void {
+    if (!result.id || this.seenResultIds.has(result.id)) {
+      result.id = uuidv4();
+    }
+    this.seenResultIds.add(result.id);
   }
 
   protected removeAnsiEscapeCodes(str: string): string {

@@ -83,6 +83,18 @@ export const envValidationSchema: JSONSchemaType<EnvType> = {
       type: 'string',
       nullable: true,
     },
+    [EnvApiEnum.timeout]: {
+      type: 'number',
+      nullable: true,
+    },
+    [EnvApiEnum.retries]: {
+      type: 'number',
+      nullable: true,
+    },
+    [EnvApiEnum.retryBackoff]: {
+      type: 'number',
+      nullable: true,
+    },
 
     [EnvRunEnum.id]: {
       type: 'number',

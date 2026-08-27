@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call */
 import { expect } from '@jest/globals';
 
 jest.mock('qase-api-v2-client', () => ({
@@ -44,13 +44,25 @@ function makeResult(overrides: any = {}): any {
   };
 }
 
+const httpError = (status: number, headers: Record<string, unknown> = {}): Error => {
+  const error = new Error(`HTTP ${status}`) as any;
+  error.isAxiosError = true;
+  error.response = { status, headers, data: {} };
+  return error;
+};
+
 describe('ClientV2.uploadResults', () => {
   let client: ClientV2;
   let uploadAttachmentsMapped: jest.Mock;
   let createResultsV2: jest.Mock;
 
   beforeEach(() => {
-    const config: any = { project: 'PROJ', uploadAttachments: true, defect: false };
+    const config: any = {
+      project: 'PROJ',
+      uploadAttachments: true,
+      defect: false,
+      api: { token: 'tok', retries: 2, retryBackoff: 0.001 },
+    };
     client = new ClientV2(silentLogger(), config, undefined, undefined);
 
     // Build the hash map from the exact attachment objects passed in.
@@ -111,5 +123,54 @@ describe('ClientV2.uploadResults', () => {
     // but returns an empty map, so no hashes are attached.
     const payload = createResultsV2.mock.calls[0][2];
     expect(payload.results[0].attachments).toEqual([]);
+  });
+
+  it('sends the result id as the idempotency key', async () => {
+    await client.uploadResults(42, [makeResult({ id: 'result-1' })]);
+
+    const payload = createResultsV2.mock.calls[0][2];
+    expect(payload.results[0].id).toBe('result-1');
+  });
+
+  it('retries a 503 and does not re-upload the attachments', async () => {
+    createResultsV2
+      .mockRejectedValueOnce(httpError(503))
+      .mockResolvedValue(undefined);
+
+    await client.uploadResults(42, [makeResult({ attachments: [{ file_name: 'a.png' } as any] })]);
+
+    expect(createResultsV2).toHaveBeenCalledTimes(2);
+    expect(uploadAttachmentsMapped).toHaveBeenCalledTimes(1);
+  });
+
+  it('repeats the same idempotency key on a retry, so the retry cannot duplicate', async () => {
+    createResultsV2
+      .mockRejectedValueOnce(httpError(429, { 'retry-after': '0' }))
+      .mockResolvedValue(undefined);
+
+    await client.uploadResults(42, [makeResult({ id: 'result-1' })]);
+
+    expect(createResultsV2).toHaveBeenCalledTimes(2);
+    const firstKey = createResultsV2.mock.calls[0][2].results[0].id;
+    const secondKey = createResultsV2.mock.calls[1][2].results[0].id;
+    expect(firstKey).toBe('result-1');
+    expect(secondKey).toBe('result-1');
+  });
+
+  it('does not retry a 422 and reports the failure', async () => {
+    createResultsV2.mockRejectedValue(httpError(422));
+
+    await expect(client.uploadResults(42, [makeResult()])).rejects.toThrow(/Bad request/);
+    expect(createResultsV2).toHaveBeenCalledTimes(1);
+  });
+
+  it('gives up after the configured number of retries', async () => {
+    createResultsV2.mockRejectedValue(httpError(500));
+
+    await expect(client.uploadResults(42, [makeResult()])).rejects.toThrow(
+      /Error on uploading results/,
+    );
+    // retries: 2 → the first attempt plus two more.
+    expect(createResultsV2).toHaveBeenCalledTimes(3);
   });
 });

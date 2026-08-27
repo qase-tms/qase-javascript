@@ -52,6 +52,9 @@ All configuration options are listed in the table below:
 | Token for [API access](https://developers.qase.io/#authentication)                                                    | `testops.api.token`        | `QASE_TESTOPS_API_TOKEN`        |  undefined                              | Yes      | Any string                 |
 | Qase API host. Enterprise users can give a host (`example.qase.io`, resolved as `https://api-example.qase.io`) or a full base URL used verbatim (`https://qase.internal`, `http://localhost:8080`) | `testops.api.host`         | `QASE_TESTOPS_API_HOST`         | `qase.io`                               | No       | Host name or base URL      |
 | Qase enterprise environment                                                                                           | `testops.api.enterprise`   | `QASE_TESTOPS_API_ENTERPRISE`   | `False`                                 | No       | `True`, `False`            |
+| Timeout of a single API request, in seconds                                                                           | `testops.api.timeout`      | `QASE_TESTOPS_API_TIMEOUT`      | `30`                                    | No       | Any positive integer       |
+| How many extra attempts a failed result upload gets                                                                   | `testops.api.retries`      | `QASE_TESTOPS_API_RETRIES`      | `3`                                     | No       | Any non-negative integer   |
+| First backoff step between result upload attempts, in seconds (doubles per attempt, capped at 30s; a `Retry-After` header wins over it) | `testops.api.retryBackoff` | `QASE_TESTOPS_API_RETRY_BACKOFF` | `1`                                    | No       | Any positive number        |
 | Code of your project, which you can take from the URL: `https://app.qase.io/project/DEMOTR` - `DEMOTR` is the project code | `testops.project`          | `QASE_TESTOPS_PROJECT`          |  undefined                              | Yes      | Any string                 |
 | Qase test run ID                                                                                                      | `testops.run.id`           | `QASE_TESTOPS_RUN_ID`           |  undefined                              | No       | Any integer                |
 | Qase test run title                                                                                                   | `testops.run.title`        | `QASE_TESTOPS_RUN_TITLE`        | `Automated run <Current date and time>` | No       | Any string                 |
@@ -111,7 +114,10 @@ All configuration options are listed in the table below:
   "testops": {
     "api": {
       "token": "<token>",
-      "host": "qase.io"
+      "host": "qase.io",
+      "timeout": 30,
+      "retries": 3,
+      "retryBackoff": 1
     },
     "run": {
       "title": "Regress run",

@@ -82,5 +82,11 @@ export interface TestOpsAttachmentsType {
 export interface TestOpsApiType {
   token: string;
   host?: string | undefined;
+  /** Per-request timeout in seconds. Defaults to 30. */
+  timeout?: number | undefined;
+  /** Extra attempts for a failed results upload. Defaults to 3. */
+  retries?: number | undefined;
+  /** First backoff step between result upload attempts, in seconds. Defaults to 1. */
+  retryBackoff?: number | undefined;
 }
 

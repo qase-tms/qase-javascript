@@ -6,7 +6,8 @@ import { HostData } from '../models/host-data';
 import { ClientV1 } from './clientV1';
 import { createApiConfigV2 } from './transport/api-config-builder';
 import { ResultTransformer } from './services/result-transformer';
-import { processError } from './services/api-error-handler';
+import { getErrorMessage, processError } from './services/api-error-handler';
+import { withRetry } from './transport/retry-policy';
 
 export class ClientV2 extends ClientV1 {
   private readonly resultsClient: ResultsApi;
@@ -53,11 +54,36 @@ export class ClientV2 extends ClientV1 {
         ),
       );
 
-      await this.resultsClient.createResultsV2(project, runId, {
-        results: models,
-      });
+      // Only the results call is retried: attachments were uploaded above and carry their own
+      // retry, and every result now sends an idempotency key, so a repeat cannot duplicate.
+      await withRetry(
+        () => this.resultsClient.createResultsV2(project, runId, {
+          results: models,
+        }),
+        {
+          retries: this.config.api.retries,
+          baseDelayMs: this.retryBackoffMs(),
+          onRetry: ({ attempt, delayMs, error }) => {
+            this.logger.log(
+              `Failed to send ${models.length} result(s) to Qase: ${getErrorMessage(error)}. ` +
+              `Retrying in ${delayMs}ms (attempt ${attempt})`,
+            );
+          },
+        },
+      );
     } catch (error) {
       throw processError(error, 'Error on uploading results', results);
     }
+  }
+
+  /**
+   * @returns {number | undefined} first backoff step in milliseconds, or undefined for the default
+   */
+  private retryBackoffMs(): number | undefined {
+    const seconds = this.config.api.retryBackoff;
+    if (typeof seconds !== 'number' || !Number.isFinite(seconds) || seconds <= 0) {
+      return undefined;
+    }
+    return seconds * 1000;
   }
 }

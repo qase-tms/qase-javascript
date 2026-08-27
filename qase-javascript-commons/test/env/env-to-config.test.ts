@@ -1,9 +1,38 @@
 import { expect } from '@jest/globals';
 import { envToConfig } from '../../src/env/env-to-config';
 import { EnvType } from '../../src/env/env-type';
-import { EnvAttachmentsEnum, EnvConfigurationsEnum } from '../../src/env/env-enum';
+import { EnvApiEnum, EnvAttachmentsEnum, EnvConfigurationsEnum } from '../../src/env/env-enum';
 
 describe('envToConfig', () => {
+  describe('api', () => {
+    it('should map the request timeout and retry settings', () => {
+      const env: EnvType = {
+        [EnvApiEnum.token]: 'tok',
+        [EnvApiEnum.timeout]: 15,
+        [EnvApiEnum.retries]: 5,
+        [EnvApiEnum.retryBackoff]: 2,
+      };
+
+      const result = envToConfig(env);
+
+      expect(result.testops?.api).toEqual({
+        token: 'tok',
+        host: undefined,
+        timeout: 15,
+        retries: 5,
+        retryBackoff: 2,
+      });
+    });
+
+    it('should leave the retry settings undefined when nothing is set', () => {
+      const result = envToConfig({});
+
+      expect(result.testops?.api?.timeout).toBeUndefined();
+      expect(result.testops?.api?.retries).toBeUndefined();
+      expect(result.testops?.api?.retryBackoff).toBeUndefined();
+    });
+  });
+
   describe('attachments', () => {
     it('should map attachment upload concurrency and timeout', () => {
       const env: EnvType = {

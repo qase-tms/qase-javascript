@@ -262,9 +262,42 @@ export class TestOpsMultiReporter extends AbstractReporter {
       this.logger.logDebug(`[${projectCode}] Sent ${toSend.length} results to Qase`);
       return true;
     } catch (error) {
-      this.logger.logError(`[${projectCode}] Error sending results:`, error);
+      this.logger.logError(
+        chalk`{red [${projectCode}] Unable to send ${toSend.length} result(s) to Qase after retries. ` +
+        `${this.unsentResultsCount(projectCode)} result(s) are still missing from run ${runId}.}`,
+        error,
+      );
       return false;
     }
+  }
+
+  /**
+   * Drops a project's queue once every queued result is confirmed sent. Results left behind by
+   * a failed batch stay queued so `complete()` gets one more chance at them.
+   *
+   * @param {string} projectCode
+   * @private
+   */
+  private discardSentResults(projectCode: string): void {
+    if (this.unsentResultsCount(projectCode) > 0) {
+      return;
+    }
+
+    this.projectQueues.set(projectCode, []);
+    this.firstIndexByProject.set(projectCode, 0);
+  }
+
+  /**
+   * Results queued for a project but never confirmed as accepted by Qase.
+   *
+   * @param {string} projectCode
+   * @returns {number}
+   * @private
+   */
+  private unsentResultsCount(projectCode: string): number {
+    const queued = this.projectQueues.get(projectCode)?.length ?? 0;
+    const first = this.firstIndexByProject.get(projectCode) ?? 0;
+    return Math.max(0, queued - first);
   }
 
   public override async sendResults(): Promise<void> {
@@ -290,8 +323,7 @@ export class TestOpsMultiReporter extends AbstractReporter {
         } while (sent);
       }
       for (const code of this.projectCodes) {
-        this.projectQueues.set(code, []);
-        this.firstIndexByProject.set(code, 0);
+        this.discardSentResults(code);
       }
     } finally {
       release();
@@ -316,8 +348,7 @@ export class TestOpsMultiReporter extends AbstractReporter {
         } while (sent);
       }
       for (const code of this.projectCodes) {
-        this.projectQueues.set(code, []);
-        this.firstIndexByProject.set(code, 0);
+        this.discardSentResults(code);
       }
     } finally {
       release();
@@ -327,6 +358,14 @@ export class TestOpsMultiReporter extends AbstractReporter {
       const client = this.clients.get(code);
       const runId = this.runIds.get(code);
       if (client && runId !== undefined) {
+        const lost = this.unsentResultsCount(code);
+        if (lost > 0) {
+          // A completed run over partial data looks trustworthy and is not, so leave it open.
+          this.logger.log(
+            chalk`{yellow [${code}] Run ${runId} is left incomplete: ${lost} result(s) could not be sent to Qase}`,
+          );
+          return;
+        }
         try {
           await client.completeRun(runId);
           if (this.showPublicReportLink) {

@@ -336,6 +336,128 @@ describe('TestOpsReporter', () => {
     });
   });
 
+  describe('unrecoverable batches', () => {
+    const makeResults = (count: number, offset = 0): TestResultType[] =>
+      Array.from({ length: count }, (_, i) => {
+        const result = new TestResultType(`Test ${offset + i}`);
+        result.id = `test-${offset + i}`;
+        result.testops_id = offset + i;
+        result.execution.status = TestStatusEnum.passed;
+        result.execution.duration = 1000;
+        return result;
+      });
+
+    beforeEach(async () => {
+      mockApiClient.createRun.mockResolvedValue(123);
+      await reporter.startTestRun();
+    });
+
+    it('does not skip a failed batch on the next sendResults', async () => {
+      const results = makeResults(100);
+
+      mockApiClient.uploadResults.mockRejectedValueOnce(new Error('network down'));
+      for (const result of results.slice(0, 99)) {
+        await reporter.addTestResult(result);
+      }
+      // The 100th result trips the batch, and that upload fails.
+      await expect(reporter.addTestResult(results[99]!)).rejects.toThrow('network down');
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      mockApiClient.uploadResults.mockClear();
+      mockApiClient.uploadResults.mockResolvedValue(undefined);
+
+      await reporter.sendResults();
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockApiClient.uploadResults).toHaveBeenCalledTimes(1);
+      expect(mockApiClient.uploadResults.mock.calls[0]?.[1]).toEqual(results);
+    });
+
+    it('does not send a batch twice when a concurrent sendResults runs mid-flight', async () => {
+      const results = makeResults(100);
+      reporter['results'] = results;
+
+      let release: () => void = () => undefined;
+      mockApiClient.uploadResults.mockImplementationOnce(
+        () => new Promise<void>((resolve) => { release = resolve; }),
+      );
+      mockApiClient.uploadResults.mockResolvedValue(undefined);
+
+      // First sender claims the whole range and stalls on the request.
+      const inFlight = reporter.sendResults();
+
+      // A second sender arriving mid-flight must find nothing left to claim.
+      await reporter.sendResults();
+
+      release();
+      await inFlight;
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockApiClient.uploadResults).toHaveBeenCalledTimes(1);
+    });
+
+    it('names how many results were lost when retries are exhausted', async () => {
+      mockApiClient.uploadResults.mockRejectedValue(new Error('still down'));
+
+      for (const result of makeResults(3)) {
+        await reporter.addTestResult(result);
+      }
+      await expect(reporter.sendResults()).rejects.toThrow('still down');
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockLogger.logError).toHaveBeenCalledWith(
+        expect.stringContaining('Unable to send 3 result(s) to Qase after retries'),
+      );
+    });
+
+    it('leaves the run open when results were lost', async () => {
+      mockApiClient.uploadResults.mockRejectedValue(new Error('still down'));
+
+      for (const result of makeResults(3)) {
+        await reporter.addTestResult(result);
+      }
+      await expect(reporter.sendResults()).rejects.toThrow('still down');
+
+      await reporter.complete();
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockApiClient.completeRun).not.toHaveBeenCalled();
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockLogger.log).toHaveBeenCalledWith(
+        expect.stringContaining('is left incomplete: 3 result(s) could not be sent'),
+      );
+    });
+
+    it('keeps the unsent results available instead of clearing them', async () => {
+      mockApiClient.uploadResults.mockRejectedValue(new Error('still down'));
+
+      for (const result of makeResults(3)) {
+        await reporter.addTestResult(result);
+      }
+      await expect(reporter.sendResults()).rejects.toThrow('still down');
+
+      expect(reporter['results']).toHaveLength(3);
+      expect(reporter['claimedIndex']).toBe(0);
+      expect(reporter['firstIndex']).toBe(0);
+    });
+
+    it('completes the run when a retried batch eventually goes through', async () => {
+      mockApiClient.uploadResults
+        .mockRejectedValueOnce(new Error('transient'))
+        .mockResolvedValue(undefined);
+
+      for (const result of makeResults(3)) {
+        await reporter.addTestResult(result);
+      }
+      await expect(reporter.sendResults()).rejects.toThrow('transient');
+      await reporter.sendResults();
+      await reporter.complete();
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockApiClient.completeRun).toHaveBeenCalledWith(123);
+    });
+  });
+
   describe('complete', () => {
     it('should complete run', async () => {
       mockApiClient.createRun.mockResolvedValue(123);

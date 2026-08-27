@@ -44,6 +44,9 @@ export const envToConfig = (env: EnvType): ConfigType => ({
     api: {
       token: env[EnvApiEnum.token],
       host: env[EnvApiEnum.host],
+      timeout: env[EnvApiEnum.timeout],
+      retries: env[EnvApiEnum.retries],
+      retryBackoff: env[EnvApiEnum.retryBackoff],
     },
 
     run: {

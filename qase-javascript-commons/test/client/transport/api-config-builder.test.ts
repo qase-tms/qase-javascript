@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call */
 import { expect } from '@jest/globals';
 import { createApiConfigV1, createApiConfigV2, buildHeaders, resolveAppUrl } from '../../../src/client/transport/api-config-builder';
 import { HostData } from '../../../src/models/host-data';
@@ -99,6 +99,32 @@ describe('api-config-builder', () => {
         expect(createApiConfigV2(config).basePath).toBe(expected);
       });
     }
+
+    it('should apply the default 30s request timeout', () => {
+      const config = { api: { token: 'tok123' } } as any;
+      expect((createApiConfigV2(config) as any).baseOptions?.timeout).toBe(30_000);
+    });
+
+    it('should apply a configured timeout, in seconds', () => {
+      const config = { api: { token: 'tok123', timeout: 5 } } as any;
+      expect((createApiConfigV2(config) as any).baseOptions?.timeout).toBe(5000);
+    });
+
+    it.each([0, -1, NaN, undefined, null, 'ten'])(
+      'should fall back to the default for a nonsensical timeout (%p)',
+      (timeout) => {
+        const config = { api: { token: 'tok123', timeout } } as any;
+        expect((createApiConfigV2(config) as any).baseOptions?.timeout).toBe(30_000);
+      },
+    );
+
+    it('should keep the timeout alongside the headers', () => {
+      const config = { api: { token: 'tok123', timeout: 7 } } as any;
+      const hostData = { reporter: '1.0.0' } as HostData;
+      const result = createApiConfigV2(config, hostData, 'qase-jest', 'jest') as any;
+      expect(result.baseOptions?.timeout).toBe(7000);
+      expect(result.baseOptions?.headers?.['X-Client']).toContain('reporter=qase-jest');
+    });
 
     it('should set X-Client and X-Platform headers when hostData provided', () => {
       const config = { api: { token: 'tok123' } } as any;

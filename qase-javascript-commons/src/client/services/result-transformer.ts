@@ -79,6 +79,12 @@ export class ResultTransformer {
       signature: result.signature,
     };
 
+    // The v2 API treats `id` as an idempotency key: without it the backend invents a random
+    // hash per request, so a retried batch would create duplicate results.
+    if (result.id) {
+      model.id = result.id;
+    }
+
     if (result.tags && result.tags.length > 0) {
       model.fields = {
         ...model.fields,

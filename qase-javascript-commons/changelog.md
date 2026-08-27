@@ -1,3 +1,17 @@
+## 2.9.2
+
+### Fixed
+
+- Result batches now carry an idempotency key. The v2 API documents `ResultCreate.id` as one and substitutes a random hash when it is absent, so any repeated request created duplicate results. `result.id` is now sent as that key, and `AbstractReporter` guarantees it is present and unique: Mocha left it empty and Newman replays the same Postman item id on every iteration, either of which would have let two distinct results collapse into one.
+- Result uploads are retried again. `ClientV2.uploadResults` sent `createResultsV2` exactly once, so a transient failure lost the whole batch silently. Transport failures, `408`, `429` and `5xx` are now retried with exponential backoff; `400`, `401`, `403`, `404`, `413`, `422` and `507` are not, since they fail identically on a second attempt. A `Retry-After` header wins over the computed backoff (capped at 120s) — Qase asks for roughly 60 seconds and a short ladder does not survive it. Attachments keep their own retry and are not re-uploaded when the results call is repeated.
+- A batch is no longer marked as sent before the API confirms it. `TestOpsReporter` advanced its index before awaiting the upload, so a failed batch fell outside the remaining range and the next `sendResults()` skipped it. The range is now claimed before the request and marked sent only after the response, so a failed batch is retried while a concurrent sender still cannot ship it twice.
+- An unrecoverable batch is now reported and the run is left open. Previously the multi-project path logged the error, dropped the queue and completed the run anyway — a completed run over partial data looks trustworthy and is not. Both the single- and multi-project reporters now log how many results are missing and skip completing the run.
+
+### Added
+
+- New `testops.api.timeout` option (`QASE_TESTOPS_API_TIMEOUT`, default `30` seconds) sets a per-request timeout for the v2 API. Without one, a connection that stalls rather than fails hung the process at teardown.
+- New `testops.api.retries` (`QASE_TESTOPS_API_RETRIES`, default `3`) and `testops.api.retryBackoff` (`QASE_TESTOPS_API_RETRY_BACKOFF`, default `1` second) options tune the result upload retry.
+
 ## 2.9.1
 
 ### Fixed
