@@ -1,0 +1,79 @@
+qase-javascript-commons/src/client/transport/api-config-builder.ts
+  s_2ff124d28489a8::t_25138a3220c200 89-90
+  s_2ff124d28489a8::t_9e8951c65571e4 9-13,58-62,79-88
+qase-javascript-commons/package.json
+  s_2ff124d28489a8::t_21b0378cb9e0d3 3
+qase-javascript-commons/src/env/env-type.ts
+  s_2ff124d28489a8::t_5087ee2c826c53 34-36
+qase-javascript-commons/src/client/transport/retry-policy.ts
+  s_2ff124d28489a8::t_c187d32a7aef21 62
+  s_2ff124d28489a8::t_4c4b064d67b643 1-61,63-194
+qase-javascript-commons/test/client/services/result-transformer.test.ts
+  s_2ff124d28489a8::t_036571e353f528 81-111
+qase-javascript-commons/test/reporters/abstract-reporter.test.ts
+  s_2ff124d28489a8::t_259a045f8816c6 1-154
+qase-javascript-commons/src/client/services/result-transformer.ts
+  s_2ff124d28489a8::t_674cb71b58e056 82-87
+qase-javascript-commons/src/reporters/abstract-reporter.ts
+  s_2ff124d28489a8::t_0256f0fad92910 165-166
+  s_2ff124d28489a8::t_48e1ce69096635 41-50,112,124,152-164
+  s_2ff124d28489a8::t_5869292c1f1ae2 139-148
+qase-javascript-commons/src/reporters/testops-multi-reporter.ts
+  s_2ff124d28489a8::t_6c4bf0d9c86b4b 267,282,288-300,361
+  s_2ff124d28489a8::t_4bb0f42a21d600 265-266,268-269,362-368
+  s_2ff124d28489a8::t_e5aa851d61c3cd 274-281,283-287,301-302,326,351
+qase-javascript-commons/src/models/config/TestOpsOptionsType.ts
+  s_2ff124d28489a8::t_2d02e795658b7d 85-90
+qase-javascript-commons/src/env/env-enum.ts
+  s_2ff124d28489a8::t_5087ee2c826c53 31-33
+qase-javascript-commons/src/client/clientV2.ts
+  s_2ff124d28489a8::t_063838680224ac 88
+  s_2ff124d28489a8::t_866cad81111801 9
+  s_2ff124d28489a8::t_a42c4261b88563 10,57-73,78-87
+qase-javascript-commons/changelog.md
+  s_2ff124d28489a8::t_21b0378cb9e0d3 1-14
+qase-javascript-commons/test/client/transport/retry-policy.test.ts
+  s_2ff124d28489a8::t_e152d0c44f38dd 2-181
+  s_2ff124d28489a8::t_c187d32a7aef21 1
+qase-javascript-commons/src/env/env-to-config.ts
+  s_2ff124d28489a8::t_5087ee2c826c53 47-49
+qase-javascript-commons/test/client/clientV2.test.ts
+  s_2ff124d28489a8::t_1fbfa414aec7e5 47-53,60-65
+  s_2ff124d28489a8::t_c187d32a7aef21 1
+  s_2ff124d28489a8::t_cf85d58a9d298a 127-175
+qase-javascript-commons/src/reporters/testops-reporter.ts
+  s_2ff124d28489a8::t_1229d4285c4246 172-179
+  s_2ff124d28489a8::t_2d1c312ecadcbd 241-242,246
+  s_2ff124d28489a8::t_bd36c860871ee3 28,31-38,74,103,106,166-170,180,182-200,202-210,212,240,243-245,247-250
+  s_2ff124d28489a8::t_4f11d1a1fc8b89 211,213,215-222
+qase-javascript-commons/src/env/env-validation-schema.ts
+  s_2ff124d28489a8::t_5087ee2c826c53 86-97
+qase-javascript-commons/README.md
+  s_2ff124d28489a8::t_a88461ff7c0845 55-57,117-120
+qase-javascript-commons/test/env/env-to-config.test.ts
+  s_2ff124d28489a8::t_fd536b535fa962 4,7-35
+qase-javascript-commons/test/client/transport/api-config-builder.test.ts
+  s_2ff124d28489a8::t_166189ec8f7db3 103-128
+  s_2ff124d28489a8::t_c187d32a7aef21 1
+qase-javascript-commons/src/config/config-validation-schema.ts
+  s_2ff124d28489a8::t_5087ee2c826c53 82-96
+qase-javascript-commons/test/reporters/testops-reporter.test.ts
+  s_2ff124d28489a8::t_810d710de9874e 339-377,379-385,388,390,392-460
+  s_2ff124d28489a8::t_f75de8d02bf2b9 378,386-387,389,391
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "3312e3dc40fc041d15e43910a37b462f48617ee1",
+  "prompts": {},
+  "sessions": {
+    "s_2ff124d28489a8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7cefde6d-8ea5-466e-a674-2d5d74789c18",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
