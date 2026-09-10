@@ -10,7 +10,7 @@
     "strip-literal": "^3.1.0",
     "tinyspy": "^4.0.4",
     "typescript": "^5.9.3",
-    "vitest": "^4.1.0",
+    "vitest": "^4.1.11",
     "vitest-qase-reporter": "^1.4.0",
     "qase-javascript-commons": "*"
   },
