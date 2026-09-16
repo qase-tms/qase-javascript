@@ -196,19 +196,24 @@ export class TestOpsReporter extends AbstractReporter {
       this.firstIndex = to;
     } catch (error) {
       this.claimedIndex = from;
-      this.reportUnrecoverableBatch(to - from);
+      this.reportUnrecoverableBatch(to - from, error);
       throw error;
     }
   }
 
   /**
+   * The message must stay inside a single tagged template: a tagged template binds tighter than
+   * `+`, so splitting it hands chalk an unbalanced `{red ...` and makes the logging call throw,
+   * replacing the upload failure it was meant to report.
+   *
    * @param {number} count
+   * @param {unknown} error
    * @private
    */
-  private reportUnrecoverableBatch(count: number): void {
+  private reportUnrecoverableBatch(count: number, error: unknown): void {
     this.logger.logError(
-      chalk`{red Unable to send ${count} result(s) to Qase after retries. ` +
-      `${this.unsentResultsCount()} result(s) are still missing from run ${this.runId ?? 'unknown'}.}`,
+      chalk`{red Unable to send ${count} result(s) to Qase after retries. ${this.unsentResultsCount()} result(s) are still missing from run ${this.runId ?? 'unknown'}.}`,
+      error,
     );
   }
 

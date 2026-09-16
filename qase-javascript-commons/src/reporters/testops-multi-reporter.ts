@@ -262,9 +262,10 @@ export class TestOpsMultiReporter extends AbstractReporter {
       this.logger.logDebug(`[${projectCode}] Sent ${toSend.length} results to Qase`);
       return true;
     } catch (error) {
+      // Keep the whole message in one tagged template: a tagged template binds tighter than `+`,
+      // so splitting it leaves chalk with an unbalanced `{red ...` and the logging call itself throws.
       this.logger.logError(
-        chalk`{red [${projectCode}] Unable to send ${toSend.length} result(s) to Qase after retries. ` +
-        `${this.unsentResultsCount(projectCode)} result(s) are still missing from run ${runId}.}`,
+        chalk`{red [${projectCode}] Unable to send ${toSend.length} result(s) to Qase after retries. ${this.unsentResultsCount(projectCode)} result(s) are still missing from run ${runId}.}`,
         error,
       );
       return false;

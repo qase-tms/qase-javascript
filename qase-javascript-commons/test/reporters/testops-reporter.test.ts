@@ -11,19 +11,9 @@ jest.mock('async-mutex', () => ({
   })),
 }));
 
-jest.mock('chalk', () => {
-  const mockChalk = jest.fn((strings: string[], ...values: string[]) => {
-    return strings.reduce((result: string, str: string, i: number) => {
-      return result + str + (values[i] || '');
-    }, '');
-  });
-  
-  (mockChalk as unknown as { blue: jest.Mock; green: jest.Mock; yellow: jest.Mock }).blue = jest.fn((text: string) => text);
-  (mockChalk as unknown as { blue: jest.Mock; green: jest.Mock; yellow: jest.Mock }).green = jest.fn((text: string) => text);
-  (mockChalk as unknown as { blue: jest.Mock; green: jest.Mock; yellow: jest.Mock }).yellow = jest.fn((text: string) => text);
-  
-  return mockChalk;
-});
+// chalk is deliberately NOT mocked: a mock that just joins the template parts cannot fail on an
+// unbalanced `{red ...}` tag, which is exactly the class of bug this suite has to catch. Jest runs
+// without a TTY, so the real chalk resolves to level 0 and returns plain text.
 
 jest.mock('../../src/state/state', () => ({
   StateManager: {
@@ -271,7 +261,7 @@ describe('TestOpsReporter', () => {
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockApiClient.completeRun).toHaveBeenCalledWith(123);
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(mockLogger.log).toHaveBeenCalledWith('{green Run 123 completed}');
+      expect(mockLogger.log).toHaveBeenCalledWith('Run 123 completed');
     });
   });
 
@@ -286,7 +276,7 @@ describe('TestOpsReporter', () => {
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockLogger.log).toHaveBeenCalledWith(
-        expect.stringContaining('{yellow No results to send to Qase}')
+        expect.stringContaining('No results to send to Qase')
       );
     });
 
@@ -396,6 +386,34 @@ describe('TestOpsReporter', () => {
       expect(mockApiClient.uploadResults).toHaveBeenCalledTimes(1);
     });
 
+    it('surfaces the upload failure instead of a message formatting error', async () => {
+      const uploadError = new Error('400 title may not be greater than 255 characters');
+      mockApiClient.uploadResults.mockRejectedValue(uploadError);
+
+      for (const result of makeResults(3)) {
+        await reporter.addTestResult(result);
+      }
+
+      // The formatting of the "results were lost" message must never replace the real cause.
+      await expect(reporter.sendResults()).rejects.toBe(uploadError);
+    });
+
+    it('logs the underlying cause alongside the lost batch message', async () => {
+      const uploadError = new Error('400 title may not be greater than 255 characters');
+      mockApiClient.uploadResults.mockRejectedValue(uploadError);
+
+      for (const result of makeResults(3)) {
+        await reporter.addTestResult(result);
+      }
+      await expect(reporter.sendResults()).rejects.toBe(uploadError);
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockLogger.logError).toHaveBeenCalledWith(
+        expect.stringContaining('Unable to send 3 result(s) to Qase after retries'),
+        uploadError,
+      );
+    });
+
     it('names how many results were lost when retries are exhausted', async () => {
       mockApiClient.uploadResults.mockRejectedValue(new Error('still down'));
 
@@ -407,6 +425,7 @@ describe('TestOpsReporter', () => {
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockLogger.logError).toHaveBeenCalledWith(
         expect.stringContaining('Unable to send 3 result(s) to Qase after retries'),
+        expect.anything(),
       );
     });
 
@@ -468,7 +487,7 @@ describe('TestOpsReporter', () => {
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockApiClient.completeRun).toHaveBeenCalledWith(123);
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(mockLogger.log).toHaveBeenCalledWith('{green Run 123 completed}');
+      expect(mockLogger.log).toHaveBeenCalledWith('Run 123 completed');
     });
 
     it('should enable public report when showPublicReportLink is true', async () => {
@@ -493,7 +512,7 @@ describe('TestOpsReporter', () => {
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockApiClient.enablePublicReport).toHaveBeenCalledWith(123);
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(mockLogger.log).toHaveBeenCalledWith('{green Run 123 completed}');
+      expect(mockLogger.log).toHaveBeenCalledWith('Run 123 completed');
     });
 
     it('should not enable public report when showPublicReportLink is false', async () => {
@@ -507,7 +526,7 @@ describe('TestOpsReporter', () => {
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockApiClient.enablePublicReport).not.toHaveBeenCalled();
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(mockLogger.log).toHaveBeenCalledWith('{green Run 123 completed}');
+      expect(mockLogger.log).toHaveBeenCalledWith('Run 123 completed');
     });
 
     it('should handle enablePublicReport error gracefully', async () => {
@@ -534,7 +553,7 @@ describe('TestOpsReporter', () => {
       expect(mockApiClient.enablePublicReport).toHaveBeenCalledWith(123);
       // Error message is logged in enablePublicReport implementation, not here
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(mockLogger.log).toHaveBeenCalledWith('{green Run 123 completed}');
+      expect(mockLogger.log).toHaveBeenCalledWith('Run 123 completed');
     });
 
     it('should throw error when runId is not set', async () => {
