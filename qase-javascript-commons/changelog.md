@@ -1,3 +1,9 @@
+## 2.9.3
+
+### Fixed
+
+- A failed result batch no longer destroys the upload error that caused it. `reportUnrecoverableBatch` built its message as `` chalk`{red ...` + `...}` ``, but a tagged template binds tighter than `+`, so chalk received only the first half with `{red` opened and never closed and threw `Chalk template literal is missing 1 closing bracket`. That throw ran before `throw error`, replacing the real cause: the reporter's own fallback then caught the chalk error, activated the permanent fallback, and nothing else reached Qase for the rest of the run. It was worst for exactly the failures that most needed reporting — `400`, `401`, `403`, `404`, `413`, `422` and `507` are rethrown without reaching `onRetry`, the only place the readable cause is logged, so the destroyed error was the sole record. Both the single- and multi-project reporters now keep the message in one template, and the underlying error is passed to `logError` alongside it, so a future formatting mistake cannot swallow the cause again. Reported in #1014.
+
 ## 2.9.2
 
 ### Fixed
