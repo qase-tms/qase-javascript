@@ -1,0 +1,25 @@
+examples/single/playwright/test/inventory.spec.js
+  s_73eb02d7e50211::t_e08730fb34924b 24,28
+examples/single/playwright/test/checkout.spec.js
+  s_73eb02d7e50211::t_e08730fb34924b 51,71,85
+examples/single/playwright/test/login.spec.js
+  s_73eb02d7e50211::t_e08730fb34924b 44,58
+examples/single/playwright/test/cart.spec.js
+  s_73eb02d7e50211::t_e08730fb34924b 32,39,68,88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a5b3ecc2e0c089be73d15445a18adce86ceba77f",
+  "prompts": {},
+  "sessions": {
+    "s_73eb02d7e50211": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1f9b8a9d-138b-4c71-b92c-8f3b9ad601cd",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
