@@ -29,16 +29,14 @@ test.describe('Shopping Cart', () => {
     });
 
     await test.step('Verify cart badge shows 1 item', async () => {
-      const cartBadge = await page.locator(inventoryPage.cartBadge).textContent();
-      expect(cartBadge).toBe('1');
+      await expect(page.locator(inventoryPage.cartBadge)).toHaveText('1');
     });
 
     await test.step('Navigate to cart and verify product', async () => {
       await inventoryPage.goToCart();
       await expect(page).toHaveURL(/.*cart.html/);
 
-      const itemCount = await cartPage.getItemCount();
-      expect(itemCount).toBe(1);
+      await expect(page.locator(cartPage.cartItems)).toHaveCount(1);
 
       const cartState = { itemsInCart: 1, product: 'Sauce Labs Backpack' };
       qase.attach({
@@ -67,8 +65,7 @@ test.describe('Shopping Cart', () => {
     });
 
     await test.step('Verify cart is empty', async () => {
-      const itemCount = await cartPage.getItemCount();
-      expect(itemCount).toBe(0);
+      await expect(page.locator(cartPage.cartItems)).toHaveCount(0);
 
       const cartBadge = page.locator(inventoryPage.cartBadge);
       await expect(cartBadge).not.toBeVisible();
@@ -88,8 +85,7 @@ test.describe('Shopping Cart', () => {
     });
 
     await test.step('Verify cart badge shows 2 items', async () => {
-      const cartBadge = await page.locator(inventoryPage.cartBadge).textContent();
-      expect(cartBadge).toBe('2');
+      await expect(page.locator(inventoryPage.cartBadge)).toHaveText('2');
     });
   });
 });

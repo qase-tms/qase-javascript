@@ -48,8 +48,8 @@ test.describe('Checkout Process', () => {
     });
 
     await test.step('Verify order completion', async () => {
+      await expect(page.locator(checkoutPage.completeHeader)).toContainText('Thank you for your order');
       const completeMessage = await checkoutPage.getCompleteMessage();
-      expect(completeMessage).toContain('Thank you for your order');
       qase.attach({
         name: 'order-complete.txt',
         content: completeMessage,
@@ -68,8 +68,7 @@ test.describe('Checkout Process', () => {
     });
 
     await test.step('Verify error message is displayed', async () => {
-      const errorMessage = await page.locator(checkoutPage.errorMessage).textContent();
-      expect(errorMessage).toContain('Error: First Name is required');
+      await expect(page.locator(checkoutPage.errorMessage)).toContainText('Error: First Name is required');
     });
   });
 
@@ -83,8 +82,7 @@ test.describe('Checkout Process', () => {
 
     await test.step('Verify return to cart page', async () => {
       await expect(page).toHaveURL(/.*cart.html/);
-      const title = await page.locator(cartPage.pageTitle).textContent();
-      expect(title).toBe('Your Cart');
+      await expect(page.locator(cartPage.pageTitle)).toHaveText('Your Cart');
     });
   });
 
