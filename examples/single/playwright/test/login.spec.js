@@ -41,8 +41,7 @@ test.describe('Authentication', () => {
     });
 
     await test.step('Verify error message is displayed', async () => {
-      const errorText = await loginPage.getErrorText();
-      expect(errorText).toContain('Username and password do not match');
+      await expect(page.locator(loginPage.errorMessage)).toContainText('Username and password do not match');
     });
   });
 
@@ -56,8 +55,7 @@ test.describe('Authentication', () => {
     });
 
     await test.step('Verify locked-out error message', async () => {
-      const errorText = await loginPage.getErrorText();
-      expect(errorText).toContain('Sorry, this user has been locked out');
+      await expect(page.locator(loginPage.errorMessage)).toContainText('Sorry, this user has been locked out');
     });
   });
 });

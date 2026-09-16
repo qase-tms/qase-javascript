@@ -21,13 +21,12 @@ test.describe('Product Inventory', () => {
     qase.suite('E-commerce\tInventory\tBrowsing');
 
     await test.step('Verify inventory page title', async () => {
-      const title = await page.locator(inventoryPage.pageTitle).textContent();
-      expect(title).toBe('Products');
+      await expect(page.locator(inventoryPage.pageTitle)).toHaveText('Products');
     });
 
     await test.step('Count available products', async () => {
+      await expect(page.locator(inventoryPage.inventoryItems)).toHaveCount(6);
       const itemCount = await inventoryPage.getItemCount();
-      expect(itemCount).toBe(6);
       qase.comment(`Found ${itemCount} products available in the inventory`);
     });
 
