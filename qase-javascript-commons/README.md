@@ -1,7 +1,7 @@
 # Qase JavaScript Commons
 
 This module is an SDK for developing test reporters for Qase TMS.
-It's using `qaseio` as an API client, and all Qase reporters are, in turn,
+It's using `qase-api-client` and `qase-api-v2-client` as API clients, and all Qase reporters are, in turn,
 using this package.
 You should use it if you're developing your own test reporter for a special-purpose framework.
 
