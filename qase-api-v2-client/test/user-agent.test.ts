@@ -66,7 +66,9 @@ describe('User-Agent header', () => {
     const axiosInstance = axios.create();
 
     beforeEach(() => {
-      mock = new MockAdapter(axiosInstance);
+      // axios ships separate ESM and CJS typings; ts-jest loads both, so the
+      // AxiosInstance types from axios and axios-mock-adapter do not match.
+      mock = new MockAdapter(axiosInstance as any);
     });
 
     afterEach(() => {
