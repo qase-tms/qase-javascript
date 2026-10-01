@@ -1,4 +1,4 @@
-import type { TestAnnotation } from '@vitest/runner';
+import type { TestAnnotation } from 'vitest';
 import { TestStepType } from 'qase-javascript-commons';
 
 export interface MetadataShape {

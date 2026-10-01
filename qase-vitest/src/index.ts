@@ -1,6 +1,5 @@
-import type { Reporter } from 'vitest/reporters';
-import type { TestAnnotation } from '@vitest/runner';
-import type { TestCase, TestSuite } from 'vitest/node';
+import type { Reporter, TestCase, TestSuite } from 'vitest/node';
+import type { TestAnnotation } from 'vitest';
 import {
   ConfigLoader,
   ConfigType,
