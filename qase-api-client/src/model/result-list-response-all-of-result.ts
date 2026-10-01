@@ -21,19 +21,19 @@ import { Result } from './result';
  */
 export interface ResultListResponseAllOfResult {
     /**
-     * 
+     * A number of results in the project, counted up to the pagination bound.
      * @type {number}
      * @memberof ResultListResponseAllOfResult
      */
     'total'?: number;
     /**
-     * 
+     * A number of results that match the filters, counted up to the pagination bound.
      * @type {number}
      * @memberof ResultListResponseAllOfResult
      */
     'filtered'?: number;
     /**
-     * 
+     * A number of results in the current page.
      * @type {number}
      * @memberof ResultListResponseAllOfResult
      */
