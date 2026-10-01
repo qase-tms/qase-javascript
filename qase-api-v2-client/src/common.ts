@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Qase.io TestOps API v2
- * Qase TestOps API v2 Specification.
+ * Qase TestOps API v2 Specification.  ## Rate limiting  Requests are rate limited per workspace (shared across all API tokens of the workspace). The exact limit depends on your subscription plan.  Every response advertises the current limit state through headers:  - `RateLimit` and `RateLimit-Policy` — IETF rate-limit headers describing the   active policies and how much of each one is left. - `X-RateLimit-Limit` — maximum number of requests allowed in the window. - `X-RateLimit-Remaining` — requests left in the current window. - `X-RateLimit-Reset` — Unix timestamp at which the window resets.  Two policies apply at the same time. `rpm` caps the sustained rate over 60 seconds. `burst` caps a short spike over 10 seconds. A request is served only when both policies allow it.  Example headers on a served request, for a plan with a 600 rpm limit:  ``` RateLimit-Policy: \"rpm\";q=600;w=60, \"burst\";q=100;w=10 RateLimit: \"rpm\";r=412;t=37, \"burst\";r=88;t=2 X-RateLimit-Limit: 100 X-RateLimit-Remaining: 88 X-RateLimit-Reset: 1756742400 ```  In `RateLimit-Policy`, `q` is the quota and `w` is the window in seconds. In `RateLimit`, `r` is the requests left and `t` is the seconds until that policy frees a slot.  The `X-RateLimit-*` headers are a single-number mirror for older clients. They report whichever of the two policies is closer to its limit, so they can show the burst quota while a spike is in progress, as in the example above.  When the limit is exceeded the API responds with `429 Too Many Requests`, a `Retry-After` header (seconds to wait before retrying), and the body:  ``` Retry-After: 12 ```  ```json {   \"status\": false,   \"errorMessage\": \"API rate limit exceeded.\" } ``` 
  *
  * The version of the OpenAPI document: 2.0.0
  * Contact: support@qase.io
@@ -130,8 +130,8 @@ export const toPathString = function (url: URL) {
  * @export
  */
 export const createRequestFunction = function (axiosArgs: RequestArgs, globalAxios: AxiosInstance, BASE_PATH: string, configuration?: Configuration) {
-    return <T = unknown, R = AxiosResponse<T>>(axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+    return <T = unknown, R = AxiosResponse<T>>(axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH): Promise<R> => {
         const axiosRequestArgs = {...axiosArgs.options, url: (configuration?.basePath || basePath) + axiosArgs.url};
-        return axios.request<T, R>(axiosRequestArgs);
+        return axios.request<T, R>(axiosRequestArgs) as Promise<R>;
     };
 }

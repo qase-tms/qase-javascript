@@ -5,9 +5,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**total** | **number** |  | [optional] [default to undefined]
-**filtered** | **number** |  | [optional] [default to undefined]
-**count** | **number** |  | [optional] [default to undefined]
+**total** | **number** | A number of results in the project, counted up to the pagination bound. | [optional] [default to undefined]
+**filtered** | **number** | A number of results that match the filters, counted up to the pagination bound. | [optional] [default to undefined]
+**count** | **number** | A number of results in the current page. | [optional] [default to undefined]
 **entities** | [**Array&lt;Result&gt;**](Result.md) |  | [optional] [default to undefined]
 
 ## Example

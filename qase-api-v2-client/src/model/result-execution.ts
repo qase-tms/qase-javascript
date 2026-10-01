@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Qase.io TestOps API v2
- * Qase TestOps API v2 Specification.
+ * Qase TestOps API v2 Specification.  ## Rate limiting  Requests are rate limited per workspace (shared across all API tokens of the workspace). The exact limit depends on your subscription plan.  Every response advertises the current limit state through headers:  - `RateLimit` and `RateLimit-Policy` — IETF rate-limit headers describing the   active policies and how much of each one is left. - `X-RateLimit-Limit` — maximum number of requests allowed in the window. - `X-RateLimit-Remaining` — requests left in the current window. - `X-RateLimit-Reset` — Unix timestamp at which the window resets.  Two policies apply at the same time. `rpm` caps the sustained rate over 60 seconds. `burst` caps a short spike over 10 seconds. A request is served only when both policies allow it.  Example headers on a served request, for a plan with a 600 rpm limit:  ``` RateLimit-Policy: \"rpm\";q=600;w=60, \"burst\";q=100;w=10 RateLimit: \"rpm\";r=412;t=37, \"burst\";r=88;t=2 X-RateLimit-Limit: 100 X-RateLimit-Remaining: 88 X-RateLimit-Reset: 1756742400 ```  In `RateLimit-Policy`, `q` is the quota and `w` is the window in seconds. In `RateLimit`, `r` is the requests left and `t` is the seconds until that policy frees a slot.  The `X-RateLimit-*` headers are a single-number mirror for older clients. They report whichever of the two policies is closer to its limit, so they can show the burst quota while a spike is in progress, as in the example above.  When the limit is exceeded the API responds with `429 Too Many Requests`, a `Retry-After` header (seconds to wait before retrying), and the body:  ``` Retry-After: 12 ```  ```json {   \"status\": false,   \"errorMessage\": \"API rate limit exceeded.\" } ``` 
  *
  * The version of the OpenAPI document: 2.0.0
  * Contact: support@qase.io
@@ -12,52 +12,54 @@
  * Do not edit the class manually.
  */
 
+
 /**
- *
+ * 
  * @export
  * @interface ResultExecution
  */
 export interface ResultExecution {
-  /**
-   * Can have the following values passed, failed, blocked, skipped, invalid + custom statuses
-   * @type {string}
-   * @memberof ResultExecution
-   */
-  status: string;
-  /**
-   * Unix epoch time in seconds (whole part) and milliseconds (fractional part).
-   * @type {number}
-   * @memberof ResultExecution
-   */
-  start_time?: number | null;
-  /**
-   * Unix epoch time in seconds (whole part) and milliseconds (fractional part).
-   * @type {number}
-   * @memberof ResultExecution
-   */
-  end_time?: number | null;
-  /**
-   * Duration of the test execution in milliseconds.
-   * @type {number}
-   * @memberof ResultExecution
-   */
-  duration?: number | null;
-  /**
-   *
-   * @type {string}
-   * @memberof ResultExecution
-   */
-  stacktrace?: string | null;
-  /**
-   * Free-form failure context captured by the reporter. For Playwright this is the content of error-context.md (test info, error details, page snapshot), so it may include rendered page content. Stored verbatim so it can be copied as raw text. Values longer than 262144 characters are silently truncated by Qase and the request still succeeds. Write-only — not returned by the result read endpoints.
-   * @type {string}
-   * @memberof ResultExecution
-   */
-  error_context?: string | null;
-  /**
-   *
-   * @type {string}
-   * @memberof ResultExecution
-   */
-  thread?: string | null;
+    /**
+     * Can have the following values passed, failed, blocked, skipped, invalid + custom statuses
+     * @type {string}
+     * @memberof ResultExecution
+     */
+    'status': string;
+    /**
+     * Unix epoch time in seconds (whole part) and milliseconds (fractional part).
+     * @type {number}
+     * @memberof ResultExecution
+     */
+    'start_time'?: number | null;
+    /**
+     * Unix epoch time in seconds (whole part) and milliseconds (fractional part).
+     * @type {number}
+     * @memberof ResultExecution
+     */
+    'end_time'?: number | null;
+    /**
+     * Duration of the test execution in milliseconds.
+     * @type {number}
+     * @memberof ResultExecution
+     */
+    'duration'?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ResultExecution
+     */
+    'stacktrace'?: string | null;
+    /**
+     * Free-form failure context captured by the reporter. For Playwright this is the content of error-context.md (test info, error details, page snapshot), so it may include rendered page content. Stored verbatim so it can be copied as raw text. Values longer than 262144 characters are silently truncated by Qase and the request still succeeds. Write-only — not returned by the result read endpoints.
+     * @type {string}
+     * @memberof ResultExecution
+     */
+    'error_context'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ResultExecution
+     */
+    'thread'?: string | null;
 }
+
