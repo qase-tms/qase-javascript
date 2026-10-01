@@ -1,0 +1,589 @@
+qase-api-client/src/api.ts
+  s_8325c3417fa0f3::t_008bcfcb09cf86 5
+qase-api-client/src/api/authors-api.ts
+  s_8325c3417fa0f3::t_ec53ac9fd58f89 5
+qase-api-client/src/api/cases-api.ts
+  s_8325c3417fa0f3::t_9f1f13603ef7b9 5
+qase-api-client/src/api/configurations-api.ts
+  s_8325c3417fa0f3::t_46ad120816141e 5
+qase-api-client/src/api/custom-fields-api.ts
+  s_8325c3417fa0f3::t_8bc68b89cabee1 5
+qase-api-client/src/api/defects-api.ts
+  s_8325c3417fa0f3::t_e0426fadee4a92 5
+qase-api-client/src/api/environments-api.ts
+  s_8325c3417fa0f3::t_8ad804723c5b61 5
+qase-api-client/src/api/milestones-api.ts
+  s_8325c3417fa0f3::t_19b709663c6c68 5
+qase-api-client/src/api/plans-api.ts
+  s_8325c3417fa0f3::t_44bfa0a6a55acd 5
+qase-api-client/src/api/projects-api.ts
+  s_8325c3417fa0f3::t_51b0b0912aef16 5
+qase-api-client/src/api/results-api.ts
+  s_8325c3417fa0f3::t_5f6effc3fab0b8 5
+qase-api-client/src/api/reviews-api.ts
+  s_8325c3417fa0f3::t_ff2541f21410f3 5
+qase-api-client/src/api/runs-api.ts
+  s_8325c3417fa0f3::t_799ad2a7e38b13 5
+qase-api-client/src/api/search-api.ts
+  s_8325c3417fa0f3::t_fe3cbfb05bf937 5
+qase-api-client/src/api/shared-parameters-api.ts
+  s_8325c3417fa0f3::t_398cdf7a4c59d6 5
+qase-api-client/src/api/shared-steps-api.ts
+  s_8325c3417fa0f3::t_2ad4229f2af9e3 5
+qase-api-client/src/api/suites-api.ts
+  s_8325c3417fa0f3::t_92229b3f45275e 5
+qase-api-client/src/api/system-fields-api.ts
+  s_8325c3417fa0f3::t_045df0ed07518e 5
+qase-api-client/src/api/users-api.ts
+  s_8325c3417fa0f3::t_3866a513f390de 5
+qase-api-client/src/base.ts
+  s_8325c3417fa0f3::t_9bd24734680f55 5
+qase-api-client/src/common.ts
+  s_8325c3417fa0f3::t_d9b0f60182d7c6 5
+qase-api-client/src/index.ts
+  s_8325c3417fa0f3::t_187b2bac1c4239 5
+qase-api-client/src/model/attachment-get.ts
+  s_8325c3417fa0f3::t_feade31756d144 5
+qase-api-client/src/model/attachment-hash.ts
+  s_8325c3417fa0f3::t_bc006ad62d7dcd 5
+qase-api-client/src/model/attachment-list-response-all-of-result.ts
+  s_8325c3417fa0f3::t_172f4bf6d3824d 5
+qase-api-client/src/model/attachment-list-response-all-of.ts
+  s_8325c3417fa0f3::t_063db603932e2f 5
+qase-api-client/src/model/attachment-list-response.ts
+  s_8325c3417fa0f3::t_1ea1baddea8857 5
+qase-api-client/src/model/attachment-response-all-of.ts
+  s_8325c3417fa0f3::t_6c0e7a0221df7b 5
+qase-api-client/src/model/attachment-response.ts
+  s_8325c3417fa0f3::t_0a84c289604958 5
+qase-api-client/src/model/attachment-uploads-response-all-of.ts
+  s_8325c3417fa0f3::t_b39b908bdba5ba 5
+qase-api-client/src/model/attachment-uploads-response.ts
+  s_8325c3417fa0f3::t_c658d3af47fe2b 5
+qase-api-client/src/model/attachment.ts
+  s_8325c3417fa0f3::t_5626a82a2bb321 5
+qase-api-client/src/model/attachmentupload.ts
+  s_8325c3417fa0f3::t_fe48fa5a664725 5
+qase-api-client/src/model/author-list-response-all-of-result.ts
+  s_8325c3417fa0f3::t_4ffac34f686d19 5
+qase-api-client/src/model/author-list-response-all-of.ts
+  s_8325c3417fa0f3::t_c8d7ea29937e40 5
+qase-api-client/src/model/author-list-response.ts
+  s_8325c3417fa0f3::t_43be71f59afdd6 5
+qase-api-client/src/model/author-response-all-of.ts
+  s_8325c3417fa0f3::t_0560f4c05ef87b 5
+qase-api-client/src/model/author-response.ts
+  s_8325c3417fa0f3::t_5e1627c2991b0d 5
+qase-api-client/src/model/author.ts
+  s_8325c3417fa0f3::t_e2d9bfda3b9d41 5
+qase-api-client/src/model/base-response.ts
+  s_8325c3417fa0f3::t_2d0d45c4dac712 5
+qase-api-client/src/model/bulk200-response-all-of-result.ts
+  s_8325c3417fa0f3::t_82070acb920173 5
+qase-api-client/src/model/bulk200-response-all-of.ts
+  s_8325c3417fa0f3::t_3151ad224bc41a 5
+qase-api-client/src/model/bulk200-response.ts
+  s_8325c3417fa0f3::t_60318dce514539 5
+qase-api-client/src/model/configuration-create.ts
+  s_8325c3417fa0f3::t_b51336c9fb4c8a 5
+qase-api-client/src/model/configuration-group-create.ts
+  s_8325c3417fa0f3::t_ba3ec4ced7b3ae 5
+qase-api-client/src/model/configuration-list-response-all-of-result.ts
+  s_8325c3417fa0f3::t_eefcb64bf1dc98 5
+qase-api-client/src/model/configuration-list-response-all-of.ts
+  s_8325c3417fa0f3::t_2cf0cc8c266c95 5
+qase-api-client/src/model/configuration-list-response.ts
+  s_8325c3417fa0f3::t_d47899e16e362d 5
+qase-api-client/src/model/custom-field-create-value-inner.ts
+  s_8325c3417fa0f3::t_794df4d97033e8 5
+qase-api-client/src/model/custom-field-create.ts
+  s_8325c3417fa0f3::t_af907bee58601a 5
+qase-api-client/src/model/custom-field-list-response.ts
+  s_8325c3417fa0f3::t_673980d1426ec0 5
+qase-api-client/src/model/custom-field-response-all-of.ts
+  s_8325c3417fa0f3::t_2bc50e518d64c9 5
+qase-api-client/src/model/custom-field-response.ts
+  s_8325c3417fa0f3::t_24f13de4ae4afc 5
+qase-api-client/src/model/custom-field-update.ts
+  s_8325c3417fa0f3::t_71c3ce461fab47 5
+qase-api-client/src/model/custom-field-value.ts
+  s_8325c3417fa0f3::t_14f52e80bc883d 5
+qase-api-client/src/model/custom-field.ts
+  s_8325c3417fa0f3::t_2bd2fcfb47f816 5
+qase-api-client/src/model/custom-fields-response-all-of-result.ts
+  s_8325c3417fa0f3::t_47c736dbe66d70 5
+qase-api-client/src/model/custom-fields-response-all-of.ts
+  s_8325c3417fa0f3::t_09c5f10855ffb1 5
+qase-api-client/src/model/custom-fields-response.ts
+  s_8325c3417fa0f3::t_1885bc209f2bc3 5
+qase-api-client/src/model/defect-create.ts
+  s_8325c3417fa0f3::t_1e7575d84fa173 5
+qase-api-client/src/model/defect-list-response-all-of-result.ts
+  s_8325c3417fa0f3::t_605a4e09b9e554 5
+qase-api-client/src/model/defect-list-response-all-of.ts
+  s_8325c3417fa0f3::t_79fe037b0bfc6a 5
+qase-api-client/src/model/defect-list-response.ts
+  s_8325c3417fa0f3::t_2add1a2ec4f1ee 5
+qase-api-client/src/model/defect-query.ts
+  s_8325c3417fa0f3::t_46bd9e0ca7aee4 5
+qase-api-client/src/model/defect-response-all-of.ts
+  s_8325c3417fa0f3::t_2c20b44ac80230 5
+qase-api-client/src/model/defect-response.ts
+  s_8325c3417fa0f3::t_7e49c4234ebfd5 5
+qase-api-client/src/model/defect-status.ts
+  s_8325c3417fa0f3::t_d86efc3f5eeb2f 5
+qase-api-client/src/model/defect-update.ts
+  s_8325c3417fa0f3::t_77d2f2f95a31ef 5
+qase-api-client/src/model/defect.ts
+  s_8325c3417fa0f3::t_e9000887e397cb 5
+qase-api-client/src/model/environment-create.ts
+  s_8325c3417fa0f3::t_eb5761d46c478c 5
+qase-api-client/src/model/environment-list-response-all-of-result.ts
+  s_8325c3417fa0f3::t_bcd401b4cee537 5
+qase-api-client/src/model/environment-list-response-all-of.ts
+  s_8325c3417fa0f3::t_fd033b56ac5492 5
+qase-api-client/src/model/environment-list-response.ts
+  s_8325c3417fa0f3::t_1d46f92548e2cd 5
+qase-api-client/src/model/environment-response-all-of.ts
+  s_8325c3417fa0f3::t_f093faa8364cd6 5
+qase-api-client/src/model/environment-response.ts
+  s_8325c3417fa0f3::t_5575e3c42fc9cd 5
+qase-api-client/src/model/environment-update.ts
+  s_8325c3417fa0f3::t_513fe7a80e00d2 5
+qase-api-client/src/model/environment.ts
+  s_8325c3417fa0f3::t_e1a8aed10dfad2 5
+qase-api-client/src/model/external-issue-issues-inner.ts
+  s_8325c3417fa0f3::t_aae187028fc75a 5
+qase-api-client/src/model/external-issue.ts
+  s_8325c3417fa0f3::t_512fcdd57f3ebc 5
+qase-api-client/src/model/hash-response-all-of-result.ts
+  s_8325c3417fa0f3::t_844d313a521e25 5
+qase-api-client/src/model/hash-response-all-of.ts
+  s_8325c3417fa0f3::t_25668d3f17c8b4 5
+qase-api-client/src/model/hash-response.ts
+  s_8325c3417fa0f3::t_613c10f4ebecd5 5
+qase-api-client/src/model/id-response-all-of-result.ts
+  s_8325c3417fa0f3::t_9bd7aa00a1c75b 5
+qase-api-client/src/model/id-response-all-of.ts
+  s_8325c3417fa0f3::t_62256be56da96f 5
+qase-api-client/src/model/id-response.ts
+  s_8325c3417fa0f3::t_808704cc9d159a 5
+qase-api-client/src/model/milestone-create.ts
+  s_8325c3417fa0f3::t_d7a92637ce9e78 5
+qase-api-client/src/model/milestone-list-response-all-of-result.ts
+  s_8325c3417fa0f3::t_f04c3c5daeda73 5
+qase-api-client/src/model/milestone-list-response-all-of.ts
+  s_8325c3417fa0f3::t_b6b34cf51374d5 5
+qase-api-client/src/model/milestone-list-response.ts
+  s_8325c3417fa0f3::t_504127077c0eb1 5
+qase-api-client/src/model/milestone-response-all-of.ts
+  s_8325c3417fa0f3::t_36f9d93a8d9d3a 5
+qase-api-client/src/model/milestone-response.ts
+  s_8325c3417fa0f3::t_8b6b8869594e6b 5
+qase-api-client/src/model/milestone-update.ts
+  s_8325c3417fa0f3::t_afe7a5acfa5610 5
+qase-api-client/src/model/milestone.ts
+  s_8325c3417fa0f3::t_f80bc0484d4911 5
+qase-api-client/src/model/parameter-group.ts
+  s_8325c3417fa0f3::t_57c253de195257 5
+qase-api-client/src/model/parameter-shared.ts
+  s_8325c3417fa0f3::t_dbf5b36ea78f3e 5
+qase-api-client/src/model/parameter-single.ts
+  s_8325c3417fa0f3::t_e89bdb55d915d0 5
+qase-api-client/src/model/plan-create.ts
+  s_8325c3417fa0f3::t_42068d2b850ffc 5
+qase-api-client/src/model/plan-detailed-all-of-cases.ts
+  s_8325c3417fa0f3::t_5a323e2f152a79 5
+qase-api-client/src/model/plan-detailed-all-of.ts
+  s_8325c3417fa0f3::t_156cee0700a82e 5
+qase-api-client/src/model/plan-detailed.ts
+  s_8325c3417fa0f3::t_a8da40fa949db6 5
+qase-api-client/src/model/plan-list-response-all-of-result.ts
+  s_8325c3417fa0f3::t_ea589ea6fac7a7 5
+qase-api-client/src/model/plan-list-response-all-of.ts
+  s_8325c3417fa0f3::t_ccb54c0be89ae6 5
+qase-api-client/src/model/plan-list-response.ts
+  s_8325c3417fa0f3::t_9ff89f11e08805 5
+qase-api-client/src/model/plan-query.ts
+  s_8325c3417fa0f3::t_9e8d09dee85317 5
+qase-api-client/src/model/plan-response-all-of.ts
+  s_8325c3417fa0f3::t_4fe04199c06b36 5
+qase-api-client/src/model/plan-response.ts
+  s_8325c3417fa0f3::t_2c3a187d256dba 5
+qase-api-client/src/model/plan-update.ts
+  s_8325c3417fa0f3::t_62fd483f9f46e2 5
+qase-api-client/src/model/plan.ts
+  s_8325c3417fa0f3::t_c109fd022c8fe0 5
+qase-api-client/src/model/project-access.ts
+  s_8325c3417fa0f3::t_f85f142a63f614 5
+qase-api-client/src/model/project-code-response-all-of-result.ts
+  s_8325c3417fa0f3::t_efb9b0b3aefd1b 5
+qase-api-client/src/model/project-code-response-all-of.ts
+  s_8325c3417fa0f3::t_54a15a7db0a163 5
+qase-api-client/src/model/project-code-response.ts
+  s_8325c3417fa0f3::t_dfc3e73e62e86e 5
+qase-api-client/src/model/project-counts-defects.ts
+  s_8325c3417fa0f3::t_02289815de674c 5
+qase-api-client/src/model/project-counts-runs.ts
+  s_8325c3417fa0f3::t_2693e81728cc3a 5
+qase-api-client/src/model/project-counts.ts
+  s_8325c3417fa0f3::t_a7a12f27466717 5
+qase-api-client/src/model/project-create.ts
+  s_8325c3417fa0f3::t_fe9a0285c21899 5
+qase-api-client/src/model/project-list-response-all-of-result.ts
+  s_8325c3417fa0f3::t_ed29f66e0799bd 5
+qase-api-client/src/model/project-list-response-all-of.ts
+  s_8325c3417fa0f3::t_5bf983196a1a91 5
+qase-api-client/src/model/project-list-response.ts
+  s_8325c3417fa0f3::t_c6b10dc1fd4803 5
+qase-api-client/src/model/project-response-all-of.ts
+  s_8325c3417fa0f3::t_be5d6e7efeffc3 5
+qase-api-client/src/model/project-response.ts
+  s_8325c3417fa0f3::t_401a03095f39ef 5
+qase-api-client/src/model/project.ts
+  s_8325c3417fa0f3::t_5879ecdbd6970d 5
+qase-api-client/src/model/qql-defect.ts
+  s_8325c3417fa0f3::t_629ddb4710cf0a 5
+qase-api-client/src/model/qql-plan.ts
+  s_8325c3417fa0f3::t_1414ea32b76a0e 5
+qase-api-client/src/model/qql-test-case-params.ts
+  s_8325c3417fa0f3::t_ed9caf77777f0b 5
+qase-api-client/src/model/qql-test-case.ts
+  s_8325c3417fa0f3::t_6a85c77e8ea3e8 5
+qase-api-client/src/model/requirement-query.ts
+  s_8325c3417fa0f3::t_6d60fccc6f400a 5
+qase-api-client/src/model/requirement.ts
+  s_8325c3417fa0f3::t_bd4f7a172ce7f5 5
+qase-api-client/src/model/response.ts
+  s_8325c3417fa0f3::t_c0edd545f361d2 5
+qase-api-client/src/model/result-create-bulk.ts
+  s_8325c3417fa0f3::t_843787a499c625 5
+qase-api-client/src/model/result-create-case.ts
+  s_8325c3417fa0f3::t_4dabb75338f09c 5
+qase-api-client/src/model/result-create-response-all-of-result.ts
+  s_8325c3417fa0f3::t_143e14b10c3e8d 5
+qase-api-client/src/model/result-create-response-all-of.ts
+  s_8325c3417fa0f3::t_18b32576331f5f 5
+qase-api-client/src/model/result-create-response.ts
+  s_8325c3417fa0f3::t_54c0ba634d36ef 5
+qase-api-client/src/model/result-create.ts
+  s_8325c3417fa0f3::t_af58a70929bf4d 5
+qase-api-client/src/model/result-list-response-all-of-result.ts
+  s_8325c3417fa0f3::t_159fa270461f43 5
+qase-api-client/src/model/result-list-response-all-of.ts
+  s_8325c3417fa0f3::t_b17a4e413ada1a 5
+qase-api-client/src/model/result-list-response.ts
+  s_8325c3417fa0f3::t_e6de9319f1ca45 5
+qase-api-client/src/model/result-query.ts
+  s_8325c3417fa0f3::t_317c9aa9fbacf0 5
+qase-api-client/src/model/result-response-all-of.ts
+  s_8325c3417fa0f3::t_2ed47e18f8cddd 5
+qase-api-client/src/model/result-response.ts
+  s_8325c3417fa0f3::t_6cfaa8a40531ed 5
+qase-api-client/src/model/result-update.ts
+  s_8325c3417fa0f3::t_5e4205439d47f8 5
+qase-api-client/src/model/result.ts
+  s_8325c3417fa0f3::t_7a069f050e750a 5
+qase-api-client/src/model/review-bulk-response-all-of-result-items.ts
+  s_8325c3417fa0f3::t_006d5ee5ed687f 5
+qase-api-client/src/model/review-bulk-response-all-of-result.ts
+  s_8325c3417fa0f3::t_6bb273c0b20c11 5
+qase-api-client/src/model/review-bulk-response-all-of.ts
+  s_8325c3417fa0f3::t_61c341d10f73eb 5
+qase-api-client/src/model/review-bulk-response.ts
+  s_8325c3417fa0f3::t_91f4d08b3f9ab4 5
+qase-api-client/src/model/review-bulk.ts
+  s_8325c3417fa0f3::t_9a7172b735b7bc 5
+qase-api-client/src/model/review-case-data.ts
+  s_8325c3417fa0f3::t_05702bd32c4417 5
+qase-api-client/src/model/review-create.ts
+  s_8325c3417fa0f3::t_dca51da8b1a3fc 5
+qase-api-client/src/model/review-detailed-all-of.ts
+  s_8325c3417fa0f3::t_fd4c2b5b90187e 5
+qase-api-client/src/model/review-detailed.ts
+  s_8325c3417fa0f3::t_b01dccad4f7c10 5
+qase-api-client/src/model/review-list-response-all-of-result.ts
+  s_8325c3417fa0f3::t_894f263cdc5450 5
+qase-api-client/src/model/review-list-response-all-of.ts
+  s_8325c3417fa0f3::t_2bef055031c3e1 5
+qase-api-client/src/model/review-list-response.ts
+  s_8325c3417fa0f3::t_eca50160ce379f 5
+qase-api-client/src/model/review-proposed-case.ts
+  s_8325c3417fa0f3::t_475c28eaf5527c 5
+qase-api-client/src/model/review-proposed-step.ts
+  s_8325c3417fa0f3::t_ce8ca9818673cd 5
+qase-api-client/src/model/review-response-all-of.ts
+  s_8325c3417fa0f3::t_1ae366ca9b41a6 5
+qase-api-client/src/model/review-response.ts
+  s_8325c3417fa0f3::t_adf1c2cb8f79d3 5
+qase-api-client/src/model/review-reviewers-inner.ts
+  s_8325c3417fa0f3::t_32bfe0132a5ec6 5
+qase-api-client/src/model/review-step-data.ts
+  s_8325c3417fa0f3::t_19557265ebe3b5 5
+qase-api-client/src/model/review-update.ts
+  s_8325c3417fa0f3::t_8c128025c5bcd5 5
+qase-api-client/src/model/review.ts
+  s_8325c3417fa0f3::t_36cefb2454a1fd 5
+qase-api-client/src/model/run-create-cloud-run-config.ts
+  s_8325c3417fa0f3::t_857826bf717651 5
+qase-api-client/src/model/run-create.ts
+  s_8325c3417fa0f3::t_7f28fbf4c07ca9 5
+qase-api-client/src/model/run-environment.ts
+  s_8325c3417fa0f3::t_592dac44d58f2b 5
+qase-api-client/src/model/run-external-issue.ts
+  s_8325c3417fa0f3::t_27214450eb1c01 5
+qase-api-client/src/model/run-external-issues-links-inner.ts
+  s_8325c3417fa0f3::t_c25804336a6516 5
+qase-api-client/src/model/run-external-issues.ts
+  s_8325c3417fa0f3::t_0b8ed62cab5a25 5
+qase-api-client/src/model/run-list-response-all-of-result.ts
+  s_8325c3417fa0f3::t_c4ad6be6681ebd 5
+qase-api-client/src/model/run-list-response-all-of.ts
+  s_8325c3417fa0f3::t_ea363b52a26bc0 5
+qase-api-client/src/model/run-list-response.ts
+  s_8325c3417fa0f3::t_0b96fdbb0aa30a 5
+qase-api-client/src/model/run-milestone.ts
+  s_8325c3417fa0f3::t_a77c79f81de7f6 5
+qase-api-client/src/model/run-public-response-all-of-result.ts
+  s_8325c3417fa0f3::t_05bd1d536441c8 5
+qase-api-client/src/model/run-public-response-all-of.ts
+  s_8325c3417fa0f3::t_10b8264c76b5d3 5
+qase-api-client/src/model/run-public-response.ts
+  s_8325c3417fa0f3::t_2e78b52e638aa0 5
+qase-api-client/src/model/run-public.ts
+  s_8325c3417fa0f3::t_9e7532920502ac 5
+qase-api-client/src/model/run-query.ts
+  s_8325c3417fa0f3::t_f2bb175151887a 5
+qase-api-client/src/model/run-response-all-of.ts
+  s_8325c3417fa0f3::t_87983b109f1c08 5
+qase-api-client/src/model/run-response.ts
+  s_8325c3417fa0f3::t_07bb2f0a411de5 5
+qase-api-client/src/model/run-stats.ts
+  s_8325c3417fa0f3::t_4fea011b14d2c6 5
+qase-api-client/src/model/run.ts
+  s_8325c3417fa0f3::t_abb5ed930f0063 5
+qase-api-client/src/model/runupdate.ts
+  s_8325c3417fa0f3::t_32fe5edd327ae6 5
+qase-api-client/src/model/search-response-all-of-result-entities.ts
+  s_8325c3417fa0f3::t_425b76fba6a6a6 5
+qase-api-client/src/model/search-response-all-of-result.ts
+  s_8325c3417fa0f3::t_e56a0089e98586 5
+qase-api-client/src/model/search-response-all-of.ts
+  s_8325c3417fa0f3::t_035883e49b6530 5
+qase-api-client/src/model/search-response.ts
+  s_8325c3417fa0f3::t_1cc32791865610 5
+qase-api-client/src/model/shared-parameter-create.ts
+  s_8325c3417fa0f3::t_bdd5689154e4e1 5
+qase-api-client/src/model/shared-parameter-list-response-all-of-result.ts
+  s_8325c3417fa0f3::t_398d01c246ecd7 5
+qase-api-client/src/model/shared-parameter-list-response-all-of.ts
+  s_8325c3417fa0f3::t_d640bd2b97d7e2 5
+qase-api-client/src/model/shared-parameter-list-response.ts
+  s_8325c3417fa0f3::t_90cea64f4ba146 5
+qase-api-client/src/model/shared-parameter-parameter.ts
+  s_8325c3417fa0f3::t_1d6530714b1d79 5
+qase-api-client/src/model/shared-parameter-response-all-of.ts
+  s_8325c3417fa0f3::t_ed34ba9b607268 5
+qase-api-client/src/model/shared-parameter-response.ts
+  s_8325c3417fa0f3::t_51ccc70cab96c9 5
+qase-api-client/src/model/shared-parameter-update.ts
+  s_8325c3417fa0f3::t_c3227b9daf658d 5
+qase-api-client/src/model/shared-parameter.ts
+  s_8325c3417fa0f3::t_789d40f7e62df1 5
+qase-api-client/src/model/shared-step-content-create.ts
+  s_8325c3417fa0f3::t_e91cea9ffff8c8 5
+qase-api-client/src/model/shared-step-content.ts
+  s_8325c3417fa0f3::t_347fd1064ccf88 5
+qase-api-client/src/model/shared-step-create.ts
+  s_8325c3417fa0f3::t_357e1e152f251b 5
+qase-api-client/src/model/shared-step-list-response-all-of-result.ts
+  s_8325c3417fa0f3::t_31b75532de0449 5
+qase-api-client/src/model/shared-step-list-response-all-of.ts
+  s_8325c3417fa0f3::t_870e2880e7caf0 5
+qase-api-client/src/model/shared-step-list-response.ts
+  s_8325c3417fa0f3::t_74b5befa7caf90 5
+qase-api-client/src/model/shared-step-response-all-of.ts
+  s_8325c3417fa0f3::t_a30d6fcdbd27e8 5
+qase-api-client/src/model/shared-step-response.ts
+  s_8325c3417fa0f3::t_57f7b407a1c16a 5
+qase-api-client/src/model/shared-step-update.ts
+  s_8325c3417fa0f3::t_8b4fdb31bfbd95 5
+qase-api-client/src/model/shared-step.ts
+  s_8325c3417fa0f3::t_cae22157773609 5
+qase-api-client/src/model/suite-create.ts
+  s_8325c3417fa0f3::t_89404232971558 5
+qase-api-client/src/model/suite-delete.ts
+  s_8325c3417fa0f3::t_c8b1dd9060ccb8 5
+qase-api-client/src/model/suite-list-response-all-of-result.ts
+  s_8325c3417fa0f3::t_d6d9c053f78d57 5
+qase-api-client/src/model/suite-list-response-all-of.ts
+  s_8325c3417fa0f3::t_6ad570a628e62d 5
+qase-api-client/src/model/suite-list-response.ts
+  s_8325c3417fa0f3::t_cd03f90c36ec5e 5
+qase-api-client/src/model/suite-response-all-of.ts
+  s_8325c3417fa0f3::t_4c4faa053e88c6 5
+qase-api-client/src/model/suite-response.ts
+  s_8325c3417fa0f3::t_284c03e4122086 5
+qase-api-client/src/model/suite-update.ts
+  s_8325c3417fa0f3::t_1da901bfe32f82 5
+qase-api-client/src/model/suite.ts
+  s_8325c3417fa0f3::t_915b007a910d1c 5
+qase-api-client/src/model/system-field-list-response-all-of.ts
+  s_8325c3417fa0f3::t_9148f9dbcbcca6 5
+qase-api-client/src/model/system-field-list-response.ts
+  s_8325c3417fa0f3::t_65c869c8c54767 5
+qase-api-client/src/model/system-field-option.ts
+  s_8325c3417fa0f3::t_3bc02570ecb7ce 5
+qase-api-client/src/model/system-field.ts
+  s_8325c3417fa0f3::t_82149d06655314 5
+qase-api-client/src/model/tag-value.ts
+  s_8325c3417fa0f3::t_d3b7de86489ab6 5
+qase-api-client/src/model/test-case-create.ts
+  s_8325c3417fa0f3::t_ba0b8e83dd8c4c 5
+qase-api-client/src/model/test-case-external-issues-links-inner.ts
+  s_8325c3417fa0f3::t_610b19771edf18 5
+qase-api-client/src/model/test-case-external-issues.ts
+  s_8325c3417fa0f3::t_b4bc1a24f704eb 5
+qase-api-client/src/model/test-case-list-response-all-of-result.ts
+  s_8325c3417fa0f3::t_c8a041fcce4b1c 5
+qase-api-client/src/model/test-case-list-response-all-of.ts
+  s_8325c3417fa0f3::t_a9902681795a67 5
+qase-api-client/src/model/test-case-list-response.ts
+  s_8325c3417fa0f3::t_074dbefce6a70c 5
+qase-api-client/src/model/test-case-parameter-base.ts
+  s_8325c3417fa0f3::t_08f94f0c4ab9f5 5
+qase-api-client/src/model/test-case-parameter-create.ts
+  s_8325c3417fa0f3::t_98337f8faa2a40 5
+qase-api-client/src/model/test-case-parameter-group-all-of.ts
+  s_8325c3417fa0f3::t_98321e7f5d04e4 5
+qase-api-client/src/model/test-case-parameter-group.ts
+  s_8325c3417fa0f3::t_ad44907a4a0a9c 5
+qase-api-client/src/model/test-case-parameter-single-all-of.ts
+  s_8325c3417fa0f3::t_5abb7ed7558580 5
+qase-api-client/src/model/test-case-parameter-single.ts
+  s_8325c3417fa0f3::t_8e7798429711db 5
+qase-api-client/src/model/test-case-parameter.ts
+  s_8325c3417fa0f3::t_f12533487b0018 5
+qase-api-client/src/model/test-case-params.ts
+  s_8325c3417fa0f3::t_775404a1b69fcc 5
+qase-api-client/src/model/test-case-query.ts
+  s_8325c3417fa0f3::t_084959a10f65f1 5
+qase-api-client/src/model/test-case-response-all-of.ts
+  s_8325c3417fa0f3::t_3547c19a15320e 5
+qase-api-client/src/model/test-case-response.ts
+  s_8325c3417fa0f3::t_cd678a96d763eb 5
+qase-api-client/src/model/test-case-update.ts
+  s_8325c3417fa0f3::t_57f8739aed9cbe 5
+qase-api-client/src/model/test-case.ts
+  s_8325c3417fa0f3::t_090d87f0404a70 5
+qase-api-client/src/model/test-casebulk-cases-inner-all-of.ts
+  s_8325c3417fa0f3::t_d98cddbb516052 5
+qase-api-client/src/model/test-casebulk-cases-inner.ts
+  s_8325c3417fa0f3::t_e0f9f9f9bfc70b 5
+qase-api-client/src/model/test-casebulk.ts
+  s_8325c3417fa0f3::t_35d50a1137c6c9 5
+qase-api-client/src/model/test-step-create.ts
+  s_8325c3417fa0f3::t_694aa930d004fd 5
+qase-api-client/src/model/test-step-result-create.ts
+  s_8325c3417fa0f3::t_10d1033566e1d2 5
+qase-api-client/src/model/test-step-result.ts
+  s_8325c3417fa0f3::t_ee64be416c6a27 5
+qase-api-client/src/model/test-step.ts
+  s_8325c3417fa0f3::t_70f11314a38af2 5
+qase-api-client/src/model/user-list-response-all-of-result.ts
+  s_8325c3417fa0f3::t_42f592252f606b 5
+qase-api-client/src/model/user-list-response-all-of.ts
+  s_8325c3417fa0f3::t_e71510351bc563 5
+qase-api-client/src/model/user-list-response.ts
+  s_8325c3417fa0f3::t_575f85c122cf0c 5
+qase-api-client/src/model/user-response-all-of.ts
+  s_8325c3417fa0f3::t_497c2e2ac696f8 5
+qase-api-client/src/model/user-response.ts
+  s_8325c3417fa0f3::t_bc21d0c5e9445f 5
+qase-api-client/src/model/user.ts
+  s_8325c3417fa0f3::t_28c3c87375fd6f 5
+qase-api-client/src/model/uuid-response-all-of-result.ts
+  s_8325c3417fa0f3::t_74b135e2e98a0d 5
+qase-api-client/src/model/uuid-response-all-of.ts
+  s_8325c3417fa0f3::t_bd5d4b88c19b51 5
+qase-api-client/src/model/uuid-response.ts
+  s_8325c3417fa0f3::t_42e1c10a57b96e 5
+qase-api-client/src/model/uuid-response1.ts
+  s_8325c3417fa0f3::t_553b2c15ae8e6a 5
+qase-api-v2-client/src/api.ts
+  s_8325c3417fa0f3::t_8251b7091a3983 5
+qase-api-v2-client/src/api/custom-fields-api.ts
+  s_8325c3417fa0f3::t_87b1a5391ae5d0 5
+qase-api-v2-client/src/api/results-api.ts
+  s_8325c3417fa0f3::t_d35f647a3830d3 5
+qase-api-v2-client/src/base.ts
+  s_8325c3417fa0f3::t_4624edfcc7c1ae 5
+qase-api-v2-client/src/common.ts
+  s_8325c3417fa0f3::t_f781d112025d9e 5
+qase-api-v2-client/src/index.ts
+  s_8325c3417fa0f3::t_347849d819e69a 5
+qase-api-v2-client/src/model/base-response.ts
+  s_8325c3417fa0f3::t_7ec0be4a00215f 5
+qase-api-v2-client/src/model/create-results-request-v2.ts
+  s_8325c3417fa0f3::t_bc8e71f39275bd 5
+qase-api-v2-client/src/model/custom-field-list-response-all-of-result.ts
+  s_8325c3417fa0f3::t_920802a5fca171 5
+qase-api-v2-client/src/model/custom-field-list-response-all-of.ts
+  s_8325c3417fa0f3::t_9d312658a246e5 5
+qase-api-v2-client/src/model/custom-field-list-response.ts
+  s_8325c3417fa0f3::t_4f0ffdac3a93ad 5
+qase-api-v2-client/src/model/custom-field-option.ts
+  s_8325c3417fa0f3::t_215bac5f33c048 5
+qase-api-v2-client/src/model/custom-field-response-all-of.ts
+  s_8325c3417fa0f3::t_ca0f575c86a5fb 5
+qase-api-v2-client/src/model/custom-field-response.ts
+  s_8325c3417fa0f3::t_b1084421ad33a6 5
+qase-api-v2-client/src/model/custom-field.ts
+  s_8325c3417fa0f3::t_a7dd398b3a0edb 5
+qase-api-v2-client/src/model/relation-suite-item.ts
+  s_8325c3417fa0f3::t_2876be651337e4 5
+qase-api-v2-client/src/model/relation-suite.ts
+  s_8325c3417fa0f3::t_b3e9309b5da25f 5
+qase-api-v2-client/src/model/result-create-bulk-response.ts
+  s_8325c3417fa0f3::t_160b87947ebfd6 5
+qase-api-v2-client/src/model/result-create-fields.ts
+  s_8325c3417fa0f3::t_7730df4eac8efa 5
+qase-api-v2-client/src/model/result-create-response-all-of-result.ts
+  s_8325c3417fa0f3::t_d80d23c511b728 5
+qase-api-v2-client/src/model/result-create-response-all-of.ts
+  s_8325c3417fa0f3::t_1b8ffe354ccff5 5
+qase-api-v2-client/src/model/result-create-response.ts
+  s_8325c3417fa0f3::t_a4807ba633ef92 5
+qase-api-v2-client/src/model/result-create.ts
+  s_8325c3417fa0f3::t_9e99b156b2029b 5
+qase-api-v2-client/src/model/result-execution.ts
+  s_8325c3417fa0f3::t_4d55e8aaf2422b 5
+qase-api-v2-client/src/model/result-relations.ts
+  s_8325c3417fa0f3::t_3f03570528d7de 5
+qase-api-v2-client/src/model/result-step-data.ts
+  s_8325c3417fa0f3::t_a9d3cc2012500c 5
+qase-api-v2-client/src/model/result-step-execution.ts
+  s_8325c3417fa0f3::t_d6e2733435bb71 5
+qase-api-v2-client/src/model/result-step-status.ts
+  s_8325c3417fa0f3::t_47db64c6ad28b3 5
+qase-api-v2-client/src/model/result-step.ts
+  s_8325c3417fa0f3::t_739695c0ca5c6d 5
+qase-api-v2-client/src/model/result-steps-type.ts
+  s_8325c3417fa0f3::t_ded11e4ac46c9d 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a80eb96726646d7c131bfefeaac827093b9273f5",
+  "prompts": {},
+  "sessions": {
+    "s_8325c3417fa0f3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3f43354b-0112-4e6a-ad2b-654e2b8062cb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
