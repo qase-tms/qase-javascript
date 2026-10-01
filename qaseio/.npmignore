@@ -1,6 +1,0 @@
-.*
-**/tsconfig.json
-**/jest.config.js
-test
-coverage
-src

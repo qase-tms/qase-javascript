@@ -18,7 +18,6 @@
   },
   "homepage": "https://github.com/qase-tms/qase-javascript#readme",
   "workspaces": [
-    "qaseio",
     "qase-api-client",
     "qase-api-v2-client",
     "qase-javascript-commons",
