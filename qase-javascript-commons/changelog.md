@@ -1,3 +1,9 @@
+## 2.9.4
+
+### Fixed
+
+- Type declarations no longer fail in TypeScript projects with `skipLibCheck: false`. `composeOptions.ts` augmented `lodash`'s `LoDashStatic` to type `mergeWith`, and the augmentation was emitted into the published `dist/options/composeOptions.d.ts`. Its `MergeWithCustomizer` only resolves when `@types/lodash` is part of the consumer's program, which the declaration never ensures — the `lodash.mergewith` import is dropped from the `.d.ts` and a module augmentation does not load its target — so every reporter failed with `TS2304: Cannot find name 'MergeWithCustomizer'`. When lodash typings were loaded, the augmentation instead silently added an overload to the consumer's own `_.mergeWith`. The augmentation is removed; `composeOptions` keeps its explicit `MergedType` return type, so the public typing is unchanged.
+
 ## 2.9.3
 
 ### Fixed
