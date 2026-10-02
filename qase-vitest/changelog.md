@@ -1,3 +1,13 @@
+# vitest-qase-reporter@1.5.1
+
+## Fixed
+
+- Type declarations now resolve with Vitest 5. The reporter imported `Reporter` from `vitest/reporters` and `TestAnnotation` from `@vitest/runner`; Vitest 5 removed the `vitest/reporters` subpath and no longer installs `@vitest/runner` as a separate package, so TypeScript projects with `skipLibCheck: false` failed with `TS2307` when importing `vitest-qase-reporter`. Both types are now imported from `vitest/node` and `vitest`, which export them in Vitest 3, 4 and 5. Runtime behaviour is unchanged — these were type-only imports.
+
+## Changed
+
+- Bumped `vitest` devDependency to `^5.0.2`. The `peerDependency` is unchanged (`>=3.0.0`).
+
 # vitest-qase-reporter@1.5.0
 
 ## Added

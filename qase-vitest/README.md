@@ -259,8 +259,8 @@ export default defineConfig({
 
 ## Requirements
 
-- Node.js >= 14
-- Vitest >= 3.0.0
+- Node.js >= 18
+- Vitest >= 3.0.0 (tested with 3.x, 4.x and 5.x)
 
 ## Documentation
 
