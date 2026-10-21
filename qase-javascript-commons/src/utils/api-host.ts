@@ -50,3 +50,34 @@ export function apiLabelToApp(host: string): string {
 export function apiLabelToAppInUrl(url: string): string {
   return url.replace(/^(https?:\/\/)api\./i, '$1app.');
 }
+
+/**
+ * Qase clusters whose web app does not follow the default host conventions, keyed by API hostname.
+ * Enterprise hosts look alike (`api-<company>.qase.io` serves `<company>.qase.io`), so a cluster
+ * cannot be inferred from the `api-` prefix and has to be listed explicitly.
+ */
+const CLUSTER_APP_HOSTS: Record<string, string> = {
+  'api-eu.qase.io': 'app-eu.qase.io',
+};
+
+/**
+ * Returns the web app URL of the Qase cluster the API host belongs to, or `undefined` when the
+ * host is not a known cluster. Accepts both shapes of the option: `eu.qase.io` and
+ * `https://api-eu.qase.io` resolve to `https://app-eu.qase.io`.
+ */
+export function resolveClusterAppUrl(host: string): string | undefined {
+  let apiHostname: string;
+  if (isAbsoluteUrl(host)) {
+    try {
+      apiHostname = new URL(host).hostname;
+    } catch {
+      return undefined;
+    }
+  } else {
+    // Mirrors how a host fragment is turned into the API base URL: `https://api-<host>`.
+    apiHostname = `api-${host}`;
+  }
+
+  const appHost = CLUSTER_APP_HOSTS[apiHostname.toLowerCase()];
+  return appHost ? `https://${appHost}` : undefined;
+}

@@ -3,7 +3,12 @@ import { Configuration as ConfigurationV2 } from 'qase-api-v2-client';
 import FormData from 'form-data';
 import { TestOpsOptionsType } from '../../models/config/TestOpsOptionsType';
 import { HostData } from '../../models/host-data';
-import { apiLabelToAppInUrl, isAbsoluteUrl, stripTrailingSlashes } from '../../utils/api-host';
+import {
+  apiLabelToAppInUrl,
+  isAbsoluteUrl,
+  resolveClusterAppUrl,
+  stripTrailingSlashes,
+} from '../../utils/api-host';
 
 const DEFAULT_API_HOST = 'qase.io';
 /**
@@ -29,6 +34,10 @@ function resolveBasePath(host: string | undefined, version: string): string {
 }
 
 export function resolveAppUrl(config: TestOpsOptionsType): string {
+  const clusterAppUrl = config.api.host ? resolveClusterAppUrl(config.api.host) : undefined;
+  if (clusterAppUrl) {
+    return clusterAppUrl;
+  }
   if (config.api.host && isAbsoluteUrl(config.api.host)) {
     // The API base URL doubles as the app origin here, so swap the `api.` label when there is
     // one. Bare host fragments keep their historical behaviour below (no swap).

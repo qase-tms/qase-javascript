@@ -45,4 +45,12 @@ describe('resolveTestOpsBaseUrl', () => {
       });
     }
   });
+
+  describe('EU cluster', () => {
+    for (const host of ['eu.qase.io', 'https://api-eu.qase.io']) {
+      it(`resolves "${host}" to the EU app`, () => {
+        expect(resolveTestOpsBaseUrl(host)).toBe('https://app-eu.qase.io');
+      });
+    }
+  });
 });
