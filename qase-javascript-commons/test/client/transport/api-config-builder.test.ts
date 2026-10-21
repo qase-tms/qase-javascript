@@ -73,6 +73,20 @@ describe('api-config-builder', () => {
     }
   });
 
+  describe('EU cluster', () => {
+    it('should send API calls to api-eu and link runs to app-eu', () => {
+      const config = { api: { token: 'tok', host: 'eu.qase.io' } } as any;
+      expect(createApiConfigV1(config).basePath).toBe('https://api-eu.qase.io/v1');
+      expect(createApiConfigV2(config).basePath).toBe('https://api-eu.qase.io/v2');
+      expect(resolveAppUrl(config)).toBe('https://app-eu.qase.io');
+    });
+
+    it('should link runs to app-eu when the API host is a full URL', () => {
+      const config = { api: { token: 'tok', host: 'https://api-eu.qase.io' } } as any;
+      expect(resolveAppUrl(config)).toBe('https://app-eu.qase.io');
+    });
+  });
+
   describe('createApiConfigV2', () => {
     it('should create V2 config with default host', () => {
       const config = { api: { token: 'tok123' } } as any;

@@ -1,3 +1,9 @@
+## 2.9.5
+
+### Fixed
+
+- Run links now open on the EU cluster's web app. With `testops.api.host` set to `eu.qase.io` (or `https://api-eu.qase.io`), API calls went to `api-eu.qase.io` but the logged run and failed-test links pointed at `https://eu.qase.io`, which is not where the EU app lives. Known clusters are now resolved from the API host, so these links point at `https://app-eu.qase.io`. Enterprise hosts keep their behaviour: `example.qase.io` still links to `https://example.qase.io`.
+
 ## 2.9.4
 
 ### Fixed

@@ -3,6 +3,7 @@ import {
   apiLabelToApp,
   apiLabelToAppInUrl,
   isAbsoluteUrl,
+  resolveClusterAppUrl,
   stripTrailingSlashes,
 } from '../../src/utils/api-host';
 
@@ -67,6 +68,23 @@ describe('api-host', () => {
     for (const [input, expected] of cases) {
       it(`rewrites "${input}" to "${expected}"`, () => {
         expect(apiLabelToAppInUrl(input)).toBe(expected);
+      });
+    }
+  });
+
+  describe('resolveClusterAppUrl', () => {
+    const eu = ['eu.qase.io', 'EU.QASE.IO', 'https://api-eu.qase.io', 'https://api-eu.qase.io/', 'http://api-eu.qase.io'];
+    for (const host of eu) {
+      it(`resolves "${host}" to the EU cluster app`, () => {
+        expect(resolveClusterAppUrl(host)).toBe('https://app-eu.qase.io');
+      });
+    }
+
+    // Enterprise hosts share the `api-` shape but serve their app on the bare host.
+    const notClusters = ['qase.io', 'company.qase.io', 'https://api-company.qase.io', 'https://api.qase.io', 'https://'];
+    for (const host of notClusters) {
+      it(`does not treat "${host}" as a known cluster`, () => {
+        expect(resolveClusterAppUrl(host)).toBeUndefined();
       });
     }
   });
