@@ -1,0 +1,37 @@
+qase-javascript-commons/package.json
+  s_531e0b712b9182::t_5966a91d1747c0 3
+qase-javascript-commons/changelog.md
+  s_531e0b712b9182::t_5966a91d1747c0 1-6
+qase-javascript-commons/src/reporters/shared/testops-url.ts
+  s_531e0b712b9182::t_64b66522d8d001 5,14,25-27
+  s_531e0b712b9182::t_a5cf1fe609c247 28-29
+qase-javascript-commons/src/client/transport/api-config-builder.ts
+  s_531e0b712b9182::t_64b66522d8d001 6-11,37-40
+qase-javascript-commons/test/client/transport/api-config-builder.test.ts
+  s_531e0b712b9182::t_19f3a64b4265a0 76-89
+qase-javascript-commons/test/utils/api-host.test.ts
+  s_531e0b712b9182::t_19f3a64b4265a0 6,74-89
+  s_531e0b712b9182::t_982d48ec3cf900 90
+qase-javascript-commons/test/reporters/shared/testops-url.test.ts
+  s_531e0b712b9182::t_19f3a64b4265a0 48-55
+qase-javascript-commons/README.md
+  s_531e0b712b9182::t_5966a91d1747c0 53
+qase-javascript-commons/src/utils/api-host.ts
+  s_531e0b712b9182::t_64b66522d8d001 53-83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4e9397f1f8c1bbfec8440d36aad42fed693adaec",
+  "prompts": {},
+  "sessions": {
+    "s_531e0b712b9182": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c0502f13-b6be-4d22-84cf-e9e77bf5f3e6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
