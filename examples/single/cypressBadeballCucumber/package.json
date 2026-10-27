@@ -6,7 +6,7 @@
     "test:testops": "QASE_MODE=testops cypress run"
   },
   "devDependencies": {
-    "@badeball/cypress-cucumber-preprocessor": "^23.2.1",
+    "@badeball/cypress-cucumber-preprocessor": "^28.0.1",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.7",
     "cypress": "^15.11.0",
     "cypress-multi-reporters": "^1.6.4",

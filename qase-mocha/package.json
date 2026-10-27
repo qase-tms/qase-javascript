@@ -43,7 +43,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "deasync-promise": "^1.0.1",
-    "mocha": "^11.7.5",
+    "mocha": "^12.0.3",
     "qase-javascript-commons": "~2.9.0",
     "uuid": "11.1.1"
   },

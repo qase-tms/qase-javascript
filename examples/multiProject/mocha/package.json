@@ -5,7 +5,7 @@
     "test": "QASE_MODE=testops_multi mocha"
   },
   "devDependencies": {
-    "mocha": "^11.7.5",
+    "mocha": "^12.0.3",
     "mocha-qase-reporter": "^1.1.6"
   }
 }

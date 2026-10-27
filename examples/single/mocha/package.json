@@ -8,7 +8,7 @@
     "test:extra-parallel": "QASE_MODE=${QASE_MODE:-off} mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec --parallel"
   },
   "devDependencies": {
-    "mocha": "^11.7.5",
+    "mocha": "^12.0.3",
     "mocha-qase-reporter": "^1.1.6"
   }
 }
