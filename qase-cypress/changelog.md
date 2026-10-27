@@ -1,3 +1,9 @@
+# cypress-qase-reporter@3.7.1
+
+## Fixed
+
+- The network profiler in `cypress-qase-reporter/support` now matches `qase.io` and `QASE_PROFILER_SKIP_DOMAINS` against the request host instead of searching the whole URL, so requests that only mention a skipped domain in their path or query are profiled again.
+
 # cypress-qase-reporter@3.7.0
 
 ## Added

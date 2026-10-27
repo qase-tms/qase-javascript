@@ -12,6 +12,16 @@ export interface NetworkProfilerOptions {
 
 const QASE_API_HOST = 'qase.io';
 
+// Matched against the parsed host, not the raw URL: a substring check also skips
+// `https://evil.test/?u=qase.io` and `https://qase.io.evil.test`.
+function hostMatchesDomain(url: URL, domain: string): boolean {
+  const normalized = domain.toLowerCase();
+  const hostname = url.hostname.toLowerCase();
+  return hostname === normalized
+    || hostname.endsWith(`.${normalized}`)
+    || url.host.toLowerCase() === normalized;
+}
+
 // Module-level ALS store — shared across all NetworkProfiler instances to
 // allow nested run() calls to see the same context.
 const store = new AsyncLocalStorage<TestStepType[]>();
@@ -42,10 +52,13 @@ export class NetworkProfiler extends AbstractProfiler {
   }
 
   shouldSkip(url: string): boolean {
-    if (url.includes(QASE_API_HOST)) {
-      return true;
+    let parsed: URL;
+    try {
+      parsed = new URL(url);
+    } catch {
+      return false;
     }
-    return this.skipDomains.some((domain) => url.includes(domain));
+    return [QASE_API_HOST, ...this.skipDomains].some((domain) => hostMatchesDomain(parsed, domain));
   }
 
   /**
