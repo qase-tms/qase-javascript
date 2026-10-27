@@ -29,7 +29,12 @@ export function isAbsoluteUrl(value: string): boolean {
  * `https://qase.internal/tms/` → `https://qase.internal/tms`
  */
 export function stripTrailingSlashes(url: string): string {
-  return url.replace(/\/+$/, '');
+  // A loop instead of /\/+$/: that regex backtracks polynomially on inputs with many inner slashes.
+  let end = url.length;
+  while (end > 0 && url[end - 1] === '/') {
+    end--;
+  }
+  return url.slice(0, end);
 }
 
 /**

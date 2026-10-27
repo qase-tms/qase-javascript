@@ -1,5 +1,21 @@
 /// <reference types="cypress" />
 
+// Matched against the parsed host, not the raw URL: a substring check also skips
+// `https://evil.test/?u=qase.io` and `https://qase.io.evil.test`.
+function hostMatchesDomain(rawUrl: string, domain: string): boolean {
+  let url: URL;
+  try {
+    url = new URL(rawUrl);
+  } catch {
+    return false;
+  }
+  const normalized = domain.toLowerCase();
+  const hostname = url.hostname.toLowerCase();
+  return hostname === normalized
+    || hostname.endsWith(`.${normalized}`)
+    || url.host.toLowerCase() === normalized;
+}
+
 beforeEach(() => {
   if (Cypress.env('QASE_PROFILER_ENABLED') !== 'true') {
     return;
@@ -22,14 +38,8 @@ beforeEach(() => {
       return;
     }
 
-    if (url.includes('qase.io')) {
+    if (['qase.io', ...skipDomains].some((domain) => hostMatchesDomain(url, domain))) {
       return;
-    }
-
-    for (const domain of skipDomains) {
-      if (url.includes(domain)) {
-        return;
-      }
     }
 
     const startTime = Date.now();

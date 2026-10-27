@@ -1,3 +1,10 @@
+## 2.9.6
+
+### Fixed
+
+- The network profiler now matches `qase.io` and `networkProfiler.skip_domains` against the request host instead of searching the whole URL. Previously any request whose URL merely contained a skipped domain, e.g. `https://example.com/?u=qase.io` or `https://qase.io.example.com`, was dropped from the profile. A domain also matches its subdomains, and an entry with a port such as `localhost:3000` matches that host and port.
+- Trailing slashes are stripped from `testops.api.host` without a regular expression that backtracks polynomially on inputs with many slashes.
+
 ## 2.9.5
 
 ### Fixed

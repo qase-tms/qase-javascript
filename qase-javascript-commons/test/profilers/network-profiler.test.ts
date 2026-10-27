@@ -96,6 +96,30 @@ describe('NetworkProfiler', () => {
       const profiler = new NetworkProfiler();
       expect(profiler.shouldSkip('https://qase.io/')).toBe(true);
     });
+
+    it('should not skip a URL that only mentions qase.io outside the host', () => {
+      const profiler = new NetworkProfiler();
+      expect(profiler.shouldSkip('https://example.com/?redirect=qase.io')).toBe(false);
+      expect(profiler.shouldSkip('https://qase.io.example.com/')).toBe(false);
+      expect(profiler.shouldSkip('https://notqase.io/')).toBe(false);
+    });
+
+    it('should match skipDomains against the host only', () => {
+      const profiler = new NetworkProfiler({ skipDomains: ['company.com'] });
+      expect(profiler.shouldSkip('https://internal.company.com/api')).toBe(true);
+      expect(profiler.shouldSkip('https://example.com/company.com')).toBe(false);
+    });
+
+    it('should match a skipDomain that includes a port', () => {
+      const profiler = new NetworkProfiler({ skipDomains: ['localhost:3000'] });
+      expect(profiler.shouldSkip('http://localhost:3000/api')).toBe(true);
+      expect(profiler.shouldSkip('http://localhost:4000/api')).toBe(false);
+    });
+
+    it('should not skip an unparseable URL', () => {
+      const profiler = new NetworkProfiler({ skipDomains: ['example.com'] });
+      expect(profiler.shouldSkip('not a url example.com')).toBe(false);
+    });
   });
 
   describe('lifecycle methods', () => {

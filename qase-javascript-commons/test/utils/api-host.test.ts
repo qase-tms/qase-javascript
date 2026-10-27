@@ -30,6 +30,8 @@ describe('api-host', () => {
       ['https://qase.internal/tms/', 'https://qase.internal/tms'],
       ['https://qase.internal///', 'https://qase.internal'],
       ['https://qase.internal', 'https://qase.internal'],
+      ['', ''],
+      ['///', ''],
     ];
 
     for (const [input, expected] of cases) {
