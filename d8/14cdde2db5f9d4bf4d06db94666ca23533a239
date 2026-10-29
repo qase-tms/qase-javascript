@@ -1,0 +1,30 @@
+qase-playwright/src/result-builder.ts
+  s_ba3339251e944c::t_10c67ee223a127 6
+  s_ba3339251e944c::t_54915491c97a8b 89-94
+  s_ba3339251e944c::t_e0b2cbf9f9e00f 154-173
+qase-playwright/test/result-builder.test.ts
+  s_ba3339251e944c::t_146b47e370b6d2 281-282
+  s_ba3339251e944c::t_7149ad0b1143b1 250-280,283-338
+qase-playwright/package.json
+  s_ba3339251e944c::t_c1c03fb95fe2d9 3
+qase-playwright/changelog.md
+  s_ba3339251e944c::t_c1c03fb95fe2d9 1-6
+package-lock.json
+  s_ba3339251e944c::t_ff58948c5b0bf0 28155
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d814cdde2db5f9d4bf4d06db94666ca23533a239",
+  "prompts": {},
+  "sessions": {
+    "s_ba3339251e944c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "41ae47f0-1c1e-4be8-9611-9beb1d66323f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
