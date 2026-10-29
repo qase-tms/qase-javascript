@@ -1,3 +1,9 @@
+# playwright-qase-reporter@2.7.1
+
+## Fixed
+
+- Tests marked with `test.fail()` are now reported according to Playwright's expected outcome instead of the raw result status. An expected failure is reported as `skipped` instead of `failed` (or `invalid` for non-assertion errors), so it no longer fails the Qase run. A `test.fail()` test that unexpectedly passes is reported as `failed`, matching Playwright, instead of `passed`. In both cases the result message starts with `Expected failure` / `Expected to fail, but passed` plus the reason given to `test.fail()`. A timeout under `test.fail()` stays `failed`, as in Playwright.
+
 # playwright-qase-reporter@2.7.0
 
 ## Added

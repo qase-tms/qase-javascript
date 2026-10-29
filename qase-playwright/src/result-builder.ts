@@ -3,6 +3,7 @@ import {
   Attachment,
   CompoundError,
   TestResultType,
+  TestStatusEnum,
   TestStepType,
   determineTestStatus,
   generateSignature,
@@ -85,7 +86,12 @@ export class ResultBuilder {
       }
     }
 
-    if (options.markAsFlaky && result.status === 'passed' && result.retry > 0) {
+    if (
+      options.markAsFlaky &&
+      result.status === 'passed' &&
+      result.retry > 0 &&
+      test.expectedStatus !== 'failed'
+    ) {
       metadata.fields['is_flaky'] = 'true';
     }
 
@@ -145,7 +151,26 @@ export class ResultBuilder {
         errorForStatus.stack = error.stacktrace;
       }
     }
-    const testStatus = determineTestStatus(errorForStatus, result.status);
+    let testStatus = determineTestStatus(errorForStatus, result.status);
+
+    // test.fail(): Playwright inverts the outcome, so mirror it instead of reporting the raw status.
+    // A timeout under test.fail() is still unexpected in Playwright and stays failed here.
+    if (test.expectedStatus === 'failed') {
+      const reason = test.annotations.find((a) => a.type === 'fail')?.description;
+      let note: string | null = null;
+      if (result.status === 'failed') {
+        testStatus = TestStatusEnum.skipped;
+        note = 'Expected failure';
+      } else if (result.status === 'passed') {
+        testStatus = TestStatusEnum.failed;
+        note = 'Expected to fail, but passed';
+      }
+      if (note) {
+        note += reason ? `: ${reason}` : '';
+        message = message ? `${note}\n\n${message}` : note;
+      }
+    }
+
     const idsForSignature =
       testops_id == null
         ? null

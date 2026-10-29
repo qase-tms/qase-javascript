@@ -247,3 +247,92 @@ describe('ResultBuilder feature flags and merging', () => {
     expect(r.execution.error_context).toBeNull();
   });
 });
+
+describe('ResultBuilder test.fail() expected failures', () => {
+  let builder: ResultBuilder;
+
+  beforeEach(() => {
+    const stepIndex = new StepIndex();
+    builder = new ResultBuilder(new StepConverter(stepIndex));
+  });
+
+  function failTest(description?: string): TestCase {
+    return {
+      title: 't',
+      titlePath: () => ['file.spec.ts', 't'],
+      annotations: [{ type: 'fail', description }],
+      expectedStatus: 'failed',
+    } as unknown as TestCase;
+  }
+
+  function failedResult(message: string): TestResult {
+    const error: any = { message, stack: undefined };
+    return makeResult('failed' as TestStatus, { error, errors: [error] });
+  }
+
+  it('reports an expected assertion failure as skipped', () => {
+    const r = builder.build(
+      defaultArgs({
+        test: failTest('known bug'),
+        result: failedResult('expect(received).toBe(expected)'),
+      }),
+    )!;
+    expect(r.execution.status).toBe('skipped');
+    expect(r.message).toMatch(/^Expected failure: known bug\n\n/);
+    expect(r.message).toContain('expect(received).toBe(expected)');
+  });
+
+  it('reports an expected non-assertion failure as skipped, not invalid', () => {
+    const r = builder.build(
+      defaultArgs({
+        test: failTest(),
+        result: failedResult('TypeError: x is not a function'),
+      }),
+    )!;
+    expect(r.execution.status).toBe('skipped');
+    expect(r.message).toMatch(/^Expected failure\n\n/);
+  });
+
+  it('reports an unexpected pass as failed', () => {
+    const r = builder.build(
+      defaultArgs({
+        test: failTest('known bug'),
+        result: makeResult('passed' as TestStatus),
+      }),
+    )!;
+    expect(r.execution.status).toBe('failed');
+    expect(r.message).toBe('Expected to fail, but passed: known bug');
+  });
+
+  it('keeps a timeout under test.fail() as failed', () => {
+    const r = builder.build(
+      defaultArgs({
+        test: failTest(),
+        result: makeResult('timedOut' as TestStatus, {
+          error: { message: 'Test timeout of 30000ms exceeded.' } as any,
+          errors: [{ message: 'Test timeout of 30000ms exceeded.' } as any],
+        }),
+      }),
+    )!;
+    expect(r.execution.status).toBe('failed');
+    expect(r.message).not.toContain('Expected');
+  });
+
+  it('does not mark an unexpected pass on retry as flaky', () => {
+    const r = builder.build(
+      defaultArgs({
+        test: failTest(),
+        result: makeResult('passed' as TestStatus, { retry: 1 }),
+        options: { markAsFlaky: true } as ReporterOptionsType,
+      }),
+    )!;
+    expect(r.fields['is_flaky']).toBeUndefined();
+  });
+
+  it('leaves a regular failing test as failed', () => {
+    const r = builder.build(
+      defaultArgs({ result: failedResult('expect(received).toBe(expected)') }),
+    )!;
+    expect(r.execution.status).toBe('failed');
+  });
+});
