@@ -46,7 +46,7 @@ describe('Login Scenarios', () => {
 
     await qase.step('Verify error message is displayed', async () => {
       await expect(LoginPage.errorMessage).toBeDisplayed();
-      await expect(LoginPage.errorMessage).toHaveTextContaining('Username and password do not match');
+      await expect(LoginPage.errorMessage).toHaveText(expect.stringContaining('Username and password do not match'));
     });
 
     qase.comment('Error message correctly displayed for invalid credentials');
@@ -67,7 +67,7 @@ describe('Login Scenarios', () => {
 
     await qase.step('Verify locked user message', async () => {
       await expect(LoginPage.errorMessage).toBeDisplayed();
-      await expect(LoginPage.errorMessage).toHaveTextContaining('locked out');
+      await expect(LoginPage.errorMessage).toHaveText(expect.stringContaining('locked out'));
     });
 
     qase.comment('System correctly prevents locked users from accessing the application');

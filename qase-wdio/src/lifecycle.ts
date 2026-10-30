@@ -13,6 +13,9 @@ export class TestLifecycle {
   constructor(private readonly storage: Storage) {}
 
   startTest(title: string, cid: string, startTime: number = Date.now() / 1000): void {
+    // qase.ignore() and qase.comment() belong to the test they were called in.
+    this.storage.ignore = false;
+    this.storage.comment = undefined;
     const result = new TestResultType(title);
     result.execution.thread = cid;
     result.execution.start_time = startTime;
@@ -58,7 +61,7 @@ export class TestLifecycle {
   attachJSON(name: string, json: unknown): void {
     const isStr = typeof json === 'string';
     const content = isStr ? json : JSON.stringify(json, null, 2);
-    this.attachFile(name, String(content), isStr ? 'application/json' : 'text/plain');
+    this.attachFile(name, String(content), isStr ? 'text/plain' : 'application/json');
   }
 
   attachFile(name: string, content: string | Buffer, contentType: string): void {

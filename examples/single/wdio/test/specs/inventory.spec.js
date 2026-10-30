@@ -59,8 +59,8 @@ describe('Product Inventory', () => {
     });
 
     await qase.step('Verify products are sorted by ascending price', async () => {
-      const prices = await InventoryPage.itemPrices;
-      const priceTexts = await Promise.all(prices.map(async p => await p.getText()));
+      // In WebdriverIO 9 `$$(...).map()` resolves the elements itself and returns a promise.
+      const priceTexts = await InventoryPage.itemPrices.map((p) => p.getText());
       const priceValues = priceTexts.map(p => parseFloat(p.replace('$', '')));
 
       for (let i = 0; i < priceValues.length - 1; i++) {

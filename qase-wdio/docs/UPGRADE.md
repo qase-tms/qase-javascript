@@ -214,7 +214,7 @@ Feature: User Authentication
     Then I should see the dashboard
 
   @QaseID=2
-  @QaseFields={'severity':'high','priority':'critical'}
+  @QaseFields={'severity':'critical','priority':'high'}
   Scenario: Failed login with invalid credentials
     Given I am on the login page
     When I enter invalid credentials
@@ -271,7 +271,7 @@ reporters: [
       // WDIO-specific options
       disableWebdriverStepsReporting: false, // Report WebDriver commands as steps
       disableWebdriverScreenshotsReporting: false, // Report screenshots
-      useCucumber: false, // Enable Cucumber integration (auto-detected)
+      useCucumber: false, // Set to true when framework is 'cucumber'
     },
   ],
 ],
@@ -281,7 +281,7 @@ reporters: [
 
 - `disableWebdriverStepsReporting`: Disable automatic reporting of WebDriver commands as steps
 - `disableWebdriverScreenshotsReporting`: Disable automatic screenshot attachment
-- `useCucumber`: Enable Cucumber mode (usually auto-detected from framework config)
+- `useCucumber`: Enable Cucumber mode. It is not detected from `framework`, so set it to `true` for Cucumber
 
 ---
 

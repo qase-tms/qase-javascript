@@ -44,13 +44,17 @@ export class CommandTracker {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     const commandResult: string | undefined = command.result.value || undefined;
     const isScreenshot = isScreenshotCommand(command);
-    if (!disableWebdriverScreenshotsReporting && isScreenshot && commandResult) {
+    // A screenshot taken outside a test (e.g. in a before hook) has no result to attach to.
+    if (!disableWebdriverScreenshotsReporting && isScreenshot && commandResult && this.storage.getLastItem()) {
       this.lifecycle.attachFile('Screenshot.png', Buffer.from(commandResult, 'base64'), 'image/png');
     }
     if (disableWebdriverStepsReporting || this.isMultiremote || !this.storage.getCurrentStep()) {
       return;
     }
-    this.lifecycle.attachJSON('Response', commandResult);
+    // Commands such as navigateTo return nothing; an attachment would only say "undefined".
+    if (commandResult !== undefined) {
+      this.lifecycle.attachJSON('Response', commandResult);
+    }
     this.lifecycle.endStep();
   }
 

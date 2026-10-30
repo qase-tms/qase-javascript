@@ -1,3 +1,23 @@
+# wdio-qase-reporter@1.8.0
+
+## Added
+
+- Cucumber scenarios accept the same Qase tags as `cucumberjs-qase-reporter`: `@QaseTitle=`, `@QaseSuite=`, `@QaseTags=`, `@QaseFields=`, `@QaseParameters=`, `@QaseGroupParameters=`, `@QaseIgnore`, `@Q-<id>` and `@qaseid.PROJ(ids)` for multi-project mode. Before, only `@QaseID=`, `@Title=`, `@Suite=`, `@Tags=` and `@QaseMuted` were read and the rest were ignored silently. The `@Title=`, `@Suite=` and `@Tags=` spellings keep working.
+
+## Fixed
+
+- `qase.ignore()` and `qase.comment()` apply to the test they are called in. Both were reset only when a suite ended, so one `qase.ignore()` dropped every later test of the same `describe` (or Cucumber feature) from the report, and a comment was added to every later result.
+- A tag value may contain `=`: `@Title=a=b` sets the title `a=b` instead of `a`.
+- `qase.suite('Outer\tInner')` and `@QaseSuite=Outer\tInner` create nested suites. A Gherkin tag cannot hold a real tab, so the two characters `\t` are accepted as well.
+- A screenshot taken outside a test, for example in a `before` hook, no longer throws `There isn't any active test!`, which failed the whole spec file and lost all its results.
+- `qase.attach({ paths: 'file.txt' })` with a single path attaches that file. A string was iterated character by character.
+- WebDriver step attachments have the right MIME type: a JSON request or response body is `application/json`, a plain string is `text/plain`. They were swapped. Commands that return nothing no longer get a `Response` attachment containing `undefined`.
+
+## Changed
+
+- Documentation: tag examples no longer contain spaces, which Gherkin rejects with `A tag may not contain whitespace`; the full tag list is documented; `@QaseIgnore` replaces the note that Cucumber cannot ignore scenarios; `useCucumber` is not auto-detected and has to be set; `mode` is lowercase `testops`.
+- Examples: `it(qase.ignore(), ...)` failed Mocha with `Test argument "title" should be a string`; `qase.ignore()` is now called inside the test. `toHaveTextContaining` (removed in WebdriverIO 9) is replaced with `toHaveText(expect.stringContaining(...))`, the price sort check uses WebdriverIO 9's `$$().map()`, and the cart and checkout specs clear saucedemo's stored cart between tests.
+
 # wdio-qase-reporter@1.7.0
 
 ## Added

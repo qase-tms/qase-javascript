@@ -78,6 +78,25 @@ describe('CommandTracker', () => {
     expect(calls.find((c) => c[0] === 'Screenshot.png' && c[2] === 'image/png')).toBeDefined();
   });
 
+  it('onAfterCommand does not attach an empty response', () => {
+    storage.push(new TestResultType('t'));
+    lifecycle.startStep('navigateTo');
+    const step = storage.getCurrentStep()!;
+    tracker.onAfterCommand({ method: 'POST', endpoint: '/url', command: 'navigateTo', result: { value: null } } as any);
+    expect(step.attachments).toEqual([]);
+  });
+
+  it('onAfterCommand does not throw for a screenshot taken outside a test', () => {
+    expect(() =>
+      tracker.onAfterCommand({
+        method: 'GET',
+        endpoint: '/screenshot',
+        command: 'takeScreenshot',
+        result: { value: 'aGVsbG8=' },
+      } as any),
+    ).not.toThrow();
+  });
+
   it('drainNewProfilerSteps returns slice since last takeProfilerSnapshot', () => {
     const profiler = makeProfiler(2) as any;
     tracker = new CommandTracker(lifecycle, storage, options, profiler);

@@ -245,7 +245,7 @@ qase.attach = (attach: {
   name?: string;
   type?: string;
   content?: string;
-  paths?: string[];
+  paths?: string | string[];
 }) => {
   sendEvent(events.addAttachment, attach);
   return this;

@@ -209,11 +209,14 @@ it('Test with metadata', () => {
 **Cucumber:**
 ```gherkin
 @QaseId=1
-@Title=Custom Test Title
-@Suite=Authentication
+@QaseTitle=Custom_test_title
+@QaseSuite=Authentication\tLogin
+@QaseFields={'severity':'critical'}
 Scenario: Login with metadata
   Given I am on the login page
 ```
+
+Gherkin tags cannot contain whitespace, so tag values use `_` instead of spaces. See the [full list of tags](docs/usage.md#supported-cucumber-tags), including `@QaseIgnore`, `@QaseParameters` and `@qaseid.PROJ(ids)`.
 
 ### Add Steps
 

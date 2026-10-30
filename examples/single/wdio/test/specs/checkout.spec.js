@@ -7,6 +7,10 @@ const CheckoutPage = require('../pageobjects/CheckoutPage');
 describe('Checkout Flow', () => {
   beforeEach(async () => {
     await LoginPage.open();
+    // saucedemo keeps the cart in localStorage; a previous test may have left the backpack in it.
+    await browser.execute(() => window.localStorage.clear());
+    await browser.deleteCookies();
+    await LoginPage.open();
     await LoginPage.login('standard_user', 'secret_sauce');
     await browser.waitUntil(
       async () => (await browser.getUrl()).includes('/inventory.html'),
@@ -57,7 +61,7 @@ describe('Checkout Flow', () => {
     });
 
     await qase.step('Verify order completion', async () => {
-      await expect(CheckoutPage.completeHeader).toHaveTextContaining('Thank you');
+      await expect(CheckoutPage.completeHeader).toHaveText(expect.stringContaining('Thank you'));
     });
 
     qase.attach({
@@ -82,7 +86,7 @@ describe('Checkout Flow', () => {
 
     await qase.step('Verify error message is shown', async () => {
       await expect(CheckoutPage.errorMessage).toBeDisplayed();
-      await expect(CheckoutPage.errorMessage).toHaveTextContaining('First Name is required');
+      await expect(CheckoutPage.errorMessage).toHaveText(expect.stringContaining('First Name is required'));
     });
 
     qase.comment('Form validation correctly prevents checkout without required fields');
@@ -111,8 +115,9 @@ describe('Checkout Flow', () => {
     qase.comment('User can safely cancel checkout and return to cart');
   });
 
-  it(qase.ignore(), 'Ignored test example', async () => {
-    // This test is ignored for demonstration purposes
+  it('Ignored test example', async () => {
+    // Runs, but is not reported to Qase
+    qase.ignore();
     await expect(true).toBe(true);
   });
 });
