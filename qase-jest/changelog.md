@@ -1,3 +1,20 @@
+# jest-qase-reporter@2.8.0
+
+## Fixed
+
+- `qase.*` calls now work when Jest runs tests in several workers, which is Jest's default. The reporter exposed them through `global.Qase` in the main process, while tests run in worker processes, so with more than one worker every call failed with `TypeError: Cannot read properties of undefined` and the test was reported as `invalid`. Only `--runInBand` worked. Each test's metadata is now written to a temporary directory the reporter creates and read when the test's result arrives. Reported in #762.
+- Metadata from `test.concurrent` tests is attributed to the test that set it. Before, calls made after an `await` in a concurrent test landed on whichever test was running at the time.
+- Each retry attempt (`jest.retryTimes`) is reported with its own metadata instead of mixing calls from different attempts.
+- `qase.*` calls in `beforeAll` and `afterAll` are ignored instead of being added to a neighbouring test's result. Calls in `beforeEach` and `afterEach` still apply to their test.
+- Calling `qase.*` without the reporter configured (for example, running one file from an IDE) no longer fails the test.
+- `qase.*` calls work with `injectGlobals: false`, when `expect` is imported from `@jest/globals`.
+- With Jest `projects`, a test file run by several projects at the same time keeps each project's metadata on that project's result. Jest does not say which project a per-test result belongs to, so such overlapping runs are reported when the file finishes. Projects that define no `globals` of their own share Jest's default object and cannot be told apart this way; their overlapping runs of one file can still mix metadata.
+
+## Changed
+
+- The examples no longer force `--runInBand`. The network profiler still needs a single process, since it records requests made where the reporter runs; the README and the troubleshooting section say so.
+- Removed the unused `src/env.ts` test environment, which was never exported from the package.
+
 # jest-qase-reporter@2.7.0
 
 ## Added

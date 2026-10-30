@@ -776,24 +776,17 @@ describe('Authentication Feature', () => {
    require('jest-qase-reporter');
    ```
 
-### Results Not Grouped Correctly
+### Parallel Workers
 
-**Problem:** Test results appear in separate test runs instead of grouping together.
+`qase.*` calls work with any number of Jest workers, including `test.concurrent` tests and retries (`jest.retryTimes`); each retry attempt is reported as its own result with its own metadata. All workers report into a single test run.
 
-**Solutions:**
+Calls made outside a test, in `beforeAll` or `afterAll`, are ignored because they do not belong to a single result. Calls in `beforeEach` and `afterEach` apply to the test they run for.
 
-1. Use `--runInBand` to run tests serially:
-   ```bash
-   npx jest --runInBand
-   ```
+With Jest `projects` that run the same test file, give each project its own `globals` object (an empty `globals: {}` is enough). The reporter uses it to tell the projects apart when they run the file at the same time; projects without one can mix metadata of such overlapping runs.
 
-2. Or configure jest for serial execution:
-   ```javascript
-   // jest.config.js
-   module.exports = {
-     maxWorkers: 1,
-   };
-   ```
+Before version 2.8.0 the reporter needed `--runInBand`: with several workers every `qase.*` call failed with `TypeError` and the test was reported as `invalid`. Upgrade instead of forcing a single worker.
+
+The network profiler still needs `--runInBand` (or `maxWorkers: 1`): it records requests made in the process that runs the reporter, so requests made in worker processes are not captured.
 
 ### Attachments Not Uploading
 

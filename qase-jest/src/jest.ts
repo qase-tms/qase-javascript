@@ -1,9 +1,12 @@
 import path from 'path';
 import { getMimeTypes, QaseStep, StepFunction, formatTitleWithProjectMapping } from 'qase-javascript-commons';
 import { v4 as uuidv4 } from 'uuid';
+import { MetadataWriter } from './metadataChannel';
 
 /** Project code → test case IDs for multi-project (testops_multi) mode. */
 export type ProjectMapping = Record<string, number[]>;
+
+const writer = new MetadataWriter();
 
 export const qase = (
   caseId: number | string | number[] | string[],
@@ -34,9 +37,7 @@ qase.projects = (mapping: ProjectMapping, name: string): string => {
  * });
  */
 qase.title = (value: string): void => {
-  // @ts-expect-error - global.Qase is dynamically added at runtime
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  global.Qase.title(value);
+  writer.title(value);
 };
 
 /**
@@ -48,9 +49,7 @@ qase.title = (value: string): void => {
  * });
  */
 qase.ignore = (): void => {
-  // @ts-expect-error - global.Qase is dynamically added at runtime
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  global.Qase.ignore();
+  writer.ignore();
 };
 
 /**
@@ -62,9 +61,7 @@ qase.ignore = (): void => {
  * });
  */
 qase.mute = (): void => {
-  // @ts-expect-error - global.Qase is dynamically added at runtime
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  global.Qase.mute();
+  writer.mute();
 };
 
 /**
@@ -77,9 +74,7 @@ qase.mute = (): void => {
  * });
  */
 qase.comment = (value: string): void => {
-  // @ts-expect-error - global.Qase is dynamically added at runtime
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  global.Qase.comment(value);
+  writer.comment(value);
 };
 
 /**
@@ -92,9 +87,7 @@ qase.comment = (value: string): void => {
  * });
  */
 qase.suite = (value: string): void => {
-  // @ts-expect-error - global.Qase is dynamically added at runtime
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  global.Qase.suite(value);
+  writer.suite(value);
 };
 
 /**
@@ -107,9 +100,7 @@ qase.suite = (value: string): void => {
  * });
  */
 qase.fields = (values: Record<string, string>): void => {
-  // @ts-expect-error - global.Qase is dynamically added at runtime
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  global.Qase.fields(values);
+  writer.fields(values);
 };
 
 /**
@@ -122,9 +113,7 @@ qase.fields = (values: Record<string, string>): void => {
  * });
  */
 qase.parameters = (values: Record<string, string>): void => {
-  // @ts-expect-error - global.Qase is dynamically added at runtime
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  global.Qase.parameters(values);
+  writer.parameters(values);
 };
 
 /**
@@ -137,9 +126,7 @@ qase.parameters = (values: Record<string, string>): void => {
  * });
  */
 qase.groupParameters = (values: Record<string, string>): void => {
-  // @ts-expect-error - global.Qase is dynamically added at runtime
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  global.Qase.groupParams(values);
+  writer.groupParams(values);
 };
 
 /**
@@ -152,9 +139,7 @@ qase.groupParameters = (values: Record<string, string>): void => {
  * });
  */
 qase.tags = (...values: string[]): void => {
-  // @ts-expect-error - global.Qase is dynamically added at runtime
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  global.Qase.tags(values);
+  writer.tags(values);
 };
 
 /**
@@ -185,9 +170,7 @@ qase.step = async (name: string, body: StepFunction, expectedResult?: string, da
   const runningStep = new QaseStep(stepName);
   // eslint-disable-next-line @typescript-eslint/require-await
   await runningStep.run(body, async (step) => {
-    // @ts-expect-error - global.Qase is dynamically added at runtime
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
-    return global.Qase.step(step);
+    writer.step(step);
   });
 };
 
@@ -213,9 +196,7 @@ qase.attach = (attach: {
       const attachmentName = path.basename(file);
       const contentType: string = getMimeTypes(file);
 
-      // @ts-expect-error - global.Qase is dynamically added at runtime
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      global.Qase.attachment({
+      writer.attachment({
         file_path: file,
         size: 0,
         id: uuidv4(),
@@ -228,9 +209,7 @@ qase.attach = (attach: {
   }
 
   if (attach.content) {
-    // @ts-expect-error - global.Qase is dynamically added at runtime
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    global.Qase.attachment({
+    writer.attachment({
       file_path: null,
       size: attach.content.length,
       id: uuidv4(),

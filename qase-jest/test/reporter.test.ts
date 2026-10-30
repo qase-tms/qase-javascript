@@ -1,7 +1,9 @@
 /* eslint-disable */
 import { expect } from '@jest/globals';
 import { JestQaseReporter } from '../src/reporter';
+import { existsSync } from 'fs';
 import { TestStepType } from 'qase-javascript-commons';
+import { METADATA_DIR_ENV, MetadataWriter, PROJECT_GLOBAL } from '../src/metadataChannel';
 
 const reporterMock = {
   startTestRun: jest.fn(),
@@ -56,6 +58,15 @@ describe('JestQaseReporter', () => {
     reporter = new JestQaseReporter(globalConfig, options, state);
   });
 
+  afterEach(() => {
+    (reporter as any).metadataReader.cleanup();
+  });
+
+  // Plays the role of qase.* calls made inside the test, in what would be a worker process.
+  // `project` is what the worker reads from the global the reporter puts into the project's config.
+  const workerFor = (testPath: string, testName: string, project = 'project-a') =>
+    new MetadataWriter(process.env[METADATA_DIR_ENV], () => ({ project, testPath, testName, invocation: 1 }));
+
   describe('static statusMap', () => {
     it('maps Jest statuses to TestStatusEnum correctly', () => {
       expect(JestQaseReporter.statusMap.passed).toBe('passed');
@@ -69,11 +80,11 @@ describe('JestQaseReporter', () => {
   });
 
   describe('constructor', () => {
-    it('initializes commons reporter and global.Qase', () => {
+    it('initializes commons reporter and hands the metadata directory to workers', () => {
       expect((reporter as any).reporter).toBe(reporterMock);
-      // @ts-expect-error - global.Qase is dynamically added at runtime
-      expect(global.Qase).toBeDefined();
-      expect((reporter as any).metadataApplier).toBeDefined();
+      const dir = (reporter as any).metadataReader.dir;
+      expect(process.env[METADATA_DIR_ENV]).toBe(dir);
+      expect(existsSync(dir)).toBe(true);
       expect((reporter as any).profilerTracker).toBeDefined();
     });
   });
@@ -86,7 +97,11 @@ describe('JestQaseReporter', () => {
   });
 
   describe('onTestCaseResult', () => {
-    const test = { path: '/test/path' } as any;
+    const test = { path: '/test/path', context: { config: { id: 'project-a', globals: {} } } } as any;
+
+    beforeEach(() => {
+      reporter.onTestFileStart(test);
+    });
     const testCaseResult = {
       title: 'Test (Qase ID: 123)',
       fullName: 'Test Suite Test',
@@ -122,22 +137,23 @@ describe('JestQaseReporter', () => {
     });
 
     it('skips addTestResult when ignore flag is set', () => {
-      reporter.addIgnore();
+      workerFor('/test/path', 'Test Suite Test').ignore();
       reporter.onTestCaseResult(test, testCaseResult);
       expect(reporterMock.addTestResult).not.toHaveBeenCalled();
     });
 
-    it('applies metadata overrides through MetadataApplier', () => {
-      reporter.addTitle('Custom Title');
-      reporter.addComment('Custom Comment');
-      reporter.addSuite('Custom Suite');
-      reporter.addFields({ field1: 'value1' });
-      reporter.addParameters({ param1: 'value1' });
-      reporter.addGroupParams({ group1: 'value1' });
+    it('applies metadata written for the test', () => {
+      const worker = workerFor('/test/path', 'Test Suite Test');
+      worker.title('Custom Title');
+      worker.comment('Custom Comment');
+      worker.suite('Custom Suite');
+      worker.fields({ field1: 'value1' });
+      worker.parameters({ param1: 'value1' });
+      worker.groupParams({ group1: 'value1' });
       const step = new TestStepType();
       step.id = 'step1';
-      reporter.addStep(step);
-      reporter.addAttachment({ file_name: 'file' } as any);
+      worker.step(step);
+      worker.attachment({ file_name: 'file' } as any);
 
       reporter.onTestCaseResult(test, testCaseResult);
       const call = reporterMock.addTestResult.mock.calls[0][0];
@@ -151,18 +167,92 @@ describe('JestQaseReporter', () => {
       expect(call.attachments).toEqual([{ file_name: 'file' }]);
     });
 
-    it('resets metadata after each test case', () => {
-      reporter.addTitle('First');
+    it('consumes metadata so it is not applied twice', () => {
+      workerFor('/test/path', 'Test Suite Test').title('First');
       reporter.onTestCaseResult(test, testCaseResult);
       reporter.onTestCaseResult(test, testCaseResult);
       const second = reporterMock.addTestResult.mock.calls[1][0];
       expect(second.title).toBe('Test'); // not 'First'
     });
+
+    it('applies metadata only to the test it was written for', () => {
+      workerFor('/test/path', 'Test Suite Other').title('Other');
+      workerFor('/test/other-file', 'Test Suite Test').title('Other file');
+      reporter.onTestCaseResult(test, testCaseResult);
+      expect(reporterMock.addTestResult.mock.calls[0][0].title).toBe('Test');
+    });
+
+    it('tags each project with its id through the project globals', () => {
+      expect(test.context.config.globals[PROJECT_GLOBAL]).toBe('project-a');
+    });
+
+    it('keeps the same test apart when it runs in two Jest projects at once', () => {
+      // Jest passes the runner's shared context to onTestCaseResult, so only file events say which
+      // project ran a test; overlapping runs of one file are reported from onTestResult.
+      const other = { path: '/test/path', context: { config: { id: 'project-b', globals: {} } } } as any;
+      reporter.onTestFileStart(other);
+      workerFor('/test/path', 'Test Suite Test', 'project-a').title('From A');
+      workerFor('/test/path', 'Test Suite Test', 'project-b').title('From B');
+
+      reporter.onTestCaseResult(test, testCaseResult);
+      reporter.onTestCaseResult(test, testCaseResult);
+      expect(reporterMock.addTestResult).not.toHaveBeenCalled();
+
+      const fileResult = { testFilePath: '/test/path', testResults: [testCaseResult] } as any;
+      reporter.onTestResult(other, fileResult);
+      reporter.onTestResult(test, fileResult);
+
+      expect(reporterMock.addTestResult.mock.calls.map((c: any[]) => c[0].title)).toEqual(['From B', 'From A']);
+    });
+
+    it('reports a test once when another project starts the same file after it was reported', () => {
+      workerFor('/test/path', 'Test Suite Test', 'project-a').title('From A');
+      reporter.onTestCaseResult(test, testCaseResult);
+
+      const other = { path: '/test/path', context: { config: { id: 'project-b', globals: {} } } } as any;
+      reporter.onTestFileStart(other);
+      reporter.onTestResult(test, { testFilePath: '/test/path', testResults: [testCaseResult] } as any);
+
+      expect(reporterMock.addTestResult.mock.calls.map((c: any[]) => c[0].title)).toEqual(['From A']);
+    });
+
+    it('keeps the first id when projects share one globals object', () => {
+      const shared = {};
+      const a = { path: '/test/shared', context: { config: { id: 'shared-a', globals: shared } } } as any;
+      const b = { path: '/test/shared', context: { config: { id: 'shared-b', globals: shared } } } as any;
+      reporter.onTestFileStart(a);
+      reporter.onTestFileStart(b);
+      expect((shared as any)[PROJECT_GLOBAL]).toBe('shared-a');
+
+      // Workers of both projects read 'shared-a', and the reporter reads with the same key.
+      workerFor('/test/shared', 'Test Suite Test', 'shared-a').title('Shared');
+      reporter.onTestResult(b, { testFilePath: '/test/shared', testResults: [testCaseResult] } as any);
+      expect(reporterMock.addTestResult.mock.calls[0][0].title).toBe('Shared');
+    });
+
+    it('falls back to no project when the project globals cannot be changed', () => {
+      const frozen = { path: '/test/frozen', context: { config: { id: 'project-c', globals: Object.freeze({}) } } } as any;
+      reporter.onTestFileStart(frozen);
+      // The worker sees no project global either, so both sides use the empty key.
+      workerFor('/test/frozen', 'Test Suite Test', '').title('No project');
+      reporter.onTestCaseResult(frozen, testCaseResult);
+      expect(reporterMock.addTestResult.mock.calls[0][0].title).toBe('No project');
+    });
+
+    it('reports the test without metadata when the metadata file is corrupt', () => {
+      const { writeFileSync, readdirSync } = jest.requireActual<typeof import('fs')>('fs');
+      workerFor('/test/path', 'Test Suite Test').title('T');
+      const dir = (reporter as any).metadataReader.dir;
+      const [file] = readdirSync(dir);
+      writeFileSync(`${dir}/${file}`, '{"title":');
+      expect(() => reporter.onTestCaseResult(test, testCaseResult)).not.toThrow();
+      expect(reporterMock.addTestResult.mock.calls[0][0].title).toBe('Test');
+    });
   });
 
   describe('onTestResult', () => {
     it('forwards pending test results to addTestResult', () => {
-      const test = {} as any;
+      const test = { path: '/test/path', context: { config: { id: 'project-a', globals: {} } } } as any;
       const result = {
         testFilePath: '/test/path',
         testResults: [
@@ -181,8 +271,8 @@ describe('JestQaseReporter', () => {
       expect(reporterMock.addTestResult).toHaveBeenCalled();
     });
 
-    it('skips non-pending test results', () => {
-      const test = {} as any;
+    it('skips non-pending test results already reported per test case', () => {
+      const test = { path: '/test/path', context: { config: { id: 'project-a', globals: {} } } } as any;
       const result = {
         testFilePath: '/test/path',
         testResults: [
@@ -219,57 +309,6 @@ describe('JestQaseReporter', () => {
   describe('getLastError', () => {
     it('does nothing (no-op for Jest reporter contract)', () => {
       expect(() => reporter.getLastError()).not.toThrow();
-    });
-  });
-
-  describe('add* mutators delegate to MetadataApplier', () => {
-    it('addTitle, addComment, addSuite update metadata', () => {
-      reporter.addTitle('T');
-      reporter.addComment('C');
-      reporter.addSuite('S');
-      const m = (reporter as any).metadataApplier.get();
-      expect(m.title).toBe('T');
-      expect(m.comment).toBe('C');
-      expect(m.suite).toBe('S');
-    });
-
-    it('addFields, addParameters, addGroupParams set maps', () => {
-      reporter.addFields({ f: '1' });
-      reporter.addParameters({ p: '1' });
-      reporter.addGroupParams({ g: '1' });
-      const m = (reporter as any).metadataApplier.get();
-      expect(m.fields).toEqual({ f: '1' });
-      expect(m.parameters).toEqual({ p: '1' });
-      expect(m.groupParams).toEqual({ g: '1' });
-    });
-
-    it('addTags appends to tags array', () => {
-      reporter.addTags(['a']);
-      reporter.addTags(['b', 'c']);
-      const m = (reporter as any).metadataApplier.get();
-      expect(m.tags).toEqual(['a', 'b', 'c']);
-    });
-
-    it('addIgnore sets the ignore flag', () => {
-      reporter.addIgnore();
-      const m = (reporter as any).metadataApplier.get();
-      expect(m.ignore).toBe(true);
-    });
-
-    it('addMute sets the mute flag', () => {
-      reporter.addMute();
-      const m = (reporter as any).metadataApplier.get();
-      expect(m.mute).toBe(true);
-    });
-
-    it('addStep and addAttachment append', () => {
-      const step = new TestStepType();
-      step.id = 's';
-      reporter.addStep(step);
-      reporter.addAttachment({ file_name: 'a' } as any);
-      const m = (reporter as any).metadataApplier.get();
-      expect(m.steps[0].id).toBe('s');
-      expect(m.attachments).toEqual([{ file_name: 'a' }]);
     });
   });
 });
