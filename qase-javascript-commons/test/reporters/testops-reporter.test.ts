@@ -74,15 +74,18 @@ describe('TestOpsReporter', () => {
       expect(reporterWithoutBatch['batchSize']).toBe(200);
     });
 
-    it.each([
+    const clampCases: [number, number][] = [
       [0, 1],
       [-5, 1],
       [500, 200],
       [50.7, 50],
-    ])('should clamp batchSize %p to %p', (size, expected) => {
-      const r = new TestOpsReporter(mockLogger, mockApiClient, false, 'TEST_PROJECT', undefined, size);
-      expect(r['batchSize']).toBe(expected);
-    });
+    ];
+    for (const [size, expected] of clampCases) {
+      it(`should clamp batchSize ${size} to ${expected}`, () => {
+        const r = new TestOpsReporter(mockLogger, mockApiClient, false, 'TEST_PROJECT', undefined, size);
+        expect(r['batchSize']).toBe(expected);
+      });
+    }
 
     it('should handle custom baseUrl correctly', () => {
       const reporterWithCustomUrl = new TestOpsReporter(
