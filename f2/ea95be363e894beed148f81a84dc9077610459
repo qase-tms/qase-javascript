@@ -1,0 +1,85 @@
+qase-jest/docs/usage.md
+  s_57b503ed365a5f::t_524b65a3f1014a 192,199
+qase-testcafe/docs/usage.md
+  s_57b503ed365a5f::t_524b65a3f1014a 177,185
+qase-cypress/docs/usage.md
+  s_57b503ed365a5f::t_524b65a3f1014a 222
+examples/single/mocha/test/api-posts.spec.js
+  s_57b503ed365a5f::t_ce9be1b520ea85 8,10,12,16,18,23,34,36,38,42,44,57,65-66,68,74,76,80,82,94
+qase-vitest/docs/ATTACHMENTS.md
+  s_57b503ed365a5f::t_555a865656f28f 14,16,25,28-29,32,38,41,51,61,64,72,77-78,80,83-84,87,93,96,110,115,117,120,123,143,152-161,165-168,170,174,176-178,183,185-187,194,211,220,224,230,236,242,245,260,265-266,268,270,272,274,276-277,280,307
+examples/multiProject/vitest/test/multiProject.test.ts
+  s_57b503ed365a5f::t_1155e54b360f70 39
+qase-vitest/docs/STEPS.md
+  s_57b503ed365a5f::t_962fdd57d8d8f8 155,166,255,258,347
+  s_57b503ed365a5f::t_4b6a9acec74703 201,220,235,352,369
+qase-mocha/docs/MULTI_PROJECT.md
+  s_57b503ed365a5f::t_bd4ba68919c62c 126-127
+examples/single/mocha/test/api-crud.spec.js
+  s_57b503ed365a5f::t_d10d28b3d1c542 8,10,12,16,18,23,33,35,37,41,43,50,68,74-77,80,84,86,93,101,103-104,107,111-113
+qase-mocha/README.md
+  s_57b503ed365a5f::t_70be22ebe3f4ea 161,165-166,172,185
+qase-mocha/changelog.md
+  s_57b503ed365a5f::t_84e01f701b60fd 7-10
+examples/single/mocha/test/api-errors.spec.js
+  s_57b503ed365a5f::t_d10d28b3d1c542 8,11,13,21-23,31,33,37-47,50,57,59,67,73-75
+qase-mocha/docs/STEPS.md
+  s_57b503ed365a5f::t_011cf1c2a74a85 44,73,132,143-145,242-245,248,252-253,284-285,313,315
+qase-vitest/README.md
+  s_57b503ed365a5f::t_e181a73734a385 43,46,141,144,151,158,161,164-165,167,174,177,182,216
+qase-vitest/docs/UPGRADE.md
+  s_57b503ed365a5f::t_bf3c972ce307af 27-30,106,112,115,123,126,131,136,144-145,147-154,157,163,176,196,206,212-225,232,245,248,250,252-253,285,289,291-292
+  s_57b503ed365a5f::t_4b6a9acec74703 182
+qase-vitest/docs/usage.md
+  s_57b503ed365a5f::t_85fe105e9a7706 7-12,44,47,55,58,74,77-78,80,103,106-107,117,129,132-133,135,141,144-145,147,177,184,211,214-215,217,223-224,232,237-238,240-241,247,254,257-259,262,264,268,273,297,300,312,318,328,334,343,352,357,363-368,382-390,438,442-443,445,452,467,470,504,518,550,552,574,581,599,601,610,614,618,620,624,631,634-635,642,648,655-656,664,685,700,738,745-747,753,760,773,776,784,795-798,805,813,816-817,819,828,831,843,847
+  s_57b503ed365a5f::t_4b6a9acec74703 176
+  s_57b503ed365a5f::t_524b65a3f1014a 190
+examples/single/vitest/test/api-advanced.test.ts
+  s_57b503ed365a5f::t_8316527e128e96 105
+examples/single/vitest/README.md
+  s_57b503ed365a5f::t_74041f4e28c80d 102,106,110-111,119,143,201
+qase-vitest/docs/MULTI_PROJECT.md
+  s_57b503ed365a5f::t_bf3c972ce307af 51,78-88
+  s_57b503ed365a5f::t_dd5a971b97c340 89
+qase-cucumberjs/docs/usage.md
+  s_57b503ed365a5f::t_524b65a3f1014a 192
+examples/multiProject/mocha/test/multiProject.spec.js
+  s_57b503ed365a5f::t_4cbc42126b5d47 9,11,13,17-19,24,31,36-37,39,41,45-47,53,58,63,71-74,77,81-83,89,95,100-101,103-104,107,111-113
+qase-mocha/docs/ATTACHMENTS.md
+  s_57b503ed365a5f::t_8316527e128e96 16,29,43,67,88,112,127,133,141-142,147-149,193,217,237
+qase-wdio/docs/usage.md
+  s_57b503ed365a5f::t_70be212801b975 244
+  s_57b503ed365a5f::t_524b65a3f1014a 253
+examples/single/mocha/README.md
+  s_57b503ed365a5f::t_87f30718aefd84 5,69,77,85,89,94,103-110,118,130,138,140-141,143-145,148,152,157,160,162,166,224
+  s_57b503ed365a5f::t_bba24dd548be3e 165
+qase-playwright/docs/usage.md
+  s_57b503ed365a5f::t_524b65a3f1014a 238,246
+examples/single/mocha/test/api-advanced.spec.js
+  s_57b503ed365a5f::t_ce9be1b520ea85 7-8,10-11,13-16,18-19,21-32,35-37,39,41-43,47,51-52,54-57,59,64,73,76,86-100,102,109,117-118
+qase-mocha/docs/UPGRADE.md
+  s_57b503ed365a5f::t_bd4ba68919c62c 30-31,139-140,142-147,159,163,167,174,180,189-201,278-279,285-286,300
+qase-vitest/changelog.md
+  s_57b503ed365a5f::t_84e01f701b60fd 7-11
+qase-vitest/package.json
+  s_57b503ed365a5f::t_9f7f45e4af4a19 10,20-22
+qase-mocha/docs/usage.md
+  s_57b503ed365a5f::t_f70a908dfd4fe7 69-70,76,106,133,146,163,199,211,236,259,299,304,309,319,325,327,334,336,365,386,391,431,440-441,450,460,480,553,572,613,622,644,652,671-674,684,693,719,722,747,751-752,759,964,971,977,1056,1059,1071,1076-1078,1085,1090-1100,1103,1107,1111
+  s_57b503ed365a5f::t_524b65a3f1014a 175
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f2ea95be363e894beed148f81a84dc9077610459",
+  "prompts": {},
+  "sessions": {
+    "s_57b503ed365a5f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4c6749a7-7eb3-4ee9-891f-611f479b9abc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
