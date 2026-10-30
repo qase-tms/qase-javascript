@@ -1,0 +1,25 @@
+qase-mocha/src/modules/stepRunner.ts
+  s_57b503ed365a5f::t_e041b4c9ec9098 50,53-58
+qase-mocha/docs/STEPS.md
+  s_57b503ed365a5f::t_37fafdecf9938b 145
+qase-mocha/changelog.md
+  s_57b503ed365a5f::t_37fafdecf9938b 9
+qase-mocha/test/stepRunner.test.ts
+  s_57b503ed365a5f::t_e041b4c9ec9098 35-37,39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ed8a10af4511233c49d78b2d0e2c88dfe8a1c1d2",
+  "prompts": {},
+  "sessions": {
+    "s_57b503ed365a5f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4c6749a7-7eb3-4ee9-891f-611f479b9abc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
