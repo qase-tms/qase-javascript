@@ -24,11 +24,10 @@ The vitest-qase-reporter is currently in its first major version series (1.x). N
 Version 1.1.0 includes:
 
 - Full support for Qase TestOps API with batch result upload
-- Jest-compatible API for easy migration from Jest
-- Test case linking via wrapper function pattern: `test(qase(id, 'name'), callback)`
-- Rich metadata support: titles, fields, suites, parameters, comments
-- Async test steps with `qase.step()`
-- File and content-based attachments with `qase.attach()`
+- Test case linking via the test name: `test(addQaseId('name', [id]), callback)`
+- Rich metadata support via `withQase(async ({ qase }) => { ... })`: titles, fields, suites, parameters, comments
+- Async test steps with `await qase.step()`
+- File and content-based attachments with `await qase.attach()`
 - Multi-project support for reporting to multiple Qase projects
 - Flexible configuration via `qase.config.json` or `vitest.config.ts`
 
@@ -104,16 +103,16 @@ QASE_MODE=testops npx vitest run
 ### Current Import (v1.x)
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { addQaseId, addQaseProjects, withQase } from 'vitest-qase-reporter/vitest';
 ```
 
 **CommonJS:**
 
 ```javascript
-const { qase } = require('vitest-qase-reporter');
+const { addQaseId, addQaseProjects, withQase } = require('vitest-qase-reporter/vitest');
 ```
 
-**Note:** Vitest uses the root package export (no subpath required), similar to Jest's API.
+**Note:** Test helpers come from the `vitest-qase-reporter/vitest` subpath. The root package export (`vitest-qase-reporter`) is the reporter itself and is referenced in the `reporters` array of `vitest.config.ts`.
 
 ---
 
@@ -121,20 +120,20 @@ const { qase } = require('vitest-qase-reporter');
 
 ### Test Case ID Linking
 
-The Vitest reporter uses Jest-compatible syntax:
+Test case IDs are added to the test name with `addQaseId(name, ids)`:
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { addQaseId } from 'vitest-qase-reporter/vitest';
 import { describe, test, expect } from 'vitest';
 
 describe('User Authentication', () => {
   // Single test case ID
-  test(qase(1, 'User can login'), () => {
+  test(addQaseId('User can login', [1]), () => {
     expect(true).toBe(true);
   });
 
   // Multiple test case IDs
-  test(qase([1, 2], 'Multiple IDs'), () => {
+  test(addQaseId('Multiple IDs', [1, 2]), () => {
     expect(true).toBe(true);
   });
 });
@@ -142,22 +141,26 @@ describe('User Authentication', () => {
 
 ### Metadata Methods
 
+Metadata methods are called on the `qase` object passed to the `withQase()` callback. All of them are async:
+
 ```typescript
-test('Test with metadata', () => {
-  qase.title('Custom test title');
-  qase.fields({ severity: 'critical', priority: 'high', layer: 'unit' });
-  qase.suite('Authentication / Login');
-  qase.comment('This test covers the main login flow');
-  qase.parameters({ environment: 'staging', mode: 'development' });
+import { withQase } from 'vitest-qase-reporter/vitest';
+
+test('Test with metadata', withQase(async ({ qase }) => {
+  await qase.title('Custom test title');
+  await qase.fields({ severity: 'critical', priority: 'high', layer: 'unit' });
+  await qase.suite('Authentication\tLogin');
+  await qase.comment('This test covers the main login flow');
+  await qase.parameters({ environment: 'staging', mode: 'development' });
 
   expect(true).toBe(true);
-});
+}));
 ```
 
 ### Steps (Async)
 
 ```typescript
-test('Test with steps', async () => {
+test('Test with steps', withQase(async ({ qase }) => {
   await qase.step('Initialize environment', async () => {
     // Setup code
   });
@@ -170,12 +173,13 @@ test('Test with steps', async () => {
     // Assertions
     expect(result).toBe(expected);
   });
-});
+}));
 ```
 
 **With expected results and data:**
 
 ```typescript
+// Inside a withQase(async ({ qase }) => { ... }) callback
 await qase.step(
   'Verify login success',
   async () => {
@@ -189,7 +193,7 @@ await qase.step(
 ### Nested Steps
 
 ```typescript
-test('Test with nested steps', async () => {
+test('Test with nested steps', withQase(async ({ qase }) => {
   await qase.step('Parent step', async () => {
     await qase.step('Child step 1', async () => {
       // Nested logic
@@ -199,31 +203,33 @@ test('Test with nested steps', async () => {
       // More nested logic
     });
   });
-});
+}));
 ```
 
 ### Attachments
 
 ```typescript
-// Path-based attachment
-qase.attach({ paths: '/path/to/log.txt' });
+test('Test with attachments', withQase(async ({ qase }) => {
+  // Path-based attachment
+  await qase.attach({ paths: ['/path/to/log.txt'] });
 
-// Multiple files
-qase.attach({ paths: ['/path/to/file1.txt', '/path/to/file2.log'] });
+  // Multiple files
+  await qase.attach({ paths: ['/path/to/file1.txt', '/path/to/file2.log'] });
 
-// Content-based attachment
-qase.attach({
-  name: 'test-data.json',
-  content: JSON.stringify({ key: 'value' }),
-  contentType: 'application/json',
-});
+  // Content-based attachment (content must be a string)
+  await qase.attach({
+    name: 'test-data.json',
+    content: JSON.stringify({ key: 'value' }),
+    type: 'application/json',
+  });
+}));
 ```
 
 ---
 
 ## Migrating from Jest
 
-If you're migrating from Jest to Vitest, the Qase reporter API is fully compatible:
+If you're migrating from Jest to Vitest, the Qase helpers differ: IDs are set with `addQaseId()` and metadata methods are called on the `qase` object passed by `withQase()`:
 
 **Jest code:**
 
@@ -236,18 +242,16 @@ test(qase(1, 'Test'), async () => {
 });
 ```
 
-**Vitest code (same API):**
+**Vitest code:**
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { addQaseId, withQase } from 'vitest-qase-reporter/vitest';
 
-test(qase(1, 'Test'), async () => {
+test(addQaseId('Test', [1]), withQase(async ({ qase }) => {
   await qase.step('Step 1', async () => { /* ... */ });
-  qase.attach({ paths: 'file.txt' });
-});
+  await qase.attach({ paths: ['file.txt'] });
+}));
 ```
-
-The only difference is the import statement - everything else remains identical.
 
 ---
 
@@ -278,14 +282,14 @@ The only difference is the import statement - everything else remains identical.
 
 #### Issue: Module not found after installation
 
-**Solution:** Ensure you're importing from the correct package:
+**Solution:** Ensure you're importing the test helpers from the `/vitest` subpath:
 
 ```typescript
 // Correct
-import { qase } from 'vitest-qase-reporter';
+import { addQaseId, withQase } from 'vitest-qase-reporter/vitest';
 
-// Incorrect - no subpath needed
-import { qase } from 'vitest-qase-reporter/vitest';
+// Incorrect - the package has no `qase` export
+import { qase } from 'vitest-qase-reporter';
 ```
 
 #### Issue: Reporter not running

@@ -48,7 +48,7 @@ Set `mode` to `testops_multi` in your Vitest config (e.g. in `vitest.config.ts` 
 Use the `addQaseProjects(name, mapping)` helper from `vitest-qase-reporter/vitest` to build a test name that includes multi-project markers. The reporter parses the title and sets `testops_project_mapping`:
 
 ```typescript
-import { test } from 'vitest';
+import { test, expect } from 'vitest';
 import { addQaseId, addQaseProjects } from 'vitest-qase-reporter/vitest';
 
 // Single project (legacy)
@@ -74,6 +74,18 @@ test(addQaseProjects('checkout', { PROJ1: [10, 11], PROJ2: [20] }), async () => 
 - Multiple IDs per project: `test(addQaseProjects('test name', { PROJ1: [10, 11], PROJ2: [20] }), () => { ... })`
 
 Project codes must match `testops_multi.projects[].code` in your config.
+
+`addQaseProjects()` only builds the test name, so it combines with `withQase()` for metadata:
+
+```typescript
+import { test, expect } from 'vitest';
+import { addQaseProjects, withQase } from 'vitest-qase-reporter/vitest';
+
+test(addQaseProjects('login flow', { PROJ1: [100], PROJ2: [200] }), withQase(async ({ qase }) => {
+  await qase.fields({ severity: 'critical' });
+  expect(true).toBe(true);
+}));
+```
 
 ---
 

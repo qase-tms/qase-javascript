@@ -11,8 +11,6 @@ Test steps provide granular visibility into test execution. Each step is reporte
 - Step name and description
 - Step status (passed/failed)
 - Step duration
-- Attachments (if any)
-- Error details (on failure)
 
 ---
 
@@ -43,7 +41,7 @@ describe('Test suite', function() {
 });
 ```
 
-**Important:** Mocha steps use `function()` syntax (not arrow functions) to access the test context via `this`. Steps are synchronous.
+**Important:** Tests must use `function()` syntax (not arrow functions) to access the test context via `this`. Steps are synchronous: `this.step()` does not await its callback, so do async work outside the step body.
 
 ### Step Parameters
 
@@ -72,29 +70,7 @@ describe('Test suite', function() {
 
 ## Nested Steps
 
-Create hierarchical step structures:
-
-```javascript
-const assert = require('assert');
-
-describe('Test suite', function() {
-  it('Test with nested steps', function() {
-    this.step('Complete user registration', function() {
-      this.step('Fill registration form', function() {
-        // Fill form fields
-      });
-
-      this.step('Submit registration', function() {
-        // Click submit button
-      });
-    });
-
-    this.step('Verify registration success', function() {
-      assert.strictEqual(true, true);
-    });
-  });
-});
-```
+Nested steps are not supported. `this.step()` records a flat list of steps, and inside a `function () {}` step callback `this` is not the test context.
 
 ---
 
@@ -153,31 +129,7 @@ this.step(
 
 ## Steps with Attachments
 
-Attach content to a specific step:
-
-```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
-const assert = require('assert');
-
-describe('Test suite', function() {
-  it('Test with step attachments', function() {
-    this.step('Capture application state', function() {
-      const state = JSON.stringify({ user: 'john', status: 'active' });
-
-      qase.attach({
-        name: 'app-state.json',
-        content: state,
-        contentType: 'application/json',
-      });
-    });
-
-    this.step('Verify state', function() {
-      // Assertions
-      assert.strictEqual(true, true);
-    });
-  });
-});
-```
+Step-level attachments are not supported. `this.attach()` called inside a step body attaches the file to the test result, not to the step. See the [Attachments Guide](ATTACHMENTS.md).
 
 ---
 
@@ -188,8 +140,9 @@ Steps automatically inherit status from execution:
 | Execution | Step Status |
 |-----------|-------------|
 | Completes normally | Passed |
-| Throws Error/AssertionError | Failed |
-| Other exception | Invalid |
+| Throws any error | Failed |
+
+The reporter catches the error thrown inside a step: the step is reported as failed, but the error is not rethrown, so the Mocha test itself does not fail because of it.
 
 ---
 
@@ -284,27 +237,20 @@ describe('Authentication', function() {
 
 ```javascript
 const assert = require('assert');
-const fetch = require('node-fetch');
 
 describe('API tests', function() {
-  it('API returns correct user data', function() {
-    let response;
-
-    this.step('Send GET request to /api/users/1', function() {
-      response = fetch('https://api.example.com/users/1');
-    });
+  it('API returns correct user data', async function() {
+    // Steps are synchronous, so await requests outside the step body
+    const response = await fetch('https://api.example.com/users/1');
+    const data = await response.json();
 
     this.step('Verify response status is 200', function() {
-      response.then(res => {
-        assert.strictEqual(res.status, 200);
-      });
+      assert.strictEqual(response.status, 200);
     });
 
     this.step('Verify response contains user data', function() {
-      response.then(res => res.json()).then(data => {
-        assert.strictEqual(data.id, 1);
-        assert.ok(data.name);
-      });
+      assert.strictEqual(data.id, 1);
+      assert.ok(data.name);
     });
   });
 });
@@ -326,12 +272,6 @@ describe('User tests', function() {
     });
   });
 
-  afterEach(function() {
-    this.step('Cleanup: Delete test user', function() {
-      // Remove user from database
-    });
-  });
-
   it('Test user operations', function() {
     this.step('Perform user action', function() {
       // Test logic
@@ -340,6 +280,8 @@ describe('User tests', function() {
   });
 });
 ```
+
+Steps recorded in `beforeEach` are reported with the test. `afterEach` hooks run after the test result has been built, so steps recorded there are not reported.
 
 ---
 
@@ -368,26 +310,9 @@ it('Test', function() {
 });
 ```
 
-### Nested Steps Flattened
+### Steps Reported as Passed Too Early
 
-Ensure you're using the synchronous callbacks correctly for nesting:
-
-```javascript
-// Correct: Nested callbacks
-this.step('Parent step', function() {
-  this.step('Child step', function() {
-    // Child step logic
-  });
-});
-
-// Incorrect: Sequential, not nested
-this.step('Step 1', function() {
-  // Step 1 logic
-});
-this.step('Step 2', function() {  // Not nested under Step 1
-  // Step 2 logic
-});
-```
+`this.step()` does not await its callback. An `async` step body returns immediately, so the step is recorded as passed before the awaited work finishes, and errors thrown after the first `await` are not attributed to the step. Keep step bodies synchronous.
 
 ### Step Duration Shows 0
 

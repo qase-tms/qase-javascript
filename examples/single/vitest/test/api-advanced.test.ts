@@ -102,9 +102,7 @@ describe("Advanced Qase Features", () => {
   }));
 
   test.skip(addQaseId("Authentication endpoint placeholder", [14]), () => {
-    qase.ignore();
-    // This test is intentionally skipped to demonstrate qase.ignore()
+    // Intentionally skipped: reported to Qase with the skipped status.
     // Future feature: test OAuth authentication flow
-    // Note: qase.ignore() is NOT async, unlike other qase methods
   });
 });

@@ -235,7 +235,7 @@ test('This test runs but is not reported', async ({ page }) => {
 
 ## Muting Tests
 
-Mark a test as muted. Muted tests are reported but do not affect the test run status:
+Mark a test as muted. The test is still reported, and its result is sent to Qase as muted, the same as setting the `muted` field to `'true'`. The test case itself is not muted:
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -243,7 +243,7 @@ import { qase } from 'playwright-qase-reporter';
 
 test(qase(1, 'Known failing test'), async ({ page }) => {
   qase.mute();
-  expect(false).toBe(true); // This failure won't affect the run status
+  expect(false).toBe(true); // Reported to Qase as a muted result
 });
 ```
 

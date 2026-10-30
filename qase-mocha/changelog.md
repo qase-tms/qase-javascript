@@ -4,6 +4,10 @@
 
 - `this.mute()` is now available in Mocha test context and marks the test result as muted in Qase, the same as `this.fields({ muted: 'true' })`. Previously the documented mute call threw `mute is not a function`; the usage docs now show `this.mute()`. Bumped `qase-javascript-commons` pin to `~2.9.7`.
 
+## Fixed
+
+- The docs, README and examples now use the real API. `mocha-qase-reporter/mocha` exports only `qase(id, name)` and `qase.projects()`; metadata methods (`this.title()`, `this.fields()`, `this.step()`, `this.attach()` and so on) live on the test context and need `function () {}` tests. The docs called them on the exported `qase`, where they throw `is not a function`. They also no longer describe nested steps, step-level attachments, awaited async steps or metadata set in `after`/`afterEach` hooks, none of which the reporter supports.
+
 # mocha-qase-reporter@1.6.0
 
 ## Added

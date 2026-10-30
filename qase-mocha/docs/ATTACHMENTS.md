@@ -13,9 +13,7 @@ Qase Mocha Reporter supports attaching various types of content to test results:
 - **Logs** — Attach text logs or console output
 - **Binary data** — Attach any binary content from memory
 
-Attachments can be added to:
-- **Test cases** — Visible in the overall test result
-- **Test steps** — Visible in specific step results
+Attachments are added to the test result. Call `this.attach()` inside a test declared with `function () {}`: the method lives on the Mocha test context and is not available in arrow functions.
 
 ---
 
@@ -24,12 +22,11 @@ Attachments can be added to:
 ### From File Path
 
 ```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
 const assert = require('assert');
 
 describe('Attachment tests', function() {
   it('Test with file attachment', function() {
-    qase.attach({ paths: './test/fixtures/test-file.txt' });
+    this.attach({ paths: './test/fixtures/test-file.txt' });
 
     assert.strictEqual(1, 1);
   });
@@ -39,12 +36,11 @@ describe('Attachment tests', function() {
 ### Multiple Files
 
 ```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
 const assert = require('assert');
 
 describe('Attachment tests', function() {
   it('Test with multiple attachments', function() {
-    qase.attach({
+    this.attach({
       paths: [
         './test/fixtures/file1.txt',
         './test/fixtures/file2.log',
@@ -64,12 +60,11 @@ describe('Attachment tests', function() {
 ### Text Content
 
 ```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
 const assert = require('assert');
 
 describe('Attachment tests', function() {
   it('Test with text attachment', function() {
-    qase.attach({
+    this.attach({
       name: 'log.txt',
       content: 'Test execution log content',
       contentType: 'text/plain',
@@ -83,7 +78,6 @@ describe('Attachment tests', function() {
 ### Binary Content (Screenshots)
 
 ```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
 const fs = require('fs');
 const assert = require('assert');
 
@@ -91,7 +85,7 @@ describe('Attachment tests', function() {
   it('Test with binary attachment', function() {
     const screenshot = fs.readFileSync('./test/fixtures/screenshot.png');
 
-    qase.attach({
+    this.attach({
       name: 'screenshot.png',
       content: screenshot,
       contentType: 'image/png',
@@ -105,7 +99,6 @@ describe('Attachment tests', function() {
 ### JSON Data
 
 ```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
 const assert = require('assert');
 
 describe('Attachment tests', function() {
@@ -116,7 +109,7 @@ describe('Attachment tests', function() {
       timestamp: new Date().toISOString(),
     };
 
-    qase.attach({
+    this.attach({
       name: 'test-data.json',
       content: JSON.stringify(data, null, 2),
       contentType: 'application/json',
@@ -131,42 +124,13 @@ describe('Attachment tests', function() {
 
 ## Attaching to Steps
 
-Attach content to a specific test step:
-
-```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
-const assert = require('assert');
-
-describe('Step attachment tests', function() {
-  it('Test with step attachments', function() {
-    qase.step('Initialize test data', () => {
-      const testData = { user: 'testuser', role: 'admin' };
-
-      qase.attach({
-        name: 'init-data.json',
-        content: JSON.stringify(testData, null, 2),
-        contentType: 'application/json',
-      });
-    });
-
-    qase.step('Execute test', () => {
-      qase.attach({
-        name: 'execution-log.txt',
-        content: 'Test execution completed successfully',
-        contentType: 'text/plain',
-      });
-
-      assert.strictEqual(1, 1);
-    });
-  });
-});
-```
+Step-level attachments are not supported. `this.attach()` called inside a step body attaches the content to the test result.
 
 ---
 
 ## Method Reference
 
-### `qase.attach()`
+### `this.attach()`
 
 Attach content to the test case.
 
@@ -174,23 +138,15 @@ Attach content to the test case.
 |-----------|------|----------|-------------|
 | `paths` | `string` or `string[]` | No* | Path(s) to file(s) to attach |
 | `content` | `string` or `Buffer` | No* | Content to attach |
-| `name` | `string` | No | Custom filename (auto-detected from path) |
-| `contentType` | `string` | No | MIME type (auto-detected from extension) |
+| `name` | `string` | No | Filename for `content` attachments (`paths` attachments use the file's basename) |
+| `contentType` | `string` | No | MIME type for `content` attachments, defaults to `text/plain` (`paths` attachments detect it from the extension) |
 
 \* Either `paths` or `content` must be provided, but not both.
 
-**CommonJS:**
 ```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
-
-qase.attach({ paths: './path/to/file.txt' });
-```
-
-**ES Modules:**
-```javascript
-import { qase } from 'mocha-qase-reporter/mocha';
-
-qase.attach({ paths: './path/to/file.txt' });
+it('Test with attachment', function() {
+  this.attach({ paths: './path/to/file.txt' });
+});
 ```
 
 ---
@@ -223,7 +179,6 @@ For other file types, specify `contentType` explicitly.
 ### Debug Logs
 
 ```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
 const assert = require('assert');
 
 describe('Debug logging', function() {
@@ -235,7 +190,7 @@ describe('Debug logging', function() {
       'Test completed successfully'
     ];
 
-    qase.attach({
+    this.attach({
       name: 'debug.log',
       content: debugLogs.join('\n'),
       contentType: 'text/plain',
@@ -249,7 +204,6 @@ describe('Debug logging', function() {
 ### File Attachments
 
 ```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
 const fs = require('fs');
 const assert = require('assert');
 
@@ -260,7 +214,7 @@ describe('File attachment tests', function() {
 
     fs.writeFileSync(filePath, reportData);
 
-    qase.attach({ paths: filePath });
+    this.attach({ paths: filePath });
 
     assert.strictEqual(1, 1);
 
@@ -273,7 +227,6 @@ describe('File attachment tests', function() {
 ### API Testing Logs
 
 ```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
 const assert = require('assert');
 
 describe('API tests', function() {
@@ -281,7 +234,7 @@ describe('API tests', function() {
     const response = await fetch('https://api.example.com/users');
     const data = await response.json();
 
-    qase.attach({
+    this.attach({
       name: 'api-response.json',
       content: JSON.stringify(data, null, 2),
       contentType: 'application/json',

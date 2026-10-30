@@ -152,7 +152,7 @@ await qase.step(
 
 ## Steps with Attachments
 
-Attach content to a specific step:
+You can call `qase.attach()` inside a step. The Vitest reporter does not link attachments to individual steps, so the attachment is added to the test result:
 
 ```typescript
 import { describe, test, expect } from 'vitest';
@@ -163,7 +163,7 @@ describe('Test suite', () => {
     await qase.step('Capture application state', async () => {
       const state = JSON.stringify({ user: 'john', status: 'active' });
 
-      qase.attach({
+      await qase.attach({
         name: 'app-state.json',
         content: state,
         type: 'application/json',
@@ -198,6 +198,7 @@ Steps automatically inherit status from execution:
 Each step should represent a single action:
 
 ```typescript
+// Inside a withQase(async ({ qase }) => { ... }) callback
 // Good: One action per step
 await qase.step('Navigate to login page', async () => {
   // Navigation logic
@@ -216,6 +217,7 @@ await qase.step('Fill form and submit', async () => {  // Too broad
 ### Use Descriptive Names
 
 ```typescript
+// Inside a withQase(async ({ qase }) => { ... }) callback
 // Good: Clear action description
 await qase.step('Verify user is redirected to dashboard', async () => {
   expect(window.location.pathname).toBe('/dashboard');
@@ -230,6 +232,7 @@ await qase.step('Check page', async () => {
 ### Include Context in Step Names
 
 ```typescript
+// Inside a withQase(async ({ qase }) => { ... }) callback
 // Good: Include relevant context
 await qase.step(`Add product '${productName}' to cart`, async () => {
   await addToCart(productName);
@@ -249,10 +252,10 @@ await qase.step('Add product', async () => {
 
 ```typescript
 import { describe, test, expect } from 'vitest';
-import { withQase } from 'vitest-qase-reporter/vitest';
+import { withQase, type QaseWrapper } from 'vitest-qase-reporter/vitest';
 
 class LoginPage {
-  async login(qase, username: string, password: string) {
+  async login(qase: QaseWrapper, username: string, password: string) {
     await qase.step(`Enter username: ${username}`, async () => {
       // Fill username field
     });
@@ -341,11 +344,12 @@ describe('User tests', () => {
 ### Steps Not Appearing
 
 1. Verify you're using `withQase` wrapper for tests with steps
-2. Check that steps are executed within a test context with `Qase` parameter
+2. Check that `qase.step()` is called on the `qase` object passed to the `withQase()` callback
 3. Enable debug logging to trace step recording
 4. **Ensure you're using `await` with async step callbacks** - Missing `await` is the most common issue
 
 ```typescript
+// Inside a withQase(async ({ qase }) => { ... }) callback
 // Incorrect: Missing await
 qase.step('Step name', async () => {  // Step won't be recorded properly
   // Logic
@@ -362,6 +366,7 @@ await qase.step('Step name', async () => {
 Ensure you're using the async callbacks correctly for nesting:
 
 ```typescript
+// Inside a withQase(async ({ qase }) => { ... }) callback
 // Correct: Nested callbacks
 await qase.step('Parent step', async () => {
   await qase.step('Child step', async () => {

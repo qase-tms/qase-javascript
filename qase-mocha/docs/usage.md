@@ -66,14 +66,14 @@ To send test results to multiple Qase projects simultaneously, see the [Multi-Pr
 
 ## Adding Title
 
+> **Note:** `mocha-qase-reporter/mocha` exports only `qase(id, name)` and `qase.projects(mapping, name)`. Metadata methods (`title`, `fields`, `suite`, `ignore`, `mute`, `attach`, `comment`, `parameters`, `groupParameters`, `tags`, `step`) are added to the Mocha test context, so call them as `this.<method>()` inside tests declared with `function () {}`. Arrow functions do not receive the Mocha context.
+
 Set a custom title for the test case (overrides auto-generated title):
 
 ```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
-
 describe('Login Tests', function() {
   it('login test', function() {
-    qase.title('User successfully logs in with valid credentials');
+    this.title('User successfully logs in with valid credentials');
 
     const user = login('user@example.com', 'password123');
     expect(user).to.exist;
@@ -101,11 +101,9 @@ Add metadata to your test cases using fields. Both system and custom fields are 
 ### Example
 
 ```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
-
 describe('User Management', function() {
   it('create new user', function() {
-    qase.fields({
+    this.fields({
       severity: 'critical',
       priority: 'high',
       layer: 'api',
@@ -130,11 +128,9 @@ Organize tests into suites and sub-suites:
 ### Simple Suite
 
 ```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
-
 describe('Payment Tests', function() {
   it('process payment', function() {
-    qase.suite('API Tests / Payment');
+    this.suite('API Tests / Payment');
 
     const payment = processPayment({ amount: 100, currency: 'USD' });
     expect(payment.status).to.equal('success');
@@ -147,7 +143,7 @@ describe('Payment Tests', function() {
 ```javascript
 describe('User Tests', function() {
   it('user registration', function() {
-    qase.suite('API Tests\\User Management\\Registration');
+    this.suite('API Tests\\User Management\\Registration');
 
     const user = registerUser('newuser@example.com', 'SecurePass123');
     expect(user.verified).to.be.false;
@@ -162,11 +158,9 @@ describe('User Tests', function() {
 Exclude a test from Qase reporting. The test still executes, but results are not sent to Qase:
 
 ```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
-
 describe('Feature Tests', function() {
   it('test under development', function() {
-    qase.ignore();
+    this.ignore();
 
     const result = testNewFeature();
     expect(result).to.be.true;
@@ -178,7 +172,7 @@ describe('Feature Tests', function() {
 
 ## Muting Tests
 
-Mark a test as muted. Muted tests are reported but do not affect the test run status:
+Mark a test as muted. The test is still reported, and its result is sent to Qase as muted, the same as setting the `muted` field to `'true'`. The test case itself is not muted:
 
 ```javascript
 describe('Known Issues', function() {
@@ -200,11 +194,9 @@ Attach files, screenshots, logs, and other content to your test results.
 ### Attach File from Path
 
 ```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
-
 describe('File Processing Tests', function() {
   it('process document', function() {
-    qase.attach({ paths: './fixtures/document.pdf' });
+    this.attach({ paths: './fixtures/document.pdf' });
 
     const result = processDocument('./fixtures/document.pdf');
     expect(result.success).to.be.true;
@@ -216,7 +208,7 @@ describe('File Processing Tests', function() {
 
 ```javascript
 it('test with multiple attachments', function() {
-  qase.attach({
+  this.attach({
     paths: [
       './fixtures/config.json',
       './fixtures/data.csv',
@@ -241,7 +233,7 @@ it('test with log attachment', function() {
     Step 4: Clean up
   `;
 
-  qase.attach({
+  this.attach({
     name: 'execution.log',
     content: testLog,
     contentType: 'text/plain',
@@ -264,7 +256,7 @@ it('API test with response data', function() {
     },
   };
 
-  qase.attach({
+  this.attach({
     name: 'api-response.json',
     content: JSON.stringify(response, null, 2),
     contentType: 'application/json',
@@ -302,21 +294,19 @@ Define test steps for detailed reporting in Qase.
 Mocha steps use synchronous callbacks:
 
 ```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
-
 describe('Shopping Cart', function() {
   it('add item to cart', function() {
-    qase.step('Navigate to product page', function() {
+    this.step('Navigate to product page', () => {
       const page = navigateTo('/products/laptop');
       expect(page.loaded).to.be.true;
     });
 
-    qase.step('Add product to cart', function() {
+    this.step('Add product to cart', () => {
       const result = addToCart('laptop-123');
       expect(result.success).to.be.true;
     });
 
-    qase.step('Verify cart count', function() {
+    this.step('Verify cart count', () => {
       const cartCount = getCartItemCount();
       expect(cartCount).to.equal(1);
     });
@@ -326,47 +316,24 @@ describe('Shopping Cart', function() {
 
 ### Nested Steps
 
-```javascript
-it('complete checkout process', function() {
-  qase.step('Add items to cart', function() {
-    qase.step('Add first item', function() {
-      addToCart('laptop-123');
-    });
-
-    qase.step('Add second item', function() {
-      addToCart('mouse-456');
-    });
-  });
-
-  qase.step('Complete checkout', function() {
-    qase.step('Enter shipping info', function() {
-      setShippingAddress('123 Main St');
-    });
-
-    qase.step('Submit payment', function() {
-      const result = submitPayment({ cardNumber: '4242424242424242' });
-      expect(result.success).to.be.true;
-    });
-  });
-});
-```
+Nested steps are not supported: `this.step()` records a flat list, so a step called inside another step is reported as a separate top-level step.
 
 ### Steps with Expected Result
 
 ```javascript
 it('form validation test', function() {
-  qase.step(
+  this.step(
     'Enter invalid email',
-    function() {
+    () => {
       const result = validateEmail('invalid-email');
       expect(result.valid).to.be.false;
     },
     'Validation should fail for invalid email format',
   );
 
-  qase.step(
+  this.step(
     'Verify error message',
-    function() {
+    () => {
       const error = getValidationError();
       expect(error).to.equal('Please enter a valid email');
     },
@@ -386,8 +353,6 @@ Report parameterized test data to Qase.
 ### Basic Parameterized Test
 
 ```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
-
 describe('Login with different users', function() {
   const users = [
     { username: 'admin', password: 'admin123', role: 'admin' },
@@ -397,7 +362,7 @@ describe('Login with different users', function() {
 
   users.forEach(function(user) {
     it(`login as ${user.role}`, function() {
-      qase.parameters({
+      this.parameters({
         username: user.username,
         role: user.role,
       });
@@ -418,12 +383,12 @@ describe('Cross-environment tests', function() {
 
   environments.forEach(function(env) {
     it(`test in ${env}`, function() {
-      qase.parameters({
+      this.parameters({
         environment: env,
         baseUrl: getBaseUrl(env),
       });
 
-      qase.groupParameters({
+      this.groupParameters({
         'Test Group': 'Environment Testing',
         'Priority': 'High',
       });
@@ -452,31 +417,18 @@ For detailed configuration, examples, and troubleshooting, see the [Multi-Projec
 Integrate Qase reporting with Mocha's before/after hooks:
 
 ```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
-
 describe('Test Suite with Hooks', function() {
   before(function() {
-    qase.comment('Suite-level setup: Database initialized with test data');
     initializeDatabase();
   });
 
   after(function() {
-    qase.comment('Suite-level teardown: Test data cleaned up');
     cleanupDatabase();
   });
 
   beforeEach(function() {
     resetState();
-  });
-
-  afterEach(function() {
-    if (this.currentTest.state === 'failed') {
-      qase.attach({
-        name: 'failure-log.txt',
-        content: `Test failed: ${this.currentTest.title}`,
-        contentType: 'text/plain',
-      });
-    }
+    this.comment('Database state reset before test');
   });
 
   it('test with hooks', function() {
@@ -484,6 +436,8 @@ describe('Test Suite with Hooks', function() {
   });
 });
 ```
+
+> Metadata set in `before`/`beforeEach` hooks is applied to the next test that finishes. `after`/`afterEach` hooks run after the test result has been built, so metadata set there (for example, an attachment on failure) is not reported.
 
 ### BDD Interface Example
 
@@ -493,7 +447,7 @@ const { qase } = require('mocha-qase-reporter/mocha');
 describe('User Authentication', function() {
   describe('Login', function() {
     it(qase(1, 'should allow valid user to login'), function() {
-      qase.fields({
+      this.fields({
         severity: 'critical',
         layer: 'e2e',
       });
@@ -503,7 +457,7 @@ describe('User Authentication', function() {
     });
 
     it(qase(2, 'should reject invalid credentials'), function() {
-      qase.fields({
+      this.fields({
         severity: 'critical',
         layer: 'e2e',
       });
@@ -523,7 +477,7 @@ const { qase } = require('mocha-qase-reporter/mocha');
 
 suite('User Management', function() {
   test(qase(10, 'createUser returns new user object'), function() {
-    qase.fields({
+    this.fields({
       layer: 'unit',
       priority: 'high',
     });
@@ -563,15 +517,11 @@ describe('API Endpoint Tests', function() {
 ### Root-Level Hooks
 
 ```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
-
 before(function() {
-  qase.comment('Global setup: Initialize test environment');
   global.testEnv = initializeTestEnvironment();
 });
 
 after(function() {
-  qase.comment('Global teardown: Clean up test environment');
   cleanupTestEnvironment(global.testEnv);
 });
 
@@ -600,7 +550,7 @@ const { expect } = require('chai');
 
 describe('User Service', function() {
   it(qase(30, 'creates user with valid data'), function() {
-    qase.fields({
+    this.fields({
       layer: 'api',
       severity: 'critical',
     });
@@ -619,7 +569,7 @@ describe('User Service', function() {
     expect(user.name).to.equal(userData.name);
     expect(user.role).to.equal(userData.role);
 
-    qase.attach({
+    this.attach({
       name: 'created-user.json',
       content: JSON.stringify(user, null, 2),
       contentType: 'application/json',
@@ -660,7 +610,7 @@ describe('Long Running Operations', function() {
   it(qase(33, 'processes large dataset'), function() {
     this.timeout(10000); // Set timeout for specific test
 
-    qase.parameters({
+    this.parameters({
       timeout: '10000ms',
       datasetSize: 'large',
     });
@@ -669,7 +619,7 @@ describe('Long Running Operations', function() {
     const result = processLargeDataset();
     const duration = Date.now() - startTime;
 
-    qase.comment(`Processing completed in ${duration}ms`);
+    this.comment(`Processing completed in ${duration}ms`);
 
     expect(result.processed).to.be.true;
     expect(duration).to.be.below(10000);
@@ -691,7 +641,7 @@ describe('API Endpoint Tests', function() {
 
   endpoints.forEach(function(endpoint) {
     it(qase(endpoint.qaseId, `${endpoint.method} ${endpoint.path} returns 200`), function() {
-      qase.parameters({
+      this.parameters({
         method: endpoint.method,
         path: endpoint.path,
       });
@@ -699,7 +649,7 @@ describe('API Endpoint Tests', function() {
       const response = request(endpoint.method, endpoint.path);
       expect(response.statusCode).to.equal(200);
 
-      qase.attach({
+      this.attach({
         name: `${endpoint.method}-${endpoint.path.replace('/', '')}.json`,
         content: JSON.stringify(response.body, null, 2),
         contentType: 'application/json',
@@ -716,14 +666,12 @@ const { qase } = require('mocha-qase-reporter/mocha');
 
 describe('Async Operations', function() {
   it(qase(50, 'fetches user data asynchronously'), async function() {
-    qase.step('Fetch user from API', function() {
-      // Step implementation
-    });
-
     const user = await fetchUserAsync(1);
 
-    expect(user).to.exist;
-    expect(user.id).to.equal(1);
+    this.step('Verify fetched user', () => {
+      expect(user).to.exist;
+      expect(user.id).to.equal(1);
+    });
   });
 });
 ```
@@ -733,7 +681,7 @@ describe('Async Operations', function() {
 ```javascript
 describe('Error Scenarios', function() {
   it(qase(51, 'handles invalid input gracefully'), function() {
-    qase.fields({
+    this.fields({
       severity: 'major',
       layer: 'unit',
     });
@@ -742,7 +690,7 @@ describe('Error Scenarios', function() {
       const result = processInput(null);
       expect.fail('Should have thrown an error');
     } catch (error) {
-      qase.attach({
+      this.attach({
         name: 'error-details.txt',
         content: error.stack,
         contentType: 'text/plain',
@@ -757,7 +705,6 @@ describe('Error Scenarios', function() {
 ### Data-Driven Testing with CSV
 
 ```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
 const fs = require('fs');
 const path = require('path');
 
@@ -769,10 +716,10 @@ describe('Email Validation', function() {
     const [email, expected] = row.split(',');
 
     it(`validates email: ${email}`, function() {
-      qase.parameters({
+      this.parameters({
         email: email,
         expected: expected,
-        row: index + 2,
+        row: String(index + 2),
       });
 
       const result = validateEmail(email.trim());
@@ -797,19 +744,19 @@ describe('Database Operations', function() {
   });
 
   it(qase(60, 'inserts record into database'), function() {
-    qase.step('Insert user record', function() {
+    this.step('Insert user record', () => {
       const user = { email: 'dbuser@example.com', name: 'DB User' };
       const insertId = db.insert('users', user);
 
-      qase.parameters({
-        insertId: insertId,
+      this.parameters({
+        insertId: String(insertId),
         table: 'users',
       });
 
       expect(insertId).to.be.a('number');
     });
 
-    qase.step('Verify record exists', function() {
+    this.step('Verify record exists', () => {
       const user = db.findOne('users', { email: 'dbuser@example.com' });
       expect(user).to.exist;
       expect(user.name).to.equal('DB User');
@@ -1014,20 +961,20 @@ npx mocha --reporter mocha-qase-reporter
 
 ### This Context Issues with Arrow Functions
 
-**Issue:** Cannot access `Qase` methods when using arrow functions.
+**Issue:** `this.title is not a function` (or similar) when using arrow functions.
 
 **Solution:** Use regular `function()` syntax (not arrow functions) for Mocha tests:
 
 ```javascript
 // Correct
 it('test', function() {
-  qase.title('Title');
+  this.title('Title');
   expect(true).to.be.true;
 });
 
 // Incorrect - arrow function loses this context
 it('test', () => {
-  qase.title('Title'); // May not work
+  this.title('Title'); // Fails: no Mocha test context
   expect(true).to.be.true;
 });
 ```
@@ -1106,10 +1053,10 @@ const { qase } = require('mocha-qase-reporter');
 
 **Issue:** Step definitions not appearing in test results.
 
-**Solution:** Ensure you're using `qase.step()` with proper syntax:
+**Solution:** Call `this.step()` from a `function () {}` test and keep the step body synchronous. `this.step()` does not await its callback, so an `async` step body is not tracked:
 
 ```javascript
-qase.step('Step name', function() {
+this.step('Step name', () => {
   // Step implementation
 });
 ```
@@ -1121,44 +1068,47 @@ qase.step('Step name', function() {
 ### Full Test Example
 
 ```javascript
-const { qase } = require('mocha-qase-reporter');
+const { qase } = require('mocha-qase-reporter/mocha');
 
 describe('Complete Example', function() {
   it(qase([1, 2], 'Comprehensive test with all features'), async function() {
     // Set metadata
-    qase.title('User can complete full registration flow');
-    qase.suite('Registration\tEnd-to-End');
-    qase.fields({
+    this.title('User can complete full registration flow');
+    this.suite('Registration\tEnd-to-End');
+    this.fields({
       severity: 'critical',
       priority: 'high',
       layer: 'e2e',
       description: 'Tests complete user registration flow from start to finish',
       preconditions: 'Application is running and database is accessible',
     });
-    qase.parameters({
+    this.parameters({
       Browser: 'Chrome',
       Environment: 'staging',
     });
 
-    // Execute test with steps
-    await qase.step('Navigate to registration page', async function() {
-      // Navigation logic
-      qase.attach({
-        name: 'page-load.txt',
-        content: 'Page loaded successfully',
-        contentType: 'text/plain',
-      });
+    // Steps are synchronous: do async work outside the step body
+    await openRegistrationPage();
+
+    this.step('Navigate to registration page', () => {
+      // Navigation checks
     });
 
-    await qase.step('Fill registration form', async function() {
+    this.attach({
+      name: 'page-load.txt',
+      content: 'Page loaded successfully',
+      contentType: 'text/plain',
+    });
+
+    this.step('Fill registration form', () => {
       // Form filling logic
     });
 
-    await qase.step('Submit form', async function() {
+    this.step('Submit form', () => {
       // Submit logic
     });
 
-    await qase.step('Verify email confirmation', async function() {
+    this.step('Verify email confirmation', () => {
       // Verification logic
     });
   });

@@ -241,7 +241,7 @@ Cucumber does not support ignore functionality via tags. Filter tests using stan
 
 ## Muting Tests
 
-Mark a test as muted. Muted tests are reported but do not affect the test run status.
+Mark a test as muted. The test is still reported, and its result is sent to Qase as muted, the same as setting the `muted` field to `'true'`. The test case itself is not muted.
 
 ### Mocha/Jasmine
 
@@ -250,7 +250,7 @@ import { qase } from 'wdio-qase-reporter';
 
 it(qase(1, 'Known failing test'), () => {
   qase.mute();
-  expect(false).to.equal(true); // This failure won't affect the run status
+  expect(false).to.equal(true); // Reported to Qase as a muted result
 });
 ```
 

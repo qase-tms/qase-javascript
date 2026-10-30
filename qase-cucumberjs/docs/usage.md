@@ -189,7 +189,7 @@ Feature: User Authentication
 
 ## Muting Tests
 
-Mark a scenario as muted using the `@QaseMuted` tag. Muted tests are reported but do not affect the test run status:
+Mark a scenario as muted using the `@QaseMuted` tag. The scenario is still reported, and its result is sent to Qase as muted, the same as setting the `muted` field to `'true'`. The test case itself is not muted:
 
 ```gherkin
 Feature: User Authentication

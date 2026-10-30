@@ -99,15 +99,16 @@ This example includes realistic API testing scenarios demonstrating all Qase rep
 | **api-crud.test.ts** | User CRUD operations (GET all, GET by ID, POST create, DELETE) | `qase.title()`, `qase.fields()`, `qase.step()`, `qase.parameters()`, `qase.attach()`, `qase.comment()` |
 | **api-posts.test.ts** | Post validation and filtering (GET all, GET by user, GET with comments) | `qase.title()`, `qase.fields()`, `qase.parameters()`, `qase.step()`, `qase.attach()` |
 | **api-errors.test.ts** | Error handling (404 responses, invalid endpoints) | `qase.title()`, `qase.fields()`, `qase.parameters()`, `qase.comment()`, `qase.attach()`, `qase.step()` |
-| **api-advanced.test.ts** | Advanced features (nested steps, suite hierarchy, parameterized tests, ignored tests) | `qase.suite()`, `qase.step()` (nested), `qase.parameters()`, `qase.comment()`, `qase.ignore()` |
+| **api-advanced.test.ts** | Advanced features (nested steps, suite hierarchy, parameterized tests, skipped tests) | `qase.suite()`, `qase.step()` (nested), `qase.parameters()`, `qase.comment()`, `test.skip` |
 
 ## Qase Features Demonstrated
 
-All 9 Qase reporter features are demonstrated in realistic API testing context:
+Qase reporter features are demonstrated in realistic API testing context:
 
 | Feature | Methods/Patterns | Where Used | Notes |
 |---------|-----------------|------------|-------|
-| **Test linking** | Wrap with `withQase()` | All test files | Access to full Qase API |
+| **Test linking** | `addQaseId(name, ids)` | All test files | Links the test to Qase case IDs via its name |
+| **Qase API access** | Wrap with `withQase()` | All test files | Passes the `qase` object to the test |
 | **Custom titles** | `await qase.title()` | All tests | Descriptive test result titles |
 | **Custom fields** | `await qase.fields()` | All tests | Layer, severity, priority metadata |
 | **Suite hierarchy** | `await qase.suite()` | api-advanced.test.ts | Use `\t` separator for nesting |
@@ -115,7 +116,7 @@ All 9 Qase reporter features are demonstrated in realistic API testing context:
 | **Attachments** | `await qase.attach()` | api-crud.test.ts, api-posts.test.ts, api-errors.test.ts | **CRITICAL: use `type` parameter, NOT `contentType`** |
 | **Comments** | `await qase.comment()` | api-crud.test.ts, api-errors.test.ts, api-advanced.test.ts | Additional context for test results |
 | **Parameters** | `await qase.parameters()` | All test files | Test input data and iterations |
-| **Ignore tests** | `qase.ignore()` | api-advanced.test.ts | Mark tests to be excluded (NOT async) |
+| **Skipped tests** | `test.skip` | api-advanced.test.ts | Reported with the skipped status (the Vitest reporter has no `ignore()`) |
 
 ## Vitest-Specific Patterns
 
@@ -139,9 +140,8 @@ All 9 Qase reporter features are demonstrated in realistic API testing context:
    - **Jest/Mocha:** `await qase.attach({ name: 'file.json', content: '...', contentType: 'application/json' })`
    - This is a key difference that will cause errors if wrong parameter is used
 
-4. **Async requirements:** MUST `await` ALL qase methods except `qase.ignore()`
+4. **Async requirements:** MUST `await` ALL qase methods
    - `await qase.title()`, `await qase.fields()`, `await qase.step()`, etc.
-   - `qase.ignore()` is the ONLY synchronous method
 
 5. **Suite hierarchy:** Use `\t` (tab character) as separator
    - Example: `await qase.suite('API Tests\tAdvanced\tRelationships')`
@@ -198,7 +198,7 @@ When running with `QASE_MODE=testops`:
 
 - **Node 18+ required** for native `fetch` API (no external HTTP library needed)
 - **Attachment parameter:** Always use `type:` NOT `contentType:` - this is critical for Vitest
-- **Async/await required:** All qase methods must be awaited except `qase.ignore()`
+- **Async/await required:** All qase methods must be awaited
 - **Internet required:** Tests make real API calls to jsonplaceholder.typicode.com
 - **Faked writes:** POST/PUT/DELETE operations appear successful but don't persist data
 - **TypeScript:** All test files use TypeScript (.test.ts) with full type safety
