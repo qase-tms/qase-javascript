@@ -155,4 +155,25 @@ describe('MetadataApplier', () => {
       expect(t.steps).toHaveLength(1);
     });
   });
+
+  describe('fixes from the 2026-10 audit', () => {
+    const withTest = () => {
+      const storage = new Storage();
+      const result = new TestResultType('t');
+      storage.push(result);
+      return { metadata: new MetadataApplier(storage), result };
+    };
+
+    it('splits a tab-separated suite into nested suites', () => {
+      const { metadata, result } = withTest();
+      metadata.addSuite({ suite: 'Outer\tInner' });
+      expect(result.relations?.suite?.data.map((d) => d.title)).toEqual(['Outer', 'Inner']);
+    });
+
+    it('accepts a single path as a string instead of iterating its characters', () => {
+      const { metadata, result } = withTest();
+      metadata.addAttachment({ paths: '/tmp/report.txt' } as any);
+      expect(result.attachments.map((a) => a.file_name)).toEqual(['report.txt']);
+    });
+  });
 });

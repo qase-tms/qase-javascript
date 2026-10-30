@@ -22,7 +22,7 @@ export interface AddAttachmentEventArgs {
   name?: string;
   type?: string;
   content?: string;
-  paths?: string[];
+  paths?: string | string[];
 }
 
 export interface AddTagsEventArgs {

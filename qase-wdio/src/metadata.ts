@@ -1,4 +1,4 @@
-import { Attachment, getMimeTypes, TestStepType } from 'qase-javascript-commons';
+import { Attachment, getMimeTypes, TestopsProjectMapping, TestStepType } from 'qase-javascript-commons';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import { Storage } from './storage';
@@ -21,6 +21,13 @@ export class MetadataApplier {
     cur.testops_id = ids;
   }
 
+  addProjectMapping(mapping: TestopsProjectMapping): void {
+    const cur = this.storage.getCurrentTest();
+    if (!cur) return;
+    cur.testops_project_mapping = mapping;
+    cur.testops_id = null;
+  }
+
   addTitle({ title }: AddTitleEventArgs): void {
     const cur = this.storage.getCurrentTest();
     if (!cur) return;
@@ -34,9 +41,11 @@ export class MetadataApplier {
   addSuite({ suite }: AddSuiteEventArgs): void {
     const cur = this.storage.getCurrentTest();
     if (!cur) return;
+    // A tab separates nested suites; Gherkin tags cannot hold one, so `\t` is accepted too.
+    const titles = suite.split(/\t|\\t/).map((s) => s.trim()).filter((s) => s.length > 0);
     cur.relations = {
       suite: {
-        data: [{ title: suite, public_id: null }],
+        data: titles.map((title) => ({ title, public_id: null })),
       },
     };
   }
@@ -78,7 +87,7 @@ export class MetadataApplier {
     if (!cur) return;
 
     if (paths) {
-      for (const file of paths) {
+      for (const file of Array.isArray(paths) ? paths : [paths]) {
         const attach: Attachment = {
           file_path: file,
           size: 0,

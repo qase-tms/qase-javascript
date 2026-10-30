@@ -107,7 +107,7 @@ QASE_MODE=testops npm test
 | Parameters | `qase.parameters({key: 'value'})` | Various tests |
 | Attachments | `qase.attach({name, content, type})` | `login.spec.js`, `inventory.spec.js`, `cart.spec.js`, `checkout.spec.js` |
 | Comment | `qase.comment('text')` | All tests |
-| Ignore | `it(qase.ignore(), 'name', async () => {})` | `checkout.spec.js` |
+| Ignore | `qase.ignore()` inside the test | `checkout.spec.js` |
 
 ## WDIO-Specific Patterns
 

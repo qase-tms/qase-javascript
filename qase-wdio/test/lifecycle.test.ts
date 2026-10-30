@@ -114,20 +114,32 @@ describe('TestLifecycle', () => {
   });
 
   describe('attachJSON', () => {
-    it('serializes objects with 2-space indent and labels them text/plain', () => {
+    it('serializes objects with 2-space indent and labels them application/json', () => {
       lifecycle.startTest('t', 'cid');
       lifecycle.attachJSON('payload', { a: 1 });
       const test = storage.getCurrentTest()!;
       expect(test.attachments[0]?.content).toBe('{\n  "a": 1\n}');
-      expect(test.attachments[0]?.mime_type).toBe('text/plain');
+      expect(test.attachments[0]?.mime_type).toBe('application/json');
     });
 
-    it('passes through strings as application/json', () => {
+    // A command result is often a bare string (a URL, element text), which is not JSON.
+    it('passes through strings as text/plain', () => {
       lifecycle.startTest('t', 'cid');
-      lifecycle.attachJSON('payload', '{"already":"json"}');
+      lifecycle.attachJSON('payload', 'https://example.com');
       const test = storage.getCurrentTest()!;
-      expect(test.attachments[0]?.content).toBe('{"already":"json"}');
-      expect(test.attachments[0]?.mime_type).toBe('application/json');
+      expect(test.attachments[0]?.content).toBe('https://example.com');
+      expect(test.attachments[0]?.mime_type).toBe('text/plain');
+    });
+  });
+
+  describe('startTest', () => {
+    it('does not carry ignore and comment over to the next test', () => {
+      lifecycle.startTest('first', 'cid');
+      storage.ignore = true;
+      storage.comment = 'first comment';
+      lifecycle.startTest('second', 'cid');
+      expect(storage.ignore).toBe(false);
+      expect(storage.comment).toBeUndefined();
     });
   });
 });

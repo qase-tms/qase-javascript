@@ -6,6 +6,10 @@ const CartPage = require('../pageobjects/CartPage');
 describe('Cart Management', () => {
   beforeEach(async () => {
     await LoginPage.open();
+    // saucedemo keeps the cart in localStorage; a previous test may have left items in it.
+    await browser.execute(() => window.localStorage.clear());
+    await browser.deleteCookies();
+    await LoginPage.open();
     await LoginPage.login('standard_user', 'secret_sauce');
     await browser.waitUntil(
       async () => (await browser.getUrl()).includes('/inventory.html'),
@@ -36,7 +40,7 @@ describe('Cart Management', () => {
 
     await qase.step('Verify product is in cart', async () => {
       await expect(CartPage.pageTitle).toHaveText('Your Cart');
-      await expect(CartPage.itemName).toHaveTextContaining('Backpack');
+      await expect(CartPage.itemName).toHaveText(expect.stringContaining('Backpack'));
     });
 
     const cartState = {

@@ -51,7 +51,7 @@ describe('Multi-project Login Scenarios', () => {
 
     await qase.step('Verify error message is displayed', async () => {
       await expect($('[data-test="error"]')).toBeDisplayed();
-      await expect($('[data-test="error"]')).toHaveTextContaining('Username and password do not match');
+      await expect($('[data-test="error"]')).toHaveText(expect.stringContaining('Username and password do not match'));
     });
 
     qase.comment('Error message correctly displayed — tracked in both projects');
@@ -93,7 +93,7 @@ describe('Multi-project Cart Scenarios', () => {
     });
 
     await qase.step('Verify product is in cart', async () => {
-      await expect($('.cart_item .inventory_item_name')).toHaveTextContaining('Backpack');
+      await expect($('.cart_item .inventory_item_name')).toHaveText(expect.stringContaining('Backpack'));
     });
 
     qase.comment('Product added to cart — reported to both projects');
@@ -144,7 +144,7 @@ describe('Multi-project Cart Scenarios', () => {
     });
 
     await qase.step('Verify order completion', async () => {
-      await expect($('.complete-header')).toHaveTextContaining('Thank you');
+      await expect($('.complete-header')).toHaveText(expect.stringContaining('Thank you'));
     });
 
     qase.attach({

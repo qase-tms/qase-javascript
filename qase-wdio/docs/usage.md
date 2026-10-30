@@ -95,7 +95,7 @@ it('Login test', () => {
 
 ```gherkin
 @QaseId=1
-@Title=User can successfully log in with valid credentials
+@QaseTitle=User_can_log_in_with_valid_credentials
 Scenario: Login test
   Given I am on the login page
 ```
@@ -182,10 +182,12 @@ it('Test with nested suite', () => {
 
 ```gherkin
 @QaseId=1
-@Suite=Authentication
+@QaseSuite=Authentication\tLogin
 Scenario: Login test
   Given I am on the login page
 ```
+
+`\t` separates nested suites.
 
 ---
 
@@ -235,7 +237,11 @@ it('Ignored test', () => {
 
 ### Cucumber
 
-Cucumber does not support ignore functionality via tags. Filter tests using standard Cucumber tag filtering.
+```gherkin
+@QaseIgnore
+Scenario: Not reported to Qase
+  Given I am on the login page
+```
 
 ---
 
@@ -498,8 +504,8 @@ exports.config = {
 Feature: User Authentication
 
   @QaseId=1
-  @Title=User can log in with valid credentials
-  @Suite=Authentication
+  @QaseTitle=User_can_log_in_with_valid_credentials
+  @QaseSuite=Authentication
   Scenario: Successful login
     Given I am on the login page
     When I enter email "user@example.com"
@@ -516,9 +522,20 @@ Feature: User Authentication
 
 ### Supported Cucumber Tags
 
-- `@QaseId=<id>` - Set Qase test case ID(s). Multiple IDs separated by commas: `@QaseId=1,2,3`
-- `@Title=<title>` - Set custom test title
-- `@Suite=<suite>` - Set test suite name
+Tag names are case-insensitive. Gherkin does not allow whitespace inside a tag, so a value cannot contain spaces: a feature file with `@QaseTitle=Log in` fails to parse.
+
+| Tag | Effect |
+|-----|--------|
+| `@QaseId=1,2` or `@Q-1`, `@Q1` | Link the scenario to test case IDs |
+| `@qaseid.PROJ1(1,2)` | Link to test cases in a specific project (`testops_multi` mode) |
+| `@QaseTitle=<title>` (or `@Title=<title>`) | Set the result title |
+| `@QaseSuite=<suite>` (or `@Suite=<suite>`) | Set the suite; `\t` separates nested suites |
+| `@QaseTags=a,b` (or `@Tags=a,b`) | Add tags to the result |
+| `@QaseFields={'severity':'critical'}` | Set fields (JSON; single quotes are allowed) |
+| `@QaseParameters={'browser':'chrome'}` | Set parameters |
+| `@QaseGroupParameters={'env':'staging','region':'eu'}` | Set group parameters |
+| `@QaseIgnore` | Do not report the scenario |
+| `@QaseMuted` | Report the result as muted |
 
 ### Cucumber Step Definitions
 
@@ -678,7 +695,7 @@ npx wdio run wdio.conf.js
    ```json
    {
      "debug": true,
-     "mode": "TestOps"
+     "mode": "testops"
    }
    ```
 
@@ -726,15 +743,15 @@ npx wdio run wdio.conf.js
    };
    ```
 
-2. **Check tag syntax:**
+2. **Check tag syntax:** a tag needs `=` and no whitespace. The tag name itself is case-insensitive, so `@QaseId=1`, `@QaseID=1` and `@qaseid=1` are the same.
    ```gherkin
    # Correct
    @QaseId=1
    Scenario: Test
 
    # Incorrect
-   @QaseID=1
-   @qaseId=1
+   @QaseId 1
+   @QaseTitle=Log in
    ```
 
 3. **Ensure framework is set to cucumber:**
@@ -1187,9 +1204,9 @@ Feature: User Authentication
   So I can access my account
 
   @QaseID=1
-  @QaseTitle=User can successfully log in with valid credentials
+  @QaseTitle=User_can_successfully_log_in_with_valid_credentials
   @QaseFields={"severity":"blocker","priority":"high","layer":"e2e"}
-  @QaseSuite=Authentication\tLogin\tHappy Path
+  @QaseSuite=Authentication\tLogin\tHappy_Path
   Scenario: Successful login
     Given I am on the login page
     When I enter username "testuser@example.com"
