@@ -14,13 +14,21 @@ import { MetadataApplier } from './modules/metadataApplier';
  */
 export const METADATA_DIR_ENV = 'QASE_JEST_METADATA_DIR';
 
+/**
+ * The same test file can run at the same time in several Jest `projects`, and nothing in a
+ * worker says which one. The reporter puts the project's id into that project's `globals`, which
+ * Jest installs in every test file's global scope, before the file is sent to a worker.
+ */
+export const PROJECT_GLOBAL = '__qaseJestProjectId';
+
 // Each retry of a test is reported as its own result, so the attempt is part of the key.
 const metadataFile = (dir: string, test: CurrentTest): string => {
-  const key = `${test.testPath}\0${test.testName}\0${test.invocation}`;
+  const key = `${test.project}\0${test.testPath}\0${test.testName}\0${test.invocation}`;
   return join(dir, `${createHash('sha1').update(key).digest('hex')}.json`);
 };
 
 export interface CurrentTest {
+  project: string;
   testPath: string;
   testName: string;
   invocation: number;
@@ -54,16 +62,33 @@ const circusRunningTest = (): CircusTest | null | undefined => {
   return state?.currentlyRunningTest ?? null;
 };
 
+/**
+ * With `injectGlobals: false` there is no global `expect`. Jest's runtime serves `@jest/globals`
+ * itself, without resolving a package, so it is available in every test file.
+ */
+const jestExpect = (): ExpectWithState | undefined => {
+  const injected = (globalThis as { expect?: ExpectWithState }).expect;
+  if (injected) return injected;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    return (require('@jest/globals') as { expect?: ExpectWithState }).expect;
+  } catch {
+    return undefined;
+  }
+};
+
 const currentTest = (): CurrentTest | null => {
-  const state = (globalThis as { expect?: ExpectWithState }).expect?.getState();
+  const state = jestExpect()?.getState();
   if (!state?.testPath) return null;
+  const projectId = (globalThis as Record<string, unknown>)[PROJECT_GLOBAL];
+  const project = typeof projectId === 'string' ? projectId : '';
 
   // test.concurrent bodies run alongside other tests; Jest tracks their names in
   // AsyncLocalStorage, the same way jest-snapshot resolves the current test. Jest 30 reports
   // sequential tests there too, so a name equal to `currentTestName` is a sequential test.
   const concurrentName = state.currentConcurrentTestName?.();
   if (concurrentName && concurrentName !== state.currentTestName) {
-    return { testPath: state.testPath, testName: concurrentName, invocation: 1 };
+    return { project, testPath: state.testPath, testName: concurrentName, invocation: 1 };
   }
 
   if (!state.currentTestName) return null;
@@ -77,6 +102,7 @@ const currentTest = (): CurrentTest | null => {
   if (running && (running.status === 'skip' || running.status === 'todo')) return null;
 
   return {
+    project,
     testPath: state.testPath,
     testName: state.currentTestName,
     invocation: running?.invocations ?? 1,
@@ -177,8 +203,27 @@ export class MetadataReader {
     process.once('exit', () => this.cleanup());
   }
 
-  take(testPath: string, testName: string, invocation = 1): Metadata {
-    const file = metadataFile(this.dir, { testPath, testName, invocation });
+  /**
+   * Makes the project's id visible to its test files and returns the key its metadata is
+   * written under: exactly what a worker will read from the project's `globals`. Projects
+   * without their own `globals` share Jest's default object, so the first project's id is
+   * kept rather than overwritten, which would let an earlier file read another project's id.
+   * Such projects share one key; a key is empty when the config cannot take one at all.
+   */
+  tagProject(config: { id: string; globals: Record<string, unknown> }): string {
+    try {
+      if (config.globals[PROJECT_GLOBAL] === undefined) {
+        config.globals[PROJECT_GLOBAL] = config.id;
+      }
+    } catch {
+      // Frozen globals: the worker sees no id either.
+    }
+    const tag = config.globals[PROJECT_GLOBAL];
+    return typeof tag === 'string' ? tag : '';
+  }
+
+  take(test: CurrentTest): Metadata {
+    const file = metadataFile(this.dir, test);
     try {
       const raw = readFileSync(file, 'utf8');
       unlinkSync(file);

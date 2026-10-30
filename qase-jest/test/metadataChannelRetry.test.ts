@@ -26,7 +26,7 @@ describe('MetadataWriter with retries', () => {
 describe('after the retried block', () => {
   it('keeps each attempt separate, as each is reported as its own result', () => {
     const name = 'MetadataWriter with retries fails on the first attempt';
-    expect(reader.take(testPath, name, 1).tags).toEqual(['attempt-1']);
-    expect(reader.take(testPath, name, 2).tags).toEqual(['attempt-2']);
+    expect(reader.take({ project: '', testPath, testName: name, invocation: 1 }).tags).toEqual(['attempt-1']);
+    expect(reader.take({ project: '', testPath, testName: name, invocation: 2 }).tags).toEqual(['attempt-2']);
   });
 });

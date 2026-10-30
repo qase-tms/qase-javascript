@@ -22,7 +22,7 @@ describe('MetadataReader', () => {
   });
 
   it('returns empty metadata for a test that made no calls', () => {
-    expect(reader.take(testPath, 'unknown test').title).toBeUndefined();
+    expect(reader.take({ project: '', testPath, testName: 'unknown test', invocation: 1 }).title).toBeUndefined();
   });
 });
 
@@ -34,16 +34,17 @@ describe('MetadataWriter', () => {
     writer.fields({ severity: 'major' });
     writer.mute();
 
-    const metadata = reader.take(testPath, 'MetadataWriter writes metadata for the running test');
+    const metadata = reader.take({ project: '', testPath, testName: 'MetadataWriter writes metadata for the running test', invocation: 1 });
     expect(metadata.title).toBe('T');
     expect(metadata.tags).toEqual(['a', 'b']);
     expect(metadata.fields).toEqual({ severity: 'major' });
     expect(metadata.mute).toBe(true);
-    expect(reader.take(testPath, 'MetadataWriter writes metadata for the running test').title).toBeUndefined();
+    expect(reader.take({ project: '', testPath, testName: 'MetadataWriter writes metadata for the running test', invocation: 1 }).title).toBeUndefined();
   });
 
   it('keeps tests in different files apart', () => {
     const other = new MetadataWriter(reader.dir, () => ({
+      project: '',
       testPath: '/other/file.test.js',
       testName: 'MetadataWriter keeps tests in different files apart',
       invocation: 1,
@@ -51,8 +52,20 @@ describe('MetadataWriter', () => {
     other.title('other');
     writer.title('this');
 
-    expect(reader.take(testPath, 'MetadataWriter keeps tests in different files apart').title).toBe('this');
-    expect(reader.take('/other/file.test.js', 'MetadataWriter keeps tests in different files apart').title).toBe('other');
+    expect(reader.take({ project: '', testPath, testName: 'MetadataWriter keeps tests in different files apart', invocation: 1 }).title).toBe('this');
+    expect(reader.take({ project: '', testPath: '/other/file.test.js', testName: 'MetadataWriter keeps tests in different files apart', invocation: 1 }).title).toBe('other');
+  });
+
+  it('finds the current test without a global expect, as with injectGlobals: false', () => {
+    const injected = (globalThis as any).expect;
+    delete (globalThis as any).expect;
+    try {
+      writer.title('no global expect');
+    } finally {
+      (globalThis as any).expect = injected;
+    }
+    const name = 'MetadataWriter finds the current test without a global expect, as with injectGlobals: false';
+    expect(reader.take({ project: '', testPath, testName: name, invocation: 1 }).title).toBe('no global expect');
   });
 
   it('does nothing without a metadata directory', () => {
@@ -98,7 +111,7 @@ describe('MetadataWriter with beforeEach', () => {
   });
 
   it('applies beforeEach calls to the test', () => {
-    const metadata = reader.take(testPath, 'MetadataWriter with beforeEach applies beforeEach calls to the test');
+    const metadata = reader.take({ project: '', testPath, testName: 'MetadataWriter with beforeEach applies beforeEach calls to the test', invocation: 1 });
     expect(metadata.tags).toEqual(['from beforeEach']);
   });
 });
@@ -119,8 +132,8 @@ describe('MetadataWriter with concurrent tests', () => {
   });
 
   it('attributes calls after await to the concurrent test that made them', () => {
-    const a = reader.take(testPath, 'MetadataWriter with concurrent tests concurrent a');
-    const b = reader.take(testPath, 'MetadataWriter with concurrent tests concurrent b');
+    const a = reader.take({ project: '', testPath, testName: 'MetadataWriter with concurrent tests concurrent a', invocation: 1 });
+    const b = reader.take({ project: '', testPath, testName: 'MetadataWriter with concurrent tests concurrent b', invocation: 1 });
     expect(a.fields).toEqual({ c: 'a-before' });
     expect(a.parameters).toEqual({ x: 'a' });
     expect(b.fields).toEqual({ c: 'b-before' });

@@ -7,6 +7,8 @@
 - Each retry attempt (`jest.retryTimes`) is reported with its own metadata instead of mixing calls from different attempts.
 - `qase.*` calls in `beforeAll` and `afterAll` are ignored instead of being added to a neighbouring test's result. Calls in `beforeEach` and `afterEach` still apply to their test.
 - Calling `qase.*` without the reporter configured (for example, running one file from an IDE) no longer fails the test.
+- `qase.*` calls work with `injectGlobals: false`, when `expect` is imported from `@jest/globals`.
+- With Jest `projects`, a test file run by several projects at the same time keeps each project's metadata on that project's result. Jest does not say which project a per-test result belongs to, so such overlapping runs are reported when the file finishes. Projects that define no `globals` of their own share Jest's default object and cannot be told apart this way; their overlapping runs of one file can still mix metadata.
 
 ## Changed
 
