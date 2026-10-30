@@ -3,20 +3,22 @@ import { expect } from '@jest/globals';
 import { qase } from '../src/jest';
 import { QaseStep } from 'qase-javascript-commons';
 
-// Mocks
-const qaseMock = {
-  title: jest.fn(),
-  ignore: jest.fn(),
-  mute: jest.fn(),
-  comment: jest.fn(),
-  suite: jest.fn(),
-  fields: jest.fn(),
-  parameters: jest.fn(),
-  groupParams: jest.fn(),
-  tags: jest.fn(),
-  step: jest.fn(),
-  attachment: jest.fn(),
-};
+jest.mock('../src/metadataChannel', () => {
+  const writer = {
+    title: jest.fn(),
+    ignore: jest.fn(),
+    mute: jest.fn(),
+    comment: jest.fn(),
+    suite: jest.fn(),
+    fields: jest.fn(),
+    parameters: jest.fn(),
+    groupParams: jest.fn(),
+    tags: jest.fn(),
+    step: jest.fn(),
+    attachment: jest.fn(),
+  };
+  return { MetadataWriter: jest.fn(() => writer), writer };
+});
 
 jest.mock('qase-javascript-commons', () => ({
   getMimeTypes: jest.fn(() => 'text/plain'),
@@ -25,11 +27,7 @@ jest.mock('qase-javascript-commons', () => ({
   })),
 }));
 
-// Mock global.Qase
-Object.defineProperty(global, 'Qase', {
-  value: qaseMock,
-  writable: true,
-});
+const qaseMock = jest.requireMock<{ writer: Record<string, jest.Mock> }>('../src/metadataChannel').writer;
 
 describe('qase', () => {
   beforeEach(() => {
@@ -59,42 +57,42 @@ describe('qase', () => {
   });
 
   describe('qase.title', () => {
-    it('should call global.Qase.title', () => {
+    it('should pass the call to the metadata writer: title', () => {
       qase.title('Custom Title');
       expect(qaseMock.title).toHaveBeenCalledWith('Custom Title');
     });
   });
 
   describe('qase.ignore', () => {
-    it('should call global.Qase.ignore', () => {
+    it('should pass the call to the metadata writer: ignore', () => {
       qase.ignore();
       expect(qaseMock.ignore).toHaveBeenCalled();
     });
   });
 
   describe('qase.mute', () => {
-    it('should call global.Qase.mute', () => {
+    it('should pass the call to the metadata writer: mute', () => {
       qase.mute();
       expect(qaseMock.mute).toHaveBeenCalled();
     });
   });
 
   describe('qase.comment', () => {
-    it('should call global.Qase.comment', () => {
+    it('should pass the call to the metadata writer: comment', () => {
       qase.comment('Custom Comment');
       expect(qaseMock.comment).toHaveBeenCalledWith('Custom Comment');
     });
   });
 
   describe('qase.suite', () => {
-    it('should call global.Qase.suite', () => {
+    it('should pass the call to the metadata writer: suite', () => {
       qase.suite('Custom Suite');
       expect(qaseMock.suite).toHaveBeenCalledWith('Custom Suite');
     });
   });
 
   describe('qase.fields', () => {
-    it('should call global.Qase.fields', () => {
+    it('should pass the call to the metadata writer: fields', () => {
       const fields = { field1: 'value1', field2: 'value2' };
       qase.fields(fields);
       expect(qaseMock.fields).toHaveBeenCalledWith(fields);
@@ -102,7 +100,7 @@ describe('qase', () => {
   });
 
   describe('qase.parameters', () => {
-    it('should call global.Qase.parameters', () => {
+    it('should pass the call to the metadata writer: parameters', () => {
       const parameters = { param1: 'value1', param2: 'value2' };
       qase.parameters(parameters);
       expect(qaseMock.parameters).toHaveBeenCalledWith(parameters);
@@ -110,7 +108,7 @@ describe('qase', () => {
   });
 
   describe('qase.groupParameters', () => {
-    it('should call global.Qase.groupParams', () => {
+    it('should pass the call to the metadata writer: groupParams', () => {
       const groupParams = { group1: 'value1', group2: 'value2' };
       qase.groupParameters(groupParams);
       expect(qaseMock.groupParams).toHaveBeenCalledWith(groupParams);
@@ -118,7 +116,7 @@ describe('qase', () => {
   });
 
   describe('qase.tags', () => {
-    it('should call global.Qase.tags', () => {
+    it('should pass the call to the metadata writer: tags', () => {
       qase.tags('smoke', 'regression');
       expect(qaseMock.tags).toHaveBeenCalledWith(['smoke', 'regression']);
     });

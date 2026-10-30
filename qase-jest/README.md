@@ -220,6 +220,8 @@ QASE_MODE=testops QASE_TESTOPS_RUN_TITLE="Nightly Regression" npx jest
 
 The Network Profiler automatically captures outgoing HTTP requests made during test execution and reports them as REQUEST-type steps in Qase TestOps.
 
+The profiler records requests made in the process that runs the reporter, so run Jest with `--runInBand` (or `maxWorkers: 1`) when it is enabled. Other `qase.*` calls work with any number of workers.
+
 **Enable in `qase.config.json`:**
 
 ```json

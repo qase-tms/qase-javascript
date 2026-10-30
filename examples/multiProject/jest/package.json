@@ -2,7 +2,7 @@
   "name": "jest-multiproject-example",
   "private": true,
   "scripts": {
-    "test": "QASE_MODE=testops_multi jest --runInBand"
+    "test": "QASE_MODE=testops_multi jest"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.28.5",

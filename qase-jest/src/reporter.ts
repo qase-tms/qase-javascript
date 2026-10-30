@@ -3,17 +3,15 @@ import { Status, TestCaseResult } from '@jest/test-result';
 import type { Circus } from '@jest/types';
 
 import {
-  Attachment,
   composeOptions,
   ConfigLoader,
   ConfigType,
   QaseReporter,
   ReporterInterface,
   TestStatusEnum,
-  TestStepType,
 } from 'qase-javascript-commons';
 import { NetworkProfiler } from 'qase-javascript-commons/profilers';
-import { Qase } from './global';
+import { MetadataReader } from './metadataChannel';
 import { MetadataApplier } from './modules/metadataApplier';
 import { ProfilerTracker } from './modules/profilerTracker';
 import { ResultBuilder } from './modules/resultBuilder';
@@ -39,7 +37,7 @@ export class JestQaseReporter implements Reporter {
 
   private reporter: ReporterInterface;
   private profilerTracker: ProfilerTracker;
-  private metadataApplier: MetadataApplier;
+  private metadataReader: MetadataReader;
   // Map keyed by `${test.path}::${fullName}` → ms-since-epoch when the test
   // actually started executing. Populated in `onTestCaseStart` (Jest 29+),
   // consumed in `onTestCaseResult`, then evicted.
@@ -68,10 +66,7 @@ export class JestQaseReporter implements Reporter {
         })
       : null;
     this.profilerTracker = new ProfilerTracker(profiler);
-    this.metadataApplier = new MetadataApplier();
-
-    // @ts-expect-error - global.Qase is dynamically added at runtime
-    global.Qase = new Qase(this);
+    this.metadataReader = new MetadataReader();
   }
 
   public onRunStart() {
@@ -88,8 +83,12 @@ export class JestQaseReporter implements Reporter {
   }
 
   public onTestCaseResult(test: Test, testCaseResult: TestCaseResult) {
-    if (this.metadataApplier.get().ignore) {
-      this.metadataApplier.reset();
+    const metadata = this.metadataReader.take(
+      test.path,
+      testCaseResult.fullName,
+      testCaseResult.invocations ?? 1,
+    );
+    if (metadata.ignore) {
       return;
     }
 
@@ -100,12 +99,11 @@ export class JestQaseReporter implements Reporter {
     const result = ResultBuilder.build({
       value: testCaseResult,
       path: test.path,
-      metadata: this.metadataApplier.get(),
+      metadata,
       profilerSteps: this.profilerTracker.getNewSteps(),
       startTimeMs,
     });
 
-    this.metadataApplier.reset();
     void this.reporter.addTestResult(result);
   }
 
@@ -135,49 +133,5 @@ export class JestQaseReporter implements Reporter {
 
   async onRunnerEnd() {
     await this.reporter.publish();
-  }
-
-  public addTitle(title: string) {
-    this.metadataApplier.applyTitle(title);
-  }
-
-  public addComment(comment: string) {
-    this.metadataApplier.applyComment(comment);
-  }
-
-  public addSuite(suite: string) {
-    this.metadataApplier.applySuite(suite);
-  }
-
-  public addFields(fields: Record<string, string>) {
-    this.metadataApplier.applyFields(fields);
-  }
-
-  public addParameters(parameters: Record<string, string>) {
-    this.metadataApplier.applyParameters(parameters);
-  }
-
-  public addGroupParams(groupParams: Record<string, string>) {
-    this.metadataApplier.applyGroupParams(groupParams);
-  }
-
-  public addTags(tags: string[]) {
-    this.metadataApplier.applyTags(tags);
-  }
-
-  public addIgnore() {
-    this.metadataApplier.applyIgnore();
-  }
-
-  public addMute() {
-    this.metadataApplier.applyMute();
-  }
-
-  public addStep(step: TestStepType) {
-    this.metadataApplier.applyStep(step);
-  }
-
-  public addAttachment(attachment: Attachment) {
-    this.metadataApplier.applyAttachment(attachment);
   }
 }
