@@ -11,7 +11,7 @@ import { LoggerInterface } from '../utils/logger';
 import { StateManager } from '../state/state';
 import { Mutex } from 'async-mutex';
 import { IClient } from '../client/interface';
-import { DEFAULT_BATCH_SIZE } from './shared/testops-constants';
+import { resolveBatchSize } from './shared/testops-constants';
 import { resolveTestOpsBaseUrl } from './shared/testops-url';
 
 /**
@@ -60,7 +60,7 @@ export class TestOpsReporter extends AbstractReporter {
   ) {
     super(logger);
     this.baseUrl = resolveTestOpsBaseUrl(baseUrl);
-    this.batchSize = batchSize ?? DEFAULT_BATCH_SIZE;
+    this.batchSize = resolveBatchSize(batchSize);
     this.runId = runId;
   }
 
@@ -165,7 +165,7 @@ export class TestOpsReporter extends AbstractReporter {
 
     while (this.claimedIndex < this.results.length) {
       const from = this.claimedIndex;
-      const to = Math.min(from + DEFAULT_BATCH_SIZE, this.results.length);
+      const to = Math.min(from + this.batchSize, this.results.length);
       await this.publishClaimed(from, to);
     }
 
@@ -253,7 +253,11 @@ export class TestOpsReporter extends AbstractReporter {
       return;
     }
 
-    await this.api.completeRun(this.runId);
+    const completed = await this.api.completeRun(this.runId);
+    if (!completed) {
+      this.logger.log(chalk`{yellow Run ${this.runId} is left open: run.complete is false}`);
+      return;
+    }
 
     if (this.showPublicReportLink) {
       try {

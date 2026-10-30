@@ -146,6 +146,33 @@ describe('ReporterFactory', () => {
       const r = factory.create(ModeEnum.report, opts, false);
       expect(r).toBeInstanceOf(ReportReporter);
     });
+
+    it('reads the local writer options from the documented report.connection key', () => {
+      const opts = {
+        ...baseOptions(),
+        report: {
+          connection: { local: { path: './custom-report', format: 'jsonp' } },
+          // envToConfig always fills `connections`, with undefined fields when no env is set.
+          connections: { local: { path: undefined, format: undefined } },
+        },
+      } as any;
+      const writer = (factory.create(ModeEnum.report, opts, false) as any).writer;
+      expect(writer.path).toBe('./custom-report');
+      expect(writer.format).toBe('jsonp');
+    });
+
+    it('lets report.connections override report.connection field by field', () => {
+      const opts = {
+        ...baseOptions(),
+        report: {
+          connection: { local: { path: './from-connection', format: 'jsonp' } },
+          connections: { local: { path: './from-connections' } },
+        },
+      } as any;
+      const writer = (factory.create(ModeEnum.report, opts, false) as any).writer;
+      expect(writer.path).toBe('./from-connections');
+      expect(writer.format).toBe('jsonp');
+    });
   });
 
   describe('unknown mode', () => {

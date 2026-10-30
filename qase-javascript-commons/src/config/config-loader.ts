@@ -59,7 +59,7 @@ export class ConfigLoader<T extends Partial<ConfigType> & Record<string, unknown
 
         const { instancePath = '', message = '' } = validationError ?? {};
         const configPath = instancePath
-          ? `\`${instancePath.substring(1).replace('/', '.')}\``
+          ? `\`${instancePath.substring(1).replaceAll('/', '.')}\``
           : 'it';
 
         throw new Error(`Invalid config: "${configPath}" ${message}`);

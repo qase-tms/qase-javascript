@@ -140,7 +140,7 @@ describe('ConfigLoader', () => {
       mockReadFileSync.mockReturnValue(configJson);
 
       const loader = new ConfigLoader();
-      expect(() => loader.load()).toThrow('Invalid config: "`testops.api/token`" must be string');
+      expect(() => loader.load()).toThrow('Invalid config: "`testops.api.token`" must be string');
     });
 
     it('should handle EISDIR error code', () => {

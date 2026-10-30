@@ -39,6 +39,24 @@ describe('TestOpsMultiReporter project options', () => {
     }
   });
 
+  it('applies global run settings to a project that configures its own run', () => {
+    const testopsOptions: any = {
+      project: 'MAIN',
+      api: { token: 'token' },
+      run: { id: 7, tags: ['nightly'], complete: false, title: 'Global' },
+      plan: {},
+    };
+    const multiConfig: any = { projects: [{ code: 'ONE', run: { title: 'Own' } }, { code: 'TWO' }] };
+
+    new TestOpsMultiReporter(
+      silentLogger(), testopsOptions, multiConfig, false, hostData, 'reporter', 'framework',
+    );
+
+    const calls = (ClientV2 as unknown as jest.Mock).mock.calls;
+    expect(calls[0][1].run).toEqual({ tags: ['nightly'], complete: false, title: 'Own' });
+    expect(calls[1][1].run).toEqual({ id: 7, tags: ['nightly'], complete: false, title: 'Global' });
+  });
+
   it('leaves attachments unset when the global config has none', () => {
     const testopsOptions: any = { project: 'MAIN', api: { token: 'token' }, run: {}, plan: {} };
     const multiConfig: any = { projects: [{ code: 'ONE' }] };

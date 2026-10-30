@@ -12,7 +12,7 @@ import { LoggerInterface } from '../utils/logger';
 import { Mutex } from 'async-mutex';
 import { ClientV2 } from '../client/clientV2';
 import { HostData } from '../models/host-data';
-import { DEFAULT_BATCH_SIZE } from './shared/testops-constants';
+import { resolveBatchSize } from './shared/testops-constants';
 import { resolveTestOpsBaseUrl } from './shared/testops-url';
 
 /**
@@ -61,7 +61,7 @@ export class TestOpsMultiReporter extends AbstractReporter {
   ) {
     super(logger);
     this.baseUrl = resolveTestOpsBaseUrl(baseUrl ?? testopsOptions.api?.host);
-    this.batchSize = batchSize ?? testopsOptions.batch?.size ?? DEFAULT_BATCH_SIZE;
+    this.batchSize = resolveBatchSize(batchSize ?? testopsOptions.batch?.size);
     this.showPublicReportLink = showPublicReportLink ?? testopsOptions.showPublicReportLink;
 
     this.defaultProject =
@@ -96,10 +96,13 @@ export class TestOpsMultiReporter extends AbstractReporter {
     global: TestOpsOptionsType,
     proj: TestOpsProjectConfigType,
   ): TestOpsOptionsType {
+    // Global run settings (tags, complete, title...) are defaults for every project. A run id
+    // names one run, so a project that configures its own run does not inherit the global one.
+    const { id: globalRunId, ...globalRun } = global.run ?? {};
     const opts: TestOpsOptionsType = {
       project: proj.code,
       api: global.api,
-      run: proj.run ?? global.run ?? {},
+      run: proj.run ? { ...globalRun, ...proj.run } : { ...globalRun, id: globalRunId },
       plan: proj.plan ?? global.plan ?? {},
       uploadAttachments: global.uploadAttachments,
       defect: global.defect,
@@ -368,7 +371,11 @@ export class TestOpsMultiReporter extends AbstractReporter {
           return;
         }
         try {
-          await client.completeRun(runId);
+          const completed = await client.completeRun(runId);
+          if (!completed) {
+            this.logger.log(chalk`{yellow [${code}] Run ${runId} is left open: run.complete is false}`);
+            return;
+          }
           if (this.showPublicReportLink) {
             try {
               await client.enablePublicReport(runId);

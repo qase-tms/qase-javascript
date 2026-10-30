@@ -1,7 +1,13 @@
 import { expect } from '@jest/globals';
 import { envToConfig } from '../../src/env/env-to-config';
 import { EnvType } from '../../src/env/env-type';
-import { EnvApiEnum, EnvAttachmentsEnum, EnvConfigurationsEnum } from '../../src/env/env-enum';
+import {
+  EnvApiEnum,
+  EnvAttachmentsEnum,
+  EnvConfigurationsEnum,
+  EnvEnum,
+  EnvRunEnum,
+} from '../../src/env/env-enum';
 
 describe('envToConfig', () => {
   describe('api', () => {
@@ -114,6 +120,15 @@ describe('envToConfig', () => {
       expect(result.testops?.configurations).toBeUndefined();
     });
 
+    it('should map createIfNotExists without values so it can apply to values from the config file', () => {
+      const result = envToConfig({ [EnvConfigurationsEnum.createIfNotExists]: true });
+
+      expect(result.testops?.configurations).toEqual({
+        values: undefined,
+        createIfNotExists: true,
+      });
+    });
+
     it('should handle single configurations value', () => {
       const env: EnvType = {
         [EnvConfigurationsEnum.values]: 'group1=value1',
@@ -130,4 +145,20 @@ describe('envToConfig', () => {
       });
     });
   });
-}); 
+
+  describe('fallback', () => {
+    it('should map QASE_FALLBACK', () => {
+      expect(envToConfig({ [EnvEnum.fallback]: 'report' }).fallback).toBe('report');
+    });
+  });
+
+  describe('run tags', () => {
+    it('should leave tags undefined when QASE_TESTOPS_RUN_TAGS is not set', () => {
+      expect(envToConfig({}).testops?.run?.tags).toBeUndefined();
+    });
+
+    it('should split and trim tags', () => {
+      expect(envToConfig({ [EnvRunEnum.tags]: 'a, b' }).testops?.run?.tags).toEqual(['a', 'b']);
+    });
+  });
+});

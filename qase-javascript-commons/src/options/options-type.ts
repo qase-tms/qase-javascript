@@ -16,6 +16,7 @@ export type ConnectionsType = {
 export type AdditionalReportOptionsType = {
   driver?: `${DriverEnum}`;
   connections?: ConnectionsType;
+  connection?: ConnectionsType;
 };
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
