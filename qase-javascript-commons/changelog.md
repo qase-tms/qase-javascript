@@ -1,3 +1,20 @@
+## 2.9.8
+
+### Changed
+
+- `testops.run.complete` now defaults to `true`, as the documentation always said. A run was completed only when the option was set explicitly, so a config without it left every run open. Set `run.complete: false` (or `QASE_TESTOPS_RUN_COMPLETE=false`) to keep runs open. When completion is turned off the reporter now says the run is left open instead of logging `Run N completed`. If several jobs report into one run through `QASE_TESTOPS_RUN_ID`, set `QASE_TESTOPS_RUN_COMPLETE=false` in each job and complete the run once after all of them, otherwise the first job to finish completes it. This matches the Python and Java reporters.
+
+### Fixed
+
+- `report.connection`, the key every README documents, is now read. The code only read `report.connections`, and the config schema accepted the documented key without using it, so a custom report path or format was silently ignored. Both keys are accepted; `connections` wins field by field when both are set. The README table now names the full `report.connection.local.path` and `report.connection.local.format` keys.
+- `QASE_FALLBACK` is now read from the environment. It was validated but never mapped into the config.
+- Arrays from a later config source now replace the earlier array instead of being merged by index. `QASE_TESTOPS_RUN_TAGS=a` over `run.tags: ["b", "c"]` gave `["a", "c"]`; it now gives `["a"]`. The same applied to `statusFilter`, `configurations.values` and `testops_multi.projects`. An unset `QASE_TESTOPS_RUN_TAGS` no longer produces an empty list, so it leaves tags from the config file in place.
+- `QASE_TESTOPS_CONFIGURATIONS_CREATE_IF_NOT_EXISTS` works without `QASE_TESTOPS_CONFIGURATIONS_VALUES` and applies to values from the config file.
+- In `testops_multi` mode a project with its own `run` settings now inherits the global run settings it does not override, such as `tags` and `complete`. Previously the project's `run` replaced the global one entirely. The global run `id` is still used only by projects without their own `run`.
+- `testops.batch.size` is clamped to `1`–`200`. A larger value was rejected by the API, and `0` sent an empty batch for every result. The final flush at the end of a run now also uses the configured batch size instead of always sending 200 results per request.
+- A config validation error names the full path of the invalid field, e.g. `testops.api.token` instead of `testops.api/token`.
+- The README no longer lists `testops.api.enterprise` / `QASE_TESTOPS_API_ENTERPRISE` or `QASE_REPORT_DRIVER`, which do not exist, and the `captureLogs` row names the `captureLogs` key instead of `testops.defect`.
+
 ## 2.9.7
 
 ### Fixed

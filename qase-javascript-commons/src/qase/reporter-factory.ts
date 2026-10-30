@@ -4,7 +4,7 @@ import {
   TestOpsMultiReporter,
   ReportReporter,
 } from '../reporters';
-import { ModeEnum, OptionsType } from '../options';
+import { composeOptions, ModeEnum, OptionsType } from '../options';
 import { ConfigType } from '../config';
 import { EnvApiEnum, EnvTestOpsEnum } from '../env';
 import { LoggerInterface } from '../utils/logger';
@@ -121,7 +121,10 @@ export class ReporterFactory {
   }
 
   private createReport(options: ConfigType & OptionsType): ReportReporter {
-    const localOptions = options.report?.connections?.[DriverEnum.local];
+    const localOptions = composeOptions(
+      options.report?.connection?.[DriverEnum.local] ?? {},
+      options.report?.connections?.[DriverEnum.local] ?? {},
+    );
     const writer = new FsWriter(localOptions);
 
     return new ReportReporter(

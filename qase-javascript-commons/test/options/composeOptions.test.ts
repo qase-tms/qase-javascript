@@ -121,4 +121,18 @@ describe('composeOptions', () => {
       c: 'world',
     });
   });
-}); 
+
+  it('should replace a longer array with a shorter one instead of merging by index', () => {
+    const config = { testops: { run: { tags: ['config-a', 'config-b'] } } };
+    const env = { testops: { run: { tags: ['env-a'] } } };
+
+    expect(composeOptions(config, env)).toEqual({ testops: { run: { tags: ['env-a'] } } });
+  });
+
+  it('should keep the config array when the env value is undefined', () => {
+    const config = { testops: { run: { tags: ['config-a'] } } };
+    const env = { testops: { run: { tags: undefined } } };
+
+    expect(composeOptions(config, env)).toEqual({ testops: { run: { tags: ['config-a'] } } });
+  });
+});

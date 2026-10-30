@@ -70,9 +70,12 @@ export class RunService {
     }
   }
 
-  async completeRun(runId: number, config: TestOpsOptionsType): Promise<void> {
-    if (!config.run.complete) {
-      return;
+  /**
+   * @returns false when completion is turned off with `run.complete: false`; unset means complete.
+   */
+  async completeRun(runId: number, config: TestOpsOptionsType): Promise<boolean> {
+    if (config.run.complete === false) {
+      return false;
     }
 
     try {
@@ -85,6 +88,8 @@ export class RunService {
       const runUrl = `${this.appUrl}/run/${config.project}/dashboard/${runId}`;
       this.logger.log(chalk`{blue Test run link: ${runUrl}}`);
     }
+
+    return true;
   }
 
   async enablePublicReport(projectCode: string, runId: number): Promise<void> {

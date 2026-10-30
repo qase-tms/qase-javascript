@@ -900,8 +900,8 @@ qasectl testops run create --project DEMO --token token --title 'Mocha test run'
 # Save run ID
 export QASE_TESTOPS_RUN_ID=$(< qase.env grep QASE_TESTOPS_RUN_ID | cut -d'=' -f2)
 
-# Run tests in parallel
-QASE_MODE=testops npx mocha --parallel
+# Run tests in parallel; the run is completed below, once
+QASE_MODE=testops QASE_TESTOPS_RUN_COMPLETE=false npx mocha --parallel
 
 # Complete the run
 qasectl testops run complete --project DEMO --token token --id $(echo $QASE_TESTOPS_RUN_ID)

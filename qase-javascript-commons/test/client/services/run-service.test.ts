@@ -125,13 +125,19 @@ describe('RunService', () => {
   describe('completeRun', () => {
     it('should complete the run', async () => {
       const config = baseConfig();
-      await service.completeRun(100, config);
+      await expect(service.completeRun(100, config)).resolves.toBe(true);
+      expect(runsApi.completeRun).toHaveBeenCalledWith('PROJ', 100);
+    });
+
+    it('should complete the run when config.run.complete is not set', async () => {
+      const config = baseConfig({ run: {} });
+      await expect(service.completeRun(100, config)).resolves.toBe(true);
       expect(runsApi.completeRun).toHaveBeenCalledWith('PROJ', 100);
     });
 
     it('should skip completion when config.run.complete is false', async () => {
       const config = baseConfig({ run: { complete: false } });
-      await service.completeRun(100, config);
+      await expect(service.completeRun(100, config)).resolves.toBe(false);
       expect(runsApi.completeRun).not.toHaveBeenCalled();
     });
 

@@ -2,6 +2,31 @@ import { ModeEnum } from '../options';
 import { DriverEnum, FormatEnum } from '../writer';
 import { ExternalLinkType } from '../models/config/TestOpsOptionsType';
 
+const connectionsSchema = {
+  type: 'object',
+  nullable: true,
+
+  properties: {
+    [DriverEnum.local]: {
+      type: 'object',
+      nullable: true,
+
+      properties: {
+        path: {
+          type: 'string',
+          nullable: true,
+        },
+
+        format: {
+          type: 'string',
+          enum: [FormatEnum.json, FormatEnum.jsonp],
+          nullable: true,
+        },
+      },
+    },
+  },
+};
+
 /**
  * @type {JSONSchemaType<ConfigType>}
  */
@@ -313,30 +338,9 @@ export const configValidationSchema = {
           nullable: true,
         },
 
-        connections: {
-          type: 'object',
-          nullable: true,
-
-          properties: {
-            [DriverEnum.local]: {
-              type: 'object',
-              nullable: true,
-
-              properties: {
-                path: {
-                  type: 'string',
-                  nullable: true,
-                },
-
-                format: {
-                  type: 'string',
-                  enum: [FormatEnum.json, FormatEnum.jsonp],
-                  nullable: true,
-                },
-              },
-            },
-          },
-        },
+        connections: connectionsSchema,
+        // The documented key; `connections` stays accepted for existing configs.
+        connection: connectionsSchema,
       },
     },
 

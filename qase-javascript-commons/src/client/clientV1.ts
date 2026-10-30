@@ -57,7 +57,7 @@ export class ClientV1 implements IClient {
     return this.runService.createRun(this.config, this.environment);
   }
 
-  async completeRun(runId: number): Promise<void> {
+  async completeRun(runId: number): Promise<boolean> {
     return this.runService.completeRun(runId, this.config);
   }
 

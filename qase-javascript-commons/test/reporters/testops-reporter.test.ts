@@ -37,7 +37,7 @@ describe('TestOpsReporter', () => {
 
     mockApiClient = {
       createRun: jest.fn(),
-      completeRun: jest.fn(),
+      completeRun: jest.fn().mockResolvedValue(true),
       uploadResults: jest.fn(),
       uploadAttachment: jest.fn(),
       enablePublicReport: jest.fn(),
@@ -72,6 +72,16 @@ describe('TestOpsReporter', () => {
         'TEST_PROJECT'
       );
       expect(reporterWithoutBatch['batchSize']).toBe(200);
+    });
+
+    it.each([
+      [0, 1],
+      [-5, 1],
+      [500, 200],
+      [50.7, 50],
+    ])('should clamp batchSize %p to %p', (size, expected) => {
+      const r = new TestOpsReporter(mockLogger, mockApiClient, false, 'TEST_PROJECT', undefined, size);
+      expect(r['batchSize']).toBe(expected);
     });
 
     it('should handle custom baseUrl correctly', () => {
@@ -488,6 +498,21 @@ describe('TestOpsReporter', () => {
       expect(mockApiClient.completeRun).toHaveBeenCalledWith(123);
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockLogger.log).toHaveBeenCalledWith('Run 123 completed');
+    });
+
+    it('should not claim the run is completed when run.complete is false', async () => {
+      mockApiClient.createRun.mockResolvedValue(123);
+      mockApiClient.completeRun.mockResolvedValue(false);
+      await reporter.startTestRun();
+
+      await reporter.complete();
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockLogger.log).toHaveBeenCalledWith('Run 123 is left open: run.complete is false');
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockLogger.log).not.toHaveBeenCalledWith('Run 123 completed');
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockApiClient.enablePublicReport).not.toHaveBeenCalled();
     });
 
     it('should enable public report when showPublicReportLink is true', async () => {

@@ -23,6 +23,7 @@ import { ExternalLinkType } from '../models/config/TestOpsOptionsType';
  */
 export const envToConfig = (env: EnvType): ConfigType => ({
   mode: env[EnvEnum.mode],
+  fallback: env[EnvEnum.fallback],
   debug: env[EnvEnum.debug],
   environment: env[EnvEnum.environment],
   captureLogs: env[EnvEnum.captureLogs],
@@ -54,7 +55,7 @@ export const envToConfig = (env: EnvType): ConfigType => ({
       title: env[EnvRunEnum.title],
       description: env[EnvRunEnum.description],
       complete: env[EnvRunEnum.complete],
-      tags: env[EnvRunEnum.tags]?.split(',').map(tag => tag.trim()) ?? [],
+      tags: env[EnvRunEnum.tags]?.split(',').map(tag => tag.trim()),
       externalLink: env[EnvRunEnum.externalLink] ? (() => {
         try {
           const externalLinkValue = env[EnvRunEnum.externalLink];
@@ -89,8 +90,8 @@ export const envToConfig = (env: EnvType): ConfigType => ({
       timeout: env[EnvAttachmentsEnum.timeout],
     } : undefined,
     defect: env[EnvTestOpsEnum.defect],
-    configurations: env[EnvConfigurationsEnum.values] ? {
-      values: env[EnvConfigurationsEnum.values].split(',').map(item => {
+    configurations: (env[EnvConfigurationsEnum.values] || env[EnvConfigurationsEnum.createIfNotExists] !== undefined) ? {
+      values: env[EnvConfigurationsEnum.values]?.split(',').map(item => {
         const [name, value] = item.split('=');
         return { name: (name ?? '').trim(), value: value ? value.trim() : '' };
       }),
