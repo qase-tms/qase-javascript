@@ -123,8 +123,8 @@ describe('Multi-project test suite', function () {
 
   // Combining multi-project with other Qase methods
   it(qase.projects({ PROJ1: [100], PROJ2: [200] }, 'User registration'), function () {
-    qase.title('Complete user registration flow');
-    qase.fields({ severity: 'critical', priority: 'high' });
+    this.title('Complete user registration flow');
+    this.fields({ severity: 'critical', priority: 'high' });
 
     expect(true).to.equal(true);
   });

@@ -1,3 +1,9 @@
+# wdio-qase-reporter@1.7.0
+
+## Added
+
+- `qase.mute()` and the `@QaseMuted` Cucumber tag now mark the result as muted in Qase, like `qase.fields({ muted: 'true' })`. Previously `qase.mute` was not a function and `@QaseMuted` was ignored, so the result was sent unmuted. Bumped `qase-javascript-commons` pin to `~2.9.7`.
+
 # wdio-qase-reporter@1.6.0
 
 ## Added

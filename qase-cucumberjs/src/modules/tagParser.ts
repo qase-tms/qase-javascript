@@ -11,6 +11,7 @@ const qaseParametersRegExp = /^@[Qq]ase[Pp]arameters=(.+)$/;
 const qaseGroupParametersRegExp = /^@[Qq]ase[Gg]roup[Pp]arameters=(.+)$/;
 const qaseSuiteRegExp = /^@[Qq]ase[Ss]uite=(.+)$/;
 const qaseIgnoreRegExp = /^@[Qq]ase[Ii][Gg][Nn][Oo][Rr][Ee]$/;
+const qaseMutedRegExp = /^@[Qq]ase[Mm][Uu][Tt][Ee][Dd]$/;
 const qaseTagsRegExp = /^@[Qq]ase[Tt]ags=(.+)$/;
 
 export class TagParser {
@@ -24,6 +25,7 @@ export class TagParser {
       fields: {},
       title: null,
       isIgnore: false,
+      isMuted: false,
       parameters: {},
       group_params: {},
       suite: null,
@@ -98,6 +100,11 @@ export class TagParser {
 
       if (qaseIgnoreRegExp.test(tag.name)) {
         metadata.isIgnore = true;
+        continue;
+      }
+
+      if (qaseMutedRegExp.test(tag.name)) {
+        metadata.isMuted = true;
       }
     }
 

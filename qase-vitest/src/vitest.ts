@@ -35,6 +35,7 @@ export interface QaseWrapper {
   parameters(values: Record<string, string>): Promise<void>;
   groupParameters(values: Record<string, string>): Promise<void>;
   tags(...values: string[]): Promise<void>;
+  mute(): Promise<void>;
   step(name: string, body: StepFunction, expectedResult?: string, data?: string): Promise<void>;
   attach(attach: {
     name?: string;
@@ -151,6 +152,18 @@ const createQaseWrapper = (annotate: AnnotateFunction): QaseWrapper => {
      */
     async tags(...values: string[]): Promise<void> {
       return await annotate(`Qase Tags: ${values.join(',')}`, { type: 'qase-tags', body: JSON.stringify(values) });
+    },
+
+    /**
+     * Mark the test result as muted in Qase
+     * @example
+     * test('test', withQase(async ({ qase }) => {
+     *    await qase.mute();
+     *     expect(true).toBe(true);
+     * }));
+     */
+    async mute(): Promise<void> {
+      return await annotate('Qase Mute: true', { type: 'qase-mute', body: 'true' });
     },
 
     /**

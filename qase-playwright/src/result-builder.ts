@@ -198,7 +198,7 @@ export class ResultBuilder {
       fields: metadata.fields,
       id: uuidv4(),
       message,
-      muted: false,
+      muted: metadata.mute,
       params: metadata.parameters,
       group_params: metadata.groupParams,
       tags: metadata.tags ?? [],

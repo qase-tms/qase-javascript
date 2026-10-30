@@ -43,10 +43,10 @@ If your workspace is on the EU cluster (you open Qase at `app-eu.qase.io`), set 
 **2. Add Qase ID to your test:**
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { addQaseId } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
-test(qase(1, 'Test name'), () => {
+test(addQaseId('Test name', [1]), () => {
   expect(true).toBe(true);
 });
 ```
@@ -144,55 +144,48 @@ Associate your tests with Qase test cases using test case IDs:
 
 **Single ID:**
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { addQaseId } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
-test(qase(1, 'Test name'), () => {
+test(addQaseId('Test name', [1]), () => {
   expect(true).toBe(true);
 });
 ```
 
 **Multiple IDs:**
 ```typescript
-test(qase([1, 2], 'Test covering multiple cases'), () => {
+test(addQaseId('Test covering multiple cases', [1, 2]), () => {
   expect(true).toBe(true);
 });
 ```
 
 ### Add Metadata
 
-Enhance your tests with additional information:
+Enhance your tests with additional information. Wrap the test function in `withQase()` and await the methods of the `qase` object it passes:
 
 ```typescript
-import { qase } from 'vitest-qase-reporter';
+import { withQase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
-test('Test with metadata', async () => {
-  qase.title('Custom test title');
+test('Test with metadata', withQase(async ({ qase }) => {
+  await qase.title('Custom test title');
 
-  qase.fields({
+  await qase.fields({
     severity: 'critical',
     priority: 'high',
     layer: 'api',
     description: 'Tests core authentication flow',
   });
 
-  qase.suite('Authentication / Login');
+  await qase.suite('Authentication\tLogin');
 
   expect(true).toBe(true);
-});
+}));
 ```
 
 ### Ignore Tests
 
-Exclude specific tests from Qase reporting (test still runs, but results are not sent):
-
-```typescript
-test('Test not reported to Qase', () => {
-  qase.ignore();
-  expect(true).toBe(true);
-});
-```
+The Vitest reporter has no `ignore()` method: every test that runs is reported. Use `test.skip` (reported as skipped) or exclude the file from the Vitest run to keep a test out of Qase.
 
 ### Test Result Statuses
 
@@ -226,7 +219,7 @@ npx vitest run --reporter=vitest-qase-reporter
 npx vitest
 ```
 
-> **Note:** Vitest is ESM-first and uses Jest-compatible API. If you're migrating from Jest, the Qase wrapper syntax is identical.
+> **Note:** Vitest is ESM-first and uses a Jest-compatible test API, but the Qase helpers differ from the Jest reporter: use `addQaseId()` for IDs and `withQase()` for metadata.
 
 ## Network Profiler
 

@@ -68,6 +68,15 @@ describe('ResultBuilder.build', () => {
     expect(builder.build(args)).toBeNull();
   });
 
+  it('sets muted to true when metadata.mute is true', () => {
+    const args = defaultArgs({ metadata: { ...emptyMetadata(), mute: true } });
+    expect(builder.build(args)?.muted).toBe(true);
+  });
+
+  it('sets muted to false when mute was not called', () => {
+    expect(builder.build(defaultArgs())?.muted).toBe(false);
+  });
+
   it('uses metadata.title when present, otherwise removes Qase IDs from test.title', () => {
     const args1 = defaultArgs({ metadata: { ...emptyMetadata(), title: 'override' } });
     expect(builder.build(args1)?.title).toBe('override');

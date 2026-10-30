@@ -9,6 +9,7 @@ export interface MetadataShape {
   parameters?: Record<string, string>;
   groupParameters?: Record<string, string>;
   tags?: string[];
+  muted?: boolean;
   currentStep?: string;
   steps: { name: string; status: 'start' | 'end' | 'failed' }[];
   attachments: { name: string; path?: string; content?: string; contentType?: string }[];
@@ -53,6 +54,7 @@ export class MetadataAccumulator {
         metadata.parameters === undefined &&
         metadata.groupParameters === undefined &&
         metadata.tags === undefined &&
+        metadata.muted === undefined &&
         metadata.currentStep === undefined &&
         metadata._profilerSteps === undefined
       ) {
@@ -145,6 +147,10 @@ export class MetadataAccumulator {
         }
         break;
       }
+
+      case 'mute':
+        metadata.muted = true;
+        break;
 
       case 'step-start':
         metadata.currentStep = annotation.message.replace('Qase Step Start: ', '');

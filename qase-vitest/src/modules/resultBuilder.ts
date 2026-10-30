@@ -103,6 +103,9 @@ export class ResultBuilder {
       if (metadata.tags && metadata.tags.length > 0) {
         testResult.tags = metadata.tags;
       }
+      if (metadata.muted) {
+        testResult.muted = true;
+      }
       if (metadata.steps.length > 0) {
         testResult.steps = metadata.steps.map((step) => {
           const stepObj = new TestStepType();

@@ -129,6 +129,24 @@ describe('MetadataApplier', () => {
     });
   });
 
+  describe('mute', () => {
+    it('marks the current test as muted without ignoring it', () => {
+      const t = withTest();
+      metadata.mute();
+      expect(t.muted).toBe(true);
+      expect(storage.ignore).toBe(false);
+    });
+
+    it('leaves muted false when not called', () => {
+      const t = withTest();
+      expect(t.muted).toBe(false);
+    });
+
+    it('does nothing without a current test', () => {
+      expect(() => metadata.mute()).not.toThrow();
+    });
+  });
+
   describe('addStep', () => {
     it('appends step to the last item (a test, when no step is active)', () => {
       const t = withTest();

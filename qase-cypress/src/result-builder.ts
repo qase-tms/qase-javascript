@@ -144,7 +144,7 @@ export class ResultBuilder {
       fields: metadata?.fields ?? {},
       tags: metadata?.tags ?? [],
       message,
-      muted: false,
+      muted: metadata?.mute ?? false,
       params: metadata?.parameters ?? {},
       group_params: metadata?.groupParams ?? {},
       relations,

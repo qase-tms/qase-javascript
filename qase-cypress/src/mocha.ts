@@ -96,6 +96,20 @@ qase.ignore = () => {
 };
 
 /**
+ * Mute the test case result in Qase
+ * @example
+ * it('test', () => {
+ *    qase.mute();
+ *    cy.visit('https://example.com');
+ * });
+ */
+qase.mute = () => {
+  return cy.task('qaseMute').then(() => {
+    //
+  });
+};
+
+/**
  * Set parameters for the test case
  * @param {Record<string, string>} values
  * @example

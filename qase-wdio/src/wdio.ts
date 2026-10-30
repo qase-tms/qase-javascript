@@ -216,6 +216,21 @@ qase.ignore = () => {
 };
 
 /**
+ * Mark the test result as muted in Qase. The test is still reported.
+ * @example
+ * describe('suite', () => {
+ *  it('should work', () => {
+ *    qase.mute();
+ *    // test code
+ *  });
+ * });
+ */
+qase.mute = () => {
+  sendEvent(events.addMute, {});
+  return this;
+};
+
+/**
  * Set attachment for the test case
  * @param {object} attach
  * @example

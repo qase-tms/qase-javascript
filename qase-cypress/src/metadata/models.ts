@@ -16,6 +16,7 @@ export interface Metadata {
   parameters?: Record<string, string>;
   groupParams?: Record<string, string>;
   ignore?: boolean;
+  mute?: boolean;
   suite?: string | undefined;
   comment?: string | undefined;
   tags?: string[];

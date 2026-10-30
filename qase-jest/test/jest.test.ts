@@ -7,6 +7,7 @@ import { QaseStep } from 'qase-javascript-commons';
 const qaseMock = {
   title: jest.fn(),
   ignore: jest.fn(),
+  mute: jest.fn(),
   comment: jest.fn(),
   suite: jest.fn(),
   fields: jest.fn(),
@@ -68,6 +69,13 @@ describe('qase', () => {
     it('should call global.Qase.ignore', () => {
       qase.ignore();
       expect(qaseMock.ignore).toHaveBeenCalled();
+    });
+  });
+
+  describe('qase.mute', () => {
+    it('should call global.Qase.mute', () => {
+      qase.mute();
+      expect(qaseMock.mute).toHaveBeenCalled();
     });
   });
 

@@ -47,14 +47,15 @@ export class StepRunner {
 
     try {
       func();
-    } catch {
+    } catch (error) {
       step.execution.status = StepStatusEnum.failed;
       this.failureFlag = true;
+      throw error;
+    } finally {
+      const endMs = Date.now();
+      step.execution.end_time = endMs / 1000;
+      step.execution.duration = endMs - startMs;
+      this.steps.push(step);
     }
-
-    const endMs = Date.now();
-    step.execution.end_time = endMs / 1000;
-    step.execution.duration = endMs - startMs;
-    this.steps.push(step);
   }
 }

@@ -163,18 +163,18 @@ describe('Login Tests', function() {
 
 ### Add Metadata
 
-Enhance your tests with additional information:
+Enhance your tests with additional information. Metadata methods are available on the Mocha test context (`this`), so use `function () {}` rather than arrow functions:
 
 ```javascript
 it('User registration', function() {
-  qase.title('User can register with valid email and password');
-  qase.fields({
+  this.title('User can register with valid email and password');
+  this.fields({
     severity: 'critical',
     priority: 'high',
     layer: 'api',
     description: 'Tests user registration flow with validation',
   });
-  qase.suite('Authentication / Registration');
+  this.suite('Authentication / Registration');
 
   const user = register('newuser@example.com', 'SecurePass123');
   expect(user.id).to.exist;
@@ -187,7 +187,7 @@ Exclude specific tests from Qase reporting (test still runs, but results are not
 
 ```javascript
 it('Test under development', function() {
-  qase.ignore();
+  this.ignore();
 
   expect(true).to.be.true;
 });

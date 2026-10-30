@@ -174,16 +174,15 @@ test.meta(qase.ignore().create())(
 
 ## Muting Tests
 
-Mark a test as muted. Muted tests are reported but do not affect the test run status:
+Mark a test as muted. The test is still reported, and its result is sent to Qase as muted, the same as setting the `muted` field to `'true'`. The test case itself is not muted:
 
 ```javascript
 import { qase } from 'testcafe-reporter-qase/qase';
 
-test.meta(qase.id(1).create())(
+test.meta(qase.id(1).mute().create())(
   'Known failing test',
   async (t) => {
-    qase.mute();
-    await t.expect(false).ok(); // This failure won't affect the run status
+    await t.expect(false).ok(); // Reported to Qase as a muted result
   }
 );
 ```

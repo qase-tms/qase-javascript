@@ -1,3 +1,9 @@
+# cypress-qase-reporter@3.8.0
+
+## Added
+
+- `qase.mute()` from `cypress-qase-reporter/mocha` now exists and marks the test result as muted in Qase, the same as `qase.fields({ muted: 'true' })`. Previously it was documented but threw `qase.mute is not a function`. Bumped `qase-javascript-commons` pin to `~2.9.7`.
+
 # cypress-qase-reporter@3.7.1
 
 ## Fixed

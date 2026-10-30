@@ -16,6 +16,7 @@ function emptyMetadata(): TestCaseMetadata {
     groupParams: {},
     attachments: [],
     ignore: false,
+    mute: false,
     suite: '',
     comment: '',
     tags: [],
@@ -151,6 +152,17 @@ describe('ResultBuilder feature flags and merging', () => {
       metadata: { ...emptyMetadata(), ignore: true },
     });
     expect(builder.build(args)).toBeNull();
+  });
+
+  it('marks the result as muted when metadata.mute is true', () => {
+    const args = defaultArgs({
+      metadata: { ...emptyMetadata(), mute: true },
+    });
+    expect(builder.build(args)!.muted).toBe(true);
+  });
+
+  it('leaves the result unmuted when metadata.mute is false', () => {
+    expect(builder.build(defaultArgs())!.muted).toBe(false);
   });
 
   it('adds browser parameter when options.browser.addAsParameter is true', () => {

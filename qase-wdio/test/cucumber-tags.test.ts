@@ -3,6 +3,7 @@ import { describe, expect, it, beforeEach, jest } from '@jest/globals';
 import { CucumberTagAdapter } from '../src/cucumber-tags';
 import { MetadataApplier } from '../src/metadata';
 import { Storage } from '../src/storage';
+import { TestResultType } from 'qase-javascript-commons';
 
 describe('CucumberTagAdapter', () => {
   let metadata: MetadataApplier;
@@ -45,6 +46,22 @@ describe('CucumberTagAdapter', () => {
   it('parses @suite=...', () => {
     adapter.applyTags([{ name: '@suite=Smoke' }]);
     expect(addSuite).toHaveBeenCalledWith({ suite: 'Smoke' });
+  });
+
+  it('marks the result muted for @QaseMuted', () => {
+    const storage = new Storage();
+    const t = new TestResultType('t');
+    storage.push(t);
+    new CucumberTagAdapter(new MetadataApplier(storage)).applyTags([{ name: '@QaseMuted' }]);
+    expect(t.muted).toBe(true);
+  });
+
+  it('leaves the result unmuted without @QaseMuted', () => {
+    const storage = new Storage();
+    const t = new TestResultType('t');
+    storage.push(t);
+    new CucumberTagAdapter(new MetadataApplier(storage)).applyTags([{ name: '@smoke' }, { name: '@qaseid=1' }]);
+    expect(t.muted).toBe(false);
   });
 
   it('parses @tags=a, b , c with whitespace trim', () => {

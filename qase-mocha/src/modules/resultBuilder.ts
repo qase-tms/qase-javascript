@@ -90,7 +90,7 @@ export class ResultBuilder {
       fields: metadata.fields ?? {},
       tags: metadata.tags ?? [],
       message: message ? message : null,
-      muted: false,
+      muted: metadata.mute ?? false,
       params: metadata.parameters ?? {},
       group_params: metadata.groupParameters ?? {},
       relations,
@@ -150,7 +150,10 @@ export class ResultBuilder {
   }
 
   static getSuites(test: Mocha.Test, metadata: Metadata): string[] {
-    if (metadata.suite) return [metadata.suite];
+    if (metadata.suite) {
+      const parts = metadata.suite.split('\t').filter((part) => part.trim().length > 0);
+      if (parts.length > 0) return parts;
+    }
 
     const suites: string[] = [];
     if (test.parent) {

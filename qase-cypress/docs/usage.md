@@ -219,7 +219,7 @@ describe('Feature Tests', () => {
 
 ## Muting Tests
 
-Mark a test as muted. Muted tests are reported but do not affect the test run status:
+Mark a test as muted. The test is still reported, and its result is sent to Qase as muted, the same as setting the `muted` field to `'true'`. The test case itself is not muted:
 
 ```javascript
 import { qase } from 'cypress-qase-reporter/mocha';

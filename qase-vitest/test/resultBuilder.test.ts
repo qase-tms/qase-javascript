@@ -250,6 +250,26 @@ describe('ResultBuilder.build', () => {
     expect(result.steps.length).toBe(2);
     expect(result.steps[1]).toEqual({ id: 'prof-1' });
   });
+
+  it('sets muted when metadata.muted is true', () => {
+    const result = ResultBuilder.build({
+      testCase: mkTestCase(),
+      metadata: { ...emptyMeta(), muted: true },
+      currentSuite: undefined,
+      profilerSteps: [],
+    });
+    expect(result.muted).toBe(true);
+  });
+
+  it('leaves muted false when metadata has no mute', () => {
+    const result = ResultBuilder.build({
+      testCase: mkTestCase(),
+      metadata: emptyMeta(),
+      currentSuite: undefined,
+      profilerSteps: [],
+    });
+    expect(result.muted).toBe(false);
+  });
 });
 
 describe('ResultBuilder.extractSuiteFromTestCase', () => {

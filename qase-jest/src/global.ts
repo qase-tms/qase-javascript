@@ -25,6 +25,10 @@ export class Qase {
     this.reporter.addIgnore();
   }
 
+  mute(): void {
+    this.reporter.addMute();
+  }
+
   comment(value: string): void {
     this.reporter.addComment(value);
   }

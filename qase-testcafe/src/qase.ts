@@ -14,6 +14,7 @@ export class qase {
   private static _qaseGroupParameters = '';
   private static _qaseSuite = '';
   private static _qaseIgnore = '';
+  private static _qaseMuted = '';
   private static _qaseProjects = '';
   private static _qaseTags = '';
 
@@ -135,6 +136,18 @@ export class qase {
   };
 
   /**
+   * Mark the test result as muted in Qase. Unlike `ignore`, the result is still reported.
+   * Don't forget to call `create` method after setting all the necessary parameters
+   * @example
+   * const q = qase.id(1).mute().create();
+   * test.meta(q)('Test case title', async t => { ... });
+   */
+  public static mute = () => {
+    this._qaseMuted = 'true';
+    return this;
+  };
+
+  /**
    * Set tags for the test case
    * Don't forget to call `create` method after setting all the necessary parameters
    * @param {...string} values
@@ -238,6 +251,7 @@ export class qase {
       QaseParameters: this._qaseParameters,
       QaseGroupParameters: this._qaseGroupParameters,
       QaseIgnore: this._qaseIgnore,
+      QaseMuted: this._qaseMuted,
       QaseProjects: this._qaseProjects,
       QaseTags: this._qaseTags,
     };
@@ -249,6 +263,7 @@ export class qase {
     this._qaseParameters = '';
     this._qaseGroupParameters = '';
     this._qaseIgnore = '';
+    this._qaseMuted = '';
     this._qaseProjects = '';
     this._qaseTags = '';
 

@@ -1,3 +1,14 @@
+# vitest-qase-reporter@1.6.0
+
+## Added
+
+- `qase.mute()` inside `withQase` now marks the result as muted in Qase, the same as `qase.fields({ muted: 'true' })`. The "Muting Tests" example in `docs/usage.md` used a non-existent `qase` export and now uses the `withQase(async ({ qase }) => { await qase.mute(); })` form. Bumped `qase-javascript-commons` pin to `~2.9.7`.
+
+## Fixed
+
+- `vitest-qase-reporter/setup`, which the README tells you to add to `setupFiles`, is now exported from the package. It was built but missing from `exports`, so the import failed to resolve.
+- The docs, README and examples now use the real API: `addQaseId()` / `addQaseProjects()` for IDs and `withQase(async ({ qase }) => { await qase.x(); })` for metadata. They imported a `qase` export that does not exist and documented a `qase.ignore()` the reporter does not have; the reporter path in `reporters` is `'vitest-qase-reporter'`, not `'vitest-qase-reporter/vitest'`.
+
 # vitest-qase-reporter@1.5.1
 
 ## Fixed

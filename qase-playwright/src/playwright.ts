@@ -20,6 +20,7 @@ export interface MetadataMessage {
   parameters?: Record<string, string>;
   groupParams?: Record<string, string>;
   ignore?: boolean;
+  mute?: boolean;
   suite?: string;
   comment?: string;
   tags?: string[];
@@ -264,6 +265,21 @@ qase.attach = function(attach: {
 qase.ignore = function() {
   addMetadata({
     ignore: true,
+  });
+  return this;
+};
+
+/**
+ * Mute the test case result in Qase
+ * @example
+ * test('test', async ({ page }) => {
+ *   qase.mute();
+ *   await page.goto('https://example.com');
+ * });
+ */
+qase.mute = function() {
+  addMetadata({
+    mute: true,
   });
   return this;
 };

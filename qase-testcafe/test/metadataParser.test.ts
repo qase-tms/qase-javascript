@@ -13,6 +13,7 @@ describe('MetadataParser', () => {
     expect(md[metadataEnum.parameters]).toEqual({});
     expect(md[metadataEnum.groupParameters]).toEqual({});
     expect(md[metadataEnum.ignore]).toBe(false);
+    expect(md[metadataEnum.mute]).toBe(false);
     expect(md[metadataEnum.projects]).toEqual({});
     expect(md[metadataEnum.tags]).toEqual([]);
   });
@@ -41,6 +42,11 @@ describe('MetadataParser', () => {
     expect(md[metadataEnum.title]).toBe('Custom title');
     expect(md[metadataEnum.suite]).toBe('Outer\tInner');
     expect(md[metadataEnum.ignore]).toBe(true);
+  });
+
+  it('parses QaseMuted', () => {
+    expect(MetadataParser.parse({ QaseMuted: 'true' })[metadataEnum.mute]).toBe(true);
+    expect(MetadataParser.parse({ QaseMuted: '' })[metadataEnum.mute]).toBe(false);
   });
 
   it('parses QaseFields / QaseParameters / QaseGroupParameters JSON', () => {

@@ -80,7 +80,7 @@ export class ResultBuilder {
       },
       fields: {},
       message: error?.message ?? null,
-      muted: false,
+      muted: metadata.mute,
       params: {},
       group_params: {},
       relations: ResultBuilder.getRelations(filePath, value.ancestorTitles),

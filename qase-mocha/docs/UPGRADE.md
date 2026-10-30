@@ -27,8 +27,8 @@ Version 1.2.0 includes:
 - Full support for Qase TestOps API with batch result upload
 - Test case linking via wrapper function pattern: `it(qase(id, 'name'), callback)`
 - Rich metadata support: titles, fields, suites, parameters, comments
-- Synchronous test steps with `qase.step()` (Mocha-style)
-- File and content-based attachments with `qase.attach()`
+- Synchronous test steps with `this.step()` (Mocha-style)
+- File and content-based attachments with `this.attach()`
 - Multi-project support for reporting to multiple Qase projects
 - Extra reporters support for combining with other Mocha reporters
 - Flexible configuration via `qase.config.json` or `.mocharc.js`
@@ -136,13 +136,15 @@ describe('User Authentication', () => {
 
 ### Metadata Methods
 
+Metadata methods are available on the Mocha test context (`this`), so tests must use `function () {}` syntax. `mocha-qase-reporter/mocha` exports only `qase(id, name)` and `qase.projects(mapping, name)`.
+
 ```javascript
-it('Test with metadata', () => {
-  qase.title('Custom test title');
-  qase.fields({ severity: 'critical', priority: 'high' });
-  qase.suite('Authentication / Login');
-  qase.comment('This test covers the main login flow');
-  qase.parameters({ environment: 'staging', browser: 'Chrome' });
+it('Test with metadata', function () {
+  this.title('Custom test title');
+  this.fields({ severity: 'critical', priority: 'high' });
+  this.suite('Authentication / Login');
+  this.comment('This test covers the main login flow');
+  this.parameters({ environment: 'staging', browser: 'Chrome' });
 
   expect(true).to.equal(true);
 });
@@ -154,28 +156,28 @@ it('Test with metadata', () => {
 
 ```javascript
 it('Test with steps', function () {
-  qase.step('Initialize environment', () => {
+  this.step('Initialize environment', () => {
     // Setup code
   });
 
-  qase.step('Perform action', () => {
+  this.step('Perform action', () => {
     // Test logic
   });
 
-  qase.step('Verify result', () => {
+  this.step('Verify result', () => {
     // Assertions
     expect(result).to.equal(expected);
   });
 });
 ```
 
-**Note:** Use `function()` syntax (not arrow functions) when you need access to Mocha's `this` context:
+**Note:** Use `function()` syntax (not arrow functions) for tests: both Mocha's own context methods and the Qase metadata methods are on `this`:
 
 ```javascript
 it('Test with context', function () {
   this.timeout(5000); // Access Mocha's this context
 
-  qase.step('Step 1', () => {
+  this.step('Step 1', () => {
     // Step code
   });
 });
@@ -184,17 +186,19 @@ it('Test with context', function () {
 ### Attachments
 
 ```javascript
-// Path-based attachment
-qase.attach({ paths: '/path/to/log.txt' });
+it('Test with attachments', function () {
+  // Path-based attachment
+  this.attach({ paths: '/path/to/log.txt' });
 
-// Multiple files
-qase.attach({ paths: ['/path/to/file1.txt', '/path/to/file2.log'] });
+  // Multiple files
+  this.attach({ paths: ['/path/to/file1.txt', '/path/to/file2.log'] });
 
-// Content-based attachment
-qase.attach({
-  name: 'test-log.txt',
-  content: 'Test execution log content',
-  contentType: 'text/plain',
+  // Content-based attachment
+  this.attach({
+    name: 'test-log.txt',
+    content: 'Test execution log content',
+    contentType: 'text/plain',
+  });
 });
 ```
 
@@ -271,15 +275,15 @@ Or configure `mode: 'testops'` in your `.mocharc.js` or `qase.config.json`.
 
 ```javascript
 // Correct - synchronous callbacks
-it('Test', () => {
-  qase.step('Step 1', () => {
+it('Test', function () {
+  this.step('Step 1', () => {
     // Code
   });
 });
 
 // Incorrect - async/await not supported for steps in Mocha
-it('Test', async () => {
-  await qase.step('Step 1', async () => {
+it('Test', async function () {
+  await this.step('Step 1', async () => {
     // This won't work correctly
   });
 });
@@ -293,7 +297,7 @@ it('Test', async () => {
 // Correct - function syntax preserves this context
 it('Test', function () {
   this.timeout(5000);
-  qase.step('Step', () => { /* ... */ });
+  this.step('Step', () => { /* ... */ });
 });
 
 // Incorrect - arrow function loses this context

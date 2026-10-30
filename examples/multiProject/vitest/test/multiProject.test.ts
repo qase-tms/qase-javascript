@@ -36,7 +36,7 @@ describe('Multi-project API - User Operations', () => {
     addQaseProjects('GET single user by ID returns correct user', { PROJ1: [3], PROJ2: [4] }),
     withQase(async ({ qase }) => {
       await qase.fields({ layer: 'api', severity: 'normal' });
-      await qase.parameters({ userId: 1 });
+      await qase.parameters({ userId: '1' });
 
       await qase.step('Send GET request to /users/1', async () => {
         const response = await fetch(`${BASE_URL}/users/1`);

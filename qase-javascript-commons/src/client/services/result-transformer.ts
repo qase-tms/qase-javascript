@@ -92,6 +92,13 @@ export class ResultTransformer {
       };
     }
 
+    if (result.muted) {
+      model.fields = {
+        ...model.fields,
+        muted: 'true',
+      };
+    }
+
     this.logger.logDebug(`Transformed result: ${JSON.stringify(model)}`);
 
     return model;

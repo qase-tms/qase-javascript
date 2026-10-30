@@ -19,6 +19,7 @@ export class MetadataManager {
       parameters: {},
       groupParams: {},
       ignore: false,
+      mute: false,
       suite: undefined,
       comment: undefined,
       steps: [],
@@ -44,6 +45,12 @@ export class MetadataManager {
   public static setIgnore(): void {
     const metadata = this.getMetadata() ?? {};
     metadata.ignore = true;
+    this.setMetadata(metadata);
+  }
+
+  public static setMute(): void {
+    const metadata = this.getMetadata() ?? {};
+    metadata.mute = true;
     this.setMetadata(metadata);
   }
 

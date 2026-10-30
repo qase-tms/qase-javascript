@@ -26,6 +26,7 @@ export class IpcBridge {
     process.on(events.addComment, (args: AddCommentEventArgs) => this.metadata.addComment(args));
     process.on(events.addAttachment, (args: AddAttachmentEventArgs) => this.metadata.addAttachment(args));
     process.on(events.addIgnore, () => this.metadata.ignore());
+    process.on(events.addMute, () => this.metadata.mute());
     process.on(events.addStep, (step: TestStepType) => this.metadata.addStep(step));
     process.on(events.addTags, (args: AddTagsEventArgs) => this.metadata.addTags(args));
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

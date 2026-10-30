@@ -32,9 +32,11 @@ describe('StepRunner', () => {
     expect(steps[0]!.execution.duration as number).toBeGreaterThanOrEqual(0);
   });
 
-  it('run() with a throwing fn marks step failed, swallows the error, and exposes hasFailure()', () => {
-    expect(() => runner.run('boom', () => { throw new Error('nope'); })).not.toThrow();
+  it('run() with a throwing fn records the failed step and rethrows so the test fails', () => {
+    const error = new Error('nope');
+    expect(() => runner.run('boom', () => { throw error; })).toThrow(error);
     expect(runner.getSteps()[0]?.execution.status).toBe(StepStatusEnum.failed);
+    expect(runner.getSteps()[0]?.execution.duration).not.toBeNull();
     expect(runner.hasFailure()).toBe(true);
   });
 

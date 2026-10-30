@@ -3,6 +3,7 @@ import { Attachment, TestStepType } from 'qase-javascript-commons';
 export interface Metadata {
   title: string | undefined;
   ignore: boolean;
+  mute: boolean;
   comment: string | undefined;
   suite: string | undefined;
   fields: Record<string, string>;

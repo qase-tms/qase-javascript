@@ -169,6 +169,16 @@ describe('qase API', () => {
     });
   });
 
+  describe('qase.mute', () => {
+    it('should call test.info().attach with mute metadata', () => {
+      qase.mute();
+      expect(testInfoMock.attach).toHaveBeenCalledWith('qase-metadata.json', {
+        contentType: 'application/qase.metadata+json',
+        body: Buffer.from(JSON.stringify({ mute: true }), 'utf8'),
+      });
+    });
+  });
+
   describe('qase.suite', () => {
     it('should call test.info().attach with suite metadata', () => {
       qase.suite('Test Suite');

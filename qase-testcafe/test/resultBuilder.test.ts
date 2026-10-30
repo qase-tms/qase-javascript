@@ -13,6 +13,7 @@ function makeMetadata(overrides: Partial<MetadataType> = {}): MetadataType {
     QaseParameters: {},
     QaseGroupParameters: {},
     QaseIgnore: false,
+    QaseMuted: false,
     QaseProjects: {},
     QaseTags: [],
     ...overrides,
@@ -55,6 +56,16 @@ describe('ResultBuilder', () => {
     expect(result.execution.status).toBe(TestStatusEnum.passed);
     expect(result.title).toBe('sample');
     expect(result.testops_id).toBeNull();
+  });
+
+  it('leaves muted false when QaseMuted is not set', () => {
+    const result = ResultBuilder.build({ ...baseArgs });
+    expect(result.muted).toBe(false);
+  });
+
+  it('sets muted when QaseMuted is true', () => {
+    const result = ResultBuilder.build({ ...baseArgs, metadata: makeMetadata({ QaseMuted: true }) });
+    expect(result.muted).toBe(true);
   });
 
   it('marks skipped when testRunInfo.skipped is true', () => {

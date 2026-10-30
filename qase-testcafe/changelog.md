@@ -1,3 +1,9 @@
+# testcafe-reporter-qase@2.8.0
+
+## Added
+
+- `qase.mute()` builder method (`test.meta(qase.id(1).mute().create())`) now marks the result as muted in Qase, the same as `qase.fields({ muted: 'true' })`. Unlike `qase.ignore()`, a muted test is still reported. The "Muting Tests" example in `docs/usage.md` called `qase.mute()` inside the test body, which is not supported; it now uses the builder form. Bumped `qase-javascript-commons` pin to `~2.9.7`.
+
 # testcafe-reporter-qase@2.7.0
 
 ## Added

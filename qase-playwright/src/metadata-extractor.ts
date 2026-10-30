@@ -20,6 +20,7 @@ export interface TestCaseMetadata {
   groupParams: Record<string, string>;
   attachments: Attachment[];
   ignore: boolean;
+  mute: boolean;
   suite: string;
   comment: string;
   tags: string[];
@@ -48,6 +49,7 @@ export class MetadataExtractor {
       groupParams: {},
       attachments: [],
       ignore: false,
+      mute: false,
       suite: '',
       comment: '',
       tags: [],
@@ -85,6 +87,10 @@ export class MetadataExtractor {
 
         if (message.ignore) {
           metadata.ignore = message.ignore;
+        }
+
+        if (message.mute) {
+          metadata.mute = message.mute;
         }
 
         if (message.suite) {

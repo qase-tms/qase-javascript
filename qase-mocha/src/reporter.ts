@@ -134,6 +134,7 @@ export class MochaQaseReporter extends reporters.Base {
     ctx.fields = this.fields;
     ctx.suite = this.suite;
     ctx.ignore = this.ignore;
+    ctx.mute = this.mute;
     ctx.attach = this.attach;
     ctx.comment = this.comment;
     ctx.tags = this.tags;
@@ -209,6 +210,10 @@ export class MochaQaseReporter extends reporters.Base {
 
   ignore = () => {
     this.metadataApplier.applyIgnore();
+  };
+
+  mute = () => {
+    this.metadataApplier.applyMute();
   };
 
   attach = (attach: { name?: string, paths?: string | string[], content?: Buffer | string, contentType?: string }) => {

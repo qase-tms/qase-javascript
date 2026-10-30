@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example demonstrates realistic API testing scenarios using Mocha with Qase TestOps integration. The tests validate a public REST API (JSONPlaceholder) while showcasing all Qase reporter features in practical contexts, including CRUD operations on users, post validation and filtering, error handling for 404 responses, and advanced features like nested steps, suite hierarchies, and parameterized tests.
+This example demonstrates realistic API testing scenarios using Mocha with Qase TestOps integration. The tests validate a public REST API (JSONPlaceholder) while showcasing all Qase reporter features in practical contexts, including CRUD operations on users, post validation and filtering, error handling for 404 responses, and advanced features like multi-step verification, suite hierarchies, and parameterized tests.
 
 ## Prerequisites
 
@@ -66,7 +66,7 @@ Tests basic CRUD operations on the `/users` endpoint:
 - **POST create user** - Tests user creation with request/response attachments
 - **DELETE user** - Verifies deletion (faked by JSONPlaceholder)
 
-**Qase features:** `qase.id`, `qase.fields`, `qase.step`, `qase.attach`, `qase.comment`, `qase.parameters`
+**Qase features:** `qase(id, name)`, `this.fields`, `this.step`, `this.attach`, `this.comment`, `this.parameters`
 
 ### 2. `api-posts.spec.js` - Post Validation
 Tests post retrieval and filtering:
@@ -74,7 +74,7 @@ Tests post retrieval and filtering:
 - **GET posts by user** - Tests filtering with query parameters
 - **GET post with comments** - Validates relationships and nested data
 
-**Qase features:** `qase.id`, `qase.fields`, `qase.parameters`, `qase.step`, `qase.attach`
+**Qase features:** `qase(id, name)`, `this.fields`, `this.parameters`, `this.step`, `this.attach`
 
 ### 3. `api-errors.spec.js` - Error Handling
 Tests error scenarios and 404 responses:
@@ -82,16 +82,16 @@ Tests error scenarios and 404 responses:
 - **Non-existent post** - Attaches error response for documentation
 - **Invalid endpoint** - Verifies graceful handling of bad URLs
 
-**Qase features:** `qase.id`, `qase.comment`, `qase.step`, `qase.attach`
+**Qase features:** `qase(id, name)`, `this.comment`, `this.step`, `this.attach`
 
 ### 4. `api-advanced.spec.js` - Advanced Features
 Demonstrates complex Qase capabilities:
-- **Complex nested steps** - Multi-level step hierarchy for related API calls
+- **Multiple steps** - Step-by-step verification of related API calls
 - **Suite hierarchy** - Nested suite structure with `\t` separator
 - **Parameterized patterns** - Testing multiple resources with parameters
 - **Ignored test** - Placeholder for future authentication features
 
-**Qase features:** `qase.id`, `qase.fields`, `qase.suite`, `qase.step`, `qase.parameters`, `qase.attach`, `qase.comment`, `qase.ignore`
+**Qase features:** `qase(id, name)`, `this.fields`, `this.suite`, `this.step`, `this.parameters`, `this.attach`, `this.comment`, `this.ignore`
 
 ## Qase Features Demonstrated
 
@@ -100,14 +100,14 @@ All 9 Qase reporter features demonstrated in these tests:
 | Feature | Usage | Example File |
 |---------|-------|--------------|
 | **Test ID** | `qase(id, 'name')` wrapper | All files |
-| **Title** | `qase.title('custom title')` | Not needed (using qase wrapper) |
-| **Fields** | `qase.fields({ layer, severity, priority })` | api-crud, api-posts, api-advanced |
-| **Suite** | `qase.suite('Parent\tChild\tGrandchild')` | api-advanced |
-| **Steps** | `await qase.step('name', async () => {})` | All files |
-| **Attachments** | `qase.attach({ name, content, contentType })` | api-crud, api-posts, api-errors, api-advanced |
-| **Comments** | `qase.comment('additional info')` | api-crud, api-errors, api-advanced |
-| **Parameters** | `qase.parameters({ key: 'value' })` | api-crud, api-posts, api-advanced |
-| **Ignore** | `qase.ignore()` with `it.skip()` | api-advanced |
+| **Title** | `this.title('custom title')` | Not needed (using qase wrapper) |
+| **Fields** | `this.fields({ layer, severity, priority })` | api-crud, api-posts, api-advanced |
+| **Suite** | `this.suite('Parent\tChild\tGrandchild')` | api-advanced |
+| **Steps** | `this.step('name', () => {})` | api-crud, api-posts, api-errors, api-advanced |
+| **Attachments** | `this.attach({ name, content, contentType })` | api-crud, api-posts, api-errors, api-advanced |
+| **Comments** | `this.comment('additional info')` | api-crud, api-errors, api-advanced |
+| **Parameters** | `this.parameters({ key: 'value' })` | api-crud, api-posts, api-advanced |
+| **Ignore** | `this.ignore()` with `it.skip()` | api-advanced |
 
 ## Mocha-Specific Patterns
 
@@ -115,7 +115,7 @@ All 9 Qase reporter features demonstrated in these tests:
 ```javascript
 const { qase } = require('mocha-qase-reporter/mocha');
 ```
-**Important:** Must import from `mocha-qase-reporter/mocha` (not base package).
+**Important:** Must import from `mocha-qase-reporter/mocha` (not base package). It exports only `qase(id, name)` and `qase.projects(mapping, name)`; all other metadata methods (`this.title`, `this.fields`, `this.step`, ...) are on the Mocha test context.
 
 ### Test ID Wrapper Pattern
 ```javascript
@@ -127,7 +127,7 @@ The `qase(id, name)` wrapper assigns Qase test case IDs.
 
 ### Attachment contentType Parameter
 ```javascript
-qase.attach({
+this.attach({
   name: 'data.json',
   content: JSON.stringify(data),
   contentType: 'application/json'  // Note: contentType, not type
@@ -135,36 +135,35 @@ qase.attach({
 ```
 **Important:** Mocha uses `contentType` parameter (Vitest uses `type`).
 
-### Steps Can Be Sync or Async
+### Steps Are Synchronous
 ```javascript
-// Async steps (recommended for API calls)
-await qase.step('Fetch data', async () => {
-  const response = await fetch(url);
-});
+// Do async work outside the step...
+const response = await fetch(url);
 
-// Sync steps (for simple operations)
-qase.step('Validate data', () => {
-  assert.strictEqual(value, expected);
+// ...and keep the step body synchronous
+this.step('Validate data', () => {
+  assert.strictEqual(response.status, 200);
 });
 ```
+`this.step()` does not await its callback, so an `async` step body would be reported before it finishes. Steps are recorded flat; nested steps are not supported.
 
 ### Suite Hierarchy with \t Separator
 ```javascript
-qase.suite('API Tests\tAdvanced\tRelationships');
+this.suite('API Tests\tAdvanced\tRelationships');
 // Creates: API Tests > Advanced > Relationships in Qase UI
 ```
 
 ### Function Context for `this` Access
-While modern API uses the `qase` object directly, traditional Mocha patterns use `function()` syntax (not arrow functions) to access `this` context:
+Metadata methods live on the Mocha test context, so tests must use `function()` syntax (not arrow functions) to access `this`:
 
 ```javascript
-// Modern approach (used in these examples)
+// Correct
 it('test', function() {
-  qase.title('Custom title');
+  this.title('Custom title');
 });
 
-// Traditional approach (also valid)
-it('test', function() {
+// Wrong: arrow functions do not receive the Mocha test context
+it('test', () => {
   this.title('Custom title');
 });
 ```
@@ -222,7 +221,7 @@ JSONPlaceholder Error Handling
   ✓ Invalid endpoint - verify graceful 404 handling (Qase ID: 10)
 
 JSONPlaceholder Advanced Qase Features
-  ✓ Complex nested steps - multi-resource retrieval (Qase ID: 11)
+  ✓ Multiple steps - multi-resource retrieval (Qase ID: 11)
   ✓ Suite hierarchy demonstration (Qase ID: 12)
   ✓ Parameterized test pattern - multiple user IDs (Qase ID: 13)
   - Future feature - API authentication (Qase ID: 14)

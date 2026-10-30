@@ -82,7 +82,7 @@ export class ResultBuilder {
       },
       fields: metadata.fields,
       message: error?.message ?? null,
-      muted: false,
+      muted: metadata.isMuted,
       params,
       group_params: metadata.group_params,
       relations,

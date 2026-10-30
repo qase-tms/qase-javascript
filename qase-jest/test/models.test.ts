@@ -8,6 +8,7 @@ describe('Metadata', () => {
     const metadata: Metadata = {
       title: 'Test Title',
       ignore: false,
+      mute: false,
       comment: 'Test Comment',
       suite: 'Test Suite',
       fields: { field1: 'value1' },
@@ -49,6 +50,7 @@ describe('Metadata', () => {
     const metadata: Metadata = {
       title: undefined,
       ignore: false,
+      mute: false,
       comment: undefined,
       suite: undefined,
       fields: {},
@@ -68,6 +70,7 @@ describe('Metadata', () => {
     const metadata: Metadata = {
       title: undefined,
       ignore: false,
+      mute: false,
       comment: undefined,
       suite: undefined,
       fields: {},

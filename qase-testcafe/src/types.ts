@@ -44,6 +44,7 @@ export enum metadataEnum {
   groupParameters = 'QaseGroupParameters',
   oldID = 'CID',
   ignore = 'QaseIgnore',
+  mute = 'QaseMuted',
   projects = 'QaseProjects',
   tags = 'QaseTags',
 }
@@ -56,6 +57,7 @@ export interface MetadataType {
   [metadataEnum.parameters]: Record<string, string>;
   [metadataEnum.groupParameters]: Record<string, string>;
   [metadataEnum.ignore]: boolean;
+  [metadataEnum.mute]: boolean;
   [metadataEnum.projects]: Record<string, number[]>;
   [metadataEnum.tags]: string[];
 }
