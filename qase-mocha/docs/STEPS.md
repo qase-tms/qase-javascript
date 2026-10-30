@@ -142,7 +142,7 @@ Steps automatically inherit status from execution:
 | Completes normally | Passed |
 | Throws any error | Failed |
 
-The reporter catches the error thrown inside a step: the step is reported as failed, but the error is not rethrown, so the Mocha test itself does not fail because of it.
+An error thrown inside a step marks the step as failed and is rethrown, so the Mocha test fails as well. Steps after the failing one do not run.
 
 ---
 
