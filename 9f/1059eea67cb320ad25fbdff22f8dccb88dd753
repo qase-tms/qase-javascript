@@ -1,0 +1,53 @@
+qase-cucumberjs/README.md
+  s_c3e47f5cf45a98::t_4d2ffa8060aa2b 34-35,41-42,97,108-109
+qase-cypress/README.md
+  s_c3e47f5cf45a98::t_04c357cbe1beae 37-38,44-45,102,117,158-159
+qase-cypress/docs/usage.md
+  s_c3e47f5cf45a98::t_02fa732a5ee043 859-861
+qase-javascript-commons/README.md
+  s_c3e47f5cf45a98::t_a524020f1c72ef 53
+qase-jest/README.md
+  s_c3e47f5cf45a98::t_81838c9202a955 34-35,41-42,76,87-88,122
+qase-jest/docs/usage.md
+  s_c3e47f5cf45a98::t_1b783da85f14db 435,439,531
+qase-mocha/README.md
+  s_c3e47f5cf45a98::t_28a53f277ff655 36-37,43-44,86,109-110
+qase-mocha/docs/usage.md
+  s_c3e47f5cf45a98::t_43d86d2605ab11 917-919
+qase-newman/README.md
+  s_c3e47f5cf45a98::t_0624958e6aa1a3 34-35,41-42,74,85-86,230,234
+qase-newman/docs/usage.md
+  s_c3e47f5cf45a98::t_c20144fbc50b98 285,554,656
+qase-playwright/README.md
+  s_c3e47f5cf45a98::t_1b84f3e0abbdae 35-36,42-43,90,121,132-133,170
+qase-playwright/docs/usage.md
+  s_c3e47f5cf45a98::t_905aaeedf94f4c 493,497
+qase-testcafe/README.md
+  s_c3e47f5cf45a98::t_efd4b334b879e4 35-36,42-43,81,92-93,294,298
+qase-testcafe/docs/usage.md
+  s_c3e47f5cf45a98::t_975a5ad0536050 439,443,983
+qase-vitest/README.md
+  s_c3e47f5cf45a98::t_09c882a7b57361 34-35,41-42,85-86,104,115-116
+qase-vitest/docs/usage.md
+  s_c3e47f5cf45a98::t_ae6667c9a33c24 736
+qase-wdio/README.md
+  s_c3e47f5cf45a98::t_9884116205b229 35-36,42-43,114,125-126,315,319
+qase-wdio/docs/usage.md
+  s_c3e47f5cf45a98::t_0799e95d0393f5 615,619,1114
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9f1059eea67cb320ad25fbdff22f8dccb88dd753",
+  "prompts": {},
+  "sessions": {
+    "s_c3e47f5cf45a98": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "504bcd79-2ecb-484d-8aa3-2456deafeac2",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Manju R <cskmnrpt@gmail.com>"
+    }
+  }
+}
