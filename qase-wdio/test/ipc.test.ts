@@ -26,6 +26,7 @@ describe('IpcBridge', () => {
     process.removeAllListeners(events.addComment);
     process.removeAllListeners(events.addAttachment);
     process.removeAllListeners(events.addIgnore);
+    process.removeAllListeners(events.addMute);
     process.removeAllListeners(events.addStep);
     process.removeAllListeners(events.addTags);
     process.removeAllListeners(events.addProfilerSteps);
@@ -35,6 +36,12 @@ describe('IpcBridge', () => {
     const spy = jest.spyOn(metadata, 'addQaseId');
     process.emit(events.addQaseID as any, { ids: [7] } as any);
     expect(spy).toHaveBeenCalledWith({ ids: [7] });
+  });
+
+  it('routes addMute events to MetadataApplier.mute', () => {
+    const spy = jest.spyOn(metadata, 'mute');
+    process.emit(events.addMute as any, {} as any);
+    expect(spy).toHaveBeenCalled();
   });
 
   it('buffers addProfilerSteps payloads (valid JSON of TestStepType[])', () => {

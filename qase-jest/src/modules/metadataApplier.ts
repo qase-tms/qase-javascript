@@ -9,6 +9,7 @@ export class MetadataApplier {
     return {
       title: undefined,
       ignore: false,
+      mute: false,
       comment: undefined,
       suite: undefined,
       fields: {},
@@ -58,6 +59,10 @@ export class MetadataApplier {
 
   applyIgnore(): void {
     this.metadata.ignore = true;
+  }
+
+  applyMute(): void {
+    this.metadata.mute = true;
   }
 
   applyAttachment(attachment: Attachment): void {

@@ -10,6 +10,10 @@ export class CucumberTagAdapter {
 
   applyTags(tags: readonly TagLike[]): void {
     for (const tag of tags) {
+      if (tag.name.toLowerCase() === '@qasemuted') {
+        this.metadata.mute();
+        continue;
+      }
       if (!tag.name.includes('=')) {
         continue;
       }

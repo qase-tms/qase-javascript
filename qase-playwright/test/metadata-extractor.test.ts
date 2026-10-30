@@ -36,6 +36,7 @@ describe('MetadataExtractor', () => {
       groupParams: {},
       attachments: [],
       ignore: false,
+      mute: false,
       suite: '',
       comment: '',
       tags: [],
@@ -70,6 +71,11 @@ describe('MetadataExtractor', () => {
     expect(m.suite).toBe('mySuite');
     expect(m.comment).toBe('note');
     expect(m.groupParams).toEqual({ region: 'eu' });
+  });
+
+  it('parses mute', () => {
+    const m = extractor.transform([makeMetadataAttachment({ mute: true })]);
+    expect(m.mute).toBe(true);
   });
 
   it('parses projectMapping when payload is an object', () => {

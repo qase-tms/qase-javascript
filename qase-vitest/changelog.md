@@ -1,3 +1,9 @@
+# vitest-qase-reporter@1.6.0
+
+## Added
+
+- `qase.mute()` inside `withQase` now marks the result as muted in Qase, the same as `qase.fields({ muted: 'true' })`. The "Muting Tests" example in `docs/usage.md` used a non-existent `qase` export and now uses the `withQase(async ({ qase }) => { await qase.mute(); })` form. Bumped `qase-javascript-commons` pin to `~2.9.7`.
+
 # vitest-qase-reporter@1.5.1
 
 ## Fixed

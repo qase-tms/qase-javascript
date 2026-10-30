@@ -1,3 +1,9 @@
+# mocha-qase-reporter@1.7.0
+
+## Added
+
+- `this.mute()` is now available in Mocha test context and marks the test result as muted in Qase, the same as `this.fields({ muted: 'true' })`. Previously the documented mute call threw `mute is not a function`; the usage docs now show `this.mute()`. Bumped `qase-javascript-commons` pin to `~2.9.7`.
+
 # mocha-qase-reporter@1.6.0
 
 ## Added

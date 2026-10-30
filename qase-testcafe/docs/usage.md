@@ -179,10 +179,9 @@ Mark a test as muted. Muted tests are reported but do not affect the test run st
 ```javascript
 import { qase } from 'testcafe-reporter-qase/qase';
 
-test.meta(qase.id(1).create())(
+test.meta(qase.id(1).mute().create())(
   'Known failing test',
   async (t) => {
-    qase.mute();
     await t.expect(false).ok(); // This failure won't affect the run status
   }
 );

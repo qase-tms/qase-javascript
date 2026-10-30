@@ -92,6 +92,19 @@ describe('ResultBuilder', () => {
     expect(result.title).toBe('overridden');
   });
 
+  it('sets muted to true when metadata.mute is set', () => {
+    const result = ResultBuilder.build({
+      ...baseArgs,
+      metadata: makeMetadata({ mute: true }),
+    });
+    expect(result.muted).toBe(true);
+  });
+
+  it('sets muted to false when mute was not called', () => {
+    const result = ResultBuilder.build(baseArgs);
+    expect(result.muted).toBe(false);
+  });
+
   it('removes "(Qase ID: 7)" suffix from title when metadata.title not set', () => {
     const test = makeTest({ title: 'login (Qase ID: 7)', parentTitlePath: ['Suite'] });
     const result = ResultBuilder.build({ ...baseArgs, test });

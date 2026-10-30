@@ -48,3 +48,13 @@ describe('qase.id (wdio runtime API)', () => {
     emit.mockRestore();
   });
 });
+
+describe('qase.mute (wdio runtime API)', () => {
+  it('emits the mute event', () => {
+    const emit = jest.spyOn(process, 'emit').mockImplementation(() => true);
+    const { qase } = require('../src/wdio');
+    qase.mute();
+    expect(emit).toHaveBeenCalledWith('qase:mute', {});
+    emit.mockRestore();
+  });
+});

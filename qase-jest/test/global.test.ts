@@ -6,6 +6,7 @@ import { Qase } from '../src/global';
 const reporterMock = {
   addTitle: jest.fn(),
   addIgnore: jest.fn(),
+  addMute: jest.fn(),
   addComment: jest.fn(),
   addSuite: jest.fn(),
   addFields: jest.fn(),
@@ -40,6 +41,13 @@ describe('Qase', () => {
     it('should call reporter.addIgnore', () => {
       qase.ignore();
       expect(reporterMock.addIgnore).toHaveBeenCalled();
+    });
+  });
+
+  describe('mute', () => {
+    it('should call reporter.addMute', () => {
+      qase.mute();
+      expect(reporterMock.addMute).toHaveBeenCalled();
     });
   });
 

@@ -46,6 +46,10 @@ export class MetadataApplier {
     this.metadata.ignore = true;
   }
 
+  applyMute(): void {
+    this.metadata.mute = true;
+  }
+
   applyAttach(attach: AttachInput): void {
     this.metadata.addAttachment(attach);
   }

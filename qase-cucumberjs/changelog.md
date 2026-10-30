@@ -1,3 +1,9 @@
+# cucumberjs-qase-reporter@2.6.0
+
+## Added
+
+- The `@QaseMuted` tag now marks the result as muted in Qase, like `@QaseFields={"muted":"true"}`. Previously the tag was ignored and the result was sent unmuted. Bumped `qase-javascript-commons` pin to `~2.9.7`.
+
 # cucumberjs-qase-reporter@2.5.0
 
 ## Added

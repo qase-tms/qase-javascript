@@ -70,6 +70,11 @@ describe('MetadataApplier', () => {
     expect(applier.get().ignore).toBe(true);
   });
 
+  it('applyMute sets mute=true', () => {
+    applier.applyMute();
+    expect(applier.get().mute).toBe(true);
+  });
+
   it('applyAttachment pushes attachment', () => {
     const a1 = { file_name: 'a' } as any;
     const a2 = { file_name: 'b' } as any;

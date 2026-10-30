@@ -80,7 +80,7 @@ export class ResultBuilder {
       fields: metadata[metadataEnum.fields],
       tags: metadata[metadataEnum.tags],
       message: errorLog ? errorLog.split('\n')[0] ?? '' : '',
-      muted: false,
+      muted: metadata[metadataEnum.mute],
       params,
       group_params: metadata[metadataEnum.groupParameters],
       relations: {

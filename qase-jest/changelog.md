@@ -1,3 +1,9 @@
+# jest-qase-reporter@2.7.0
+
+## Added
+
+- `qase.mute()` now exists. It was documented in the "Muting Tests" section but not implemented, so calling it failed with `Property 'mute' does not exist` in TypeScript and `qase.mute is not a function` at runtime. The test is still reported, and its result is marked as muted in Qase, the same as `qase.fields({ muted: 'true' })`. Bumped `qase-javascript-commons` pin to `~2.9.7`.
+
 # jest-qase-reporter@2.6.0
 
 ## Added

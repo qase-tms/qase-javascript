@@ -169,6 +169,10 @@ export class JestQaseReporter implements Reporter {
     this.metadataApplier.applyIgnore();
   }
 
+  public addMute() {
+    this.metadataApplier.applyMute();
+  }
+
   public addStep(step: TestStepType) {
     this.metadataApplier.applyStep(step);
   }

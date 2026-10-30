@@ -52,6 +52,12 @@ describe('TagParser', () => {
     expect(md.isIgnore).toBe(true);
   });
 
+  it('parses @QaseMuted as isMuted=true', () => {
+    const md = TagParser.parse([tag('@QaseMuted')]);
+    expect(md.isMuted).toBe(true);
+    expect(md.isIgnore).toBe(false);
+  });
+
   it('parses @QaseTags= comma-separated list', () => {
     const md = TagParser.parse([tag('@QaseTags=smoke, regression, fast')]);
     expect(md.tags).toEqual(['smoke', 'regression', 'fast']);
@@ -65,6 +71,7 @@ describe('TagParser', () => {
     expect(md.fields).toEqual({});
     expect(md.title).toBeNull();
     expect(md.isIgnore).toBe(false);
+    expect(md.isMuted).toBe(false);
     expect(md.parameters).toEqual({});
     expect(md.group_params).toEqual({});
     expect(md.suite).toBeNull();

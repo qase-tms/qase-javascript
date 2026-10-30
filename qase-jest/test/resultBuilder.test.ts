@@ -114,6 +114,28 @@ describe('ResultBuilder.build', () => {
     expect(result.message).toBe('Runtime exception');
   });
 
+  it('marks the result as muted when metadata.mute is true', () => {
+    const meta = MetadataApplier.empty();
+    meta.mute = true;
+    const result = ResultBuilder.build({
+      value: baseValue,
+      path: '/x.ts',
+      metadata: meta,
+      profilerSteps: [],
+    });
+    expect(result.muted).toBe(true);
+  });
+
+  it('leaves the result unmuted when mute was not called', () => {
+    const result = ResultBuilder.build({
+      value: baseValue,
+      path: '/x.ts',
+      metadata: MetadataApplier.empty(),
+      profilerSteps: [],
+    });
+    expect(result.muted).toBe(false);
+  });
+
   it('applies metadata.title and metadata.comment', () => {
     const meta = MetadataApplier.empty();
     meta.title = 'Override Title';

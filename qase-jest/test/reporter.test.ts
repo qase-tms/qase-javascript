@@ -256,6 +256,12 @@ describe('JestQaseReporter', () => {
       expect(m.ignore).toBe(true);
     });
 
+    it('addMute sets the mute flag', () => {
+      reporter.addMute();
+      const m = (reporter as any).metadataApplier.get();
+      expect(m.mute).toBe(true);
+    });
+
     it('addStep and addAttachment append', () => {
       const step = new TestStepType();
       step.id = 's';

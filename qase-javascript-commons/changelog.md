@@ -1,3 +1,9 @@
+## 2.9.7
+
+### Fixed
+
+- A result marked as muted (`TestResult.muted`) is now sent to Qase TestOps as muted. The flag was only written to the local report, so `qase.mute()` support in the reporters had nothing to send. The v2 result now carries `fields.muted: 'true'` when the result is muted; results that are not muted are sent as before, and a `muted` field set through `qase.fields()` is kept.
+
 ## 2.9.6
 
 ### Fixed

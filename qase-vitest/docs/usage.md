@@ -193,13 +193,13 @@ test('Test not reported to Qase', () => {
 Mark a test as muted. Muted tests are reported but do not affect the test run status:
 
 ```typescript
-import { qase } from 'vitest-qase-reporter/vitest';
+import { withQase } from 'vitest-qase-reporter/vitest';
 import { test, expect } from 'vitest';
 
-test('Muted test', () => {
-  qase.mute();
+test('Muted test', withQase(async ({ qase }) => {
+  await qase.mute();
   expect(true).toBe(true);
-});
+}));
 ```
 
 ---

@@ -337,6 +337,10 @@ export default class WDIOQaseReporter extends WDIOReporter {
     this.metadata.ignore();
   }
 
+  mute() {
+    this.metadata.mute();
+  }
+
   addStep(step: TestStepType) {
     this.metadata.addStep(step);
   }

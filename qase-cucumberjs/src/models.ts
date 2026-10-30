@@ -7,6 +7,7 @@ export interface TestMetadata {
   fields: Record<string, string>;
   title: string | null;
   isIgnore: boolean;
+  isMuted: boolean;
   parameters: Record<string, string>;
   group_params: Record<string, string>;
   suite: string | null;

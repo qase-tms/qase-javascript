@@ -4,6 +4,7 @@ export const events = {
   addFields: 'qase:fields',
   addSuite: 'qase:suite',
   addIgnore: 'qase:ignore',
+  addMute: 'qase:mute',
   addParameters: 'qase:parameters',
   addGroupParameters: 'qase:groupParameters',
   addComment: 'qase:comment',

@@ -49,6 +49,11 @@ describe('MetadataApplier', () => {
     expect(applier.get().ignore).toBe(true);
   });
 
+  it('applyMute sets the mute flag', () => {
+    applier.applyMute();
+    expect(applier.get().mute).toBe(true);
+  });
+
   it('applyTags accumulates across calls and applyComment appends with \\n\\n', () => {
     applier.applyTags(['smoke']);
     applier.applyTags(['regression', 'fast']);
@@ -64,6 +69,7 @@ describe('MetadataApplier', () => {
     applier.applyTitle('Custom');
     applier.applyTags(['smoke']);
     applier.applyIgnore();
+    applier.applyMute();
     applier.applyAttach({ name: 'log.txt', content: 'x', contentType: 'text/plain' });
 
     applier.reset();
@@ -73,6 +79,7 @@ describe('MetadataApplier', () => {
     expect(m.title).toBe('');
     expect(m.tags).toEqual([]);
     expect(m.ignore).toBe(false);
+    expect(m.mute).toBe(false);
     expect(m.attachments).toEqual([]);
   });
 });

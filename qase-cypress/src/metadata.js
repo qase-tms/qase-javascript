@@ -23,6 +23,13 @@ module.exports = function(on) {
   });
 
   on('task', {
+    qaseMute() {
+      MetadataManager.setMute();
+      return null;
+    },
+  });
+
+  on('task', {
     qaseParameters(value) {
       MetadataManager.setParameters(value);
       return null;

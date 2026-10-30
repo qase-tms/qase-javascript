@@ -90,7 +90,7 @@ export class ResultBuilder {
       fields: metadata.fields ?? {},
       tags: metadata.tags ?? [],
       message: message ? message : null,
-      muted: false,
+      muted: metadata.mute ?? false,
       params: metadata.parameters ?? {},
       group_params: metadata.groupParameters ?? {},
       relations,

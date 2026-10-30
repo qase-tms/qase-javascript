@@ -36,6 +36,8 @@ export interface Methods {
 
   ignore(): void;
 
+  mute(): void;
+
   attach(attach: { name?: string, paths?: string | string[], content?: Buffer | string, contentType?: string }): void;
 
   comment(message: string): void;
@@ -52,6 +54,7 @@ export class Metadata {
   parameters?: Record<string, string>;
   groupParameters?: Record<string, string>;
   ignore?: boolean;
+  mute?: boolean;
   suite?: string;
   comment?: string;
   tags?: string[];
@@ -111,6 +114,7 @@ export class Metadata {
     this.parameters = {};
     this.groupParameters = {};
     this.ignore = false;
+    this.mute = false;
     this.suite = '';
     this.comment = '';
     this.tags = [];

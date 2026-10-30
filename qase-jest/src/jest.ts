@@ -54,6 +54,20 @@ qase.ignore = (): void => {
 };
 
 /**
+ * Mute the test case
+ * @example
+ * test('test', () => {
+ *    qase.mute();
+ *     expect(true).toBe(true);
+ * });
+ */
+qase.mute = (): void => {
+  // @ts-expect-error - global.Qase is dynamically added at runtime
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  global.Qase.mute();
+};
+
+/**
  * Add a comment to the test case
  * @param {string} value
  * @example

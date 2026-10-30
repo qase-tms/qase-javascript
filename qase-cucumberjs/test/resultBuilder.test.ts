@@ -11,6 +11,7 @@ const baseMetadata: TestMetadata = {
   fields: {},
   title: null,
   isIgnore: false,
+  isMuted: false,
   parameters: {},
   group_params: {},
   suite: null,
@@ -45,6 +46,14 @@ describe('ResultBuilder', () => {
     expect(result.execution.status).toBe(TestStatusEnum.passed);
     expect(result.title).toBe('A scenario');
     expect(result.testops_id).toBeNull();
+  });
+
+  it('sets muted from metadata.isMuted', () => {
+    expect(ResultBuilder.build(makeArgs()).muted).toBe(false);
+    const result = ResultBuilder.build(makeArgs({
+      metadata: { ...baseMetadata, isMuted: true },
+    }));
+    expect(result.muted).toBe(true);
   });
 
   it('uses metadata.title override', () => {

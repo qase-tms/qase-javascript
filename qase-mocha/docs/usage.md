@@ -181,11 +181,9 @@ describe('Feature Tests', function() {
 Mark a test as muted. Muted tests are reported but do not affect the test run status:
 
 ```javascript
-const { qase } = require('mocha-qase-reporter/mocha');
-
 describe('Known Issues', function() {
   it('flaky test with known issue', function() {
-    qase.mute();
+    this.mute();
 
     const result = performFlakyOperation();
     expect(result).to.equal('expected');

@@ -63,6 +63,16 @@ describe('MetadataAccumulator.parseAnnotation', () => {
     expect(acc.getMetadata('t1')!.tags).toEqual(['smoke', 'p0', 'p1']);
   });
 
+  it('parses Qase Mute annotation', () => {
+    acc.parseAnnotation('t1', mkAnnotation('Qase Mute: true'));
+    expect(acc.getMetadata('t1')!.muted).toBe(true);
+  });
+
+  it('leaves muted undefined without Qase Mute annotation', () => {
+    acc.parseAnnotation('t1', mkAnnotation('Qase Title: T'));
+    expect(acc.getMetadata('t1')!.muted).toBeUndefined();
+  });
+
   it('appends tags across multiple annotations', () => {
     acc.parseAnnotation('t1', mkAnnotation('Qase Tags: ["a"]'));
     acc.parseAnnotation('t1', mkAnnotation('Qase Tags: ["b","c"]'));

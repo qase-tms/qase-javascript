@@ -10,6 +10,7 @@ export class MetadataParser {
       QaseParameters: {},
       QaseGroupParameters: {},
       QaseIgnore: false,
+      QaseMuted: false,
       QaseProjects: {},
       QaseTags: [],
     };
@@ -46,6 +47,10 @@ export class MetadataParser {
 
     if (meta[metadataEnum.ignore] !== undefined && meta[metadataEnum.ignore] !== '') {
       metadata.QaseIgnore = meta[metadataEnum.ignore] === 'true';
+    }
+
+    if (meta[metadataEnum.mute] !== undefined && meta[metadataEnum.mute] !== '') {
+      metadata.QaseMuted = meta[metadataEnum.mute] === 'true';
     }
 
     if (meta[metadataEnum.tags] !== undefined && meta[metadataEnum.tags] !== '') {

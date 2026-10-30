@@ -111,6 +111,12 @@ export class MetadataApplier {
     this.storage.ignore = true;
   }
 
+  mute(): void {
+    const cur = this.storage.getCurrentTest();
+    if (!cur) return;
+    cur.muted = true;
+  }
+
   addStep(step: TestStepType): void {
     const cur = this.storage.getLastItem();
     if (!cur) return;

@@ -165,6 +165,27 @@ describe('ResultTransformer', () => {
       expect(model.fields.tags).toBe('smoke,regression');
     });
 
+    it('should send a muted result with fields.muted', () => {
+      const model = transformer.transform(
+        makeResult({ muted: true, fields: { severity: 'major' } }),
+        mockResolveHash,
+      );
+      expect(model.fields).toEqual({ severity: 'major', muted: 'true' });
+    });
+
+    it('should not add fields.muted to a result that is not muted', () => {
+      const model = transformer.transform(makeResult({ muted: false }), mockResolveHash);
+      expect(model.fields).not.toHaveProperty('muted');
+    });
+
+    it('should keep a user-set fields.muted when the result is not muted', () => {
+      const model = transformer.transform(
+        makeResult({ muted: false, fields: { muted: 'true' } }),
+        mockResolveHash,
+      );
+      expect(model.fields.muted).toBe('true');
+    });
+
     it('should upload attachments and include prepared ones', () => {
       mockResolveHash.mockReturnValue('uploaded-hash');
       const result = makeResult({
