@@ -1,0 +1,78 @@
+qase-javascript-commons/test/env/env-to-config.test.ts
+  s_57b503ed365a5f::t_5fad4d605e80d5 4-10,123-131,148-164
+qase-javascript-commons/src/reporters/testops-multi-reporter.ts
+  s_57b503ed365a5f::t_27d33cd158cf30 64
+  s_57b503ed365a5f::t_2fbb1be73ceb0d 99-101,105
+  s_57b503ed365a5f::t_46d698bb46a5fe 374-378
+  s_57b503ed365a5f::t_0c5d524f58c795 15
+qase-javascript-commons/test/config/config-loader.test.ts
+  s_57b503ed365a5f::t_1eb71acb012d80 143
+qase-javascript-commons/README.md
+  s_57b503ed365a5f::t_db94fc170387b7 42,48-50
+qase-javascript-commons/test/qase/reporter-factory.test.ts
+  s_57b503ed365a5f::t_b4318ebbbc9992 149-175
+qase-javascript-commons/src/reporters/testops-reporter.ts
+  s_57b503ed365a5f::t_27d33cd158cf30 63
+  s_57b503ed365a5f::t_0c5d524f58c795 14,168
+  s_57b503ed365a5f::t_46d698bb46a5fe 256-260
+qase-javascript-commons/src/env/env-to-config.ts
+  s_57b503ed365a5f::t_49b5ed9f350733 26,58
+  s_57b503ed365a5f::t_5fad4d605e80d5 93-94
+qase-javascript-commons/src/config/config-validation-schema.ts
+  s_57b503ed365a5f::t_700afcd437c9ef 28
+  s_57b503ed365a5f::t_be8215ecd4b118 5-27,29,341-343
+qase-mocha/README.md
+  s_57b503ed365a5f::t_8338736f2a054c 242-243
+qase-javascript-commons/src/options/composeOptions.ts
+  s_57b503ed365a5f::t_e2f7d1b9216431 9
+  s_57b503ed365a5f::t_49b5ed9f350733 6-8,10-11,14
+qase-javascript-commons/src/qase/reporter-factory.ts
+  s_57b503ed365a5f::t_aec2d9491b5996 7,124-127
+qase-javascript-commons/src/client/interface.ts
+  s_57b503ed365a5f::t_46d698bb46a5fe 5
+qase-javascript-commons/src/client/clientV1.ts
+  s_57b503ed365a5f::t_46d698bb46a5fe 60
+qase-javascript-commons/test/reporters/testops-reporter.test.ts
+  s_57b503ed365a5f::t_064ff7151b2f1f 77-86,516
+  s_57b503ed365a5f::t_3652d0b4148cbf 40,503-515
+  s_57b503ed365a5f::t_09347cf67c5cb1 517
+qase-javascript-commons/src/config/config-loader.ts
+  s_57b503ed365a5f::t_27d33cd158cf30 62
+qase-javascript-commons/src/reporters/shared/testops-constants.ts
+  s_57b503ed365a5f::t_27d33cd158cf30 6-15
+qase-mocha/docs/usage.md
+  s_57b503ed365a5f::t_8338736f2a054c 903-904
+qase-javascript-commons/src/client/services/run-service.ts
+  s_57b503ed365a5f::t_46d698bb46a5fe 73-78,91-92
+qase-javascript-commons/changelog.md
+  s_57b503ed365a5f::t_b21dcbb1e7af65 1-4,6-17
+  s_57b503ed365a5f::t_8338736f2a054c 5
+qase-javascript-commons/test/client/services/run-service.test.ts
+  s_57b503ed365a5f::t_3652d0b4148cbf 128-134,140
+qase-javascript-commons/src/options/options-type.ts
+  s_57b503ed365a5f::t_aec2d9491b5996 19
+qase-javascript-commons/test/options/composeOptions.test.ts
+  s_57b503ed365a5f::t_5fad4d605e80d5 124-138
+qase-javascript-commons/test/reporters/testops-multi-reporter.test.ts
+  s_57b503ed365a5f::t_2fbb1be73ceb0d 42-59
+qase-javascript-commons/package.json
+  s_57b503ed365a5f::t_b21dcbb1e7af65 3
+package-lock.json
+  s_57b503ed365a5f::t_429b3080b018c1 28033
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7bd8d59334c47efa784ecfb52b21e54fe131e473",
+  "prompts": {},
+  "sessions": {
+    "s_57b503ed365a5f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4c6749a7-7eb3-4ee9-891f-611f479b9abc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
