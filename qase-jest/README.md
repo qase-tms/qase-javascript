@@ -216,6 +216,25 @@ QASE_MODE=testops npx jest --testPathPattern="auth"
 QASE_MODE=testops QASE_TESTOPS_RUN_TITLE="Nightly Regression" npx jest
 ```
 
+### Parallel Execution
+
+Since 2.8.0, `qase.*` calls work with any number of Jest workers, so `--runInBand` is not needed. All workers report into a single test run. This also covers `test.concurrent` tests, retries (`jest.retryTimes`, each attempt is reported with its own metadata) and `injectGlobals: false`.
+
+- Calls in `beforeEach` and `afterEach` apply to the test they run for. Calls in `beforeAll` and `afterAll` are ignored, because they do not belong to a single result.
+- With [Jest `projects`](https://jestjs.io/docs/configuration#projects-arraystring--projectconfig) that run the same test file, give each project its own `globals` (an empty `globals: {}` is enough). Projects without one share Jest's default object, and the reporter cannot tell them apart when they run the same file at the same time.
+- The [Network Profiler](#network-profiler) still needs `--runInBand` (or `maxWorkers: 1`).
+
+```javascript
+// jest.config.js — the same tests in two environments
+module.exports = {
+  projects: [
+    { displayName: 'node', testEnvironment: 'node', globals: {} },
+    { displayName: 'dom', testEnvironment: 'jsdom', globals: {} },
+  ],
+  reporters: ['default', ['jest-qase-reporter', { mode: 'testops' }]],
+};
+```
+
 ## Network Profiler
 
 The Network Profiler automatically captures outgoing HTTP requests made during test execution and reports them as REQUEST-type steps in Qase TestOps.
