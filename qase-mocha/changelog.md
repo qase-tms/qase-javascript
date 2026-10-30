@@ -6,6 +6,7 @@
 
 ## Fixed
 
+- `this.suite('A\tB\tC')` now reports nested suites `A > B > C`, as the docs describe. The whole string was sent as a single suite title.
 - An error thrown inside `this.step()` now fails the test. The reporter marked the step as failed but swallowed the error, so a failing assertion inside a step left the Mocha test green. The step is still reported as failed, and the error is rethrown.
 - The docs, README and examples now use the real API. `mocha-qase-reporter/mocha` exports only `qase(id, name)` and `qase.projects()`; metadata methods (`this.title()`, `this.fields()`, `this.step()`, `this.attach()` and so on) live on the test context and need `function () {}` tests. The docs called them on the exported `qase`, where they throw `is not a function`. They also no longer describe nested steps, step-level attachments, awaited async steps or metadata set in `after`/`afterEach` hooks, none of which the reporter supports.
 

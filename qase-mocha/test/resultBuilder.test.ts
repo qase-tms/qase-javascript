@@ -143,6 +143,15 @@ describe('ResultBuilder', () => {
     expect(data).toEqual(['OnlyThis']);
   });
 
+  it('splits a tab-separated metadata.suite into nested suites', () => {
+    const result = ResultBuilder.build({
+      ...baseArgs,
+      metadata: makeMetadata({ suite: 'API Tests\tAdvanced\t\tRelationships' }),
+    });
+    const data = (result.relations as any).suite.data.map((d: any) => d.title);
+    expect(data).toEqual(['API Tests', 'Advanced', 'Relationships']);
+  });
+
   it('merges StepRunner steps and ProfilerTracker steps in order', () => {
     const result = ResultBuilder.build({
       ...baseArgs,
