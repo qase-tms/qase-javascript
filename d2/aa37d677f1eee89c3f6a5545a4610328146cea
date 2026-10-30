@@ -1,0 +1,19 @@
+qase-jest/README.md
+  s_57b503ed365a5f::t_0e56fe8e5b93a3 219-237
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d2aa37d677f1eee89c3f6a5545a4610328146cea",
+  "prompts": {},
+  "sessions": {
+    "s_57b503ed365a5f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4c6749a7-7eb3-4ee9-891f-611f479b9abc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
