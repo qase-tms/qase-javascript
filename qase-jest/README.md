@@ -31,11 +31,14 @@ npm install --save-dev jest-qase-reporter
   "testops": {
     "project": "YOUR_PROJECT_CODE",
     "api": {
-      "token": "YOUR_API_TOKEN"
+      "token": "YOUR_API_TOKEN",
+      "host": "qase.io"
     }
   }
 }
 ```
+
+If your workspace is on the EU cluster (you open Qase at `app-eu.qase.io`), set `host` to `eu.qase.io`. The default, `qase.io`, is the US cluster.
 
 **2. Add Qase ID to your test:**
 
@@ -70,6 +73,7 @@ The reporter is configured via (in order of priority):
 | `mode` | `QASE_MODE` | Set to `testops` to enable reporting |
 | `testops.project` | `QASE_TESTOPS_PROJECT` | Your Qase project code |
 | `testops.api.token` | `QASE_TESTOPS_API_TOKEN` | Your Qase API token |
+| `testops.api.host` | `QASE_TESTOPS_API_HOST` | `qase.io` (US cluster, the default) or `eu.qase.io` (EU cluster). Required if your workspace is on the EU cluster |
 
 ### Example `qase.config.json`
 
@@ -80,7 +84,8 @@ The reporter is configured via (in order of priority):
   "testops": {
     "project": "YOUR_PROJECT_CODE",
     "api": {
-      "token": "YOUR_API_TOKEN"
+      "token": "YOUR_API_TOKEN",
+      "host": "qase.io"
     },
     "run": {
       "title": "Jest Automated Run"
@@ -114,6 +119,7 @@ module.exports = {
         testops: {
           api: {
             token: process.env.QASE_API_TOKEN,
+            host: 'qase.io', // 'eu.qase.io' for the EU cluster
           },
           project: 'YOUR_PROJECT_CODE',
           run: {

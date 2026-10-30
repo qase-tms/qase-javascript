@@ -490,10 +490,11 @@ QASE_MODE=testops npx playwright test
 ### With Environment Variables
 
 ```bash
-# Set project and token via environment
+# Set project, token and API host via environment (host: eu.qase.io on the EU cluster)
 QASE_MODE=testops \
 QASE_TESTOPS_PROJECT=DEMO \
 QASE_TESTOPS_API_TOKEN=your_token \
+QASE_TESTOPS_API_HOST=qase.io \
 npx playwright test
 ```
 

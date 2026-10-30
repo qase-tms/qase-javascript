@@ -31,11 +31,14 @@ npm install --save-dev newman-reporter-qase
   "testops": {
     "project": "YOUR_PROJECT_CODE",
     "api": {
-      "token": "YOUR_API_TOKEN"
+      "token": "YOUR_API_TOKEN",
+      "host": "qase.io"
     }
   }
 }
 ```
+
+If your workspace is on the EU cluster (you open Qase at `app-eu.qase.io`), set `host` to `eu.qase.io`. The default, `qase.io`, is the US cluster.
 
 **2. Add Qase ID to your Postman test using special comments:**
 
@@ -68,6 +71,7 @@ The reporter is configured via (in order of priority):
 | `mode` | `QASE_MODE` | Set to `testops` to enable reporting |
 | `testops.project` | `QASE_TESTOPS_PROJECT` | Your Qase project code |
 | `testops.api.token` | `QASE_TESTOPS_API_TOKEN` | Your Qase API token |
+| `testops.api.host` | `QASE_TESTOPS_API_HOST` | `qase.io` (US cluster, the default) or `eu.qase.io` (EU cluster). Required if your workspace is on the EU cluster |
 
 ### Example `qase.config.json`
 
@@ -78,7 +82,8 @@ The reporter is configured via (in order of priority):
   "testops": {
     "project": "YOUR_PROJECT_CODE",
     "api": {
-      "token": "YOUR_API_TOKEN"
+      "token": "YOUR_API_TOKEN",
+      "host": "qase.io"
     },
     "run": {
       "title": "Newman Automated Run"
@@ -222,10 +227,11 @@ newman run ./collection.json -r qase -d ./users.csv
 # Set environment variables
 newman run ./collection.json -r qase -e ./environment.json
 
-# Override config with environment variables
+# Override config with environment variables (set QASE_TESTOPS_API_HOST to eu.qase.io on the EU cluster)
 QASE_MODE=testops \
 QASE_TESTOPS_PROJECT=DEMO \
 QASE_TESTOPS_API_TOKEN=your_token \
+QASE_TESTOPS_API_HOST=qase.io \
 newman run ./collection.json -r qase
 ```
 

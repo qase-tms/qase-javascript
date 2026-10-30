@@ -856,6 +856,9 @@ QASE_MODE=testops QASE_TESTOPS_PROJECT=DEMO npx cypress run
 
 # Use specific API token
 QASE_MODE=testops QASE_TESTOPS_API_TOKEN=your_token npx cypress run
+
+# Specify API host (qase.io is the US cluster, the default; eu.qase.io for the EU cluster)
+QASE_MODE=testops QASE_TESTOPS_API_HOST=qase.io npx cypress run
 ```
 
 ### With Test Plan
