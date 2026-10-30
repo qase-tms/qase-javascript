@@ -1,0 +1,25 @@
+qase-mocha/src/modules/resultBuilder.ts
+  s_57b503ed365a5f::t_e07f9cfd12a398 153-156
+qase-mocha/test/resultBuilder.test.ts
+  s_57b503ed365a5f::t_3e55b622f4ce7f 146-154
+expected/mocha-examples.yaml
+  s_57b503ed365a5f::t_7ebdd8e31313f1 4,8,39,49,59,65-66,69,79,86,89,109,116,119,129,133-137,140,143,153,163,173
+qase-mocha/changelog.md
+  s_57b503ed365a5f::t_4268032f1bd7aa 9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c2078d1c3e120f5f86241d35c7ef11fef716e937",
+  "prompts": {},
+  "sessions": {
+    "s_57b503ed365a5f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4c6749a7-7eb3-4ee9-891f-611f479b9abc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
