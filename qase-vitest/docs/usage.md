@@ -733,6 +733,7 @@ jobs:
         env:
           QASE_MODE: testops
           QASE_TESTOPS_API_TOKEN: ${{ secrets.QASE_API_TOKEN }}
+          QASE_TESTOPS_API_HOST: qase.io # eu.qase.io for the EU cluster
           QASE_TESTOPS_PROJECT: DEMO
 ```
 

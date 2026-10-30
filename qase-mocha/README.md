@@ -33,11 +33,14 @@ npm install --save-dev mocha-qase-reporter
   "testops": {
     "project": "YOUR_PROJECT_CODE",
     "api": {
-      "token": "YOUR_API_TOKEN"
+      "token": "YOUR_API_TOKEN",
+      "host": "qase.io"
     }
   }
 }
 ```
+
+If your workspace is on the EU cluster (you open Qase at `app-eu.qase.io`), set `host` to `eu.qase.io`. The default, `qase.io`, is the US cluster.
 
 **2. Configure Mocha to use the reporter in `.mocharc.js`:**
 
@@ -80,6 +83,7 @@ The reporter is configured via (in order of priority):
 | `mode` | `QASE_MODE` | Set to `testops` to enable reporting |
 | `testops.project` | `QASE_TESTOPS_PROJECT` | Your Qase project code |
 | `testops.api.token` | `QASE_TESTOPS_API_TOKEN` | Your Qase API token |
+| `testops.api.host` | `QASE_TESTOPS_API_HOST` | `qase.io` (US cluster, the default) or `eu.qase.io` (EU cluster). Required if your workspace is on the EU cluster |
 
 ### Example `.mocharc.js`
 
@@ -102,7 +106,8 @@ module.exports = {
   "testops": {
     "project": "YOUR_PROJECT_CODE",
     "api": {
-      "token": "YOUR_API_TOKEN"
+      "token": "YOUR_API_TOKEN",
+      "host": "qase.io"
     },
     "run": {
       "title": "Mocha Automated Run",

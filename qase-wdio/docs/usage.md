@@ -612,10 +612,11 @@ exports.config = {
 ### With Environment Variables
 
 ```bash
-# Override configuration
+# Override configuration (set QASE_TESTOPS_API_HOST to eu.qase.io on the EU cluster)
 QASE_MODE=testops \
 QASE_TESTOPS_PROJECT=DEMO \
 QASE_TESTOPS_API_TOKEN=your_token \
+QASE_TESTOPS_API_HOST=qase.io \
 npx wdio run wdio.conf.js
 ```
 
@@ -1110,6 +1111,7 @@ jobs:
           QASE_MODE: testops
           QASE_TESTOPS_PROJECT: DEMO
           QASE_TESTOPS_API_TOKEN: \${{ secrets.QASE_TOKEN }}
+          QASE_TESTOPS_API_HOST: qase.io # eu.qase.io for the EU cluster
 ```
 
 **package.json:**

@@ -914,6 +914,9 @@ QASE_MODE=testops QASE_TESTOPS_PROJECT=DEMO npx mocha
 
 # Use specific API token
 QASE_MODE=testops QASE_TESTOPS_API_TOKEN=your_token npx mocha
+
+# Specify API host (qase.io is the US cluster, the default; eu.qase.io for the EU cluster)
+QASE_MODE=testops QASE_TESTOPS_API_HOST=qase.io npx mocha
 ```
 
 ### With Test Plan

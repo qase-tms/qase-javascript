@@ -282,6 +282,7 @@ set -e
 export QASE_MODE=testops
 export QASE_TESTOPS_PROJECT=DEMO
 export QASE_TESTOPS_API_TOKEN="${CI_QASE_TOKEN}"
+export QASE_TESTOPS_API_HOST=qase.io  # eu.qase.io for the EU cluster
 
 # Run Newman with Qase reporter
 newman run ./api-tests.json \
@@ -550,6 +551,7 @@ newman-tests:
     QASE_MODE: testops
     QASE_TESTOPS_PROJECT: DEMO
     QASE_TESTOPS_API_TOKEN: $CI_QASE_TOKEN
+    QASE_TESTOPS_API_HOST: qase.io # eu.qase.io for the EU cluster
 ```
 
 ### Use Case 3: Test with Multiple Environments
@@ -651,7 +653,7 @@ pm.test('Request tracking', function() {
 {
   "mode": "testops",
   "testops": {
-    "api": { "token": "..." },
+    "api": { "token": "...", "host": "qase.io" },
     "project": "DEMO",
     "run": {
       "title": "API Regression - {{date}}",

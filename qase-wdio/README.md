@@ -32,11 +32,14 @@ npm install --save-dev wdio-qase-reporter
   "testops": {
     "project": "YOUR_PROJECT_CODE",
     "api": {
-      "token": "YOUR_API_TOKEN"
+      "token": "YOUR_API_TOKEN",
+      "host": "qase.io"
     }
   }
 }
 ```
+
+If your workspace is on the EU cluster (you open Qase at `app-eu.qase.io`), set `host` to `eu.qase.io`. The default, `qase.io`, is the US cluster.
 
 **2. Configure reporter in `wdio.conf.js`:**
 
@@ -108,6 +111,7 @@ The reporter is configured via (in order of priority):
 | `mode` | `QASE_MODE` | Set to `testops` to enable reporting |
 | `testops.project` | `QASE_TESTOPS_PROJECT` | Your Qase project code |
 | `testops.api.token` | `QASE_TESTOPS_API_TOKEN` | Your Qase API token |
+| `testops.api.host` | `QASE_TESTOPS_API_HOST` | `qase.io` (US cluster, the default) or `eu.qase.io` (EU cluster). Required if your workspace is on the EU cluster |
 
 ### Example `qase.config.json`
 
@@ -118,7 +122,8 @@ The reporter is configured via (in order of priority):
   "testops": {
     "project": "YOUR_PROJECT_CODE",
     "api": {
-      "token": "YOUR_API_TOKEN"
+      "token": "YOUR_API_TOKEN",
+      "host": "qase.io"
     },
     "run": {
       "title": "WDIO Automated Run"
@@ -307,10 +312,11 @@ QASE_MODE=testops npx wdio run wdio.conf.js
 ### Environment Variables
 
 ```bash
-# Override configuration
+# Override configuration (set QASE_TESTOPS_API_HOST to eu.qase.io on the EU cluster)
 QASE_MODE=testops \
 QASE_TESTOPS_PROJECT=DEMO \
 QASE_TESTOPS_API_TOKEN=your_token \
+QASE_TESTOPS_API_HOST=qase.io \
 npx wdio run wdio.conf.js
 ```
 
