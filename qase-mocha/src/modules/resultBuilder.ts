@@ -68,8 +68,9 @@ export class ResultBuilder {
           mime_type: 'text/plain',
           content: output.stdout,
           file_path: null,
-          size: 0,
-          id: '',
+          size: Buffer.byteLength(output.stdout),
+          // The local report names files `<id>-<name>`, so an empty id let one test's log overwrite another's.
+          id: uuidv4(),
         });
       }
       if (output.stderr) {
@@ -78,8 +79,8 @@ export class ResultBuilder {
           mime_type: 'text/plain',
           content: output.stderr,
           file_path: null,
-          size: 0,
-          id: '',
+          size: Buffer.byteLength(output.stderr),
+          id: uuidv4(),
         });
       }
     }

@@ -49,7 +49,7 @@ describe('JSONPlaceholder Advanced Qase Features', function() {
 
   it(qase(12, 'Suite hierarchy demonstration'), async function() {
     this.suite('API Tests\tAdvanced\tRelationships');
-    this.fields({ layer: 'api', severity: 'low' });
+    this.fields({ layer: 'api', severity: 'minor' });
 
     const albumResponse = await fetch(`${BASE_URL}/albums/1`);
     const album = await albumResponse.json();

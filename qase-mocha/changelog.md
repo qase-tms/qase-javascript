@@ -1,3 +1,17 @@
+# mocha-qase-reporter@1.8.0
+
+## Fixed
+
+- Console output from tests reaches the terminal again. The reporter replaced `process.stdout.write` and `process.stderr.write` for every test and kept what was written, so `console.log` in a test printed nothing, even with `captureLogs` off. Output is now recorded only when `captureLogs` is on, and it is copied, not taken over.
+- A test whose `beforeEach` hook fails is reported as failed with the hook's error. Mocha sends no test-end event for it, so the test was missing from Qase, and the output capture was never removed, which also hid the console output of every later test.
+- Metadata no longer carries over between tests. `this.comment()`, `this.fields()` and the other calls made in a failing `beforeEach` hook were applied to the next test that ended, even in another suite.
+- `stdout.txt` and `stderr.txt` attachments contain only the test's own output, not the line the `spec` reporter prints for its result, and each one has its own id, so in the local report they no longer overwrite each other.
+- A comment no longer ends with a blank line: `this.comment('a')` gives `a`, not `a\n\n`.
+
+## Changed
+
+- Examples: `severity` values the Qase API rejects (`low`, `high`) are replaced with valid ones. The API answers such a value with `400` and drops every result in the batch.
+
 # mocha-qase-reporter@1.7.0
 
 ## Added

@@ -35,7 +35,7 @@ describe('Multi-project Login Scenarios', () => {
 
   // Report invalid login to PROJ1 (case 3) and PROJ2 (case 4)
   it(qase.projects({ PROJ1: [3], PROJ2: [4] }, 'Invalid password shows error'), async () => {
-    qase.fields({ severity: 'high', priority: 'high', layer: 'e2e' });
+    qase.fields({ severity: 'critical', priority: 'high', layer: 'e2e' });
     qase.suite('E-commerce\tAuthentication\tLogin');
     qase.parameters({ username: 'standard_user', password: 'wrong_password' });
 

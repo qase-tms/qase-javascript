@@ -75,4 +75,33 @@ describe('OutputCapture', () => {
     expect(process.stdout.write).toBe(originalStdoutWrite);
     expect(process.stderr.write).toBe(originalStderrWrite);
   });
+
+  it('still writes to the terminal while recording', () => {
+    const written: string[] = [];
+    process.stdout.write = ((chunk: any) => {
+      written.push(String(chunk));
+      return true;
+    }) as any;
+    capture.install();
+    process.stdout.write('visible');
+    const result = capture.drain();
+    expect(written).toEqual(['visible']);
+    expect(result.stdout).toBe('visible');
+  });
+
+  it('records Buffer chunks as text', () => {
+    process.stdout.write = (() => true) as any;
+    capture.install();
+    process.stdout.write(Buffer.from('bytes'));
+    expect(capture.drain().stdout).toBe('bytes');
+  });
+
+  it('stop() ends recording but keeps the output for drain()', () => {
+    process.stdout.write = (() => true) as any;
+    capture.install();
+    process.stdout.write('kept');
+    capture.stop();
+    process.stdout.write('after stop');
+    expect(capture.drain().stdout).toBe('kept');
+  });
 });

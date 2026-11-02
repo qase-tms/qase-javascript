@@ -61,7 +61,7 @@ describe('MetadataApplier', () => {
     applier.applyComment('second');
 
     expect(applier.get().tags).toEqual(['smoke', 'regression', 'fast']);
-    expect(applier.get().comment).toBe('first\n\nsecond\n\n');
+    expect(applier.get().comment).toBe('first\n\nsecond');
   });
 
   it('reset() clears all fields back to initial values', () => {
