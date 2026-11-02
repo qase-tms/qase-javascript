@@ -8,7 +8,6 @@ export interface StateModel {
   IsModeChanged: boolean | undefined;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class StateManager {
   static statePath = path.resolve(__dirname, 'reporterState.json');
 

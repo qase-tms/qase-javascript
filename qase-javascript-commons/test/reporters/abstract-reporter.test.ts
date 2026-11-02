@@ -1,11 +1,12 @@
 import { expect } from '@jest/globals';
 import { AbstractReporter } from '../../src/reporters/abstract-reporter';
-import { Attachment, TestResultType, TestStatusEnum } from '../../src/models';
+import { TestResultType, TestStatusEnum } from '../../src/models';
 import { LoggerInterface } from '../../src/utils/logger';
 
 /** Minimal concrete reporter: only the accumulation logic of the base class is under test. */
 class CollectingReporter extends AbstractReporter {
-  constructor(logger: LoggerInterface) {
+  // Re-exposes the base's protected constructor.
+  public constructor(logger: LoggerInterface) {
     super(logger);
   }
 
@@ -25,7 +26,7 @@ class CollectingReporter extends AbstractReporter {
     return Promise.resolve();
   }
 
-  public async uploadAttachment(_attachment: Attachment): Promise<string> {
+  public async uploadAttachment(): Promise<string> {
     return Promise.resolve('');
   }
 

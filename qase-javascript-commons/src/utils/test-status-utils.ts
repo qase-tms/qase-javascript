@@ -37,7 +37,7 @@ export function determineTestStatus(error: Error | null, originalStatus: string)
  */
 function isAssertionError(error: Error, originalStatus: string): boolean {
   const errorMessage = error.message.toLowerCase();
-  const errorStack = error.stack?.toLowerCase() || '';
+  const errorStack = error.stack?.toLowerCase() ?? '';
   const normalizedOriginalStatus = originalStatus.toLowerCase();
   
   // Common assertion error patterns
@@ -174,5 +174,5 @@ function mapOriginalStatus(originalStatus: string): TestStatusEnum {
   };
 
   const normalizedStatus = originalStatus.toLowerCase();
-  return statusMap[normalizedStatus] || TestStatusEnum.skipped;
+  return statusMap[normalizedStatus] ?? TestStatusEnum.skipped;
 }

@@ -18,7 +18,6 @@ export interface BuildArgs {
   profilerSteps: TestStepType[];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class ResultBuilder {
   static build(args: BuildArgs): TestResultType {
     const { testCase, metadata, profilerSteps } = args;

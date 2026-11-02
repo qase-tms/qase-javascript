@@ -37,7 +37,7 @@ beforeEach(() => {
 
   // The plugin cannot pass this through `config.env`: Cypress drops changes to the config
   // unless `setupNodeEvents` returns it, and the documented setup does not.
-  cy.task<ProfilerConfig>('qaseProfilerConfig', null, { log: false }).then((config) => {
+  cy.task<ProfilerConfig | null>('qaseProfilerConfig', null, { log: false }).then((config) => {
     if (!config?.enabled) {
       return;
     }

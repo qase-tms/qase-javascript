@@ -8,14 +8,14 @@ describe('QaseReporter.complete', () => {
 
   beforeEach(() => {
     (QaseReporter as unknown as { instance: unknown }).instance = undefined;
-    delete process.env['QASE_RUN_SESSION'];
+    Reflect.deleteProperty(process.env, 'QASE_RUN_SESSION');
     complete = jest.spyOn(ReportReporter.prototype, 'complete').mockResolvedValue(undefined);
   });
 
   afterEach(() => {
     complete.mockRestore();
     RunFailures.consume();
-    delete process.env['QASE_RUN_SESSION'];
+    Reflect.deleteProperty(process.env, 'QASE_RUN_SESSION');
   });
 
   const reporter = () => {

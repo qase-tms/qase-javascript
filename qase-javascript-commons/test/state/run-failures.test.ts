@@ -4,7 +4,7 @@ import { RunFailures } from '../../src/state/run-failures';
 describe('RunFailures', () => {
   afterEach(() => {
     RunFailures.consume();
-    delete process.env['QASE_RUN_SESSION'];
+    Reflect.deleteProperty(process.env, 'QASE_RUN_SESSION');
   });
 
   it('records nothing outside a run', () => {

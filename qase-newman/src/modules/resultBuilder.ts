@@ -15,7 +15,6 @@ export interface BuildPendingArgs {
   signature: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class ResultBuilder {
   static buildPending(args: BuildPendingArgs): TestResultType {
     const { item, suites, ids, projectMapping, signature } = args;

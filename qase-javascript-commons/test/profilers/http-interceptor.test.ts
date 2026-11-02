@@ -158,7 +158,7 @@ describe('HttpInterceptor', () => {
     expect(step!.execution.start_time).not.toBeNull();
     expect(step!.execution.end_time).not.toBeNull();
     expect(step!.execution.duration).not.toBeNull();
-    expect((step!.execution.duration as number) >= 0).toBe(true);
+    expect(step!.execution.duration! >= 0).toBe(true);
   });
 
   it('emits start_time/end_time as Unix seconds and duration in ms', async () => {
@@ -171,9 +171,9 @@ describe('HttpInterceptor', () => {
     const nowSecAfter = Date.now() / 1000;
     expect(steps).toHaveLength(1);
     const exec = steps[0]!.execution;
-    const start = exec.start_time as number;
-    const end = exec.end_time as number;
-    const duration = exec.duration as number;
+    const start = exec.start_time!;
+    const end = exec.end_time!;
+    const duration = exec.duration!;
     // start/end must be Unix seconds (~1e9-1e10), not ms (~1e12)
     expect(start).toBeGreaterThan(nowSecBefore - 1);
     expect(end).toBeLessThan(nowSecAfter + 1);

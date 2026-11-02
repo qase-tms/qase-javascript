@@ -32,7 +32,7 @@ export const envToConfig = (env: EnvType): ConfigType => ({
     Object.fromEntries(
       env[EnvEnum.statusMapping].split(',').map(item => {
         const [from, to] = item.split('=');
-        return [from?.trim() || '', to?.trim() || ''];
+        return [from?.trim() ?? '', to?.trim() ?? ''];
       })
     ) : undefined,
 

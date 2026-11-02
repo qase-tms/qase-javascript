@@ -13,7 +13,7 @@ export const PROFILER_CONTENT_TYPE = 'application/qase.profiler-steps+json';
 // 2. Uses snapshot/delta pattern on fallback accumulator (diagnostics_channel
 //    handlers do not inherit AsyncLocalStorage context)
 // 3. Serializes captured steps as a JSON attachment
-export const test = base.extend<{ qaseProfiler: void }>({
+export const test = base.extend<{ qaseProfiler: undefined }>({
   // eslint-disable-next-line no-empty-pattern
   qaseProfiler: [async ({}, use, testInfo) => {
     const configLoader = new ConfigLoader();
@@ -21,7 +21,7 @@ export const test = base.extend<{ qaseProfiler: void }>({
     const options = composeOptions({}, config);
 
     if (!options.profilers?.includes('network')) {
-      await use();
+      await use(undefined);
       return;
     }
 
@@ -36,7 +36,7 @@ export const test = base.extend<{ qaseProfiler: void }>({
     const snapshot = profiler.getAllSteps().length;
 
     try {
-      await use();
+      await use(undefined);
 
       const allSteps = profiler.getAllSteps();
       const steps = allSteps.slice(snapshot);

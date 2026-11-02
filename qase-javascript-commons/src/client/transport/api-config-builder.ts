@@ -65,7 +65,7 @@ export function createApiConfigV2(
   apiConfig.basePath = resolveBasePath(config.api.host, API_V2);
 
   apiConfig.baseOptions = {
-    ...(apiConfig.baseOptions as Record<string, unknown> ?? {}),
+    ...(apiConfig.baseOptions as Record<string, unknown> | undefined ?? {}),
     timeout: resolveRequestTimeout(config),
   };
 
@@ -73,7 +73,7 @@ export function createApiConfigV2(
     const headers = buildHeaders(hostData, reporterName, frameworkName);
     const existingHeaders = (apiConfig.baseOptions as { headers?: Record<string, string> } | undefined)?.headers ?? {};
     const baseOptionsWithHeaders: { headers: Record<string, string> } = {
-      ...(apiConfig.baseOptions as Record<string, unknown> ?? {}),
+      ...(apiConfig.baseOptions as Record<string, unknown> | undefined ?? {}),
       headers: {
         ...existingHeaders,
         ...headers,
@@ -98,7 +98,7 @@ export function resolveRequestTimeout(config: TestOpsOptionsType): number {
 }
 
 export function buildHeaders(
-  hostData: HostData,
+  hostData: Partial<HostData>,
   reporterName?: string,
   frameworkName?: string,
 ): Record<string, string> {

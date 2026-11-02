@@ -79,7 +79,7 @@ describe('ReportReporter', () => {
   let reporter: ReportReporter;
 
   beforeEach(() => {
-    delete process.env['QASE_REPORT_RUN_STARTED_AT'];
+    Reflect.deleteProperty(process.env, 'QASE_REPORT_RUN_STARTED_AT');
     writer = createMockWriter();
     logger = createMockLogger();
     reporter = new ReportReporter(logger, writer, 'jest', 'reporter', 'dev', 'RootSuite', 42);

@@ -106,7 +106,7 @@ export class MetadataExtractor {
         }
 
         if (message.tags) {
-          metadata.tags = [...(metadata.tags ?? []), ...message.tags];
+          metadata.tags = [...metadata.tags, ...message.tags];
         }
 
         continue;

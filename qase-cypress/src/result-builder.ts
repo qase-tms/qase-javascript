@@ -165,7 +165,7 @@ export class ResultBuilder {
         thread: null,
       },
       testops_id: !hasProjectMapping && legacyIds.length > 0
-        ? (legacyIds.length === 1 ? legacyIds[0]! : legacyIds)
+        ? (legacyIds.length === 1 ? legacyIds[0] : legacyIds)
         : null,
       testops_project_mapping: hasProjectMapping ? projectMapping : null,
       title: metadata?.title ?? (fromTitle.cleanedTitle || removeQaseIdsFromTitle(test.title)),
@@ -242,7 +242,7 @@ export class ResultBuilder {
         thread: null,
       },
       testops_id: !hasProjectMapping && legacyIds.length > 0
-        ? (legacyIds.length === 1 ? legacyIds[0]! : legacyIds)
+        ? (legacyIds.length === 1 ? legacyIds[0] : legacyIds)
         : null,
       testops_project_mapping: hasProjectMapping ? projectMapping : null,
       title: fromTitle.cleanedTitle || removeQaseIdsFromTitle(test.title),

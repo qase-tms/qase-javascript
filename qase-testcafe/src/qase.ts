@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 import path from 'path';
 import { QaseStep, StepFunction, getMimeTypes } from 'qase-javascript-commons';
 import { v4 as uuidv4 } from 'uuid';
@@ -6,7 +5,6 @@ import { currentTestRunId } from './modules/testRunContext';
 
 import type { TestopsProjectMapping } from 'qase-javascript-commons';
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class qase {
   private static _qaseID = '';
   private static _qaseTitle = '';
@@ -28,7 +26,9 @@ export class qase {
    * test.meta(q)('Test reported to two projects', async t => { ... });
    */
   public static projects = (mapping: TestopsProjectMapping) => {
-    if (mapping && typeof mapping === 'object' && Object.keys(mapping).length > 0) {
+    // Plain-JS callers can pass anything, so the guard stays despite the type.
+    const value = mapping as TestopsProjectMapping | null | undefined;
+    if (value && typeof value === 'object' && Object.keys(value).length > 0) {
       this._qaseProjects = JSON.stringify(mapping);
     }
     return this;

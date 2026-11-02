@@ -3,11 +3,10 @@ import { isAxiosError } from '../../src/utils/is-axios-error';
 
 describe('isAxiosError', () => {
   it('should return true for axios error', () => {
-    const axiosError = new Error('Axios error') as Error & { isAxiosError: boolean };
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    (axiosError as any).isAxiosError = true;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    (axiosError as any).response = { status: 404 };
+    const axiosError = Object.assign(new Error('Axios error'), {
+      isAxiosError: true,
+      response: { status: 404 },
+    });
 
     const result = isAxiosError(axiosError);
 
@@ -33,8 +32,7 @@ describe('isAxiosError', () => {
   it('should return false for Error without isAxiosError property', () => {
     const error = new Error('Some error');
     // Explicitly remove isAxiosError property if it exists
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    delete (error as any).isAxiosError;
+    Reflect.deleteProperty(error, 'isAxiosError');
 
     const result = isAxiosError(error);
 
@@ -42,9 +40,7 @@ describe('isAxiosError', () => {
   });
 
   it('should return false for Error with falsy isAxiosError property', () => {
-    const error = new Error('Some error');
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    (error as any).isAxiosError = false;
+    const error = Object.assign(new Error('Some error'), { isAxiosError: false });
 
     const result = isAxiosError(error);
 

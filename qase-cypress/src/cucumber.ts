@@ -1,7 +1,5 @@
 /// <reference types="cypress" />
 
-declare const window: any;
-
 interface CypressLogEntry {
   attributes: {
     name: string;
@@ -67,11 +65,11 @@ const sendTaskMessage = (message: string) => {
  * });
  * ```
  */
-export const addCucumberStep = (stepName: string): void => {
+export const addCucumberStep = (stepName: string | null | undefined): void => {
   // Use Cypress.log to avoid command queue issues
   // The step will be collected by MetadataManager
   try {
-    if (stepName && stepName.trim()) {
+    if (stepName?.trim()) {
       Cypress.log({
         name: 'qase:step',
         message: stepName,

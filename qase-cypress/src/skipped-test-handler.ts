@@ -4,6 +4,12 @@ import type { ResultBuilder, BuildSkippedArgs } from './result-builder';
 import type { TestTracker } from './test-tracker';
 
 export type PublishFn = (result: TestResultType) => void;
+// Cypress hands over its own Mocha suite objects; don't trust the typings that these arrays exist.
+interface LooseSuite {
+  tests?: Test[];
+  suites?: LooseSuite[];
+}
+
 export type BuildArgsFactory = (test: Test) => Omit<BuildSkippedArgs, 'test'>;
 
 /**
@@ -33,11 +39,9 @@ export class SkippedTestHandler {
     }
   }
 
-  private collectAllTestsFromSuite(suite: Suite, tests: Test[]): void {
-    const suiteTests = suite.tests ?? [];
-    tests.push(...suiteTests);
-    const nestedSuites = suite.suites ?? [];
-    for (const nestedSuite of nestedSuites) {
+  private collectAllTestsFromSuite(suite: LooseSuite, tests: Test[]): void {
+    tests.push(...(suite.tests ?? []));
+    for (const nestedSuite of suite.suites ?? []) {
       this.collectAllTestsFromSuite(nestedSuite, tests);
     }
   }

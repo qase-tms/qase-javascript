@@ -27,6 +27,7 @@ const Events = Runner.constants;
 /** Set by the parallel-mode worker reporter on the options it passes to MochaQaseReporter. */
 export const PARALLEL_WORKER_OPTION = 'qaseParallelWorker';
 type WorkerOptions = MochaOptions & { [PARALLEL_WORKER_OPTION]?: boolean };
+type ParallelRunner = Runner & { workerReporter?: unknown };
 interface GlobalFixtures {
   globalSetup?: (() => Promise<void>)[];
   globalTeardown?: (() => Promise<void>)[];
@@ -62,7 +63,7 @@ export class MochaQaseReporter extends reporters.Base {
     const config = configLoader.load();
 
     // Parse and validate extraReporters configuration
-    const extraReportersConfig = parseExtraReporters(options, config || undefined);
+    const extraReportersConfig = parseExtraReporters(options, config ?? undefined);
 
     const composedOptions = composeOptions(options, config);
     this.reporter = QaseReporter.getInstance({
@@ -105,10 +106,10 @@ export class MochaQaseReporter extends reporters.Base {
     if (options.parallel) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       options.require = [...(options.require ?? []), resolveParallelModeSetupFile()];
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      if (this.runner && typeof (this.runner as any).workerReporter === 'function') {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        (this.runner as any).workerReporter(resolveParallelModeSetupFile());
+      // workerReporter exists only on Mocha's internal ParallelBufferedRunner, not in its typings.
+      const parallelRunner = this.runner as ParallelRunner | undefined;
+      if (typeof parallelRunner?.workerReporter === 'function') {
+        parallelRunner.workerReporter(resolveParallelModeSetupFile());
       }
       // Workers are forked after the global setup fixtures and inherit the run started there,
       // so they only add their results. Run events here fire inside a promise job, where

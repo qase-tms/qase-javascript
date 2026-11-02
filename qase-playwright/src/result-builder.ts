@@ -76,11 +76,10 @@ export class ResultBuilder {
     }
 
     if (options.browser?.addAsParameter) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      const browser = (test as any)._projectId ?? null;
+      // _projectId is Playwright-internal and absent from its public TestCase typings.
+      const browser = (test as TestCase & { _projectId?: string })._projectId ?? null;
       if (browser) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        metadata.parameters[options.browser?.parameterName ?? 'browser'] =
+        metadata.parameters[options.browser.parameterName ?? 'browser'] =
           browser;
         suites = suites.filter((suite) => suite !== browser);
       }
@@ -106,7 +105,6 @@ export class ResultBuilder {
       annotations.projectMapping != null &&
       Object.keys(annotations.projectMapping).length > 0;
     const hasTitleProjectMapping =
-      titleParsed.projectMapping != null &&
       Object.keys(titleParsed.projectMapping).length > 0;
 
     const projectMapping = hasMetadataProjectMapping
@@ -126,17 +124,13 @@ export class ResultBuilder {
       testops_project_mapping = projectMapping;
       testops_id = null;
     } else if (annotations.ids.length > 0) {
-      testops_id =
-        annotations.ids.length === 1 ? annotations.ids[0]! : annotations.ids;
+      testops_id = singleIdOrList(annotations.ids);
       testops_project_mapping = null;
     } else if (metadata.ids.length > 0) {
-      testops_id = metadata.ids.length === 1 ? metadata.ids[0]! : metadata.ids;
+      testops_id = singleIdOrList(metadata.ids);
       testops_project_mapping = null;
     } else if (titleParsed.legacyIds.length > 0) {
-      testops_id =
-        titleParsed.legacyIds.length === 1
-          ? titleParsed.legacyIds[0]!
-          : titleParsed.legacyIds;
+      testops_id = singleIdOrList(titleParsed.legacyIds);
       testops_project_mapping = null;
     } else {
       const registryIds = qaseIdsRegistry.get(test.title);
@@ -146,7 +140,7 @@ export class ResultBuilder {
 
     let errorForStatus: Error | null = null;
     if (error) {
-      errorForStatus = new Error(error.message || 'Test failed');
+      errorForStatus = new Error(error.message === '' ? 'Test failed' : error.message);
       if (error.stacktrace) {
         errorForStatus.stack = error.stacktrace;
       }
@@ -201,7 +195,7 @@ export class ResultBuilder {
       muted: metadata.mute,
       params: metadata.parameters,
       group_params: metadata.groupParams,
-      tags: metadata.tags ?? [],
+      tags: metadata.tags,
       relations: {
         suite: {
           data: suites
@@ -250,6 +244,11 @@ export class ResultBuilder {
 
     return testResult as unknown as TestResultType;
   }
+}
+
+function singleIdOrList(ids: number[]): number | number[] {
+  const [only, ...rest] = ids;
+  return only !== undefined && rest.length === 0 ? only : ids;
 }
 
 function transformError(testErrors: TestError[]): CompoundError {

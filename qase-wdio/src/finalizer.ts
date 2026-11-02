@@ -48,7 +48,8 @@ export class ResultFinalizer {
 
     let error: Error | null = null;
     if (err) {
-      error = new Error(err.message || 'Test failed');
+      // An empty message must also fall back, so `??` would not do here.
+      error = new Error(err.message ? err.message : 'Test failed');
       if (err.stacktrace) {
         error.stack = err.stacktrace;
       }
@@ -91,7 +92,8 @@ export class ResultFinalizer {
       testResult.testops_project_mapping = parsed.projectMapping;
       testResult.testops_id = null;
     } else if (parsed.legacyIds.length > 0) {
-      testResult.testops_id = parsed.legacyIds.length === 1 ? parsed.legacyIds[0]! : parsed.legacyIds;
+      const [onlyId] = parsed.legacyIds;
+      testResult.testops_id = parsed.legacyIds.length === 1 && onlyId !== undefined ? onlyId : parsed.legacyIds;
     }
     testResult.title = parsed.cleanedTitle || removeQaseIdsFromTitle(testResult.title);
 

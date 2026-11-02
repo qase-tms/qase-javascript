@@ -8,12 +8,17 @@ import {
   TestStatusEnum,
 } from '../models';
 import type { TestOpsOptionsType, TestOpsProjectConfigType, TestOpsMultiConfigType } from '../models/config/TestOpsOptionsType';
+import type { TestopsProjectMapping } from '../models/test-result';
 import { LoggerInterface } from '../utils/logger';
 import { Mutex } from 'async-mutex';
 import { ClientV2 } from '../client/clientV2';
 import { HostData } from '../models/host-data';
 import { resolveBatchSize } from './shared/testops-constants';
 import { resolveTestOpsBaseUrl } from './shared/testops-url';
+
+// The factory casts partial user config to TestOpsOptionsType; `run` and `plan` may be absent.
+type MultiTestOpsOptionsType = Omit<TestOpsOptionsType, 'run' | 'plan'> &
+  Partial<Pick<TestOpsOptionsType, 'run' | 'plan'>>;
 
 /**
  * Multi-project TestOps reporter. Sends test results to multiple Qase projects
@@ -48,7 +53,7 @@ export class TestOpsMultiReporter extends AbstractReporter {
 
   constructor(
     logger: LoggerInterface,
-    testopsOptions: TestOpsOptionsType,
+    testopsOptions: MultiTestOpsOptionsType,
     multiConfig: TestOpsMultiConfigType,
     withState: boolean,
     hostData: HostData,
@@ -60,20 +65,21 @@ export class TestOpsMultiReporter extends AbstractReporter {
     showPublicReportLink?: boolean,
   ) {
     super(logger);
-    this.baseUrl = resolveTestOpsBaseUrl(baseUrl ?? testopsOptions.api?.host);
+    this.baseUrl = resolveTestOpsBaseUrl(baseUrl ?? testopsOptions.api.host);
     this.batchSize = resolveBatchSize(batchSize ?? testopsOptions.batch?.size);
     this.showPublicReportLink = showPublicReportLink ?? testopsOptions.showPublicReportLink;
 
-    this.defaultProject =
-      multiConfig.default_project ??
-      (multiConfig.projects.length > 0 ? multiConfig.projects[0]!.code : '');
+    // Projects come from user config, so malformed entries are skipped rather than trusted.
+    const projects: readonly (TestOpsProjectConfigType | null | undefined)[] = multiConfig.projects;
 
-    this.projectCodes = multiConfig.projects
+    this.defaultProject = multiConfig.default_project ?? projects[0]?.code ?? '';
+
+    this.projectCodes = projects
       .filter((p): p is TestOpsProjectConfigType => Boolean(p?.code))
       .map((p) => p.code);
     void withState; // reserved for future StateManager integration
 
-    for (const proj of multiConfig.projects) {
+    for (const proj of projects) {
       if (!proj?.code) continue;
       const projectOptions = this.buildProjectOptions(testopsOptions, proj);
       const env = proj.environment ?? environment;
@@ -93,7 +99,7 @@ export class TestOpsMultiReporter extends AbstractReporter {
   }
 
   private buildProjectOptions(
-    global: TestOpsOptionsType,
+    global: MultiTestOpsOptionsType,
     proj: TestOpsProjectConfigType,
   ): TestOpsOptionsType {
     // Global run settings (tags, complete, title...) are defaults for every project. A run id
@@ -134,7 +140,7 @@ export class TestOpsMultiReporter extends AbstractReporter {
 
   public override async addTestResult(result: TestResultType): Promise<void> {
     if (result.execution.status === TestStatusEnum.failed) {
-      const mapping = result.getTestopsProjectMapping?.() ?? result.testops_project_mapping ?? null;
+      const mapping = this.getProjectMapping(result);
       if (mapping) {
         for (const [projectCode, ids] of Object.entries(mapping)) {
           for (const id of ids) {
@@ -168,7 +174,7 @@ export class TestOpsMultiReporter extends AbstractReporter {
 
       for (const { code, ids } of this.getProjectsToUseForResult(result)) {
         const copy = this.copyResultForProject(result, code, ids);
-        const queue = this.projectQueues.get(code)!;
+        const queue = this.getQueue(code);
         queue.push(copy);
 
         const first = this.firstIndexByProject.get(code) ?? 0;
@@ -185,9 +191,9 @@ export class TestOpsMultiReporter extends AbstractReporter {
    * Get list of (projectCode, ids) for a result (multi-project mapping or legacy testops_id).
    * Caller must hold mutex when using projectQueues.
    */
-  private getProjectsToUseForResult(result: TestResultType): Array<{ code: string; ids: number[] }> {
-    const mapping = result.getTestopsProjectMapping?.() ?? result.testops_project_mapping ?? null;
-    const projectsToUse: Array<{ code: string; ids: number[] }> = [];
+  private getProjectsToUseForResult(result: TestResultType): { code: string; ids: number[] }[] {
+    const mapping = this.getProjectMapping(result);
+    const projectsToUse: { code: string; ids: number[] }[] = [];
 
     if (mapping && Object.keys(mapping).length > 0) {
       for (const [code, ids] of Object.entries(mapping)) {
@@ -217,9 +223,23 @@ export class TestOpsMultiReporter extends AbstractReporter {
   private distributeResultToProjectQueues(result: TestResultType): void {
     for (const { code, ids } of this.getProjectsToUseForResult(result)) {
       const copy = this.copyResultForProject(result, code, ids);
-      const queue = this.projectQueues.get(code)!;
-      queue.push(copy);
+      this.getQueue(code).push(copy);
     }
+  }
+
+  // Results copied by spread or rehydrated from JSON (e.g. Cypress) lose their class methods.
+  private getProjectMapping(result: TestResultType): TestopsProjectMapping | null {
+    const { getTestopsProjectMapping } = result as Partial<Pick<TestResultType, 'getTestopsProjectMapping'>>;
+    return getTestopsProjectMapping?.call(result) ?? result.testops_project_mapping ?? null;
+  }
+
+  // A default_project missing from `projects` has no queue; keep failing loudly on it.
+  private getQueue(code: string): TestResultType[] {
+    const queue = this.projectQueues.get(code);
+    if (!queue) {
+      throw new Error(`[${code}] Project is not listed in testops_multi.projects`);
+    }
+    return queue;
   }
 
   private copyResultForProject(
@@ -229,14 +249,17 @@ export class TestOpsMultiReporter extends AbstractReporter {
   ): TestResultType {
     const copy = { ...result } as TestResultType;
     copy.id = uuidv4();
-    copy.testops_id = ids.length === 0 ? null : ids.length === 1 ? ids[0]! : ids;
+    copy.testops_id = ids.length > 1 ? ids : ids[0] ?? null;
     copy.testops_project_mapping = null;
     return copy;
   }
 
   private async checkOrCreateTestRuns(): Promise<void> {
     for (const code of this.projectCodes) {
-      const client = this.clients.get(code)!;
+      const client = this.clients.get(code);
+      if (!client) {
+        throw new Error(`[${code}] No API client for project`);
+      }
       const runId = await client.createRun();
       this.runIds.set(code, runId);
       this.logger.logDebug(`[${code}] Run ID: ${runId}`);

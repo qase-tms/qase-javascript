@@ -1,5 +1,6 @@
 import {
   Attachment as Attach,
+  Examples,
   GherkinDocument,
   Pickle,
   TestCaseStarted,
@@ -45,7 +46,9 @@ export class EventStorage {
 
       const parameters: Record<string, Record<string, string>> = {};
 
-      scenario.examples?.forEach((example) => {
+      // Envelopes come from parsed JSON (e.g. message formatter output) and may omit the array.
+      const { examples } = scenario as { examples?: readonly Examples[] };
+      examples?.forEach((example) => {
         if (example.tableHeader) {
           const columnNames = example.tableHeader.cells.map((cell) => cell.value);
 
