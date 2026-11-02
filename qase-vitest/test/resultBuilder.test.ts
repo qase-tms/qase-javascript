@@ -109,6 +109,34 @@ describe('ResultBuilder.build', () => {
     expect(result.message).toBe('boom');
   });
 
+  it('reports a test that passed on a retry as passed, without the earlier attempts\' errors', () => {
+    const result = ResultBuilder.build({
+      testCase: mkTestCase({
+        result: jest.fn().mockReturnValue({ state: 'passed', errors: [new Error('first attempt')] }),
+      }),
+      metadata: undefined,
+      currentSuite: undefined,
+      profilerSteps: [],
+    });
+    expect(result.execution.status).toBe('passed');
+    expect(result.message).toBeNull();
+    expect(result.execution.stacktrace).toBeFalsy();
+  });
+
+  it('takes the message of a test failing on every retry from its last attempt', () => {
+    const result = ResultBuilder.build({
+      testCase: mkTestCase({
+        result: jest.fn().mockReturnValue({ state: 'failed', errors: [new Error('attempt 1'), new Error('attempt 2')] }),
+      }),
+      metadata: undefined,
+      currentSuite: undefined,
+      profilerSteps: [],
+    });
+    expect(result.execution.status).toBe('failed');
+    expect(result.message).toBe('attempt 2');
+    expect(result.execution.stacktrace).toContain('attempt 1');
+  });
+
   it('maps skipped result with note to status=skipped and message=note', () => {
     const result = ResultBuilder.build({
       testCase: mkTestCase({

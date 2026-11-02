@@ -1,3 +1,10 @@
+# vitest-qase-reporter@1.6.1
+
+## Fixed
+
+- A test that failed and then passed on a `retry` was reported as `failed` or `invalid` with the first attempt's error, because Vitest keeps the errors of every attempt. It is now reported as `passed`. A test failing on every attempt takes its message from the last attempt.
+- Steps, tags, comments and attachments set through `withQase` piled up over retries and `repeats`, so a result showed every attempt's steps and attachments. The result now holds those of the last attempt only.
+
 # vitest-qase-reporter@1.6.0
 
 ## Added

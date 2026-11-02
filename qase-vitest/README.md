@@ -195,6 +195,8 @@ The Vitest reporter has no `ignore()` method: every test that runs is reported. 
 | Failed | Failed |
 | Skipped | Skipped |
 
+A test retried with `retry` or run again with `repeats` is reported once, with the status of its last attempt. Steps and metadata set through `withQase` come from that attempt only.
+
 > For more usage examples, see the [Usage Guide](docs/usage.md).
 
 ## Running Tests

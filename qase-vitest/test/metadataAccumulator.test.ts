@@ -23,6 +23,20 @@ describe('MetadataAccumulator.parseAnnotation', () => {
     expect(m!.attachments).toEqual([]);
   });
 
+  it('drops what earlier attempts recorded when a new attempt starts', () => {
+    acc.parseAnnotation('t1', mkAnnotation('Qase Tags: ["try1"]'));
+    acc.parseAnnotation('t1', mkAnnotation('Qase Comment: first'));
+    acc.parseAnnotation('t1', mkAnnotation('Qase Step Start: s1'));
+    acc.parseAnnotation('t1', mkAnnotation('Qase Step End: s1'));
+    acc.parseAnnotation('t2', mkAnnotation('Qase Title: other test'));
+
+    acc.parseAnnotation('t1', mkAnnotation('Qase Attempt: 2'));
+    acc.parseAnnotation('t1', mkAnnotation('Qase Tags: ["try2"]'));
+
+    expect(acc.getMetadata('t1')).toEqual({ steps: [], attachments: [], tags: ['try2'] });
+    expect(acc.getMetadata('t2')!.title).toBe('other test');
+  });
+
   it('parses Qase Title annotation', () => {
     acc.parseAnnotation('t1', mkAnnotation('Qase Title: New Title'));
     expect(acc.getMetadata('t1')!.title).toBe('New Title');
