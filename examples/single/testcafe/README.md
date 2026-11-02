@@ -139,7 +139,7 @@ Chain multiple metadata methods before calling `.create()`:
 test.meta(
   qase.id(1)
     .title('Complex test')
-    .fields({severity: 'high'})
+    .fields({severity: 'critical'})
     .suite('Module\tFeature')
     .parameters({user: 'admin'})
     .create()

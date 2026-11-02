@@ -40,7 +40,7 @@ test.meta(qase.projects({ PROJ1: [1], PROJ2: [2] }).title('User can login with v
 
 // Report invalid login to PROJ1 (case 3) and PROJ2 (case 4)
 test.meta(qase.projects({ PROJ1: [3], PROJ2: [4] }).title('Invalid password shows error').fields({
-  severity: 'high',
+  severity: 'critical',
   priority: 'high',
   layer: 'e2e'
 }).suite('E-commerce\tAuthentication\tLogin').parameters({

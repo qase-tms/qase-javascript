@@ -29,7 +29,7 @@ describe('Multi-project Login Scenarios', () => {
   // Report to PROJ1 (case 3) and PROJ2 (case 4)
   qase.projects({ PROJ1: [3], PROJ2: [4] },
     it('Invalid password shows error', () => {
-      qase.fields({ severity: 'high', priority: 'high', layer: 'e2e' });
+      qase.fields({ severity: 'critical', priority: 'high', layer: 'e2e' });
       qase.suite('E-commerce\tAuthentication\tLogin');
       qase.parameters({ username: 'standard_user', password: 'wrong_password' });
 
@@ -52,7 +52,7 @@ describe('Multi-project Login Scenarios', () => {
   // Report to PROJ1 (case 5) and PROJ2 (case 6)
   qase.projects({ PROJ1: [5], PROJ2: [6] },
     it('Locked user cannot login', () => {
-      qase.fields({ severity: 'high', priority: 'medium', layer: 'e2e' });
+      qase.fields({ severity: 'major', priority: 'medium', layer: 'e2e' });
       qase.suite('E-commerce\tAuthentication\tLogin');
       qase.parameters({ username: 'locked_out_user' });
 

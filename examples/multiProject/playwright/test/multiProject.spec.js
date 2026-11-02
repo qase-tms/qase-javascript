@@ -27,7 +27,7 @@ test.describe('Multi-project Login Scenarios', () => {
   // Report to PROJ1 (case 3) and PROJ2 (case 4)
   test('Invalid password shows error', async ({ page }) => {
     qase.projects({ PROJ1: [3], PROJ2: [4] });
-    qase.fields({ severity: 'high', priority: 'high', layer: 'e2e' });
+    qase.fields({ severity: 'critical', priority: 'high', layer: 'e2e' });
     qase.suite('E-commerce\tAuthentication\tLogin');
     qase.parameters({ username: 'standard_user', password: 'wrong_password' });
 
@@ -48,7 +48,7 @@ test.describe('Multi-project Login Scenarios', () => {
 
   // Alternative: qase.projectsTitle() in the test name
   test(qase.projectsTitle('Locked user cannot login', { PROJ1: [5], PROJ2: [6] }), async ({ page }) => {
-    qase.fields({ severity: 'high', priority: 'medium', layer: 'e2e' });
+    qase.fields({ severity: 'major', priority: 'medium', layer: 'e2e' });
     qase.suite('E-commerce\tAuthentication\tLogin');
     qase.parameters({ username: 'locked_out_user' });
 

@@ -69,7 +69,7 @@ export class Metadata {
   }
 
   addComment(message: string) {
-    this.comment += message + '\n\n';
+    this.comment = this.comment ? `${this.comment}\n\n${message}` : message;
   }
 
   addTags(values: string[]) {

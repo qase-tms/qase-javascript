@@ -42,6 +42,9 @@ export class MochaQaseReporter extends reporters.Base {
   private readonly stepRunner: StepRunner = new StepRunner();
   private testBeginTime: number = Date.now();
   private currentType: 'test' | 'step' = 'test';
+  // The test between EVENT_TEST_BEGIN and its result; a failing `before each` hook never ends it.
+  private currentTest: Mocha.Test | null = null;
+  private readonly reportedTests = new WeakSet<Mocha.Test>();
 
   public constructor(
     runner: Runner,
@@ -107,12 +110,15 @@ export class MochaQaseReporter extends reporters.Base {
     this.runner.on(Events.EVENT_RUN_BEGIN, () => this.onStartRun());
     this.runner.on(Events.EVENT_RUN_END, () => this.onEndRun());
 
-    this.runner.on(Events.EVENT_TEST_BEGIN, (test: Test) => this.addMethods(test));
+    this.runner.on(Events.EVENT_TEST_BEGIN, (test: Test) => this.onStartTest(test));
     this.runner.on(Events.EVENT_HOOK_BEGIN, (hook: Hook) => this.addMethodsToContext(hook.ctx));
-
-    this.runner.on(Events.EVENT_TEST_BEGIN, () => this.onStartTest());
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    // EVENT_TEST_FAIL is emitted for failing hooks too.
+    this.runner.on(Events.EVENT_TEST_FAIL, (runnable: Mocha.Runnable, err: Error) => this.onFail(runnable, err));
     this.runner.on(Events.EVENT_TEST_END, (test) => this.onEndTest(test));
+    // Reporters such as `spec` print the result on pass/fail, before EVENT_TEST_END; stop
+    // recording first so that line does not end up in the test's stdout.txt.
+    this.runner.prependListener(Events.EVENT_TEST_PASS, () => this.outputCapture.stop());
+    this.runner.prependListener(Events.EVENT_TEST_FAIL, () => this.outputCapture.stop());
   };
 
   private onStartRun() {
@@ -141,21 +147,44 @@ export class MochaQaseReporter extends reporters.Base {
     ctx.step = this.step;
   }
 
-  private addMethods(test: Test) {
-    this.outputCapture.install();
+  private onStartTest(test: Test) {
     this.addMethodsToContext(test.ctx);
-  }
-
-  private onStartTest() {
+    this.currentTest = test;
+    // Metadata set in `before each` hooks runs after this event, so it still reaches the test.
+    this.metadataApplier.reset();
     this.outputCapture.reset();
-    this.outputCapture.install();
+    if (this.reporter.isCaptureLogs()) {
+      this.outputCapture.install();
+    }
     this.stepRunner.reset();
     this.currentType = 'test';
     this.testBeginTime = Date.now();
     this.profilerTracker.onTestStart();
   }
 
-  private onEndTest(test: Mocha.Test) {
+  /**
+   * Mocha emits no EVENT_TEST_END for a test whose `before each` hook fails: the test would be
+   * missing from Qase and its metadata would carry over to the next one. Report it as failed
+   * with the hook's error instead.
+   */
+  private onFail(runnable: Mocha.Runnable, err: Error) {
+    if ((runnable as { type?: string }).type !== 'hook') return;
+    if (!runnable.title.startsWith('"before each" hook')) return;
+    const test = this.currentTest;
+    if (!test || runnable.ctx?.currentTest !== test) return;
+
+    const failed = Object.create(test, {
+      state: { value: 'failed' },
+      err: { value: err },
+    }) as Mocha.Test;
+    this.onEndTest(failed, test);
+  }
+
+  private onEndTest(test: Mocha.Test, original: Mocha.Test = test) {
+    if (this.reportedTests.has(original)) return;
+    this.reportedTests.add(original);
+    this.currentTest = null;
+
     const output = this.outputCapture.drain();
     const metadata = this.metadataApplier.get();
 

@@ -1,13 +1,17 @@
-import { StreamInterceptor } from '../interceptor';
-
 export interface CapturedOutput {
   stdout: string;
   stderr: string;
 }
 
+type Write = typeof process.stdout.write;
+
+/**
+ * Records what a test writes to stdout and stderr for the `captureLogs` attachments. Writes
+ * still reach the terminal: the capture copies them, it does not take them over.
+ */
 export class OutputCapture {
-  private originalStdoutWrite: typeof process.stdout.write | null = null;
-  private originalStderrWrite: typeof process.stderr.write | null = null;
+  private originalStdoutWrite: Write | null = null;
+  private originalStderrWrite: Write | null = null;
   private buffer: CapturedOutput = { stdout: '', stderr: '' };
 
   install(): void {
@@ -22,17 +26,17 @@ export class OutputCapture {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     this.originalStderrWrite = process.stderr.write;
 
-    const stdoutInterceptor = new StreamInterceptor((data: string) => {
+    process.stdout.write = this.tee(process.stdout, this.originalStdoutWrite, (data) => {
       this.buffer.stdout += data;
     });
-    const stderrInterceptor = new StreamInterceptor((data: string) => {
+    process.stderr.write = this.tee(process.stderr, this.originalStderrWrite, (data) => {
       this.buffer.stderr += data;
     });
+  }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
-    process.stdout.write = stdoutInterceptor.write.bind(stdoutInterceptor) as typeof process.stdout.write;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
-    process.stderr.write = stderrInterceptor.write.bind(stderrInterceptor) as typeof process.stderr.write;
+  /** Stops recording but keeps what was recorded for `drain()`. */
+  stop(): void {
+    this.restore();
   }
 
   drain(): CapturedOutput {
@@ -45,6 +49,13 @@ export class OutputCapture {
   reset(): void {
     this.restore();
     this.buffer = { stdout: '', stderr: '' };
+  }
+
+  private tee(stream: NodeJS.WriteStream, original: Write, record: (data: string) => void): Write {
+    return function (this: unknown, chunk: unknown, ...rest: unknown[]) {
+      record(typeof chunk === 'string' ? chunk : Buffer.from(chunk as Uint8Array).toString());
+      return (original as (...args: unknown[]) => boolean).call(stream, chunk, ...rest);
+    } as Write;
   }
 
   private restore(): void {
