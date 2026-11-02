@@ -2,6 +2,7 @@
 import path from 'path';
 import { QaseStep, StepFunction, getMimeTypes } from 'qase-javascript-commons';
 import { v4 as uuidv4 } from 'uuid';
+import { currentTestRunId } from './modules/testRunContext';
 
 import type { TestopsProjectMapping } from 'qase-javascript-commons';
 
@@ -173,13 +174,16 @@ export class qase {
    * });
    */
   public static step = async (name: string, body: StepFunction) => {
+    // Resolved before the first `await`: native async continuations lose TestCafe's test run marker.
+    const testRunId = currentTestRunId();
     const runningStep = new QaseStep(name);
+    // global.Qase is missing when the run does not use the qase reporter; the step still runs.
     // eslint-disable-next-line @typescript-eslint/require-await
     await runningStep.run(body, async (step) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
       // @ts-expect-error - global.Qase is dynamically added at runtime
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      return global.Qase.step(step);
+      return global.Qase?.step(step, testRunId);
     });
   };
 
@@ -200,6 +204,7 @@ export class qase {
     content?: string;
     paths?: string[];
   }) => {
+    const testRunId = currentTestRunId();
     if (attach.paths) {
       for (const file of attach.paths) {
         const attachmentName = path.basename(file);
@@ -207,14 +212,14 @@ export class qase {
 
         // @ts-expect-error - global.Qase is dynamically added at runtime
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        global.Qase.attachment({
+        global.Qase?.attachment({
           file_path: file,
           size: 0,
           id: uuidv4(),
           file_name: attachmentName,
           mime_type: contentType,
           content: '',
-        });
+        }, testRunId);
       }
       return;
     }
@@ -222,14 +227,14 @@ export class qase {
     if (attach.content) {
       // @ts-expect-error - global.Qase is dynamically added at runtime
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      global.Qase.attachment({
+      global.Qase?.attachment({
         file_path: null,
         size: attach.content.length,
         id: uuidv4(),
         file_name: attach.name ?? 'attachment',
         mime_type: attach.type ?? 'application/octet-stream',
         content: attach.content,
-      });
+      }, testRunId);
     }
   };
 

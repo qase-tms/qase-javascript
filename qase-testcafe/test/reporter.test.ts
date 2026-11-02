@@ -78,17 +78,76 @@ describe('TestcafeQaseReporter', () => {
     });
   });
 
-  describe('addStep', () => {
-    it('should add step to steps array', () => {
-      reporter.addStep({ id: '1' } as any);
-      expect((reporter as any).steps).toHaveLength(1);
-    });
-  });
+  describe('steps and attachments under concurrency', () => {
+    const info = (browsers: any[]) => ({
+      errs: [], warnings: [], durationMs: 1, unstable: false, screenshotPath: '', screenshots: [],
+      quarantine: {}, skipped: false, fixture: { id: 'f', name: 'F', meta: {} }, browsers,
+    }) as any;
+    const step = (action: string) => ({ id: action, data: { action }, steps: [] } as any);
+    const attachment = (file_name: string) =>
+      ({ file_name, file_path: null, mime_type: 'text/plain', content: 'x', size: 1, id: file_name } as any);
+    const reported = () => reporterMock.addTestResult.mock.calls.map((c: any) => c[0]);
 
-  describe('addAttachment', () => {
-    it('should add attachment to attachments array', () => {
-      reporter.addAttachment({ file_name: 'file', file_path: '', mime_type: '', content: '', size: 0, id: 'id' });
-      expect((reporter as any).attachments).toHaveLength(1);
+    it('keeps what each test run records apart when tests overlap', async () => {
+      reporter.reportTestStart({ testId: 'a', testRunIds: ['run-a'], startTime: new Date(1000), skipped: false });
+      reporter.reportTestStart({ testId: 'b', testRunIds: ['run-b'], startTime: new Date(2000), skipped: false });
+      reporter.addStep(step('a1'), 'run-a');
+      reporter.addStep(step('b1'), 'run-b');
+      reporter.addAttachment(attachment('b.txt'), 'run-b');
+      reporter.addStep(step('a2'), 'run-a');
+
+      await reporter.reportTestDone('A', { ...info([{ testRunId: 'run-a' }]), testId: 'a' }, {}, () => '');
+      await reporter.reportTestDone('B', { ...info([{ testRunId: 'run-b' }]), testId: 'b' }, {}, () => '');
+
+      const [a, b] = reported();
+      expect(a.steps.map((s: any) => s.data.action)).toEqual(['a1', 'a2']);
+      expect(a.attachments).toEqual([]);
+      expect(a.execution.start_time).toBe(1);
+      expect(b.steps.map((s: any) => s.data.action)).toEqual(['b1']);
+      expect(b.attachments.map((x: any) => x.file_name)).toEqual(['b.txt']);
+      expect(b.execution.start_time).toBe(2);
+    });
+
+    it('reports only the final quarantine attempt', async () => {
+      reporter.addStep(step('try1'), 'run-1');
+      reporter.addAttachment(attachment('try1.txt'), 'run-1');
+      reporter.addStep(step('try2'), 'run-2');
+
+      await reporter.reportTestDone('Q', info([{ testRunId: 'run-2', quarantineAttemptsTestRunIds: ['run-1', 'run-2'] }]), {}, () => '');
+
+      expect(reported()[0].steps.map((s: any) => s.data.action)).toEqual(['try2']);
+      expect(reported()[0].attachments).toEqual([]);
+      expect((reporter as any).recorded.size).toBe(0);
+    });
+
+    it('takes steps from one browser and attachments from all', async () => {
+      reporter.addStep(step('s'), 'chrome');
+      reporter.addAttachment(attachment('chrome.png'), 'chrome');
+      reporter.addStep(step('s'), 'firefox');
+      reporter.addAttachment(attachment('firefox.png'), 'firefox');
+
+      await reporter.reportTestDone('M', info([{ testRunId: 'chrome' }, { testRunId: 'firefox' }]), {}, () => '');
+
+      expect(reported()[0].steps).toHaveLength(1);
+      expect(reported()[0].attachments.map((x: any) => x.file_name)).toEqual(['chrome.png', 'firefox.png']);
+    });
+
+    it('gives calls outside a known test run to the next reported test', async () => {
+      reporter.reportTestStart();
+      reporter.addStep(step('loose'));
+      reporter.addAttachment(attachment('loose.txt'));
+
+      await reporter.reportTestDone('L', info([]), {}, () => '');
+
+      expect(reported()[0].steps.map((s: any) => s.data.action)).toEqual(['loose']);
+      expect(reported()[0].attachments.map((x: any) => x.file_name)).toEqual(['loose.txt']);
+    });
+
+    it('drops what an ignored test recorded', async () => {
+      reporter.addStep(step('ignored'), 'run-i');
+      await reporter.reportTestDone('I', info([{ testRunId: 'run-i' }]), { QaseIgnore: 'true' }, () => '');
+      expect(reporterMock.addTestResult).not.toHaveBeenCalled();
+      expect((reporter as any).recorded.size).toBe(0);
     });
   });
 
@@ -100,14 +159,12 @@ describe('TestcafeQaseReporter', () => {
   });
 
   describe('reportTestStart', () => {
-    it('should reset steps, attachments, and testBeginTime', () => {
-      (reporter as any).steps = [{ id: '1' }];
-      (reporter as any).attachments = [{ file_name: 'file', file_path: '', mime_type: '', content: '', size: 0, id: 'id' }];
+    it('should reset unattributed records and testBeginTime', () => {
+      reporter.addStep({ id: '1' } as any, null);
       (reporter as any).testBeginTime = 123;
       reporter.reportTestStart();
-      expect((reporter as any).steps).toEqual([]);
-      expect((reporter as any).attachments).toEqual([]);
-      expect(typeof (reporter as any).testBeginTime).toBe('number');
+      expect((reporter as any).unattributed.steps).toEqual([]);
+      expect((reporter as any).testBeginTime).not.toBe(123);
     });
   });
 
@@ -170,7 +227,7 @@ describe('TestcafeQaseReporter', () => {
         type: '',
         errMsg: 'fail',
       }] };
-      (reporter as any).attachments = [{ file_name: 'file', file_path: '', mime_type: '', content: '', size: 0, id: 'id' }];
+      reporter.addAttachment({ file_name: 'file', file_path: '', mime_type: '', content: '', size: 0, id: 'id' }, null);
       await reporter.reportTestDone('Test Title', info, meta, formatError);
       const call = reporterMock.addTestResult.mock.calls[0][0];
       expect(call.message).toContain('fail');

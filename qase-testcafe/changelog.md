@@ -1,3 +1,11 @@
+# testcafe-reporter-qase@2.8.1
+
+## Fixed
+
+- Steps and attachments added with `qase.step()` and `qase.attach()` went to whichever test reported next, so with `concurrency`, several browsers or quarantine mode tests got each other's steps, duplicated steps and steps of failed quarantine attempts. They are now kept by TestCafe test run and reported with their own test: steps from the first browser, attachments from all browsers, and only the final quarantine attempt. The start time of a result is the test's own start time.
+- `qase.step()` and `qase.attach()` threw `Cannot read properties of undefined (reading 'step')` when the run did not use the qase reporter (e.g. `-r spec` only), failing every test that called them. Steps now still run and attachments are ignored.
+- The `testcafe` peer dependency was pinned to exactly `3.7.6`, so npm refused to install the reporter next to any other TestCafe version. It is now `>=2.0.0`, as the README states.
+
 # testcafe-reporter-qase@2.8.0
 
 ## Added

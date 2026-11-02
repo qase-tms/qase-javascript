@@ -326,6 +326,8 @@ Then run:
 QASE_MODE=testops npx testcafe
 ```
 
+Steps and attachments stay with their own test when tests run concurrently (`concurrency`, `-c`), in several browsers or in quarantine mode. With several browsers a test is reported once: its steps come from the first browser, its attachments from all of them. In quarantine mode only the final attempt's steps and attachments are reported.
+
 ## Browser as Parameter
 
 When running tests, the reporter can automatically add the browser name as a test parameter. The browser is detected from TestCafe's user agent string (e.g., `"Chrome 97.0 / macOS 10.15"` → `"chrome"`).
