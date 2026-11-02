@@ -21,7 +21,7 @@ export interface AddCommentEventArgs {
 export interface AddAttachmentEventArgs {
   name?: string;
   type?: string;
-  content?: string;
+  content?: string | Buffer;
   paths?: string | string[];
 }
 

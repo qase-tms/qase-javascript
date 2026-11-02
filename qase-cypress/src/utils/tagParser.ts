@@ -21,14 +21,12 @@ export function extractTags(filePath: string, scenarioName: string): string[] {
     // Check if the line is a Scenario line and matches the provided name
     if (trimmedLine?.startsWith('Scenario:') && trimmedLine === `Scenario: ${scenarioName}`) {
 
-      // Collect tags from preceding lines
+      // Collect the tag block right above the scenario; it may span several lines and contain comments
       for (let j = i - 1; j >= 0; j--) {
-        const previousLine = lines[j]?.trim(); // Ensure line exists and trim it
-        if (previousLine?.startsWith('@')) {
-          tags = previousLine.split(/\s+/).filter(tag => tag.startsWith('@'));
-          break;
-        } else if (previousLine === '' || previousLine?.startsWith('Feature:')) {
-          // Stop searching if an empty line or the start of a feature is reached
+        const previousLine = lines[j]?.trim() ?? '';
+        if (previousLine.startsWith('@')) {
+          tags = [...previousLine.split(/\s+/).filter(tag => tag.startsWith('@')), ...tags];
+        } else if (!previousLine.startsWith('#')) {
           break;
         }
       }

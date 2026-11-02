@@ -250,6 +250,18 @@ export default defineConfig({
 }
 ```
 
+or in the reporter options in `vitest.config.ts`:
+
+```typescript
+reporters: [
+  'default',
+  ['vitest-qase-reporter', {
+    profilers: ['network'],
+    networkProfiler: { skip_domains: ['analytics.example.com'] },
+  }],
+],
+```
+
 | Option | Description | Default |
 |--------|-------------|---------|
 | `profilers` | Array of profilers to enable. Use `["network"]` for HTTP capture | `[]` |

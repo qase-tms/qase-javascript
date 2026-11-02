@@ -230,7 +230,13 @@ QASE_MODE=testops npx mocha --reporter mocha-qase-reporter --reporter-options ex
 
 ## Parallel Execution
 
-The reporter supports parallel execution of tests. First, create a new run in Qase.io using the [Qase CLI](https://github.com/qase-tms/qasectl):
+The reporter supports parallel execution of tests (`--parallel`). The main Mocha process starts the run before the workers start and completes it once, after the last worker; the workers only send their results. In `report` mode the report contains the results of every worker.
+
+```bash
+QASE_MODE=testops npx mocha --parallel
+```
+
+To report into a run created beforehand, for example with the [Qase CLI](https://github.com/qase-tms/qasectl):
 
 ```bash
 # Create a new test run
@@ -254,8 +260,8 @@ The reporter supports additional reporters alongside the main Qase reporter. Thi
 # Single extra reporter
 QASE_MODE=testops npx mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec
 
-# Multiple extra reporters
-QASE_MODE=testops npx mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec,json
+# Multiple extra reporters: separate them with ';' (Mocha splits option values on ',')
+QASE_MODE=testops npx mocha --reporter mocha-qase-reporter --reporter-options "extraReporters=spec;json"
 
 # With parallel execution
 QASE_MODE=testops npx mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec --parallel

@@ -82,7 +82,7 @@ export class qase {
    * Don't forget to call `create` method after setting all the necessary parameters
    * @param {Record<string, string>} values
    * @example
-   * const q = qase.fields({ 'severity': 'high', 'priority': 'medium' }).create();
+   * const q = qase.fields({ 'severity': 'critical', 'priority': 'medium' }).create();
    * test.meta(q)('Test case title', async t => { ... });
    * or
    * test.meta({userField: 123, ...q})('Test case title', async t => { ... });
@@ -193,20 +193,24 @@ export class qase {
    * @param attach
    * @example
    * test.meta({userField: 123, ...q})('Test case title', async t => {
-   *   qase.attach({ name: 'attachment.txt', content: 'Hello, world!', type: 'text/plain' });
+   *   qase.attach({ name: 'attachment.txt', content: 'Hello, world!', contentType: 'text/plain' });
+   *   qase.attach({ paths: '/path/to/file' });
    *   qase.attach({ paths: ['/path/to/file', '/path/to/another/file']});
    *     expect(true).toBe(true);
    * });
    */
   public static attach = (attach: {
     name?: string;
+    contentType?: string;
+    /** @deprecated use `contentType` */
     type?: string;
     content?: string;
-    paths?: string[];
+    paths?: string | string[];
   }) => {
     const testRunId = currentTestRunId();
     if (attach.paths) {
-      for (const file of attach.paths) {
+      const files = Array.isArray(attach.paths) ? attach.paths : [attach.paths];
+      for (const file of files) {
         const attachmentName = path.basename(file);
         const contentType: string = getMimeTypes(file);
 
@@ -232,7 +236,7 @@ export class qase {
         size: attach.content.length,
         id: uuidv4(),
         file_name: attach.name ?? 'attachment',
-        mime_type: attach.type ?? 'application/octet-stream',
+        mime_type: attach.contentType ?? attach.type ?? 'application/octet-stream',
         content: attach.content,
       }, testRunId);
     }
@@ -242,7 +246,7 @@ export class qase {
    * Create a Qase metadata
    * Call this method after setting all the necessary parameters
    * @example
-   * const q = qase.id(1).title('Test case title').fields({ 'severity': 'high', 'priority': 'medium' }).create();
+   * const q = qase.id(1).title('Test case title').fields({ 'severity': 'critical', 'priority': 'medium' }).create();
    * test.meta(q)('Test case title', async t => { ... });
    * or
    * test.meta({userField: 123, ...q})('Test case title', async t => { ... });

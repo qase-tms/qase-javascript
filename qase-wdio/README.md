@@ -66,6 +66,8 @@ exports.config = {
 };
 ```
 
+Keep the Qase settings (`mode`, `testops`, `report`) in `qase.config.json` or `QASE_*` environment variables. `beforeRunHook` and `afterRunHook` run in the WebdriverIO launcher, which does not see the reporter options, and they create and complete the run that all workers share.
+
 **3. Add Qase ID to your test:**
 
 **For Mocha/Jasmine:**
@@ -361,7 +363,7 @@ For detailed information, see the [Multi-Project Support Guide](docs/MULTI_PROJE
 
 The Network Profiler automatically captures outgoing HTTP requests made during test execution and reports them as REQUEST-type steps in Qase TestOps.
 
-**Additional setup:** Register `QaseWdioService` in your WDIO configuration:
+**Additional setup:** Register `QaseWdioService` in your WDIO configuration. It works with Mocha, Jasmine and Cucumber; in Cucumber the requests of a scenario are added to that scenario's result:
 
 ```javascript
 // wdio.conf.js

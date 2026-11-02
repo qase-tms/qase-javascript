@@ -100,7 +100,7 @@ export class FileSearcher {
    * Finds all mp4 video files in the given directory and its subdirectories.
    *
    * @param videoFolderPath Path to the folder with video files.
-   * @param specFileName Name of the spec file (without extension).
+   * @param specFileName Name of the spec file with its extension, e.g. `login.cy.js`.
    * @param specRelativePath Optional relative path from e2e directory to the spec file.
    * @returns Array of absolute paths to the matching mp4 files.
    */
@@ -119,8 +119,8 @@ export class FileSearcher {
       for (const entry of entries) {
         if (entry.isFile()) {
           const fileName = entry.name;
-          // Check if the file is an mp4 video file with the expected format: {specFileName}.cy.js.mp4
-          if (fileName.toLowerCase().endsWith('.mp4') && fileName.startsWith(specFileName)) {
+          // Cypress names the video after the spec file: {specFileName}.mp4
+          if (fileName === `${specFileName}.mp4`) {
             const entryPath = path.join(dir, fileName);
             result.push(entryPath);
           }

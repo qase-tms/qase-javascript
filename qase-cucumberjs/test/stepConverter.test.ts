@@ -45,7 +45,17 @@ describe('StepConverter', () => {
     expect(out[0]?.step_type).toBe(StepType.GHERKIN);
     expect(out[0]?.execution.status).toBe(StepStatusEnum.passed);
     expect(out[0]?.execution.duration).toBe(1000);
-    expect((out[0]?.data as any).keyword).toBe('Given a thing');
+    expect((out[0]?.data as any).name).toBe('Given a thing');
+  });
+
+  it('takes the keyword from the Gherkin step, not the step text', () => {
+    const pickleSteps = [{ id: 'p1', text: 'a thing', astNodeIds: ['ast1'], type: 'Context' } as unknown as PickleStep];
+    const tc = { id: 'tc1', testSteps: [{ id: 's1', pickleStepId: 'p1' }] } as unknown as TestCase;
+    const finishedMap = new Map<string, TestStepFinished>([['s1', finished('s1', Status.PASSED)]]);
+
+    const out = StepConverter.convert(pickleSteps, tc, emptyStarted, finishedMap, () => [], (id) => (id === 'ast1' ? 'Given' : undefined));
+
+    expect(out[0]?.data).toMatchObject({ keyword: 'Given', name: 'a thing' });
   });
 
   it('emits start_time/end_time from TestStepStarted/Finished timestamps', () => {

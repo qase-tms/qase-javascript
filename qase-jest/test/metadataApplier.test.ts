@@ -49,6 +49,12 @@ describe('MetadataApplier', () => {
     expect(applier.get().fields).toEqual({ severity: 'critical' });
   });
 
+  it('applyFields merges repeated calls, later keys win', () => {
+    applier.applyFields({ severity: 'critical', layer: 'api' });
+    applier.applyFields({ severity: 'minor', priority: 'high' });
+    expect(applier.get().fields).toEqual({ severity: 'minor', layer: 'api', priority: 'high' });
+  });
+
   it('applyParameters sets parameters map', () => {
     applier.applyParameters({ env: 'prod' });
     expect(applier.get().parameters).toEqual({ env: 'prod' });

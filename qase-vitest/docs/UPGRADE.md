@@ -13,6 +13,22 @@ This guide covers migration steps between major versions of the Qase Vitest Repo
 
 ---
 
+## Upgrading to 1.7.0
+
+The result signature changed from Vitest's full test name to the format the other Qase reporters use: Qase IDs, test file path, `describe` blocks, test title and parameters. Qase uses the signature to match a result to a test case when the test has no Qase ID, so on the first run after upgrading such tests get new test cases and the old ones stop receiving results.
+
+To keep the existing cases, give the tests their Qase IDs before upgrading:
+
+```typescript
+import { addQaseId } from 'vitest-qase-reporter/vitest';
+
+test(addQaseId('User can log in', [42]), async () => { /* ... */ });
+```
+
+Tests that already have a Qase ID are matched by the ID and are not affected.
+
+---
+
 ## Upgrading to 1.x
 
 ### Breaking Changes
@@ -307,7 +323,7 @@ Or configure `mode: 'testops'` in your `vitest.config.ts` or `qase.config.json`.
 **Solution:** Check that:
 1. API token is set: `process.env.QASE_API_TOKEN`
 2. Project code is correct: `project: 'YOUR_PROJECT_CODE'`
-3. Mode is set to TestOps: `mode: 'TestOps'`
+3. Mode is set to TestOps: `mode: 'testops'`
 4. Reporter is in the `reporters` array in vitest.config.ts
 
 #### Issue: Configuration format errors

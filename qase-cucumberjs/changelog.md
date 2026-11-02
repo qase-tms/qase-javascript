@@ -1,3 +1,20 @@
+# cucumberjs-qase-reporter@2.6.1
+
+## Fixed
+
+- Scenarios inside a Gherkin `Rule:` block now keep their Examples parameters and their feature suite. Previously they were reported without parameters and without a suite.
+- Test duration now includes the sub-second part of Cucumber timestamps. Previously it was rounded to whole seconds, so a 150 ms scenario was reported as 0 or 1000 ms.
+- With `--retry`, only the final attempt of a scenario is reported. Previously every attempt was sent as a separate result.
+- An attachment added with `this.attach()` in a step is now reported once, on that step. Previously it was also added to the test. Attachments from hooks are still reported on the test, and attachments no longer leak between retry attempts.
+- A step is sent with its Gherkin keyword and text, e.g. `Given a user`. The step text was put in the keyword field, so Qase TestOps showed the text without its keyword and the local report repeated the text (`a user a user`). Requires `qase-javascript-commons` 2.9.11 or later; the pin is raised to `~2.9.11`.
+- `@QaseSuite=A\tB` written with a literal backslash-`t` (as in the docs) now creates nested suites `A` > `B`. Previously only a real tab character was split.
+
+## Documentation
+
+- Removed tag examples with spaces (Gherkin cannot parse whitespace inside a tag) and added a note about it.
+- Fixed `--tags "@QaseID"` filtering examples: tag expressions match whole tags, so they now use `@QaseID=1`.
+- Corrected the claim that Qase tag names are case-sensitive, invalid `severity: high` values, `mode: TestOps` (must be `testops`), and the multi-project tag syntax in usage examples.
+
 # cucumberjs-qase-reporter@2.6.0
 
 ## Added

@@ -1,4 +1,4 @@
-import { Pickle, TestCaseFinished, TestCaseStarted } from '@cucumber/messages';
+import { Pickle, TestCaseFinished, TestCaseStarted, Timestamp } from '@cucumber/messages';
 import { TestCase } from '@cucumber/messages/dist/esm/src/messages';
 import {
   Attachment,
@@ -45,7 +45,7 @@ export class ResultBuilder {
     let relations: Relation | null = null;
 
     if (metadata.suite) {
-      const suiteParts = metadata.suite.split('\t').filter((part) => part.trim().length > 0);
+      const suiteParts = metadata.suite.split(/\t|\\t/).filter((part) => part.trim().length > 0);
       relations = {
         suite: {
           data: suiteParts.map((suite) => ({
@@ -76,7 +76,9 @@ export class ResultBuilder {
         status,
         start_time: testCaseStarted.timestamp.seconds,
         end_time: testCaseFinished.timestamp.seconds,
-        duration: Math.abs(testCaseFinished.timestamp.seconds - testCaseStarted.timestamp.seconds) * 1000,
+        duration: Math.round(Math.abs(
+          ResultBuilder.toMillis(testCaseFinished.timestamp) - ResultBuilder.toMillis(testCaseStarted.timestamp),
+        )),
         stacktrace: error?.stacktrace ?? null,
         thread: null,
       },
@@ -95,6 +97,10 @@ export class ResultBuilder {
       title: metadata.title ?? pickle.name,
       tags: metadata.tags,
     } as unknown as TestResultType;
+  }
+
+  private static toMillis(ts: Timestamp): number {
+    return ts.seconds * 1000 + ts.nanos / 1e6;
   }
 
   static getSignature(pickle: Pickle, ids: number[], parameters: Record<string, string> = {}): string {

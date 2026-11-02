@@ -6,11 +6,7 @@ This guide covers migration steps between major versions of the Qase TestCafe Re
 
 ## Version History
 
-| Version | Release Date | Node.js Support | Key Changes |
-|---------|--------------|-----------------|-------------|
-| 2.2.0 | January 2026 | >= 14 | Current stable release with improved metadata support |
-| 2.1.0 | December 2025 | >= 14 | Enhanced builder pattern and multi-project support |
-| 2.0.0 | August 2025 | >= 14 | Complete rewrite with new architecture |
+See [changelog.md](../changelog.md) for the changes in each release.
 
 ---
 
@@ -24,11 +20,11 @@ The testcafe-reporter-qase started with the v2.x architecture, leveraging the un
 
 ### Current Version Features
 
-Version 2.2.0 includes:
+Version 2.x includes:
 
 - Full support for Qase TestOps API with batch result upload
 - Builder pattern for test metadata: `.meta(qase.id(1).create())`
-- Rich metadata support: titles, fields, suites, parameters, comments
+- Rich metadata support: titles, fields, suites, parameters, group parameters, tags
 - Nested test steps with callback-based API
 - File and content-based attachments
 - Multi-project support for reporting to multiple Qase projects
@@ -106,6 +102,7 @@ const { qase } = require('testcafe-reporter-qase/qase');
 TestCafe uses a builder pattern with `.meta()` for test metadata:
 
 ```javascript
+import { Selector } from 'testcafe';
 import { qase } from 'testcafe-reporter-qase/qase';
 
 fixture('User Authentication')
@@ -123,7 +120,7 @@ test
 
 // Multiple test case IDs
 test
-  .meta(qase.id(1, 2, 3).create())
+  .meta(qase.id([1, 2, 3]).create())
   ('Test with multiple IDs', async (t) => {
     // Test code
   });
@@ -138,7 +135,7 @@ test
       .id(1)
       .title('Custom test title')
       .fields({ severity: 'critical', priority: 'high', layer: 'e2e' })
-      .suite('Authentication / Login')
+      .suite('Authentication\tLogin')
       .create()
   )
   ('Test with rich metadata', async (t) => {
@@ -148,33 +145,40 @@ test
 
 **Builder Pattern Methods:**
 
-- `.id(...ids)` - Set test case ID(s)
+- `.id(number | number[])` - Set test case ID(s)
 - `.title(string)` - Set custom title
 - `.fields(object)` - Set custom fields
-- `.suite(string)` - Set suite hierarchy
+- `.suite(string)` - Set suite hierarchy (levels separated by `\t`)
+- `.parameters(object)` / `.groupParameters(object)` - Set parameters
+- `.tags(...string)` - Set tags
+- `.projects(object)` - Map the test to cases in several projects
+- `.ignore()` / `.mute()` - Do not report the test / report it as muted
 - `.create()` - **Required** - Finalize and create metadata object
 
 ### Steps with Nested Callbacks
 
-TestCafe steps use a callback-based pattern with step parameters:
+`qase.step(name, body)` takes the step name and a callback. Inside the callback keep using the
+test controller `t`; the callback receives the step object, which can attach files to the step:
 
 ```javascript
+import { Selector } from 'testcafe';
 import { qase } from 'testcafe-reporter-qase/qase';
 
 test
   .meta(qase.id(1).create())
   ('Test with steps', async (t) => {
-    await qase.step(t, 'Navigate to login page', async (s) => {
-      await s.navigateTo('https://example.com/login');
+    await qase.step('Navigate to login page', async () => {
+      await t.navigateTo('https://example.com/login');
     });
 
-    await qase.step(t, 'Enter credentials', async (s) => {
-      await s.typeText('#username', 'user@example.com');
-      await s.typeText('#password', 'password123');
+    await qase.step('Enter credentials', async () => {
+      await t.typeText('#username', 'user@example.com');
+      await t.typeText('#password', 'password123');
     });
 
-    await qase.step(t, 'Verify login success', async (s) => {
-      await s.expect(Selector('.dashboard').exists).ok();
+    await qase.step('Verify login success', async (s) => {
+      await t.expect(Selector('.dashboard').exists).ok();
+      s.attach({ paths: await t.takeScreenshot() });
     });
   });
 ```
@@ -182,19 +186,16 @@ test
 **Nested Steps:**
 
 ```javascript
-await qase.step(t, 'Parent step', async (s) => {
-  await qase.step(s, 'Child step 1', async (s1) => {
-    // Use s1 for TestCafe controller
-    await s1.typeText('#field1', 'value1');
+await qase.step('Parent step', async () => {
+  await qase.step('Child step 1', async () => {
+    await t.typeText('#field1', 'value1');
   });
 
-  await qase.step(s, 'Child step 2', async (s2) => {
-    await s2.typeText('#field2', 'value2');
+  await qase.step('Child step 2', async () => {
+    await t.typeText('#field2', 'value2');
   });
 });
 ```
-
-**Note:** The step callback parameter (`s`, `s1`, `s2`) is the TestCafe controller for that step scope.
 
 ### Attachments
 
@@ -207,31 +208,28 @@ test
   .meta(qase.id(1).create())
   ('Test with attachment', async (t) => {
     // Test code
-    await qase.attach(t, { paths: '/path/to/log.txt' });
+    qase.attach({ paths: '/path/to/log.txt' });
+    qase.attach({ paths: ['/path/to/a.log', '/path/to/b.log'] });
   });
 ```
 
 **Content-based Attachment:**
 
 ```javascript
-await qase.attach(t, {
+qase.attach({
   name: 'test-data.json',
   content: JSON.stringify({ key: 'value' }),
-  type: 'application/json', // Note: 'type' not 'contentType'
+  contentType: 'application/json',
 });
 ```
 
 **Screenshot Attachment:**
 
-```javascript
-await qase.attach(t, {
-  name: 'screenshot.png',
-  content: await t.takeScreenshot(),
-  type: 'image/png',
-});
-```
+`t.takeScreenshot()` saves the screenshot and returns its path, so attach it by path:
 
-**Important:** TestCafe uses `type` parameter (not `contentType`) for attachment MIME type.
+```javascript
+qase.attach({ paths: await t.takeScreenshot() });
+```
 
 ---
 
@@ -271,11 +269,11 @@ QASE_MODE=testops npx testcafe chrome tests/ --reporter spec,qase
 
 ### Node.js Version Support
 
-- **Current (2.2.0):** Node.js >= 14
+- Node.js >= 18
 
 ### TestCafe Version Support
 
-- **Current (2.2.0):** TestCafe >= 2.0.0
+- TestCafe >= 2.0.0
 - Tested with TestCafe 3.x
 
 ### Framework Compatibility
@@ -307,48 +305,28 @@ test.meta(qase.id(1))('Test name', async (t) => { /* ... */ });
 
 #### Issue: Steps not working
 
-**Solution:** Pass the TestCafe controller (`t`) as the first parameter:
+**Solution:** Import `qase` from the `/qase` subpath, pass the step name and a callback, and `await` the call:
 
 ```javascript
-// Correct
-await qase.step(t, 'Step name', async (s) => {
-  await s.click('#button');
-});
+import { qase } from 'testcafe-reporter-qase/qase';
 
-// Incorrect - missing t parameter
-await qase.step('Step name', async (s) => {
-  await s.click('#button');
+await qase.step('Step name', async () => {
+  await t.click('#button');
 });
 ```
 
 #### Issue: Attachments not appearing
 
-**Solution:** Use `type` parameter (not `contentType`):
+**Solution:** Attach files with `paths` and in-memory data with `content`. `t.takeScreenshot()` returns a file path, so pass it as `paths`:
 
 ```javascript
-// Correct
-await qase.attach(t, {
-  name: 'file.txt',
-  content: 'content',
-  type: 'text/plain',
-});
+qase.attach({ paths: await t.takeScreenshot() });
 
-// Incorrect - contentType not supported in TestCafe
-await qase.attach(t, {
+qase.attach({
   name: 'file.txt',
   content: 'content',
   contentType: 'text/plain',
 });
-```
-
-Also ensure you're passing `t` as first parameter:
-
-```javascript
-// Correct
-await qase.attach(t, { paths: 'file.txt' });
-
-// Incorrect - missing t parameter
-await qase.attach({ paths: 'file.txt' });
 ```
 
 #### Issue: Reporter not running
@@ -394,7 +372,7 @@ If you encounter issues:
 1. Check the [GitHub Issues](https://github.com/qase-tms/qase-javascript/issues)
 2. Review the CHANGELOG
 3. Open a new issue with:
-   - Current version (2.2.0)
+   - Reporter version
    - TestCafe version
    - Error messages
    - Configuration file (without sensitive data)

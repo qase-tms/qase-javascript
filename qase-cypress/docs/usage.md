@@ -720,12 +720,12 @@ For Cucumber/Gherkin integration, see the [Cucumber Integration Guide](cucumber.
 
 ```gherkin
 # features/login.feature
-@QaseID=12
 Feature: User Login
   As a user
   I want to log in to the application
   So I can access my account
 
+  @QaseID(12)
   Scenario: Successful login
     Given I am on the login page
     When I enter valid credentials

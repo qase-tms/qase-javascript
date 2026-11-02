@@ -130,7 +130,7 @@ test(qase([1, 2], 'Multiple IDs'), async ({ page }) => {
 ```typescript
 test('Simple test', async ({ page }) => {
   qase.title('Custom test title');
-  qase.fields({ severity: 'high', priority: 'medium' });
+  qase.fields({ severity: 'critical', priority: 'medium' });
 
   await page.goto('https://example.com');
   expect(await page.title()).toBe('Example');
@@ -143,7 +143,7 @@ test('Simple test', async ({ page }) => {
 test('Test with metadata', async ({ page }) => {
   qase.title('Custom test title');
   qase.fields({ severity: 'critical', priority: 'high', layer: 'e2e' });
-  qase.suite('Authentication / Login');
+  qase.suite('Authentication\tLogin');
   qase.comment('This test covers the main login flow');
   qase.parameters({ browser: 'chromium', viewport: '1920x1080' });
 
@@ -189,7 +189,7 @@ test('Test with expected results', async ({ page }) => {
 });
 ```
 
-All three positional arguments are required — pass `undefined` for `expectedResult` or `data` when not needed.
+Only `action` is required; `expectedResult` and `data` are optional, e.g. `qase.step('Open page')` or `qase.step('Submit', 'Form is sent')`.
 
 ### Attachments
 
@@ -272,7 +272,7 @@ reporter: [
 **Solution:** Check that:
 1. API token is set: `process.env.QASE_API_TOKEN`
 2. Project code is correct: `project: 'YOUR_PROJECT_CODE'`
-3. Mode is set to TestOps: `mode: 'TestOps'`
+3. Mode is set to TestOps: `mode: 'testops'`
 
 #### Issue: Configuration format errors
 

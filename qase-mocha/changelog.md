@@ -1,3 +1,18 @@
+# mocha-qase-reporter@1.8.1
+
+## Fixed
+
+- With `--parallel`, the run is started once in the main Mocha process, before the workers, and completed once after the last worker; the workers only send their results. In `report` mode each worker cleared the report folder when it started, so the report kept only the results of the last worker. Requires `qase-javascript-commons` 2.9.10 or later for the shared report.
+- With `--parallel`, extra reporters run once, in the main process. They also ran inside every worker, so `extraReporters=spec` printed each file twice, once per file with its own summary.
+- Several extra reporters can be given on the command line separated by `;`: `--reporter-options "extraReporters=spec;json"`. Mocha splits `--reporter-options` on `,`, so `extraReporters=spec,json` kept only `spec`. A comma-separated string in `qase.config.json` (`"extraReporters": "spec,json"`) also works now.
+- A skipped test (`it.skip`, or a test in a skipped suite) has its own start time. It got the start time of the test before it.
+- `this.suite('A\\tB')` written with the two characters `\t` creates nested suites, like a real tab does.
+- Attachments added with `this.attach()` have their own ids. In `report` mode they were saved as `-<name>`, so two tests attaching a file with the same name overwrote each other.
+
+## Documentation
+
+- Parallel execution no longer requires creating the run beforehand with `qasectl`; the docs describe that as an option.
+
 # mocha-qase-reporter@1.8.0
 
 ## Fixed

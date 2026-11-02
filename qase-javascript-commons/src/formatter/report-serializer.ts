@@ -1,5 +1,6 @@
 import { Attachment, TestResultType, TestStepType, StepType } from '../models';
 import { StepTextData, StepGherkinData } from '../models/step-data';
+import { gherkinAction } from '../utils/gherkin-action';
 
 export interface ReportSerializerInterface {
   serializeResult(result: TestResultType): Record<string, unknown>;
@@ -92,7 +93,7 @@ export class ReportSerializer implements ReportSerializerInterface {
     ) {
       const gherkinData = data as unknown as StepGherkinData;
       return {
-        action: `${gherkinData.keyword} ${gherkinData.name}`,
+        action: gherkinAction(gherkinData.keyword, gherkinData.name),
         expected_result: null,
         input_data: null,
       };

@@ -22,6 +22,7 @@ jest.mock('qase-javascript-commons', () => ({
     skipped: 'skipped',
   },
   generateSignature: jest.fn(() => 'mock-signature'),
+  getMimeTypes: jest.fn(() => 'image/png'),
   determineTestStatus: jest.fn((error, originalStatus) => {
     if (error) return 'failed';
     if (originalStatus === 'passed') return 'passed';

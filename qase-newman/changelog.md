@@ -1,3 +1,16 @@
+# newman-reporter-qase@2.4.1
+
+## Fixed
+
+- Space-separated case IDs such as `// qase: 4 5 6` link the request to cases 4, 5 and 6. Only commas were treated as separators, so the IDs were dropped and the result was reported without a case.
+- A request skipped with `pm.execution.skipRequest()` is reported as `skipped`, and a request whose pre-request or test script throws, or which fails to be sent (for example, connection refused), is reported as `invalid` with the error message. All of them were reported as `passed`.
+- Parameters keep the case of their names and values from the data file: `UserName` was reported as `username`. Names in `// qase.parameters:` still match data keys regardless of case.
+- Iterations of a data-driven run are reported as separate results. Parameters were not part of the result signature, so every iteration of a request was merged into one test in Qase.
+
+## Documentation
+
+- The status table lists the `skipped` and `invalid` cases; a troubleshooting example used a `TestOps` config key instead of `testops`; the multi-project example README named `QASE_TOKEN` instead of `QASE_TESTOPS_API_TOKEN`.
+
 # newman-reporter-qase@2.4.0
 
 ## Added

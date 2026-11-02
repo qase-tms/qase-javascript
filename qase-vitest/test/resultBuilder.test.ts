@@ -16,10 +16,17 @@ jest.mock('qase-javascript-commons', () => {
   };
 });
 
+const mkModule = (moduleId = '/root/test/file.test.ts') => ({ type: 'module', moduleId });
+const mkParent = (names: string[], module: any = mkModule()) =>
+  names.reduce((parent: any, name) => ({ type: 'suite', name, parent, module }), module);
+
 const mkTestCase = (overrides: any = {}) => ({
   name: 'Test',
   id: 'test-id',
   fullName: 'Suite > Test',
+  parent: mkParent(['Suite']),
+  module: mkModule(),
+  project: { config: { root: '/root' } },
   result: jest.fn().mockReturnValue({ state: 'passed', errors: [] }),
   diagnostic: jest.fn().mockReturnValue({ duration: 100, startTime: 1_700_000_000_000 }),
   ...overrides,
@@ -35,7 +42,6 @@ describe('ResultBuilder.build', () => {
     const result = ResultBuilder.build({
       testCase: mkTestCase(),
       metadata: undefined,
-      currentSuite: undefined,
       profilerSteps: [],
     });
     expect(result.execution.status).toBe('passed');
@@ -44,7 +50,7 @@ describe('ResultBuilder.build', () => {
     expect(result.execution.end_time).toBe(1_700_000_000.1);
     expect(result.execution.duration).toBe(100);
     expect(result.id).toBe('test-id');
-    expect(result.signature).toBe('Suite > Test');
+    expect(result.signature).toBe('test::file.test.ts::suite::test');
     expect(result.steps).toEqual([]);
   });
 
@@ -52,7 +58,6 @@ describe('ResultBuilder.build', () => {
     const result = ResultBuilder.build({
       testCase: mkTestCase({ name: 'Test (Qase ID: 123)', fullName: 'Suite > Test (Qase ID: 123)' }),
       metadata: undefined,
-      currentSuite: undefined,
       profilerSteps: [],
     });
     expect(result.testops_id).toBe(123);
@@ -63,7 +68,6 @@ describe('ResultBuilder.build', () => {
     const result = ResultBuilder.build({
       testCase: mkTestCase({ name: 'Test (Qase ID: 1,2,3)' }),
       metadata: undefined,
-      currentSuite: undefined,
       profilerSteps: [],
     });
     expect(result.testops_id).toEqual([1, 2, 3]);
@@ -73,7 +77,6 @@ describe('ResultBuilder.build', () => {
     const result = ResultBuilder.build({
       testCase: mkTestCase({ name: 'Test (Qase PROJ1: 100) (Qase PROJ2: 200)' }),
       metadata: undefined,
-      currentSuite: undefined,
       profilerSteps: [],
     });
     expect(result.testops_id).toBeNull();
@@ -87,7 +90,6 @@ describe('ResultBuilder.build', () => {
     const result = ResultBuilder.build({
       testCase: mkTestCase(),
       metadata: meta,
-      currentSuite: undefined,
       profilerSteps: [],
     });
     expect(result.title).toBe('Override Title');
@@ -101,7 +103,6 @@ describe('ResultBuilder.build', () => {
         result: jest.fn().mockReturnValue({ state: 'failed', errors: [error] }),
       }),
       metadata: undefined,
-      currentSuite: undefined,
       profilerSteps: [],
     });
     expect(result.execution.status).toBe('failed');
@@ -115,7 +116,6 @@ describe('ResultBuilder.build', () => {
         result: jest.fn().mockReturnValue({ state: 'passed', errors: [new Error('first attempt')] }),
       }),
       metadata: undefined,
-      currentSuite: undefined,
       profilerSteps: [],
     });
     expect(result.execution.status).toBe('passed');
@@ -129,7 +129,6 @@ describe('ResultBuilder.build', () => {
         result: jest.fn().mockReturnValue({ state: 'failed', errors: [new Error('attempt 1'), new Error('attempt 2')] }),
       }),
       metadata: undefined,
-      currentSuite: undefined,
       profilerSteps: [],
     });
     expect(result.execution.status).toBe('failed');
@@ -143,7 +142,6 @@ describe('ResultBuilder.build', () => {
         result: jest.fn().mockReturnValue({ state: 'skipped', note: 'cond fail', errors: [] }),
       }),
       metadata: undefined,
-      currentSuite: undefined,
       profilerSteps: [],
     });
     expect(result.execution.status).toBe('skipped');
@@ -156,7 +154,6 @@ describe('ResultBuilder.build', () => {
     const result = ResultBuilder.build({
       testCase: mkTestCase(),
       metadata: meta,
-      currentSuite: 'CurrentSuite',
       profilerSteps: [],
     });
     expect(result.relations).toEqual({
@@ -167,25 +164,67 @@ describe('ResultBuilder.build', () => {
     });
   });
 
-  it('falls back to currentSuite when metadata.suite missing', () => {
-    const result = ResultBuilder.build({
-      testCase: mkTestCase(),
-      metadata: undefined,
-      currentSuite: 'OuterSuite',
-      profilerSteps: [],
-    });
-    expect(result.relations?.suite?.data?.[0]?.title).toBe('OuterSuite');
+  it.each([
+    ['a tab', 'Application\tAuthentication'],
+    ['the two characters \\t', 'Application\\tAuthentication'],
+  ])('splits a metadata.suite separated by %s into nested suites', (_, suite) => {
+    const meta = emptyMeta();
+    meta.suite = suite;
+    const result = ResultBuilder.build({ testCase: mkTestCase(), metadata: meta, profilerSteps: [] });
+    expect(result.relations?.suite?.data.map((d) => d.title)).toEqual(['Application', 'Authentication']);
   });
 
-  it('falls back to extractSuiteFromTestCase when no metadata.suite and no currentSuite', () => {
+  it('takes the suite path from the describe blocks the test is nested in', () => {
     const result = ResultBuilder.build({
-      testCase: mkTestCase({ fullName: 'Outer > Inner > Test', name: 'Test' }),
+      testCase: mkTestCase({ fullName: 'Outer > Inner > Test', parent: mkParent(['Outer', 'Inner']) }),
       metadata: undefined,
-      currentSuite: undefined,
       profilerSteps: [],
     });
     const titles = result.relations?.suite?.data?.map((d: any) => d.title);
-    expect(titles).toEqual(['Outer > Inner']);
+    expect(titles).toEqual(['Outer', 'Inner']);
+  });
+
+  it('keeps a describe title containing " > " or " - " as one suite', () => {
+    const result = ResultBuilder.build({
+      testCase: mkTestCase({ parent: mkParent(['API - v2 > users']) }),
+      metadata: undefined,
+      profilerSteps: [],
+    });
+    const titles = result.relations?.suite?.data?.map((d: any) => d.title);
+    expect(titles).toEqual(['API - v2 > users']);
+  });
+
+  it('sets no suite for a test outside any describe block', () => {
+    const result = ResultBuilder.build({
+      testCase: mkTestCase({ fullName: 'Test', parent: mkModule() }),
+      metadata: undefined,
+      profilerSteps: [],
+    });
+    expect(result.relations).toBeNull();
+  });
+
+  it('builds the signature from Qase IDs, file, describe blocks, title and parameters', () => {
+    const meta = emptyMeta();
+    meta.parameters = { Browser: 'Chrome' };
+    const result = ResultBuilder.build({
+      testCase: mkTestCase({
+        name: 'Log In (Qase ID: 5,6)',
+        parent: mkParent(['Auth Flow', 'Form'], mkModule('/root/test/auth/login.test.ts')),
+        module: mkModule('/root/test/auth/login.test.ts'),
+      }),
+      metadata: meta,
+      profilerSteps: [],
+    });
+    expect(result.signature).toBe("5-6::test::auth::login.test.ts::auth_flow::form::log_in::{'browser':'chrome'}");
+  });
+
+  it('builds the signature without IDs for multi-project titles', () => {
+    const result = ResultBuilder.build({
+      testCase: mkTestCase({ name: 'Login (Qase PROJ1: 100)' }),
+      metadata: undefined,
+      profilerSteps: [],
+    });
+    expect(result.signature).toBe('test::file.test.ts::suite::login');
   });
 
   it('applies metadata.fields/parameters/groupParameters/tags', () => {
@@ -197,7 +236,6 @@ describe('ResultBuilder.build', () => {
     const result = ResultBuilder.build({
       testCase: mkTestCase(),
       metadata: meta,
-      currentSuite: undefined,
       profilerSteps: [],
     });
     expect(result.fields).toEqual({ severity: 'major' });
@@ -212,27 +250,77 @@ describe('ResultBuilder.build', () => {
     const result = ResultBuilder.build({
       testCase: mkTestCase(),
       metadata: meta,
-      currentSuite: undefined,
       profilerSteps: [],
     });
     expect(result.message).toBe('Override comment');
   });
 
+  it('keeps the error message of a failed test after the comment', () => {
+    const meta = emptyMeta();
+    meta.comment = 'my comment';
+    const result = ResultBuilder.build({
+      testCase: mkTestCase({
+        result: jest.fn().mockReturnValue({ state: 'failed', errors: [new Error('boom')] }),
+      }),
+      metadata: meta,
+      profilerSteps: [],
+    });
+    expect(result.message).toBe('my comment\n\nboom');
+  });
+
+  it('keeps the skip note after the comment', () => {
+    const meta = emptyMeta();
+    meta.comment = 'my comment';
+    const result = ResultBuilder.build({
+      testCase: mkTestCase({
+        result: jest.fn().mockReturnValue({ state: 'skipped', note: 'cond fail', errors: [] }),
+      }),
+      metadata: meta,
+      profilerSteps: [],
+    });
+    expect(result.message).toBe('my comment\n\ncond fail');
+  });
+
   it('builds steps from metadata.steps with extractAndCleanStep applied', () => {
     const meta = emptyMeta();
     meta.steps = [
-      { name: 'do thing QaseExpRes: ok', status: 'end' },
-      { name: 'failed step', status: 'failed' },
+      { name: 'do thing QaseExpRes: ok', status: 'end', steps: [] },
+      { name: 'failed step', status: 'failed', steps: [] },
     ];
     const result = ResultBuilder.build({
       testCase: mkTestCase(),
       metadata: meta,
-      currentSuite: undefined,
       profilerSteps: [],
     });
     expect(result.steps.length).toBe(2);
     expect(result.steps[0]?.execution?.status).toBe('passed');
     expect(result.steps[1]?.execution?.status).toBe('failed');
+  });
+
+  it('builds nested steps under their parent step', () => {
+    const meta = emptyMeta();
+    meta.steps = [
+      {
+        name: 'parent',
+        status: 'end',
+        steps: [
+          { name: 'child', status: 'failed', steps: [] },
+          { name: 'unfinished', status: 'start', steps: [] },
+        ],
+      },
+    ];
+    const result = ResultBuilder.build({
+      testCase: mkTestCase(),
+      metadata: meta,
+      profilerSteps: [],
+    });
+    expect(result.steps.length).toBe(1);
+    const parent = result.steps[0]!;
+    expect((parent.data as any).action).toBe('parent');
+    expect(parent.steps.map((s: any) => [s.data.action, s.execution.status, s.parent_id])).toEqual([
+      ['child', 'failed', parent.id],
+      ['unfinished', 'failed', parent.id],
+    ]);
   });
 
   it('builds attachments from metadata.attachments', () => {
@@ -244,7 +332,6 @@ describe('ResultBuilder.build', () => {
     const result = ResultBuilder.build({
       testCase: mkTestCase(),
       metadata: meta,
-      currentSuite: undefined,
       profilerSteps: [],
     });
     expect(result.attachments.length).toBe(2);
@@ -260,7 +347,6 @@ describe('ResultBuilder.build', () => {
     const result = ResultBuilder.build({
       testCase: mkTestCase(),
       metadata: meta,
-      currentSuite: undefined,
       profilerSteps: [],
     });
     expect(result.steps).toEqual([{ id: 'meta-prof-1' }]);
@@ -268,11 +354,10 @@ describe('ResultBuilder.build', () => {
 
   it('appends profilerSteps argument after metadata steps', () => {
     const meta = emptyMeta();
-    meta.steps = [{ name: 'manual', status: 'end' }];
+    meta.steps = [{ name: 'manual', status: 'end', steps: [] }];
     const result = ResultBuilder.build({
       testCase: mkTestCase(),
       metadata: meta,
-      currentSuite: undefined,
       profilerSteps: [{ id: 'prof-1' } as any],
     });
     expect(result.steps.length).toBe(2);
@@ -283,7 +368,6 @@ describe('ResultBuilder.build', () => {
     const result = ResultBuilder.build({
       testCase: mkTestCase(),
       metadata: { ...emptyMeta(), muted: true },
-      currentSuite: undefined,
       profilerSteps: [],
     });
     expect(result.muted).toBe(true);
@@ -293,31 +377,8 @@ describe('ResultBuilder.build', () => {
     const result = ResultBuilder.build({
       testCase: mkTestCase(),
       metadata: emptyMeta(),
-      currentSuite: undefined,
       profilerSteps: [],
     });
     expect(result.muted).toBe(false);
-  });
-});
-
-describe('ResultBuilder.extractSuiteFromTestCase', () => {
-  it('extracts suite from "Suite > Test" format', () => {
-    const tc = mkTestCase({ fullName: 'Outer > Test' });
-    expect(ResultBuilder.extractSuiteFromTestCase(tc)).toBe('Outer');
-  });
-
-  it('extracts multi-level suite from "A > B > Test" format', () => {
-    const tc = mkTestCase({ fullName: 'A > B > Test' });
-    expect(ResultBuilder.extractSuiteFromTestCase(tc)).toBe('A > B');
-  });
-
-  it('returns undefined when no suite separator', () => {
-    const tc = mkTestCase({ fullName: 'JustATest', name: 'JustATest' });
-    expect(ResultBuilder.extractSuiteFromTestCase(tc)).toBeUndefined();
-  });
-
-  it('falls back to testCase.name when fullName missing', () => {
-    const tc = { name: 'OnlyName' } as any;
-    expect(ResultBuilder.extractSuiteFromTestCase(tc)).toBeUndefined();
   });
 });

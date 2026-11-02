@@ -226,7 +226,7 @@ test('Test with content attachment', async (t) => {
   qase.attach({
     name: 'test-data.json',
     content: JSON.stringify({ key: 'value' }),
-    type: 'application/json',
+    contentType: 'application/json',
   });
   await t.expect(true).ok();
 });
@@ -236,13 +236,9 @@ test('Test with content attachment', async (t) => {
 
 ```javascript
 test('Test with screenshot', async (t) => {
-  const screenshot = await t.takeScreenshot();
+  const screenshotPath = await t.takeScreenshot();
 
-  qase.attach({
-    name: 'page-screenshot.png',
-    content: screenshot,
-    type: 'image/png',
-  });
+  qase.attach({ paths: screenshotPath });
 
   await t.expect(true).ok();
 });
@@ -253,13 +249,9 @@ test('Test with screenshot', async (t) => {
 ```javascript
 test('Test with step attachments', async (t) => {
   await qase.step('Capture state', async (step) => {
-    const screenshot = await t.takeScreenshot();
+    const screenshotPath = await t.takeScreenshot();
 
-    step.attach({
-      name: 'current-state.png',
-      content: screenshot,
-      type: 'image/png',
-    });
+    step.attach({ paths: screenshotPath });
   });
 });
 ```
@@ -330,13 +322,9 @@ test('Test with nested steps', async (t) => {
 ```javascript
 test('Test with step attachments', async (t) => {
   await qase.step('Capture application state', async (step) => {
-    const screenshot = await t.takeScreenshot();
+    const screenshotPath = await t.takeScreenshot();
 
-    step.attach({
-      name: 'application-state.png',
-      content: screenshot,
-      type: 'image/png',
-    });
+    step.attach({ paths: screenshotPath });
 
     await t.expect(true).ok();
   });
@@ -391,7 +379,7 @@ test.meta(
 test.meta(
   qase.id(1)
     .title('Cross-browser test')
-    .fields({ 'severity': 'high' })
+    .fields({ 'severity': 'critical' })
     .parameters({ 'browser': 'firefox', 'os': 'Windows' })
     .create()
 )(
@@ -473,27 +461,27 @@ Steps and attachments stay with their own test when tests run concurrently (`con
 
 ### Reporter Not Found
 
-**Problem:** `Error: Reporter "Qase" not found` or tests run without Qase reporting.
+**Problem:** `Error: Reporter "qase" not found` or tests run without Qase reporting.
 
 **Solutions:**
 
 1. **Verify installation:**
    ```bash
-   npm list testcafe-reporter-Qase
+   npm list testcafe-reporter-qase
    ```
 
 2. **Reinstall if needed:**
    ```bash
-   npm install --save-dev testcafe-reporter-Qase
+   npm install --save-dev testcafe-reporter-qase
    ```
 
 3. **Check reporter name in command:**
    ```bash
    # Correct
-   npx testcafe chrome tests/ -r Qase
+   npx testcafe chrome tests/ -r qase
 
    # Incorrect
-   npx testcafe chrome tests/ -r testcafe-reporter-Qase
+   npx testcafe chrome tests/ -r testcafe-reporter-qase
    ```
 
 ### Tests Not Appearing in Qase
@@ -516,7 +504,7 @@ Steps and attachments stay with their own test when tests run concurrently (`con
    ```json
    {
      "debug": true,
-     "mode": "TestOps"
+     "mode": "testops"
    }
    ```
 
@@ -542,10 +530,10 @@ Steps and attachments stay with their own test when tests run concurrently (`con
 2. **Check import path:**
    ```javascript
    // Correct
-   import { Qase } from 'testcafe-reporter-qase/qase';
+   import { qase } from 'testcafe-reporter-qase/qase';
 
    // Incorrect
-   import { Qase } from 'testcafe-reporter-Qase';
+   import { qase } from 'testcafe-reporter-qase';
    ```
 
 ### Steps Not Reporting
@@ -606,7 +594,7 @@ Steps and attachments stay with their own test when tests run concurrently (`con
    qase.attach({
      name: 'log.txt',
      content: 'Log content',
-     type: 'text/plain',  // Must be specified for content
+     contentType: 'text/plain',  // defaults to application/octet-stream
    });
    ```
 
@@ -729,12 +717,8 @@ fixture\`E2E Tests\`
   })
   .afterEach(async (t) => {
     await qase.step('Teardown: Capture screenshot', async (step) => {
-      const screenshot = await t.takeScreenshot();
-      step.attach({
-        name: 'final-state.png',
-        content: screenshot,
-        type: 'image/png',
-      });
+      const screenshotPath = await t.takeScreenshot();
+      step.attach({ paths: screenshotPath });
     });
   });
 
@@ -770,13 +754,9 @@ test.meta(qase.id(101).create())(
 test.meta(qase.id(201).create())(
   'Visual: Login page',
   async (t) => {
-    const screenshot = await t.takeScreenshot();
+    const screenshotPath = await t.takeScreenshot();
 
-    qase.attach({
-      name: 'login-page.png',
-      content: screenshot,
-      type: 'image/png',
-    });
+    qase.attach({ paths: screenshotPath });
 
     await t.expect('#login-form').exists;
   }
@@ -811,7 +791,7 @@ test.meta(qase.id(301).create())(
     qase.attach({
       name: 'api-response.json',
       content: JSON.stringify(apiLogger.requests[0].response.body, null, 2),
-      type: 'application/json',
+      contentType: 'application/json',
     });
   }
 );
@@ -951,7 +931,7 @@ test.meta(qase.id(901).create())(
     qase.attach({
       name: 'performance-metrics.json',
       content: JSON.stringify({ loadTime, threshold: 3000 }, null, 2),
-      type: 'application/json',
+      contentType: 'application/json',
     });
 
     await t.expect(loadTime).lt(3000, 'Page load time exceeds 3 seconds');
@@ -1027,7 +1007,7 @@ test.meta(
       qase.attach({
         name: 'page-load.txt',
         content: 'Page loaded successfully',
-        type: 'text/plain',
+        contentType: 'text/plain',
       });
     });
 

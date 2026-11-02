@@ -1,3 +1,24 @@
+# vitest-qase-reporter@1.7.0
+
+## Fixed
+
+- A test's suite is now the chain of `describe` blocks it is nested in. It came from the suite Vitest started last, so with files running in parallel a test could get a suite from another file, and a test inside nested `describe` blocks got only the innermost one.
+- `qase.step()` called inside another step is now reported as a child of that step. The outer step was lost and its children were reported at the top level.
+- `qase.comment()` on a failed or skipped test no longer replaces the error message or skip note; the result message is the comment followed by the error.
+- `vitest-qase-reporter/setup` failed to load with "Vitest cannot be imported in a CommonJS module using require()", so the network profiler never ran in the test workers. It is now an ES module.
+- The network profiler in the test workers now uses `profilers` and `networkProfiler` from the reporter options in `vitest.config`, not only from `qase.config.json` and environment variables.
+- `qase.suite('A\tB')` with a tab (or the two characters `\t`, as the docs write it) creates nested suites. Only ` - ` did before; it still does.
+
+## Changed
+
+- The result signature is built the same way as in the other Qase reporters: Qase IDs, test file path, `describe` blocks, test title and parameters (for example `7::test::login.test.ts::auth::log_in::{'browser':'chrome'}`) instead of Vitest's full test name. Results that had the same full name but different parameters no longer share a signature.
+
+  **Upgrading:** Qase matches results to test cases by signature when a test has no Qase ID. After upgrading, such tests get new test cases in Qase on their first run, and the old cases receive no more results. Link the tests with `addQaseId()` / a Qase ID in the title to keep using the existing cases.
+
+## Documentation
+
+- Fixed `mode: 'TestOps'` in the upgrade guide (the value is `testops`), documented the inline network profiler options and that the default suite comes from `describe` blocks.
+
 # vitest-qase-reporter@1.6.1
 
 ## Fixed

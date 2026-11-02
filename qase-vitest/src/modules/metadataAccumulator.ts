@@ -1,6 +1,12 @@
 import type { TestAnnotation } from 'vitest';
 import { TestStepType } from 'qase-javascript-commons';
 
+export interface StepRecord {
+  name: string;
+  status: 'start' | 'end' | 'failed';
+  steps: StepRecord[];
+}
+
 export interface MetadataShape {
   title?: string;
   comment?: string;
@@ -10,15 +16,14 @@ export interface MetadataShape {
   groupParameters?: Record<string, string>;
   tags?: string[];
   muted?: boolean;
-  currentStep?: string;
-  steps: { name: string; status: 'start' | 'end' | 'failed' }[];
+  steps: StepRecord[];
+  openSteps?: StepRecord[];
   attachments: { name: string; path?: string; content?: string; contentType?: string }[];
   _profilerSteps?: TestStepType[];
 }
 
 export class MetadataAccumulator {
   private testMetadata = new Map<string, MetadataShape>();
-  private currentSuite: string | undefined = undefined;
 
   parseAnnotation(testId: string, annotation: TestAnnotation): void {
     if (!annotation.message) return;
@@ -55,7 +60,7 @@ export class MetadataAccumulator {
         metadata.groupParameters === undefined &&
         metadata.tags === undefined &&
         metadata.muted === undefined &&
-        metadata.currentStep === undefined &&
+        metadata.openSteps === undefined &&
         metadata._profilerSteps === undefined
       ) {
         this.testMetadata.delete(testId);
@@ -156,23 +161,28 @@ export class MetadataAccumulator {
         metadata.muted = true;
         break;
 
-      case 'step-start':
-        metadata.currentStep = annotation.message.replace('Qase Step Start: ', '');
+      case 'step-start': {
+        const step: StepRecord = { name: annotation.message.replace('Qase Step Start: ', ''), status: 'start', steps: [] };
+        const openSteps = metadata.openSteps ?? [];
+        const parent = openSteps[openSteps.length - 1];
+        (parent ? parent.steps : metadata.steps).push(step);
+        openSteps.push(step);
+        metadata.openSteps = openSteps;
         break;
+      }
 
-      case 'step-end':
-        if (metadata.currentStep) {
-          metadata.steps.push({ name: metadata.currentStep, status: 'end' });
-          delete metadata.currentStep;
-        }
+      case 'step-end': {
+        const name = annotation.message.replace('Qase Step End: ', '');
+        MetadataAccumulator.closeStep(metadata, (step) => step.name === name, 'end');
         break;
+      }
 
-      case 'step-failed':
-        if (metadata.currentStep) {
-          metadata.steps.push({ name: metadata.currentStep, status: 'failed' });
-          delete metadata.currentStep;
-        }
+      case 'step-failed': {
+        // The message is "<step name> - <error>"; both parts may contain " - ".
+        const rest = annotation.message.replace('Qase Step Failed: ', '');
+        MetadataAccumulator.closeStep(metadata, (step) => rest.startsWith(`${step.name} - `), 'failed');
         break;
+      }
 
       case 'attachment': {
         const attachmentName = annotation.message.replace('Qase Attachment: ', '');
@@ -191,23 +201,30 @@ export class MetadataAccumulator {
     }
   }
 
+  private static closeStep(
+    metadata: MetadataShape,
+    matches: (step: StepRecord) => boolean,
+    status: 'end' | 'failed',
+  ): void {
+    const openSteps = metadata.openSteps ?? [];
+    for (let i = openSteps.length - 1; i >= 0; i--) {
+      const step = openSteps[i];
+      if (step && matches(step)) {
+        step.status = status;
+        openSteps.splice(i, 1);
+        break;
+      }
+    }
+    if (openSteps.length === 0) {
+      delete metadata.openSteps;
+    }
+  }
+
   getMetadata(testId: string): MetadataShape | undefined {
     return this.testMetadata.get(testId);
   }
 
   clearMetadata(testId: string): void {
     this.testMetadata.delete(testId);
-  }
-
-  setCurrentSuite(name: string): void {
-    this.currentSuite = name;
-  }
-
-  clearCurrentSuite(): void {
-    this.currentSuite = undefined;
-  }
-
-  getCurrentSuite(): string | undefined {
-    return this.currentSuite;
   }
 }

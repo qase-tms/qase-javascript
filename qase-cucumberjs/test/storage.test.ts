@@ -135,6 +135,7 @@ describe('Storage', () => {
   describe('addAttachment', () => {
     it('should add attachment for test step', () => {
       const attachment: Attachment = {
+        testCaseStartedId: 'case-1',
         testStepId: 'step-1',
         mediaType: 'text/plain',
         body: 'test content',
@@ -143,8 +144,8 @@ describe('Storage', () => {
 
       storage.addAttachment(attachment);
 
-      expect((storage as any).events.getAttachments('step-1')).toHaveLength(1);
-      expect((storage as any).events.getAttachments('step-1')[0]).toEqual({
+      expect((storage as any).events.getStepAttachments('case-1', 'step-1')).toHaveLength(1);
+      expect((storage as any).events.getStepAttachments('case-1', 'step-1')[0]).toEqual({
         file_name: 'file.txt',
         mime_type: 'text/plain',
         file_path: null,
@@ -177,12 +178,14 @@ describe('Storage', () => {
 
     it('should handle multiple attachments for same id', () => {
       const attachment1: Attachment = {
+        testCaseStartedId: 'case-1',
         testStepId: 'step-1',
         mediaType: 'text/plain',
         body: 'content1',
         contentEncoding: AttachmentContentEncoding.IDENTITY,
       };
       const attachment2: Attachment = {
+        testCaseStartedId: 'case-1',
         testStepId: 'step-1',
         mediaType: 'application/json',
         body: 'content2',
@@ -192,7 +195,7 @@ describe('Storage', () => {
       storage.addAttachment(attachment1);
       storage.addAttachment(attachment2);
 
-      expect((storage as any).events.getAttachments('step-1')).toHaveLength(2);
+      expect((storage as any).events.getStepAttachments('case-1', 'step-1')).toHaveLength(2);
     });
   });
 
@@ -970,4 +973,52 @@ describe('Storage', () => {
       expect(EventStorage.getFileNameFromMediaType('unknown/type')).toBe('file');
     });
   });
-}); 
+
+  describe('retries and attachments', () => {
+    function setup(testSteps: any[] = [], pickleSteps: any[] = []) {
+      storage.addPickle({ id: 'p', name: 'Retry', language: 'en', steps: pickleSteps, tags: [], astNodeIds: [], uri: 'r.feature' } as any);
+      storage.addTestCase({ id: 'tc', pickleId: 'p', testSteps } as any);
+    }
+    function start(id: string, attempt: number) {
+      storage.addTestCaseStarted({ id, testCaseId: 'tc', timestamp: { seconds: 0, nanos: 0 }, attempt } as any);
+    }
+
+    it('skips an attempt with willBeRetried on TestCaseFinished', () => {
+      setup();
+      start('a1', 0);
+      expect(storage.convertTestCase({ testCaseStartedId: 'a1', timestamp: { seconds: 1, nanos: 0 }, willBeRetried: true })).toBeUndefined();
+      start('a2', 1);
+      expect(storage.convertTestCase({ testCaseStartedId: 'a2', timestamp: { seconds: 1, nanos: 0 }, willBeRetried: false })).toBeDefined();
+    });
+
+    it('skips an attempt whose step result has the legacy willBeRetried flag (cucumber 7)', () => {
+      setup([{ id: 's1', pickleStepId: 'ps1' }], [{ id: 'ps1', text: 'step', astNodeIds: [] }]);
+      start('a1', 0);
+      storage.addTestCaseStep({
+        testCaseStartedId: 'a1', testStepId: 's1', timestamp: { seconds: 0, nanos: 0 },
+        testStepResult: { status: 'FAILED', duration: { seconds: 0, nanos: 0 }, willBeRetried: true },
+      } as any);
+      expect(storage.convertTestCase({ testCaseStartedId: 'a1', timestamp: { seconds: 1, nanos: 0 } } as any)).toBeUndefined();
+    });
+
+    it('reports a step attachment once, on the step; hook attachments go to the test', () => {
+      setup(
+        [{ id: 'h1', hookId: 'hook' }, { id: 's1', pickleStepId: 'ps1' }],
+        [{ id: 'ps1', text: 'step', astNodeIds: [] }],
+      );
+      start('a1', 0);
+      storage.addAttachment({ testCaseStartedId: 'a1', testStepId: 'h1', mediaType: 'text/plain', body: 'hook' } as any);
+      storage.addAttachment({ testCaseStartedId: 'a1', testStepId: 's1', mediaType: 'text/plain', body: 'step' } as any);
+      storage.addAttachment({ testCaseStartedId: 'a1', mediaType: 'text/plain', body: 'test' } as any);
+      for (const id of ['h1', 's1']) {
+        storage.addTestCaseStep({
+          testCaseStartedId: 'a1', testStepId: id, timestamp: { seconds: 0, nanos: 0 },
+          testStepResult: { status: 'PASSED', duration: { seconds: 0, nanos: 0 } },
+        } as any);
+      }
+      const result = storage.convertTestCase({ testCaseStartedId: 'a1', timestamp: { seconds: 1, nanos: 0 }, willBeRetried: false });
+      expect(result?.attachments.map((a) => a.content).sort()).toEqual(['hook', 'test']);
+      expect(result?.steps[0]?.attachments.map((a) => a.content)).toEqual(['step']);
+    });
+  });
+});

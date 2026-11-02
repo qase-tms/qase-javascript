@@ -1,12 +1,14 @@
 import { ConfigLoader, composeOptions } from 'qase-javascript-commons';
 import { NetworkProfiler } from 'qase-javascript-commons/profilers';
 import { events } from './events';
+import { forwardCucumberAttachments } from './cucumber-attach';
 
 /**
- * QaseWdioService — WDIO service for network request profiling.
+ * QaseWdioService — WDIO service for network request profiling and Cucumber attachments.
  *
  * Runs in the SAME process as tests (worker). Uses before/after hooks for profiler
- * lifecycle and beforeTest/afterTest for per-test step collection.
+ * lifecycle and beforeTest/afterTest (beforeScenario/afterScenario in Cucumber) for
+ * per-test step collection.
  * Steps are sent to the reporter via process.emit(events.addProfilerSteps, steps).
  *
  * Usage: add `services: [['qase-wdio-reporter', { /* options *\/ }], QaseWdioService]`
@@ -58,6 +60,16 @@ export class QaseWdioService {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       (process as any).emit(events.addProfilerSteps, JSON.stringify(newSteps));
     }
+  }
+
+  // Cucumber runs no beforeTest/afterTest hooks; a scenario is the reported test.
+  beforeScenario(_world: unknown, context?: unknown): void {
+    forwardCucumberAttachments(context);
+    this.beforeTest();
+  }
+
+  afterScenario(): void {
+    this.afterTest();
   }
 
   after(): void {

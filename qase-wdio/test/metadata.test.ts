@@ -107,12 +107,39 @@ describe('MetadataApplier', () => {
       expect(t.attachments[0]?.file_path).toBe('/tmp/screenshot.png');
     });
 
-    it('attaches inline content with default mime type', () => {
+    it('derives the mime type of inline content from its name', () => {
       const t = withTest();
-      metadata.addAttachment({ content: 'data', name: 'inline.txt' });
-      expect(t.attachments[0]?.file_name).toBe('inline.txt');
+      metadata.addAttachment({ content: '{"a":1}', name: 'data.json' });
+      expect(t.attachments[0]?.file_name).toBe('data.json');
+      expect(t.attachments[0]?.mime_type).toMatch(/^application\/json/);
+      expect(t.attachments[0]?.content).toBe('{"a":1}');
+    });
+
+    it('falls back to application/octet-stream for inline content of unknown type', () => {
+      const t = withTest();
+      metadata.addAttachment({ content: 'data' });
+      expect(t.attachments[0]?.file_name).toBe('attachment');
       expect(t.attachments[0]?.mime_type).toBe('application/octet-stream');
-      expect(t.attachments[0]?.content).toBe('data');
+    });
+
+    it('adds an extension matching the given type to a name without one', () => {
+      const t = withTest();
+      metadata.addAttachment({ content: 'log text', name: 'log', type: 'text/plain' });
+      expect(t.attachments[0]?.file_name).toBe('log.txt');
+      expect(t.attachments[0]?.mime_type).toBe('text/plain');
+    });
+
+    it('keeps a name that already has an extension', () => {
+      const t = withTest();
+      metadata.addAttachment({ content: 'x', name: 'notes.md', type: 'text/plain' });
+      expect(t.attachments[0]?.file_name).toBe('notes.md');
+    });
+
+    it('accepts Buffer content', () => {
+      const t = withTest();
+      metadata.addAttachment({ content: Buffer.from('png'), name: 'shot.png', type: 'image/png' });
+      expect(t.attachments[0]?.content).toEqual(Buffer.from('png'));
+      expect(t.attachments[0]?.size).toBe(3);
     });
   });
 

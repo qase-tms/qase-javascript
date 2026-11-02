@@ -7,6 +7,13 @@ export interface ExtraReporterConfig {
 
 export type ExtraReportersConfig = string | ExtraReporterConfig | (string | ExtraReporterConfig)[];
 
+// Mocha splits `--reporter-option` values on ',', so on the command line reporters are
+// separated with ';' instead: --reporter-option "extraReporters=spec;json".
+function splitReporterNames(value: string): string | string[] {
+  const names = value.split(/[;,]/).map((name) => name.trim()).filter(Boolean);
+  return names.length === 1 ? names[0]! : names;
+}
+
 /**
  * Parses extraReporters configuration from Mocha options
  * Supports both string format and object format
@@ -18,7 +25,7 @@ export function parseExtraReporters(options: Mocha.MochaOptions, config?: Record
   if (reporterOptions) {
     // Handle different formats of extraReporters from Mocha options
     if (typeof reporterOptions['extraReporters'] === 'string') {
-      return reporterOptions['extraReporters'];
+      return splitReporterNames(reporterOptions['extraReporters']);
     }
     
     if (Array.isArray(reporterOptions['extraReporters'])) {
@@ -33,7 +40,7 @@ export function parseExtraReporters(options: Mocha.MochaOptions, config?: Record
   // If not found in Mocha options, try to get from qase.config.json
   if (config && config['extraReporters']) {
     if (typeof config['extraReporters'] === 'string') {
-      return config['extraReporters'];
+      return splitReporterNames(config['extraReporters']);
     }
     
     if (Array.isArray(config['extraReporters'])) {

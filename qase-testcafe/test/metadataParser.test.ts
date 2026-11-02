@@ -23,6 +23,12 @@ describe('MetadataParser', () => {
     expect(md[metadataEnum.id]).toEqual([1, 2, 3]);
   });
 
+  it('ignores non-numeric QaseID values', () => {
+    expect(MetadataParser.parse({ QaseID: 'abc' })[metadataEnum.id]).toEqual([]);
+    expect(MetadataParser.parse({ QaseID: '1,x,3' })[metadataEnum.id]).toEqual([1, 3]);
+    expect(MetadataParser.parse({ CID: 'x' })[metadataEnum.id]).toEqual([]);
+  });
+
   it('uses legacy CID when QaseID is missing', () => {
     const md = MetadataParser.parse({ CID: '7' });
     expect(md[metadataEnum.id]).toEqual([7]);

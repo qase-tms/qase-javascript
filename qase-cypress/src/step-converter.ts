@@ -7,7 +7,11 @@ import {
 import type { StepEnd, StepStart } from './metadata/models';
 
 export class StepConverter {
-  convertCypressMessages(messages: StepStart[], testStatus: string): TestStepType[] {
+  convertCypressMessages(
+    messages: StepStart[],
+    testStatus: string,
+    attachments: Record<string, Attachment[]> = {},
+  ): TestStepType[] {
     const result: TestStepType[] = [];
 
     const lastIndex = messages.length - 1;
@@ -23,6 +27,7 @@ export class StepConverter {
         expected_result: null,
         data: null,
       };
+      step.attachments = attachments[message.id] ?? [];
 
       if (lastIndex === messages.indexOf(message) && testStatus !== 'passed') {
         step.execution.status = StepStatusEnum.failed;
@@ -55,8 +60,8 @@ export class StepConverter {
         newStep.execution.end_time = null;
         newStep.data = {
           action: step.name,
-          expected_result: null,
-          data: null,
+          expected_result: step.expectedResult ?? null,
+          data: step.data ?? null,
         };
 
         if (attachments[step.id]) {

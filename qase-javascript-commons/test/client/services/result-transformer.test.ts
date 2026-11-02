@@ -221,6 +221,14 @@ describe('ResultTransformer', () => {
       expect(model.steps![0]!.data!.action).toBe('Given user exists');
     });
 
+    it('should send a GHERKIN step as its keyword and text', () => {
+      const result = makeResult({
+        steps: [makeStep({ step_type: StepType.GHERKIN, data: { keyword: 'Given', name: 'a user exists', line: 3 } })],
+      });
+      const model = transformer.transform(result, mockResolveHash);
+      expect(model.steps![0]!.data!.action).toBe('Given a user exists');
+    });
+
     it('should transform REQUEST step', () => {
       const result = makeResult({
         steps: [

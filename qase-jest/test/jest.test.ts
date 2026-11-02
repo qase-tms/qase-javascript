@@ -187,6 +187,26 @@ describe('qase', () => {
       });
     });
 
+    it('accepts a single path given as a string', () => {
+      qase.attach({ paths: '/path/to/file.txt' });
+
+      expect(qaseMock.attachment).toHaveBeenCalledTimes(1);
+      expect(qaseMock.attachment.mock.calls[0][0].file_path).toBe('/path/to/file.txt');
+      expect(qaseMock.attachment.mock.calls[0][0].file_name).toBe('file.txt');
+    });
+
+    it('uses contentType for content attachments', () => {
+      qase.attach({ name: 'data.json', content: '{}', contentType: 'application/json' });
+
+      expect(qaseMock.attachment.mock.calls[0][0].mime_type).toBe('application/json');
+    });
+
+    it('uses contentType over the detected type for file attachments', () => {
+      qase.attach({ paths: ['/path/to/file.bin'], contentType: 'image/png' });
+
+      expect(qaseMock.attachment.mock.calls[0][0].mime_type).toBe('image/png');
+    });
+
     it('should not call attachment if no paths or content provided', () => {
       qase.attach({});
       expect(qaseMock.attachment).not.toHaveBeenCalled();

@@ -19,7 +19,11 @@ results:
   relations:
     suite:
       data:
-      - title: "API Tests\tAdvanced\tData Validation"
+      - title: API Tests
+        public_id: null
+      - title: Advanced
+        public_id: null
+      - title: Data Validation
         public_id: null
   steps:
   - data:
@@ -75,13 +79,13 @@ results:
       action: Fetch comments for the post
     execution:
       status: passed
+      attachments:
+      - file_name: post-with-comments.json
+        mime_type: application/json
   - data:
       action: Verify comment structure
     execution:
       status: passed
-  attachments:
-  - file_name: post-with-comments.json
-    mime_type: application/octet-stream
 - title: GET non-existent user returns empty object
   signature: 8::test::api-errors.test.js::jsonplaceholder_api_-_error_handling_get_non-existent_user_returns_empty_object_(qase_id:_8)
   testops_ids:
@@ -184,13 +188,14 @@ results:
     execution:
       status: passed
   - data:
-      action: Verify photo structure
-    execution:
-      status: passed
-  - data:
       action: Fetch photos in album
     execution:
       status: passed
+    steps:
+    - data:
+        action: Verify photo structure
+      execution:
+        status: passed
 - title: GET posts filtered by user ID returns correct results
   signature: 6::test::api-posts.test.js::jsonplaceholder_api_-_post_validation_get_posts_filtered_by_user_id_returns_correct_results_(qase_id:_6)::{'userid':'1'}::{'filtertype':'query_parameter'}
   testops_ids:
@@ -317,9 +322,9 @@ results:
       action: Send POST request to create user
     execution:
       status: passed
-  attachments:
-  - file_name: request-body.json
-    mime_type: application/octet-stream
+      attachments:
+      - file_name: request-body.json
+        mime_type: application/json
 - title: Parameterized test pattern - multiple user IDs
   signature: 14::test::api-advanced.test.js::jsonplaceholder_api_-_advanced_features_parameterized_test_pattern_-_multiple_user_ids_(qase_id:_14)::{'testscope':'multiple_users'}::{'userids':'1,2,3'}::{'validationtype':'existence'}
   testops_ids:
@@ -410,26 +415,32 @@ results:
   relations:
     suite:
       data:
-      - title: "API Tests\tAdvanced\tRelationships"
+      - title: API Tests
+        public_id: null
+      - title: Advanced
+        public_id: null
+      - title: Relationships
         public_id: null
   steps:
-  - data:
-      action: Validate user has company information
-    execution:
-      status: passed
   - data:
       action: Fetch user details
     execution:
       status: passed
-  - data:
-      action: Verify first post belongs to user
-    execution:
-      status: passed
-  - data:
-      action: Verify post titles are non-empty
-    execution:
-      status: passed
+    steps:
+    - data:
+        action: Validate user has company information
+      execution:
+        status: passed
   - data:
       action: Fetch all posts by user
     execution:
       status: passed
+    steps:
+    - data:
+        action: Verify first post belongs to user
+      execution:
+        status: passed
+    - data:
+        action: Verify post titles are non-empty
+      execution:
+        status: passed

@@ -156,7 +156,7 @@ qase.title = function(value: string) {
  * @param {Record<string, string>[]} values
  * @example
  * test('test', async ({ page }) => {
- *    qase.fields({ 'severity': 'high', 'priority': 'medium' });
+ *    qase.fields({ 'severity': 'critical', 'priority': 'medium' });
  *    await page.goto('https://example.com');
  * });
  */

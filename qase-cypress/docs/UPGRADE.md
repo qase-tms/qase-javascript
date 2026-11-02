@@ -77,8 +77,10 @@ module.exports = defineConfig({
       require('cypress-qase-reporter/plugin')(on, config);
       require('cypress-qase-reporter/metadata')(on);
 
-      // Add afterSpecHook for video upload
-      on('after:spec', afterSpecHook(config));
+      // Add afterSpecHook for video upload (since 3.6.1 the plugin registers it for you)
+      on('after:spec', async (spec) => {
+        await afterSpecHook(spec, config);
+      });
 
       return config;
     },
@@ -91,7 +93,12 @@ module.exports = defineConfig({
         token: process.env.QASE_API_TOKEN,
       },
       project: 'DEMO',
-      uploadDelay: 1000, // Optional: delay before video upload (ms)
+    },
+    framework: {
+      cypress: {
+        videosFolder: 'cypress/videos', // Where the reporter looks for videos; must match Cypress
+        uploadDelay: 10, // Optional: delay before video upload (seconds)
+      },
     },
   },
 });
@@ -133,7 +140,8 @@ describe('Test suite', () => {
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `uploadDelay` | Delay (in milliseconds) before uploading video after test completion | 0 |
+| `framework.cypress.videosFolder` | Folder the reporter searches for spec videos to attach. Videos are not uploaded without it | — |
+| `framework.cypress.uploadDelay` | Delay (in seconds) before uploading videos after the spec completes | 10 |
 
 **Example:**
 
@@ -143,7 +151,12 @@ reporterOptions: {
   testops: {
     api: { token: 'token' },
     project: 'DEMO',
-    uploadDelay: 1000, // Wait 1 second before video upload
+  },
+  framework: {
+    cypress: {
+      videosFolder: 'cypress/videos',
+      uploadDelay: 10, // Wait 10 seconds before video upload
+    },
   },
 }
 ```
@@ -174,7 +187,7 @@ describe('Tests', () => {
 
 it('Test with metadata', () => {
   qase.title('Custom title');
-  qase.fields({ severity: 'high' });
+  qase.fields({ severity: 'critical' });
   qase.attach({ paths: 'screenshot.png' });
 });
 ```
@@ -227,7 +240,9 @@ module.exports = defineConfig({
     setupNodeEvents(on, config) {
       require('cypress-qase-reporter/plugin')(on, config);
       require('cypress-qase-reporter/metadata')(on);
-      on('after:spec', afterSpecHook(config));
+      on('after:spec', async (spec) => {
+        await afterSpecHook(spec, config);
+      });
       return config;
     },
   },
@@ -237,6 +252,11 @@ module.exports = defineConfig({
     testops: {
       api: { token: process.env.QASE_API_TOKEN },
       project: 'DEMO',
+    },
+    framework: {
+      cypress: {
+        videosFolder: 'cypress/videos',
+      },
     },
   },
 });
@@ -270,8 +290,8 @@ it(qase(1, 'Test with screenshot and video'), () => {
 
 ### Node.js Version Support
 
-- **v3.2.0:** Node.js >= 14
-- **v2.3.x:** Node.js >= 14
+- **v3.6.3 and later:** Node.js >= 18
+- **v3.6.2 and earlier:** Node.js >= 14
 
 ### Cypress Version Support
 
@@ -298,12 +318,14 @@ it(qase(1, 'Test with screenshot and video'), () => {
 **Solution:**
 
 1. Verify video recording is enabled: `video: true` in config
-2. Check that `afterSpecHook` is registered:
+2. Check that `afterSpecHook` runs after each spec. Since 3.6.1 the plugin registers it; if you register `after:spec` yourself, call it there:
    ```javascript
    const { afterSpecHook } = require('cypress-qase-reporter/hooks');
-   on('after:spec', afterSpecHook(config));
+   on('after:spec', async (spec) => {
+     await afterSpecHook(spec, config);
+   });
    ```
-3. Ensure videos folder exists and is writable: `videosFolder: 'cypress/videos'`
+3. Set `framework.cypress.videosFolder` in the reporter options to the folder Cypress writes videos to (`videosFolder` in the Cypress config, `cypress/videos` by default)
 
 #### Issue: Hook registration error
 

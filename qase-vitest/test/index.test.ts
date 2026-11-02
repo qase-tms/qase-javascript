@@ -36,6 +36,9 @@ const mkTestCase = (overrides: any = {}) => ({
   result: jest.fn().mockReturnValue({ state: 'passed', errors: [] }),
   diagnostic: jest.fn().mockReturnValue({ duration: 100 }),
   meta: jest.fn().mockReturnValue({}),
+  parent: { type: 'suite', name: 'Suite', parent: { type: 'module', moduleId: '/root/test.test.ts' } },
+  module: { type: 'module', moduleId: '/root/test.test.ts' },
+  project: { config: { root: '/root' } },
   ...overrides,
 }) as any;
 
@@ -111,12 +114,27 @@ describe('VitestQaseReporter', () => {
     });
   });
 
-  describe('onTestSuiteReady / onTestSuiteResult', () => {
-    it('sets and clears currentSuite via MetadataAccumulator', () => {
-      reporter.onTestSuiteReady?.({ name: 'My Suite' } as any);
-      expect((reporter as any).metadataAccumulator.getCurrentSuite()).toBe('My Suite');
-      reporter.onTestSuiteResult?.();
-      expect((reporter as any).metadataAccumulator.getCurrentSuite()).toBeUndefined();
+  describe('onInit', () => {
+    const mkVitest = () => ({ provide: jest.fn() });
+
+    it('hands the network profiler options to the workers', () => {
+      const composeOptionsMock = jest.requireMock('qase-javascript-commons').composeOptions;
+      composeOptionsMock.mockReturnValueOnce({
+        profilers: ['network'],
+        networkProfiler: { skip_domains: ['example.org'], track_on_fail: true },
+      });
+      const vitest = mkVitest();
+      new VitestQaseReporter({}).onInit?.(vitest as any);
+      expect(vitest.provide).toHaveBeenCalledWith('qaseNetworkProfiler', {
+        skipDomains: ['example.org'],
+        trackOnFail: true,
+      });
+    });
+
+    it('tells the workers the network profiler is off when not configured', () => {
+      const vitest = mkVitest();
+      reporter.onInit?.(vitest as any);
+      expect(vitest.provide).toHaveBeenCalledWith('qaseNetworkProfiler', null);
     });
   });
 
@@ -136,6 +154,25 @@ describe('VitestQaseReporter', () => {
       await reporter.onTestCaseResult?.(tc);
       const call = (reporterMock.addTestResult.mock.calls[0] as any[])[0];
       expect(call.title).toBe('Override');
+    });
+
+    it('reports each test with the suite of its own file when files run in parallel', async () => {
+      const mod = (id: string) => ({ type: 'module', moduleId: id });
+      const suiteA = { type: 'suite', name: 'Suite A', parent: mod('/root/a.test.ts') };
+      const suiteB = { type: 'suite', name: 'Suite B', parent: mod('/root/b.test.ts') };
+      const tcA = mkTestCase({ id: 'a', name: 'test a', fullName: 'Suite A > test a', parent: suiteA, module: suiteA.parent });
+      const tcB = mkTestCase({ id: 'b', name: 'test b', fullName: 'Suite B > test b', parent: suiteB, module: suiteB.parent });
+
+      (reporter as any).onTestSuiteReady?.(suiteA);
+      (reporter as any).onTestSuiteReady?.(suiteB);
+      await reporter.onTestCaseResult?.(tcA);
+      (reporter as any).onTestSuiteResult?.(suiteB);
+      await reporter.onTestCaseResult?.(tcB);
+
+      const suites = reporterMock.addTestResult.mock.calls.map(
+        (c: any[]) => c[0].relations?.suite?.data.map((d: any) => d.title),
+      );
+      expect(suites).toEqual([['Suite A'], ['Suite B']]);
     });
 
     it('clears metadata after processing the test case', async () => {

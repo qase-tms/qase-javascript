@@ -83,7 +83,7 @@ Scenario: Test Scenario
 
       const result = extractTags('/path/to/feature.feature', 'Test Scenario');
 
-      expect(result).toEqual(['@tag3']);
+      expect(result).toEqual(['@tag1', '@tag2', '@tag3']);
     });
 
     it('should stop searching at empty line', () => {
@@ -186,6 +186,25 @@ Scenario: Test Scenario
       const result = extractTags('/path/to/feature.feature', 'Test Scenario');
 
       expect(result).toEqual(['@tag-with-dashes', '@tag_with_underscores', '@tag123']);
+    });
+
+    it('collects tags written on several lines above the scenario', () => {
+      const fileContent = `
+Feature: Test Feature
+
+  @QaseID=1
+  @smoke @regression
+  # a comment between tags
+  @slow
+  Scenario: Test Scenario
+    Given some step
+`;
+
+      mockFs.readFileSync.mockReturnValue(fileContent);
+
+      const result = extractTags('/path/to/feature.feature', 'Test Scenario');
+
+      expect(result).toEqual(['@QaseID=1', '@smoke', '@regression', '@slow']);
     });
   });
 }); 

@@ -1,8 +1,9 @@
-import { Attach, Metadata, NetworkRequestData, StepStart } from './models';
+import { Attach, Metadata, NetworkRequestData, StepStart, StepStartPayload } from './models';
 import { readFileSync, existsSync, unlinkSync, writeFileSync } from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import { Attachment, getMimeTypes } from 'qase-javascript-commons';
+import { reviveBuffer, toBuffer } from './buffer';
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class MetadataManager {
@@ -25,14 +26,13 @@ export class MetadataManager {
       steps: [],
       cucumberSteps: [],
       currentStepId: undefined,
-      firstStepName: undefined,
       attachments: [],
       stepAttachments: {},
     };
 
     try {
       const data = readFileSync(this.metadataPath, 'utf8');
-      metadata = JSON.parse(data) as Metadata;
+      metadata = JSON.parse(data, reviveBuffer) as Metadata;
 
       return metadata;
     } catch (err) {
@@ -54,24 +54,24 @@ export class MetadataManager {
     this.setMetadata(metadata);
   }
 
-  public static addStepStart(name: string): void {
+  public static addStepStart(step: string | StepStartPayload): void {
     const metadata = this.getMetadata() ?? {};
-
-    if (metadata.firstStepName === name) {
-      return;
-    }
+    const { name, expectedResult, data } = typeof step === 'string' ? { name: step } as StepStartPayload : step;
 
     if (!metadata.steps) {
       metadata.steps = [];
     }
     const id = uuidv4();
     const parentId = metadata.currentStepId ?? undefined;
-    metadata.steps.push({ timestamp: Date.now(), name, id: id, parentId: parentId });
+    metadata.steps.push({
+      timestamp: Date.now(),
+      name,
+      id: id,
+      parentId: parentId,
+      expectedResult: expectedResult ?? null,
+      data: data ?? null,
+    });
     metadata.currentStepId = id;
-
-    if (!metadata.firstStepName) {
-      metadata.firstStepName = name;
-    }
 
     this.setMetadata(metadata);
   }
@@ -81,7 +81,7 @@ export class MetadataManager {
     if (!metadata.steps || !metadata.currentStepId) {
       return;
     }
-    const parentId = metadata.steps.reverse().find((step): step is StepStart => step.id === metadata.currentStepId)?.parentId;
+    const parentId = [...metadata.steps].reverse().find((step): step is StepStart => step.id === metadata.currentStepId)?.parentId;
     metadata.steps.push({ timestamp: Date.now(), status, id: metadata.currentStepId });
     metadata.currentStepId = parentId;
     this.setMetadata(metadata);
@@ -90,10 +90,6 @@ export class MetadataManager {
   public static addCucumberStep(name: string): void {
     const metadata = this.getMetadata() ?? {};
 
-    if (metadata.firstStepName === name) {
-      return;
-    }
-
     if (!metadata.cucumberSteps) {
       metadata.cucumberSteps = [];
     }
@@ -101,10 +97,6 @@ export class MetadataManager {
     const parentId = metadata.currentStepId ?? undefined;
     metadata.cucumberSteps.push({ timestamp: Date.now(), name, id: id, parentId: parentId });
     metadata.currentStepId = id;
-
-    if (!metadata.firstStepName) {
-      metadata.firstStepName = name;
-    }
 
     this.setMetadata(metadata);
   }
@@ -244,7 +236,7 @@ export class MetadataManager {
         file_name: attach.name ?? 'attachment',
         mime_type: attach.contentType ?? 'application/octet-stream',
         file_path: null,
-        content: attach.content,
+        content: toBuffer(attach.content) ?? attach.content,
         size: 0,
         id: uuidv4(),
       });

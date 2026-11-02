@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
 import path from 'path';
 import { TestResultType } from 'qase-javascript-commons';
+import { reviveBuffer } from './buffer';
 
 export class ResultsManager {
     static resultsPath = path.resolve(__dirname, 'qaseResults');
@@ -13,7 +14,7 @@ export class ResultsManager {
         let results: TestResultType[] = [];
 
         try {
-            results = JSON.parse(readFileSync(this.resultsPath, 'utf8')) as TestResultType[];
+            results = JSON.parse(readFileSync(this.resultsPath, 'utf8'), reviveBuffer) as TestResultType[];
         } catch (error) {
             console.log('Error reading results file', error);
         }

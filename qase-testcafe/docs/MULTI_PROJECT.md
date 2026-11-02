@@ -72,7 +72,7 @@ You can chain `qase.projects()` with other builder methods:
 
 ```javascript
 // Combine multi-project with test ID and fields
-const q = qase.id(1).projects({ PROJ1: [100], PROJ2: [200] }).fields({ severity: 'high' }).create();
+const q = qase.id(1).projects({ PROJ1: [100], PROJ2: [200] }).fields({ severity: 'critical' }).create();
 test.meta(q)('Test with ID, multi-project, and fields', async (t) => {
   await t.expect(true).ok();
 });

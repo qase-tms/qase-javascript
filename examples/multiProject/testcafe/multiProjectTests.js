@@ -30,7 +30,6 @@ test.meta(qase.projects({ PROJ1: [1], PROJ2: [2] }).title('User can login with v
     await t.expect(title).eql('Products', 'Should redirect to inventory page');
   });
 
-  await qase.comment('Login verified across both projects with standard credentials');
   await qase.attach({
     name: 'login-credentials.txt',
     content: 'Username: standard_user\nPassword: secret_sauce',
@@ -61,8 +60,6 @@ test.meta(qase.projects({ PROJ1: [3], PROJ2: [4] }).title('Invalid password show
     const errorContainer = await t.eval(() => !!document.querySelector('[data-test="error"]'));
     await t.expect(errorContainer).ok('Error message should be displayed');
   });
-
-  await qase.comment('Invalid credentials correctly rejected in both projects');
 });
 
 fixture`Multi-project Cart Scenarios`
@@ -99,8 +96,6 @@ test.meta(qase.projects({ PROJ1: [5, 6], PROJ2: [7] }).title('Add product to car
     const itemName = await t.eval(() => document.querySelector('.inventory_item_name')?.textContent);
     await t.expect(itemName).eql('Sauce Labs Backpack', 'Correct product in cart');
   });
-
-  await qase.comment('Product added to cart and reported to both projects');
 
   await qase.attach({
     name: 'cart-state.json',
@@ -158,8 +153,6 @@ test.meta(qase.projects({ PROJ1: [8], PROJ2: [9] }).title('Complete checkout flo
     await t.expect(header).eql('Thank you for your order!', 'Should show confirmation message');
   });
 
-  await qase.comment('Full checkout flow verified across both projects');
-
   await qase.attach({
     name: 'order-details.json',
     content: JSON.stringify({
@@ -173,5 +166,4 @@ test.meta(qase.projects({ PROJ1: [8], PROJ2: [9] }).title('Complete checkout flo
 
 test.meta(qase.projects({ PROJ1: [10], PROJ2: [11] }).ignore().create())('Ignored multi-project test', async t => {
   await t.expect(true).ok('This will not be reported to Qase');
-  await qase.comment('This test demonstrates ignore with multi-project');
 });

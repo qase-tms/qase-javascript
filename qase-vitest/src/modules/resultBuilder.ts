@@ -1,3 +1,4 @@
+import path from 'path';
 import type { TestCase } from 'vitest/node';
 import {
   Attachment,
@@ -5,22 +6,22 @@ import {
   TestResultType,
   TestStepType,
   determineTestStatus,
+  generateSignature,
   parseProjectMappingFromTitle,
 } from 'qase-javascript-commons';
-import { extractAndCleanStep } from 'qase-javascript-commons/internal';
-import { MetadataShape } from './metadataAccumulator';
+import { extractAndCleanStep, normalizeSuitePart } from 'qase-javascript-commons/internal';
+import { MetadataShape, StepRecord } from './metadataAccumulator';
 
 export interface BuildArgs {
   testCase: TestCase;
   metadata: MetadataShape | undefined;
-  currentSuite: string | undefined;
   profilerSteps: TestStepType[];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class ResultBuilder {
   static build(args: BuildArgs): TestResultType {
-    const { testCase, metadata, currentSuite, profilerSteps } = args;
+    const { testCase, metadata, profilerSteps } = args;
 
     const result = testCase.result();
     const parsed = parseProjectMappingFromTitle(testCase.name);
@@ -29,7 +30,6 @@ export class ResultBuilder {
     const testTitle = metadata?.title ?? (parsed.cleanedTitle.replace(/\s+/g, ' ').trim() || testCase.name);
     const testResult = new TestResultType(testTitle);
     testResult.id = testCase.id;
-    testResult.signature = testCase.fullName;
 
     const hasProjectMapping = Object.keys(parsed.projectMapping).length > 0;
     if (hasProjectMapping) {
@@ -41,16 +41,30 @@ export class ResultBuilder {
       testResult.testops_id = null;
     }
 
-    const suiteToUse = metadata?.suite ?? currentSuite ?? ResultBuilder.extractSuiteFromTestCase(testCase);
-    if (suiteToUse) {
+    const describeTitles = ResultBuilder.getDescribeTitles(testCase);
+    if (metadata?.suite) {
       testResult.relations = { suite: { data: [] } };
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const suiteData = testResult.relations.suite!.data;
-      const suites = suiteToUse.split(' - ');
-      suites.forEach((suite) => {
+      // A tab (or the two characters `\t`, as the docs write it) nests suites; ` - ` always has.
+      metadata.suite.split(/\t|\\t| - /).filter((suite) => suite.trim()).forEach((suite) => {
         suiteData.push({ title: suite.trim(), public_id: null });
       });
+    } else if (describeTitles.length > 0) {
+      testResult.relations = {
+        suite: { data: describeTitles.map((title) => ({ title, public_id: null })) },
+      };
     }
+
+    testResult.signature = generateSignature(
+      hasProjectMapping ? null : parsed.legacyIds,
+      [
+        ...ResultBuilder.getModulePath(testCase),
+        ...describeTitles.map(normalizeSuitePart),
+        normalizeSuitePart(parsed.cleanedTitle.replace(/\s+/g, ' ').trim() || testCase.name),
+      ],
+      metadata?.parameters ?? {},
+    );
 
     // Vitest's `testCase.diagnostic()` exposes both the absolute `startTime`
     // (ms since epoch) and elapsed `duration` (ms). end_time is derived as
@@ -91,7 +105,9 @@ export class ResultBuilder {
 
     if (metadata) {
       if (metadata.comment) {
-        testResult.message = metadata.comment;
+        testResult.message = testResult.message
+          ? `${metadata.comment}\n\n${testResult.message}`
+          : metadata.comment;
       }
       if (metadata.fields) {
         testResult.fields = metadata.fields;
@@ -109,18 +125,7 @@ export class ResultBuilder {
         testResult.muted = true;
       }
       if (metadata.steps.length > 0) {
-        testResult.steps = metadata.steps.map((step) => {
-          const stepObj = new TestStepType();
-          stepObj.id = Math.random().toString(36).substr(2, 9);
-          const stepData = extractAndCleanStep(step.name);
-          stepObj.data = {
-            action: stepData.cleanedString,
-            expected_result: stepData.expectedResult,
-            data: stepData.data,
-          };
-          stepObj.execution.status = step.status === 'failed' ? StepStatusEnum.failed : StepStatusEnum.passed;
-          return stepObj;
-        });
+        testResult.steps = ResultBuilder.buildSteps(metadata.steps, null);
       }
       if (metadata.attachments.length > 0) {
         testResult.attachments = metadata.attachments.map((attachment) => {
@@ -148,13 +153,38 @@ export class ResultBuilder {
     return testResult;
   }
 
-  static extractSuiteFromTestCase(testCase: TestCase): string | undefined {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    const fullName = testCase.fullName ?? testCase.name;
-    const parts = fullName.split(' > ');
-    if (parts.length > 1) {
-      return parts.slice(0, -1).join(' > ');
+  private static buildSteps(steps: StepRecord[], parentId: string | null): TestStepType[] {
+    return steps.map((step) => {
+      const stepObj = new TestStepType();
+      stepObj.id = Math.random().toString(36).substr(2, 9);
+      stepObj.parent_id = parentId;
+      const stepData = extractAndCleanStep(step.name);
+      stepObj.data = {
+        action: stepData.cleanedString,
+        expected_result: stepData.expectedResult,
+        data: stepData.data,
+      };
+      // A step still open when the test ended did not finish (the test timed out or was aborted).
+      stepObj.execution.status = step.status === 'end' ? StepStatusEnum.passed : StepStatusEnum.failed;
+      stepObj.steps = ResultBuilder.buildSteps(step.steps, stepObj.id);
+      return stepObj;
+    });
+  }
+
+  // Read from the test's own parents: suite events of files running in parallel interleave.
+  static getDescribeTitles(testCase: TestCase): string[] {
+    const titles: string[] = [];
+    let parent: TestCase['parent'] = testCase.parent;
+    while (parent.type === 'suite') {
+      titles.unshift(parent.name);
+      parent = parent.parent;
     }
-    return undefined;
+    return titles;
+  }
+
+  private static getModulePath(testCase: TestCase): string[] {
+    const moduleId = testCase.module.moduleId;
+    const root = testCase.project.config.root;
+    return path.relative(root, moduleId).split(path.sep).filter((part) => part.length > 0);
   }
 }

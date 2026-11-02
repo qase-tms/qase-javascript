@@ -134,3 +134,20 @@ describe('utils', () => {
     });
   });
 }); 
+
+describe('withExtension', () => {
+  const { withExtension } = require('../src/utils');
+
+  it('adds the extension of a known type to a name without one', () => {
+    expect(withExtension('Response', 'application/json')).toBe('Response.json');
+    expect(withExtension('log', 'text/plain; charset=utf-8')).toBe('log.txt');
+  });
+
+  it('keeps a name with a known extension', () => {
+    expect(withExtension('data.csv', 'text/plain')).toBe('data.csv');
+  });
+
+  it('keeps the name when the type is unknown', () => {
+    expect(withExtension('blob', 'application/x-custom')).toBe('blob');
+  });
+});

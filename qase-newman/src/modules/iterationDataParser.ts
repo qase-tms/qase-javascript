@@ -22,7 +22,7 @@ export class IterationDataParser {
           if (this.isRecord(value)) {
             Object.assign(record, this.convertToRecord(value, newKey));
           } else {
-            record[newKey.toLowerCase()] = String(value);
+            record[newKey] = String(value);
           }
         }
       }

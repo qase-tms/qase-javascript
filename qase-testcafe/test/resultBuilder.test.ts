@@ -137,6 +137,17 @@ describe('ResultBuilder', () => {
     expect(result.attachments[1]?.file_name).toBe('log.txt');
   });
 
+  it('names screenshots by their base name with the mime type of their extension', () => {
+    const screenshot = { screenshotPath: '/abs/screenshots/run/1.png', thumbnailPath: '', userAgent: '', quarantineAttempt: 0, takenOnFail: true };
+    const result = ResultBuilder.build({
+      ...baseArgs,
+      testRunInfo: makeInfo({ screenshots: [screenshot] }),
+    });
+    expect(result.attachments[0]?.file_name).toBe('1.png');
+    expect(result.attachments[0]?.file_path).toBe('/abs/screenshots/run/1.png');
+    expect(result.attachments[0]?.mime_type).toBe('image/png');
+  });
+
   it('respects project mapping precedence', () => {
     const result = ResultBuilder.build({
       ...baseArgs,

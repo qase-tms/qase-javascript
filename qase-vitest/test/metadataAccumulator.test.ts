@@ -93,27 +93,52 @@ describe('MetadataAccumulator.parseAnnotation', () => {
     expect(acc.getMetadata('t1')!.tags).toEqual(['a', 'b', 'c']);
   });
 
-  it('Qase Step Start sets currentStep but does not push', () => {
+  it('Qase Step Start records an open step', () => {
     acc.parseAnnotation('t1', mkAnnotation('Qase Step Start: do thing'));
     const m = acc.getMetadata('t1')!;
-    expect(m.currentStep).toBe('do thing');
-    expect(m.steps).toEqual([]);
+    expect(m.steps).toEqual([{ name: 'do thing', status: 'start', steps: [] }]);
   });
 
-  it('Qase Step End pushes step and clears currentStep', () => {
+  it('Qase Step End closes the step as passed', () => {
     acc.parseAnnotation('t1', mkAnnotation('Qase Step Start: do thing'));
     acc.parseAnnotation('t1', mkAnnotation('Qase Step End: do thing'));
     const m = acc.getMetadata('t1')!;
-    expect(m.steps).toEqual([{ name: 'do thing', status: 'end' }]);
-    expect(m.currentStep).toBeUndefined();
+    expect(m.steps).toEqual([{ name: 'do thing', status: 'end', steps: [] }]);
   });
 
-  it('Qase Step Failed pushes failed step and clears currentStep', () => {
-    acc.parseAnnotation('t1', mkAnnotation('Qase Step Start: risky'));
-    acc.parseAnnotation('t1', mkAnnotation('Qase Step Failed: risky - boom'));
+  it('Qase Step Failed closes the step as failed', () => {
+    acc.parseAnnotation('t1', mkAnnotation('Qase Step Start: risky - part'));
+    acc.parseAnnotation('t1', mkAnnotation('Qase Step Failed: risky - part - boom'));
     const m = acc.getMetadata('t1')!;
-    expect(m.steps).toEqual([{ name: 'risky', status: 'failed' }]);
-    expect(m.currentStep).toBeUndefined();
+    expect(m.steps).toEqual([{ name: 'risky - part', status: 'failed', steps: [] }]);
+  });
+
+  it('nests steps started inside another step under it', () => {
+    acc.parseAnnotation('t1', mkAnnotation('Qase Step Start: parent'));
+    acc.parseAnnotation('t1', mkAnnotation('Qase Step Start: child 1'));
+    acc.parseAnnotation('t1', mkAnnotation('Qase Step End: child 1'));
+    acc.parseAnnotation('t1', mkAnnotation('Qase Step Start: child 2'));
+    acc.parseAnnotation('t1', mkAnnotation('Qase Step Start: grandchild'));
+    acc.parseAnnotation('t1', mkAnnotation('Qase Step Failed: grandchild - boom'));
+    acc.parseAnnotation('t1', mkAnnotation('Qase Step Failed: child 2 - boom'));
+    acc.parseAnnotation('t1', mkAnnotation('Qase Step Failed: parent - boom'));
+    acc.parseAnnotation('t1', mkAnnotation('Qase Step Start: sibling'));
+    acc.parseAnnotation('t1', mkAnnotation('Qase Step End: sibling'));
+    expect(acc.getMetadata('t1')!.steps).toEqual([
+      {
+        name: 'parent',
+        status: 'failed',
+        steps: [
+          { name: 'child 1', status: 'end', steps: [] },
+          {
+            name: 'child 2',
+            status: 'failed',
+            steps: [{ name: 'grandchild', status: 'failed', steps: [] }],
+          },
+        ],
+      },
+      { name: 'sibling', status: 'end', steps: [] },
+    ]);
   });
 
   it('Qase Step End without prior Step Start is a no-op', () => {
@@ -193,20 +218,5 @@ describe('MetadataAccumulator state lifecycle', () => {
 
   it('clearMetadata of an unknown test is a no-op', () => {
     expect(() => acc.clearMetadata('unknown')).not.toThrow();
-  });
-
-  it('setCurrentSuite stores the suite name', () => {
-    acc.setCurrentSuite('My Suite');
-    expect(acc.getCurrentSuite()).toBe('My Suite');
-  });
-
-  it('clearCurrentSuite resets to undefined', () => {
-    acc.setCurrentSuite('My Suite');
-    acc.clearCurrentSuite();
-    expect(acc.getCurrentSuite()).toBeUndefined();
-  });
-
-  it('getCurrentSuite returns undefined initially', () => {
-    expect(acc.getCurrentSuite()).toBeUndefined();
   });
 });

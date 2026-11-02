@@ -14,6 +14,7 @@ import {
   composeOptions,
   generateSignature,
   determineTestStatus,
+  TestStatusEnum,
 } from 'qase-javascript-commons';
 
 import { MetadataExtractor } from './modules/metadataExtractor';
@@ -42,6 +43,7 @@ export class NewmanQaseReporter {
   private reporter: ReporterInterface;
   private pendingResultMap = new Map<string, TestResultType>();
   private timerMap = new Map<string, number>();
+  private requestedItems = new Set<string>();
   private readonly parameters: Record<string, string>[];
   private autoCollectParams: boolean;
 
@@ -80,21 +82,33 @@ export class NewmanQaseReporter {
       const pending = ResultBuilder.buildPending({ item, suites, ids, projectMapping, signature });
       this.pendingResultMap.set(item.id, pending);
       this.timerMap.set(item.id, Date.now());
+      this.requestedItems.delete(item.id);
     });
 
     runner.on('assertion', (err: Error | undefined, exec: NewmanRunExecution) => {
-      const pending = this.pendingResultMap.get(exec.item.id);
-      if (pending && err) {
-        pending.execution.status = determineTestStatus(err, 'failed');
-        pending.execution.stacktrace = err.stack ?? null;
-        pending.message = err.message;
-      }
+      if (err) this.applyError(exec.item.id, err);
+    });
+
+    // Errors thrown by pre-request and test scripts.
+    runner.on('script', (err: Error | undefined, exec: NewmanRunExecution) => {
+      if (err) this.applyError(exec.item.id, err);
+    });
+
+    runner.on('request', (err: Error | undefined, exec: NewmanRunExecution) => {
+      this.requestedItems.add(exec.item.id);
+      if (err) this.applyError(exec.item.id, err);
     });
 
     runner.on('item', (_err: Error | undefined, exec: NewmanRunExecution) => {
       const { item } = exec;
       const pending = this.pendingResultMap.get(item.id);
       if (!pending) return;
+
+      // Newman drops the runtime's `isSkipped` flag; a request skipped by
+      // pm.execution.skipRequest() is the only way an item ends without a request event.
+      if (!this.requestedItems.has(item.id) && pending.execution.status === TestStatusEnum.passed) {
+        pending.execution.status = TestStatusEnum.skipped;
+      }
 
       const timer = this.timerMap.get(item.id);
       if (timer) {
@@ -112,10 +126,17 @@ export class NewmanQaseReporter {
       }
 
       pending.params = this.prepareParameters(item, exec.cursor.iteration);
+      if (Object.keys(pending.params).length > 0) {
+        const parent = item.parent();
+        const suites = parent ? MetadataExtractor.getParentTitles(parent) : [];
+        const ids = MetadataExtractor.getCaseIds(item.events);
+        pending.signature = generateSignature(ids, [...suites, item.name], pending.params);
+      }
       void this.reporter.addTestResult(pending);
 
       this.timerMap.delete(item.id);
       this.pendingResultMap.delete(item.id);
+      this.requestedItems.delete(item.id);
     });
 
     runner.on('beforeDone', () => {
@@ -125,6 +146,19 @@ export class NewmanQaseReporter {
     runner.on('done', () => {
       this.preventExit();
     });
+  }
+
+  // The first error decides the status; later ones are added to the message.
+  private applyError(itemId: string, err: Error) {
+    const pending = this.pendingResultMap.get(itemId);
+    if (!pending) return;
+    if (pending.execution.status === TestStatusEnum.passed) {
+      pending.execution.status = determineTestStatus(err, 'failed');
+      pending.execution.stacktrace = err.stack ?? null;
+      pending.message = err.message;
+      return;
+    }
+    pending.message = pending.message ? `${pending.message}\n${err.message}` : err.message;
   }
 
   private prepareParameters(item: Item, iteration: number): Record<string, string> {
@@ -140,9 +174,13 @@ export class NewmanQaseReporter {
       return {};
     }
     return params.reduce<Record<string, string>>((filteredParams, param) => {
-      const value = availableParameters[param.toLowerCase()];
-      if (value) {
-        filteredParams[param.toLowerCase()] = value;
+      // Names in `qase.parameters` used to match data keys case-insensitively; keep that.
+      const key = param in availableParameters
+        ? param
+        : Object.keys(availableParameters).find((k) => k.toLowerCase() === param.toLowerCase());
+      const value = key !== undefined ? availableParameters[key] : undefined;
+      if (key !== undefined && value) {
+        filteredParams[key] = value;
       }
       return filteredParams;
     }, {});

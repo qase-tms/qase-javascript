@@ -59,7 +59,7 @@ export class ResultBuilder {
       annotations.suites.length > 0
         ? annotations.suites
         : metadata.suite
-          ? [metadata.suite]
+          ? splitSuite(metadata.suite)
           : transformSuiteTitle(test);
 
     let message: string | null = null;
@@ -263,6 +263,14 @@ function transformError(testErrors: TestError[]): CompoundError {
     compound.addStacktrace(e.stack);
   }
   return compound;
+}
+
+// A literal backslash-t (e.g. from String.raw or a data file) also separates levels.
+function splitSuite(suite: string): string[] {
+  return suite
+    .split(/\t|\\t/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
 }
 
 function transformSuiteTitle(test: TestCase): string[] {

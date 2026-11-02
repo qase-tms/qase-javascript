@@ -100,5 +100,16 @@ describe('hooks defensive option handling', () => {
       ).resolves.not.toThrow();
       expect(qaseReporterMock.sendResults).toHaveBeenCalled();
     });
+
+    it('looks up the video by the full spec file name', async () => {
+      const { ResultsManager } = jest.requireMock('../src/metadata/resultsManager');
+      const { FileSearcher } = jest.requireMock('../src/fileSearcher');
+      (ResultsManager.getResults as jest.Mock).mockReturnValueOnce([{ id: 'r1' }]);
+      composeOptionsMock.mockReturnValueOnce({ framework: { cypress: { videosFolder: 'cypress/videos' } } } as any);
+
+      await afterSpecHook({ name: 'auth/login.cy.js', relative: 'cypress/e2e/auth/login.cy.js' } as any, { reporterOptions: null } as any);
+
+      expect(FileSearcher.findVideoFiles).toHaveBeenCalledWith('cypress/videos', 'login.cy.js', 'auth/login.cy.js');
+    });
   });
 });

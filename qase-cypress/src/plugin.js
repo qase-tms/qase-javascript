@@ -1,4 +1,4 @@
-const { afterRunHook, afterSpecHook, beforeRunHook } = require('./hooks');
+const { afterRunHook, afterSpecHook, beforeRunHook, resolveUserOptions } = require('./hooks');
 const { ConfigLoader, composeOptions } = require('qase-javascript-commons');
 const { configSchema } = require('./configSchema');
 
@@ -7,7 +7,7 @@ module.exports = function (on, config) {
   try {
     const configLoader = new ConfigLoader(configSchema);
     const qaseConfig = configLoader.load();
-    const reporterOptions = config.reporterOptions?.['cypressQaseReporterReporterOptions'] ?? {};
+    const reporterOptions = resolveUserOptions(config.reporterOptions);
     const composed = composeOptions(reporterOptions, qaseConfig);
     if (composed.profilers?.includes('network')) {
       profiler.enabled = true;

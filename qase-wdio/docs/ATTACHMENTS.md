@@ -19,7 +19,7 @@ Attachments can be added to:
 
 **Framework Support:**
 - **Mocha/Jasmine:** Programmatic attachment API via `qase.attach()`
-- **Cucumber:** Attachments added via Cucumber's native step attachment API are automatically captured
+- **Cucumber:** `this.attach()` in step definitions, when `QaseWdioService` is registered (see [Cucumber Attachments](#cucumber-attachments)); `qase.attach()` works as well
 
 ---
 
@@ -159,15 +159,25 @@ describe('Test Suite', () => {
 
 ## Cucumber Attachments
 
-Cucumber attachments are automatically captured when using step attachments:
+WebdriverIO does not pass Cucumber attachments on to reporters. Register `QaseWdioService`, which forwards every `this.attach()` call to the Qase reporter:
 
 ```javascript
-const { Given, When, Then } = require('@cucumber/cucumber');
+// wdio.conf.js
+const { QaseWdioService } = require('wdio-qase-reporter');
+
+exports.config = {
+  services: [[QaseWdioService, {}]],
+  // ... other options
+};
+```
+
+```javascript
+const { When } = require('@wdio/cucumber-framework');
 
 When('I take a screenshot', async function() {
   const screenshot = await browser.takeScreenshot();
-  // Cucumber's native attach method
-  this.attach(screenshot, 'image/png');
+  // takeScreenshot() returns base64; the `base64:` prefix makes Cucumber decode it
+  this.attach(screenshot, 'base64:image/png');
 });
 
 When('I log test data', function() {
@@ -175,6 +185,8 @@ When('I log test data', function() {
   this.attach(data, 'application/json');
 });
 ```
+
+The attachment is added to the scenario's result. Without a `fileName` option it is named `attachment` with an extension that matches the media type, such as `attachment.json`.
 
 ---
 
@@ -209,8 +221,8 @@ Attach content to the test case.
 |-----------|------|----------|-------------|
 | `paths` | `string` or `string[]` | No* | Path(s) to file(s) to attach |
 | `content` | `string` or `Buffer` | No* | Content to attach |
-| `name` | `string` | No | Custom filename (auto-detected from path) |
-| `type` | `string` | No | MIME type (auto-detected from extension) |
+| `name` | `string` | No | File name (taken from the path for `paths`; `attachment` for `content`) |
+| `type` | `string` | No | MIME type (detected from the name's extension when omitted) |
 
 \* Either `paths` or `content` must be provided, but not both.
 
@@ -247,7 +259,7 @@ await qase.step('Step name', async (step) => {
 
 ## MIME Types
 
-Common MIME types are auto-detected based on file extension:
+Qase determines an uploaded file's type from its name, so give `name` an extension. When `name` has none and `type` is a common type such as `text/plain` or `application/json`, the reporter appends the matching extension (`log` becomes `log.txt`). MIME types are detected from these extensions:
 
 | Extension | MIME Type |
 |-----------|-----------|
@@ -383,7 +395,7 @@ describe('Test Suite', () => {
    }
    ```
 4. For Mocha/Jasmine, ensure `qase` is imported from `wdio-qase-reporter`
-5. For Cucumber, verify you're using `this.attach()` within step definitions
+5. For Cucumber, verify `QaseWdioService` is registered in `services` when you use `this.attach()`
 
 ### Large Files
 
@@ -404,7 +416,7 @@ When attaching binary data, always specify:
 Ensure:
 - Reporter is properly configured in `wdio.conf.js`
 - `useCucumber: true` is set in reporter options
-- Using `this.attach()` method, not `qase.attach()`
+- `QaseWdioService` is registered in `services`; without it `this.attach()` never reaches the reporter
 
 ---
 

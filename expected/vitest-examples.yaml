@@ -9,8 +9,7 @@ run:
     muted: 0
 results:
 - title: Retrieve all users from JSONPlaceholder API
-  signature: 'User CRUD Operations > GET all users - verify 10 users returned (Qase
-    ID: 1)'
+  signature: 1::test::api-crud.test.ts::user_crud_operations::get_all_users_-_verify_10_users_returned
   status: passed
   fields:
     layer: api
@@ -30,8 +29,7 @@ results:
     execution:
       status: passed
 - title: Retrieve specific user by ID
-  signature: 'User CRUD Operations > GET single user by ID - verify user 1 is Leanne
-    Graham (Qase ID: 2)'
+  signature: 2::test::api-crud.test.ts::user_crud_operations::get_single_user_by_id_-_verify_user_1_is_leanne_graham::{'userid':'1'}
   status: passed
   fields:
     layer: api
@@ -53,8 +51,7 @@ results:
     execution:
       status: passed
 - title: Create new user via POST request
-  signature: 'User CRUD Operations > POST create user - verify 201 response and returned
-    ID (Qase ID: 3)'
+  signature: 3::test::api-crud.test.ts::user_crud_operations::post_create_user_-_verify_201_response_and_returned_id
   status: passed
   fields:
     layer: api
@@ -78,7 +75,7 @@ results:
   - file_name: new-user-payload.json
     mime_type: application/octet-stream
 - title: Delete user by ID
-  signature: 'User CRUD Operations > DELETE user - verify 200 response (Qase ID: 4)'
+  signature: 4::test::api-crud.test.ts::user_crud_operations::delete_user_-_verify_200_response::{'userid':'1'}
   status: passed
   fields:
     layer: api
@@ -100,8 +97,7 @@ results:
     execution:
       status: passed
 - title: Retrieve all posts from JSONPlaceholder API
-  signature: 'Post Validation > GET all posts - verify 100 posts returned (Qase ID:
-    5)'
+  signature: 5::test::api-posts.test.ts::post_validation::get_all_posts_-_verify_100_posts_returned
   status: passed
   fields:
     layer: api
@@ -122,8 +118,7 @@ results:
     execution:
       status: passed
 - title: Retrieve posts for specific user
-  signature: 'Post Validation > GET posts by user ID - verify filtered results (Qase
-    ID: 6)'
+  signature: 6::test::api-posts.test.ts::post_validation::get_posts_by_user_id_-_verify_filtered_results::{'userid':'1'}::{'expectedposts':'10'}
   status: passed
   fields:
     layer: api
@@ -150,8 +145,7 @@ results:
     execution:
       status: passed
 - title: Retrieve post comments and validate structure
-  signature: 'Post Validation > GET post with comments - verify comment structure
-    (Qase ID: 7)'
+  signature: 7::test::api-posts.test.ts::post_validation::get_post_with_comments_-_verify_comment_structure::{'postid':'1'}
   status: passed
   fields:
     layer: api
@@ -180,8 +174,7 @@ results:
   - file_name: first-comment.json
     mime_type: application/octet-stream
 - title: Demonstrate nested step execution
-  signature: 'Advanced Qase Features > Complex nested steps - multi-step user and
-    post retrieval (Qase ID: 11)'
+  signature: 11::test::api-advanced.test.ts::advanced_qase_features::complex_nested_steps_-_multi-step_user_and_post_retrieval::{'userid':'1'}::{'username':'leanne graham'}::{'postcount':'10'}
   status: passed
   fields:
     layer: api
@@ -198,20 +191,29 @@ results:
         public_id: null
   steps:
   - data:
-      action: 'Nested: Validate user data completeness'
+      action: 'Step 1: Retrieve user data'
     execution:
       status: passed
+    steps:
+    - data:
+        action: 'Nested: Validate user data completeness'
+      execution:
+        status: passed
   - data:
-      action: 'Nested: Validate posts belong to user'
+      action: 'Step 2: Retrieve posts for user'
     execution:
       status: passed
+    steps:
+    - data:
+        action: 'Nested: Validate posts belong to user'
+      execution:
+        status: passed
   - data:
       action: 'Step 3: Verify relationship consistency'
     execution:
       status: passed
 - title: Demonstrate suite hierarchy with tab separators
-  signature: 'Advanced Qase Features > Suite hierarchy - demonstrate nested suite
-    structure (Qase ID: 12)'
+  signature: 12::test::api-advanced.test.ts::advanced_qase_features::suite_hierarchy_-_demonstrate_nested_suite_structure
   status: passed
   fields:
     layer: api
@@ -219,7 +221,11 @@ results:
   relations:
     suite:
       data:
-      - title: "API Tests\tAdvanced\tRelationships"
+      - title: API Tests
+        public_id: null
+      - title: Advanced
+        public_id: null
+      - title: Relationships
         public_id: null
   steps:
   - data:
@@ -231,8 +237,7 @@ results:
     execution:
       status: passed
 - title: Verify multiple users with different parameters
-  signature: 'Advanced Qase Features > Parameterized test pattern - demonstrate multiple
-    test parameters (Qase ID: 13)'
+  signature: 13::test::api-advanced.test.ts::advanced_qase_features::parameterized_test_pattern_-_demonstrate_multiple_test_parameters::{'userid':'3'}::{'iteration':'3'}::{'totaliterations':'3'}
   status: passed
   fields:
     layer: api
@@ -264,8 +269,7 @@ results:
     execution:
       status: passed
 - title: Authentication endpoint placeholder
-  signature: 'Advanced Qase Features > Authentication endpoint placeholder (Qase ID:
-    14)'
+  signature: 14::test::api-advanced.test.ts::advanced_qase_features::authentication_endpoint_placeholder
   status: skipped
   relations:
     suite:
@@ -273,8 +277,7 @@ results:
       - title: Advanced Qase Features
         public_id: null
 - title: Verify API returns 404 for non-existent user
-  signature: 'Error Handling > GET non-existent user (404) - verify error status (Qase
-    ID: 8)'
+  signature: 8::test::api-errors.test.ts::error_handling::get_non-existent_user_(404)_-_verify_error_status::{'userid':'999'}
   status: passed
   fields:
     layer: api
@@ -301,8 +304,7 @@ results:
     execution:
       status: passed
 - title: Verify API returns 404 for non-existent post
-  signature: 'Error Handling > GET non-existent post (404) - attach error response
-    (Qase ID: 9)'
+  signature: 9::test::api-errors.test.ts::error_handling::get_non-existent_post_(404)_-_attach_error_response::{'postid':'9999'}
   status: passed
   fields:
     layer: api
@@ -331,8 +333,7 @@ results:
   - file_name: 404-error-response.json
     mime_type: application/octet-stream
 - title: Verify API handles invalid endpoints gracefully
-  signature: 'Error Handling > GET invalid endpoint (404) - verify graceful handling
-    (Qase ID: 10)'
+  signature: 10::test::api-errors.test.ts::error_handling::get_invalid_endpoint_(404)_-_verify_graceful_handling
   status: passed
   fields:
     layer: api

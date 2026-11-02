@@ -20,7 +20,7 @@ import fs from 'fs';
  *     user sets `reporter: 'cypress-qase-reporter'` without the multi-reporter wrapper
  * Returning `null` lets `composeOptions` fall back entirely to the file/env config.
  */
-function resolveUserOptions(reporterOptions: unknown): unknown {
+export function resolveUserOptions(reporterOptions: unknown): unknown {
   if (reporterOptions == null || typeof reporterOptions !== 'object') {
     return null;
   }
@@ -105,7 +105,7 @@ async function afterSpecHook(spec: Spec, options: PluginConfigOptions) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
     const uploadDelay = composedOptions.framework?.cypress?.uploadDelay ?? 10;
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const specFileName = path.basename(spec.name, '.cy.js');
+    const specFileName = path.basename(spec.name);
     
     // Get the relative path from the spec.relative field
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
