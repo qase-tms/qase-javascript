@@ -16,64 +16,73 @@ function hostMatchesDomain(rawUrl: string, domain: string): boolean {
     || url.host.toLowerCase() === normalized;
 }
 
+interface ProfilerConfig {
+  enabled: boolean;
+  skipDomains: string[];
+}
+
+interface RecordedRequest {
+  method: string;
+  url: string;
+  statusCode: number;
+  duration: number;
+  responseBody: string | null;
+  startTime: number;
+}
+
+let recorded: RecordedRequest[] = [];
+
 beforeEach(() => {
-  if (Cypress.env('QASE_PROFILER_ENABLED') !== 'true') {
-    return;
-  }
+  recorded = [];
 
-  let skipDomains: string[] = [];
-  try {
-    const raw = Cypress.env('QASE_PROFILER_SKIP_DOMAINS') as string | undefined;
-    if (raw) {
-      skipDomains = JSON.parse(raw) as string[];
-    }
-  } catch {
-    skipDomains = [];
-  }
-
-  cy.intercept('**', (req) => {
-    const url: string = req.url;
-
-    if (url.includes('/__cypress/')) {
+  // The plugin cannot pass this through `config.env`: Cypress drops changes to the config
+  // unless `setupNodeEvents` returns it, and the documented setup does not.
+  cy.task<ProfilerConfig>('qaseProfilerConfig', null, { log: false }).then((config) => {
+    if (!config?.enabled) {
       return;
     }
 
-    if (['qase.io', ...skipDomains].some((domain) => hostMatchesDomain(url, domain))) {
-      return;
-    }
+    cy.intercept('**', (req) => {
+      const url: string = req.url;
 
-    const startTime = Date.now();
-
-    req.continue((res) => {
-      const duration = Date.now() - startTime;
-      const statusCode: number = res.statusCode;
-
-      let responseBody: string | null = null;
-      if (statusCode >= 400) {
-        const body = res.body as unknown;
-        if (typeof body === 'string') {
-          responseBody = body.slice(0, 10000);
-        } else if (body !== null && body !== undefined) {
-          try {
-            responseBody = JSON.stringify(body).slice(0, 10000);
-          } catch {
-            responseBody = null;
-          }
-        }
+      if (url.includes('/__cypress/')) {
+        return;
       }
 
-      cy.task(
-        'qaseNetworkRequest',
-        {
-          method: req.method,
-          url,
-          statusCode,
-          duration,
-          responseBody,
-          startTime,
-        },
-        { log: false },
-      );
+      if (['qase.io', ...config.skipDomains].some((domain) => hostMatchesDomain(url, domain))) {
+        return;
+      }
+
+      const startTime = Date.now();
+
+      req.continue((res) => {
+        const statusCode: number = res.statusCode;
+
+        let responseBody: string | null = null;
+        if (statusCode >= 400) {
+          const body = res.body as unknown;
+          if (typeof body === 'string') {
+            responseBody = body.slice(0, 10000);
+          } else if (body !== null && body !== undefined) {
+            try {
+              responseBody = JSON.stringify(body).slice(0, 10000);
+            } catch {
+              responseBody = null;
+            }
+          }
+        }
+
+        // cy commands cannot run inside an intercept handler; the requests are sent after the test.
+        recorded.push({ method: req.method, url, statusCode, duration: Date.now() - startTime, responseBody, startTime });
+      });
     });
   });
+});
+
+afterEach(() => {
+  const requests = recorded;
+  recorded = [];
+  for (const request of requests) {
+    cy.task('qaseNetworkRequest', request, { log: false });
+  }
 });

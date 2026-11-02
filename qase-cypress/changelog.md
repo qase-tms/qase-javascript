@@ -1,3 +1,11 @@
+# cypress-qase-reporter@3.8.1
+
+## Fixed
+
+- The network profiler did not work. `import 'cypress-qase-reporter/support'`, as the README says, failed to build with `Package path ./support is not exported`; the package now exports `./support`, with its types, and marks it as having side effects so bundlers keep the import.
+- With the import resolved, the profiler was still off: the plugin passed its settings through `config.env`, which Cypress drops unless `setupNodeEvents` returns the config, and the documented setup does not. The support file now reads them from the plugin through a `qaseProfilerConfig` task.
+- When the profiler was on, every test failed with `Cypress detected that you returned a promise from a command while also invoking one or more cy commands`, because each request was sent with `cy.task` from inside the `cy.intercept` handler. Requests are now collected during the test and sent after it, and each test gets its own requests as REQUEST steps.
+
 # cypress-qase-reporter@3.8.0
 
 ## Added
