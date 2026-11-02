@@ -1,0 +1,48 @@
+qase-javascript-commons/src/qase.ts
+  s_57b503ed365a5f::t_640ff7778e545f 305
+  s_57b503ed365a5f::t_871c328f04f17d 13,98,264,296,302-304,306-307
+qase-javascript-commons/src/state/run-failures.ts
+  s_57b503ed365a5f::t_871c328f04f17d 1-44
+expected/cypress-examples.yaml
+  s_57b503ed365a5f::t_e7e11bc4a3b1c3 3-4,105-423
+qase-javascript-commons/src/writer/writer-interface.ts
+  s_57b503ed365a5f::t_27f5a3d7308578 8
+qase-javascript-commons/src/reporters/report-reporter.ts
+  s_57b503ed365a5f::t_933747b80ad4e7 9-12,62-63,76-78,114-117,143-147,149-152
+qase-javascript-commons/package.json
+  s_57b503ed365a5f::t_d7deefa79c0994 3
+qase-javascript-commons/changelog.md
+  s_57b503ed365a5f::t_d7deefa79c0994 1-7
+qase-javascript-commons/test/writer/fs-writer-read.test.ts
+  s_57b503ed365a5f::t_3246b4aa7baccc 1-43
+qase-javascript-commons/src/writer/fs-writer.ts
+  s_57b503ed365a5f::t_27f5a3d7308578 1,120-140,142-144
+  s_57b503ed365a5f::t_933747b80ad4e7 141
+  s_57b503ed365a5f::t_105c79a8fdd3ea 145-146
+qase-javascript-commons/test/state/run-failures.test.ts
+  s_57b503ed365a5f::t_3246b4aa7baccc 1-27
+qase-javascript-commons/test/reporters/report-reporter.test.ts
+  s_57b503ed365a5f::t_bf464cae5ec8a7 67,82,88-98,100-107,109,111-116,118-135
+  s_57b503ed365a5f::t_10a97eabe14d9e 99,108,110,117
+  s_57b503ed365a5f::t_122eb632d4500e 136-137
+qase-javascript-commons/test/qase-complete.test.ts
+  s_57b503ed365a5f::t_3246b4aa7baccc 1-48
+package-lock.json
+  s_57b503ed365a5f::t_4eca0b54c79322 28033
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4385b6152a08de20530310dff18b47f1399261c2",
+  "prompts": {},
+  "sessions": {
+    "s_57b503ed365a5f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4c6749a7-7eb3-4ee9-891f-611f479b9abc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
