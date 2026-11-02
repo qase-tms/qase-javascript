@@ -66,6 +66,10 @@ export class MetadataAccumulator {
     const qaseType = annotation.message.split(':')[0]?.replace('Qase ', '').toLowerCase().replace(' ', '-') ?? '';
 
     switch (qaseType) {
+      case 'attempt':
+        this.testMetadata.set(testId, { steps: [], attachments: [] });
+        break;
+
       case 'title':
         metadata.title = annotation.message.replace('Qase Title: ', '');
         break;

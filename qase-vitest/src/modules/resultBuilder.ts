@@ -66,19 +66,21 @@ export class ResultBuilder {
     testResult.execution.duration = durationMs;
 
     let error: Error | null = null;
-    if (result.errors && result.errors.length > 0) {
-      const firstError = result.errors[0];
-      if (firstError) {
-        error = new Error(firstError.message);
-        if (firstError.stack) {
-          error.stack = firstError.stack;
+    // A test that passes on a retry keeps the errors of its failed attempts; it still passed.
+    if (result.state !== 'passed' && result.errors && result.errors.length > 0) {
+      // Errors accumulate over retries; the last one is from the attempt that decided the result.
+      const lastError = result.errors[result.errors.length - 1];
+      if (lastError) {
+        error = new Error(lastError.message);
+        if (lastError.stack) {
+          error.stack = lastError.stack;
         }
       }
 
       testResult.execution.stacktrace = result.errors.map((err) => {
         return err.stack ?? err.message;
       }).join('\n');
-      testResult.message = firstError ? firstError.message : 'Test failed';
+      testResult.message = lastError ? lastError.message : 'Test failed';
     }
 
     testResult.execution.status = determineTestStatus(error, result.state);

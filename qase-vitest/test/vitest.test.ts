@@ -60,6 +60,18 @@ describe('vitest.ts - Main functions', () => {
       const wrappedFn = withQase(testFn);
       expect(typeof wrappedFn).toBe('function');
     });
+
+    it('marks a retried attempt before the test body runs', async () => {
+      const { withQase } = require('../src/vitest');
+      const calls: string[] = [];
+      const annotate = jest.fn(async (message: string) => { calls.push(message); });
+      const body = withQase(async ({ qase }: any) => { await qase.title('t'); });
+
+      await body({ annotate, task: { result: { retryCount: 0 } } });
+      await body({ annotate, task: { result: { retryCount: 1 } } });
+
+      expect(calls).toEqual(['Qase Title: t', 'Qase Attempt: 2', 'Qase Title: t']);
+    });
   });
 
   describe('Exports', () => {

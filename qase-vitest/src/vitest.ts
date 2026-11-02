@@ -25,6 +25,10 @@ export const addQaseProjects = (name: string, mapping: ProjectMapping): string =
 // Type for annotate function from Vitest
 type AnnotateFunction = (message: string, options?: unknown) => Promise<void>;
 
+interface RetriedTask {
+  result?: { retryCount?: number; repeatCount?: number };
+}
+
 // Type for qase wrapper functions
 export interface QaseWrapper {
   annotate(message: string, options?: unknown): Promise<void>;
@@ -270,8 +274,15 @@ const createQaseWrapper = (annotate: AnnotateFunction): QaseWrapper => {
 export const withQase = <T extends unknown[]>(
   testFn: (context: TestContextWithQase & T[0]) => unknown
 ) => {
-  return async (context: T[0] & { annotate: AnnotateFunction }) => {
+  return async (context: T[0] & { annotate: AnnotateFunction; task?: RetriedTask }) => {
     const qase = createQaseWrapper(context.annotate);
+    // Annotations of every attempt reach the reporter; this marks where the attempt that is
+    // reported starts, so steps and metadata of failed attempts are dropped.
+    const result = context.task?.result;
+    if (result?.retryCount || result?.repeatCount) {
+      const attempt = String((result.repeatCount ?? 0) + (result.retryCount ?? 0) + 1);
+      await context.annotate(`Qase Attempt: ${attempt}`, { type: 'qase-attempt', body: attempt });
+    }
     return await testFn({ ...context, qase } as TestContextWithQase & T[0]);
   };
 };
