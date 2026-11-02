@@ -1,0 +1,35 @@
+qase-cypress/README.md
+  s_57b503ed365a5f::t_23b128636a72ac 322
+qase-cypress/src/plugin.js
+  s_57b503ed365a5f::t_7cee6128e1e0af 6,13-14,20-25
+  s_57b503ed365a5f::t_c16d684d6aac9e 26
+qase-cypress/test/plugin.test.ts
+  s_57b503ed365a5f::t_f13ffa7d350fc6 69-70
+  s_57b503ed365a5f::t_18944caaa829c9 65-68,71-85
+qase-cypress/changelog.md
+  s_57b503ed365a5f::t_23b128636a72ac 1-8
+qase-cypress/package.json
+  s_57b503ed365a5f::t_1e8b23c15d4a2e 19-20,35-37
+  s_57b503ed365a5f::t_18944caaa829c9 3,6-8
+qase-cypress/src/support.ts
+  s_57b503ed365a5f::t_7cee6128e1e0af 19-22,24-31,33,35-36,38-41,45-56,58-59,61-71,75-77,81-87
+  s_57b503ed365a5f::t_604b0376d4d619 88
+package-lock.json
+  s_57b503ed365a5f::t_338f97f8d72804 28004
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "29f7570d9b586cd7fd3fb074b4ffa7f9438ec179",
+  "prompts": {},
+  "sessions": {
+    "s_57b503ed365a5f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4c6749a7-7eb3-4ee9-891f-611f479b9abc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
