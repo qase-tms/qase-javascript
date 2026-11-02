@@ -1,9 +1,11 @@
 {
   "name": "cypress-qase-reporter",
-  "version": "3.8.0",
+  "version": "3.8.1",
   "description": "Qase Cypress Reporter",
   "homepage": "https://github.com/qase-tms/qase-javascript",
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/support.js"
+  ],
   "main": "./dist/index.cjs.js",
   "types": "./dist/index.cjs.d.ts",
   "exports": {
@@ -14,7 +16,8 @@
     "./plugin": "./dist/plugin.js",
     "./metadata": "./dist/metadata.js",
     "./hooks": "./dist/hooks.js",
-    "./cucumber": "./dist/cucumber.js"
+    "./cucumber": "./dist/cucumber.js",
+    "./support": "./dist/support.js"
   },
   "typesVersions": {
     "*": {
@@ -29,6 +32,9 @@
       ],
       "cucumber": [
         "./dist/cucumber.d.ts"
+      ],
+      "support": [
+        "./dist/support.d.ts"
       ]
     }
   },

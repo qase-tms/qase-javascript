@@ -319,7 +319,7 @@ The Network Profiler automatically captures browser-originated HTTP requests mad
 import 'cypress-qase-reporter/support';
 ```
 
-The support file registers a `beforeEach` hook that installs `cy.intercept('**')` to capture all application HTTP requests. No changes to spec files are needed.
+The support file registers a `beforeEach` hook that installs `cy.intercept('**')` to capture all application HTTP requests. No changes to spec files are needed. It reads the profiler settings from `cypress-qase-reporter/plugin`, so register the plugin in `setupNodeEvents` as shown in [Quick Start](#quick-start).
 
 **Enable in `qase.config.json`:**
 

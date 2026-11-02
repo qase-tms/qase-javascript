@@ -3,20 +3,26 @@ const { ConfigLoader, composeOptions } = require('qase-javascript-commons');
 const { configSchema } = require('./configSchema');
 
 module.exports = function (on, config) {
+  const profiler = { enabled: false, skipDomains: [] };
   try {
     const configLoader = new ConfigLoader(configSchema);
     const qaseConfig = configLoader.load();
     const reporterOptions = config.reporterOptions?.['cypressQaseReporterReporterOptions'] ?? {};
     const composed = composeOptions(reporterOptions, qaseConfig);
     if (composed.profilers?.includes('network')) {
-      config.env['QASE_PROFILER_ENABLED'] = 'true';
-      config.env['QASE_PROFILER_SKIP_DOMAINS'] = JSON.stringify(
-        composed.networkProfiler?.skip_domains ?? []
-      );
+      profiler.enabled = true;
+      profiler.skipDomains = composed.networkProfiler?.skip_domains ?? [];
     }
   } catch (e) {
     // Silent — profiler config errors must not break test runs
   }
+
+  // Read by `cypress-qase-reporter/support` before each test.
+  on('task', {
+    qaseProfilerConfig() {
+      return profiler;
+    },
+  });
 
   on('before:browser:launch', (browser, launchOptions) => {
     config.browser = browser;

@@ -62,4 +62,25 @@ describe('plugin registration', () => {
     const plugin = loadPlugin();
     expect(() => plugin(on, { reporterOptions: null, env: {} })).not.toThrow();
   });
+
+  // Changes to config.env are dropped unless setupNodeEvents returns the config, so the
+  // support file asks for the profiler settings through a task.
+  const profilerTask = (profilers: string[], skip?: string[]) => {
+    // Modules are reset before each test; take the mock the plugin will load.
+    require('qase-javascript-commons').composeOptions.mockReturnValueOnce({ profilers, networkProfiler: { skip_domains: skip } });
+    const tasks: Record<string, Function> = {};
+    const on = jest.fn((event: string, handlers: Record<string, Function>) => {
+      if (event === 'task') Object.assign(tasks, handlers);
+    });
+    loadPlugin()(on, { reporterOptions: null, env: {} });
+    return tasks['qaseProfilerConfig']!();
+  };
+
+  it('tells the support file to profile when the network profiler is on', () => {
+    expect(profilerTask(['network'], ['analytics.test'])).toEqual({ enabled: true, skipDomains: ['analytics.test'] });
+  });
+
+  it('tells the support file not to profile otherwise', () => {
+    expect(profilerTask([])).toEqual({ enabled: false, skipDomains: [] });
+  });
 });
