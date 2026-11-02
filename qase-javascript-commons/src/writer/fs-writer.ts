@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync, copyFileSync, existsSync, readdirSync, lstatSync, unlinkSync, rmdirSync } from 'fs';
+import { mkdirSync, writeFileSync, copyFileSync, existsSync, readdirSync, lstatSync, unlinkSync, rmdirSync, readFileSync } from 'fs';
 import * as path from 'path';
 
 import { WriterInterface } from './writer-interface';
@@ -115,6 +115,33 @@ export class FsWriter implements WriterInterface {
 
     writeFileSync(filePath, await this.formatter.format(result));
 
+  }
+
+  /**
+   * Results already written to the report, by this process or by others sharing the run.
+   */
+  readTestResults(): TestResultType[] {
+    const resultsPath = path.join(this.path, 'results');
+    if (!existsSync(resultsPath)) {
+      return [];
+    }
+
+    const results: TestResultType[] = [];
+    for (const file of readdirSync(resultsPath)) {
+      if (!file.endsWith(`.${this.format}`)) {
+        continue;
+      }
+      try {
+        const content = readFileSync(path.join(resultsPath, file), 'utf8');
+        const json = this.format === FormatEnum.jsonp
+          ? content.slice(content.indexOf('(') + 1, content.lastIndexOf(')'))
+          : content;
+        results.push(JSON.parse(json) as TestResultType);
+      } catch {
+        // Skip a file that cannot be parsed rather than fail the whole report.
+      }
+    }
+    return results;
   }
 
   private deleteFolderRecursive(directoryPath: string) {
