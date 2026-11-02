@@ -1,4 +1,5 @@
 import { TestcafeQaseOptionsType, TestcafeQaseReporter, TestRunInfoType } from './reporter';
+import { TestStartInfoType } from './types';
 
 /**
  * @param {TestcafeQaseOptionsType} options
@@ -16,8 +17,8 @@ export const factory = (options: TestcafeQaseOptionsType) => {
     reportFixtureStart: () => {
       /* empty */
     },
-    reportTestStart: () => {
-      reporter.reportTestStart();
+    reportTestStart: (_name: string, _meta: Record<string, string>, testStartInfo?: TestStartInfoType) => {
+      reporter.reportTestStart(testStartInfo);
     },
     async reportTestDone(
       name: string,

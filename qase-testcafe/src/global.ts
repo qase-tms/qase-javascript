@@ -17,12 +17,12 @@ export class Qase {
     this.reporter = reporter;
   }
 
-  step(step: TestStepType): void {
-    this.reporter.addStep(step);
+  step(step: TestStepType, testRunId?: string | null): void {
+    this.reporter.addStep(step, testRunId);
   }
 
-  attachment(attachment: Attachment): void {
-    this.reporter.addAttachment(attachment);
+  attachment(attachment: Attachment, testRunId?: string | null): void {
+    this.reporter.addAttachment(attachment, testRunId);
   }
 }
 

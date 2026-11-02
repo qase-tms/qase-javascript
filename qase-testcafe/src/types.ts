@@ -72,4 +72,18 @@ export interface TestRunInfoType {
   quarantine: Record<string, Record<'passed', boolean>>;
   skipped: boolean;
   fixture: FixtureType;
+  testId?: string;
+  browsers?: BrowserRunType[];
+}
+
+export interface BrowserRunType {
+  testRunId: string;
+  quarantineAttemptsTestRunIds?: string[];
+}
+
+export interface TestStartInfoType {
+  testRunIds: string[];
+  testId: string;
+  startTime: Date;
+  skipped: boolean;
 }

@@ -465,6 +465,8 @@ Run with configuration:
 QASE_MODE=testops npx testcafe
 ```
 
+Steps and attachments stay with their own test when tests run concurrently (`concurrency`, `-c`), in several browsers or in quarantine mode. With several browsers a test is reported once: its steps come from the first browser, its attachments from all of them. In quarantine mode only the final attempt's steps and attachments are reported.
+
 ---
 
 ## Troubleshooting
