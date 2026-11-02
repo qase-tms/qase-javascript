@@ -256,16 +256,17 @@ export class ResultTransformer {
     groupParams: Record<string, string>,
     params: Record<string, string>,
   ): string[][] {
-    const keys = Object.keys(groupParams);
-    if (keys.length === 0) return [];
-
+    const keys: string[] = [];
     for (const [key, value] of Object.entries(groupParams)) {
       if (value) {
         params[key] = value;
+        keys.push(key);
       }
     }
 
-    return [keys];
+    // The API rejects a group of fewer than two parameters, and the whole batch with it.
+    // A single grouped parameter is an ordinary parameter, which `params` already carries.
+    return keys.length >= 2 ? [keys] : [];
   }
 
   private getRelation(relation: Relation | null): ResultRelations {

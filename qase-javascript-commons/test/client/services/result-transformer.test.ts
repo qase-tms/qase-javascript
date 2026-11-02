@@ -276,6 +276,33 @@ describe('ResultTransformer', () => {
       expect(model.param_groups).toEqual([['browser', 'os']]);
       expect(model.params).toEqual({ browser: 'chrome', os: 'linux' });
     });
+
+    it('should send a single group parameter as an ordinary parameter, since the API rejects a one-item group', () => {
+      const model = transformer.transform(
+        makeResult({ group_params: { env: 'staging' }, params: { browser: 'chrome' } }),
+        mockResolveHash,
+      );
+      expect(model.param_groups).toEqual([]);
+      expect(model.params).toEqual({ browser: 'chrome', env: 'staging' });
+    });
+
+    it('should leave empty group parameters out of the group', () => {
+      const model = transformer.transform(
+        makeResult({ group_params: { env: 'staging', region: '', os: 'linux' }, params: {} }),
+        mockResolveHash,
+      );
+      expect(model.param_groups).toEqual([['env', 'os']]);
+      expect(model.params).toEqual({ env: 'staging', os: 'linux' });
+    });
+
+    it('should not build a group when only one group parameter has a value', () => {
+      const model = transformer.transform(
+        makeResult({ group_params: { env: 'staging', region: '' }, params: {} }),
+        mockResolveHash,
+      );
+      expect(model.param_groups).toEqual([]);
+      expect(model.params).toEqual({ env: 'staging' });
+    });
   });
 
   describe('relations', () => {

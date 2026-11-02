@@ -1,3 +1,9 @@
+## 2.9.9
+
+### Fixed
+
+- A test with a single group parameter no longer makes Qase TestOps reject every result in its batch. `qase.groupParameters({ env: 'staging' })` (or one `@QaseGroupParameters` key) was sent as a group of one, the v2 API answers `param_groups.0 must have at least 2 items` with `400`, and a `400` fails the whole request, so the neighbouring tests' results were lost too and the run was left open. A single group parameter is now sent as an ordinary parameter, and only parameters with a value are put into a group.
+
 ## 2.9.8
 
 ### Changed
