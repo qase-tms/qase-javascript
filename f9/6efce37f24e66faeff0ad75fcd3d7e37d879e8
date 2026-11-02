@@ -1,0 +1,98 @@
+qase-javascript-commons/test/reporters/report-reporter.test.ts
+  s_57b503ed365a5f::t_93c74830a73bf2 82
+qase-javascript-commons/src/client/transport/api-config-builder.ts
+  s_57b503ed365a5f::t_adf926e9c9b9fb 68,76,101
+qase-javascript-commons/src/client/services/attachment-service.ts
+  s_57b503ed365a5f::t_cb765d9c0546dd 117-118
+qase-javascript-commons/test/reporters/abstract-reporter.test.ts
+  s_57b503ed365a5f::t_4842a387c9ebcb 3,8-9
+  s_57b503ed365a5f::t_fc5d2f1a9eac4a 29
+qase-javascript-commons/src/profilers/fetch-interceptor.ts
+  s_57b503ed365a5f::t_0093017be6def8 313
+  s_57b503ed365a5f::t_de7296d008b756 312
+qase-javascript-commons/test/profilers/http-interceptor.test.ts
+  s_57b503ed365a5f::t_fc5d2f1a9eac4a 161,174-176
+qase-javascript-commons/test/qase/options-resolver.test.ts
+  s_57b503ed365a5f::t_fc5d2f1a9eac4a 17-18
+qase-javascript-commons/src/internal/ids-parser.ts
+  s_57b503ed365a5f::t_0093017be6def8 12-13
+qase-javascript-commons/src/client/services/result-transformer.ts
+  s_57b503ed365a5f::t_cb765d9c0546dd 89-91,94,168,170,172,249-250
+  s_57b503ed365a5f::t_fcc926813a84a2 166-167
+qase-javascript-commons/src/profilers/http-interceptor.ts
+  s_57b503ed365a5f::t_0093017be6def8 293
+qase-testcafe/src/modules/metadataParser.ts
+  s_57b503ed365a5f::t_e6e553ac376021 64
+qase-javascript-commons/test/utils/is-axios-error.test.ts
+  s_57b503ed365a5f::t_fc5d2f1a9eac4a 6-9,35,43
+qase-cucumberjs/src/modules/eventStorage.ts
+  s_57b503ed365a5f::t_2dfd5740ee14e5 50
+  s_57b503ed365a5f::t_2b40a31e3bff42 3,49,51
+qase-javascript-commons/src/reporters/testops-multi-reporter.ts
+  s_57b503ed365a5f::t_9d7b0cc0ec40e9 11,19-22,56,68,72-75,77,82,102,143,177,194-196,226-240,242,252,259-262
+.eslintrc.js
+  s_57b503ed365a5f::t_874167fa838c36 42-49
+  s_57b503ed365a5f::t_6c6fa312afc51c 37-41
+qase-javascript-commons/src/qase/options-resolver.ts
+  s_57b503ed365a5f::t_0093017be6def8 36-37
+qase-playwright/src/fixture.ts
+  s_57b503ed365a5f::t_6ac38c379ddc2c 16,24,39
+qase-javascript-commons/src/env/env-to-config.ts
+  s_57b503ed365a5f::t_0093017be6def8 35
+qase-javascript-commons/test/qase-complete.test.ts
+  s_57b503ed365a5f::t_93c74830a73bf2 11,18
+qase-testcafe/src/qase.ts
+  s_57b503ed365a5f::t_e6e553ac376021 29-31
+qase-javascript-commons/src/utils/test-status-utils.ts
+  s_57b503ed365a5f::t_0093017be6def8 40,177
+qase-javascript-commons/test/state/run-failures.test.ts
+  s_57b503ed365a5f::t_93c74830a73bf2 7
+qase-javascript-commons/test/profilers/fetch-interceptor.test.ts
+  s_57b503ed365a5f::t_fc5d2f1a9eac4a 98
+qase-testcafe/src/modules/resultBuilder.ts
+  s_57b503ed365a5f::t_e6e553ac376021 70-71,91-92
+qase-cucumberjs/src/modules/profilerTracker.ts
+  s_57b503ed365a5f::t_9ec2ff16ca1a25 5,11,17,22
+qase-cypress/src/cucumber.ts
+  s_57b503ed365a5f::t_85d4da32fd5a96 68,72
+qase-cypress/src/hooks.ts
+  s_57b503ed365a5f::t_85dc7ef095bace 34-35,54,72,85
+qase-cypress/src/result-builder.ts
+  s_57b503ed365a5f::t_f02a95e5f07dd8 168,245
+qase-cypress/src/skipped-test-handler.ts
+  s_57b503ed365a5f::t_e9b738c120e2fc 7-12,42-44
+qase-cypress/src/support.ts
+  s_57b503ed365a5f::t_1cfeaa2fe1c4f0 40
+qase-javascript-commons/src/qase/reporter-factory.ts
+  s_57b503ed365a5f::t_aa1492c6f6dfe0 13,95-97,102,119
+qase-mocha/src/extraReporters.ts
+  s_57b503ed365a5f::t_c6f55245b18424 8-9,16-17,44,53,92-93,108,121
+qase-mocha/src/reporter.ts
+  s_57b503ed365a5f::t_7debbc597e23ab 30,66,109-112
+qase-playwright/src/annotation-extractor.ts
+  s_57b503ed365a5f::t_9570c336611222 3,20
+qase-playwright/src/metadata-extractor.ts
+  s_57b503ed365a5f::t_077c763204b7bf 109
+qase-playwright/src/reporter.ts
+  s_57b503ed365a5f::t_d6238d337aaad5 88-90
+qase-playwright/src/result-builder.ts
+  s_57b503ed365a5f::t_ad270d0e26900f 79-80,82,127,130,133,143,198,249-253
+qase-wdio/src/finalizer.ts
+  s_57b503ed365a5f::t_2d1107390f1271 51-52,95-96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f96efce37f24e66faeff0ad75fcd3d7e37d879e8",
+  "prompts": {},
+  "sessions": {
+    "s_57b503ed365a5f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4c6749a7-7eb3-4ee9-891f-611f479b9abc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
