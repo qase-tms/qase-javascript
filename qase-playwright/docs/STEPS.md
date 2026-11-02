@@ -101,8 +101,8 @@ When you need to attach an **expected result** or **input data** to a step, wrap
 ```typescript
 qase.step(
   action: string,
-  expectedResult: string | undefined,
-  data: string | undefined,
+  expectedResult?: string,
+  data?: string,
 ): string
 ```
 
@@ -128,7 +128,7 @@ test('Test with expected results', async ({ page }) => {
   );
 
   await test.step(
-    qase.step('Submit form', 'Form should be submitted', undefined),
+    qase.step('Submit form', 'Form should be submitted'),
     async () => {
       await page.click('button[type="submit"]');
     },
@@ -136,7 +136,7 @@ test('Test with expected results', async ({ page }) => {
 });
 ```
 
-> All three positional arguments are required. Pass `undefined` for `expectedResult` or `data` when you don't need them.
+> Only `action` is required. `expectedResult` and `data` are optional: `qase.step('Open page')` and `qase.step('Submit', 'Form is sent')` both work.
 
 ---
 

@@ -16,7 +16,7 @@ export class MetadataExtractor {
         event.script.exec.forEach((line: string) => {
           const [, match] = line.match(MetadataExtractor.qaseIdRegExp) ?? [];
           if (match) {
-            ids.push(...match.split(',').map((id) => Number(id)));
+            ids.push(...match.split(/[\s,]+/).filter(Boolean).map((id) => Number(id)));
           }
         });
       }

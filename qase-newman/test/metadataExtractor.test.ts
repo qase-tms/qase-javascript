@@ -34,6 +34,11 @@ describe('MetadataExtractor.getCaseIds', () => {
     expect(MetadataExtractor.getCaseIds(eventList)).toEqual([]);
   });
 
+  it('extracts ids separated by spaces or commas and spaces', () => {
+    expect(MetadataExtractor.getCaseIds(eventListFromExec(['// qase: 4 5 6']))).toEqual([4, 5, 6]);
+    expect(MetadataExtractor.getCaseIds(eventListFromExec(['// qase: 4, 5,6 ']))).toEqual([4, 5, 6]);
+  });
+
   it('handles `// Qase:` (capital Q)', () => {
     expect(MetadataExtractor.getCaseIds(eventListFromExec(['// Qase: 42']))).toEqual([42]);
   });

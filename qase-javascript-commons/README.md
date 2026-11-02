@@ -12,9 +12,12 @@ use the corresponding reporter module instead:
 * [CucumberJS](https://github.com/qase-tms/qase-javascript/tree/main/qase-cucumberjs#readme)
 * [Cypress](https://github.com/qase-tms/qase-javascript/tree/main/qase-cypress#readme)
 * [Jest](https://github.com/qase-tms/qase-javascript/tree/main/qase-jest#readme)
+* [Mocha](https://github.com/qase-tms/qase-javascript/tree/main/qase-mocha#readme)
 * [Newman](https://github.com/qase-tms/qase-javascript/tree/main/qase-newman#readme)
 * [Playwright](https://github.com/qase-tms/qase-javascript/tree/main/qase-playwright#readme)
 * [TestCafe](https://github.com/qase-tms/qase-javascript/tree/main/qase-testcafe#readme)
+* [Vitest](https://github.com/qase-tms/qase-javascript/tree/main/qase-vitest#readme)
+* [WebdriverIO](https://github.com/qase-tms/qase-javascript/tree/main/qase-wdio#readme)
 
 ## Installation
 
@@ -41,6 +44,9 @@ All configuration options are listed in the table below:
 | Enable debug logs                                                                                                     | `debug`                    | `QASE_DEBUG`                    | `False`                                 | No       | `True`, `False`            |
 | Enable capture logs from `stdout` and `stderr`                                                                        | `captureLogs`              | `QASE_CAPTURE_LOGS`             | `False`                                 | No       | `True`, `False`            |
 | Map test result statuses to different values (format: `fromStatus=toStatus`)                                          | `statusMapping`                     | `QASE_STATUS_MAPPING`                    | undefined                               | No       | Object mapping statuses (e.g., `{"invalid": "failed", "skipped": "passed"}`) |
+| Profilers to enable, in reporters that support them (Cypress, Jest, Playwright, TestCafe, WebdriverIO)                | `profilers`                | N/A                             | `[]`                                    | No       | `["network"]`              |
+| Domains the network profiler does not record                                                                          | `networkProfiler.skip_domains` | N/A                         | `[]`                                    | No       | Array of strings           |
+| Record the response body of failed requests (status >= 400)                                                          | `networkProfiler.track_on_fail` | N/A                        | `true`                                  | No       | `true`, `false`            |
 | **Logging configuration**                                                                                             |                            |                                 |                                         |          |                            |
 | Enable/disable console output for reporter logs                                                                       | `logging.console`          | `QASE_LOGGING_CONSOLE`          | `True`                                  | No       | `True`, `False`            |
 | Enable/disable file output for reporter logs                                                                          | `logging.file`             | `QASE_LOGGING_FILE`             | Same as `debug` setting                 | No       | `True`, `False`            |
@@ -77,12 +83,15 @@ All configuration options are listed in the table below:
 | Project code                                                                                                         | `testops_multi.projects[].code`     | N/A                                       | undefined                               | Yes\*\*  | Any string                 |
 | Project-specific test run title                                                                                      | `testops_multi.projects[].run.title` | N/A                                       | Same as single-project default          | No       | Any string                 |
 | Project-specific test run description                                                                               | `testops_multi.projects[].run.description` | N/A                                | Same as single-project default          | No       | Any string                 |
-| Project-specific test run complete                                                                                  | `testops_multi.projects[].run.complete`    | N/A                                | `true`                                  | No       | `true`, `false`            |
-| Project-specific test run ID                                                                                        | `testops_multi.projects[].run.id`   | N/A                                       | undefined                               | No       | Any integer                |
+| Project-specific test run complete                                                                                  | `testops_multi.projects[].run.complete`    | N/A                                | Global `testops.run.complete`           | No       | `true`, `false`            |
+| Project-specific test run tags                                                                                      | `testops_multi.projects[].run.tags` | N/A                                       | Global `testops.run.tags`               | No       | Array of strings           |
+| Project-specific test run ID                                                                                        | `testops_multi.projects[].run.id`   | N/A                                       | Global `testops.run.id` only if the project has no `run` | No | Any integer       |
 | Project-specific test plan ID                                                                                       | `testops_multi.projects[].plan.id`  | N/A                                       | undefined                               | No       | Any integer                |
 | Project-specific environment                                                                                        | `testops_multi.projects[].environment`     | N/A                                | Uses global `environment` if not set     | No       | Any string                 |
 
 \*\* Required when using `testops_multi` mode
+
+In `testops_multi` mode the global `testops.run` settings are defaults for every project: a project's own `run` overrides only the keys it sets. The global run `id` is used only by projects that have no `run` of their own.
 
 ### Example `qase.config.json` config
 

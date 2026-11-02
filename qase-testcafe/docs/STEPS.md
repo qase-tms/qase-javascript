@@ -121,11 +121,7 @@ test('Test with step attachments', async (t) => {
   await qase.step('Navigate to page', async (s) => {
     await t.navigateTo('https://example.com');
 
-    s.attach({
-      name: 'page-loaded.png',
-      content: await t.takeScreenshot(),
-      type: 'image/png',
-    });
+    s.attach({ paths: await t.takeScreenshot() });
   });
 
   await qase.step('Perform action', async (s) => {

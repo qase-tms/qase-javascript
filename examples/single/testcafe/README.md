@@ -109,8 +109,7 @@ When tests run with Qase reporting enabled:
 | **Parameters** | `qase.parameters({username:'user1'})` | Document test parameters |
 | **Steps** | `await qase.step('name', async () => {})` | Create hierarchical test steps |
 | **Nested Steps** | `await qase.step('parent', async (s1) => { await s1.step('child', ...) })` | Multi-level step nesting |
-| **Attachments** | `qase.attach({name:'file.txt', content:'...', type:'text/plain'})` | Attach files or content |
-| **Comments** | `qase.comment('Additional info')` | Add runtime comments |
+| **Attachments** | `qase.attach({name:'file.txt', content:'...', contentType:'text/plain'})` | Attach files or content |
 | **Ignore** | `qase.ignore()` | Skip reporting to Qase |
 
 ## TestCafe-Specific Patterns
@@ -148,24 +147,20 @@ test.meta(
 });
 ```
 
-### 3. Attachment Type Parameter
+### 3. Attachments
 
-Use `type` (not `contentType`) for MIME type:
+Attach files with `paths` (a path or an array of paths) and in-memory data with `content`.
+Set the MIME type of `content` with `contentType` (`type` is accepted too):
 
 ```javascript
-// ✅ CORRECT
-await qase.attach({
+qase.attach({
   name: 'data.json',
   content: JSON.stringify({key: 'value'}),
-  type: 'application/json'  // Use 'type'
+  contentType: 'application/json'
 });
 
-// ❌ WRONG
-await qase.attach({
-  name: 'data.json',
-  content: JSON.stringify({key: 'value'}),
-  contentType: 'application/json'  // Don't use 'contentType'
-});
+// t.takeScreenshot() returns the path of the saved file
+qase.attach({ paths: await t.takeScreenshot() });
 ```
 
 ### 4. Async Steps
@@ -256,7 +251,7 @@ These are publicly available demo credentials for testing purposes only.
 ### Common Issues
 
 1. **Missing `.create()`**: If tests don't report to Qase, ensure all `.meta()` calls end with `.create()`
-2. **Wrong attachment parameter**: Use `type` not `contentType` for attachments
+2. **Screenshot attached as text**: `t.takeScreenshot()` returns a file path, so pass it as `paths`, not `content`
 3. **Step not awaited**: All `qase.step()` calls must be awaited in TestCafe
 4. **Browser not found**: Install Chrome or modify package.json to use a different browser
 

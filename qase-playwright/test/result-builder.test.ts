@@ -196,6 +196,16 @@ describe('ResultBuilder feature flags and merging', () => {
     expect(r.fields['is_flaky']).toBeUndefined();
   });
 
+  it.each([
+    ['a real tab', 'Parent\tChild\tLeaf'],
+    ['a literal backslash-t', 'Parent\\tChild\\tLeaf'],
+  ])('splits qase.suite() on %s into a hierarchy', (_label, suite) => {
+    const r = builder.build(defaultArgs({ metadata: { ...emptyMetadata(), suite } }))!;
+    expect(
+      r.relations.suite.data.map((s: { title: string }) => s.title),
+    ).toEqual(['Parent', 'Child', 'Leaf']);
+  });
+
   it('filters test.title out of suites', () => {
     const test = makeTest('login', ['root', 'login']);
     const r = builder.build(defaultArgs({ test }))!;

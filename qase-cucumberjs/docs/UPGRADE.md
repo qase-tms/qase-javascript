@@ -28,7 +28,7 @@ Version 2.2.0 includes:
 
 - Full support for Qase TestOps API with batch result upload
 - Gherkin tag-based test case linking: `@QaseID=1`
-- Field annotations via tags: `@QaseFields={'severity':'high'}`
+- Field annotations via tags: `@QaseFields={'severity':'critical'}`
 - Native Gherkin step reporting (Given/When/Then/And)
 - Native attachment support via `this.attach()` in step definitions
 - Multi-project support for reporting to multiple Qase projects
@@ -101,7 +101,7 @@ Feature: User Authentication
     Then I should see the dashboard
 
   @QaseID=2
-  @QaseFields={'severity':'high','priority':'critical'}
+  @QaseFields={'severity':'critical','priority':'high'}
   Scenario: Failed login with invalid credentials
     Given I am on the login page
     When I enter invalid credentials
@@ -112,7 +112,7 @@ Feature: User Authentication
 ### Field Annotations
 
 ```gherkin
-@QaseFields={'severity':'high','priority':'medium','layer':'e2e'}
+@QaseFields={'severity':'critical','priority':'medium','layer':'e2e'}
 Scenario: User can update profile
   Given I am logged in
   When I update my profile information
@@ -121,9 +121,9 @@ Scenario: User can update profile
 
 **Supported field formats:**
 
-- Single quotes: `@QaseFields={'severity':'high'}`
-- Double quotes: `@QaseFields={"severity":"high"}`
-- Mixed: `@QaseFields={'severity':"high","priority":'medium'}`
+- Single quotes: `@QaseFields={'severity':'critical'}`
+- Double quotes: `@QaseFields={"severity":"critical"}`
+- Mixed: `@QaseFields={'severity':"critical","priority":'medium'}`
 
 ---
 
@@ -253,13 +253,13 @@ Scenario: Test scenario
 
 ```gherkin
 # Correct - single quotes for object
-@QaseFields={'severity':'high','priority':'medium'}
+@QaseFields={'severity':'critical','priority':'medium'}
 
 # Also correct - double quotes
-@QaseFields={"severity":"high","priority":"medium"}
+@QaseFields={"severity":"critical","priority":"medium"}
 
 # Incorrect - missing quotes
-@QaseFields={severity:high,priority:medium}
+@QaseFields={severity:critical,priority:medium}
 ```
 
 #### Issue: Attachments not appearing in Qase

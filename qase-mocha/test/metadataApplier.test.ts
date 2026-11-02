@@ -82,4 +82,13 @@ describe('MetadataApplier', () => {
     expect(m.mute).toBe(false);
     expect(m.attachments).toEqual([]);
   });
+
+  it('gives every attachment its own id, so two files with the same name do not overwrite each other', () => {
+    applier.applyAttach({ name: 'log.txt', content: 'a' });
+    applier.applyAttach({ paths: ['/tmp/log.txt'] });
+
+    const ids = applier.get().attachments!.map((a) => a.id);
+    expect(ids.every((id) => id.length > 0)).toBe(true);
+    expect(new Set(ids).size).toBe(2);
+  });
 });

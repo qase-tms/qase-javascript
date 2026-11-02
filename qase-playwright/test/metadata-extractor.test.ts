@@ -58,6 +58,14 @@ describe('MetadataExtractor', () => {
     expect(m.parameters).toEqual({ browser: 'chrome' });
   });
 
+  it('merges repeated qase.fields() calls, later keys win', () => {
+    const m = extractor.transform([
+      makeMetadataAttachment({ fields: { severity: 'major', priority: 'low' } }),
+      makeMetadataAttachment({ fields: { priority: 'high', layer: 'e2e' } }),
+    ]);
+    expect(m.fields).toEqual({ severity: 'major', priority: 'high', layer: 'e2e' });
+  });
+
   it('parses ignore/suite/comment/groupParams', () => {
     const m = extractor.transform([
       makeMetadataAttachment({

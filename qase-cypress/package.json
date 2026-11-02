@@ -1,13 +1,13 @@
 {
   "name": "cypress-qase-reporter",
-  "version": "3.8.1",
+  "version": "3.8.2",
   "description": "Qase Cypress Reporter",
   "homepage": "https://github.com/qase-tms/qase-javascript",
   "sideEffects": [
     "./dist/support.js"
   ],
   "main": "./dist/index.cjs.js",
-  "types": "./dist/index.cjs.d.ts",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": "./dist/index.js",
     "./mocha": "./dist/mocha.js",

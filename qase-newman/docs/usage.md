@@ -79,6 +79,8 @@ pm.test('User ID is correct', function() {
 });
 ```
 
+Names in `qase.parameters` match data file keys regardless of case. Parameters are reported with the names and values exactly as they are in the data file, and each set of values is reported as a separate result in Qase.
+
 ### Example Data File
 
 Create a `data.json` file:
@@ -197,7 +199,8 @@ Newman test results are mapped to Qase statuses:
 |---------------|-------------|-------------|
 | Passed | passed | Test assertion succeeded |
 | Failed | failed | Test assertion failed |
-| Skipped | skipped | Test was not executed |
+| Skipped | skipped | The request was skipped with `pm.execution.skipRequest()` |
+| Error | invalid | A pre-request or test script threw an error, or the request itself failed (for example, connection refused) |
 
 ---
 
@@ -325,7 +328,7 @@ newman run ./api-tests.json \
    ```json
    {
      "debug": true,
-     "TestOps": {
+     "testops": {
        "api": { "token": "..." },
        "project": "DEMO"
      }

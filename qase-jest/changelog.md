@@ -1,3 +1,19 @@
+# jest-qase-reporter@2.8.1
+
+## Fixed
+
+- `qase.attach({ paths: 'file.txt' })` with a single path as a string attached each character of the path as a separate file, and the whole report then failed to publish. A string is now treated as one path, the same as an array with one element.
+- `qase.attach()` ignored the documented `contentType` option and only read `type`, so attachments were sent as `application/octet-stream`. `contentType` is now used for content and file attachments; `type` still works.
+- `qase.comment()` on a failed test replaced the test's error message. The result message is now the comment, a blank line, then the error message, as in the Playwright and Mocha reporters.
+- `qase.suite('A\tB')` created one suite named `A\tB` instead of a suite `B` inside `A`. Suites are now split on a tab character or the literal characters `\t`.
+- A `qase.step()` called inside another step was reported as a separate top-level step, after its parent. Nested steps are now reported under their parent, in the order they started.
+- `qase.attach()` called inside a `qase.step()` added the attachment to the test. It is now added to the step that is running.
+- A second `qase.fields()` call replaced the fields set by the first one. Calls are now merged; a later value for the same field wins.
+
+## Documentation
+
+- The upgrade guide said `mode: 'TestOps'`; the value is lowercase `testops`.
+
 # jest-qase-reporter@2.8.0
 
 ## Fixed

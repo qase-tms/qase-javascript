@@ -7,4 +7,4 @@ This example uses `mode: 'testops_multi'` and `testops_multi` config. Use tags i
 
 Legacy `@QaseID=1` and `@Q-1` remain for single-project.
 
-Run: `npm test` (set `QASE_TOKEN` and use real project codes in `qase.config.json`).
+Run: `npm test` (set `QASE_TESTOPS_API_TOKEN` and use real project codes in `qase.config.json`).

@@ -6,6 +6,9 @@ import Mocha from 'mocha';
 const upstream = {
   startTestRunAsync: jest.fn(async () => undefined),
   publish: jest.fn(async () => undefined),
+  sendResults: jest.fn(async () => undefined),
+  complete: jest.fn(async () => undefined),
+  setTestResults: jest.fn((_results: any[]) => undefined),
   addTestResult: jest.fn(async (_result: any) => undefined),
   isCaptureLogs: jest.fn(() => false),
 };
@@ -23,6 +26,7 @@ jest.mock('qase-javascript-commons', () => {
 });
 
 import { MochaQaseReporter } from '../src/reporter';
+const QaseParallelReporter = require('../src/parallel');
 
 type Body = (this: any) => void;
 
@@ -122,5 +126,107 @@ describe('MochaQaseReporter with real Mocha', () => {
     const stdout = results[0].attachments.find((a: any) => a.file_name === 'stdout.txt');
     expect(stdout.content).toBe('from the test\n');
     expect(stdout.id).not.toBe('');
+  });
+  it('keeps only the last attempt\'s tags and comment when a test is retried', async () => {
+    const results = await run((root) => {
+      const s = suite(root, 'S');
+      s.retries(2);
+      let attempt = 0;
+      s.addTest(test('flaky', function (this: any) {
+        attempt++;
+        this.tags('smoke');
+        this.comment(`attempt ${attempt}`);
+        if (attempt < 3) throw new Error('not yet');
+      }));
+    });
+    expect(results).toHaveLength(1);
+    expect(results[0].tags).toEqual(['smoke']);
+    expect(results[0].message).toBe('attempt 3');
+  });
+
+  it('gives a skipped test its own start time', async () => {
+    const results = await run((root) => {
+      const s = suite(root, 'S');
+      s.addTest(test('slow', () => {
+        const until = Date.now() + 50;
+        while (Date.now() < until) { /* busy wait */ }
+      }));
+      s.addTest(new Mocha.Test('skipped'));
+    });
+    const slow = results.find((r) => r.title === 'slow');
+    const skipped = results.find((r) => r.title === 'skipped');
+    expect(skipped.execution.status).toBe('skipped');
+    expect(skipped.execution.start_time).toBeGreaterThanOrEqual(slow.execution.end_time);
+  });
+});
+
+describe('MochaQaseReporter in parallel mode', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    upstream.isCaptureLogs.mockReturnValue(false);
+  });
+
+  const Events = Mocha.Runner.constants;
+  const mainRunner = () => {
+    const runner: any = new Mocha.Runner(new Mocha.Suite('root'));
+    runner.workerReporter = jest.fn();
+    return runner;
+  };
+
+  it('starts the run before the workers and completes it once at the end', async () => {
+    const runner = mainRunner();
+    const options: any = { parallel: true, globalSetup: [], globalTeardown: [] };
+    new MochaQaseReporter(runner, options);
+
+    // Mocha awaits these around the parallel run; workers are forked after the setup.
+    for (const fn of options.globalSetup) await fn();
+    expect(upstream.startTestRunAsync).toHaveBeenCalledTimes(1);
+
+    runner.emit(Events.EVENT_RUN_BEGIN);
+    runner.emit(Events.EVENT_RUN_END);
+    for (const fn of options.globalTeardown) await fn();
+    expect(upstream.startTestRunAsync).toHaveBeenCalledTimes(1);
+    expect(upstream.complete).toHaveBeenCalledTimes(1);
+    expect(upstream.publish).not.toHaveBeenCalled();
+  });
+
+  it('runs extra reporters in the main process', () => {
+    const runner = mainRunner();
+    const log = jest.spyOn(process.stdout, 'write').mockImplementation(() => true);
+    new MochaQaseReporter(runner, { parallel: true, reporterOptions: { extraReporters: 'json' } } as any);
+    runner.emit(Events.EVENT_RUN_BEGIN);
+    runner.emit(Events.EVENT_RUN_END);
+    const printed = log.mock.calls.map((c) => String(c[0])).join('\n');
+    log.mockRestore();
+    expect(printed).toContain('"passes"');
+  });
+
+  it('in a worker, sends its results without starting or completing the run', async () => {
+    await new Promise<void>((resolve) => {
+      const mocha = new Mocha({ reporter: QaseParallelReporter as any });
+      mocha.suite.addTest(test('in worker', () => {}));
+      mocha.run(() => resolve());
+    });
+    expect(upstream.addTestResult).toHaveBeenCalledTimes(1);
+    expect(upstream.startTestRunAsync).not.toHaveBeenCalled();
+    expect(upstream.publish).not.toHaveBeenCalled();
+    expect(upstream.sendResults).toHaveBeenCalledTimes(1);
+    // The worker's reporter instance is reused for its next file.
+    expect(upstream.setTestResults).toHaveBeenCalledWith([]);
+  });
+
+  it('in a worker, does not run extra reporters', async () => {
+    const log = jest.spyOn(process.stdout, 'write').mockImplementation(() => true);
+    await new Promise<void>((resolve) => {
+      const mocha = new Mocha({
+        reporter: QaseParallelReporter as any,
+        reporterOptions: { extraReporters: 'json' },
+      });
+      mocha.suite.addTest(test('in worker', () => {}));
+      mocha.run(() => resolve());
+    });
+    const printed = log.mock.calls.map((c) => String(c[0])).join('\n');
+    log.mockRestore();
+    expect(printed).not.toContain('"passes"');
   });
 });

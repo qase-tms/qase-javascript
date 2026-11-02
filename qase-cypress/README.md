@@ -88,9 +88,9 @@ npx cypress run
 
 The reporter is configured via (in order of priority):
 
-1. **cypress.config.js** (Cypress-specific, highest priority)
-2. **Environment variables** (`QASE_*`)
-3. **Config file** (`qase.config.json`)
+1. **Environment variables** (`QASE_*`, highest priority)
+2. **Config file** (`qase.config.json`)
+3. **cypress.config.js** (`reporterOptions`, lowest priority)
 
 ### Minimal Configuration
 
@@ -343,7 +343,7 @@ The support file registers a `beforeEach` hook that installs `cy.intercept('**')
 
 ## Requirements
 
-- Node.js >= 14
+- Node.js >= 18
 - Cypress >= 10.0.0
 
 ## Documentation

@@ -38,7 +38,6 @@ function emptyMetadata(): Metadata {
     steps: [],
     cucumberSteps: [],
     currentStepId: undefined,
-    firstStepName: undefined,
     attachments: [],
     stepAttachments: {},
   } as unknown as Metadata;

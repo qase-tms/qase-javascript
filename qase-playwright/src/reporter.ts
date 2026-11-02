@@ -21,9 +21,10 @@ import { StepConverter } from './step-converter';
 import { MetadataExtractor } from './metadata-extractor';
 import { ResultBuilder } from './result-builder';
 import { readErrorContext } from './error-context';
+import { configSchema } from './configSchema';
 
 export type PlaywrightQaseOptionsType = Omit<ConfigType, 'reporterOptions'> & {
-  framework: ReporterOptionsType;
+  framework?: ReporterOptionsType;
 };
 
 /**
@@ -81,12 +82,17 @@ export class PlaywrightQaseReporter implements Reporter {
    */
   public constructor(
     options: PlaywrightQaseOptionsType,
-    configLoader = new ConfigLoader(),
+    configLoader = new ConfigLoader(configSchema),
   ) {
     const config = configLoader.load();
     const { framework, ...composedOptions } = composeOptions(options, config);
 
-    this.options = options.framework ?? {};
+    // Inline options are flat (`framework.browser`), the config file nests them under
+    // `framework.playwright`; inline wins to keep the pre-file-support precedence.
+    this.options = composeOptions(
+      config?.framework?.playwright,
+      options.framework,
+    );
     this.uploadAttachments = composedOptions.testops?.uploadAttachments ?? true;
 
     this.reporter = QaseReporter.getInstance({

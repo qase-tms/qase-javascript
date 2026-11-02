@@ -248,7 +248,8 @@ import { Given } from '@wdio/cucumber-framework';
 
 Given('I take a screenshot', async function () {
   const screenshot = await browser.takeScreenshot();
-  await this.attach(screenshot, 'image/png');
+  // takeScreenshot() returns base64, so tell Cucumber to decode it
+  await this.attach(screenshot, 'base64:image/png');
 });
 ```
 
@@ -374,19 +375,23 @@ qase.step('Step name', async () => {
 
 #### Issue: Cucumber attachments not appearing
 
-**Solution:** Use native `this.attach()` in step definitions:
+**Solution:** WebdriverIO does not pass Cucumber attachments to reporters. Register `QaseWdioService` (it forwards `this.attach()` to the Qase reporter), or use `qase.attach()`:
 
 ```javascript
-// Correct - in step definition
+// wdio.conf.js
+const { QaseWdioService } = require('wdio-qase-reporter');
+
+exports.config = {
+  services: [[QaseWdioService, {}]],
+};
+```
+
+```javascript
+// In a step definition
 When('I capture screenshot', async function () {
   const screenshot = await browser.takeScreenshot();
-  await this.attach(screenshot, 'image/png');
-});
-
-// Incorrect - qase.attach() not supported in Cucumber mode
-When('I capture screenshot', async () => {
-  const screenshot = await browser.takeScreenshot();
-  await qase.attach({ content: screenshot }); // Error
+  // takeScreenshot() returns base64, so tell Cucumber to decode it
+  await this.attach(screenshot, 'base64:image/png');
 });
 ```
 

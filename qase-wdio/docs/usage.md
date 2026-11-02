@@ -138,7 +138,15 @@ it('Critical login test', () => {
 
 ### Cucumber Example
 
-Cucumber does not support fields via tags. Use fields in step definitions:
+Set fields with the `@QaseFields` tag (JSON without spaces; single quotes are allowed):
+
+```gherkin
+@QaseFields={'severity':'critical','priority':'high'}
+Scenario: Critical login test
+  Given I open the login page
+```
+
+Or call `qase.fields()` in a step definition:
 
 ```javascript
 // In step definition file
@@ -146,8 +154,8 @@ import { qase } from 'wdio-qase-reporter';
 
 Given('I have set test metadata', () => {
   qase.fields({
-    severity: 'high',
-    priority: 'critical',
+    severity: 'critical',
+    priority: 'high',
   });
 });
 ```

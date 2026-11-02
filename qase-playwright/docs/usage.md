@@ -396,7 +396,7 @@ test('Test with expected results', async ({ page }) => {
 });
 ```
 
-> All three positional arguments of `qase.step()` are required. Pass `undefined` for `expectedResult` or `data` when you don't need them.
+> Only `action` is required. `expectedResult` and `data` are optional: `qase.step('Open page')` and `qase.step('Submit', 'Form is sent')` both work.
 
 > For more details, see [Steps Guide](STEPS.md).
 
@@ -821,12 +821,12 @@ test(qase(201, 'GET /users returns 200'), async () => {
 
 **Solutions:**
 
-1. Verify `mode` is set to `TestOps` in playwright.config.ts:
+1. Verify `mode` is set to `testops` in playwright.config.ts:
    ```typescript
    reporter: [
      [
        'playwright-qase-reporter',
-       { mode: 'TestOps', TestOps: { ... } }
+       { mode: 'testops', testops: { ... } }
      ],
    ]
    ```
@@ -837,7 +837,7 @@ test(qase(201, 'GET /users returns 200'), async () => {
 
 3. Verify project code is correct:
    ```typescript
-   TestOps: {
+   testops: {
      project: 'DEMO', // Check this matches your project
    }
    ```
@@ -846,7 +846,7 @@ test(qase(201, 'GET /users returns 200'), async () => {
    ```typescript
    {
      debug: true,
-     TestOps: { ... }
+     testops: { ... }
    }
    ```
 
@@ -911,7 +911,7 @@ test(qase(201, 'GET /users returns 200'), async () => {
 
 1. Verify `uploadAttachments` is enabled:
    ```typescript
-   TestOps: {
+   testops: {
      uploadAttachments: true,
    }
    ```

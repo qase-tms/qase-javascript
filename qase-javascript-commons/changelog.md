@@ -1,3 +1,14 @@
+## 2.9.11
+
+### Fixed
+
+- Gherkin steps are sent with their keyword and text (`Given a user`); TestOps got only the `keyword` field, and the local report joined keyword and text even when a reporter had put the text in both, which printed it twice. Pairs with `cucumberjs-qase-reporter` 2.6.1, which fills in the real keyword.
+
+### Documentation
+
+- The README now lists the `profilers`, `networkProfiler.skip_domains` and `networkProfiler.track_on_fail` options, and the Mocha, Vitest and WebdriverIO reporters.
+- The `testops_multi` rows now describe how a project's `run` inherits the global run settings: `run.complete` and `run.tags` default to the global values, and the global `run.id` is used only by projects without their own `run`. The table said a project's `run.complete` defaulted to `true`.
+
 ## 2.9.10
 
 ### Fixed

@@ -58,7 +58,7 @@ test('Test with text content attachment', async (t) => {
   qase.attach({
     name: 'execution.log',
     content: logContent,
-    type: 'text/plain',
+    contentType: 'text/plain',
   });
 
   await t.expect(true).ok();
@@ -73,13 +73,9 @@ import { qase } from 'testcafe-reporter-qase/qase';
 test('Test with screenshot attachment', async (t) => {
   await t.navigateTo('https://example.com');
 
-  const screenshot = await t.takeScreenshot();
+  const screenshotPath = await t.takeScreenshot();
 
-  qase.attach({
-    name: 'page-screenshot.png',
-    content: screenshot,
-    type: 'image/png',
-  });
+  qase.attach({ paths: screenshotPath });
 
   await t.expect('#header').exists;
 });
@@ -100,7 +96,7 @@ test('Test with JSON data attachment', async (t) => {
   qase.attach({
     name: 'test-data.json',
     content: JSON.stringify(testData, null, 2),
-    type: 'application/json',
+    contentType: 'application/json',
   });
 
   await t.expect(true).ok();
@@ -120,11 +116,7 @@ test('Test with step-level attachments', async (t) => {
   await qase.step('Navigate and capture screenshot', async (s) => {
     await t.navigateTo('https://example.com/login');
 
-    s.attach({
-      name: 'login-page.png',
-      content: await t.takeScreenshot(),
-      type: 'image/png',
-    });
+    s.attach({ paths: await t.takeScreenshot() });
   });
 
   await qase.step('Perform action', async (s) => {
@@ -149,10 +141,10 @@ Attach content to the test case.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `paths` | `string[]` | No* | Array of path(s) to file(s) to attach |
+| `paths` | `string` or `string[]` | No* | Path or paths of files to attach; the name and MIME type come from the file |
 | `content` | `string` or `Buffer` | No* | Content to attach |
-| `name` | `string` | No | Custom filename (auto-detected from path) |
-| `type` | `string` | No | MIME type (auto-detected from extension) |
+| `name` | `string` | No | File name for `content` (default `attachment`) |
+| `contentType` | `string` | No | MIME type for `content` (default `application/octet-stream`); `type` is accepted as an alias |
 
 \* Either `paths` or `content` must be provided, but not both.
 
@@ -167,13 +159,13 @@ qase.attach({ paths: ['path/to/file.txt'] });
 qase.attach({
   name: 'log.txt',
   content: 'Test log content',
-  type: 'text/plain',
+  contentType: 'text/plain',
 });
 ```
 
 ### Step-level Attachment
 
-Within a step callback, use the step parameter:
+Within a step callback, use the step parameter. `step.attach()` takes the MIME type of `content` as `type`:
 
 ```javascript
 await qase.step('Step name', async (s) => {
@@ -206,7 +198,7 @@ Common MIME types are auto-detected based on file extension:
 | `.pdf` | `application/pdf` |
 | `.zip` | `application/zip` |
 
-For other file types, specify `type` explicitly.
+For `content` attachments, set `contentType` (in `step.attach()`, `type`).
 
 ---
 
@@ -221,13 +213,9 @@ test('Test with TestCafe screenshot', async (t) => {
   await t.navigateTo('https://example.com');
 
   // Take screenshot using TestCafe
-  const screenshot = await t.takeScreenshot();
+  const screenshotPath = await t.takeScreenshot();
 
-  qase.attach({
-    name: 'page-state.png',
-    content: screenshot,
-    type: 'image/png',
-  });
+  qase.attach({ paths: screenshotPath });
 
   await t.expect('#main-content').exists;
 });
@@ -249,7 +237,7 @@ test('Test with page source attachment', async (t) => {
   qase.attach({
     name: 'page-source.html',
     content: pageSource,
-    type: 'text/html',
+    contentType: 'text/html',
   });
 
   await t.expect('#header').exists;
@@ -267,11 +255,7 @@ test('Test with failure screenshot', async (t) => {
     await t.expect('#nonexistent-element').exists;
   } catch (error) {
     // Capture screenshot on failure
-    qase.attach({
-      name: 'failure-screenshot.png',
-      content: await t.takeScreenshot(),
-      type: 'image/png',
-    });
+    qase.attach({ paths: await t.takeScreenshot() });
 
     throw error;
   }
@@ -300,7 +284,7 @@ test('Test with request logs', async (t) => {
   qase.attach({
     name: 'request-log.json',
     content: JSON.stringify(logger.requests, null, 2),
-    type: 'application/json',
+    contentType: 'application/json',
   });
 
   await t.expect(logger.requests.length).gt(0);
@@ -333,7 +317,7 @@ Large attachments may slow down test execution. Consider:
 
 When attaching binary data, always specify:
 - `name` with appropriate extension
-- `type` if extension doesn't match content type
+- `contentType` (in `step.attach()`, `type`) with the MIME type
 
 ---
 

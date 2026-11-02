@@ -1,3 +1,18 @@
+# wdio-qase-reporter@1.8.1
+
+## Fixed
+
+- Attachments without a file extension showed up in Qase as `application/octet-stream`, because Qase takes the type from the file name. The WebDriver step attachments are now named `Request.json` and `Response.json`/`Response.txt`, and `qase.attach({ name: 'log', type: 'text/plain', content })` uploads `log.txt`. `qase.attach()` with `content` and no `type` takes the MIME type from the name's extension instead of always using `application/octet-stream`.
+- Cucumber: `this.attach()` in step definitions was lost, because WebdriverIO does not pass Cucumber attachments to reporters. With `QaseWdioService` registered, the attachments are added to the scenario's result. Text, `base64:` strings, Buffers and streams are supported; the `fileName` option is used as the name.
+- Cucumber: the network profiler of `QaseWdioService` recorded requests but never reported them, since it only used Mocha's `beforeTest`/`afterTest` hooks. The requests of a scenario are now added to that scenario's result.
+
+## Documentation
+
+- Cucumber fields can be set with `@QaseFields`; the example that said otherwise used the invalid severity `high`.
+- Cucumber screenshot examples use `this.attach(screenshot, 'base64:image/png')`; `takeScreenshot()` returns base64, which `'image/png'` stored as text.
+- Cucumber attachments and network profiling require `QaseWdioService`.
+- The README says to keep the Qase settings in `qase.config.json` or environment variables: `beforeRunHook` and `afterRunHook` run in the launcher and do not see the reporter options.
+
 # wdio-qase-reporter@1.8.0
 
 ## Added

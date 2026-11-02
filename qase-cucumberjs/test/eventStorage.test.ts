@@ -54,8 +54,9 @@ describe('EventStorage', () => {
     expect(sc?.parameters).toEqual({ row1: { env: 'prod', region: 'eu' } });
   });
 
-  it('addAttachment keys both testStepId and testCaseStartedId', () => {
+  it('addAttachment keys step attachments by attempt and step, test attachments by attempt', () => {
     storage.addAttachment({
+      testCaseStartedId: 'tcs1',
       testStepId: 'step1',
       mediaType: 'image/png',
       body: 'data',
@@ -68,8 +69,8 @@ describe('EventStorage', () => {
       contentEncoding: 'IDENTITY',
     } as any);
 
-    expect(storage.getAttachments('step1')).toHaveLength(1);
-    expect(storage.getAttachments('step1')[0]?.mime_type).toBe('image/png');
+    expect(storage.getStepAttachments('tcs1', 'step1')).toHaveLength(1);
+    expect(storage.getStepAttachments('tcs1', 'step1')[0]?.mime_type).toBe('image/png');
     expect(storage.getAttachments('tcs1')).toHaveLength(1);
     expect(storage.getAttachments('tcs1')[0]?.mime_type).toBe('text/plain');
     expect(storage.getAttachments('missing')).toEqual([]);
@@ -79,5 +80,58 @@ describe('EventStorage', () => {
     const finished = { testStepId: 's1', testCaseStartedId: 'tcs1', testStepResult: { status: 'PASSED', duration: { seconds: 0, nanos: 0 } } } as unknown as TestStepFinished;
     storage.addTestStepFinished(finished);
     expect(storage.getTestStepFinished('s1')).toBe(finished);
+  });
+
+  it('addScenario keeps the keyword of background, scenario and Rule steps', () => {
+    const doc = {
+      feature: {
+        name: 'F',
+        children: [
+          { background: { steps: [{ id: 'b1', keyword: 'Given ' }] } },
+          { scenario: { id: 'sc', steps: [{ id: 's1', keyword: 'When ' }], examples: [] } },
+          { rule: { id: 'r', children: [
+            { background: { steps: [{ id: 'rb1', keyword: 'And ' }] } },
+            { scenario: { id: 'rsc', steps: [{ id: 'rs1', keyword: 'Then ' }], examples: [] } },
+          ] } },
+        ],
+      },
+    } as unknown as GherkinDocument;
+    storage.addScenario(doc);
+    expect(['b1', 's1', 'rb1', 'rs1'].map((id) => storage.getStepKeyword(id))).toEqual(['Given', 'When', 'And', 'Then']);
+  });
+
+  it('addScenario finds scenarios nested in a Rule', () => {
+    const doc = {
+      feature: {
+        name: 'Feature R',
+        children: [{
+          rule: {
+            id: 'rule1',
+            children: [{
+              scenario: {
+                id: 'sc-r',
+                steps: [],
+                examples: [{
+                  tableHeader: { cells: [{ value: 'v' }] },
+                  tableBody: [{ id: 'row-r', cells: [{ value: '1' }] }],
+                }],
+              },
+            }],
+          },
+        }],
+      },
+    } as unknown as GherkinDocument;
+    storage.addScenario(doc);
+    const sc = storage.getScenario('sc-r');
+    expect(sc?.name).toBe('Feature R');
+    expect(sc?.parameters).toEqual({ 'row-r': { v: '1' } });
+  });
+
+  it('attachment with a testStepId is kept on the step only, per attempt', () => {
+    storage.addAttachment({ testCaseStartedId: 'tcs1', testStepId: 'step1', mediaType: 'text/plain', body: 'a' } as any);
+    storage.addAttachment({ testCaseStartedId: 'tcs2', testStepId: 'step1', mediaType: 'text/plain', body: 'b' } as any);
+    expect(storage.getAttachments('tcs1')).toEqual([]);
+    expect(storage.getStepAttachments('tcs1', 'step1').map((a) => a.content)).toEqual(['a']);
+    expect(storage.getStepAttachments('tcs2', 'step1').map((a) => a.content)).toEqual(['b']);
   });
 });

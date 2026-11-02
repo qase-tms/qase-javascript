@@ -102,14 +102,17 @@ export class ResultBuilder {
       result.title = metadata.title;
     }
     if (metadata.comment) {
-      result.message = metadata.comment;
+      result.message = error?.message ? `${metadata.comment}\n\n${error.message}` : metadata.comment;
     }
     if (metadata.suite) {
-      result.relations = {
-        suite: {
-          data: [{ title: metadata.suite, public_id: null }],
-        },
-      };
+      const parts = metadata.suite.split(/\t|\\t/).filter((part) => part.trim().length > 0);
+      if (parts.length > 0) {
+        result.relations = {
+          suite: {
+            data: parts.map((title) => ({ title, public_id: null })),
+          },
+        };
+      }
     }
     if (Object.keys(metadata.fields).length > 0) {
       result.fields = metadata.fields;

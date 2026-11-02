@@ -66,11 +66,13 @@ To send test results to multiple Qase projects simultaneously, see the [Multi-Pr
 
 Set a custom title for the test case using the `@QaseTitle` tag (overrides scenario name):
 
+> **Note:** Gherkin tags cannot contain whitespace (cucumber-js fails with `A tag may not contain whitespace`), so tag values such as titles, suite names and field values must not contain spaces.
+
 ```gherkin
 Feature: User Authentication
 
   @QaseID=1
-  @QaseTitle=User can successfully complete login flow
+  @QaseTitle=User_can_complete_login_flow
   Scenario: Login
     Given I am on the login page
     When I enter valid credentials
@@ -100,7 +102,7 @@ Add metadata to your test cases using the `@QaseFields` tag. Both system and cus
 Feature: User Authentication
 
   @QaseID=1
-  @QaseFields={"severity":"critical","priority":"high","layer":"e2e","description":"Tests core authentication flow"}
+  @QaseFields={"severity":"critical","priority":"high","layer":"e2e"}
   Scenario: Critical login test
     Given I am on the login page
     When I enter valid credentials
@@ -128,13 +130,13 @@ Feature: User Authentication
 
 ### Nested Suites
 
-Use tab character (`\t`) to separate suite levels:
+Separate suite levels with `\t` (a backslash followed by `t`, as in the example below; a real tab character works too):
 
 ```gherkin
 Feature: User Authentication
 
   @QaseID=1
-  @QaseSuite=Application\tAuthentication\tLogin\tEdge Cases
+  @QaseSuite=Application\tAuthentication\tLogin\tEdgeCases
   Scenario: Login with special characters
     Given I am on the login page
     When I enter credentials with special characters
@@ -421,8 +423,10 @@ npx cucumber-js -f cucumberjs-qase-reporter --tags "@smoke"
 ### With Tag Expression
 
 ```sh
-npx cucumber-js -f cucumberjs-qase-reporter --tags "@QaseID and not @skip"
+npx cucumber-js -f cucumberjs-qase-reporter --tags "@QaseID=1 and not @skip"
 ```
+
+> **Note:** Cucumber tag expressions match whole tag names, so `--tags "@QaseID"` does not select scenarios tagged `@QaseID=1`. Use the full tag, e.g. `--tags "@QaseID=1 or @QaseID=2"`.
 
 ### Using Profile
 
@@ -458,9 +462,9 @@ Feature: User Authentication
     And the database is seeded
 
   @QaseID=1
-  @QaseTitle=User can successfully log in with valid credentials
-  @QaseFields={"severity":"blocker","priority":"high","layer":"e2e","description":"Verifies complete login flow"}
-  @QaseSuite=Authentication\tLogin\tHappy Path
+  @QaseTitle=User_can_log_in_with_valid_credentials
+  @QaseFields={"severity":"blocker","priority":"high","layer":"e2e"}
+  @QaseSuite=Authentication\tLogin\tHappyPath
   Scenario: Successful login
     Given I am on the login page
     When I enter username "testuser@example.com"
@@ -472,7 +476,7 @@ Feature: User Authentication
 
   @QaseID=2
   @QaseFields={"severity":"critical","priority":"high","layer":"e2e"}
-  @QaseSuite=Authentication\tLogin\tEdge Cases
+  @QaseSuite=Authentication\tLogin\tEdgeCases
   Scenario: Login with invalid credentials
     Given I am on the login page
     When I enter username "invalid@example.com"
@@ -508,7 +512,7 @@ my-project/
 
 ### Tests Not Appearing in Qase
 
-1. Verify `mode` is set to `TestOps` (not `off` or `report`)
+1. Verify `mode` is set to `testops` (not `off` or `report`)
 2. Check API token has write permissions
 3. Verify project code is correct
 4. Check for errors in console output (enable `debug: true`)
@@ -520,9 +524,10 @@ my-project/
 
 **Solution:**
 1. Verify tag syntax: `@QaseID=1` (no spaces around `=`)
-2. For fields, use valid JSON: `@QaseFields={"severity":"high"}`
-3. Check for typos in tag names (case-sensitive)
-4. Ensure tags are at scenario level, not step level
+2. For fields, use valid JSON: `@QaseFields={"severity":"critical"}`
+3. Check for typos in tag names. Only the first letter of each word may vary in case (`@QaseID`, `@qaseid`, `@QaseId` all work); fully upper-case names such as `@QASEID` are not recognized
+4. Make sure tag values contain no spaces — Gherkin cannot parse whitespace inside a tag
+5. Ensure tags are at scenario level, not step level
 
 ### Step Definition Not Found
 
@@ -713,8 +718,8 @@ npx cucumber-js --tags "@smoke"
 # Run smoke tests that are not skipped
 npx cucumber-js --tags "@smoke and not @skip"
 
-# Run tests with QaseID or marked as critical
-npx cucumber-js --tags "@QaseID or @critical"
+# Run the scenario linked to case 1 or marked as critical
+npx cucumber-js --tags "@QaseID=1 or @critical"
 
 # Complex expression
 npx cucumber-js --tags "(@smoke or @regression) and not (@wip or @skip)"
@@ -729,8 +734,8 @@ npx cucumber-js --tags "(@smoke or @regression) and not (@wip or @skip)"
 ```gherkin
 Feature: Multi-Project Reporting
 
-  @QaseID.PROJ1=1
-  @QaseID.PROJ2=5
+  @qaseid.PROJ1(1)
+  @qaseid.PROJ2(5)
   Scenario: Test reported to multiple projects
     Given I am testing shared functionality
     When I execute the test
@@ -787,11 +792,11 @@ Feature: Login with Different Browsers
 ### Use Case 4: Filter by @QaseID Tags
 
 ```sh
-# Run only tests with QaseID
-npx cucumber-js --tags "@QaseID"
+# Run specific QaseIDs (tag expressions match the whole tag, so "@QaseID" alone matches nothing)
+npx cucumber-js --tags "@QaseID=1 or @QaseID=2"
 
-# Run specific QaseID
-npx cucumber-js features/login.feature:12  # Line number
+# Run a scenario by line number
+npx cucumber-js features/login.feature:12
 
 # Run all except ignored tests
 npx cucumber-js --tags "not @QaseIgnore"
@@ -827,9 +832,9 @@ Background steps run before each scenario and are reported as part of the test f
 Feature: E2E Checkout Flow
 
   @QaseID=1
-  @QaseTitle=User can complete full checkout process from cart to confirmation
-  @QaseFields={"severity":"blocker","priority":"high","layer":"e2e","description":"Tests complete checkout including payment processing","preconditions":"- User account exists\n- Payment method configured\n- Product catalog seeded","postconditions":"Order created in database and confirmation email sent"}
-  @QaseSuite=E2E\tCheckout\tHappy Path
+  @QaseTitle=User_can_complete_checkout_from_cart_to_confirmation
+  @QaseFields={"severity":"blocker","priority":"high","layer":"e2e"}
+  @QaseSuite=E2E\tCheckout\tHappyPath
   @QaseParameters={"payment_method":"credit_card","shipping":"standard"}
   Scenario: Complete checkout with credit card
     Given I am logged in
@@ -851,7 +856,7 @@ Feature: E2E Checkout Flow
 Feature: API User Management
 
   @QaseID=10
-  @QaseFields={"layer":"api","severity":"high"}
+  @QaseFields={"layer":"api","severity":"critical"}
   Scenario: Create user via API
     Given the API is available
     When I send POST request to "/users" with:

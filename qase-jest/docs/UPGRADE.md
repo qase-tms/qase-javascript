@@ -220,7 +220,7 @@ const { qase } = require('jest-qase-reporter');
 QASE_MODE=testops npx jest
 ```
 
-Or configure `mode: 'TestOps'` in your reporter options.
+Or configure `mode: 'testops'` in your reporter options.
 
 #### Issue: Configuration not recognized
 

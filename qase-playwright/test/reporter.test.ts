@@ -211,7 +211,7 @@ describe('PlaywrightQaseReporter', () => {
   describe('constructor', () => {
     it('should initialize reporter and options', () => {
       expect((reporter as any).reporter).toBe(reporterMock);
-      expect((reporter as any).options).toBe(options.framework);
+      expect((reporter as any).options).toEqual(options.framework);
     });
   });
 

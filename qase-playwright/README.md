@@ -147,9 +147,20 @@ The reporter is configured via (in order of priority):
         "format": "json"
       }
     }
+  },
+  "framework": {
+    "playwright": {
+      "browser": {
+        "addAsParameter": true,
+        "parameterName": "Browser"
+      },
+      "markAsFlaky": true
+    }
   }
 }
 ```
+
+In `qase.config.json` the Playwright-specific settings go under `framework.playwright`. In `playwright.config.ts` they go directly under `framework` (see below), and any setting given there overrides the same setting from `qase.config.json`.
 
 ### Example `playwright.config.ts`
 
@@ -237,7 +248,7 @@ test('Login test', async ({ page }) => {
     priority: 'high',
     layer: 'e2e',
   });
-  qase.suite('Authentication / Login');
+  qase.suite('Authentication\tLogin'); // \t nests Login under Authentication
 
   // Test logic
   await page.goto('https://example.com/login');

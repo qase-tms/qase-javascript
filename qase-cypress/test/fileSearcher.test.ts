@@ -96,7 +96,7 @@ describe('FileSearcher', () => {
         { name: 'other.cy.js.mp4', isDirectory: () => false, isFile: () => true },
       ] as any);
 
-      const result = FileSearcher.findVideoFiles('/videos', 'test');
+      const result = FileSearcher.findVideoFiles('/videos', 'test.cy.js');
 
       expect(result).toEqual(['/videos/test.cy.js.mp4']);
     });
@@ -113,7 +113,7 @@ describe('FileSearcher', () => {
         { name: 'other.cy.js.mp4', isDirectory: () => false, isFile: () => true },
       ] as any);
 
-      const result = FileSearcher.findVideoFiles('/videos', 'test', 'feature/test.cy.js');
+      const result = FileSearcher.findVideoFiles('/videos', 'test.cy.js', 'feature/test.cy.js');
 
       // The actual path will depend on the system, so we check that it contains the right parts
       expect(result).toHaveLength(1);
@@ -131,7 +131,7 @@ describe('FileSearcher', () => {
         { name: 'test.cy.js.mp4', isDirectory: () => false, isFile: () => true },
       ] as any);
 
-      const result = FileSearcher.findVideoFiles('/videos', 'test', 'non-existent/test.cy.js');
+      const result = FileSearcher.findVideoFiles('/videos', 'test.cy.js', 'non-existent/test.cy.js');
 
       // The actual path will depend on the system, so we check that it contains the right parts
       expect(result).toHaveLength(1);
@@ -149,7 +149,7 @@ describe('FileSearcher', () => {
         { name: 'test.cy.js.mp4', isDirectory: () => false, isFile: () => true },
       ] as any);
 
-      const result = FileSearcher.findVideoFiles('/videos', 'test', 'feature/test.cy.js');
+      const result = FileSearcher.findVideoFiles('/videos', 'test.cy.js', 'feature/test.cy.js');
 
       // The actual path will depend on the system, so we check that it contains the right parts
       expect(result).toHaveLength(1);
@@ -159,7 +159,7 @@ describe('FileSearcher', () => {
     it('should return empty array when video directory does not exist', () => {
       mockFs.existsSync.mockReturnValue(false);
 
-      const result = FileSearcher.findVideoFiles('/non-existent', 'test');
+      const result = FileSearcher.findVideoFiles('/non-existent', 'test.cy.js');
 
       expect(result).toEqual([]);
     });
@@ -172,9 +172,22 @@ describe('FileSearcher', () => {
         { name: 'test.cy.js.mov', isDirectory: () => false, isFile: () => true },
       ] as any);
 
-      const result = FileSearcher.findVideoFiles('/videos', 'test');
+      const result = FileSearcher.findVideoFiles('/videos', 'test.cy.js');
 
       expect(result).toEqual(['/videos/test.cy.js.mp4']);
+    });
+
+    it('matches the video of the spec exactly, not of specs sharing its name prefix', () => {
+      mockFs.existsSync.mockReturnValue(true);
+      mockFs.readdirSync.mockReturnValue([
+        { name: 'login.cy.js.mp4', isDirectory: () => false, isFile: () => true },
+        { name: 'login.cy.js-extra.mp4', isDirectory: () => false, isFile: () => true },
+        { name: 'login2.cy.js.mp4', isDirectory: () => false, isFile: () => true },
+      ] as any);
+
+      const result = FileSearcher.findVideoFiles('/videos', 'login.cy.js');
+
+      expect(result).toEqual(['/videos/login.cy.js.mp4']);
     });
   });
 

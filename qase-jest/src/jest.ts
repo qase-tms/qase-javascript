@@ -1,5 +1,13 @@
+import { AsyncLocalStorage } from 'async_hooks';
 import path from 'path';
-import { getMimeTypes, QaseStep, StepFunction, formatTitleWithProjectMapping } from 'qase-javascript-commons';
+import {
+  Attachment,
+  getMimeTypes,
+  QaseStep,
+  StepFunction,
+  TestStepType,
+  formatTitleWithProjectMapping,
+} from 'qase-javascript-commons';
 import { v4 as uuidv4 } from 'uuid';
 import { MetadataWriter } from './metadataChannel';
 
@@ -7,6 +15,22 @@ import { MetadataWriter } from './metadataChannel';
 export type ProjectMapping = Record<string, number[]>;
 
 const writer = new MetadataWriter();
+
+// Tracks the step whose body is running, so nested steps and attachments land on it. Async
+// context keeps parallel steps and concurrent tests apart.
+const currentStep = new AsyncLocalStorage<QaseStep>();
+
+// Steps are emitted when they end, so parallel siblings are put back in the order they started.
+// Start times can be equal within a millisecond, hence a counter.
+const startOrder = new WeakMap<TestStepType, number>();
+let startCounter = 0;
+
+const insertInStartOrder = (steps: TestStepType[], step: TestStepType, order: number): void => {
+  startOrder.set(step, order);
+  const index = steps.findIndex((s) => (startOrder.get(s) ?? -1) > order);
+  if (index === -1) steps.push(step);
+  else steps.splice(index, 0, step);
+};
 
 export const qase = (
   caseId: number | string | number[] | string[],
@@ -168,10 +192,15 @@ qase.step = async (name: string, body: StepFunction, expectedResult?: string, da
     ? `${name} QaseExpRes:${expectedResult ? `: ${expectedResult}` : ''} QaseData:${data ? `: ${data}` : ''}` 
     : name;
   const runningStep = new QaseStep(stepName);
-  // eslint-disable-next-line @typescript-eslint/require-await
-  await runningStep.run(body, async (step) => {
-    writer.step(step);
-  });
+  const parent = currentStep.getStore();
+  const order = startCounter++;
+  await currentStep.run(runningStep, () =>
+    // eslint-disable-next-line @typescript-eslint/require-await
+    runningStep.run(body, async (step) => {
+      if (parent) insertInStartOrder(parent.steps, step, order);
+      else writer.step(step);
+    }),
+  );
 };
 
 
@@ -180,7 +209,7 @@ qase.step = async (name: string, body: StepFunction, expectedResult?: string, da
  * @param attach
  * @example
  * test('test', () => {
- *   qase.attach({ name: 'attachment.txt', content: 'Hello, world!', type: 'text/plain' });
+ *   qase.attach({ name: 'attachment.txt', content: 'Hello, world!', contentType: 'text/plain' });
  *   qase.attach({ paths: ['/path/to/file', '/path/to/another/file']});
  *     expect(true).toBe(true);
  * });
@@ -188,20 +217,26 @@ qase.step = async (name: string, body: StepFunction, expectedResult?: string, da
 qase.attach = (attach: {
   name?: string;
   type?: string;
+  contentType?: string;
   content?: string;
-  paths?: string[];
+  paths?: string | string[];
 }) => {
-  if (attach.paths) {
-    for (const file of attach.paths) {
-      const attachmentName = path.basename(file);
-      const contentType: string = getMimeTypes(file);
+  const step = currentStep.getStore();
+  const add = (attachment: Attachment): void => {
+    if (step) step.attachments.push(attachment);
+    else writer.attachment(attachment);
+  };
+  const mimeType = attach.contentType ?? attach.type;
 
-      writer.attachment({
+  if (attach.paths) {
+    const files = Array.isArray(attach.paths) ? attach.paths : [attach.paths];
+    for (const file of files) {
+      add({
         file_path: file,
         size: 0,
         id: uuidv4(),
-        file_name: attachmentName,
-        mime_type: contentType,
+        file_name: path.basename(file),
+        mime_type: mimeType ?? getMimeTypes(file),
         content: '',
       });
     }
@@ -209,16 +244,13 @@ qase.attach = (attach: {
   }
 
   if (attach.content) {
-    writer.attachment({
+    add({
       file_path: null,
       size: attach.content.length,
       id: uuidv4(),
       file_name: attach.name ?? 'attachment',
-      mime_type: attach.type ?? 'application/octet-stream',
+      mime_type: mimeType ?? 'application/octet-stream',
       content: attach.content,
     });
   }
 };
-
-
-

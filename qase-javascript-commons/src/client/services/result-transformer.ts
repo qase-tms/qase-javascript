@@ -17,6 +17,7 @@ import {
   TestStepType,
 } from '../../models';
 import { LoggerInterface } from '../../utils/logger';
+import { gherkinAction } from '../../utils/gherkin-action';
 import chalk from 'chalk';
 
 const statusMap: Record<TestStatusEnum, string> = {
@@ -219,7 +220,7 @@ export class ResultTransformer {
 
   private processGherkinStep(step: TestStepType, resultStep: ResultStep): void {
     if (!('keyword' in step.data) || !resultStep.data) return;
-    resultStep.data.action = step.data.keyword;
+    resultStep.data.action = gherkinAction(step.data.keyword, step.data.name);
   }
 
   private processRequestStep(step: TestStepType, resultStep: ResultStep): void {

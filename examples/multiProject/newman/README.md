@@ -7,4 +7,4 @@ This example uses `mode: 'testops_multi'` and `testops_multi` config. To map a r
 
 Legacy single-project `// qase: 222` is still supported.
 
-Run: `npm test` (set `QASE_TOKEN` and use real project codes in `qase.config.json`).
+Run: `npm test` (set `QASE_TESTOPS_API_TOKEN` and use real project codes in `qase.config.json`).

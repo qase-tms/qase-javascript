@@ -121,7 +121,7 @@ test('Test with fields', withQase(async ({ qase }) => {
 
 ## Adding Suite
 
-Organize tests into suites and sub-suites:
+By default, a test's suite is the chain of `describe` blocks it is nested in (`describe('A')` > `describe('B')` gives suite `A` with sub-suite `B`). Use `qase.suite()` to set a different one:
 
 ### Simple Suite
 

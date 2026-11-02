@@ -17,6 +17,7 @@ jest.mock('qase-javascript-commons', () => ({
   TestStatusEnum: {
     passed: 'passed',
     failed: 'failed',
+    skipped: 'skipped',
   },
   generateSignature: jest.fn(() => 'mock-signature'),
   determineTestStatus: jest.fn((error: unknown, originalStatus: string) => {

@@ -19,6 +19,7 @@ export class EventStorage {
   private testCases: Record<string, TestCase> = {};
   private scenarios: Record<string, ScenarioData> = {};
   private attachments: Record<string, Attachment[]> = {};
+  private stepKeywords: Record<string, string> = {};
 
   addPickle(pickle: Pickle): void {
     this.pickles[pickle.id] = pickle;
@@ -29,8 +30,18 @@ export class EventStorage {
 
     const { children, name } = document.feature;
 
-    for (const { scenario } of children) {
-      if (!scenario) continue;
+    const nodes = children.flatMap((child) => (child.rule ? child.rule.children : [child]));
+    for (const node of nodes) {
+      for (const step of [...(node.background?.steps ?? []), ...(node.scenario?.steps ?? [])]) {
+        this.stepKeywords[step.id] = step.keyword.trim();
+      }
+    }
+    const scenarios = children.flatMap((child) => {
+      if (child.scenario) return [child.scenario];
+      return child.rule?.children.flatMap((ruleChild) => (ruleChild.scenario ? [ruleChild.scenario] : [])) ?? [];
+    });
+
+    for (const scenario of scenarios) {
 
       const parameters: Record<string, Record<string, string>> = {};
 
@@ -62,9 +73,12 @@ export class EventStorage {
 
   addAttachment(attachment: Attach): void {
     if (attachment.testStepId) {
-      this.appendAttachment(attachment.testStepId, attachment);
-    }
-    if (attachment.testCaseStartedId) {
+      // Step ids repeat across retry attempts, so key by the attempt as well.
+      this.appendAttachment(
+        EventStorage.stepKey(attachment.testCaseStartedId, attachment.testStepId),
+        attachment,
+      );
+    } else if (attachment.testCaseStartedId) {
       this.appendAttachment(attachment.testCaseStartedId, attachment);
     }
   }
@@ -97,12 +111,24 @@ export class EventStorage {
     return this.testCaseStarts[id];
   }
 
+  getStepKeyword(astNodeId: string): string | undefined {
+    return this.stepKeywords[astNodeId];
+  }
+
   getScenario(id: string): ScenarioData | undefined {
     return this.scenarios[id];
   }
 
   getAttachments(key: string): Attachment[] {
     return this.attachments[key] ?? [];
+  }
+
+  getStepAttachments(testCaseStartedId: string, testStepId: string): Attachment[] {
+    return this.getAttachments(EventStorage.stepKey(testCaseStartedId, testStepId));
+  }
+
+  private static stepKey(testCaseStartedId: string | undefined, testStepId: string): string {
+    return `${testCaseStartedId ?? ''}:${testStepId}`;
   }
 
   getTestStepFinished(id: string): TestStepFinished | undefined {

@@ -29,6 +29,7 @@ export class Storage {
   private events: EventStorage = new EventStorage();
   private statusTracker: StatusTracker = new StatusTracker();
   private profilerTracker: ProfilerTracker;
+  private retriedAttempts = new Set<string>();
 
   constructor(profiler: NetworkProfiler | null = null) {
     this.profilerTracker = new ProfilerTracker(profiler);
@@ -67,9 +68,19 @@ export class Storage {
   public addTestCaseStep(testCaseStep: TestStepFinished): void {
     this.events.addTestStepFinished(testCaseStep);
     this.statusTracker.applyStep(testCaseStep);
+    // Cucumber < 8 flags the retry on the step result instead of on TestCaseFinished.
+    if ((testCaseStep.testStepResult as { willBeRetried?: boolean }).willBeRetried) {
+      this.retriedAttempts.add(testCaseStep.testCaseStartedId);
+    }
   }
 
   public convertTestCase(testCase: TestCaseFinished): undefined | TestResultType {
+    if (testCase.willBeRetried || this.retriedAttempts.has(testCase.testCaseStartedId)) {
+      this.retriedAttempts.delete(testCase.testCaseStartedId);
+      this.profilerTracker.reset(testCase.testCaseStartedId);
+      return undefined;
+    }
+
     const tcs = this.events.getTestCaseStarted(testCase.testCaseStartedId);
     if (!tcs) return undefined;
 
@@ -103,8 +114,14 @@ export class Storage {
       tc,
       this.events.getAllTestStepStarted(),
       this.events.getAllTestStepFinished(),
-      (stepId) => this.events.getAttachments(stepId),
+      (stepId) => this.events.getStepAttachments(tcs.id, stepId),
+      (astNodeId) => this.events.getStepKeyword(astNodeId),
     );
+
+    // Hooks are not reported as steps, so their attachments belong to the test.
+    const hookAttachments = tc.testSteps
+      .filter((s) => !s.pickleStepId)
+      .flatMap((s) => this.events.getStepAttachments(tcs.id, s.id));
 
     const profilerSteps = this.profilerTracker.getEvents(testCase.testCaseStartedId);
     this.profilerTracker.reset(testCase.testCaseStartedId);
@@ -119,7 +136,7 @@ export class Storage {
       error,
       steps,
       profilerSteps,
-      attachments: this.events.getAttachments(testCase.testCaseStartedId),
+      attachments: [...this.events.getAttachments(tcs.id), ...hookAttachments],
       scenarioName: scenario?.name,
       scenarioParameters,
     });

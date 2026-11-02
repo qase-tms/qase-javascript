@@ -1,13 +1,13 @@
 {
   "name": "vitest-qase-reporter",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "description": "Qase TMS Vitest Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": "./dist/index.js",
     "./vitest": "./dist/vitest.js",
-    "./setup": "./dist/setup.js",
+    "./setup": "./dist/setup.mjs",
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -19,7 +19,7 @@
         "./dist/vitest.d.ts"
       ],
       "setup": [
-        "./dist/setup.d.ts"
+        "./dist/setup.d.mts"
       ]
     }
   },

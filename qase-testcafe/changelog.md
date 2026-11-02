@@ -1,3 +1,19 @@
+# testcafe-reporter-qase@2.8.2
+
+## Fixed
+
+- `qase.attach({ paths: '/path/to/file' })` with a single path as a string attached every character of the path as a separate file. `paths` now takes a string or an array of strings.
+- `qase.attach()` ignored the documented `contentType` option and sent content attachments as `application/octet-stream`. `contentType` is now used; `type` keeps working.
+- TestCafe screenshots were uploaded with their absolute path as the file name and without a MIME type. They are now named by their file name (e.g. `1.png`) and sent as `image/png`.
+- A non-numeric Qase ID (`qase.id('abc')`, `meta({ QaseID: 'x' })` or one bad entry in `'1,x'`) was reported as `NaN`. Invalid IDs are now ignored and the valid ones are kept.
+- TypeScript projects with `moduleResolution: "node"` could not resolve the types of `testcafe-reporter-qase/qase`. The subpath is now listed in `typesVersions`.
+
+## Documentation
+
+- Screenshot examples passed the path returned by `t.takeScreenshot()` as `content`; they now attach it with `paths`.
+- The upgrade guide described a non-existent API (`qase.step(t, ...)`, `qase.attach(t, ...)`, `qase.id(1, 2, 3)`) and called the real one incorrect; it now follows the actual API. Wrong package names (`testcafe-reporter-Qase`, `testcafe-qase-reporter`), `import { Qase }`, `"mode": "TestOps"`, invalid `severity` values and the Node.js requirement (now `>= 18`) were corrected.
+- The multi-project example and the example README used `qase.comment()`, which the TestCafe reporter does not have; it was removed. The multi-project example README now names `QASE_TESTOPS_API_TOKEN`.
+
 # testcafe-reporter-qase@2.8.1
 
 ## Fixed

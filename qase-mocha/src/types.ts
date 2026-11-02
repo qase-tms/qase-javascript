@@ -1,5 +1,6 @@
 import { Attachment, getMimeTypes } from 'qase-javascript-commons';
 import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
 
 declare module 'mocha' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -90,7 +91,7 @@ export class Metadata {
           mime_type: contentType,
           content: '',
           size: 0,
-          id: '',
+          id: uuidv4(),
         });
       }
 
@@ -103,7 +104,7 @@ export class Metadata {
       content: attach.content ?? '',
       file_path: null,
       size: 0,
-      id: '',
+      id: uuidv4(),
     });
   }
 

@@ -258,6 +258,8 @@ You can associate Qase test case IDs with your scenarios using tags:
 - Single ID: `@QaseID(123)`
 - Multiple IDs: `@QaseID(123,456)`
 
+Put the tags above `Scenario:`; they may span several lines.
+
 The Qase reporter will automatically extract these IDs and link the test results to the corresponding test cases in Qase.
 
 ---
@@ -282,7 +284,7 @@ Each example includes:
 
 ```bash
 # Navigate to the example directory
-cd examples/cypressBadeballCucumber
+cd examples/single/cypressBadeballCucumber
 
 # Install dependencies
 npm install
@@ -317,7 +319,7 @@ If you see errors like "Cypress detected that you returned a promise from a comm
 - Verify your API token is correct in `cypress.config.js`
 - Check that your project code matches your Qase project
 - Enable `debug: true` in reporter options to see detailed logs
-- Ensure `mode: 'TestOps'` is set in your configuration
+- Ensure `mode: 'testops'` is set in your configuration
 
 ---
 

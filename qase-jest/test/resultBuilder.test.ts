@@ -150,6 +150,37 @@ describe('ResultBuilder.build', () => {
     expect(result.message).toBe('Override Comment');
   });
 
+  it('keeps the error message of a failed test after the comment', () => {
+    const meta = MetadataApplier.empty();
+    meta.comment = 'My comment';
+    const value = {
+      ...baseValue,
+      status: 'failed',
+      failureDetails: [{ matcherResult: { message: 'expected 1 to be 2' } }],
+      failureMessages: ['Error: expected 1 to be 2'],
+    } as any;
+    const result = ResultBuilder.build({ value, path: '/x.ts', metadata: meta, profilerSteps: [] });
+    expect(result.message).toBe('My comment\n\nexpected 1 to be 2');
+  });
+
+  it.each([
+    ['a tab', 'A\tB\tC'],
+    ['a literal backslash-t', 'A\\tB\\tC'],
+  ])('splits a suite separated by %s into a hierarchy', (_, suite) => {
+    const meta = MetadataApplier.empty();
+    meta.suite = suite;
+    const result = ResultBuilder.build({ value: baseValue, path: '/x.ts', metadata: meta, profilerSteps: [] });
+    expect(result.relations).toEqual({
+      suite: {
+        data: [
+          { title: 'A', public_id: null },
+          { title: 'B', public_id: null },
+          { title: 'C', public_id: null },
+        ],
+      },
+    });
+  });
+
   it('replaces relations when metadata.suite is set', () => {
     const meta = MetadataApplier.empty();
     meta.suite = 'CustomSuite';

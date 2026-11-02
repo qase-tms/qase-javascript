@@ -5,7 +5,6 @@ import {
   composeOptions,
   ConfigLoader,
   QaseReporter,
-  ReporterInterface,
   TestStatusEnum,
 } from 'qase-javascript-commons';
 import { NetworkProfiler } from 'qase-javascript-commons/profilers';
@@ -25,6 +24,14 @@ import { STATUS_MAP, MochaState } from './modules/statusMap';
 
 const Events = Runner.constants;
 
+/** Set by the parallel-mode worker reporter on the options it passes to MochaQaseReporter. */
+export const PARALLEL_WORKER_OPTION = 'qaseParallelWorker';
+type WorkerOptions = MochaOptions & { [PARALLEL_WORKER_OPTION]?: boolean };
+interface GlobalFixtures {
+  globalSetup?: (() => Promise<void>)[];
+  globalTeardown?: (() => Promise<void>)[];
+}
+
 // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-return,@typescript-eslint/restrict-template-expressions
 const resolveParallelModeSetupFile = () => join(__dirname, `parallel${extname(__filename)}`);
 
@@ -35,7 +42,7 @@ export class MochaQaseReporter extends reporters.Base {
 
   static statusMap: Record<MochaState, TestStatusEnum> = STATUS_MAP;
 
-  private reporter: ReporterInterface;
+  private reporter: QaseReporter;
 
   private readonly metadataApplier: MetadataApplier = new MetadataApplier();
 
@@ -75,8 +82,11 @@ export class MochaQaseReporter extends reporters.Base {
     }
     this.profilerTracker = new ProfilerTracker(profiler);
 
-    // Create extra reporters in both modes, but validate compatibility for parallel mode
-    if (extraReportersConfig) {
+    const isWorker = (options as WorkerOptions)[PARALLEL_WORKER_OPTION] === true;
+
+    // In parallel mode the main process re-emits the workers' events, so extra reporters run
+    // there once; in the workers they would print every file separately.
+    if (extraReportersConfig && !isWorker) {
       if (options.parallel) {
         const validation = validateExtraReportersForParallel(extraReportersConfig);
         if (validation.valid) {
@@ -94,26 +104,36 @@ export class MochaQaseReporter extends reporters.Base {
 
     if (options.parallel) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      options.require = [...(options.require ?? []), resolveParallelModeSetupFile()];      
+      options.require = [...(options.require ?? []), resolveParallelModeSetupFile()];
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (this.runner && typeof (this.runner as any).workerReporter === 'function') {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         (this.runner as any).workerReporter(resolveParallelModeSetupFile());
       }
+      // Workers are forked after the global setup fixtures and inherit the run started there,
+      // so they only add their results. Run events here fire inside a promise job, where
+      // deasync cannot wait, hence fixtures, which Mocha awaits.
+      const fixtures = options as MochaOptions & GlobalFixtures;
+      fixtures.globalSetup = [...(fixtures.globalSetup ?? []), () => this.reporter.startTestRunAsync()];
+      fixtures.globalTeardown = [...(fixtures.globalTeardown ?? []), () => this.reporter.complete()];
     } else {
-      this.applyListeners();
+      this.applyListeners(isWorker);
     }
 
   }
 
-  private applyListeners = () => {
-    this.runner.on(Events.EVENT_RUN_BEGIN, () => this.onStartRun());
-    this.runner.on(Events.EVENT_RUN_END, () => this.onEndRun());
+  private applyListeners = (isWorker: boolean) => {
+    if (!isWorker) {
+      this.runner.on(Events.EVENT_RUN_BEGIN, () => this.onStartRun());
+    }
+    this.runner.on(Events.EVENT_RUN_END, () => this.onEndRun(isWorker));
 
     this.runner.on(Events.EVENT_TEST_BEGIN, (test: Test) => this.onStartTest(test));
     this.runner.on(Events.EVENT_HOOK_BEGIN, (hook: Hook) => this.addMethodsToContext(hook.ctx));
     // EVENT_TEST_FAIL is emitted for failing hooks too.
     this.runner.on(Events.EVENT_TEST_FAIL, (runnable: Mocha.Runnable, err: Error) => this.onFail(runnable, err));
+    // `it.skip` and tests in a skipped suite get no EVENT_TEST_BEGIN, only these two events.
+    this.runner.on(Events.EVENT_TEST_PENDING, (test: Mocha.Test) => this.onPending(test));
     this.runner.on(Events.EVENT_TEST_END, (test) => this.onEndTest(test));
     // Reporters such as `spec` print the result on pass/fail, before EVENT_TEST_END; stop
     // recording first so that line does not end up in the test's stdout.txt.
@@ -125,9 +145,16 @@ export class MochaQaseReporter extends reporters.Base {
     deasyncPromise(this.reporter.startTestRunAsync());
   }
 
-  private onEndRun() {
+  private onEndRun(isWorker: boolean) {
     this.profilerTracker.restore();
-    deasyncPromise(this.reporter.publish());
+    if (!isWorker) {
+      deasyncPromise(this.reporter.publish());
+      return;
+    }
+    deasyncPromise(this.reporter.sendResults());
+    // A worker runs several files with one reporter instance; without this the next file
+    // writes these results to the report again.
+    this.reporter.setTestResults([]);
   }
 
   private addMethodsToContext(ctx?: Context) {
@@ -160,6 +187,11 @@ export class MochaQaseReporter extends reporters.Base {
     this.currentType = 'test';
     this.testBeginTime = Date.now();
     this.profilerTracker.onTestStart();
+  }
+
+  private onPending(test: Mocha.Test) {
+    if (this.currentTest === test) return;
+    this.testBeginTime = Date.now();
   }
 
   /**

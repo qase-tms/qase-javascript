@@ -78,7 +78,7 @@ export class MetadataExtractor {
         }
 
         if (message.fields) {
-          metadata.fields = message.fields;
+          metadata.fields = { ...metadata.fields, ...message.fields };
         }
 
         if (message.parameters) {

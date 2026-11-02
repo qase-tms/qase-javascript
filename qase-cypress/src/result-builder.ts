@@ -98,7 +98,11 @@ export class ResultBuilder {
       : [];
 
     if (metadata?.cucumberSteps && metadata.cucumberSteps.length > 0) {
-      steps.push(...this.stepConverter.convertCypressMessages(metadata.cucumberSteps, test.state ?? 'failed'));
+      steps.push(...this.stepConverter.convertCypressMessages(
+        metadata.cucumberSteps,
+        test.state ?? 'failed',
+        metadata.stepAttachments ?? {},
+      ));
       if (test.parent) {
         const file = getFile(test.parent);
         if (file) {

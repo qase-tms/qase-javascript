@@ -22,7 +22,11 @@ results:
   relations:
     suite:
       data:
-      - title: "E-commerce\tInventory\tSorting"
+      - title: E-commerce
+        public_id: null
+      - title: Inventory
+        public_id: null
+      - title: Sorting
         public_id: null
   steps:
   - data:
@@ -54,7 +58,11 @@ results:
   relations:
     suite:
       data:
-      - title: "E-commerce\tCheckout\tNavigation"
+      - title: E-commerce
+        public_id: null
+      - title: Checkout
+        public_id: null
+      - title: Navigation
         public_id: null
   steps:
   - data:
@@ -86,7 +94,11 @@ results:
   relations:
     suite:
       data:
-      - title: "E-commerce\tInventory\tBrowsing"
+      - title: E-commerce
+        public_id: null
+      - title: Inventory
+        public_id: null
+      - title: Browsing
         public_id: null
   steps:
   - data:
@@ -125,7 +137,11 @@ results:
   relations:
     suite:
       data:
-      - title: "E-commerce\tInventory\tProduct Details"
+      - title: E-commerce
+        public_id: null
+      - title: Inventory
+        public_id: null
+      - title: Product Details
         public_id: null
   steps:
   - data:
@@ -157,7 +173,11 @@ results:
   relations:
     suite:
       data:
-      - title: "E-commerce\tShopping Cart\tRemove Items"
+      - title: E-commerce
+        public_id: null
+      - title: Shopping Cart
+        public_id: null
+      - title: Remove Items
         public_id: null
   steps:
   - data:
@@ -197,7 +217,11 @@ results:
   relations:
     suite:
       data:
-      - title: "E-commerce\tShopping Cart\tMultiple Items"
+      - title: E-commerce
+        public_id: null
+      - title: Shopping Cart
+        public_id: null
+      - title: Multiple Items
         public_id: null
   steps:
   - data:
@@ -237,7 +261,11 @@ results:
   relations:
     suite:
       data:
-      - title: "E-commerce\tCheckout\tComplete Flow"
+      - title: E-commerce
+        public_id: null
+      - title: Checkout
+        public_id: null
+      - title: Complete Flow
         public_id: null
   steps:
   - data:
@@ -288,7 +316,11 @@ results:
   relations:
     suite:
       data:
-      - title: "E-commerce\tAuthentication\tLogin"
+      - title: E-commerce
+        public_id: null
+      - title: Authentication
+        public_id: null
+      - title: Login
         public_id: null
   steps:
   - data:
@@ -323,7 +355,11 @@ results:
   relations:
     suite:
       data:
-      - title: "E-commerce\tAuthentication\tLogin"
+      - title: E-commerce
+        public_id: null
+      - title: Authentication
+        public_id: null
+      - title: Login
         public_id: null
   steps:
   - data:
@@ -364,7 +400,11 @@ results:
   relations:
     suite:
       data:
-      - title: "E-commerce\tCheckout\tValidation"
+      - title: E-commerce
+        public_id: null
+      - title: Checkout
+        public_id: null
+      - title: Validation
         public_id: null
   steps:
   - data:
@@ -398,7 +438,11 @@ results:
   relations:
     suite:
       data:
-      - title: "E-commerce\tShopping Cart\tAdd Items"
+      - title: E-commerce
+        public_id: null
+      - title: Shopping Cart
+        public_id: null
+      - title: Add Items
         public_id: null
   steps:
   - data:
@@ -439,7 +483,11 @@ results:
   relations:
     suite:
       data:
-      - title: "E-commerce\tAuthentication\tLogin"
+      - title: E-commerce
+        public_id: null
+      - title: Authentication
+        public_id: null
+      - title: Login
         public_id: null
   steps:
   - data:

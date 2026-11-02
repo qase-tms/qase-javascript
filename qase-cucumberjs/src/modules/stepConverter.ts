@@ -10,6 +10,7 @@ export class StepConverter {
     startedSteps: Map<string, TestStepStarted>,
     finishedSteps: Map<string, TestStepFinished>,
     getAttachments: (stepId: string) => Attachment[],
+    getKeyword: (astNodeId: string) => string | undefined = () => undefined,
   ): TestStepType[] {
     const results: TestStepType[] = [];
 
@@ -20,6 +21,7 @@ export class StepConverter {
       const step = pickleSteps.find((ps) => ps.id === s.pickleStepId);
       if (!step) continue;
 
+      const astNodeId = step.astNodeIds[0];
       const started = startedSteps.get(s.id);
       const startTimeSec = started ? StepConverter.toSeconds(started.timestamp) : null;
       const endTimeSec = StepConverter.toSeconds(finished.timestamp);
@@ -28,7 +30,7 @@ export class StepConverter {
         id: s.id,
         step_type: StepType.GHERKIN,
         data: {
-          keyword: step.text,
+          keyword: (astNodeId !== undefined ? getKeyword(astNodeId) : undefined) ?? '',
           name: step.text,
           line: 0,
         },

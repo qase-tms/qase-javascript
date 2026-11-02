@@ -181,16 +181,23 @@ qase.comment = (
  * Add a step to  the test case
  * @param {string} name
  * @param {() => T | PromiseLike<T>} body
+ * @param {string} expectedResult
+ * @param {string} data
  * @example
  * it('test', () => {
  *    qase.step("Some step", () => {
  *      // some actions
- *    });
+ *    }, "Expected result", "Step data");
  *    cy.visit('https://example.com');
  * });
  */
-qase.step = <T = void>(name: string, body: () => T | PromiseLike<T>) => {
-  return cy.task('qaseStepStart', name).then(() => {
+qase.step = <T = void>(
+  name: string,
+  body: () => T | PromiseLike<T>,
+  expectedResult?: string,
+  data?: string,
+) => {
+  return cy.task('qaseStepStart', { name, expectedResult, data }).then(() => {
     return Cypress.Promise.resolve(body());
   }).then(() => {
     cy.task('qaseStepEnd', 'passed').then(() => {

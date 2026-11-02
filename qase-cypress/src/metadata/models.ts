@@ -23,7 +23,6 @@ export interface Metadata {
   steps?: (StepStart | StepEnd)[];
   cucumberSteps?: StepStart[];
   currentStepId?: string | undefined;
-  firstStepName?: string | undefined;
   attachments?: Attachment[];
   stepAttachments?: Record<string, Attachment[]>;
   networkRequests?: NetworkRequestData[];
@@ -34,6 +33,14 @@ export interface StepStart {
   timestamp: number;
   name: string;
   parentId: string | undefined;
+  expectedResult?: string | null;
+  data?: string | null;
+}
+
+export interface StepStartPayload {
+  name: string;
+  expectedResult?: string | null;
+  data?: string | null;
 }
 
 export interface StepEnd {

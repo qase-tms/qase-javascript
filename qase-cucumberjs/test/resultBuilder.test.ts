@@ -92,4 +92,20 @@ describe('ResultBuilder', () => {
     expect(result.testops_id).toBeNull();
     expect(result.testops_project_mapping).toEqual({ PROJ: [10] });
   });
+
+  it('includes nanos in the duration', () => {
+    const result = ResultBuilder.build(makeArgs({
+      testCaseStarted: { id: 'tcs1', testCaseId: 'tc1', timestamp: { seconds: 100, nanos: 900_000_000 } },
+      testCaseFinished: { testCaseStartedId: 'tcs1', timestamp: { seconds: 101, nanos: 50_000_000 } },
+    }));
+    expect(result.execution.duration).toBe(150);
+  });
+
+  it('splits a literal backslash-t in QaseSuite into sub-suites', () => {
+    const result = ResultBuilder.build(makeArgs({
+      metadata: { ...baseMetadata, suite: 'Outer\\tInner' },
+    }));
+    const data = (result.relations as any).suite.data.map((d: any) => d.title);
+    expect(data).toEqual(['Outer', 'Inner']);
+  });
 });

@@ -1,3 +1,4 @@
+import { basename } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import {
   Attachment,
@@ -6,6 +7,7 @@ import {
   TestResultType,
   generateSignature,
   determineTestStatus,
+  getMimeTypes,
 } from 'qase-javascript-commons';
 import { normalizeSuitePart } from 'qase-javascript-commons/internal';
 import {
@@ -134,9 +136,9 @@ export class ResultBuilder {
     const attachments: Attachment[] = [];
     for (const screenshot of screenshots) {
       attachments.push({
-        file_name: screenshot.screenshotPath,
+        file_name: basename(screenshot.screenshotPath),
         file_path: screenshot.screenshotPath,
-        mime_type: '',
+        mime_type: getMimeTypes(screenshot.screenshotPath),
         content: '',
         size: 0,
         id: uuidv4(),

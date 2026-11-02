@@ -152,6 +152,15 @@ describe('ResultBuilder', () => {
     expect(data).toEqual(['API Tests', 'Advanced', 'Relationships']);
   });
 
+  it('splits a metadata.suite written with the two characters \\t', () => {
+    const result = ResultBuilder.build({
+      ...baseArgs,
+      metadata: makeMetadata({ suite: 'API Tests\\tAdvanced' }),
+    });
+    const data = (result.relations as any).suite.data.map((d: any) => d.title);
+    expect(data).toEqual(['API Tests', 'Advanced']);
+  });
+
   it('merges StepRunner steps and ProfilerTracker steps in order', () => {
     const result = ResultBuilder.build({
       ...baseArgs,

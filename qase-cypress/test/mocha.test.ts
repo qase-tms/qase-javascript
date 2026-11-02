@@ -46,4 +46,24 @@ describe('qase()', () => {
       expect(result).toBeNull();
     });
   });
+
+  describe('qase.step', () => {
+    const task = jest.fn((..._args: unknown[]) => ({ then: (fn: () => unknown) => { fn(); return { then: (g: () => unknown) => g() }; } }));
+
+    beforeEach(() => {
+      task.mockClear();
+      (global as any).cy = { task };
+      (global as any).Cypress = { Promise: Promise };
+    });
+
+    afterEach(() => {
+      delete (global as any).cy;
+      delete (global as any).Cypress;
+    });
+
+    it('sends the expected result and data with the step', () => {
+      qase.step('Click', () => undefined, 'Clicked', 'payload');
+      expect(task).toHaveBeenCalledWith('qaseStepStart', { name: 'Click', expectedResult: 'Clicked', data: 'payload' });
+    });
+  });
 });

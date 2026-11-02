@@ -39,6 +39,15 @@ describe('StepConverter', () => {
       expect(result[0]?.execution.status).toBe(StepStatusEnum.passed);
       expect(result[1]?.execution.status).toBe(StepStatusEnum.failed);
     });
+
+    it('attaches cucumber step attachments by step id', () => {
+      const messages: StepStart[] = [{ id: 's1', name: 'Given a', timestamp: 100 } as StepStart];
+      const attachments = {
+        s1: [{ file_name: 'x.png', mime_type: 'image/png', content: '', file_path: null, size: 0, id: 'a1' } as any],
+      };
+      const result = converter.convertCypressMessages(messages, 'passed', attachments);
+      expect(result[0]?.attachments.map((a) => a.file_name)).toEqual(['x.png']);
+    });
   });
 
   describe('getSteps', () => {
@@ -114,6 +123,24 @@ describe('StepConverter', () => {
       const result = converter.getSteps(messages, {});
       expect(result[0]?.id).toBe('a');
       expect(result[1]?.id).toBe('b');
+    });
+
+    it('reports the expected result and data of a step', () => {
+      const messages: (StepStart | StepEnd)[] = [
+        { id: 's1', name: 'Click', timestamp: 100, expectedResult: 'Clicked', data: 'payload' } as StepStart,
+      ];
+      const result = converter.getSteps(messages, {});
+      expect(result[0]?.data).toEqual({ action: 'Click', expected_result: 'Clicked', data: 'payload' });
+    });
+
+    it('nests a child under a parent that started in the same millisecond', () => {
+      const messages: (StepStart | StepEnd)[] = [
+        { id: 'p', name: 'parent', timestamp: 100 } as StepStart,
+        { id: 'c', name: 'child', timestamp: 100, parentId: 'p' } as StepStart,
+      ];
+      const result = converter.getSteps(messages, {});
+      expect(result.map((s) => s.id)).toEqual(['p']);
+      expect(result[0]?.steps[0]?.id).toBe('c');
     });
 
     it('keeps a child as a top-level step when parent is missing from the message stream', () => {

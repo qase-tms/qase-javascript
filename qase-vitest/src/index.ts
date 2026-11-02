@@ -1,4 +1,4 @@
-import type { Reporter, TestCase, TestSuite } from 'vitest/node';
+import type { Reporter, TestCase, Vitest } from 'vitest/node';
 import type { TestAnnotation } from 'vitest';
 import {
   ConfigLoader,
@@ -8,11 +8,12 @@ import {
   TestStepType,
   composeOptions,
 } from 'qase-javascript-commons';
-import { NetworkProfiler } from 'qase-javascript-commons/profilers';
+import { NetworkProfiler, NetworkProfilerOptions } from 'qase-javascript-commons/profilers';
 
 import { MetadataAccumulator } from './modules/metadataAccumulator';
 import { ProfilerTracker } from './modules/profilerTracker';
 import { ResultBuilder } from './modules/resultBuilder';
+import { PROFILER_OPTIONS_KEY, profilerOptionsFrom } from './modules/workerProfiler';
 
 export type VitestQaseOptionsType = ConfigType;
 
@@ -20,6 +21,7 @@ export class VitestQaseReporter implements Reporter {
   private reporter: ReporterInterface;
   private profilerTracker: ProfilerTracker;
   private metadataAccumulator: MetadataAccumulator;
+  private workerProfilerOptions: NetworkProfilerOptions | null;
 
   constructor(
     options: VitestQaseOptionsType = {},
@@ -35,14 +37,19 @@ export class VitestQaseReporter implements Reporter {
       reporterName: 'vitest-qase-reporter',
     });
 
-    const profiler = composedOptions.profilers?.includes('network')
-      ? new NetworkProfiler({
-          skipDomains: composedOptions.networkProfiler?.skip_domains,
-          trackOnFail: composedOptions.networkProfiler?.track_on_fail,
-        })
-      : null;
+    this.workerProfilerOptions = profilerOptionsFrom(composedOptions);
+    const profiler = this.workerProfilerOptions ? new NetworkProfiler(this.workerProfilerOptions) : null;
     this.profilerTracker = new ProfilerTracker(profiler);
     this.metadataAccumulator = new MetadataAccumulator();
+  }
+
+  // The setup file runs in the workers and cannot see the inline reporter options otherwise.
+  onInit?(vitest: Vitest): void {
+    // Without `provide` (older Vitest) the setup file falls back to qase.config.json and env.
+    (vitest as { provide?: (key: string, value: unknown) => void }).provide?.(
+      PROFILER_OPTIONS_KEY,
+      this.workerProfilerOptions,
+    );
   }
 
   onTestRunStart?(): void {
@@ -58,12 +65,11 @@ export class VitestQaseReporter implements Reporter {
   async onTestCaseResult?(testCase: TestCase): Promise<void> {
     const testId = testCase.id;
     const metadata = this.metadataAccumulator.getMetadata(testId);
-    const currentSuite = this.metadataAccumulator.getCurrentSuite();
     const localProfilerSteps = this.profilerTracker.getNewSteps();
     const workerProfilerSteps = this.extractWorkerProfilerSteps(testCase);
     const profilerSteps = [...localProfilerSteps, ...workerProfilerSteps];
 
-    const result = ResultBuilder.build({ testCase, metadata, currentSuite, profilerSteps });
+    const result = ResultBuilder.build({ testCase, metadata, profilerSteps });
     this.metadataAccumulator.clearMetadata(testId);
     await this.reporter.addTestResult(result);
   }
@@ -71,14 +77,6 @@ export class VitestQaseReporter implements Reporter {
   onTestCaseAnnotate?(testCase: TestCase, annotation: TestAnnotation): void {
     const testId = testCase.id;
     this.metadataAccumulator.parseAnnotation(testId, annotation);
-  }
-
-  onTestSuiteReady?(testSuite: TestSuite): void {
-    this.metadataAccumulator.setCurrentSuite(testSuite.name);
-  }
-
-  onTestSuiteResult?(): void {
-    this.metadataAccumulator.clearCurrentSuite();
   }
 
   private extractWorkerProfilerSteps(testCase: TestCase): TestStepType[] {

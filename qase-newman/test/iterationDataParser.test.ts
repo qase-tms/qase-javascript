@@ -28,8 +28,8 @@ describe('IterationDataParser.parse', () => {
     expect(parser.parse([{ a: 1 }, 'oops'])).toEqual([]);
   });
 
-  it('flattens flat object array with lowercased keys', () => {
-    expect(parser.parse([{ Foo: 'bar', Baz: 42 }])).toEqual([{ foo: 'bar', baz: '42' }]);
+  it('flattens flat object array keeping the case of keys and values', () => {
+    expect(parser.parse([{ Foo: 'Bar', Baz: 42 }])).toEqual([{ Foo: 'Bar', Baz: '42' }]);
   });
 
   it('flattens nested object using dot notation in keys', () => {

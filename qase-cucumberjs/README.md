@@ -168,13 +168,15 @@ Enhance your scenarios with additional information using tags:
 Feature: User Authentication
 
   @QaseID=1
-  @QaseTitle=Custom Test Title
+  @QaseTitle=Custom_Test_Title
   @QaseFields={"severity":"critical","priority":"high","layer":"e2e"}
   Scenario: Login with metadata
     Given I am on the login page
     When I enter valid credentials
     Then I should see the dashboard
 ```
+
+> **Note:** Gherkin tags cannot contain whitespace (cucumber-js fails with `A tag may not contain whitespace`), so tag values such as titles, suite names and field values must not contain spaces.
 
 **Programmatic Metadata (in Before hooks):**
 ```javascript

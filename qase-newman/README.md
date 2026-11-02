@@ -192,7 +192,8 @@ Newman does not support ignoring individual tests. All tests in the collection w
 |---------------|-------------|
 | Passed | passed |
 | Failed | failed |
-| Skipped | skipped |
+| Skipped (`pm.execution.skipRequest()`) | skipped |
+| Script or request error | invalid |
 
 > For more usage examples, see the [Usage Guide](docs/usage.md).
 

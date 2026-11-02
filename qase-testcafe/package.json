@@ -1,6 +1,6 @@
 {
   "name": "testcafe-reporter-qase",
-  "version": "2.8.1",
+  "version": "2.8.2",
   "description": "Qase TMS TestCafe Reporter",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -14,6 +14,9 @@
     "*": {
       ".": [
         "./dist/index.d.ts"
+      ],
+      "qase": [
+        "./dist/qase.d.ts"
       ],
       "reporter": [
         "./dist/reporter.d.ts"

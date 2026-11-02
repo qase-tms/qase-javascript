@@ -1,3 +1,4 @@
+import { parseQaseIdsFromString } from 'qase-javascript-commons/internal';
 import { metadataEnum, MetadataType } from '../types';
 
 export class MetadataParser {
@@ -16,13 +17,11 @@ export class MetadataParser {
     };
 
     if (meta[metadataEnum.oldID] !== undefined && meta[metadataEnum.oldID] !== '') {
-      const v = meta[metadataEnum.oldID].split(',');
-      metadata.QaseID = Array.isArray(v) ? v.map(Number) : [Number(v)];
+      metadata.QaseID = parseQaseIdsFromString(meta[metadataEnum.oldID]);
     }
 
     if (meta[metadataEnum.id] !== undefined && meta[metadataEnum.id] !== '') {
-      const v = meta[metadataEnum.id].split(',');
-      metadata.QaseID = Array.isArray(v) ? v.map(Number) : [Number(v)];
+      metadata.QaseID = parseQaseIdsFromString(meta[metadataEnum.id]);
     }
 
     if (meta[metadataEnum.title] !== undefined && meta[metadataEnum.title] !== '') {

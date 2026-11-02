@@ -781,8 +781,8 @@ You can configure extra reporters using the `extraReporters` option in the `qase
 # Single extra reporter
 QASE_MODE=testops npx mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec
 
-# Multiple extra reporters
-QASE_MODE=testops npx mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec,json
+# Multiple extra reporters: separate them with ';' (Mocha splits option values on ',')
+QASE_MODE=testops npx mocha --reporter mocha-qase-reporter --reporter-options "extraReporters=spec;json"
 
 # With parallel execution
 QASE_MODE=testops npx mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec --parallel
@@ -810,6 +810,8 @@ QASE_MODE=testops npx mocha --reporter mocha-qase-reporter --reporter-options ex
 }
 ```
 
+In parallel mode extra reporters run once, in the main Mocha process, so their output covers the whole run.
+
 ### Parallel Mode Compatibility
 
 Some reporters are incompatible with parallel mode and will be automatically filtered out with a warning:
@@ -831,7 +833,7 @@ npm run test:extra
 npm run test:extra-parallel
 
 # Multiple reporters
-QASE_MODE=testops npx mocha --reporter mocha-qase-reporter --reporter-options extraReporters=spec,json --parallel
+QASE_MODE=testops npx mocha --reporter mocha-qase-reporter --reporter-options "extraReporters=spec;json" --parallel
 ```
 
 ---
@@ -892,6 +894,14 @@ QASE_MODE=testops npx mocha tests/auth.spec.js
 ```
 
 ### Parallel Execution
+
+With `--parallel`, the main Mocha process starts the run before the workers start and completes it once, after the last worker; the workers only send their results. In `report` mode the report contains the results of every worker.
+
+```bash
+QASE_MODE=testops npx mocha --parallel
+```
+
+To report into a run created beforehand:
 
 ```bash
 # Create test run
@@ -1049,8 +1059,7 @@ const { qase } = require('mocha-qase-reporter');
 **Solutions:**
 
 1. Use extra reporters instead of mocha-multi-reporters
-2. Create test run before parallel execution
-3. Ensure all tests are independent (no shared state)
+2. Ensure all tests are independent (no shared state)
 
 ### Steps Not Showing in Qase
 

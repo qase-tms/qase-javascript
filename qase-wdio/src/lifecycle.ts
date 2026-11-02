@@ -8,6 +8,7 @@ import {
 } from 'qase-javascript-commons';
 import { v4 as uuidv4 } from 'uuid';
 import { Storage } from './storage';
+import { withExtension } from './utils';
 
 export class TestLifecycle {
   constructor(private readonly storage: Storage) {}
@@ -61,7 +62,8 @@ export class TestLifecycle {
   attachJSON(name: string, json: unknown): void {
     const isStr = typeof json === 'string';
     const content = isStr ? json : JSON.stringify(json, null, 2);
-    this.attachFile(name, String(content), isStr ? 'text/plain' : 'application/json');
+    const type = isStr ? 'text/plain' : 'application/json';
+    this.attachFile(withExtension(name, type), String(content), type);
   }
 
   attachFile(name: string, content: string | Buffer, contentType: string): void {

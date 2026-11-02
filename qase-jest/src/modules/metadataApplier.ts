@@ -42,7 +42,7 @@ export class MetadataApplier {
   }
 
   applyFields(values: Record<string, string>): void {
-    this.metadata.fields = values;
+    this.metadata.fields = { ...this.metadata.fields, ...values };
   }
 
   applyParameters(values: Record<string, string>): void {
@@ -70,6 +70,11 @@ export class MetadataApplier {
   }
 
   applyStep(step: TestStepType): void {
+    MetadataApplier.cleanStep(step);
+    this.metadata.steps.push(step);
+  }
+
+  private static cleanStep(step: TestStepType): void {
     const isTextStep =
       step.step_type === StepType.TEXT ||
       (step.step_type as StepType | undefined) === undefined ||
@@ -86,6 +91,6 @@ export class MetadataApplier {
       stepTextData.expected_result = cleaned.expectedResult;
       stepTextData.data = cleaned.data;
     }
-    this.metadata.steps.push(step);
+    (step.steps as TestStepType[] | undefined)?.forEach((child) => MetadataApplier.cleanStep(child));
   }
 }

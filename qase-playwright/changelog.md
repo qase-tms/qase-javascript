@@ -1,3 +1,17 @@
+# playwright-qase-reporter@2.8.1
+
+## Fixed
+
+- Playwright-specific settings (`browser.addAsParameter`, `browser.parameterName`, `markAsFlaky`) are now read from `qase.config.json` under `framework.playwright`. Previously they were only honoured when passed inline in `playwright.config` and were silently ignored in the config file. The file section is validated, and a setting passed inline under `framework` still overrides the same setting from the file.
+- `framework` is now optional in the exported `PlaywrightQaseOptionsType`. Previously TypeScript users had to pass `framework: {}` even when they did not use any Playwright-specific setting.
+- Calling `qase.fields()` more than once in a test now merges the fields, with later calls overriding keys set earlier. Previously the last call replaced all fields set before it.
+- `qase.suite('Parent\tChild')` now reports a nested suite hierarchy (`Parent` > `Child`), as documented. Previously the whole string, tab included, was sent as a single suite title. A literal backslash-t (`'Parent\\tChild'`) is split the same way.
+
+## Documentation
+
+- `qase.step()` docs no longer say all three arguments are required: only `action` is, `expectedResult` and `data` are optional.
+- Replaced the invalid `severity: 'high'` in examples and JSDoc with a valid value, fixed `mode: 'TestOps'` / `TestOps: {...}` to the lowercase `testops`, and replaced the `qase.suite('Authentication / Login')` example with the tab-separated form that actually nests suites.
+
 # playwright-qase-reporter@2.8.0
 
 ## Added

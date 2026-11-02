@@ -1,3 +1,23 @@
+# cypress-qase-reporter@3.8.2
+
+## Fixed
+
+- `qase.step(name, body, expectedResult, data)` dropped the expected result and the data; they are now reported with the step.
+- A step with the same name as the first step of the test was dropped, e.g. the second `Open page` in `Open page`, `Search`, `Open page`. Steps with repeated names are now all reported, for `qase.step` and for Cucumber steps.
+- Attachments added while a Cucumber step was running were lost; they are now reported on that step.
+- `@QaseID(...)` and other tags written on several lines above `Scenario:` were lost except for the line right above it. The whole tag block is now read, comment lines included.
+- Videos were matched to specs by name prefix, so `login.cy.js` also got the videos of `login2.cy.js` or `login-admin.cy.js`. A spec now gets only its own video, `<spec file name>.mp4`.
+- `qase.attach({ content: Buffer })` broke reporting of the whole spec with `The "data" argument must be of type string or an instance of Buffer ... Received an instance of Object`, because the Buffer arrived from the browser as a plain object. Buffer content is now restored and uploaded as is.
+- With `reporter: 'cypress-qase-reporter'` (without `cypress-multi-reporters`) the plugin ignored `reporterOptions`, so `profilers: ['network']` set there did not turn the network profiler on. Both forms of `reporterOptions` are now read.
+- Nested `qase.step` calls could appear at the top level instead of under their parent when both started in the same millisecond.
+- The root `types` entry in `package.json` pointed to the declarations of a different module than the one `require('cypress-qase-reporter')` loads; it now points to `dist/index.d.ts`.
+
+## Documentation
+
+- README: the configuration priority was listed backwards. Environment variables override `qase.config.json`, which overrides `reporterOptions` in `cypress.config.js`. The Node.js requirement is `>= 18`.
+- UPGRADE: `afterSpecHook` is called as `on('after:spec', async (spec) => afterSpecHook(spec, config))`; the video options are `framework.cypress.videosFolder` and `framework.cypress.uploadDelay` (in seconds), not `testops.uploadDelay` in milliseconds; `severity: 'high'` replaced with a valid value; Node.js requirements per version corrected.
+- Cucumber: `@QaseID` tags go above `Scenario:` in the `@QaseID(12)` form, `mode` is `testops` in lowercase, and the example path is `examples/single/cypressBadeballCucumber`.
+
 # cypress-qase-reporter@3.8.1
 
 ## Fixed

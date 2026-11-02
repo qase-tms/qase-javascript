@@ -9,6 +9,7 @@ jest.mock('../src/hooks', () => ({
   beforeRunHook: beforeRunHookMock,
   afterRunHook: afterRunHookMock,
   afterSpecHook: afterSpecHookMock,
+  resolveUserOptions: jest.requireActual('../src/hooks').resolveUserOptions,
 }));
 
 jest.mock('qase-javascript-commons', () => ({
@@ -82,5 +83,20 @@ describe('plugin registration', () => {
 
   it('tells the support file not to profile otherwise', () => {
     expect(profilerTask([])).toEqual({ enabled: false, skipDomains: [] });
+  });
+
+  // With `reporter: 'cypress-qase-reporter'` Cypress passes the options unwrapped.
+  it('reads the profiler settings from unwrapped reporter options', () => {
+    const reporterOptions = { profilers: ['network'], testops: { project: 'P' } };
+    loadPlugin()(jest.fn(), { reporterOptions, env: {} });
+    const { composeOptions } = require('qase-javascript-commons');
+    expect(composeOptions).toHaveBeenCalledWith(reporterOptions, expect.anything());
+  });
+
+  it('reads the profiler settings from cypress-multi-reporters options', () => {
+    const inner = { profilers: ['network'] };
+    loadPlugin()(jest.fn(), { reporterOptions: { reporterEnabled: 'cypress-qase-reporter', cypressQaseReporterReporterOptions: inner }, env: {} });
+    const { composeOptions } = require('qase-javascript-commons');
+    expect(composeOptions).toHaveBeenCalledWith(inner, expect.anything());
   });
 });

@@ -130,6 +130,15 @@ describe('TestLifecycle', () => {
       expect(test.attachments[0]?.content).toBe('https://example.com');
       expect(test.attachments[0]?.mime_type).toBe('text/plain');
     });
+
+    // Qase's v1 upload takes the MIME type from the file name, so a bare name arrives as octet-stream.
+    it('gives the file name an extension that matches the content', () => {
+      lifecycle.startTest('t', 'cid');
+      lifecycle.attachJSON('Request', { a: 1 });
+      lifecycle.attachJSON('Response', 'https://example.com');
+      const test = storage.getCurrentTest()!;
+      expect(test.attachments.map((a) => a.file_name)).toEqual(['Request.json', 'Response.txt']);
+    });
   });
 
   describe('startTest', () => {

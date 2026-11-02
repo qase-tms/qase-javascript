@@ -2,6 +2,7 @@ import { Attachment, getMimeTypes, TestopsProjectMapping, TestStepType } from 'q
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import { Storage } from './storage';
+import { withExtension } from './utils';
 import {
   AddAttachmentEventArgs,
   AddCommentEventArgs,
@@ -102,12 +103,14 @@ export class MetadataApplier {
     }
 
     if (content) {
+      const fileName = name ?? 'attachment';
+      const mimeType = type ?? getMimeTypes(fileName);
       const attach: Attachment = {
         file_path: null,
         size: content.length,
         id: uuidv4(),
-        file_name: name ?? 'attachment',
-        mime_type: type ?? 'application/octet-stream',
+        file_name: withExtension(fileName, mimeType),
+        mime_type: mimeType,
         content,
       };
       cur.attachments.push(attach);
