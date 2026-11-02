@@ -6,6 +6,10 @@ import { getHostInfo } from '../utils/hostData';
 import { HostData } from '../models/host-data';
 import { ReportSerializer, ReportSerializerInterface } from '../formatter/report-serializer';
 
+// Set by the process that starts the run and inherited by the processes it spawns, such as
+// WebdriverIO workers, so they add their results to the report instead of clearing it.
+const RUN_STARTED_ENV = 'QASE_REPORT_RUN_STARTED_AT';
+
 /**
  * @class ReportReporter
  * @extends AbstractReporter
@@ -55,6 +59,8 @@ export class ReportReporter extends AbstractReporter {
   // eslint-disable-next-line @typescript-eslint/require-await
   public async startTestRun(): Promise<void> {
     this.startTime = Date.now();
+    this.writer.clearPreviousResults();
+    process.env[RUN_STARTED_ENV] = String(this.startTime);
   }
 
   /**
@@ -67,7 +73,9 @@ export class ReportReporter extends AbstractReporter {
   }
 
   public async sendResults(): Promise<void> {
-    this.writer.clearPreviousResults();
+    if (!process.env[RUN_STARTED_ENV]) {
+      this.writer.clearPreviousResults();
+    }
 
     for (const result of this.results) {
       if (result.attachments.length > 0) {
@@ -103,6 +111,10 @@ export class ReportReporter extends AbstractReporter {
   }
 
   public async complete(): Promise<void> {
+    const startedAt = Number(process.env[RUN_STARTED_ENV]);
+    if (startedAt) {
+      this.startTime = startedAt;
+    }
     const endTime = Date.now();
     const report: Report = {
       title: 'Test run',
@@ -128,7 +140,16 @@ export class ReportReporter extends AbstractReporter {
       host_data: this.hostData ?? getHostInfo(this.frameworkName, this.reporterName),
     };
 
+    // Other processes of the run, such as WebdriverIO workers, have written their results only.
+    const results = new Map<string, TestResultType>();
+    for (const result of this.writer.readTestResults()) {
+      results.set(result.id, result);
+    }
     for (const result of this.results) {
+      results.set(result.id, result);
+    }
+
+    for (const result of results.values()) {
       report.stats.total++;
       switch (result.execution.status) {
         case TestStatusEnum.passed:

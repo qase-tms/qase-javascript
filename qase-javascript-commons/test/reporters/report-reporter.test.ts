@@ -64,6 +64,7 @@ const createMockWriter = (): jest.Mocked<WriterInterface> => ({
   writeAttachment: jest.fn((attachments) => attachments.map(a => ({ ...a, file_path: '/mock/' + a.file_name }))),
   writeTestResult: jest.fn().mockResolvedValue(undefined),
   writeReport: jest.fn().mockResolvedValue('/mock/run.json'),
+  readTestResults: jest.fn().mockReturnValue([]),
 });
 
 const createMockLogger = (): jest.Mocked<LoggerInterface> => ({
@@ -78,9 +79,60 @@ describe('ReportReporter', () => {
   let reporter: ReportReporter;
 
   beforeEach(() => {
+    delete process.env['QASE_REPORT_RUN_STARTED_AT'];
     writer = createMockWriter();
     logger = createMockLogger();
     reporter = new ReportReporter(logger, writer, 'jest', 'reporter', 'dev', 'RootSuite', 42);
+  });
+
+  describe('a run shared by several processes', () => {
+    const result = (id: string, status: TestStatusEnum) => {
+      const r = new TestResultType(id);
+      r.id = id;
+      r.execution.status = status;
+      r.execution.duration = 1;
+      return r;
+    };
+
+    it('clears the previous report when the run starts and tells spawned processes', async () => {
+      await reporter.startTestRun();
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(writer.clearPreviousResults).toHaveBeenCalledTimes(1);
+      expect(process.env['QASE_REPORT_RUN_STARTED_AT']).toBe(String(reporter['startTime']));
+    });
+
+    it('adds the results of a process that did not start the run to the report', async () => {
+      process.env['QASE_REPORT_RUN_STARTED_AT'] = '1000';
+      reporter['results'] = [result('w1', TestStatusEnum.passed)];
+      await reporter.sendResults();
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(writer.clearPreviousResults).not.toHaveBeenCalled();
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(writer.writeTestResult).toHaveBeenCalledTimes(1);
+    });
+
+    it('still replaces the report when no process started the run', async () => {
+      reporter['results'] = [result('r1', TestStatusEnum.passed)];
+      await reporter.sendResults();
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(writer.clearPreviousResults).toHaveBeenCalledTimes(1);
+    });
+
+    it('counts the results other processes wrote, once each', async () => {
+      process.env['QASE_REPORT_RUN_STARTED_AT'] = '1000';
+      writer.readTestResults.mockReturnValue([
+        result('w1', TestStatusEnum.passed),
+        result('w2', TestStatusEnum.failed),
+        result('own', TestStatusEnum.failed),
+      ]);
+      reporter['results'] = [result('own', TestStatusEnum.passed)];
+
+      await reporter.complete();
+
+      const report = writer.writeReport.mock.calls[0]?.[0];
+      expect(report?.stats).toEqual({ total: 3, passed: 2, failed: 1, skipped: 0, blocked: 0, invalid: 0, muted: 0 });
+      expect(report?.execution.start_time).toBe(1);
+    });
   });
 
   it('should initialize with correct parameters', () => {

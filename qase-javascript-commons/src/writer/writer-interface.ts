@@ -5,4 +5,5 @@ export interface WriterInterface {
   writeTestResult(result: TestResultType): Promise<void>;
   writeAttachment(attachments: Attachment[]): Attachment[];
   clearPreviousResults(): void;
+  readTestResults(): TestResultType[];
 }

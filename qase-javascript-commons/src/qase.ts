@@ -10,6 +10,7 @@ import { Logger, LoggerInterface } from './utils/logger';
 import { getHostInfo } from './utils/hostData';
 import { sanitizeOptionsForLog } from './utils/token-masker';
 import { StateManager, StateModel } from './state/state';
+import { RunFailures } from './state/run-failures';
 
 import { OptionsResolver, ResolvedOptions } from './qase/options-resolver';
 import { ReporterFactory } from './qase/reporter-factory';
@@ -94,6 +95,7 @@ export class QaseReporter implements ReporterInterface {
     );
 
     this.fallback = new FallbackCoordinator(this.logger, upstream, fallback, {
+      onUpstreamFailure: () => RunFailures.record(),
       onFallbackActivated: () => {
         if (this.withState) {
           StateManager.setMode(resolved.composed.fallback as ModeEnum);
@@ -259,6 +261,7 @@ export class QaseReporter implements ReporterInterface {
 
   public startTestRun(): void {
     if (this.withState) StateManager.clearState();
+    RunFailures.begin();
     this.fallback.reset();
     this.logger.logDebug('Starting test run');
 
@@ -290,11 +293,18 @@ export class QaseReporter implements ReporterInterface {
         'publish the run results',
       );
     }
+    RunFailures.consume();
     if (this.withState) StateManager.clearState();
   }
 
   public async complete(): Promise<void> {
     if (this.withState) StateManager.clearState();
+    // Another process of the run, such as a WebdriverIO worker, failed to send its results.
+    // Leave the run open, as a single process does, and complete the fallback report instead.
+    if (RunFailures.consume() && !this.fallback.isUsingFallback()) {
+      this.logger.logError('Some results of this run were not sent to Qase; the run is left open.');
+      this.fallback.setUseFallback(true);
+    }
     if (this.fallback.isDisabled()) return;
     await this.fallback.run((r) => r.complete(), 'complete the run');
   }

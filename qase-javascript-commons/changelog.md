@@ -1,3 +1,10 @@
+## 2.9.10
+
+### Fixed
+
+- `report` mode kept only the last process's results when tests ran in several processes, as WebdriverIO does with one worker per spec file: every worker cleared the report folder before writing its own results, and `run.json`, written by the launcher, had no results at all. The report folder is now cleared once, when the run starts. Processes started by that one add their results, and `run.json` counts every result in the folder.
+- When a worker process failed to send its results to Qase TestOps, the launcher still completed the run as if nothing were missing. The run is now left open, as it is when a single-process reporter fails to send its results, and the launcher logs that some results were not sent. With `fallback: report` the launcher writes the fallback report's `run.json`.
+
 ## 2.9.9
 
 ### Fixed

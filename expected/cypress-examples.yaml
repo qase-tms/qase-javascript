@@ -1,7 +1,7 @@
 run:
   stats:
-    total: 3
-    passed: 3
+    total: 12
+    passed: 12
     failed: 0
     skipped: 0
     blocked: 0
@@ -100,5 +100,324 @@ results:
       status: passed
   - data:
       action: Verify cannot access inventory
+    execution:
+      status: passed
+- title: User can browse all products
+  signature: 4::cypress::e2e::inventory.cy.js::product_inventory::user_can_browse_all_products_(qase_id:_4)
+  testops_ids:
+  - 4
+  status: passed
+  fields:
+    severity: major
+    priority: high
+    layer: e2e
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tInventory\tBrowsing"
+        public_id: null
+  steps:
+  - data:
+      action: Verify Products page title
+    execution:
+      status: passed
+  - data:
+      action: Count inventory items
+    execution:
+      status: passed
+  - data:
+      action: Verify product names are visible
+    execution:
+      status: passed
+  - data:
+      action: Verify product prices are visible
+    execution:
+      status: passed
+  - data:
+      action: Attach product count data
+    execution:
+      status: passed
+      attachments:
+      - file_name: product-count.json
+        mime_type: application/json
+- title: User can sort products by price
+  signature: 5::cypress::e2e::inventory.cy.js::product_inventory::user_can_sort_products_by_price_(qase_id:_5)::{'sortoption':'lohi'}
+  testops_ids:
+  - 5
+  status: passed
+  fields:
+    severity: normal
+    priority: medium
+    layer: e2e
+  params:
+    sortOption: lohi
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tInventory\tSorting"
+        public_id: null
+  steps:
+  - data:
+      action: Select sort by price low to high
+    execution:
+      status: passed
+  - data:
+      action: Verify prices are in ascending order
+    execution:
+      status: passed
+- title: User can view product details
+  signature: 6::cypress::e2e::inventory.cy.js::product_inventory::user_can_view_product_details_(qase_id:_6)
+  testops_ids:
+  - 6
+  status: passed
+  fields:
+    severity: normal
+    priority: medium
+    layer: e2e
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tInventory\tProduct Details"
+        public_id: null
+  steps:
+  - data:
+      action: Click on first product name
+    execution:
+      status: passed
+  - data:
+      action: Verify product detail page loads
+    execution:
+      status: passed
+  - data:
+      action: Verify back to products button is present
+    execution:
+      status: passed
+- title: User can add product to cart
+  signature: 7::cypress::e2e::cart.cy.js::cart_management::user_can_add_product_to_cart_(qase_id:_7)::{'product':'sauce
+    labs backpack'}
+  testops_ids:
+  - 7
+  status: passed
+  fields:
+    severity: critical
+    priority: high
+    layer: e2e
+  params:
+    product: Sauce Labs Backpack
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tShopping Cart\tAdd Items"
+        public_id: null
+  steps:
+  - data:
+      action: Verify cart is initially empty
+    execution:
+      status: passed
+  - data:
+      action: Add Sauce Labs Backpack to cart
+    execution:
+      status: passed
+  - data:
+      action: Verify cart badge shows 1 item
+    execution:
+      status: passed
+  - data:
+      action: Navigate to cart
+    execution:
+      status: passed
+  - data:
+      action: Verify product appears in cart
+    execution:
+      status: passed
+  - data:
+      action: Attach cart state
+    execution:
+      status: passed
+      attachments:
+      - file_name: cart-state.json
+        mime_type: application/json
+- title: User can remove product from cart
+  signature: 8::cypress::e2e::cart.cy.js::cart_management::user_can_remove_product_from_cart_(qase_id:_8)
+  testops_ids:
+  - 8
+  status: passed
+  fields:
+    severity: major
+    priority: medium
+    layer: e2e
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tShopping Cart\tRemove Items"
+        public_id: null
+  steps:
+  - data:
+      action: Add product to cart
+    execution:
+      status: passed
+  - data:
+      action: Navigate to cart
+    execution:
+      status: passed
+  - data:
+      action: Verify product is in cart
+    execution:
+      status: passed
+  - data:
+      action: Remove product from cart
+    execution:
+      status: passed
+  - data:
+      action: Verify cart is empty
+    execution:
+      status: passed
+- title: User can add multiple products to cart
+  signature: 9::cypress::e2e::cart.cy.js::cart_management::user_can_add_multiple_products_to_cart_(qase_id:_9)
+  testops_ids:
+  - 9
+  status: passed
+  fields:
+    severity: major
+    priority: medium
+    layer: e2e
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tShopping Cart\tMultiple Items"
+        public_id: null
+  steps:
+  - data:
+      action: Add first product to cart
+    execution:
+      status: passed
+  - data:
+      action: Add second product to cart
+    execution:
+      status: passed
+  - data:
+      action: Navigate to cart and verify both products
+    execution:
+      status: passed
+- title: User can complete checkout with valid information
+  signature: 10::cypress::e2e::checkout.cy.js::checkout_flow::user_can_complete_checkout_with_valid_information_(qase_id:_10)::{'firstname':'john'}::{'lastname':'doe'}::{'postalcode':'12345'}
+  testops_ids:
+  - 10
+  status: passed
+  fields:
+    severity: critical
+    priority: high
+    layer: e2e
+  params:
+    firstName: John
+    lastName: Doe
+    postalCode: '12345'
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tCheckout\tComplete Flow"
+        public_id: null
+  steps:
+  - data:
+      action: Verify on checkout information page
+    execution:
+      status: passed
+  - data:
+      action: Fill in checkout information
+    execution:
+      status: passed
+  - data:
+      action: Continue to overview
+    execution:
+      status: passed
+  - data:
+      action: Verify on checkout overview page
+    execution:
+      status: passed
+  - data:
+      action: Verify order details are correct
+    execution:
+      status: passed
+  - data:
+      action: Complete the order
+    execution:
+      status: passed
+  - data:
+      action: Verify order completion
+    execution:
+      status: passed
+  - data:
+      action: Attach order details
+    execution:
+      status: passed
+      attachments:
+      - file_name: order-details.txt
+        mime_type: text/plain
+- title: Checkout fails without required information
+  signature: 11::cypress::e2e::checkout.cy.js::checkout_flow::checkout_fails_without_required_information_(qase_id:_11)::{'scenario':'missing_first_name'}
+  testops_ids:
+  - 11
+  status: passed
+  fields:
+    severity: major
+    priority: medium
+    layer: e2e
+  params:
+    scenario: missing_first_name
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tCheckout\tValidation"
+        public_id: null
+  steps:
+  - data:
+      action: Verify on checkout information page
+    execution:
+      status: passed
+  - data:
+      action: Fill only last name and postal code
+    execution:
+      status: passed
+  - data:
+      action: Attempt to continue without first name
+    execution:
+      status: passed
+  - data:
+      action: Verify error message is displayed
+    execution:
+      status: passed
+  - data:
+      action: Verify still on information page
+    execution:
+      status: passed
+- title: User can cancel checkout
+  signature: 12::cypress::e2e::checkout.cy.js::checkout_flow::user_can_cancel_checkout_(qase_id:_12)
+  testops_ids:
+  - 12
+  status: passed
+  fields:
+    severity: normal
+    priority: low
+    layer: e2e
+  relations:
+    suite:
+      data:
+      - title: "E-commerce\tCheckout\tNavigation"
+        public_id: null
+  steps:
+  - data:
+      action: Verify on checkout information page
+    execution:
+      status: passed
+  - data:
+      action: Click cancel button
+    execution:
+      status: passed
+  - data:
+      action: Verify returned to cart page
+    execution:
+      status: passed
+  - data:
+      action: Verify product still in cart
     execution:
       status: passed
