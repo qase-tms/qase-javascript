@@ -1,0 +1,366 @@
+qase-mocha/package.json
+  s_57b503ed365a5f::t_8caa4003e3ba7d 3,47
+qase-wdio/src/service.ts
+  s_57b503ed365a5f::t_783d1339dc75fa 4,7,10-11,65-73
+  s_57b503ed365a5f::t_a88b5e1ab2dc3d 74
+examples/multiProject/newman/README.md
+  s_57b503ed365a5f::t_69df2d3e885f71 10
+qase-newman/package.json
+  s_57b503ed365a5f::t_8caa4003e3ba7d 3
+qase-vitest/src/index.ts
+  s_57b503ed365a5f::t_1122eb39776c0a 1,11,16,24,40-41,46-47,53-54,72
+  s_57b503ed365a5f::t_950721ee36c19b 48-52
+qase-cucumberjs/changelog.md
+  s_57b503ed365a5f::t_84930338972619 1-8,10-17
+  s_57b503ed365a5f::t_a04e934cb9cb89 9
+qase-vitest/test/metadataAccumulator.test.ts
+  s_57b503ed365a5f::t_74cb25c2a261fe 96,99,102,106,109-111,113-141
+qase-jest/test/metadataApplier.test.ts
+  s_57b503ed365a5f::t_4120ba75044a13 52-57
+qase-vitest/docs/UPGRADE.md
+  s_57b503ed365a5f::t_cd3cdb10e7855b 16-31
+  s_57b503ed365a5f::t_cc5e560ba5ee10 326
+qase-vitest/README.md
+  s_57b503ed365a5f::t_cc5e560ba5ee10 253-264
+qase-playwright/package.json
+  s_57b503ed365a5f::t_8caa4003e3ba7d 3
+qase-cypress/docs/UPGRADE.md
+  s_57b503ed365a5f::t_8fe953d2474dfd 80-83,96-101,143-144,154-159,190,243-245,256-260,293-294,321,324-326,328
+expected/vitest-examples.yaml
+  s_57b503ed365a5f::t_3b69fe1bddb323 12,32,54,78,100,121,148,177,194,197-201,203,206-210,216,224-228,240,272,280,307,336
+qase-cypress/test/metadata-manager.test.ts
+  s_57b503ed365a5f::t_87a3178abcd9de 1-87
+qase-testcafe/README.md
+  s_57b503ed365a5f::t_0a09a492c98f8e 230-232,235-237
+  s_57b503ed365a5f::t_5f69ddc64511c7 4,383
+qase-jest/test/steps.test.ts
+  s_57b503ed365a5f::t_cd961fa79153cb 1-3,5-75,79-96
+  s_57b503ed365a5f::t_8e5a17c6a90d62 4,76-78
+expected/jest-examples.yaml
+  s_57b503ed365a5f::t_3b69fe1bddb323 22-26,82-84,194-198,325-327,418-422,429-433,438-446
+qase-mocha/docs/usage.md
+  s_57b503ed365a5f::t_f32cb9de559112 784-785,813-814,836,898-905,1062
+qase-mocha/README.md
+  s_57b503ed365a5f::t_f32cb9de559112 233-239,263-264
+qase-newman/src/modules/metadataExtractor.ts
+  s_57b503ed365a5f::t_8b825b26a52447 19
+examples/single/testcafe/README.md
+  s_57b503ed365a5f::t_af2e38468bba62 112,150,152-153,156,159,162-163,254
+expected/playwright-examples.yaml
+  s_57b503ed365a5f::t_3b69fe1bddb323 25-29,61-65,97-101,140-144,176-180,220-224,264-268,319-323,358-362,403-407,441-445,486-490
+qase-vitest/src/setup.mts
+  s_57b503ed365a5f::t_1122eb39776c0a 1-2,5-22
+  s_57b503ed365a5f::t_5ec11e0a3838d2 3-4
+qase-newman/test/metadataExtractor.test.ts
+  s_57b503ed365a5f::t_b6252b20885526 37-41
+qase-mocha/src/modules/resultBuilder.ts
+  s_57b503ed365a5f::t_b5a62f73401d9d 155
+qase-cucumberjs/docs/UPGRADE.md
+  s_57b503ed365a5f::t_0a1294e07dc3f0 31,104,115,124-126,256,259,262
+qase-cypress/src/step-converter.ts
+  s_57b503ed365a5f::t_039d2458e8b600 10-14,30,63-64
+qase-javascript-commons/test/utils/gherkin-action.test.ts
+  s_57b503ed365a5f::t_8e32bbd7a9f99d 1-12,17-20
+  s_57b503ed365a5f::t_c3391220c23e98 13-16
+qase-wdio/src/utils.ts
+  s_57b503ed365a5f::t_37725182b48caa 2,26-49,51-55
+  s_57b503ed365a5f::t_204602f44bfe83 3,50
+qase-newman/docs/usage.md
+  s_57b503ed365a5f::t_69df2d3e885f71 202-203,331
+  s_57b503ed365a5f::t_8c8b9d21c5d391 82-83
+qase-vitest/package.json
+  s_57b503ed365a5f::t_8caa4003e3ba7d 3
+  s_57b503ed365a5f::t_1122eb39776c0a 10,22
+qase-wdio/changelog.md
+  s_57b503ed365a5f::t_786a0b5d07e2ab 14
+  s_57b503ed365a5f::t_c66e4414bccf0e 1-13,15
+qase-javascript-commons/package.json
+  s_57b503ed365a5f::t_8caa4003e3ba7d 3
+qase-testcafe/package.json
+  s_57b503ed365a5f::t_8caa4003e3ba7d 3
+  s_57b503ed365a5f::t_e2c52bc81965f3 18-20
+qase-wdio/src/cucumber-attach.ts
+  s_57b503ed365a5f::t_a607050e4eb489 1-55
+qase-playwright/test/reporter.test.ts
+  s_57b503ed365a5f::t_b40b2b1a3f1602 214
+qase-cypress/changelog.md
+  s_57b503ed365a5f::t_96c86976a593b8 9
+  s_57b503ed365a5f::t_b492201925195c 1-8,10-20
+qase-cucumberjs/test/eventStorage.test.ts
+  s_57b503ed365a5f::t_29d99e296641e5 57,59,72-73
+  s_57b503ed365a5f::t_43b581afa8b6ac 85-102,104-105,122-124,128,136
+  s_57b503ed365a5f::t_0bd922a7dcdc2b 84,103,106-121,125-127,129-135
+qase-testcafe/src/qase.ts
+  s_57b503ed365a5f::t_5f69ddc64511c7 85,196-197,204-205,208,212-213,239,249
+qase-jest/src/modules/metadataApplier.ts
+  s_57b503ed365a5f::t_30717209a90183 45,73-77,94
+qase-newman/src/modules/iterationDataParser.ts
+  s_57b503ed365a5f::t_8b825b26a52447 25
+qase-vitest/changelog.md
+  s_57b503ed365a5f::t_a04e934cb9cb89 1-21
+qase-cucumberjs/src/storage.ts
+  s_57b503ed365a5f::t_b8f978afc8af3b 118
+  s_57b503ed365a5f::t_f3734f8f06af64 32,71-74,78-83,117,121-125,139
+qase-cucumberjs/src/modules/eventStorage.ts
+  s_57b503ed365a5f::t_b8f978afc8af3b 22,33-44,76-81,114-115
+  s_57b503ed365a5f::t_4168b540f48cff 116-117,126-133
+examples/multiProject/testcafe/README.md
+  s_57b503ed365a5f::t_5f69ddc64511c7 5
+qase-cypress/src/hooks.ts
+  s_57b503ed365a5f::t_039d2458e8b600 23,108
+qase-playwright/test/reporter-config.test.ts
+  s_57b503ed365a5f::t_3c8a976d573bfb 1-5,7-21,52-128
+  s_57b503ed365a5f::t_0b31b9373790f6 6,22-23,27-28,30-45,47-51
+  s_57b503ed365a5f::t_e9165ad7c3eda1 24-26,29,46
+qase-cypress/src/metadata/manager.ts
+  s_57b503ed365a5f::t_1ff442286bc99a 1,6,35,57,59,66-73,84,239
+qase-newman/test/iterationDataParser.test.ts
+  s_57b503ed365a5f::t_b6252b20885526 31-32
+qase-javascript-commons/test/client/services/result-transformer.test.ts
+  s_57b503ed365a5f::t_c3391220c23e98 224-231
+qase-cypress/src/fileSearcher.ts
+  s_57b503ed365a5f::t_039d2458e8b600 103,122-123
+qase-mocha/test/metadataApplier.test.ts
+  s_57b503ed365a5f::t_707a1e8a3c5219 85-93
+qase-cypress/docs/usage.md
+  s_57b503ed365a5f::t_4d846a1b116028 728
+qase-jest/test/jest.test.ts
+  s_57b503ed365a5f::t_4120ba75044a13 190-209
+qase-cucumberjs/package.json
+  s_57b503ed365a5f::t_8caa4003e3ba7d 3,44
+qase-wdio/src/models.ts
+  s_57b503ed365a5f::t_37725182b48caa 24
+qase-mocha/src/types.ts
+  s_57b503ed365a5f::t_77d7873895a06b 3,94,107
+qase-wdio/src/lifecycle.ts
+  s_57b503ed365a5f::t_37725182b48caa 11,65-66
+qase-playwright/changelog.md
+  s_57b503ed365a5f::t_3e64ca7dcb53d6 1-14
+qase-cypress/test/results-manager.test.ts
+  s_57b503ed365a5f::t_b1aaf0540dcffd 1-32
+qase-wdio/test/utils.test.ts
+  s_57b503ed365a5f::t_204602f44bfe83 137-153
+qase-javascript-commons/src/utils/gherkin-action.ts
+  s_57b503ed365a5f::t_e9fcd793612e19 1-4
+  s_57b503ed365a5f::t_c3391220c23e98 5-8
+qase-vitest/docs/usage.md
+  s_57b503ed365a5f::t_cc5e560ba5ee10 124
+qase-cypress/README.md
+  s_57b503ed365a5f::t_4d846a1b116028 91-93,346
+qase-newman/src/reporter.ts
+  s_57b503ed365a5f::t_8b825b26a52447 17,46,85,89-99,107-112,129-134,139,151-163,177-183
+qase-newman/README.md
+  s_57b503ed365a5f::t_69df2d3e885f71 195-196
+qase-cypress/package.json
+  s_57b503ed365a5f::t_8caa4003e3ba7d 3
+  s_57b503ed365a5f::t_71a37d70b294dd 10
+qase-javascript-commons/changelog.md
+  s_57b503ed365a5f::t_a04e934cb9cb89 3-6
+  s_57b503ed365a5f::t_68b80de9e2538a 1-2,7-11
+qase-cucumberjs/test/stepConverter.test.ts
+  s_57b503ed365a5f::t_43b581afa8b6ac 48-58
+qase-cucumberjs/docs/usage.md
+  s_57b503ed365a5f::t_0a1294e07dc3f0 69-70,75,105,133,139,426,429-430,465-467,479,515,527-530,721-722,737-738,795-796,798-799,835-837,859
+qase-cypress/src/utils/tagParser.ts
+  s_57b503ed365a5f::t_039d2458e8b600 24,26-29
+qase-cypress/test/step-converter.test.ts
+  s_57b503ed365a5f::t_983c13140378f9 128-145
+  s_57b503ed365a5f::t_ab91174a1120d8 43-50
+  s_57b503ed365a5f::t_d4fa594c6bacef 42
+qase-newman/test/reporter.test.ts
+  s_57b503ed365a5f::t_b6252b20885526 20
+qase-newman/changelog.md
+  s_57b503ed365a5f::t_8c8b9d21c5d391 1-13
+qase-mocha/test/reporter.test.ts
+  s_57b503ed365a5f::t_d71343c71f3b62 9-10,141,145,155,160-175,177,180,183-194,196-200,202-218,220-229,231
+  s_57b503ed365a5f::t_9163cbd28da475 195,219
+  s_57b503ed365a5f::t_7952575cbcbe78 11,29,130-140,142-144,146-154,156-159,176,178-179,181-182,201,230
+qase-cypress/src/result-builder.ts
+  s_57b503ed365a5f::t_039d2458e8b600 101-105
+qase-cypress/test/fileSearcher.test.ts
+  s_57b503ed365a5f::t_af2e38468bba62 180-191
+  s_57b503ed365a5f::t_490a1ce567d2c2 99,116,134,152,162,175,179
+qase-jest/changelog.md
+  s_57b503ed365a5f::t_3783b4586f2df1 1-16
+qase-vitest/src/modules/resultBuilder.ts
+  s_57b503ed365a5f::t_3e64ca7dcb53d6 1,9,12-13,24,44-45,53-56,59-68,108-110,128,156-180,182-188
+  s_57b503ed365a5f::t_b5a62f73401d9d 49-50
+qase-jest/test/resultBuilder.test.ts
+  s_57b503ed365a5f::t_4120ba75044a13 153-183
+qase-vitest/src/modules/metadataAccumulator.ts
+  s_57b503ed365a5f::t_f6fc32a3b03f17 4-9,19-20,63,164-170,172,174-176,178,180-183,185,204-220
+  s_57b503ed365a5f::t_94cfdb51d79574 221-222
+qase-testcafe/docs/UPGRADE.md
+  s_57b503ed365a5f::t_f81b0e72a5dfd9 9,23,27,105,123,138,148,151-155,160-161,164,170-171,174-176,179-181,189-191,194-195,211-212,219,222,228-229,231,272,276,308,311,313-314,320,323,325,375
+qase-testcafe/changelog.md
+  s_57b503ed365a5f::t_0a1294e07dc3f0 1-16
+examples/multiProject/cucumberjs/README.md
+  s_57b503ed365a5f::t_35b90ba805768a 10
+qase-vitest/tsconfig.build.json
+  s_57b503ed365a5f::t_1122eb39776c0a 10
+qase-vitest/test/index.test.ts
+  s_57b503ed365a5f::t_33cc36752cbb58 39-41,117-137,159-176
+  s_57b503ed365a5f::t_359a02d2d8e82b 177
+qase-cypress/docs/cucumber.md
+  s_57b503ed365a5f::t_4d846a1b116028 261-262,287,322
+qase-newman/test/reporterEvents.test.ts
+  s_57b503ed365a5f::t_61426119c05a4f 1-125
+qase-wdio/README.md
+  s_57b503ed365a5f::t_ee27167cbec69c 69-70,366
+qase-jest/package.json
+  s_57b503ed365a5f::t_8caa4003e3ba7d 3
+qase-testcafe/docs/usage.md
+  s_57b503ed365a5f::t_0a09a492c98f8e 464,470,475,481,484,533,536,597
+  s_57b503ed365a5f::t_5f69ddc64511c7 382,507
+  s_57b503ed365a5f::t_87a3178abcd9de 239,241,252,254,325,327,720-721,757,759
+  s_57b503ed365a5f::t_9d49cbe46f493c 229,794,934,1010
+qase-jest/docs/UPGRADE.md
+  s_57b503ed365a5f::t_3783b4586f2df1 223
+qase-jest/src/modules/resultBuilder.ts
+  s_57b503ed365a5f::t_30717209a90183 105,108-115
+qase-testcafe/test/reporter.test.ts
+  s_57b503ed365a5f::t_e7338ebd624949 25
+qase-testcafe/docs/MULTI_PROJECT.md
+  s_57b503ed365a5f::t_5f69ddc64511c7 75
+qase-cucumberjs/src/modules/stepConverter.ts
+  s_57b503ed365a5f::t_b8f978afc8af3b 13,24,33
+qase-testcafe/docs/STEPS.md
+  s_57b503ed365a5f::t_87a3178abcd9de 124
+qase-javascript-commons/README.md
+  s_57b503ed365a5f::t_8e5a17c6a90d62 47
+  s_57b503ed365a5f::t_cd84f5b6cf7b88 15,19-20,48-49,86-88,94
+  s_57b503ed365a5f::t_66f8a155682b5a 95
+qase-wdio/src/metadata.ts
+  s_57b503ed365a5f::t_37725182b48caa 5,106-107,112-113
+qase-testcafe/test/qase.test.ts
+  s_57b503ed365a5f::t_f119e50b914612 1,18-33,35-36,39-50,52-56,58
+  s_57b503ed365a5f::t_15a6943e9c0a25 38,51,57
+  s_57b503ed365a5f::t_e7338ebd624949 34,37
+  s_57b503ed365a5f::t_ed833df20c8495 59
+qase-vitest/test/resultBuilder.test.ts
+  s_57b503ed365a5f::t_86c6602fd65e43 19-22,27-29,53,167-177,179,183-184,187,189,194-212,214-227,258-283,287-288,300-325,357
+  s_57b503ed365a5f::t_e92a7eebd28e10 213
+qase-playwright/docs/STEPS.md
+  s_57b503ed365a5f::t_91e6aa608a6468 104-105,131,139
+qase-vitest/test/workerProfiler.test.ts
+  s_57b503ed365a5f::t_56b5281ea26ff4 1-72
+qase-mocha/test/extraReporters.test.ts
+  s_57b503ed365a5f::t_b1e099523c8b1d 1-26
+qase-wdio/package.json
+  s_57b503ed365a5f::t_8caa4003e3ba7d 3
+qase-cypress/src/mocha.ts
+  s_57b503ed365a5f::t_039d2458e8b600 184-185,190,194-200
+qase-testcafe/test/metadataParser.test.ts
+  s_57b503ed365a5f::t_f119e50b914612 26-31
+qase-playwright/docs/usage.md
+  s_57b503ed365a5f::t_f2d4e22c3b792d 840,849,914
+  s_57b503ed365a5f::t_91e6aa608a6468 399,824,829
+qase-cypress/src/metadata/models.ts
+  s_57b503ed365a5f::t_1ff442286bc99a 36-43
+qase-playwright/src/playwright.ts
+  s_57b503ed365a5f::t_91e6aa608a6468 159
+qase-cucumberjs/README.md
+  s_57b503ed365a5f::t_0a1294e07dc3f0 171,179
+  s_57b503ed365a5f::t_2b3387b62687df 180
+qase-vitest/src/modules/workerProfiler.ts
+  s_57b503ed365a5f::t_0f962b31884260 1-60
+qase-mocha/changelog.md
+  s_57b503ed365a5f::t_22961ee11f7ae7 1-8,11-15
+  s_57b503ed365a5f::t_a04e934cb9cb89 9-10
+qase-testcafe/test/resultBuilder.test.ts
+  s_57b503ed365a5f::t_f119e50b914612 140-150
+qase-mocha/src/extraReporters.ts
+  s_57b503ed365a5f::t_24735b36e442ca 10-16,28,43
+qase-jest/src/jest.ts
+  s_57b503ed365a5f::t_30717209a90183 1,3-10,19-34,195-203,212,220,222,224-229,231-234,238-239,247,252
+qase-wdio/test/service.test.ts
+  s_57b503ed365a5f::t_693664224acb69 7-11
+  s_57b503ed365a5f::t_c6469765aa704b 1-6,12-121
+qase-mocha/src/reporter.ts
+  s_57b503ed365a5f::t_0e87f4ea922de7 135-136,148,150-157,192-194
+  s_57b503ed365a5f::t_96d02af383ec45 27-34,45,85-89,107,113-118,120,125-129,195-196
+qase-cypress/test/hooks.test.ts
+  s_57b503ed365a5f::t_783d1339dc75fa 110-112
+  s_57b503ed365a5f::t_3d7e098bd7fbd5 103-109,113
+qase-playwright/docs/UPGRADE.md
+  s_57b503ed365a5f::t_91e6aa608a6468 133,146,192,275
+qase-testcafe/docs/ATTACHMENTS.md
+  s_57b503ed365a5f::t_87a3178abcd9de 76,78,119,216,218,258
+  s_57b503ed365a5f::t_97d41708a7ebad 61,99,144,146-147,162,168,201,240,287,320
+qase-cucumberjs/test/storage.test.ts
+  s_57b503ed365a5f::t_29d99e296641e5 138,147-148,181,188,198
+  s_57b503ed365a5f::t_8b89afaa6b27a8 976-1024
+qase-javascript-commons/src/client/services/result-transformer.ts
+  s_57b503ed365a5f::t_e9fcd793612e19 20
+  s_57b503ed365a5f::t_b8f978afc8af3b 223
+qase-javascript-commons/src/formatter/report-serializer.ts
+  s_57b503ed365a5f::t_b8f978afc8af3b 96
+  s_57b503ed365a5f::t_e9fcd793612e19 3
+qase-cypress/test/tagParser.test.ts
+  s_57b503ed365a5f::t_af2e38468bba62 190-208
+  s_57b503ed365a5f::t_00f08e816a252e 86
+qase-playwright/README.md
+  s_57b503ed365a5f::t_91e6aa608a6468 150-158,163-164,251
+package-lock.json
+  s_57b503ed365a5f::t_98a906c9873381 27782,27786,28004,28033,28066,28093,28098,28118,28155,28177,28199,28422
+qase-cucumberjs/src/modules/resultBuilder.ts
+  s_57b503ed365a5f::t_cb55ca251b770a 1,48,79-81,102-105
+qase-cucumberjs/test/resultBuilder.test.ts
+  s_57b503ed365a5f::t_a06a9cb31cd412 95-110
+qase-cypress/src/metadata/buffer.ts
+  s_57b503ed365a5f::t_5c578cf77141fe 1-12
+qase-cypress/src/metadata/resultsManager.ts
+  s_57b503ed365a5f::t_90d248cd749698 4,17
+qase-cypress/src/plugin.js
+  s_57b503ed365a5f::t_e363343fc09a31 1,10
+qase-cypress/test/mocha.test.ts
+  s_57b503ed365a5f::t_89bc95d62342f1 49-68
+qase-cypress/test/package.test.ts
+  s_57b503ed365a5f::t_8ae895e592f68d 1-9
+qase-cypress/test/plugin.test.ts
+  s_57b503ed365a5f::t_3ea798e39509c5 12,87-101
+qase-mocha/src/parallel.ts
+  s_57b503ed365a5f::t_eba85180f3f594 5,11
+qase-mocha/test/resultBuilder.test.ts
+  s_57b503ed365a5f::t_b58ac2e88d5139 155-163
+qase-playwright/src/metadata-extractor.ts
+  s_57b503ed365a5f::t_063eb5ee65f390 81
+qase-playwright/src/reporter.ts
+  s_57b503ed365a5f::t_d179bd782c9b3e 24,27,85,90-95
+qase-playwright/src/result-builder.ts
+  s_57b503ed365a5f::t_950734bb4e2eb3 62,268-275
+qase-playwright/test/metadata-extractor.test.ts
+  s_57b503ed365a5f::t_21ad5d0984f3ff 61-68
+qase-playwright/test/result-builder.test.ts
+  s_57b503ed365a5f::t_e19195bbe75514 199-208
+qase-testcafe/src/modules/metadataParser.ts
+  s_57b503ed365a5f::t_62d014e9bd1273 1,20,24
+qase-testcafe/src/modules/resultBuilder.ts
+  s_57b503ed365a5f::t_c07a00c7274977 1,10,139,141
+qase-wdio/docs/ATTACHMENTS.md
+  s_57b503ed365a5f::t_75caf29ed7985a 22,162,165-175,179-180,189-190,224-225,262,398,419
+qase-wdio/docs/UPGRADE.md
+  s_57b503ed365a5f::t_711882f342a92e 251-252,378,381-387,389-391,393-394
+qase-wdio/docs/usage.md
+  s_57b503ed365a5f::t_253c5ea09672ba 141-149,157-158
+qase-wdio/test/lifecycle.test.ts
+  s_57b503ed365a5f::t_a50007dfeef6cf 133-141
+qase-wdio/test/metadata.test.ts
+  s_57b503ed365a5f::t_f1bd65af962945 110,112-121,123-142
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3a0c89282c516e4b29adb1140192bd224806f5aa",
+  "prompts": {},
+  "sessions": {
+    "s_57b503ed365a5f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4c6749a7-7eb3-4ee9-891f-611f479b9abc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
