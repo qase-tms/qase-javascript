@@ -156,7 +156,7 @@ Configure in `wdio.conf.js`:
 | `disableWebdriverScreenshotsReporting` | boolean | `false` | Disable automatic screenshot attachments |
 | `useCucumber` | boolean | `false` | Enable Cucumber integration (set to `true` if using Cucumber) |
 
-> **Full configuration reference:** See [qase-javascript-commons](../qase-javascript-commons/README.md) for all available options including logging, status mapping, execution plans, and more.
+> **Full configuration reference:** See [qase-javascript-commons](https://github.com/qase-tms/qase-javascript/blob/main/qase-javascript-commons/README.md) for all available options including logging, status mapping, execution plans, and more.
 
 ## Usage
 
@@ -218,7 +218,7 @@ Scenario: Login with metadata
   Given I am on the login page
 ```
 
-Gherkin tags cannot contain whitespace, so tag values use `_` instead of spaces. See the [full list of tags](docs/usage.md#supported-cucumber-tags), including `@QaseIgnore`, `@QaseParameters` and `@qaseid.PROJ(ids)`.
+Gherkin tags cannot contain whitespace, so tag values use `_` instead of spaces. See the [full list of tags](https://github.com/qase-tms/qase-javascript/blob/main/qase-wdio/docs/usage.md#supported-cucumber-tags), including `@QaseIgnore`, `@QaseParameters` and `@qaseid.PROJ(ids)`.
 
 ### Add Steps
 
@@ -290,7 +290,7 @@ it('Ignored test', () => {
 | failed | failed |
 | skipped | skipped |
 
-> For more usage examples, see the [Usage Guide](docs/usage.md).
+> For more usage examples, see the [Usage Guide](https://github.com/qase-tms/qase-javascript/blob/main/qase-wdio/docs/usage.md).
 
 ## Running Tests
 
@@ -357,7 +357,7 @@ it(qase.projects({ PROJ1: [1], PROJ2: [2] }, 'Multi-project test'), () => {
 }
 ```
 
-For detailed information, see the [Multi-Project Support Guide](docs/MULTI_PROJECT.md).
+For detailed information, see the [Multi-Project Support Guide](https://github.com/qase-tms/qase-javascript/blob/main/qase-wdio/docs/MULTI_PROJECT.md).
 
 ## Network Profiler
 
@@ -399,26 +399,26 @@ exports.config = {
 
 ## Requirements
 
-- Node.js >= 14
+- Node.js >= 18
 - WebdriverIO >= 8.40.0
 
 ## Documentation
 
 | Guide | Description |
 |-------|-------------|
-| [Usage Guide](docs/usage.md) | Complete usage reference with all methods and options |
-| [Attachments](docs/ATTACHMENTS.md) | Adding screenshots, logs, and files to test results |
-| [Steps](docs/STEPS.md) | Defining test steps for detailed reporting |
-| [Multi-Project Support](docs/MULTI_PROJECT.md) | Reporting to multiple Qase projects |
-| [Upgrade Guide](docs/UPGRADE.md) | Migration guide for breaking changes |
-| [Configuration Reference](../qase-javascript-commons/README.md) | Full configuration options |
+| [Usage Guide](https://github.com/qase-tms/qase-javascript/blob/main/qase-wdio/docs/usage.md) | Complete usage reference with all methods and options |
+| [Attachments](https://github.com/qase-tms/qase-javascript/blob/main/qase-wdio/docs/ATTACHMENTS.md) | Adding screenshots, logs, and files to test results |
+| [Steps](https://github.com/qase-tms/qase-javascript/blob/main/qase-wdio/docs/STEPS.md) | Defining test steps for detailed reporting |
+| [Multi-Project Support](https://github.com/qase-tms/qase-javascript/blob/main/qase-wdio/docs/MULTI_PROJECT.md) | Reporting to multiple Qase projects |
+| [Upgrade Guide](https://github.com/qase-tms/qase-javascript/blob/main/qase-wdio/docs/UPGRADE.md) | Migration guide for breaking changes |
+| [Configuration Reference](https://github.com/qase-tms/qase-javascript/blob/main/qase-javascript-commons/README.md) | Full configuration options |
 
 ## Examples
 
-See the [examples directory](../examples/) for complete working examples:
-- [Mocha/Jasmine example](../examples/multiProject/wdio/)
-- Cucumber examples (check examples directory)
+See the [examples directory](https://github.com/qase-tms/qase-javascript/tree/main/examples) for complete working examples:
+- [Single-project example](https://github.com/qase-tms/qase-javascript/tree/main/examples/single/wdio)
+- [Multi-project example](https://github.com/qase-tms/qase-javascript/tree/main/examples/multiProject/wdio)
 
 ## License
 
-Apache License 2.0. See [LICENSE](LICENSE) for details.
+Apache License 2.0. See [LICENSE](https://github.com/qase-tms/qase-javascript/blob/main/qase-wdio/LICENSE) for details.
