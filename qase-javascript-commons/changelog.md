@@ -1,3 +1,9 @@
+## 2.9.12
+
+### Security
+
+- Requires `qase-api-client` 1.1.17 and `qase-api-v2-client` 1.0.13, which depend on `axios` `^1.20.0`. The previous clients allowed `axios` from 1.18.1, and axios up to 1.19.0 is affected by several high-severity advisories (prototype-pollution gadgets, ReDoS, header injection, proxy and redirect bypasses, e.g. GHSA-vh66-26gq-q6x8, GHSA-mghh-pgcx-3jjj, GHSA-r4gj-5m52-g5wh). A project whose lockfile still holds an older axios gets the fixed version with `npm update qase-javascript-commons` (or by updating the reporter).
+
 ## 2.9.11
 
 ### Fixed
