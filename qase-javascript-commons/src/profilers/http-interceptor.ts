@@ -290,7 +290,7 @@ export class HttpInterceptor {
 
                 // Push to accumulator — re-fetch in case context is still active
                 const acc = self.store.getStore();
-                if (acc !== undefined && acc !== null) {
+                if (acc) {
                   acc.push(step);
                 } else {
                   // No ALS context — push to fallback accumulator (for Jest/Vitest/WDIO workers)

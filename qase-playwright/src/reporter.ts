@@ -85,7 +85,9 @@ export class PlaywrightQaseReporter implements Reporter {
     configLoader = new ConfigLoader(configSchema),
   ) {
     const config = configLoader.load();
-    const { framework, ...composedOptions } = composeOptions(options, config);
+    const composedOptions = composeOptions(options, config);
+    // QaseReporter gets the common options only; the playwright framework block is read below.
+    delete composedOptions.framework;
 
     // Inline options are flat (`framework.browser`), the config file nests them under
     // `framework.playwright`; inline wins to keep the pre-file-support precedence.

@@ -31,7 +31,8 @@ export function resolveUserOptions(reporterOptions: unknown): unknown {
   return reporterOptions;
 }
 
-async function beforeRunHook(options: PluginConfigOptions) {
+// Users call these hooks from their own setupNodeEvents, so `options` may be missing.
+async function beforeRunHook(options: PluginConfigOptions | undefined) {
   const configLoader = new ConfigLoader(configSchema);
   const config = configLoader.load();
   const userOptions = resolveUserOptions(options?.reporterOptions);
@@ -50,7 +51,7 @@ async function beforeRunHook(options: PluginConfigOptions) {
   await reporter.startTestRunAsync();
 }
 
-async function afterRunHook(options: PluginConfigOptions) {
+async function afterRunHook(options: PluginConfigOptions | undefined) {
   const configLoader = new ConfigLoader(configSchema);
   const config = configLoader.load();
   const userOptions = resolveUserOptions(options?.reporterOptions);
@@ -68,7 +69,7 @@ async function afterRunHook(options: PluginConfigOptions) {
   await reporter.complete();
 }
 
-async function afterSpecHook(spec: Spec, options: PluginConfigOptions) {
+async function afterSpecHook(spec: Spec, options: PluginConfigOptions | undefined) {
   const results = ResultsManager.getResults();
   if (results) {
 
@@ -81,7 +82,7 @@ async function afterSpecHook(spec: Spec, options: PluginConfigOptions) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
     const browserConfig = composedOptions.framework?.cypress?.browser;
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    if (browserConfig?.addAsParameter && options.browser) {
+    if (browserConfig?.addAsParameter && options?.browser) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
       const paramName: string = browserConfig.parameterName ?? 'browser';
       const browserName = options.browser.name.toLowerCase();

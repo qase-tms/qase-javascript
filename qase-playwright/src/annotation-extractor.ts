@@ -1,6 +1,6 @@
 import { parseQaseIdsFromString } from 'qase-javascript-commons/internal';
 
-export type Annotation = { type: string; description?: string };
+export interface Annotation { type: string; description?: string }
 
 export class AnnotationExtractor {
   extractQaseIds(annotations: Annotation[]): number[] {
@@ -17,7 +17,7 @@ export class AnnotationExtractor {
     for (const item of annotations) {
       if (item.type.toLowerCase() === 'qaseprojects' && item.description) {
         try {
-          const parsed = JSON.parse(item.description) as Record<string, number[]>;
+          const parsed = JSON.parse(item.description) as Record<string, number[]> | null;
           if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
             return parsed;
           }

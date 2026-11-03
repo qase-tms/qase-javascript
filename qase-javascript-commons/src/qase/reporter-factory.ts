@@ -10,7 +10,7 @@ import { EnvApiEnum, EnvTestOpsEnum } from '../env';
 import { LoggerInterface } from '../utils/logger';
 import { DisabledException } from '../utils/disabled-exception';
 import { HostData } from '../models/host-data';
-import { TestOpsOptionsType } from '../models/config/TestOpsOptionsType';
+import { TestOpsOptionsType, TestOpsProjectConfigType } from '../models/config/TestOpsOptionsType';
 import { ClientV2 } from '../client/clientV2';
 import { DriverEnum, FsWriter } from '../writer';
 
@@ -92,12 +92,14 @@ export class ReporterFactory {
     }
 
     const multi = options.testops_multi;
-    if (!multi?.projects?.length) {
+    // User config is not trusted to match the type, so its shape is checked here.
+    const projects: readonly (Partial<TestOpsProjectConfigType> | null | undefined)[] | undefined = multi?.projects;
+    if (!multi || !projects?.length) {
       throw new Error(
         '"testops_multi.projects" must contain at least one project with a "code" field',
       );
     }
-    for (const p of multi.projects) {
+    for (const p of projects) {
       if (!p?.code) {
         throw new Error(
           'Each project in "testops_multi.projects" must have a "code" field',
@@ -114,7 +116,7 @@ export class ReporterFactory {
       options.reporterName,
       options.frameworkPackage,
       options.environment,
-      options.testops.api?.host,
+      options.testops.api.host,
       options.testops.batch?.size,
       options.testops.showPublicReportLink,
     );

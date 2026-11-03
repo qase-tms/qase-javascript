@@ -309,7 +309,8 @@ export class FetchInterceptor {
     for (let i = searchArray.length - 1; i >= 0; i--) {
       const step = searchArray[i];
       if (!step) continue;
-      const data = step.data as StepRequestData;
+      // Accumulators are public arrays of generic steps, so the request shape is not guaranteed.
+      const data = step.data as Partial<StepRequestData>;
       if (data.status_code !== statusCode) continue;
       if (data.response_body !== null) continue;
 

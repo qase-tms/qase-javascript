@@ -14,8 +14,8 @@ jest.mock('../../src/state/state', () => ({
 import { StateManager } from '../../src/state/state';
 
 const resetEnv = () => {
-  delete process.env[EnvEnum.mode];
-  delete process.env[EnvRunEnum.id];
+  Reflect.deleteProperty(process.env, EnvEnum.mode);
+  Reflect.deleteProperty(process.env, EnvRunEnum.id);
   delete process.env.QASE_MODE;
   delete process.env.QASE_TESTOPS_API_TOKEN;
 };

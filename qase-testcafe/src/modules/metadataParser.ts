@@ -61,7 +61,7 @@ export class MetadataParser {
 
     if (meta[metadataEnum.projects] !== undefined && meta[metadataEnum.projects] !== '') {
       try {
-        const parsed = JSON.parse(meta[metadataEnum.projects]) as Record<string, number[]>;
+        const parsed = JSON.parse(meta[metadataEnum.projects]) as Record<string, number[]> | null;
         if (parsed && typeof parsed === 'object') {
           metadata.QaseProjects = parsed;
         }

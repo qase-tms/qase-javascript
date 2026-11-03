@@ -33,7 +33,6 @@ export interface ResultBuilderArgs {
   startTimeMs?: number | null;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class ResultBuilder {
 
   static build(args: ResultBuilderArgs): TestResultType {

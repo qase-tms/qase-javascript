@@ -5,7 +5,6 @@ import path from 'path';
 import { Attachment, getMimeTypes } from 'qase-javascript-commons';
 import { reviveBuffer, toBuffer } from './buffer';
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class MetadataManager {
   static metadataPath = path.resolve(__dirname, 'qaseMetadata');
 

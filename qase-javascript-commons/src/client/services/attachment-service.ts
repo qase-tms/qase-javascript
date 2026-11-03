@@ -114,7 +114,8 @@ export class AttachmentService {
 
   async uploadAttachmentsMapped(
     projectCode: string,
-    attachments: Attachment[],
+    // Collected from results that may be rehydrated from JSON, so holes are possible.
+    attachments: readonly (Attachment | null | undefined)[],
     uploadEnabled: boolean,
   ): Promise<Map<Attachment, string>> {
     const hashByAttachment = new Map<Attachment, string>();

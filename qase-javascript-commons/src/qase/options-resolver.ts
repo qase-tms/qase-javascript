@@ -33,8 +33,8 @@ export class OptionsResolver {
     const composed = composeOptions(options, env);
 
     return {
-      effectiveMode: (composed.mode as ModeEnum) ?? ModeEnum.off,
-      effectiveFallback: (composed.fallback as ModeEnum) ?? ModeEnum.off,
+      effectiveMode: (composed.mode as ModeEnum | undefined) ?? ModeEnum.off,
+      effectiveFallback: (composed.fallback as ModeEnum | undefined) ?? ModeEnum.off,
       composed,
       withState,
     };

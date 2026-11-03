@@ -12,7 +12,6 @@ const markerPath = (): string | null => {
   return session ? path.join(tmpdir(), `qase-run-${session}.failed`) : null;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class RunFailures {
   static begin(): void {
     if (!process.env[SESSION_ENV]) {

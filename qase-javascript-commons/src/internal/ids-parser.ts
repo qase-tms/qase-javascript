@@ -9,7 +9,8 @@ import { LoggerInterface } from '../utils/logger';
  * Examples: "1,2,3" → [1, 2, 3], "42" → [42], "" → [].
  */
 export function parseQaseIdsFromString(
-  value: string,
+  // Reporters pass raw framework metadata (annotation descriptions, test meta), which can be absent.
+  value: string | null | undefined,
   logger?: LoggerInterface,
 ): number[] {
   if (!value?.trim()) {

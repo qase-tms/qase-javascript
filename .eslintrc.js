@@ -34,5 +34,18 @@ module.exports = {
       'plugin:@typescript-eslint/recommended-requiring-type-checking',
       'plugin:@typescript-eslint/strict',
     ],
+
+    rules: {
+      // Static-only classes group a module's helpers; the codebase uses them throughout.
+      '@typescript-eslint/no-extraneous-class': ['warn', { allowStaticOnly: true }],
+    },
+  }, {
+    // Tests read private state and assert on values they have just checked.
+    files: '**/test/**/*.ts',
+
+    rules: {
+      '@typescript-eslint/dot-notation': ['warn', { allowPrivateClassPropertyAccess: true, allowProtectedClassPropertyAccess: true }],
+      '@typescript-eslint/no-non-null-assertion': 'off',
+    },
   }],
 };

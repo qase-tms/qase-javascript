@@ -86,10 +86,12 @@ export class ResultTransformer {
       model.id = result.id;
     }
 
-    if (result.tags && result.tags.length > 0) {
+    // Results rehydrated from JSON written by another process may predate the `tags` field.
+    const tags = result.tags as string[] | undefined;
+    if (tags && tags.length > 0) {
       model.fields = {
         ...model.fields,
-        tags: [...new Set(result.tags)].join(','),
+        tags: [...new Set(tags)].join(','),
       };
     }
 
@@ -161,11 +163,13 @@ export class ResultTransformer {
       step.execution.status,
     );
 
-    if (step.step_type === StepType.TEXT) {
+    // Steps can arrive as JSON from another process, so a missing type is skipped, not assumed.
+    const stepType = step.step_type as StepType | undefined;
+    if (stepType === StepType.TEXT) {
       this.processTextStep(step, resultStep, testTitle);
-    } else if (step.step_type === StepType.GHERKIN) {
+    } else if (stepType === StepType.GHERKIN) {
       this.processGherkinStep(step, resultStep);
-    } else if (step.step_type === StepType.REQUEST) {
+    } else if (stepType === StepType.REQUEST) {
       this.processRequestStep(step, resultStep);
     }
 
@@ -242,7 +246,8 @@ export class ResultTransformer {
   }
 
   private transformParams(
-    params: Record<string, string>,
+    // Frameworks hand over parameter values of any type, including null/undefined.
+    params: Record<string, unknown>,
   ): Record<string, string> {
     const transformedParams: Record<string, string> = {};
     for (const [key, value] of Object.entries(params)) {

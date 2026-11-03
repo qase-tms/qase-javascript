@@ -95,7 +95,7 @@ describeOrSkip('FetchInterceptor', () => {
     expect(step.execution.start_time).not.toBeNull();
     expect(step.execution.end_time).not.toBeNull();
     expect(step.execution.duration).not.toBeNull();
-    expect((step.execution.duration as number) >= 0).toBe(true);
+    expect(step.execution.duration! >= 0).toBe(true);
   });
 
   it('fetch() with status 200 has response_body: null', async () => {

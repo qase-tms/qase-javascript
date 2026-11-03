@@ -2,7 +2,6 @@ import { EventList, Item, PropertyBase, PropertyBaseDefinition } from 'postman-c
 import { TestopsProjectMapping } from 'qase-javascript-commons';
 import { filterPositiveIds } from 'qase-javascript-commons/internal';
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class MetadataExtractor {
   static qaseIdRegExp = /\/\/\s*?[qQ]ase:\s?((?:[\d]+[\s,]{0,})+)/;
   static qaseParamRegExp = /qase\.parameters:\s*([\w.]+(?:\s*,\s*[\w.]+)*)/i;

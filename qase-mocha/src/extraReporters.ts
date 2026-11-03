@@ -5,13 +5,16 @@ export interface ExtraReporterConfig {
   options?: Record<string, unknown>;
 }
 
+type ReporterConstructor = new (runner: Mocha.Runner, options: Mocha.MochaOptions) => Mocha.reporters.Base;
+
 export type ExtraReportersConfig = string | ExtraReporterConfig | (string | ExtraReporterConfig)[];
 
 // Mocha splits `--reporter-option` values on ',', so on the command line reporters are
 // separated with ';' instead: --reporter-option "extraReporters=spec;json".
 function splitReporterNames(value: string): string | string[] {
   const names = value.split(/[;,]/).map((name) => name.trim()).filter(Boolean);
-  return names.length === 1 ? names[0]! : names;
+  const [only, ...rest] = names;
+  return only !== undefined && rest.length === 0 ? only : names;
 }
 
 /**
@@ -38,7 +41,7 @@ export function parseExtraReporters(options: Mocha.MochaOptions, config?: Record
   }
 
   // If not found in Mocha options, try to get from qase.config.json
-  if (config && config['extraReporters']) {
+  if (config?.['extraReporters']) {
     if (typeof config['extraReporters'] === 'string') {
       return splitReporterNames(config['extraReporters']);
     }
@@ -47,7 +50,7 @@ export function parseExtraReporters(options: Mocha.MochaOptions, config?: Record
       return config['extraReporters'] as (string | ExtraReporterConfig)[];
     }
     
-    if (typeof config['extraReporters'] === 'object' && config['extraReporters'] !== null) {
+    if (typeof config['extraReporters'] === 'object') {
       return config['extraReporters'] as ExtraReporterConfig;
     }
   }
@@ -86,17 +89,15 @@ export function createExtraReporters(
         continue;
       }
 
-      // Load the reporter
-      let ReporterClass: new (runner: Mocha.Runner, options: Mocha.MochaOptions) => Mocha.reporters.Base;
+      // A user-named module, so its export is checked before being constructed.
+      let ReporterClass: unknown;
       
       try {
         // Try to load built-in reporter first
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         ReporterClass = require(`mocha/lib/reporters/${reporterName}`);
       } catch {
         try {
           // Try to load as external package
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           ReporterClass = require(reporterName);
         } catch {
           console.warn(`Failed to load reporter: ${reporterName}`);
@@ -104,7 +105,7 @@ export function createExtraReporters(
         }
       }
 
-      if (ReporterClass && typeof ReporterClass === 'function') {
+      if (typeof ReporterClass === 'function') {
         // Create reporter instance with clean options (without main reporter options)
         const cleanOptions = {
           ...options,
@@ -117,7 +118,7 @@ export function createExtraReporters(
           'reporter-option': reporterOptions
         };
         
-        const reporter = new ReporterClass(runner, cleanOptions);
+        const reporter = new (ReporterClass as ReporterConstructor)(runner, cleanOptions);
         reporters.push(reporter);
       }
     } catch (error) {

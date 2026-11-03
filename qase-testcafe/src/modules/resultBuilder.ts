@@ -67,7 +67,8 @@ export class ResultBuilder {
     }
 
     const projectMapping = metadata[metadataEnum.projects];
-    const hasProjectMapping = projectMapping && Object.keys(projectMapping).length > 0;
+    const suite = metadata[metadataEnum.suite];
+    const hasProjectMapping = Object.keys(projectMapping).length > 0;
 
     return {
       author: null,
@@ -87,8 +88,8 @@ export class ResultBuilder {
       group_params: metadata[metadataEnum.groupParameters],
       relations: {
         suite: {
-          data: metadata[metadataEnum.suite]
-            ? metadata[metadataEnum.suite]!.split('\t').map((s) => ({
+          data: suite
+            ? suite.split('\t').map((s) => ({
                 title: s,
                 public_id: null,
               }))
