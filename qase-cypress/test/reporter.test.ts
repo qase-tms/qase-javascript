@@ -343,3 +343,19 @@ describe('CypressQaseReporter', () => {
     });
   });
 }); 
+
+describe('CypressQaseReporter without mocha installed', () => {
+  it('loads and subscribes to the runner without requiring mocha', () => {
+    jest.isolateModules(() => {
+      jest.doMock('mocha', () => { throw new Error('mocha is not installed'); });
+      const { CypressQaseReporter: IsolatedReporter } = require('../src/reporter');
+      const runner = { on: jest.fn(), once: jest.fn() };
+
+      new IsolatedReporter(runner, { reporterOptions: {} }, { load: jest.fn(() => ({})) });
+
+      expect(runner.on).toHaveBeenCalledWith('pass', expect.any(Function));
+      expect(runner.once).toHaveBeenCalledWith('end', expect.any(Function));
+      jest.dontMock('mocha');
+    });
+  });
+});

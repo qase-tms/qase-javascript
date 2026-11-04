@@ -1,3 +1,15 @@
+# cypress-qase-reporter@3.9.0
+
+## Changed
+
+- Supported versions are now Cypress `>=13.0.0 <17.0.0` and Node.js `^22 || ^24 || >=26`, the Node.js versions Cypress 16 supports. The reporter is tested against Cypress 16. Stay on 3.8.x for Cypress 10–12 or Node.js 18/20.
+- `mocha` is now an optional peer dependency. The reporter no longer loads mocha at runtime and uses only its types, so installing the reporter does not add a second copy of mocha next to the one bundled with Cypress.
+- The `log` task registered by `cypress-qase-reporter/metadata` is renamed to `qaseLog`. A generic `log` collided with user tasks of the same name.
+
+## Documentation
+
+- README: `framework.cypress.uploadDelay`, the wait before each spec's video upload (10 seconds by default), is now documented, along with the trade-off of lowering it.
+
 # cypress-qase-reporter@3.8.2
 
 ## Fixed

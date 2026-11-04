@@ -16,6 +16,14 @@ This guide covers migration steps between major versions of the Qase Cypress Rep
 
 ---
 
+## Upgrading to 3.9.0
+
+- **Node.js 22, 24 or >= 26** and **Cypress 13 – 16** are required, matching what Cypress 16 supports. Stay on 3.8.x for older Node.js or Cypress.
+- `mocha` is no longer a required peer dependency: the reporter runs on the mocha bundled with Cypress. Install it yourself only if your own setup needs it, e.g. for `cypress-multi-reporters`.
+- The `log` task registered by `cypress-qase-reporter/metadata` is renamed to `qaseLog`, so it no longer overrides a `log` task of your own. If you called `cy.task('log', ...)` without registering it yourself, register it in `setupNodeEvents`.
+
+---
+
 ## Upgrading to 3.x from 2.x
 
 Version 3.0.0 introduces video attachment support for Cypress tests, allowing automatic upload of test execution videos to Qase.
@@ -155,7 +163,7 @@ reporterOptions: {
   framework: {
     cypress: {
       videosFolder: 'cypress/videos',
-      uploadDelay: 10, // Wait 10 seconds before video upload
+      uploadDelay: 5, // Wait 5 seconds before video upload
     },
   },
 }
@@ -164,9 +172,8 @@ reporterOptions: {
 ### Video Upload Behavior
 
 - Videos are automatically attached to test results when video recording is enabled
-- Only videos for failed tests are uploaded by default (Cypress behavior)
-- Configure `videoUploadOnPasses: true` in Cypress config to upload videos for passing tests
-- Videos are uploaded after the spec file completes execution
+- Cypress records one video per spec, and the reporter attaches it to every result of that spec
+- Videos are uploaded after the spec file completes execution, `uploadDelay` seconds later (10 by default)
 
 ---
 
@@ -290,12 +297,14 @@ it(qase(1, 'Test with screenshot and video'), () => {
 
 ### Node.js Version Support
 
-- **v3.6.3 and later:** Node.js >= 18
+- **v3.9.0 and later:** Node.js 22, 24 or >= 26
+- **v3.6.3 – v3.8.x:** Node.js >= 18
 - **v3.6.2 and earlier:** Node.js >= 14
 
 ### Cypress Version Support
 
-- **v3.2.0:** Cypress >= 10.0.0
+- **v3.9.0 and later:** Cypress >= 13.0.0 < 17.0.0
+- **v3.2.0 – v3.8.x:** Cypress >= 10.0.0
 - **v2.3.x:** Cypress >= 8.0.0
 
 **Note:** Cypress 10+ uses the new configuration format with `setupNodeEvents`. If upgrading from Cypress 9 or earlier, you'll also need to migrate your Cypress configuration.

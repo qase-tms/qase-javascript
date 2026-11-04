@@ -93,7 +93,7 @@ module.exports = function(on) {
   });
 
   on('task', {
-    log(message) {
+    qaseLog(message) {
       console.log(message);
       return null;
     },
