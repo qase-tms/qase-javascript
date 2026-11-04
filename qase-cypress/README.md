@@ -187,6 +187,13 @@ module.exports = defineConfig({
 }
 ```
 
+### Video options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `framework.cypress.videosFolder` | Folder the reporter searches for spec videos to attach. Videos are not uploaded without it | — |
+| `framework.cypress.uploadDelay` | Seconds to wait after each spec before uploading its video (0–300). The wait applies to every spec that has a video, so it adds up on long suites; lower it to speed up runs. At `0` the first video upload of a run can fail and leave the run without results, so keep at least a few seconds | `10` |
+
 > **Full configuration reference:** See [qase-javascript-commons](../qase-javascript-commons/README.md) for all available options including logging, status mapping, execution plans, and more.
 
 ## Usage
@@ -343,8 +350,8 @@ The support file registers a `beforeEach` hook that installs `cy.intercept('**')
 
 ## Requirements
 
-- Node.js >= 18
-- Cypress >= 10.0.0
+- Node.js 22, 24 or >= 26 (the versions Cypress 16 supports)
+- Cypress >= 13.0.0 < 17.0.0
 
 ## Documentation
 

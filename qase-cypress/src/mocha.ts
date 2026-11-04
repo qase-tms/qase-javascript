@@ -1,4 +1,4 @@
-import { Test } from 'mocha';
+import type { Test } from 'mocha';
 import { formatTitleWithProjectMapping } from 'qase-javascript-commons';
 
 /** Project code → test case IDs for multi-project (testops_multi) mode. */

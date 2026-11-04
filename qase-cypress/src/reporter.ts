@@ -1,6 +1,6 @@
 // import { spawnSync } from 'child_process';
 
-import { MochaOptions, reporters, Runner, Suite, Test } from 'mocha';
+import type { MochaOptions, Runner, Suite, Test } from 'mocha';
 
 import {
   composeOptions,
@@ -19,14 +19,14 @@ import { StepConverter } from './step-converter';
 import { ResultBuilder } from './result-builder';
 import { SkippedTestHandler } from './skipped-test-handler';
 
-const {
-  EVENT_TEST_FAIL,
-  EVENT_TEST_PASS,
-  EVENT_TEST_PENDING,
-  EVENT_RUN_END,
-  EVENT_TEST_BEGIN,
-  EVENT_SUITE_END
-} = Runner.constants;
+// Mocha's Runner.constants, inlined so the reporter does not load mocha at runtime:
+// Cypress drives the reporter with its own bundled mocha, and a required peer would install a second copy.
+const EVENT_TEST_FAIL = 'fail';
+const EVENT_TEST_PASS = 'pass';
+const EVENT_TEST_PENDING = 'pending';
+const EVENT_RUN_END = 'end';
+const EVENT_TEST_BEGIN = 'test';
+const EVENT_SUITE_END = 'suite end';
 
 type CypressState = 'failed' | 'passed' | 'pending';
 
@@ -36,9 +36,8 @@ export type CypressQaseOptionsType = Omit<MochaOptions, 'reporterOptions'> & {
 
 /**
  * @class CypressQaseReporter
- * @extends reporters.Base
  */
-export class CypressQaseReporter extends reporters.Base {
+export class CypressQaseReporter {
   /**
    * @type {Record<CypressState, TestStatusEnum>}
    */
@@ -93,8 +92,6 @@ export class CypressQaseReporter extends reporters.Base {
     options: CypressQaseOptionsType,
     configLoader = new ConfigLoader(configSchema),
   ) {
-    super(runner, options);
-
     const { reporterOptions } = options;
     const config = configLoader.load();
     const { framework, ...composedOptions } = composeOptions(reporterOptions, config);

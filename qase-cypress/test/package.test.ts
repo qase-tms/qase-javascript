@@ -6,4 +6,8 @@ describe('package.json', () => {
   it('points the root types at the declarations of the root export', () => {
     expect(pkg.types).toBe(pkg.exports['.'].replace(/\.js$/, '.d.ts'));
   });
+
+  it('does not require its own copy of mocha', () => {
+    expect(pkg.peerDependenciesMeta.mocha.optional).toBe(true);
+  });
 });
