@@ -1,0 +1,58 @@
+qase-cypress/src/reporter.ts
+  s_2628dbff04e195::t_0b20ff3ab1fa43 3,22-29,40
+qase-cypress/src/mocha.ts
+  s_2628dbff04e195::t_4931c77a2b7cf3 1
+qase-cypress/src/metadata.js
+  s_2628dbff04e195::t_0b20ff3ab1fa43 96
+examples/single/cypressCucumber/package.json
+  s_2628dbff04e195::t_b7bf469a846d5c 8
+examples/multiProject/cypress/package.json
+  s_2628dbff04e195::t_b7bf469a846d5c 8
+qase-cypress/test/package.test.ts
+  s_2628dbff04e195::t_ab2a139bee21ae 9-12
+qase-cypress/test/reporter.test.ts
+  s_2628dbff04e195::t_ab2a139bee21ae 346-361
+qase-cypress/README.md
+  s_2628dbff04e195::t_d61fb08c64f4a7 195
+  s_2628dbff04e195::t_85907b5bf90cf6 190-194,196,353-354
+examples/single/cypress/package.json
+  s_2628dbff04e195::t_b7bf469a846d5c 8
+examples/single/cypressBadeballCucumber/package.json
+  s_2628dbff04e195::t_b7bf469a846d5c 11
+qase-cypress/docs/UPGRADE.md
+  s_2628dbff04e195::t_85907b5bf90cf6 166,300-301,306-307
+  s_2628dbff04e195::t_588f4cffc74a1c 19-26,175
+  s_2628dbff04e195::t_3d420dd30c1777 176
+examples/multiProject/cypressCucumber/package.json
+  s_2628dbff04e195::t_b7bf469a846d5c 8
+qase-cypress/changelog.md
+  s_2628dbff04e195::t_588f4cffc74a1c 1-7,12
+  s_2628dbff04e195::t_3d420dd30c1777 8-11
+examples/multiProject/cypressBadeballCucumber/package.json
+  s_2628dbff04e195::t_b7bf469a846d5c 10
+qase-cypress/package.json
+  s_2628dbff04e195::t_20f33eb66adf0f 78
+  s_2628dbff04e195::t_1c5ce088f3a431 3,50,65,70
+qase-cypress/test/metadata.test.ts
+  s_2628dbff04e195::t_459d1613fada67 11
+  s_2628dbff04e195::t_0286a4ffeb12bd 3-4,8-9,13
+  s_2628dbff04e195::t_ab2a139bee21ae 1-2,5-7,10,12,14-15
+package-lock.json
+  s_2628dbff04e195::t_2ba029f991766e 193,198-262,268,273-337,341,347-411,797,804-868,877,884-948,994,1000-1064,4099,4128,4139,6814,6821,6835,8913,9836,10165,10224,10555,10569,10576,10629,10677,10693,10710,10723,10740,10891,10963,11905,11908,12136,12138,12261,13448,14399,14406,14497,15517,15845,16172,16189,16665,17062,17125,18975,18993,19006,19019,19026,19044,19060,19210,19261,19355,19371,19384,19397,19404,19421,19439,19455,19739,20936,21382,22072,22247,22953,23138,23155,23171,23204,23901,23918,24653,25792,25955,25968,26030,26648,28055,28467,28478,28484,28487,28492,28496-28560
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "671175f28dea3553ca456fba6097eed1eeb4a76e",
+  "prompts": {},
+  "sessions": {
+    "s_2628dbff04e195": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32c7e04e-636c-45eb-b4d0-238b8db75384",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Dmitrii Gridnev <dgridnev@qase.io>"
+    }
+  }
+}
